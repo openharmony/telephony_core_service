@@ -88,6 +88,17 @@ std::string NetworkUtils::FormatString(const std::string &format, Args... args)
 
 class NetworkSearchManager;
 class ITelRilManager;
+/**
+ * @brief function pointer of class ITelRilManager.
+ *
+ */
+using RilFunc_Event = std::function<int32_t(ITelRilManager *, int32_t, const AppExecFwk::InnerEvent::Pointer &)>;
+using RilFunc_Int_Event =
+    std::function<int32_t(ITelRilManager *, int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &)>;
+using RilFunc_Int_Int_Event =
+    std::function<int32_t(ITelRilManager *, int32_t, int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &)>;
+using RilFunc_Int_String_Event =
+    std::function<int32_t(ITelRilManager *, int32_t, int32_t, std::string, const AppExecFwk::InnerEvent::Pointer &)>;
 class EventSender {
 public:
     EventSender(
@@ -234,11 +245,12 @@ private:
      *
      * @tparam T function pointer type. see RilFunc_Event, RilFunc_Int_Event,
      * RilFunc_Int_Int_Event, RilFunc_Int_String_Event
+     * @param funcs map of function pointer
      * @param radioEvent see RadioEvent
      * @return T function pointer . if not found , it is nullptr
      */
     template<typename T>
-    T GetFunctionOfEvent(RadioEvent radioEvent);
+    T GetFunctionOfEvent(const std::map<RadioEvent, T> &funcs, RadioEvent radioEvent);
 
     /**
      * @brief Send event to model of TelRilManager
@@ -274,18 +286,22 @@ private:
      * @brief map of function pointer
      *
      */
-    static const std::map<RadioEvent, std::any> mapFunctions_;
+    static const std::map<RadioEvent, RilFunc_Event> mapFunctions_;
+    static const std::map<RadioEvent, RilFunc_Int_Event> mapFunctionsInt_;
+    static const std::map<RadioEvent, RilFunc_Int_Int_Event> mapFunctionsIntInt_;
+    static const std::map<RadioEvent, RilFunc_Int_String_Event> mapFunctionsIntString_;
+
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 };
 
 template<typename T>
-T EventSender::GetFunctionOfEvent(RadioEvent radioEvent)
+T EventSender::GetFunctionOfEvent(const std::map<RadioEvent, T> &funcs, RadioEvent radioEvent)
 {
-    auto itFunc = mapFunctions_.find(radioEvent);
-    if (itFunc != mapFunctions_.end() && itFunc->second.has_value()) {
+    auto itFunc = funcs.find(radioEvent);
+    if (itFunc != funcs.end()) {
         TELEPHONY_LOGD("GetFunctionOfEvent find");
-        return std::any_cast<T>(itFunc->second);
+        return itFunc->second;
     }
     TELEPHONY_LOGI("GetFunctionOfEvent nullptr , radioEvent: %{public}d", radioEvent);
     return nullptr;
@@ -339,7 +355,7 @@ bool EventSender::Send(
         TELEPHONY_LOGE("EventSender::Send telRilManager_.get() is null.");
         return false;
     }
-    if ((telRilManager_.get()->*rilFuncPointer)(slotId, args..., event) != TELEPHONY_ERR_SUCCESS) {
+    if (rilFuncPointer(telRilManager_.get(), slotId, args..., event) != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("EventSender::Send process ril function error.");
         return false;
     }

@@ -438,22 +438,14 @@ int32_t TelRilManager::SetBarringPassword(int32_t slotId, const char *oldPasswor
 int32_t TelRilManager::SendDtmf(
     int32_t slotId, const DtmfParam &dtmfParam, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    // Define the function pointer type here, it is necessary to deal with
-    // the function pointer difference caused by overloading
-    typedef int32_t (TelRilCall::*SendDtmfFunc)(
-        const std::string &, int32_t, int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), (SendDtmfFunc)&TelRilCall::SendDtmf,
-        dtmfParam.sDTMFCode, dtmfParam.index, dtmfParam.switchOn, dtmfParam.switchOff);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SendDtmfString, dtmfParam.sDTMFCode,
+        dtmfParam.index, dtmfParam.switchOn, dtmfParam.switchOff);
 }
 
 int32_t TelRilManager::SendDtmf(
     int32_t slotId, char cDTMFCode, int32_t index, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    // Define the function pointer type here, it is necessary to deal with
-    // the function pointer difference caused by overloading
-    typedef int32_t (TelRilCall::*SendDtmfFunc)(char, int32_t, const AppExecFwk::InnerEvent::Pointer &);
-    return TaskSchedule(
-        response, "TelRilCall", GetTelRilCall(slotId), (SendDtmfFunc)&TelRilCall::SendDtmf, cDTMFCode, index);
+    return TaskSchedule(response, "TelRilCall", GetTelRilCall(slotId), &TelRilCall::SendDtmf, cDTMFCode, index);
 }
 
 int32_t TelRilManager::StartDtmf(

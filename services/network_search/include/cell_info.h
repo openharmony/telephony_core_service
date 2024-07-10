@@ -72,7 +72,7 @@ private:
     sptr<CellInformation> currentCellInfo_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 
-    using CallInfoFunc = bool (CellInfo::*)(CellNearbyInfo *);
+    using CallInfoFunc = std::function<bool(CellInfo *, CellNearbyInfo *)>;
     static const std::map<TelRilRatType, CallInfoFunc> memberFuncMap_;
     int32_t slotId_ = 0;
     static int32_t signalBar_;

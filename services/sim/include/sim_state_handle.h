@@ -103,7 +103,7 @@ struct UnlockData {
 
 class SimStateHandle : public TelEventHandler {
 public:
-    using Func = void (SimStateHandle::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
+    using Func = std::function<void(SimStateHandle *, int32_t, const AppExecFwk::InnerEvent::Pointer &)>;
     explicit SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle() = default;
     void Init(int32_t slotId);

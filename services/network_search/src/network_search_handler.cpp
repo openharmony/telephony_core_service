@@ -34,50 +34,182 @@ const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
 const std::string PERMISSION_PUBLISH_SYSTEM_EVENT = "ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT";
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
-    { RadioEvent::RADIO_SIM_STATE_CHANGE, &NetworkSearchHandler::SimStateChange },
-    { RadioEvent::RADIO_IMSI_LOADED_READY, &NetworkSearchHandler::ImsiLoadedReady },
-    { RadioEvent::RADIO_SIM_RECORDS_LOADED, &NetworkSearchHandler::SimRecordsLoaded },
-    { RadioEvent::RADIO_STATE_CHANGED, &NetworkSearchHandler::RadioStateChange },
-    { RadioEvent::RADIO_NETWORK_STATE, &NetworkSearchHandler::GetNetworkStateInfo },
-    { RadioEvent::RADIO_RESTRICTED_STATE, &NetworkSearchHandler::RadioRestrictedState },
-    { RadioEvent::RADIO_DATA_REG_STATE, &NetworkSearchHandler::RadioRilDataRegState },
-    { RadioEvent::RADIO_VOICE_REG_STATE, &NetworkSearchHandler::RadioRilVoiceRegState },
-    { RadioEvent::RADIO_GET_SIGNAL_STRENGTH, &NetworkSearchHandler::RadioSignalStrength },
-    { RadioEvent::RADIO_SIGNAL_STRENGTH_UPDATE, &NetworkSearchHandler::RadioSignalStrength },
-    { RadioEvent::RADIO_OPERATOR, &NetworkSearchHandler::RadioRilOperator },
-    { RadioEvent::RADIO_NETWORK_SEARCH_RESULT, &NetworkSearchHandler::NetworkSearchResult },
-    { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE, &NetworkSearchHandler::GetNetworkSelectionModeResponse },
-    { RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &NetworkSearchHandler::SetNetworkSelectionModeResponse },
-    { RadioEvent::RADIO_GET_STATUS, &NetworkSearchHandler::GetRadioStateResponse },
-    { RadioEvent::RADIO_SET_STATUS, &NetworkSearchHandler::SetRadioStateResponse },
-    { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, &NetworkSearchHandler::SetPreferredNetworkResponse },
-    { RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &NetworkSearchHandler::GetPreferredNetworkResponse },
-    { RadioEvent::RADIO_NETWORK_TIME_UPDATE, &NetworkSearchHandler::RadioNitzUpdate },
-    { RadioEvent::RADIO_IMS_SERVICE_STATUS_UPDATE, &NetworkSearchHandler::UpdateImsServiceStatus },
-    { RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE, &NetworkSearchHandler::UpdateImsRegisterState },
-    { RadioEvent::RADIO_GET_IMEI, &NetworkSearchHandler::RadioGetImei },
-    { RadioEvent::RADIO_GET_IMEISV, &NetworkSearchHandler::RadioGetImeiSv },
-    { RadioEvent::RADIO_GET_MEID, &NetworkSearchHandler::RadioGetMeid },
-    { RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO, &NetworkSearchHandler::RadioGetNeighboringCellInfo },
-    { RadioEvent::RADIO_GET_CURRENT_CELL_INFO, &NetworkSearchHandler::RadioGetCurrentCellInfo },
-    { RadioEvent::RADIO_CURRENT_CELL_UPDATE, &NetworkSearchHandler::RadioCurrentCellInfoUpdate },
-    { RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE, &NetworkSearchHandler::RadioChannelConfigInfo },
-    { RadioEvent::RADIO_VOICE_TECH_CHANGED, &NetworkSearchHandler::RadioVoiceTechChange },
-    { RadioEvent::RADIO_GET_VOICE_TECH, &NetworkSearchHandler::RadioVoiceTechChange },
-    { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE, &NetworkSearchHandler::DcPhysicalLinkActiveUpdate },
-    { RadioEvent::RADIO_GET_BASEBAND_VERSION, &NetworkSearchHandler::RadioGetBasebandVersion },
-    { RadioEvent::RADIO_SET_NR_OPTION_MODE, &NetworkSearchHandler::SetNrOptionModeResponse },
-    { RadioEvent::RADIO_GET_NR_OPTION_MODE, &NetworkSearchHandler::GetNrOptionModeResponse },
-    { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
-    { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE, &NetworkSearchHandler::RadioGetRrcConnectionState },
-    { RadioEvent::NOTIFY_STATE_CHANGE, &NetworkSearchHandler::NotifyStateChange },
-    { RadioEvent::DELAY_NOTIFY_STATE_CHANGE, &NetworkSearchHandler::HandleDelayNotifyEvent },
-    { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE, &NetworkSearchHandler::RadioResidentNetworkChange },
-    { RadioEvent::RADIO_GET_NR_SSBID_INFO, &NetworkSearchHandler::GetNrSsbIdResponse },
-    { SettingEventCode::MSG_AUTO_TIME, &NetworkSearchHandler::AutoTimeChange },
-    { SettingEventCode::MSG_AUTO_TIMEZONE, &NetworkSearchHandler::AutoTimeZoneChange },
-    { SettingEventCode::MSG_AUTO_AIRPLANE_MODE, &NetworkSearchHandler::AirplaneModeChange },
-    { RadioEvent::SATELLITE_STATUS_CHANGED, &NetworkSearchHandler::SatelliteStatusChanged }
+    { RadioEvent::RADIO_SIM_STATE_CHANGE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SimStateChange(event);
+        } },
+    { RadioEvent::RADIO_IMSI_LOADED_READY,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->ImsiLoadedReady(event);
+        } },
+    { RadioEvent::RADIO_SIM_RECORDS_LOADED,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SimRecordsLoaded(event);
+        } },
+    { RadioEvent::RADIO_STATE_CHANGED,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioStateChange(event);
+        } },
+    { RadioEvent::RADIO_NETWORK_STATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetNetworkStateInfo(event);
+        } },
+    { RadioEvent::RADIO_RESTRICTED_STATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioRestrictedState(event);
+        } },
+    { RadioEvent::RADIO_DATA_REG_STATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioRilDataRegState(event);
+        } },
+    { RadioEvent::RADIO_VOICE_REG_STATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioRilVoiceRegState(event);
+        } },
+    { RadioEvent::RADIO_GET_SIGNAL_STRENGTH,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioSignalStrength(event);
+        } },
+    { RadioEvent::RADIO_SIGNAL_STRENGTH_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioSignalStrength(event);
+        } },
+    { RadioEvent::RADIO_OPERATOR,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioRilOperator(event);
+        } },
+    { RadioEvent::RADIO_NETWORK_SEARCH_RESULT,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->NetworkSearchResult(event);
+        } },
+    { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetNetworkSelectionModeResponse(event);
+        } },
+    { RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SetNetworkSelectionModeResponse(event);
+        } },
+    { RadioEvent::RADIO_GET_STATUS,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetRadioStateResponse(event);
+        } },
+    { RadioEvent::RADIO_SET_STATUS,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SetRadioStateResponse(event);
+        } },
+    { RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SetPreferredNetworkResponse(event);
+        } },
+    { RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetPreferredNetworkResponse(event);
+        } },
+    { RadioEvent::RADIO_NETWORK_TIME_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioNitzUpdate(event);
+        } },
+    { RadioEvent::RADIO_IMS_SERVICE_STATUS_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->UpdateImsServiceStatus(event);
+        } },
+    { RadioEvent::RADIO_IMS_REGISTER_STATE_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->UpdateImsRegisterState(event);
+        } },
+    { RadioEvent::RADIO_GET_IMEI,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetImei(event);
+        } },
+    { RadioEvent::RADIO_GET_IMEISV,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetImeiSv(event);
+        } },
+    { RadioEvent::RADIO_GET_MEID,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetMeid(event);
+        } },
+    { RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetNeighboringCellInfo(event);
+        } },
+    { RadioEvent::RADIO_GET_CURRENT_CELL_INFO,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetCurrentCellInfo(event);
+        } },
+    { RadioEvent::RADIO_CURRENT_CELL_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioCurrentCellInfoUpdate(event);
+        } },
+    { RadioEvent::RADIO_CHANNEL_CONFIG_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioChannelConfigInfo(event);
+        } },
+    { RadioEvent::RADIO_VOICE_TECH_CHANGED,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioVoiceTechChange(event);
+        } },
+    { RadioEvent::RADIO_GET_VOICE_TECH,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioVoiceTechChange(event);
+        } },
+    { RadioEvent::RADIO_SET_DATA_CONNECT_ACTIVE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->DcPhysicalLinkActiveUpdate(event);
+        } },
+    { RadioEvent::RADIO_GET_BASEBAND_VERSION,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetBasebandVersion(event);
+        } },
+    { RadioEvent::RADIO_SET_NR_OPTION_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SetNrOptionModeResponse(event);
+        } },
+    { RadioEvent::RADIO_GET_NR_OPTION_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetNrOptionModeResponse(event);
+        } },
+    { RadioEvent::RADIO_GET_RRC_CONNECTION_STATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetRrcConnectionState(event);
+        } },
+    { RadioEvent::RADIO_RRC_CONNECTION_STATE_UPDATE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioGetRrcConnectionState(event);
+        } },
+    { RadioEvent::NOTIFY_STATE_CHANGE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->NotifyStateChange(event);
+        } },
+    { RadioEvent::DELAY_NOTIFY_STATE_CHANGE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->HandleDelayNotifyEvent(event);
+        } },
+    { RadioEvent::RADIO_RESIDENT_NETWORK_CHANGE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->RadioResidentNetworkChange(event);
+        } },
+    { RadioEvent::RADIO_GET_NR_SSBID_INFO,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->GetNrSsbIdResponse(event);
+        } },
+    { SettingEventCode::MSG_AUTO_TIME,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->AutoTimeChange(event);
+        } },
+    { SettingEventCode::MSG_AUTO_TIMEZONE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->AutoTimeZoneChange(event);
+        } },
+    { SettingEventCode::MSG_AUTO_AIRPLANE_MODE,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->AirplaneModeChange(event);
+        } },
+    { RadioEvent::SATELLITE_STATUS_CHANGED,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->SatelliteStatusChanged(event);
+        } }
 };
 
 NetworkSearchHandler::NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
@@ -323,7 +455,7 @@ void NetworkSearchHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &e
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            (this->*memberFunc)(event);
+            memberFunc(this, event);
         }
     }
 }
