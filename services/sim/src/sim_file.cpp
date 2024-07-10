@@ -1295,7 +1295,7 @@ void SimFile::OnMccMncLoaded(std::string imsi)
     bool cond = sz >= lenNum;
     if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC && lengthOfMnc_ != UNINITIALIZED_MNC) && cond) {
         operatorNumeric_ = imsi.substr(0, lenNum);
-        TELEPHONY_LOGI("SimFile OnMccMncLoaded  MCCMNC:%{public}s", operatorNumeric_.c_str());
+        TELEPHONY_LOGI("SimFile OnMccMncLoaded MCCMNC:%{public}s", operatorNumeric_.c_str());
         FileChangeToExt(operatorNumeric_, FileChangeType::G_MCCMNC_FILE_LOAD);
         std::string mcc = imsi.substr(0, MCC_LEN);
         std::string mnc = imsi.substr(MCC_LEN, lengthOfMnc_);
