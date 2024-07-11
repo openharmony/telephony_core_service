@@ -475,8 +475,14 @@ static bool MatchGetIMEIParameter(napi_env env, napi_value parameter[], size_t p
 static bool MatchGetNrOptionModeParameter(napi_env env, napi_value parameter[], size_t parameterCount)
 {
     switch (parameterCount) {
+        case PARAMETER_COUNT_ZERO: {
+            return true;
+        }
         case PARAMETER_COUNT_ONE: {
-            return NapiUtil::MatchParameters(env, parameter, { napi_number });
+            return NapiUtil::MatchParameters(env, parameter, { napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_null }) ||
+                   NapiUtil::MatchParameters(env, parameter, { napi_undefined });
         }
         case PARAMETER_COUNT_TWO: {
             return NapiUtil::MatchParameters(env, parameter, { napi_number, napi_function });
@@ -2432,8 +2438,22 @@ static napi_value GetNrOptionMode(napi_env env, napi_callback_info info)
         return nullptr;
     }
     auto asyncContext = std::make_unique<NrOptionModeContext>();
-    NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
-    if (parameterCount == PARAMETER_COUNT_TWO) {
+    if (parameterCount == PARAMETER_COUNT_ZERO) {
+        asyncContext->slotId = GetDefaultSlotId();
+    } else if (parameterCount == PARAMETER_COUNT_ONE) {
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, parameters[0], &valueType));
+        if (valueType == napi_undefined || valueType == napi_null) {
+            TELEPHONY_LOGI("undefined or null parameter detected, treating as no parameter input.");
+            asyncContext->slotId = GetDefaultSlotId();
+        } else if (valueType == napi_number) {
+            NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
+        } else if (valueType == napi_function) {
+            asyncContext->slotId = GetDefaultSlotId();
+            NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
+        }
+    } else if (parameterCount == PARAMETER_COUNT_TWO) {
+        NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
     return NapiUtil::HandleAsyncWork(
