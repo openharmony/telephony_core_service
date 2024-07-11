@@ -288,8 +288,10 @@ public:
     static std::string MccCountryCode(int mcc);
     static int ShortestMncLengthFromMcc(int mcc);
     static bool LengthIsThreeMnc(const std::string &mccMncCode);
+    static bool LengthIsTwoMnc(const std::string &mccMncCode);
     static std::vector<std::shared_ptr<MccAccess>> mccAccessTable_;
     static std::vector<std::string> specialMccMnc_;
+    static std::vector<std::string> indiaMccMnc_;
 
 private:
     static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
@@ -307,6 +309,7 @@ private:
     static void AddMccMncForInAirtel();
     static void AddMccMncForInHutch();
     static void AddMccMncForMy();
+    static void InitIndiaTables();
 };
 } // namespace Telephony
 } // namespace OHOS
