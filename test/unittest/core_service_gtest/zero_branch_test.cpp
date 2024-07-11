@@ -543,11 +543,11 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     simFile->imsi_ = "1234567890";
     EXPECT_EQ(simFile->ObtainIsoCountryCode(), "");
     simFile->lengthOfMnc_ = OBTAIN_SPN_GENERAL;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     simFile->lengthOfMnc_ = UNKNOWN_MNC;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     simFile->lengthOfMnc_ = UNINITIALIZED_MNC;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     EXPECT_FALSE(simFile->CphsVoiceMailAvailable());
     EXPECT_FALSE(simFile->ProcessIccReady(event));
     EXPECT_TRUE(simFile->ProcessGetAdDone(event));
