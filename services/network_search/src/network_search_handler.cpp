@@ -20,6 +20,7 @@
 #include "ims_core_service_client.h"
 #include "mcc_pool.h"
 #include "network_search_manager.h"
+#include "resource_utils.h"
 #include "satellite_service_client.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
@@ -228,6 +229,7 @@ NetworkSearchHandler::~NetworkSearchHandler()
 
 bool NetworkSearchHandler::Init()
 {
+    ResourceUtils::Get().GetBooleanValueByName(ResourceUtils::IS_CS_CAPABLE, isCsCapable_);
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
         TELEPHONY_LOGE("failed to get NetworkSearchManager");
@@ -567,11 +569,21 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGI("radio is power off, no need update data reg state");
         return;
     }
-    if (networkRegister_ != nullptr) {
-        networkRegister_->ProcessPsRegister(event);
+    std::lock_guard<std::mutex> lock(mutex_);
+    psRegStatusResultInfo_ = event->GetSharedObject<PsRegStatusResultInfo>();
+    if (psRegStatusResultInfo_ == nullptr) {
+        TELEPHONY_LOGE("psRegStatusResult is nullptr slotId:%{public}d", slotId_);
+        return;
     }
-    if (operatorName_ != nullptr) {
-        operatorName_->TrySetLongOperatorNameWithTranslation();
+    if (psRegStatusResultInfo_->flag != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated ps registration event slotId:%{public}d", slotId_);
+        return;
+    }
+    networkSearchManager->decMsgNum(slotId_);
+    TelRilRegStatus regStatus = psRegStatusResultInfo_->regStatus;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
+    if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
+        UpdateNetworkState();
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
@@ -588,11 +600,21 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGI("radio is power off, no need update voice reg state");
         return;
     }
-    if (networkRegister_ != nullptr) {
-        networkRegister_->ProcessCsRegister(event);
+    std::lock_guard<std::mutex> lock(mutex_);
+    csRegStatusInfo_ = event->GetSharedObject<CsRegStatusInfo>();
+    if (csRegStatusInfo_ == nullptr) {
+        TELEPHONY_LOGE("csRegStatusResult is nullptr slotId:%{public}d", slotId_);
+        return;
     }
-    if (operatorName_ != nullptr) {
-        operatorName_->TrySetLongOperatorNameWithTranslation();
+    if (csRegStatusInfo_->flag != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated cs registration event slotId:%{public}d", slotId_);
+        return;
+    }
+    networkSearchManager->decMsgNum(slotId_);
+    TelRilRegStatus regStatus = csRegStatusInfo_->regStatus;
+    bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
+    if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
+        UpdateNetworkState();
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilVoiceRegState slotId:%{public}d", slotId_);
 }
@@ -615,10 +637,48 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("NetworkSearchHandler::RadioRilOperator event is nullptr!");
         return;
     }
-    if (operatorName_ != nullptr) {
-        operatorName_->HandleOperatorInfo(event);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr ||
+        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        TELEPHONY_LOGI("radio is power off, no need update operator info");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
+    if (operatorInfoResult_ == nullptr) {
+        TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    if (operatorInfoResult_->flag == networkSearchManager->GetSerialNum(slotId_)) {
+        networkSearchManager->decMsgNum(slotId_);
+        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        UpdateNetworkState();
+        }
+    } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
+        if (operatorName_ != nullptr) {
+            operatorName_->HandleOperatorInfo(operatorInfoResult_);
+        }
+    } else {
+        TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilOperator slotId:%{public}d", slotId_);
+}
+
+void NetworkSearchHandler::UpdateNetworkState()
+{
+    if (networkRegister_ != nullptr) {
+        networkRegister_->ProcessPsRegister(psRegStatusResultInfo_);
+        networkRegister_->ProcessCsRegister(csRegStatusInfo_);
+    }
+    if (operatorName_ != nullptr) {
+        operatorName_->HandleOperatorInfo(operatorInfoResult_);
+        operatorName_->TrySetLongOperatorNameWithTranslation();
+    }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager != nullptr) {
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
+    }
+    TELEPHONY_LOGI("NetworkSearchHandler::UpdateNetworkState slotId:%{public}d", slotId_);
 }
 
 void NetworkSearchHandler::GetRilSignalIntensity(bool checkTime)
