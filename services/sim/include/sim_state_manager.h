@@ -56,6 +56,7 @@ public:
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
     bool IfModemInitDone();
+    int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response);
 
 public:
     static bool responseReady_;

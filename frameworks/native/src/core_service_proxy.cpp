@@ -3180,5 +3180,37 @@ int32_t CoreServiceProxy::GetOpkeyVersion(std::string &versionInfo)
     versionInfo = reply.ReadString();
     return reply.ReadInt32();
 }
+
+int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
+    int32_t fileId, const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimIO WriteInterfaceToken is false");
+        return ERROR;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(static_cast<int32_t>(command));
+    data.WriteInt32(static_cast<int32_t>(fileId));
+    data.WriteString(dataStr);
+    data.WriteString(path);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSimIO Remote is null");
+        return ERROR;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SIM_IO_DONE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimIO failed, error code is %{public}d", st);
+        return ERROR;
+    }
+    int32_t ret = reply.ReadInt32();
+    response.sw1 = reply.ReadInt32();
+    response.sw2 = reply.ReadInt32();
+    response.response = reply.ReadString();
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

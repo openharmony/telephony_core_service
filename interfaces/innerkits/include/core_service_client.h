@@ -912,6 +912,20 @@ public:
      */
     int32_t GetOpkeyVersion(std::string &versionInfo);
 
+    /**
+     * @brief Get data from sim io
+     *
+     * @param slotId[in], sim slot id
+     * @param command[in], command id
+     * @param fileId[in], file id
+     * @param dataStr[in], data to be sended
+     * @param path[in], file path
+     * @param response[out], the response of sim io command
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
+        const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
