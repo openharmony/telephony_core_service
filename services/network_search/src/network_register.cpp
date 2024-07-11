@@ -78,27 +78,17 @@ void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
     networkSearchState_->SetNetworkStateToRoaming(roam, type);
 }
 
-void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> csRegStateResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<CsRegStatusInfo> csRegStateResult = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStateResult == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister csRegStateResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (csRegStateResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
-        TELEPHONY_LOGI("Aborting outdated cs registration event slotId:%{public}d", slotId_);
-        return;
-    }
-    networkSearchManager->decMsgNum(slotId_);
     RilRegister registrationStatus = static_cast<RilRegister>(csRegStateResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
@@ -115,10 +105,6 @@ void NetworkRegister::ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &e
     auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
     TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
-    if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
-        TELEPHONY_LOGI("cs domain change, slotId:%{public}d", slotId_);
-        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-    }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
@@ -138,27 +124,17 @@ void NetworkRegister::UpdateCellularCall(const RegServiceState &regStatus, const
     }
 }
 
-void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event)
+void NetworkRegister::ProcessPsRegister(const std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister networkSearchManager is nullptr");
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResult == nullptr) {
         TELEPHONY_LOGE("NetworkRegister::ProcessPsRegister psRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (psRegStatusResult->flag != networkSearchManager->GetSerialNum(slotId_)) {
-        TELEPHONY_LOGI("Aborting outdated ps registration event slotId:%{public}d", slotId_);
-        return;
-    }
-    networkSearchManager->decMsgNum(slotId_);
     RilRegister registrationStatus = static_cast<RilRegister>(psRegStatusResult->regStatus);
     RegServiceState regStatus = ConvertRegFromRil(registrationStatus);
     if (networkSearchState_ == nullptr) {
@@ -180,10 +156,6 @@ void NetworkRegister::ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &e
     auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
     TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
         iter->second.c_str(), registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
-    if (networkSearchManager->CheckIsNeedNotify(slotId_) || networkSearchState_->IsEmergency()) {
-        TELEPHONY_LOGI("ps domain change, slotId:%{public}d", slotId_);
-        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-    }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
