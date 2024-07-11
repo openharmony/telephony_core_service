@@ -236,6 +236,8 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnInitExtraModule(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_IO_DONE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimIO(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerVoiceMailToMap()
@@ -1927,6 +1929,27 @@ int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &r
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t command = data.ReadInt32();
+    int32_t fileId = data.ReadInt32();
+    std::string dataStr = data.ReadString();
+    std::string path = data.ReadString();
+    SimAuthenticationResponse response = { 0 };
+    int32_t result = GetSimIO(slotId, command, fileId, dataStr, path, response);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    reply.WriteInt32(result);
+    reply.WriteInt32(response.sw1);
+    reply.WriteInt32(response.sw2);
+    reply.WriteString(response.response);
+
     return NO_ERROR;
 }
 } // namespace Telephony

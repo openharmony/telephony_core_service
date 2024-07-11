@@ -1631,5 +1631,21 @@ int32_t CoreService::GetOpkeyVersion(std::string &versionInfo)
     }
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
+
+int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
+    int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGD("CoreService::GetSimIO(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
+}
+
 } // namespace Telephony
 } // namespace OHOS
