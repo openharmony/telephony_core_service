@@ -305,7 +305,7 @@ int32_t CoreServiceStub::SetTimer(uint32_t code)
     if (itCollieId != collieCodeStringMap_.end()) {
         std::string collieStr = itCollieId->second;
         std::string collieName = "CoreServiceStub: " + collieStr;
-        unsigned int flag = HiviewDFX::XCOLLIE_FLAG_LOG | HiviewDFX::XCOLLIE_FLAG_NOOP;
+        unsigned int flag = HiviewDFX::XCOLLIE_FLAG_NOOP;
         auto TimerCallback = [collieStr](void *) {
             TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s", collieStr.c_str());
         };
