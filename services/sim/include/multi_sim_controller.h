@@ -117,6 +117,7 @@ private:
     int32_t IsSatelliteSupported();
 
 private:
+    const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     int32_t maxCount_ = 0;
     int32_t primarySimId_ = 0;
     int32_t defaultSmsSimId_ = 0;

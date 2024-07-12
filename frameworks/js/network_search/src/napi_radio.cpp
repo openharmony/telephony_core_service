@@ -1354,7 +1354,7 @@ static void NativeGetOperatorName(napi_env env, void *data)
     context->errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId, u16OperatorName);
     std::string operatorName = NapiUtil::ToUtf8(u16OperatorName);
-    TELEPHONY_LOGI("NativeGetOperatorName operatorName = %{public}s", operatorName.c_str());
+    TELEPHONY_LOGD("NativeGetOperatorName operatorName = %{public}s", operatorName.c_str());
     if (context->errorCode == TELEPHONY_ERR_SUCCESS) {
         context->resolved = true;
         context->operatorNameLength = (operatorName.size() < BUF_SIZE) ? operatorName.size() : BUF_SIZE;
@@ -1752,7 +1752,10 @@ void NativeGetIMEI(napi_env env, void *data)
     if (context->errorCode == TELEPHONY_SUCCESS) {
         context->resolved = true;
         context->getIMEIResult = NapiUtil::ToUtf8(imei);
-        TELEPHONY_LOGI("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
+        TELEPHONY_LOGD("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
+    } else {
+        TELEPHONY_LOGE("Get IMEI fail, NativeGetIMEI len = %{public}lu",
+            static_cast<unsigned long>(context->getIMEIResult.length()));
     }
 }
 
@@ -2161,7 +2164,7 @@ static void NativeGetCellInformation(napi_env env, void *data)
     asyncContext->cellInformations.clear();
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(
         asyncContext->slotId, asyncContext->cellInformations);
-    TELEPHONY_LOGI("NativeGetCellInformation len = %{public}lu",
+    TELEPHONY_LOGD("NativeGetCellInformation len = %{public}lu",
         static_cast<unsigned long>(asyncContext->cellInformations.size()));
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NativeGetCellInformation errorCode = %{public}d", asyncContext->errorCode);
@@ -2178,8 +2181,8 @@ static void NativeGetCellInformation(napi_env env, void *data)
 void GetCellInformationCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<CellInformationContext *>(data);
-    TELEPHONY_LOGI("GetCellInformationCallback size = %{public}zu,resolved = %{public}d",
-        asyncContext->cellInformations.size(), asyncContext->resolved);
+    TELEPHONY_LOGI("GetCellInformationCallback size = %{public}zu,resolved = %{public}d,slotId = %{public}d",
+        asyncContext->cellInformations.size(), asyncContext->resolved, asyncContext->slotId);
     if (asyncContext->resolved) {
         napi_create_array(env, &(asyncContext->callbackValue));
         int i = 0;

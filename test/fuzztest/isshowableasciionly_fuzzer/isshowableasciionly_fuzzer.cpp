@@ -32,9 +32,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     auto simUtils = std::make_shared<SIMUtils>();
-    int32_t byteslen = static_cast<int32_t>(size);
-    int32_t offset = static_cast<int32_t>(size);
-    char argument = static_cast<char>(size);
+    int32_t byteslen = static_cast<int32_t>(*data);
+    int32_t offset = static_cast<int32_t>(*data + sizeof(int32_t));
+    char argument = static_cast<char>(*data);
     std::string str(reinterpret_cast<const char *>(data), size);
     std::string parameter(reinterpret_cast<const char *>(data), size);
     simUtils->HexStringConvertToBytes(str, byteslen);
@@ -46,9 +46,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

@@ -155,6 +155,7 @@ ohos_shared_library("tel_core_service") {
     "ability_base:zuri",
     "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
@@ -210,6 +211,11 @@ ohos_shared_library("tel_core_service") {
       "location:locator_sdk",
     ]
     defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  if (telephony_hicollie_able) {
+    external_deps += [ "hicollie:libhicollie" ]
+    defines += [ "HICOLLIE_ENABLE" ]
   }
 
   part_name = "core_service"

@@ -57,7 +57,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(SatelliteCoreCallbackStub::GetDescriptor())) {
         return;
     }
-    int32_t code = static_cast<int32_t>(size % SATELLITE_CORE);
+    int32_t code = static_cast<int32_t>(*data % SATELLITE_CORE);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -75,23 +75,28 @@ void SetRadioStateResponse(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t eventId = static_cast<int32_t>(size % SATELLITE_CORE);
+    int32_t eventId = static_cast<int32_t>(*data % SATELLITE_CORE);
     dataMessageParcel.WriteInt32(eventId);
-    int32_t dataType = static_cast<int32_t>(size % SATELLITE_TYPE);
+    int32_t dataType = static_cast<int32_t>(*data % SATELLITE_TYPE);
     dataMessageParcel.WriteInt32(dataType);
+    int32_t offset = 0;
     if (dataType == 1) {
-        int32_t flag = static_cast<int32_t>(size % SATELLITE_CORE);
+        int32_t flag = static_cast<int32_t>(*data + offset);
         dataMessageParcel.WriteInt32(flag);
-        int32_t serial = static_cast<int32_t>(size % SATELLITE_CORE);
+        offset += sizeof(int32_t);
+        int32_t serial = static_cast<int32_t>(*data + offset);
         dataMessageParcel.WriteInt32(serial);
-        int32_t error = static_cast<int32_t>(size % SATELLITE_CORE);
+        offset += sizeof(int32_t);
+        int32_t error = static_cast<int32_t>(*data + offset);
         dataMessageParcel.WriteInt32(error);
-        int32_t type = static_cast<int32_t>(size % SATELLITE_TYPE);
+        offset += sizeof(int32_t);
+        int32_t type = static_cast<int32_t>(*data + offset);
         dataMessageParcel.WriteInt32(type);
     } else if (dataType == RESPONSE_TYPE) {
-        int64_t flag = static_cast<int64_t>(size % SATELLITE_CORE);
+        int64_t flag = static_cast<int64_t>(*data + offset);
         dataMessageParcel.WriteInt64(flag);
-        int32_t state = static_cast<int32_t>(size % SATELLITE_TYPE);
+        offset += sizeof(int32_t);
+        int32_t state = static_cast<int32_t>(*data + offset);
         dataMessageParcel.WriteInt32(state);
     }
     dataMessageParcel.WriteBuffer(data, size);
@@ -111,9 +116,9 @@ void RadioStateChanged(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t eventId = static_cast<int32_t>(size % SATELLITE_CORE);
+    int32_t eventId = static_cast<int32_t>(*data % SATELLITE_CORE);
     dataMessageParcel.WriteInt32(eventId);
-    int32_t dataType = static_cast<int32_t>(size % SATELLITE_TYPE);
+    int32_t dataType = static_cast<int32_t>(*data % SATELLITE_TYPE);
     dataMessageParcel.WriteInt32(dataType);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -132,11 +137,11 @@ void SatelliteStatusChanged(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t eventId = static_cast<int32_t>(size % SATELLITE_CORE);
+    int32_t eventId = static_cast<int32_t>(*data % SATELLITE_CORE);
     dataMessageParcel.WriteInt32(eventId);
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     dataMessageParcel.WriteInt32(slotId);
-    int32_t mode = static_cast<int32_t>(size % SATELLITE_TYPE);
+    int32_t mode = static_cast<int32_t>(*data % SATELLITE_TYPE);
     dataMessageParcel.WriteInt32(mode);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -155,7 +160,7 @@ void SimStateChanged(const uint8_t *data, size_t size)
     }
 
     MessageParcel dataMessageParcel;
-    int32_t eventId = static_cast<int32_t>(size % SATELLITE_CORE);
+    int32_t eventId = static_cast<int32_t>(*data % SATELLITE_CORE);
     dataMessageParcel.WriteInt32(eventId);
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
@@ -189,9 +194,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();

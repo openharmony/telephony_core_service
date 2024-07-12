@@ -20,6 +20,8 @@
 #include "radio_event.h"
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
+#include "configuration.h"
+#include "app_mgr_client.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -87,7 +89,7 @@ void RuimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            bool isFileHandleResponse = (this->*memberFunc)(event);
+            bool isFileHandleResponse = memberFunc(event);
             ProcessFileLoaded(isFileHandleResponse);
         }
     } else {
@@ -222,6 +224,27 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         SaveCountryCode();
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+            int imsiSize = static_cast<int>(imsi_.size());
+            std::string mcc = "";
+            bool isSizeEnough = imsiSize >= MCC_LEN;
+            if (isSizeEnough) {
+                mcc = imsi_.substr(0, MCC_LEN);
+            }
+            std::string mnc = "";
+            isSizeEnough = imsiSize >= MCC_LEN + lengthOfMnc_;
+            if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC) && isSizeEnough) {
+                mnc = imsi_.substr(MCC_LEN, lengthOfMnc_);
+            }
+            int mncLength = MccPool::ShortestMncLengthFromMcc(std::stoi(mcc));
+            isSizeEnough = imsiSize >= MCC_LEN + mncLength;
+            if (mnc.empty() && IsValidDecValue(mcc) && isSizeEnough) {
+                mnc = imsi_.substr(MCC_LEN, mncLength);
+            }
+            AppExecFwk::Configuration configuration;
+            configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MCC, mcc);
+            configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MNC, mnc);
+            auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+            appMgrClient->UpdateConfiguration(configuration);
         }
         FileChangeToExt(imsi_, FileChangeType::C_IMSI_FILE_LOAD);
     }
@@ -274,13 +297,20 @@ bool RuimFile::ObtainCsimSpnDisplayCondition()
 
 void RuimFile::InitMemberFunc()
 {
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &RuimFile::ProcessIccReady;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &RuimFile::ProcessIccLocked;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &RuimFile::ProcessIccLocked;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &RuimFile::ProcessGetImsiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &RuimFile::ProcessGetIccidDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CDMA_SUBSCRIPTION_DONE] = &RuimFile::ProcessGetSubscriptionDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CSIM_SPN_DONE] = &RuimFile::ProcessGetSpnDone;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetImsiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccidDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CDMA_SUBSCRIPTION_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSubscriptionDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CSIM_SPN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSpnDone(event); };
 }
 
 bool RuimFile::ProcessGetSpnDone(const AppExecFwk::InnerEvent::Pointer &event)

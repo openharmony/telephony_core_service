@@ -120,6 +120,7 @@ enum class CoreServiceInterfaceCode {
     GET_TARGET_OPKEY,
     GET_OPKEY_VERSION,
     GET_RESIDENT_NETWORK_NUMERIC,
+    GET_SIM_IO_DONE,
 };
 } // namespace Telephony
 } // namespace OHOS

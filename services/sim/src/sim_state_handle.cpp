@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,18 +42,58 @@ std::mutex SimStateManager::ctx_;
 bool SimStateManager::responseReady_ = false;
 std::condition_variable SimStateManager::cv_;
 const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = {
-    { MSG_SIM_UNLOCK_PIN_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PUK_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_CHANGE_PIN_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PIN2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_PUK2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_CHANGE_PIN2_DONE, &SimStateHandle::GetUnlockResult },
-    { MSG_SIM_UNLOCK_SIMLOCK_DONE, &SimStateHandle::GetUnlockSimLockResult },
-    { MSG_SIM_ENABLE_PIN_DONE, &SimStateHandle::GetSetLockResult },
-    { MSG_SIM_CHECK_PIN_DONE, &SimStateHandle::GetSimLockState },
-    { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE, &SimStateHandle::GetSimCardData },
-    { MSG_SIM_AUTHENTICATION_DONE, &SimStateHandle::GetSimAuthenticationResult },
-    { MSG_SIM_SEND_NCFG_OPER_INFO_DONE, &SimStateHandle::GetSendSimMatchedOperatorInfoResult },
+    { MSG_SIM_UNLOCK_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PUK_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_CHANGE_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PIN2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_PUK2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_CHANGE_PIN2_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockResult(slotId, event);
+        } },
+    { MSG_SIM_UNLOCK_SIMLOCK_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetUnlockSimLockResult(slotId, event);
+        } },
+    { MSG_SIM_ENABLE_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSetLockResult(slotId, event);
+        } },
+    { MSG_SIM_CHECK_PIN_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimLockState(slotId, event);
+        } },
+    { MSG_SIM_GET_REALTIME_ICC_STATUS_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimCardData(slotId, event);
+        } },
+    { MSG_SIM_AUTHENTICATION_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimAuthenticationResult(slotId, event);
+        } },
+    { MSG_SIM_SEND_NCFG_OPER_INFO_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSendSimMatchedOperatorInfoResult(slotId, event);
+        } },
+    { MSG_SIM_GET_SIM_IO_DONE,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->GetSimIOResult(slotId, event);
+        } },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -658,7 +698,7 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            (this->*memberFunc)(slotId_, event);
+            memberFunc(this, slotId_, event);
         }
         SyncCmdResponse();
         return;
@@ -873,6 +913,7 @@ void SimStateHandle::RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventH
                 TelEventHandler::SendTelEvent(handler, RadioEvent::RADIO_SIM_ICCID_LOADED, slotId_, 0);
                 TELEPHONY_LOGI("SimStateHandle::RegisterIccidLoaded() OK send, slotId = %{public}d", slotId_);
             }
+            break;
         default:
             TELEPHONY_LOGI("SimStateHandle RegisterCoreNotify do default");
             break;
@@ -926,6 +967,40 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
         return true;
     }
     return false;
+}
+
+int32_t SimStateHandle::GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo)
+{
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_SIM_IO_DONE);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return SIM_AUTH_FAIL;
+    }
+    event->SetOwner(shared_from_this());
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSimIO() telRilManager is nullptr!!");
+        return SIM_AUTH_FAIL;
+    }
+    return telRilManager->GetSimIO(slotId, requestInfo, event);
+}
+
+void SimStateHandle::GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGI("SimStateHandle::GetSimIOResult slotId = %{public}d", slotId);
+    auto response = event->GetSharedObject<IccIoResultInfo>();
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SimStateHandle::GetSimIOResult() fail");
+        return;
+    }
+    simIORespon_.sw1 = response->sw1;
+    simIORespon_.sw2 = response->sw2;
+    simIORespon_.response = response->response;
+}
+
+SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
+{
+    return simIORespon_;
 }
 } // namespace Telephony
 } // namespace OHOS

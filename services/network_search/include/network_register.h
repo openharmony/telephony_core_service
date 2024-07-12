@@ -31,8 +31,8 @@ public:
         std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId);
     virtual ~NetworkRegister() = default;
     void InitNrConversionConfig();
-    void ProcessPsRegister(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessCsRegister(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessPsRegister(const std::shared_ptr<PsRegStatusResultInfo> psRegStatusResult);
+    void ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> csRegStateResult);
     void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);

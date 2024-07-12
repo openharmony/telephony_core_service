@@ -133,7 +133,7 @@ void IccFile::SetVoiceMailByOperator(std::string spn)
 std::string IccFile::ObtainIMSI()
 {
     if (imsi_.empty()) {
-        TELEPHONY_LOGI("IccFile::ObtainIMSI is null:");
+        TELEPHONY_LOGD("IccFile::ObtainIMSI is null:");
     }
     return imsi_;
 }
@@ -739,6 +739,7 @@ void IccFile::ClearData()
     operatorNumeric_ = "";
     mcc_ = "";
     mnc_ = "";
+    lengthOfMnc_ = UNINITIALIZED_MNC;
     indexOfMailbox_ = 1;
     msisdn_ = "";
     gid1_ = "";
@@ -802,11 +803,7 @@ bool IccFile::ExecutOriginalSimIoRequest(int32_t fileId, int fileIdDone)
 {
     TELEPHONY_LOGD("ExecutOriginalSimIoRequest simfile: %{public}x doneId: %{public}x", fileId, fileIdDone);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(fileIdDone);
-    if (fileId == ELEMENTARY_FILE_AD) {
-        fileController_->ObtainAllLinearFixedFile(fileId, event);
-    } else {
-        fileController_->ObtainBinaryFile(fileId, event);
-    }
+    fileController_->ObtainBinaryFile(fileId, event);
     return true;
 }
 

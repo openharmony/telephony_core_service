@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -169,7 +169,7 @@ protected:
     const uint8_t BYTE_NUM6 = 0xFE;
     const uint8_t BYTE_NUM7 = 0xF0;
     const int DATA_STEP = 2;
-    const int LENGTH_TWO = 2;
+    const unsigned long LENGTH_TWO = 2;
     static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;

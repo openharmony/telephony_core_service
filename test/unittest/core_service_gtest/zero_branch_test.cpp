@@ -543,11 +543,11 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     simFile->imsi_ = "1234567890";
     EXPECT_EQ(simFile->ObtainIsoCountryCode(), "");
     simFile->lengthOfMnc_ = OBTAIN_SPN_GENERAL;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     simFile->lengthOfMnc_ = UNKNOWN_MNC;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     simFile->lengthOfMnc_ = UNINITIALIZED_MNC;
-    simFile->CheckMncLength();
+    simFile->CheckMncLengthForAdDone();
     EXPECT_FALSE(simFile->CphsVoiceMailAvailable());
     EXPECT_FALSE(simFile->ProcessIccReady(event));
     EXPECT_TRUE(simFile->ProcessGetAdDone(event));
@@ -1672,13 +1672,16 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_001, Function | MediumTest | Leve
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto networkRegister = std::make_shared<NetworkRegister>(networkSearchState, networkSearchManager, INVALID_SLOTID);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0, 1);
-    networkRegister->ProcessPsRegister(event);
-    networkRegister->ProcessCsRegister(event);
+    auto psRegInfo = std::make_shared<PsRegStatusResultInfo>();
+    auto csRegInfo = std::make_shared<CsRegStatusInfo>();
+    networkRegister->ProcessPsRegister(psRegInfo);
+    networkRegister->ProcessCsRegister(csRegInfo);
     networkRegister->ProcessChannelConfigInfo(event);
     networkRegister->NotifyNrFrequencyChanged();
-    event = nullptr;
-    networkRegister->ProcessPsRegister(event);
-    networkRegister->ProcessCsRegister(event);
+    psRegInfo = nullptr;
+    csRegInfo = nullptr;
+    networkRegister->ProcessPsRegister(psRegInfo);
+    networkRegister->ProcessCsRegister(csRegInfo);
     EXPECT_EQ(networkRegister->ConvertRegFromRil(NetworkRegister::NetworkRegister::RilRegister::REG_STATE_SEARCH),
         RegServiceState::REG_STATE_SEARCH);
     EXPECT_EQ(networkRegister->ConvertRegFromRil(NetworkRegister::RilRegister::REG_STATE_NOT_REG),
@@ -1781,7 +1784,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
         subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0, 1);
+    auto operatorInfo = std::make_shared<OperatorInfoResult>();
     std::string plmn = "";
     bool showPlmn = true;
     std::string numeric = "qwe";
@@ -1803,14 +1806,14 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
     operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
-    operatorName->GsmOperatorInfo(event);
-    operatorName->HandleOperatorInfo(event);
+    operatorName->GsmOperatorInfo(operatorInfo);
+    operatorName->HandleOperatorInfo(operatorInfo);
     operatorName->TrySetLongOperatorNameWithTranslation();
     operatorName->NotifySpnChanged();
-    operatorName->CdmaOperatorInfo(event);
-    event = nullptr;
-    operatorName->GsmOperatorInfo(event);
-    operatorName->CdmaOperatorInfo(event);
+    operatorName->CdmaOperatorInfo(operatorInfo);
+    operatorInfo = nullptr;
+    operatorName->GsmOperatorInfo(operatorInfo);
+    operatorName->CdmaOperatorInfo(operatorInfo);
     EXPECT_EQ(operatorName->GetCurrentLac(), 0);
     EXPECT_TRUE(operatorName->GetNetworkStatus() == nullptr);
     EXPECT_EQ(operatorName->GetCustomName(plmn), "");
@@ -1854,8 +1857,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
     std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR, operatorResult);
-    operatorName->HandleOperatorInfo(event);
+    operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
 }
 
@@ -2682,6 +2684,8 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_TRUE(simUtils->CharsConvertToChar16(bytes, 1, outChar16Len, true) == nullptr);
     EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, true) == nullptr);
     EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, OBTAIN_SPN_GENERAL, outChar16Len, false) == nullptr);
+    EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, MAX_ENGLISH_NAME * OBTAIN_SPN_GENERAL, outChar16Len, false)
+        == nullptr);
     EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");

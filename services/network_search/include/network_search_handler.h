@@ -40,7 +40,7 @@ namespace Telephony {
 class NetworkSearchManager;
 class NetworkSearchHandler : public TelEventHandler {
 public:
-    using NsHandlerFunc = void (NetworkSearchHandler::*)(const AppExecFwk::InnerEvent::Pointer &);
+    using NsHandlerFunc = std::function<void(NetworkSearchHandler *, const AppExecFwk::InnerEvent::Pointer &)>;
     explicit NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
         const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager,
         int32_t slotId);
@@ -143,6 +143,8 @@ private:
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
     void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
     bool InitOperatorName();
+    bool InitSettingUtils();
+    void SubscribeSystemAbility();
     int32_t IsSatelliteSupported() const;
     void GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncGetSsbInfoResponse();
@@ -150,6 +152,7 @@ private:
     void ClearSignalAndCellInfoList() const;
     bool IsSatelliteOn() const;
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
+    void UpdateNetworkState();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
@@ -164,6 +167,9 @@ private:
     std::unique_ptr<NitzUpdate> nitzUpdate_ = nullptr;
     std::unique_ptr<CellInfo> cellInfo_ = nullptr;
     std::unique_ptr<NrSsbInfo> nrSsbInfo_ = nullptr;
+    std::shared_ptr<PsRegStatusResultInfo> psRegStatusResultInfo_ = nullptr;
+    std::shared_ptr<CsRegStatusInfo> csRegStatusInfo_ = nullptr;
+    std::shared_ptr<OperatorInfoResult> operatorInfoResult_ = nullptr;
     static const std::map<uint32_t, NsHandlerFunc> memberFuncMap_;
     int64_t lastTimeSignalReq_ = 0;
     int64_t lastTimeOperatorReq_ = 0;
@@ -176,6 +182,8 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
     const int32_t INVALID_SLOT_ID = -1;
+    bool isCsCapable_ = true;
+    std::mutex mutex_;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

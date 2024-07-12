@@ -600,6 +600,9 @@ int32_t NetworkSearchManager::GetSignalInfoList(int32_t slotId, std::vector<sptr
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     inner->networkSearchHandler_->GetSignalInfo(signals);
+    if (signals.empty()) {
+        return TELEPHONY_ERR_SUCCESS;
+    }
     if (TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_(slotId, signals);
     }
@@ -1446,7 +1449,7 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         return false;
     }
     if (delayTime_ <= INVALID_DELAY_TIME) {
-        TELEPHONY_LOGI("The system properties are not configured with a valid delay time.");
+        TELEPHONY_LOGD("The system properties are not configured with a valid delay time.");
         return false;
     }
     int32_t networkCapabilityState = 0;
@@ -1531,7 +1534,7 @@ std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInne
 
 void NetworkSearchManager::ClearManagerInner()
 {
-    for (int32_t slotId = 0; slotId < mapManagerInner_.size(); slotId++) {
+    for (int32_t slotId = 0; slotId < static_cast<int32_t>(mapManagerInner_.size()); slotId++) {
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             std::lock_guard<std::mutex> lock(inner->mutex_);
@@ -1578,7 +1581,7 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
             inner->networkSearchHandler_->TimezoneRefresh();
         }
     }
-    TELEPHONY_LOGE("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
+    TELEPHONY_LOGD("NetworkSearchManager::TriggerTimezoneRefresh slotId:%{public}d", slotId);
 }
 
 void NetworkSearchManager::InitAirplaneMode(int32_t slotId)

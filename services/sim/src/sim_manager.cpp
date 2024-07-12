@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
 
 void SimManager::InitBaseManager(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= simStateManager_.size()) {
+    if (slotId < 0 || slotId >= static_cast<int32_t>(simStateManager_.size())) {
         return;
     }
     simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager_);
@@ -1130,7 +1130,7 @@ bool SimManager::IsValidSlotId(int32_t slotId)
 template<class N>
 bool SimManager::IsValidSlotId(int32_t slotId, std::vector<N> vec)
 {
-    if ((slotId < SLOT_ID_ZERO) || (slotId >= vec.size())) {
+    if ((slotId < SLOT_ID_ZERO) || (slotId >= static_cast<int32_t>(vec.size()))) {
         TELEPHONY_LOGE("slotId is invalid by vec.size(), slotId = %{public}d", slotId);
         return false;
     }
@@ -1213,6 +1213,21 @@ bool SimManager::IsSetPrimarySlotIdInProgress()
         return false;
     }
     return multiSimController_->IsSetPrimarySlotIdInProgress();
+}
+
+int32_t SimManager::GetSimIO(int32_t slotId, int32_t command,
+    int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SimAuthentication has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    SimIoRequestInfo requestInfo;
+    requestInfo.command = command;
+    requestInfo.fileId = fileId;
+    requestInfo.data = data;
+    requestInfo.path = path;
+    return simStateManager_[slotId]->GetSimIO(slotId, requestInfo, response);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -30,13 +30,19 @@ public:
 
 private:
     void AddHandlerNetWorkToMap();
+    void AddHandlerDeviceToMap();
+    void AddHandlerImsToMap();
     void AddHandlerSimToMap();
+    void AddHandlerSimLockToMap();
     void AddHandlerSimToMapExt();
+    void AddHandlerVoiceMailToMap();
     void AddHandlerPdpProfileToMap();
     void AddHandlerOpkeyVersionToMap();
+    int32_t SetTimer(uint32_t code);
+    void CancelTimer(int32_t id);
 
 private:
-    using CoreServiceFunc = int32_t (CoreServiceStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CoreServiceFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnGetPsRadioTech(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCsRadioTech(MessageParcel &data, MessageParcel &reply);
@@ -135,9 +141,22 @@ private:
     int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
+    std::map<uint32_t, std::string> collieCodeStringMap_ = {
+        { uint32_t(CoreServiceInterfaceCode::GET_SIGNAL_INFO_LIST), "GET_SIGNAL_INFO_LIST" },
+        { uint32_t(CoreServiceInterfaceCode::GET_NETWORK_STATE), "GET_NETWORK_STATE" },
+        { uint32_t(CoreServiceInterfaceCode::REG_IMS_CALLBACK), "REG_IMS_CALLBACK" },
+        { uint32_t(CoreServiceInterfaceCode::HAS_SIM_CARD), "HAS_SIM_CARD" },
+        { uint32_t(CoreServiceInterfaceCode::GET_MAX_SIM_COUNT), "GET_MAX_SIM_COUNT" },
+        { uint32_t(CoreServiceInterfaceCode::GET_SIM_STATE), "GET_SIM_STATE" },
+        { uint32_t(CoreServiceInterfaceCode::CHECK_LOCK), "CHECK_LOCK" },
+        { uint32_t(CoreServiceInterfaceCode::UNLOCK_PIN), "UNLOCK_PIN" },
+        { uint32_t(CoreServiceInterfaceCode::UNLOCK_PUK), "UNLOCK_PUK" },
+        { uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST), "GET_ACTIVE_ACCOUNT_INFO_LIST" },
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

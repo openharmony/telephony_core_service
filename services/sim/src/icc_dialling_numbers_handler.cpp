@@ -120,7 +120,7 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            (this->*memberFunc)(event, loadId);
+            memberFunc(event, loadId);
             SendBackResult(loadId);
         }
     } else {
@@ -442,7 +442,7 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     std::string tempStrNumber =
     SimNumberDecode::BCDConvertToString(data, offset, length, SimNumberDecode::BCD_TYPE_ADN);
     diallingNumber->number_ = Str8ToStr16(tempStrNumber);
-    TELEPHONY_LOGI("FetchDiallingNumberContent result end");
+    TELEPHONY_LOGD("FetchDiallingNumberContent result end");
 }
 
 std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
@@ -594,10 +594,14 @@ std::shared_ptr<RadioResponseInfo> IccDiallingNumbersHandler::MakeExceptionResul
 
 void IccDiallingNumbersHandler::InitFuncMap()
 {
-    memberFuncMap_[MSG_SIM_OBTAIN_ADN_DONE] = &IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ALL_ADN_DONE] = &IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_LINEAR_FILE_SIZE_DONE] = &IccDiallingNumbersHandler::ProcessLinearSizeDone;
-    memberFuncMap_[MSG_SIM_RENEW_ADN_DONE] = &IccDiallingNumbersHandler::ProcessUpdateRecordDone;
+    memberFuncMap_[MSG_SIM_OBTAIN_ADN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessDiallingNumberLoadDone(event, id); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ALL_ADN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessDiallingNumberAllLoadDone(event, id); };
+    memberFuncMap_[MSG_SIM_OBTAIN_LINEAR_FILE_SIZE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessLinearSizeDone(event, id); };
+    memberFuncMap_[MSG_SIM_RENEW_ADN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessUpdateRecordDone(event, id); };
 }
 
 void IccDiallingNumbersHandler::UpdateFileController(const std::shared_ptr<IccFileController> &fileController)

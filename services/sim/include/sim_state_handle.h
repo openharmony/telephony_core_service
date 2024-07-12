@@ -84,6 +84,8 @@ const int MSG_SIM_AUTHENTICATION_DONE = 61;
 
 const int MSG_SIM_SEND_NCFG_OPER_INFO_DONE = 62;
 
+const int MSG_SIM_GET_SIM_IO_DONE = 71;
+
 // pin lock type
 constexpr const char *FAC_PIN_LOCK = "SC";
 // change pin2 type
@@ -103,7 +105,7 @@ struct UnlockData {
 
 class SimStateHandle : public TelEventHandler {
 public:
-    using Func = void (SimStateHandle::*)(int32_t, const AppExecFwk::InnerEvent::Pointer &);
+    using Func = std::function<void(SimStateHandle *, int32_t, const AppExecFwk::InnerEvent::Pointer &)>;
     explicit SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager);
     ~SimStateHandle() = default;
     void Init(int32_t slotId);
@@ -137,6 +139,8 @@ public:
     void SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
     int32_t GetSendSimMatchedOperatorInfoResponse();
+    int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo);
+    SimAuthenticationResponse GetSimIOResponse();
 
 public:
     bool modemInitDone_ = false;
@@ -162,6 +166,7 @@ private:
     std::string GetAidByCardType(CardType type);
     bool IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t IsSatelliteSupported();
+    void GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
@@ -170,6 +175,7 @@ private:
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
     SimAuthenticationResponse simAuthRespon_ = { 0 };
+    SimAuthenticationResponse simIORespon_ = { 0 };
     int32_t sendSimMatchedOperatorInfoResult_ = static_cast<int32_t>(ErrType::NONE);
     LockStatusResponse simlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR };
     IccState iccState_; // icc card states

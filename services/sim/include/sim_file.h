@@ -44,6 +44,7 @@ public:
     std::string GetVoiceMailNumber();
     void SetVoiceMailNumber(const std::string mailNumber);
     void ClearData();
+    static std::vector<std::string> indiaMcc_;
 
 public:
     enum {
@@ -83,9 +84,12 @@ protected:
     std::shared_ptr<UsimFunctionHandle> UsimFunctionHandle_ = nullptr;
 
 private:
-    using FileProcessFunc = bool (SimFile::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, FileProcessFunc> memberFuncMap_;
     void InitMemberFunc();
+    void InitBaseMemberFunc();
+    void InitObtainMemberFunc();
+    void InitPlmnMemberFunc();
     void ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event);
     std::string AnalysisBcdPlmn(std::string data, std::string description);
     void ProcessElementaryFileCsp(std::string data);
@@ -136,13 +140,19 @@ private:
     void StartObtainSpn();
     void LoadSimOtherFile();
 
-    void CheckMncLength();
+    void CheckMncLengthForAdDone();
+    void CheckMncLengthForImsiDone();
+    bool CheckMncLen(std::string imsi, int imsiSize, int mncLen, int mccmncLen, bool isCheckUninitMnc);
+    bool IsIndiaMcc(std::string mccCode);
+    void OnMccMncLoaded(std::string imsi);
     bool IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newStatus);
     std::atomic<int32_t> reloadIccidCount_ = 3;
     const int MNC_INDEX = 7;
     const int MCC_LEN = 3;
+    const int MNC_LONG_LEN = 3;
     const int MNC_LEN = 2;
     const int MCCMNC_LEN = 6;
+    const int MCCMNC_SHORT_LEN = 5;
     const int LOAD_STEP = 1;
     const int INVALID_BYTES_NUM = 1;
     const int SPN_CHAR_POS = 0;
