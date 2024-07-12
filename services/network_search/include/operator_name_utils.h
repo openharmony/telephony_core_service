@@ -27,10 +27,12 @@ namespace Telephony {
 class OperatorNameUtils {
     struct OperatorNameCust {
         std::vector<std::string> mccMnc = {};
-        std::string zhHansCN = "";
-        std::string enLatnUS = "";
-        std::string zhHantTW = "";
-        std::string zhHantHK = "";
+        std::string zhCN = "";
+        std::string enUS = "";
+        std::string zhTW = "";
+        std::string zhHK = "";
+        std::string zhHans = "";
+        std::string zhHant = "";
     };
 
 public:

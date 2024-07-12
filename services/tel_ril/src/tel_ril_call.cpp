@@ -449,7 +449,7 @@ int32_t TelRilCall::SetCallRestriction(
     return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetCallRestriction, callRestrictionInfo);
 }
 
-int32_t TelRilCall::SendDtmf(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
+int32_t TelRilCall::SendDtmfString(const std::string &sDTMFCode, int32_t index, int32_t switchOn, int32_t switchOff,
     const AppExecFwk::InnerEvent::Pointer &result)
 {
     HDI::Ril::V1_1::DtmfInfo dtmfInfo = {};
@@ -578,7 +578,7 @@ int32_t TelRilCall::CallRingbackVoiceNotice(const HDI::Ril::V1_1::RingbackVoice 
         TELEPHONY_LOGE("ERROR : ringbackVoiceInfo == nullptr !!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ringbackVoiceInfo->status = ringbackVoice.status;
+    ringbackVoiceInfo->status = !ringbackVoice.status;
     return Notify<RingbackVoice>(TELEPHONY_LOG_FUNC_NAME, ringbackVoiceInfo, RadioEvent::RADIO_CALL_RINGBACK_VOICE);
 }
 

@@ -145,6 +145,8 @@ public:
     bool IsAllowedInsertApn(std::string &value) override;
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
+    int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
+        const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
 
 private:
     template<class T>

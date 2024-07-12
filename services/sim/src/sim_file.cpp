@@ -25,6 +25,8 @@
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_state_registry_client.h"
+#include "configuration.h"
+#include "app_mgr_client.h"
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -35,6 +37,7 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 const int64_t DELAY_TIME = 500;
 std::mutex IccFile::mtx_;
+std::vector<std::string> SimFile::indiaMcc_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
     fileQueried_ = false;
@@ -166,7 +169,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            bool isFileProcessResponse = (this->*memberFunc)(event);
+            bool isFileProcessResponse = memberFunc(event);
             ProcessFileLoaded(isFileProcessResponse);
         }
     } else {
@@ -196,11 +199,7 @@ void SimFile::ProcessIccRefresh(int msgId)
         case ELEMENTARY_FILE_CFF_CPHS:
             break;
         default:
-            auto iccFileExt = iccFile_.lock();
-            if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
-                TELEPHONY_LOGI("icc refresh, clear telephonyext data");
-                iccFileExt->ClearData();
-            }
+            ClearData();
             DeleteOperatorCache();
             LoadSimFiles();
             break;
@@ -331,7 +330,7 @@ void SimFile::LoadSimFiles()
         fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID2, eventGid2);
         fileToGet_++;
         AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
-        fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_AD, eventAD);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_AD, eventAD);
         fileToGet_++;
     }
     AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
@@ -1100,7 +1099,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         SaveCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
         if (!imsi_.empty()) {
-            CheckMncLength();
+            CheckMncLengthForImsiDone();
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             FileChangeToExt(imsi_, FileChangeType::G_IMSI_FILE_LOAD);
         }
@@ -1146,6 +1145,7 @@ bool SimFile::ProcessGetCffDone(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
+    lengthOfMnc_ = UNKNOWN_MNC;
     if (event == nullptr) {
         TELEPHONY_LOGE("get Ad event is nullptr!");
         return isFileProcessResponse;
@@ -1178,41 +1178,132 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
         lengthOfMnc_ = UNINITIALIZED_MNC;
     }
     TELEPHONY_LOGI("update5 length Mnc_= %{public}d", lengthOfMnc_);
-    CheckMncLength();
+    CheckMncLengthForAdDone();
     return isFileProcessResponse;
 }
 
-void SimFile::CheckMncLength()
+bool SimFile::CheckMncLen(std::string imsi, int imsiSize, int mncLen, int mccmncLen, bool isCheckUninitMnc)
+{
+    if (isCheckUninitMnc) {
+        return ((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == mncLen)) &&
+            ((!imsi.empty()) && (imsiSize >= mccmncLen));
+    }
+    return ((lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == mncLen)) && ((!imsi.empty()) && (imsiSize >= mccmncLen));
+}
+
+bool SimFile::IsIndiaMcc(std::string mccCode)
+{
+    if (indiaMcc_.size() == 0) {
+        indiaMcc_ = {"404", "405"};
+    }
+    std::vector<std::string>::iterator obj = std::find(indiaMcc_.begin(), indiaMcc_.end(), mccCode);
+    return (obj == indiaMcc_.end()) ? false : true;
+}
+
+void SimFile::CheckMncLengthForAdDone()
 {
     std::string imsi = ObtainIMSI();
     int imsiSize = static_cast<int>(imsi.size());
-    if (((lengthOfMnc_ == UNINITIALIZED_MNC) || (lengthOfMnc_ == UNKNOWN_MNC) || (lengthOfMnc_ == MNC_LEN)) &&
-        ((!imsi.empty()) && (imsiSize >= MCCMNC_LEN))) {
+    if (CheckMncLen(imsi, imsiSize, MNC_LEN, MCCMNC_LEN, true)) {
         std::string mccMncCode = imsi.substr(0, MCCMNC_LEN);
         TELEPHONY_LOGI("SimFile mccMncCode= %{public}s", mccMncCode.c_str());
         if (MccPool::LengthIsThreeMnc(mccMncCode)) {
-            lengthOfMnc_ = MCC_LEN;
-            TELEPHONY_LOGI("SimFile update6 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            lengthOfMnc_ = MNC_LONG_LEN;
+            TELEPHONY_LOGI("SimFile AdDone update1 lengthOfMnc_= %{public}d", lengthOfMnc_);
+        }
+    }
+
+    if (CheckMncLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, true)) {
+        std::string mccCode = imsi.substr(0, MCC_LEN);
+        if (IsIndiaMcc(mccCode)) {
+            std::string mccMncCode = imsi.substr(0, MCCMNC_SHORT_LEN);
+            if (MccPool::LengthIsTwoMnc(mccMncCode)) {
+                lengthOfMnc_ = MNC_LEN;
+                TELEPHONY_LOGI("SimFile AdDone update2 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            }
         }
     }
 
     if (lengthOfMnc_ == UNKNOWN_MNC || lengthOfMnc_ == UNINITIALIZED_MNC) {
         if (!imsi.empty()) {
-            int mcc = atoi(imsi.substr(0, MCC_LEN).c_str());
-            lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
-            TELEPHONY_LOGI("SimFile update7 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            std::string mccCode = imsi.substr(0, MCC_LEN);
+            if (IsIndiaMcc(mccCode)) {
+                lengthOfMnc_ = MNC_LONG_LEN;
+                TELEPHONY_LOGI("SimFile AdDone update3 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            } else {
+                int mcc = atoi(mccCode.c_str());
+                lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
+                TELEPHONY_LOGI("SimFile AdDone update4 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            }
         } else {
             lengthOfMnc_ = UNKNOWN_MNC;
             TELEPHONY_LOGI(
                 "MNC length not present in ELEMENTARY_FILE_AD setting9 lengthOfMnc_= %{public}d", lengthOfMnc_);
         }
     }
+    OnMccMncLoaded(imsi);
+}
+
+void SimFile::CheckMncLengthForImsiDone()
+{
+    std::string imsi = ObtainIMSI();
+    int imsiSize = static_cast<int>(imsi.size());
+    if (CheckMncLen(imsi, imsiSize, MNC_LEN, MCCMNC_LEN, false)) {
+        std::string mccMncCode = imsi.substr(0, MCCMNC_LEN);
+        TELEPHONY_LOGI("SimFile imsidone mccMncCode= %{public}s", mccMncCode.c_str());
+        if (MccPool::LengthIsThreeMnc(mccMncCode)) {
+            lengthOfMnc_ = MNC_LONG_LEN;
+            TELEPHONY_LOGI("SimFile imsidone update1 lengthOfMnc_= %{public}d", lengthOfMnc_);
+        }
+    }
+
+    if (CheckMncLen(imsi, imsiSize, MNC_LONG_LEN, MCCMNC_SHORT_LEN, false)) {
+        std::string mccCode = imsi.substr(0, MCC_LEN);
+        if (IsIndiaMcc(mccCode)) {
+            std::string mccMncCode = imsi.substr(0, MCCMNC_SHORT_LEN);
+            if (MccPool::LengthIsTwoMnc(mccMncCode)) {
+                lengthOfMnc_ = MNC_LEN;
+                TELEPHONY_LOGI("SimFile imsidone update2 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            }
+        }
+    }
+
+    if (lengthOfMnc_ == UNKNOWN_MNC) {
+        if (!imsi.empty()) {
+            std::string mccCode = imsi.substr(0, MCC_LEN);
+            if (IsIndiaMcc(mccCode)) {
+                lengthOfMnc_ = MNC_LONG_LEN;
+                TELEPHONY_LOGI("SimFile imsidone update3 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            } else {
+                int mcc = atoi(mccCode.c_str());
+                lengthOfMnc_ = MccPool::ShortestMncLengthFromMcc(mcc);
+                TELEPHONY_LOGI("SimFile imsidone update4 lengthOfMnc_= %{public}d", lengthOfMnc_);
+            }
+        } else {
+            lengthOfMnc_ = UNKNOWN_MNC;
+            TELEPHONY_LOGI(
+                "MNC length not present in ELEMENTARY_FILE_AD setting9 lengthOfMnc_= %{public}d", lengthOfMnc_);
+        }
+    }
+    OnMccMncLoaded(imsi);
+}
+
+void SimFile::OnMccMncLoaded(std::string imsi)
+{
     int lenNum = MCC_LEN + lengthOfMnc_;
     int sz = static_cast<int>(imsi.size());
     bool cond = sz >= lenNum;
-    if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC) && cond) {
+    if ((!imsi.empty()) && (lengthOfMnc_ != UNKNOWN_MNC && lengthOfMnc_ != UNINITIALIZED_MNC) && cond) {
         operatorNumeric_ = imsi.substr(0, lenNum);
+        TELEPHONY_LOGI("SimFile OnMccMncLoaded MCCMNC:%{public}s", operatorNumeric_.c_str());
         FileChangeToExt(operatorNumeric_, FileChangeType::G_MCCMNC_FILE_LOAD);
+        std::string mcc = imsi.substr(0, MCC_LEN);
+        std::string mnc = imsi.substr(MCC_LEN, lengthOfMnc_);
+        AppExecFwk::Configuration configuration;
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MCC, mcc);
+        configuration.AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_MNC, mnc);
+        auto appMgrClient = std::make_unique<AppExecFwk::AppMgrClient>();
+        appMgrClient->UpdateConfiguration(configuration);
     }
 }
 
@@ -1679,51 +1770,107 @@ bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newSt
 
 void SimFile::InitMemberFunc()
 {
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &SimFile::ProcessIccReady;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] = &SimFile::ProcessIccLocked;
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] = &SimFile::ProcessIccLocked;
-    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] = &SimFile::ProcessReloadIccid;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &SimFile::ProcessObtainIMSIDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &SimFile::ProcessGetIccIdDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] = &SimFile::ProcessGetMbiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] = &SimFile::ProcessGetCphsMailBoxDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] = &SimFile::ProcessGetMbdnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] = &SimFile::ProcessGetMsisdnDone;
-    memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] = &SimFile::ProcessSetMsisdnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_MWIS_DONE] = &SimFile::ProcessGetMwisDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] = &SimFile::ProcessVoiceMailCphs;
-    memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] = &SimFile::ProcessGetAdDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] = &SimFile::ProcessObtainSpnPhase;
-    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] = &SimFile::ProcessObtainLiLanguage;
-    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] = &SimFile::ProcessObtainPlLanguage;
-    memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] = &SimFile::ProcessGetCffDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] = &SimFile::ProcessGetSpdiDone;
-    memberFuncMap_[MSG_SIM_UPDATE_DONE] = &SimFile::ProcessUpdateDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] = &SimFile::ProcessGetPnnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] = &SimFile::ProcessGetOplDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] = &SimFile::ProcessGetOpl5gDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] = &SimFile::ProcessGetAllSmsDone;
-    memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] = &SimFile::ProcessMarkSms;
-    memberFuncMap_[MSG_SIM_SMS_ON_SIM] = &SimFile::ProcessSmsOnSim;
-    memberFuncMap_[MSG_SIM_OBTAIN_SMS_DONE] = &SimFile::ProcessGetSmsDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_SST_DONE] = &SimFile::ProcessGetSstDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_INFO_CPHS_DONE] = &SimFile::ProcessGetInfoCphs;
-    memberFuncMap_[MSG_SIM_SET_MBDN_DONE] = &SimFile::ProcessSetMbdn;
-    memberFuncMap_[MSG_SIM_SET_CPHS_MAILBOX_DONE] = &SimFile::ProcessSetCphsMailbox;
-    memberFuncMap_[MSG_SIM_OBTAIN_CFIS_DONE] = &SimFile::ProcessGetCfisDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] = &SimFile::ProcessGetCspCphs;
-    memberFuncMap_[MSG_SIM_OBTAIN_GID1_DONE] = &SimFile::ProcessObtainGid1Done;
-    memberFuncMap_[MSG_SIM_OBTAIN_GID2_DONE] = &SimFile::ProcessObtainGid2Done;
-    memberFuncMap_[MSG_SIM_OBTAIN_PLMN_W_ACT_DONE] = &SimFile::ProcessGetPlmnActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE] = &SimFile::ProcessGetOplmnActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE] = &SimFile::ProcessGetHplmActDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_EHPLMN_DONE] = &SimFile::ProcessGetEhplmnDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] = &SimFile::ProcessGetFplmnDone;
+    InitBaseMemberFunc();
+    InitObtainMemberFunc();
+    InitPlmnMemberFunc();
+}
+
+void SimFile::InitBaseMemberFunc()
+{
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
+    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadIccid(event); };
+    memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMsisdnDone(event); };
+    memberFuncMap_[MSG_SIM_UPDATE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessUpdateDone(event); };
+    memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessMarkSms(event); };
+    memberFuncMap_[MSG_SIM_SMS_ON_SIM] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSmsOnSim(event); };
+    memberFuncMap_[MSG_SIM_SET_MBDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMbdn(event); };
+    memberFuncMap_[MSG_SIM_SET_CPHS_MAILBOX_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetCphsMailbox(event); };
+}
+
+void SimFile::InitObtainMemberFunc()
+{
+    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainIMSIDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccIdDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCphsMailBoxDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbdnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMsisdnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_MWIS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMwisDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessVoiceMailCphs(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAdDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainLiLanguage(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainPlLanguage(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCffDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSpdiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPnnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOpl5gDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAllSmsDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SMS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSmsDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_SST_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSstDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_INFO_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetInfoCphs(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CFIS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCfisDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCspCphs(event); };
+}
+
+void SimFile::InitPlmnMemberFunc()
+{
+    memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainSpnPhase(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_GID1_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid1Done(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_GID2_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid2Done(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_PLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPlmnActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplmnActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetHplmActDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_EHPLMN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetEhplmnDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetFplmnDone(event); };
 }
 
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     unsigned int cond = 0;
+    unsigned int condTemp = 0;
     if (displayConditionOfSpn_ <= SPN_INVALID) {
         return cond;
     }
@@ -1733,12 +1880,15 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
             cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {
-        cond = SPN_CONDITION_DISPLAY_SPN;
+        condTemp = SPN_CONDITION_DISPLAY_SPN;
         if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND_PLMN)) ==
             SPN_COND_PLMN) {
-            cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
+            condTemp |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_PLMN);
         }
+        cond = SPN_CONDITION_DISPLAY_PLMN;
     }
+    TELEPHONY_LOGI("displayConditionOfSpn_:%{public}d, roaming:%{public}d, cond:%{public}d, condTemp:%{public}d",
+        displayConditionOfSpn_, roaming, cond, condTemp);
     return cond;
 }
 

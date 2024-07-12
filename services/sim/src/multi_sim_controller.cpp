@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -254,7 +254,6 @@ bool MultiSimController::InitIccId(int slotId)
     if (newIccId.empty()) {
         TELEPHONY_LOGI("iccid is empty.");
         newIccId = "emptyiccid" + std::to_string(slotId);
-        return false;
     }
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -509,7 +508,7 @@ bool MultiSimController::IsSimActive(int32_t slotId)
         return false;
     }
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("failed by out of range");
+        TELEPHONY_LOGD("failed by out of range");
         return false;
     }
     return localCacheInfo_[slotId].isActive == ACTIVE ? true : false;
@@ -529,6 +528,8 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     }
     isSetActiveSimInProgress_[slotId] = 1;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
+        CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
+            slotId, SimCardErrorCode::SET_ACTIVESIM_ERROR, "SetActiveSimToRil failure");
         TELEPHONY_LOGE("SetActiveSimToRil failed");
         isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_RIL_CMD_FAIL;
@@ -694,7 +695,7 @@ int32_t MultiSimController::GetDefaultVoiceSlotId()
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < localCacheInfo_.size(); i++) {
+    for (; i < static_cast<int32_t>(localCacheInfo_.size()); i++) {
         if (localCacheInfo_[i].isVoiceCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -754,7 +755,7 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < localCacheInfo_.size(); i++) { // save to cache
+    for (; i < static_cast<int32_t>(localCacheInfo_.size()); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isVoiceCard = MAIN_CARD;
             curSimId = localCacheInfo_[i].simId;
@@ -790,7 +791,7 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
         return INVALID_VALUE;
     }
     int32_t i = DEFAULT_SIM_SLOT_ID;
-    for (; i < localCacheInfo_.size(); i++) {
+    for (; i < static_cast<int32_t>(localCacheInfo_.size()); i++) {
         if (localCacheInfo_[i].isMessageCard == MAIN_CARD && localCacheInfo_[i].isActive == ACTIVE) {
             return i;
         }
@@ -822,7 +823,7 @@ int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
         TELEPHONY_LOGE("failed by nullptr");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    for (; i < localCacheInfo_.size(); i++) { // save to cache
+    for (; i < static_cast<int32_t>(localCacheInfo_.size()); i++) { // save to cache
         if (slotId == i) {
             localCacheInfo_[i].isMessageCard = MAIN_CARD;
             curSimId = localCacheInfo_[slotId].simId;
@@ -870,7 +871,6 @@ int32_t MultiSimController::GetDefaultCellularDataSlotId()
 int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 {
     SaveDefaultCellularDataSlotIdInfo(slotId);
-    lastCellularDataSlotId_ = slotId;
     CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(slotId);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -910,11 +910,6 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     isSetPrimarySlotIdInProgress_ = false;
     PublishSetPrimaryEvent(true);
-    for (int32_t i = 0; i < maxCount_; i++) {
-        if (!(localCacheInfo_[i].iccId.empty())) {
-            InitActive(i);
-        }
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -996,6 +991,7 @@ void MultiSimController::SavePrimarySlotIdInfo(int32_t slotId)
 void MultiSimController::SaveDefaultCellularDataSlotIdInfo(int32_t slotId)
 {
     SetParameter(MAIN_CELLULAR_DATA_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
+    lastCellularDataSlotId_ = slotId;
     SendDefaultCellularDataBroadCast(slotId);
 }
 
@@ -1255,6 +1251,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
         return TELEPHONY_ERROR;
     }
     SimRdbInfo simRdbInfo;
+    simRdbInfo.imsSwitch = IMS_SWITCH_STATUS_UNKNOWN;
     simDbHelper_->QueryDataByIccId(curIccid, simRdbInfo);
     imsSwitchValue = simRdbInfo.imsSwitch;
     return TELEPHONY_SUCCESS;

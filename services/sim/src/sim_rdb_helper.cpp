@@ -30,6 +30,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
     TELEPHONY_LOGD("start");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateDataHelper Failed");
+        return nullptr;
     }
     return mTelephonyDatahelper->CreateSimHelper();
 }
@@ -39,6 +40,7 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateOpKeyHelper()
     TELEPHONY_LOGI("SimRdbHelper::CreateOpKeyHelper");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed");
+        return nullptr;
     }
     return mTelephonyDatahelper->CreateOpKeyHelper();
 }
@@ -410,6 +412,14 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     std::shared_ptr<DataShare::DataShareResultSet> result = Query(dataShareHelper, colume, predicates);
     if (result == nullptr) {
         TELEPHONY_LOGE("get nothing");
+        dataShareHelper->Release();
+        return TELEPHONY_SUCCESS;
+    }
+    int rowCount = 0;
+    result->GetRowCount(rowCount);
+    if (rowCount <= 0) {
+        TELEPHONY_LOGE("dont query the iccid record in db");
+        result->Close();
         dataShareHelper->Release();
         return TELEPHONY_SUCCESS;
     }

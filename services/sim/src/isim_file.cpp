@@ -51,7 +51,7 @@ void IsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            isFileHandleResponse = (this->*memberFunc)(event);
+            isFileHandleResponse = memberFunc(event);
         }
     } else {
         IccFile::ProcessEvent(event);
@@ -174,12 +174,18 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 void IsimFile::InitMemberFunc()
 {
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] = &IsimFile::ProcessIccReady;
-    memberFuncMap_[MSG_ICC_REFRESH] = &IsimFile::ProcessIsimRefresh;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] = &IsimFile::ProcessGetImsiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] = &IsimFile::ProcessGetIccidDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_IMPI_DONE] = &IsimFile::ProcessGetImpiDone;
-    memberFuncMap_[MSG_SIM_OBTAIN_IST_DONE] = &IsimFile::ProcessGetIstDone;
+    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
+    memberFuncMap_[MSG_ICC_REFRESH] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIsimRefresh(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetImsiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccidDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_IMPI_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetImpiDone(event); };
+    memberFuncMap_[MSG_SIM_OBTAIN_IST_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIstDone(event);};
 }
 
 bool IsimFile::ProcessGetImpiDone(const AppExecFwk::InnerEvent::Pointer &event)

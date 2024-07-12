@@ -33,6 +33,8 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SLEEP_TIME_SECONDS = 3;
+constexpr int32_t NETWORK_CAPABILITY_TYPE = 2;
+constexpr int32_t NETWORK_CAPABILITY_STATE = 2;
 
 bool IsServiceInited()
 {
@@ -52,7 +54,7 @@ void GetUniqueDeviceId(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -67,7 +69,7 @@ void GetMeid(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -82,7 +84,7 @@ void GetBasebandVersion(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -96,9 +98,9 @@ void SetNetworkCapability(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t networkCapabilityType = static_cast<int32_t>(size);
-    int32_t networkCapabilityState = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t networkCapabilityType = static_cast<int32_t>(*data % NETWORK_CAPABILITY_TYPE);
+    int32_t networkCapabilityState = static_cast<int32_t>(*data % NETWORK_CAPABILITY_STATE);
     MessageParcel dataMessageParcel;
     MessageParcel reply;
     dataMessageParcel.WriteInt32(slotId);
@@ -116,9 +118,9 @@ void GetNetworkCapability(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t networkCapabilityType = static_cast<int32_t>(size);
-    int32_t networkCapabilityState = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t networkCapabilityType = static_cast<int32_t>(*data % NETWORK_CAPABILITY_TYPE);
+    int32_t networkCapabilityState = static_cast<int32_t>(*data % NETWORK_CAPABILITY_STATE);
     MessageParcel dataMessageParcel;
     MessageParcel reply;
     dataMessageParcel.WriteInt32(slotId);
@@ -138,7 +140,7 @@ void GetOperatorNumeric(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -153,7 +155,7 @@ void GetResidentNetworkNumeric(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -168,7 +170,7 @@ void GetOperatorName(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteBuffer(data, size);
@@ -183,7 +185,7 @@ void SendEnvelopeCmd(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     std::string cmd(reinterpret_cast<const char *>(data), size);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
@@ -225,9 +227,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
     OHOS::AddCoreServiceTokenFuzzer token;
+    return 0;
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<CoreService>::DestroyInstance();

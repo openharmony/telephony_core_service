@@ -35,13 +35,13 @@ public:
         int32_t slotId);
     virtual ~OperatorName() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-    void HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
     void NotifySpnChanged(bool isForce = false);
     void TrySetLongOperatorNameWithTranslation();
 
 private:
-    void GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    void CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
+    void CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
     void PublishEvent(int32_t rule, RegServiceState state, bool showPlmn, const std::string &plmn, bool showSpn,
         const std::string &spn, const std::string &domesticSpn);
     sptr<NetworkState> GetNetworkStatus();

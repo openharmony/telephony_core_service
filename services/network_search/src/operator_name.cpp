@@ -76,7 +76,6 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
             return;
         }
-        networkSearchManager->decMsgNum(slotId_);
         if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
             networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
@@ -86,54 +85,34 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
     }
 }
 
-void OperatorName::HandleOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo networkSearchManager is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult == nullptr) {
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    if (operatorInfoResult->flag != networkSearchManager->GetSerialNum(slotId_) &&
-        operatorInfoResult->flag != NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
-        TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
-        return;
-    }
     PhoneType type = networkSearchManager->GetPhoneType(slotId_);
     if (type == PhoneType::PHONE_TYPE_IS_GSM) {
-        GsmOperatorInfo(event);
+        GsmOperatorInfo(operatorInfoResult);
     } else if (type == PhoneType::PHONE_TYPE_IS_CDMA) {
-        CdmaOperatorInfo(event);
+        CdmaOperatorInfo(operatorInfoResult);
     } else {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
-    networkSearchManager->decMsgNum(slotId_);
-    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-    }
-
     NotifySpnChanged();
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
-void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("OperatorName::GsmOperatorInfo event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
     std::string longName = "";
     std::string shortName = "";
     std::string numeric = "";
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult != nullptr) {
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
@@ -150,16 +129,11 @@ void OperatorName::GsmOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-void OperatorName::CdmaOperatorInfo(const AppExecFwk::InnerEvent::Pointer &event)
+void OperatorName::CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("OperatorName::CdmaOperatorInfo event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
     std::string longName = "";
     std::string shortName = "";
     std::string numeric = "";
-    std::shared_ptr<OperatorInfoResult> operatorInfoResult = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult != nullptr) {
         longName = operatorInfoResult->longName;
         shortName = operatorInfoResult->shortName;
@@ -306,7 +280,7 @@ void OperatorName::NotifyGsmSpnChanged(
     }
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
-    if (slotId_ == VSIM_SLOT_ID) {
+    if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
         UpdateVSimSpn(spn, spnRule, showSpn);
     }
 
@@ -333,9 +307,9 @@ void OperatorName::NotifyGsmSpnChanged(
 void OperatorName::UpdateVSimSpn(std::string &spn, int32_t &rule, bool &showSpn)
 {
     if (TELEPHONY_EXT_WRAPPER.getVSimSlotId_ && TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_) {
-        int vSimSlotId = INVALID_SLOT_ID;
+        int vSimSlotId = static_cast<int>(SimSlotType::INVALID_SLOT_ID);
         TELEPHONY_EXT_WRAPPER.getVSimSlotId_(vSimSlotId);
-        if (vSimSlotId == VSIM_SLOT_ID) {
+        if (vSimSlotId == static_cast<int>(SimSlotType::VSIM_SLOT_ID)) {
             TELEPHONY_EXT_WRAPPER.changeSpnAndRuleExt_(spn, rule, showSpn);
         }
     }

@@ -56,7 +56,7 @@ void NetworkSearchState::SetOperatorInfo(
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
-        TELEPHONY_LOGI("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
+        TELEPHONY_LOGD("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
                        "%{public}s, slotId:%{public}d",
             networkState_->GetLongOperatorName().c_str(), networkState_->GetShortOperatorName().c_str(),
             networkState_->GetPlmnNumeric().c_str(), slotId_);
@@ -173,7 +173,7 @@ void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceS
     bool smsChanged = imsServiceStatus_->supportImsSms != imsServiceStatus.supportImsSms;
     bool radioTechChanged = imsServiceStatus_->imsRegTech != imsServiceStatus.imsRegTech;
     if (!voiceChanged && !videoChanged && !utChanged && !smsChanged && !radioTechChanged) {
-        TELEPHONY_LOGI("Nothing need update for slotId:%{public}d", slotId_);
+        TELEPHONY_LOGD("Nothing need update for slotId:%{public}d", slotId_);
         return;
     }
 
@@ -286,7 +286,7 @@ void NetworkSearchState::SetNrState(NrState state)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
-        TELEPHONY_LOGE("nrState_:%{public}d slotId:%{public}d", state, slotId_);
+        TELEPHONY_LOGD("nrState_:%{public}d slotId:%{public}d", state, slotId_);
         networkState_->SetNrState(state);
     }
 }

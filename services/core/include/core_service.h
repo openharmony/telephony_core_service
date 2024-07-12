@@ -24,6 +24,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 #include "tel_ril_manager.h"
+#include "tel_ril_sim_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -256,6 +257,9 @@ public:
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
 
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
+
+    int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
+        const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
 
 private:
     bool Init();

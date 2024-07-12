@@ -137,6 +137,8 @@ public:
 
     virtual bool IsSetActiveSimInProgress(int32_t slotId) = 0;
     virtual bool IsSetPrimarySlotIdInProgress() = 0;
+    virtual int32_t GetSimIO(int32_t slotId, int32_t command,
+        int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
