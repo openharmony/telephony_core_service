@@ -735,7 +735,6 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     bool isAirplaneMode = false;
     if (networkSearchManager->GetAirplaneMode(isAirplaneMode) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RadioOffOrUnavailableState GetAirplaneMode fail slotId: %{public}d", slotId_);
-        return;
     }
     auto simManager = networkSearchManager->GetSimManager();
     if (simManager == nullptr) {
