@@ -350,8 +350,6 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_003, Function | Med
     std::shared_ptr<DiallingNumbersInfo> diallingNumbers = std::make_shared<DiallingNumbersInfo>();
     AppExecFwk::InnerEvent::Pointer event = iccDiallingNumbersManager->BuildCallerInfo(-1);
     diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_ADN, diallingNumbers, 0, true, event);
-//    int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
-//    diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_ADN, extensionEf, event);
     std::u16string str1(u"Hello");
     EXPECT_TRUE(diallingNumbersCache->StringEqual(str1, str1));
 }
