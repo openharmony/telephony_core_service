@@ -231,8 +231,8 @@ public:
     static constexpr const char *RAW_CONTACT_ID = "raw_contact_id";
     static constexpr const char *TYPE_ID = "type_id";
     static constexpr const char *DETAIL_INFO = "detail_info";
-    static constexpr const char *LABEL_ID = "extend7";
-    static constexpr const char *LABEL_NAME = "custom_data";
+    static constexpr const char *LABEL_ID = "custom_data";
+    static constexpr const char *LABEL_NAME = "extend7";
     static constexpr const char *FULL_NAME = "detail_info";
     static constexpr const char *FAMILY_NAME = "family_name";
     static constexpr const char *FAMILY_NAME_PHONETIC = "phonetic_name";
