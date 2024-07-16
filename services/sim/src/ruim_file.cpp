@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -224,7 +224,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         SaveCountryCode();
         if (!imsi_.empty()) {
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
-            int imsiSize = static_cast<int>(imsi_.size());
+            size_t imsiSize = imsi_.size();
             std::string mcc = "";
             bool isSizeEnough = imsiSize >= MCC_LEN;
             if (isSizeEnough) {
