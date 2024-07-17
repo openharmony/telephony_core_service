@@ -233,7 +233,6 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
     if (len > length - START_POS) {
         len = length - START_POS;
     }
-    TELEPHONY_LOGI("len2: %{public}d", len);
     unsigned char* dataUsc = new unsigned char[len * HALF_LEN]{ FF_DATA };
     int index = 0;
     int base = 0;
