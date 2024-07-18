@@ -25,7 +25,7 @@ namespace Telephony {
 using SatelliteMessage = GsmSimMessageParam;
 
 namespace {
-const int32_t TELEPHONY_SATELLITE_SERVICE_ABILITY_ID = 4012;
+const int32_t TELEPHONY_SATELLITE_SERVICE_ABILITY_ID = 4013;
 }
 
 enum SatelliteServiceProxyType {
