@@ -160,6 +160,11 @@ ohos_shared_library("libtel_vcard") {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
   }
 
+  cflags_cc = [
+    "-O2",
+    "-D_FORTIFY_SOURCE=2",
+  ]
+
   include_dirs = [
     ":tel_contact_config",
     "../interfaces/innerkits/include/",
