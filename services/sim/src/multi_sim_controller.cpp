@@ -681,14 +681,6 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAc
 
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
-    if (GetLocalCacheSize() == 0) {
-        TELEPHONY_LOGE("failed by nullptr");
-        if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("simDbHelper is nullptr");
-            return INVALID_VALUE;
-        }
-        return simDbHelper_->GetDefaultVoiceCardSlotId();
-    }
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() <= 0) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -777,14 +769,6 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
 
 int32_t MultiSimController::GetDefaultSmsSlotId()
 {
-    if (GetLocalCacheSize() == 0) {
-        TELEPHONY_LOGE("failed by nullptr");
-        if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("simDbHelper is nullptr");
-            return INVALID_VALUE;
-        }
-        return simDbHelper_->GetDefaultMessageCardSlotId();
-    }
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() <= 0) {
         TELEPHONY_LOGE("failed by nullptr");
