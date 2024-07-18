@@ -233,7 +233,7 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
     if (len > length - START_POS) {
         len = length - START_POS;
     }
-    unsigned char dataUsc[MAX_ENGLISH_NAME * HALF_LEN] = { FF_DATA };
+    unsigned char* dataUsc = new unsigned char[len * HALF_LEN]{ FF_DATA };
     int index = 0;
     int base = 0;
     int dataOffset = UCS_OFFSET;
@@ -250,7 +250,9 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
         index = index + HALF_LEN;
     }
     int outlen = 0;
-    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
+    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, len * HALF_LEN, outlen, true);
+    delete[] dataUsc;
+    dataUsc = nullptr;
     if (cs == nullptr) {
         TELEPHONY_LOGE("cs is nullptr");
         return u"";
@@ -268,7 +270,7 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
         len = length - END_POS;
     }
     int base = (data[offset + UCS_BASE_POS] << BYTE_BIT) + data[offset + UCS_BASE_POS + 1];
-    unsigned char dataUsc[MAX_ENGLISH_NAME * HALF_LEN] = { FF_DATA };
+    unsigned char* dataUsc = new unsigned char[len * HALF_LEN]{ FF_DATA };
     int dataOffset = UCS_WIDE_OFFSET;
     int index = 0;
     while (index < len * HALF_LEN && offset + dataOffset < length) {
@@ -284,7 +286,9 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
         dataOffset++;
     }
     int outlen = 0;
-    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, MAX_ENGLISH_NAME * HALF_LEN, outlen, true);
+    std::shared_ptr<char16_t> cs = CharsConvertToChar16(dataUsc, len * HALF_LEN, outlen, true);
+    delete[] dataUsc;
+    dataUsc = nullptr;
     if (cs == nullptr) {
         TELEPHONY_LOGE("cs is nullptr");
         return u"";
