@@ -333,7 +333,8 @@ void NetworkSearchHandler::SubscribeSystemAbility()
         TELEPHONY_LOGE("SubscribeSystemAbility  samgrProxy or statusChangeListener_ is nullptr");
     } else {
         int32_t commonEventResult = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-        int32_t DataShareResult = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, statusChangeListener_);
+        int32_t DataShareResult = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID,
+            statusChangeListener_);
         TELEPHONY_LOGI("SubscribeSystemAbility  COMMON_EVENT_SERVICE_ID result:%{public}d"
             "DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID result:%{public}d.", commonEventResult, DataShareResult);
     }
@@ -1516,13 +1517,12 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility
             break;
         }
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
-        TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
+            TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
             SettingUtils::GetInstance()->UpdateDdsState(true);
             break;
         default:
             TELEPHONY_LOGE("NetworkSearchHandler::OnAddSystemAbility unknown sa id %{public}d", systemAbilityId);
     }
-    
 }
 
 void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
