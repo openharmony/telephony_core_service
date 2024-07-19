@@ -76,8 +76,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShar
         TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
         return nullptr;
     }
-    sptr<IRemoteObject> distributedData = saManager->GetSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-    if (distributedData == nullptr) {
+    if (!isDdsReady_.load() {
         TELEPHONY_LOGE("SettingUtils: distributedData is not started.");
         return nullptr;
     }
@@ -106,7 +105,7 @@ bool SettingUtils::UnRegisterSettingsObserver(
             it++;
         }
     }
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateNonBlockDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
         return false;
@@ -138,6 +137,9 @@ void SettingUtils::RegisterSettingsObserver()
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
         RegisterToDataShare(it->first, it->second);
+        if (it->first.ToString() == NETWORK_SEARCH_SETTING_AIRPLANE_MODE_URI) {
+            it->second->OnChange();
+        }
     }
 }
 
@@ -158,7 +160,7 @@ bool SettingUtils::RegisterToDataShare(
 int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils:Query");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateNonBlockDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -193,7 +195,7 @@ int32_t SettingUtils::Query(Uri uri, const std::string &key, std::string &value)
 int32_t SettingUtils::Insert(Uri uri, const std::string &key, const std::string &value)
 {
     TELEPHONY_LOGI("SettingUtils: insert start");
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateNonBlockDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -221,7 +223,7 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     if (Query(uri, key, queryValue) != TELEPHONY_SUCCESS) {
         return Insert(uri, key, value);
     }
-    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateDataShareHelper();
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper = CreateNonBlockDataShareHelper();
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("settingHelper is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -250,6 +252,18 @@ void SettingUtils::SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscr
 std::shared_ptr<EventFwk::CommonEventSubscriber> SettingUtils::GetCommonEventSubscriber()
 {
     return commonEventSubscriber_;
+}
+
+void SettingUtils::UpdateDdsState(bool isReady)
+{
+    if (isReady == isDdsReady_.load()) {
+        return;
+    }
+    isDdsReady_.store(isReady);
+    if (isReady) {
+        TELEPHONY_LOGE("Distributed data service start.");
+        RegisterSettingsObserver();
+    }
 }
 
 SettingUtils::BroadcastSubscriber::BroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &sp)
