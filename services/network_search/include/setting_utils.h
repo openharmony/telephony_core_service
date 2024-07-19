@@ -59,6 +59,7 @@ public:
     int32_t Query(Uri uri, const std::string &key, std::string &value);
     int32_t Insert(Uri uri, const std::string &key, const std::string &value);
     int32_t Update(Uri uri, const std::string &key, const std::string &value);
+    void UpdateDdsState(bool isReady);
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
@@ -72,6 +73,7 @@ private:
     std::mutex mtx_;
     std::vector<std::pair<Uri, sptr<AAFwk::IDataAbilityObserver>>> registerInfos_;
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ = nullptr;
+    std::atomic<bool> isDdsReady_ = false;
 
 private:
     class BroadcastSubscriber : public EventFwk::CommonEventSubscriber {

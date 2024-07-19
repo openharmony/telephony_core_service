@@ -332,8 +332,11 @@ void NetworkSearchHandler::SubscribeSystemAbility()
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("SubscribeSystemAbility  samgrProxy or statusChangeListener_ is nullptr");
     } else {
-        int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-        TELEPHONY_LOGI("SubscribeSystemAbility  COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
+        int32_t commonEventResult = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+        int32_t DataShareResult = samgrProxy->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID,
+            statusChangeListener_);
+        TELEPHONY_LOGI("SubscribeSystemAbility  COMMON_EVENT_SERVICE_ID result:%{public}d"
+            "DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID result:%{public}d.", commonEventResult, DataShareResult);
     }
 }
 
@@ -1499,20 +1502,27 @@ NetworkSearchHandler::SystemAbilityStatusChangeListener::SystemAbilityStatusChan
 void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
-    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
-        return;
+    switch (systemAbilityId) {
+        case COMMON_EVENT_SERVICE_ID: {
+            if (opName_ == nullptr) {
+                TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
+                return;
+            }
+            opName_->NotifySpnChanged(true);
+            bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
+            bool settingsResult = EventFwk::CommonEventManager::SubscribeCommonEvent(
+                SettingUtils::GetInstance()->GetCommonEventSubscriber());
+            TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d, %{public}d",
+                subscribeResult, settingsResult);
+            break;
+        }
+        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
+            TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID");
+            SettingUtils::GetInstance()->UpdateDdsState(true);
+            break;
+        default:
+            TELEPHONY_LOGE("NetworkSearchHandler::OnAddSystemAbility unknown sa id %{public}d", systemAbilityId);
     }
-    if (opName_ == nullptr) {
-        TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
-        return;
-    }
-    opName_->NotifySpnChanged(true);
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
-    bool settingsResult = EventFwk::CommonEventManager::SubscribeCommonEvent(
-        SettingUtils::GetInstance()->GetCommonEventSubscriber());
-    TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d, %{public}d", subscribeResult,
-        settingsResult);
 }
 
 void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
