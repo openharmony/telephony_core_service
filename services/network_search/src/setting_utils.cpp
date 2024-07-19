@@ -136,7 +136,7 @@ void SettingUtils::RegisterSettingsObserver()
 {
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
-        if (it->first == nullptr || it->second == nullptr) {
+        if (it->second == nullptr) {
             continue;
         }
         RegisterToDataShare(it->first, it->second);
