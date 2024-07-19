@@ -76,7 +76,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShar
         TELEPHONY_LOGE("SettingUtils: GetSystemAbility Service Failed.");
         return nullptr;
     }
-    if (!isDdsReady_.load() {
+    if (!isDdsReady_.load()) {
         TELEPHONY_LOGE("SettingUtils: distributedData is not started.");
         return nullptr;
     }
