@@ -264,7 +264,7 @@ void SettingUtils::UpdateDdsState(bool isReady)
     }
     isDdsReady_.store(isReady);
     if (isReady) {
-        TELEPHONY_LOGE("Distributed data service start.");
+        TELEPHONY_LOGI("Distributed data service start.");
         RegisterSettingsObserver();
     }
 }
