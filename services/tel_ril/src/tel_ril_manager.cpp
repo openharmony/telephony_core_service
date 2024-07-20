@@ -941,7 +941,7 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
             return;
         }
         TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, reconnect riladapter service success");
-        int32_t size = static_cast<int32_t>(telRilModem_.size());
+        int32_t size = static_cast<int32_t>(telRilSim_.size());
         for (int32_t slotId = SIM_SLOT_0; slotId < size; slotId++) {
             if (GetTelRilSim(slotId) != nullptr) {
                 GetTelRilSim(slotId)->SimStateUpdated();
