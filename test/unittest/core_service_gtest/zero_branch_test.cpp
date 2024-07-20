@@ -105,19 +105,10 @@ void BranchTest::TearDown() {}
 void BranchTest::SetUpTestCase()
 {
     constexpr int permissionNum = 2;
-    const char *perms[permissionNum] = {
-            "ohos.permission.GET_TELEPHONY_STATE",
-            "ohos.permission.SET_TELEPHONY_STATE"
-    };
-    NativeTokenInfoParams infoInstance = {
-            .dcapsNum = 0,  // Indicates the capsbility list of the sa.
-            .permsNum = permissionNum,
-            .aclsNum = 0,  // acls is the list of rights thar can be escalated.
-            .dcaps = nullptr,
-            .perms = perms,
-            .acls = nullptr,
-            .processName = "BranchTest",
-            .aplStr = "system_basic",
+    const char *perms[permissionNum] = {"ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.SET_TELEPHONY_STATE"};
+    NativeTokenInfoParams infoInstance = {.dcapsNum = 0, .permsNum = permissionNum, .aclsNum = 0, .dcaps = nullptr,
+        .perms = perms, .acls = nullptr, .processName = "BranchTest", .aplStr = "system_basic",
     };
     uint64_t tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
