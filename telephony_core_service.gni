@@ -12,11 +12,6 @@
 # limitations under the License.
 
 declare_args() {
-  telephony_ext_feature = false
-  telephony_vsim_feature = false
-  telephony_fullnetwork_feature = false
-  data_service_ext_feature = false
-
   telephony_hicollie_able = true
   if (defined(global_parts_info) &&
       !defined(global_parts_info.hiviewdfx_hicollie)) {
@@ -24,21 +19,10 @@ declare_args() {
   }
 }
 
-print("telephony_ext_feature = ${telephony_ext_feature}")
 telephony_extra_defines = []
 
-if (telephony_ext_feature) {
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_telephony_enhanced)) {
   telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_EXT" ]
-}
-
-if (telephony_vsim_feature) {
   telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_VSIM" ]
-}
-
-if (telephony_fullnetwork_feature) {
-  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_FULLNETWORK" ]
-}
-
-if (data_service_ext_feature) {
-  telephony_extra_defines += [ "OHOS_BUILD_ENABLE_DATA_SERVICE_EXT" ]
 }
