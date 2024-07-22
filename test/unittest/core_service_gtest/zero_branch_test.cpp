@@ -56,6 +56,11 @@
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
+#include "telephony_data_helper.h"
+#include "sim_data.h"
+#include "accesstoken_kit.h"
+#include "token_setproc.h"
+#include "nativetoken_kit.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,6 +69,7 @@ using namespace testing::ext;
 namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
+const int DATA_STORAGE_ERR_PERMISSION_ERR = -3;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
 const int32_t OBTAIN_SPN_GENERAL = 2;
@@ -89,13 +95,26 @@ public:
     void SetUp();
     void TearDown();
 };
-void BranchTest::SetUpTestCase() {}
 
 void BranchTest::TearDownTestCase() {}
 
 void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
+
+void BranchTest::SetUpTestCase()
+{
+    constexpr int permissionNum = 2;
+    const char *perms[permissionNum] = {"ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.SET_TELEPHONY_STATE"};
+    NativeTokenInfoParams infoInstance = {.dcapsNum = 0, .permsNum = permissionNum, .aclsNum = 0, .dcaps = nullptr,
+        .perms = perms, .acls = nullptr, .processName = "BranchTest", .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    auto result = Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
+}
 
 /**
  * @tc.number   Telephony_CellInfo_001
@@ -2844,21 +2863,72 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
  */
 HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
 {
+    TELEPHONY_LOGI("Telephony_SimRdbHelper_001");
     auto simRdbHelper = std::make_shared<SimRdbHelper>();
     SimRdbInfo simBean;
     std::string iccId = "";
     std::vector<SimRdbInfo> vec;
-    EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultCellularDataCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryAllData(vec), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultCellularDataCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultVoiceCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_SimRdbHelper_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimRdbHelper_002, Function | MediumTest | Level1)
+{
+    TELEPHONY_LOGI("Telephony_SimRdbHelper_002");
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->InitData(0);
+    multiSimController->ForgetAllData();
+    auto simRdbHelper = std::make_shared<SimRdbHelper>();
+    SimRdbInfo simBean;
+    std::string iccId = "empty_slot0";
+    std::vector<SimRdbInfo> vec;
+    EXPECT_GE(simRdbHelper->UpdateOpKeyInfo(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->ClearData(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject slotObj(0);
+    DataShare::DataShareValueObject iccidObj(iccId);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
+    values.Put(SimData::SLOT_INDEX, slotObj);
+    values.Put(SimData::ICC_ID, iccidObj);
+    values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int64_t id;
+    EXPECT_GE(simRdbHelper->InsertData(id, values), DATA_STORAGE_ERR_PERMISSION_ERR);
+    DataShare::DataShareValuesBucket valuesExt;
+    DataShare::DataShareValueObject mccObj("460");
+    DataShare::DataShareValueObject mncObj("09");
+    valuesExt.Put(SimData::MCC, mccObj);
+    valuesExt.Put(SimData::MNC, mncObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SimData::ICC_ID, iccId);
+    EXPECT_GE(simRdbHelper->UpdateDataByIccId(iccId, valuesExt), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    int curSimId = multiSimController->GetSimId(0);
+    DataShare::DataShareValuesBucket valuesNumber;
+    DataShare::DataShareValueObject numberObj("123569877456");
+    valuesNumber.Put(SimData::PHONE_NUMBER, numberObj);
+    EXPECT_GE(simRdbHelper->UpdateDataBySimId(curSimId, valuesNumber), DATA_STORAGE_ERR_PERMISSION_ERR);
+    multiSimController->ForgetAllData(0);
 }
 
 /**
