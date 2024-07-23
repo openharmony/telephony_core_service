@@ -320,9 +320,12 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     diallingNumbersCache->SendBackResult(event, list, object);
     diallingNumbersCache->SendUpdateResult(event, object);
     data->result = static_cast<std::shared_ptr<void>>(list);
-    diallingNumbersCache->ProcessObtainPbrDetailsDone(event);
-    diallingNumbersCache->ProcessObtainAdnDetailsDone(event);
-    diallingNumbersCache->ProcessChangeDiallingNumbersDone(event);
+    auto owner = event->GetOwner();
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
+    diallingNumbersCache->ProcessObtainAdnDetailsDone(response);
+    diallingNumbersCache->ProcessChangeDiallingNumbersDone(response);
     diallingNumbersCache->LoadReadyDiallingNumbers(ELEMENTARY_FILE_ADN);
     diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
     std::u16string str1(u"Hello");
@@ -478,6 +481,55 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_001, Function | 
     usimDiallingNumbersService->SetFileControllerAndDiallingNumberHandler(iccFileController, iccDiallingNumbersHandler);
     usimDiallingNumbersService->LoadPbrFiles();
     EXPECT_TRUE(usimDiallingNumbersService->fileController_ == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_002, Function | MediumTest | Level1)
+{
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
+    event = nullptr;
+    usimDiallingNumbersService->ProcessPbrLoadDone(event);
+    usimDiallingNumbersService->ProcessDiallingNumberLoadDone(event);
+    usimDiallingNumbersService->NextStep(0);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
+    AppExecFwk::InnerEvent::Pointer pointer = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
+    usimDiallingNumbersService->ObtainUsimElementaryFiles(pointer);
+    AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->BuildCallerInfo(-1);
+    std::unique_ptr<FileToControllerMsg> cmdData = event->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
+    std::vector<std::string> strValue = {"FFFFFFFFFFFFFFFF"};
+    object->fileResults.assign(strValue.begin(), strValue.end());
+    object->resultLength = static_cast<int>(strValue.size());
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, object, eventParam);
+    usimDiallingNumbersService->ProcessPbrLoadDone(response);
 }
 
 /**
