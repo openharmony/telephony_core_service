@@ -228,6 +228,7 @@ void NapiAsyncBaseCompleteCallback(
         napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
         NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is false");
         return;
     }
 
@@ -236,6 +237,7 @@ void NapiAsyncBaseCompleteCallback(
             (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
         NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
         NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is true");
         return;
     }
 
