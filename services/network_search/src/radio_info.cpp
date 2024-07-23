@@ -323,7 +323,8 @@ void RadioInfo::AirplaneModeChange()
         if (simManager->IsSimActive(slotId_)) {
             nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
         }
-        bool hasSim = simManager->HasSimCard(slotId_);
+        bool hasSim = false;
+        simManager->HasSimCard(slotId_, hasSim);
         int32_t primarySlot = INVALID_SLOT_ID;
         simManager->GetPrimarySlotId(primarySlot);
         if (!hasSim && slotId_ == primarySlot) {
