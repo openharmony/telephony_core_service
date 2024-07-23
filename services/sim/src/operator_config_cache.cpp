@@ -143,6 +143,7 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
     if (opc_.configValue.size() > 0) {
         TELEPHONY_LOGD("get from memory");
         CopyOperatorConfig(opc_, poc);
+        lock.unlock();
         return TELEPHONY_ERR_SUCCESS;
     }
     lock.unlock();
