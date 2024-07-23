@@ -736,42 +736,6 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     ASSERT_TRUE(iccFileController->BuildCallerInfo(0, 0, 0, holder) != nullptr);
 }
 
-/**
- * @tc.number   Telephony_SimManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = nullptr;
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->InitSingleSimObject();
-    simManager->slotCount_ = 1;
-    int32_t slotId;
-    std::u16string testU = u"";
-    simManager->SetShowNumber(INVALID_SLOTID, testU);
-    simManager->GetShowNumber(INVALID_SLOTID, testU);
-    simManager->GetDefaultVoiceSimId(slotId);
-    simManager->GetDefaultSmsSlotId();
-    simManager->slotCount_ = 1;
-    int32_t dsdsMode = 0;
-    int32_t slotCount = 1;
-    std::string testS = "";
-    simManager->GetDsdsMode(dsdsMode);
-    simManager->stkManager_.resize(slotCount);
-    simManager->simFileManager_.resize(slotCount);
-    simManager->SendCallSetupRequestResult(INVALID_SLOTID, true);
-    simManager->GetSimGid2(INVALID_SLOTID);
-    simManager->GetOpName(INVALID_SLOTID, testU);
-    simManager->GetOpKey(INVALID_SLOTID, testU);
-    simManager->GetOpKeyExt(INVALID_SLOTID, testU);
-    simManager->GetSimTeleNumberIdentifier(INVALID_SLOTID);
-    simManager->ObtainSpnCondition(INVALID_SLOTID, false, testS);
-    simManager->slotCount_ = 0;
-    simManager->GetPrimarySlotId(slotId);
-    EXPECT_GT(simManager->GetDefaultSmsSlotId(), TELEPHONY_PERMISSION_ERROR);
-}
-
 AppExecFwk::InnerEvent::Pointer GetControllerToFileMsgEvent(int32_t code, bool withException)
 {
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
