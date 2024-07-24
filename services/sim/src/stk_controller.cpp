@@ -100,7 +100,6 @@ void StkController::InitListener()
     }
     auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
     TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
-    CheckOpcNeedUpdata(false);
 }
 
 void StkController::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
@@ -144,10 +143,10 @@ void StkController::SubscribeBundleScanFinished()
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
     bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo, *this);
     if (CommonEventManager::SubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
-        TELEPHONY_LOGI("Subscribe datashare ready success");
+        TELEPHONY_LOGI("Subscribe Bundle Scan Finished success");
     } else {
         bundleScanFinishedSubscriber_ = nullptr;
-        TELEPHONY_LOGE("Subscribe datashare ready fail");
+        TELEPHONY_LOGE("Subscribe Bundle Scan Finished fail");
     }
 }
 
