@@ -58,12 +58,115 @@ StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &tel
       slotId_(slotId)
 {}
 
+StkController::~StkController()
+{
+    UnSubscribeListeners();
+}
+
 void StkController::Init()
 {
     stkBundleName_ = initStkBudleName();
     RegisterEvents();
     if (TELEPHONY_EXT_WRAPPER.initBip_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.initBip_(slotId_);
+    }
+    InitListener();
+}
+
+void StkController::UnSubscribeListeners()
+{
+    if (bundleScanFinishedSubscriber_ != nullptr &&
+        CommonEventManager::UnSubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
+        bundleScanFinishedSubscriber_ = nullptr;
+        TELEPHONY_LOGI("Unsubscribe Bundle Scan Finished success");
+    }
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+            TELEPHONY_LOGI("Unsubscribe COMMON_EVENT_SERVICE_ID success");
+        }
+    }
+}
+
+void StkController::InitListener()
+{
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
+        return;
+    }
+    auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
+    CheckOpcNeedUpdata(false);
+}
+
+void StkController::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
+            handler_.SubscribeBundleScanFinished();
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
+}
+
+void StkController::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId)
+{
+    switch (systemAbilityId) {
+        case COMMON_EVENT_SERVICE_ID: {
+            TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped");
+            break;
+        }
+        default:
+            TELEPHONY_LOGE("systemAbilityId is invalid");
+            break;
+    }
+}
+
+void StkController::SubscribeBundleScanFinished()
+{
+    if (bundleScanFinishedSubscriber_ != nullptr) {
+        TELEPHONY_LOGW("Bundle Scan Finished has Subscribed");
+        return;
+    }
+    MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(BUNDLE_SCAN_FINISHED_EVENT);
+    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+    bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo, *this);
+    if (CommonEventManager::SubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
+        TELEPHONY_LOGI("Subscribe datashare ready success");
+    } else {
+        bundleScanFinishedSubscriber_ = nullptr;
+        TELEPHONY_LOGE("Subscribe datashare ready fail");
+    }
+}
+
+void StkController::BundleScanFinishedEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = want.GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == BUNDLE_SCAN_FINISHED_EVENT) {
+        handler_.OnReceiveBms();
+    }
+}
+
+void StkController::OnReceiveBms()
+{
+    if (!retryWant_.GetStringParam(PARAM_MSG_CMD).empty() && !isProactiveCommandSucc) {
+        remainTryCount_ = MAX_RETRY_COUNT;
+        TELEPHONY_LOGI("OnReceiveBms retry send stkdata");
+        RetrySendRilProactiveCommand();
     }
 }
 
@@ -266,6 +369,7 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
         SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
         return;
     }
+    isProactiveCommandSucc = true;
     remainTryCount_ = 0;
 }
 
@@ -279,6 +383,7 @@ void StkController::RetrySendRilProactiveCommand()
             return;
         }
         TELEPHONY_LOGI("StkController[%{public}d] retry sucess", slotId_);
+        isProactiveCommandSucc = true;
         remainTryCount_ = 0;
         return;
     }
