@@ -18,7 +18,10 @@ group("unittest") {
   deps = []
   deps += [
     "unittest/core_service_gtest:tel_core_service_gtest",
+    "unittest/core_service_gtest:tel_core_zero_branch_gtest",
     "unittest/core_service_gtest:tel_network_search_gtest",
+    "unittest/core_service_gtest:tel_sim_gtest",
+    "unittest/core_service_gtest:tel_sim_zero_branch_gtest",
     "unittest/tel_ril_gtest:tel_ril_gtest",
   ]
 }
