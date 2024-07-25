@@ -495,5 +495,6 @@ group("unittest") {
     ":tel_core_zero_branch_gtest",
     ":tel_network_search_gtest",
     ":tel_sim_gtest",
+    ":tel_sim_zero_branch_gtest",
   ]
 }
