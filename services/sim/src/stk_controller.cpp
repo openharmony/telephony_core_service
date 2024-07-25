@@ -122,6 +122,7 @@ void StkController::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int
 {
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
+            handler_.UnSubscribeListeners();
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped");
             break;
         }
