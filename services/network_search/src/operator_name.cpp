@@ -277,8 +277,11 @@ void OperatorName::NotifyGsmSpnChanged(
     }
 
     showPlmnOld = showPlmn;
-    if (spn.empty() || !plmn.empty()) {
+    if (spn.empty() && !plmn.empty()) {
         showPlmn = true;
+    }
+    if (showPlmn && spn == plmn) {
+        showSpn = false;
     }
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
