@@ -164,9 +164,13 @@ void StkController::BundleScanFinishedEventSubscriber::OnReceiveEvent(const Comm
 void StkController::OnReceiveBms()
 {
     if (!retryWant_.GetStringParam(PARAM_MSG_CMD).empty() && !isProactiveCommandSucc) {
-        remainTryCount_ = MAX_RETRY_COUNT;
-        TELEPHONY_LOGI("OnReceiveBms retry send stkdata");
-        SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
+        if (remainTryCount_ == 0) {
+            remainTryCount_ = MAX_RETRY_COUNT;
+            TELEPHONY_LOGI("OnReceiveBms retry send stkdata");
+            SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
+        } else {
+            remainTryCount_ = MAX_RETRY_COUNT;
+        }
     }
 }
 
