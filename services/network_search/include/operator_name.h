@@ -56,6 +56,7 @@ private:
         RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn);
     int32_t GetCurrentLac();
     std::string GetCustomName(const std::string &numeric);
+    unsigned int GetSpnRule(sptr<NetworkState> &networkState);
     unsigned int GetCustSpnRule(bool roaming);
     std::string GetEons(const std::string &numeric, int32_t lac, bool longNameRequired);
     std::string GetCustEons(const std::string &numeric, int32_t lac, bool roaming, bool longNameRequired);
@@ -64,6 +65,7 @@ private:
     void UpdateOplCust(const std::vector<std::string> &oplCust);
     void UpdateOperatorConfig();
     bool isDomesticRoaming(const std::string &simPlmn, const std::string &netPlmn);
+    bool IsChinaCard();
     bool isCMCard(const std::string &numeric);
     bool isCUCard(const std::string &numeric);
     bool isCTCard(const std::string &numeric);

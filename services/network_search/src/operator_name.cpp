@@ -263,21 +263,13 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_LOGE("OperatorName::NotifyGsmSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    int32_t spnRule = 0;
+
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
     bool showPlmnOld = false;
     bool showSpn = false;
-    bool roaming = networkState->IsRoaming();
-    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
-        spnRule = GetCustSpnRule(roaming);
-    } else {
-        std::string numeric = networkState->GetPlmnNumeric();
-        if (simManager_ != nullptr) {
-            spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
-        }
-    }
+    int32_t spnRule = GetSpnRule(networkState);
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
@@ -418,6 +410,23 @@ std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool 
         return "";
     }
     return Str16ToStr8(simManager_->GetSimEons(slotId_, numeric, lac, longNameRequired));
+}
+
+unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
+{
+    int32_t spnRule = 0;
+    bool roaming = networkState->IsRoaming();
+    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
+        spnRule = GetCustSpnRule(roaming);
+    } else if (!roaming && IsChinaCard()) {
+        spnRule = SPN_CONDITION_DISPLAY_PLMN;
+    } else {
+        std::string numeric = networkState->GetPlmnNumeric();
+        if (simManager_ != nullptr) {
+            spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
+        }
+    }
+    return spnRule;
 }
 
 unsigned int OperatorName::GetCustSpnRule(bool roaming)
@@ -604,6 +613,17 @@ bool OperatorName::isCBDomestic(const std::string &numeric)
         return true;
     }
     return false;
+}
+
+bool OperatorName::IsChinaCard()
+{
+    std::string simPlmn = "";
+    if (simManager_ != nullptr) {
+        std::u16string operatorNumeric = u"";
+        simManager_->GetSimOperatorNumeric(slotId_, operatorNumeric);
+        simPlmn = Str16ToStr8(operatorNumeric);
+    }
+    return isCMCard(simPlmn) || isCUCard(simPlmn) || isCTCard(simPlmn) || isCBCard(simPlmn);
 }
 
 int32_t OperatorName::GetCurrentLac()
