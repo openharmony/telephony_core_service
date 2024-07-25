@@ -165,7 +165,7 @@ void StkController::OnReceiveBms()
     if (!retryWant_.GetStringParam(PARAM_MSG_CMD).empty() && !isProactiveCommandSucc) {
         remainTryCount_ = MAX_RETRY_COUNT;
         TELEPHONY_LOGI("OnReceiveBms retry send stkdata");
-        RetrySendRilProactiveCommand();
+        SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
     }
 }
 
