@@ -16,9 +16,9 @@
 #ifndef OHOS_STK_CONTROLLER_H
 #define OHOS_STK_CONTROLLER_H
 
-#include "common_event_subscriber.h"
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
+#include "common_event_subscriber.h"
 #include "telephony_state_registry_client.h"
 #include "i_tel_ril_manager.h"
 #include "inner_event.h"
