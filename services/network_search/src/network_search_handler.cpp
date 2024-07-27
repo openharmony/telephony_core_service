@@ -1191,6 +1191,7 @@ void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
         return;
     }
+    RevertLastTechnology();
     RadioOnState();
 }
 
