@@ -1458,8 +1458,7 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         TELEPHONY_LOGI("The NR switch is closed.");
         return false;
     }
-    RegServiceState regState = RegServiceState::REG_STATE_UNKNOWN;
-    inner->networkSearchHandler_->GetRegServiceState(regState);
+    RegServiceState regState = inner->networkSearchState_->GetNetworkStatus()->GetRegStatus();
     if (regState == RegServiceState::REG_STATE_NO_SERVICE) {
         TELEPHONY_LOGI("The reg state is no service.");
         return false;
@@ -1473,8 +1472,10 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         TELEPHONY_LOGI("Has call, slotId:%{public}d", slotId);
         return false;
     }
-    RadioTech lastCfgTech = inner->networkSearchState_->GetNetworkStatus()->GetLastCfgTech();
-    RadioTech lastPsRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetLastPsRadioTech();
+    RadioTech lastCfgTech;
+    inner->networkSearchState_->GetLastCfgTech(lastCfgTech);
+    RadioTech lastPsRadioTech;
+    inner->networkSearchState_->GetLastPsRadioTech(lastPsRadioTech);
     if ((lastCfgTech == RadioTech::RADIO_TECHNOLOGY_NR) && (lastPsRadioTech != RadioTech::RADIO_TECHNOLOGY_NR) &&
         (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE || (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE_CA))) {
         TELEPHONY_LOGI(
