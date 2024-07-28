@@ -12,18 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define private public
+#define protected public
 #include "vcard_email_data.h"
 #include "vcard_event_data.h"
 #include "vcard_im_data.h"
+#include "vcard_manager.h"
 #include "vcard_name_data.h"
 #include "vcard_nickname_data.h"
 #include "vcard_note_data.h"
 #include "vcard_organization_data.h"
 #include "vcard_phone_data.h"
 #include "vcard_photo_data.h"
+#include "vcard_postal_data.h"
+#include "vcard_relation_data.h"
 #include "vcard_contact.h"
 #include "vcard_constant.h"
+#include "vcard_decoder_v21.h"
+#include "vcard_decoder_v30.h"
+#include "vcard_decoder_v40.h"
+#include "vcard_encoder.h"
 #include "telephony_errors.h"
 
 #include <fcntl.h>
@@ -372,6 +380,342 @@ HWTEST_F(ContactDataTest, VCardContact_BuildContact, Function | MediumTest | Lev
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     EXPECT_EQ(contact_->BuildContact(nullptr), TELEPHONY_ERROR);
     EXPECT_EQ(contact_->BuildContact(resultSet), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData, Function | MediumTest | Level3)
+{
+    VCardPostalData postalData;
+    std::vector<std::string> propValueList =
+        {"pobox", "postalAddress", "street", "city", "region", "postCode", "country"};
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
+    EXPECT_STREQ((postalData.GetPOBox()).c_str(), "pobox");
+
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    EXPECT_EQ(postalData.BuildData(nullptr), TELEPHONY_ERROR);
+    EXPECT_EQ(postalData.BuildData(resultSet), TELEPHONY_SUCCESS);
+
+    propValueList.push_back("default");
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
+    EXPECT_STREQ((postalData.GetPostCode()).c_str(), "postCode");
+}
+
+HWTEST_F(ContactDataTest, VCardRelationData_BuildData, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    VCardRelationData relationData;
+    EXPECT_EQ(relationData.BuildData(nullptr), TELEPHONY_ERROR);
+    EXPECT_EQ(relationData.BuildData(resultSet), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardSipData_InitSipData, Function | MediumTest | Level3)
+{
+    VCardSipData sipData;
+    sipData.InitSipData("sip:john@example.com", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
+    EXPECT_STREQ((sipData.GetAddress()).c_str(), "john@example.com");
+    sipData.InitSipData("", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
+    EXPECT_STREQ((sipData.GetAddress()).c_str(), "");
+
+    sipData.InitSipData("pis:john@example.com", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
+    EXPECT_STREQ((sipData.GetAddress()).c_str(), "pis:john@example.com");
+}
+
+HWTEST_F(ContactDataTest, VCardWebsiteData_BuildData, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    VCardWebsiteData websiteData;
+    EXPECT_EQ(websiteData.BuildData(nullptr), TELEPHONY_ERROR);
+    EXPECT_EQ(websiteData.BuildData(resultSet), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DecodeOne, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    std::shared_ptr<VCardManager::DecodeListener> listener = std::make_shared<VCardManager::DecodeListener>();
+    decoder.AddVCardDecodeListener(nullptr);
+
+    int32_t errorCode = -1;
+    decoder.Decode(errorCode);
+    EXPECT_EQ(TELEPHONY_ERR_VCARD_FILE_INVALID, errorCode);
+    EXPECT_FALSE(decoder.ParseItem(errorCode));
+
+    decoder.AddVCardDecodeListener(listener);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealRawDataValue001, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = -1;
+    decoder.DealRawDataValue("name", nullptr, errorCode);
+    EXPECT_EQ(errorCode, -1);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    rawData->AppendParameter("param", "value");
+    rawData->SetRawValue("RawValue");
+    rawData->SetName(VCARD_TYPE_ADR);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+    EXPECT_EQ((rawData->GetParameters(VCARD_PARAM_CHARSET)).size(), 0);
+
+    rawData->AppendParameter(VCARD_PARAM_CHARSET, "TESTCHARSET");
+    decoder.DealRawDataValue("name", rawData, errorCode);
+    EXPECT_STREQ((rawData->GetParameters(VCARD_PARAM_CHARSET))[0].c_str(), "TESTCHARSET");
+
+    rawData->SetName(VCARD_TYPE_ORG);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    rawData->SetName(VCARD_TYPE_N);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    rawData->SetName(VCARD_TYPE_FN);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealRawDataValue002, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = -1;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    rawData->SetRawValue("RawValue");
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_QP, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_BASE64, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_B, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_7BIT, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_8BIT, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_8BIT, rawData, errorCode);
+    EXPECT_EQ(errorCode, -1);
+    decoder.DealRawDataValue("name", rawData, errorCode);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealBase64OrB, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = -1;
+    decoder.DealBase64OrB("RawValue", nullptr, errorCode);
+    EXPECT_EQ(errorCode, -1);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealParams001, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = 0;
+    decoder.DealParams("TYPE=ABC", nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    decoder.DealParams("TYPE=ABC", rawData, errorCode);
+    decoder.DealParams("TYPE=DOM", rawData, errorCode);
+    decoder.DealParams("TYPE=X-DOM", rawData, errorCode);
+
+    decoder.DealParams("VALUE=ABC", nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+    decoder.DealParams("VALUE=ABC", rawData, errorCode);
+    decoder.DealParams("VALUE=URL", rawData, errorCode);
+    decoder.DealParams("VALUE=X-URL", rawData, errorCode);
+
+    decoder.DealParams("ENCODING=ABC", nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+    decoder.DealParams("ENCODING=ABC", rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+    errorCode = 0;
+    decoder.DealParams("ENCODING=VCARD_PARAM_ENCODING_QP", rawData, errorCode);
+    decoder.DealParams("ENCODING=X-VCARD_PARAM_ENCODING_QP", rawData, errorCode);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealParams002, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = 0;
+    decoder.DealParams("CHARSET=ABC", nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    decoder.DealParams("CHARSET=ABC", rawData, errorCode);
+
+    decoder.DealParams("LANGUAGE=ABC", nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+    decoder.DealParams("LANGUAGE=ABC", rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+
+    errorCode = 0;
+    decoder.DealParams("LANGUAGE=####-CHINESE", rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+
+    errorCode = 0;
+    decoder.DealParams("LANGUAGE=ENGLISH-####", rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+
+    errorCode = 0;
+    decoder.DealParams("LANGUAGE=ENGLISH-CHINESE", rawData, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    errorCode = 0;
+    decoder.DealParams("X-NAME=ENGLISH-CHINESE", rawData, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    decoder.DealParams("NAME=ENGLISH-CHINESE", rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealEncodingQPOrNoEncodingFN, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = 0;
+    decoder.DealEncodingQPOrNoEncodingFN("RawValue", nullptr, "", "", errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    decoder.DealEncodingQPOrNoEncodingFN("example=value=\r\n", rawData, "", "", errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_BuildListFromValue, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    EXPECT_STREQ((decoder.BuildListFromValue("test1test2test3"))[0].c_str(), "test1test2test3");
+    EXPECT_STREQ((decoder.BuildListFromValue("test1;test2;test3"))[0].c_str(), "test1");
+    EXPECT_STREQ((decoder.BuildListFromValue("test1\\;test2;test3"))[0].c_str(), "test1;test2");
+    EXPECT_STREQ((decoder.BuildListFromValue("test1\\atest2test3"))[0].c_str(), "test1\\atest2test3");
+    EXPECT_STREQ((decoder.BuildListFromValue("test1\\\\;test2\\;test3"))[0].c_str(), "test1\\");
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealAgent, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = 0;
+    decoder.DealAgent(nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    decoder.DealAgent(rawData, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    rawData->SetRawValue("BEGIN : VCARD some other content");
+    decoder.DealAgent(rawData, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV21_DealAdrOrgN, Function | MediumTest | Level3)
+{
+    VCardDecoderV21 decoder;
+    int32_t errorCode = 0;
+    decoder.DealAdrOrgN("RawValue", nullptr, DEFAULT_INTERMEDIATE_CHARSET, DEFAULT_IMPORT_CHARSET, errorCode);
+    EXPECT_EQ(errorCode, 0);
+
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_QP, rawData, errorCode);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_UnescapeText, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    EXPECT_STREQ(decoder.UnescapeText("").c_str(), "");
+
+    EXPECT_STREQ(decoder.UnescapeText("teststring").c_str(), "teststring");
+    EXPECT_STREQ(decoder.UnescapeText("test\nstring").c_str(), "test\nstring");
+    EXPECT_STREQ(decoder.UnescapeText("test\\Nstring").c_str(), "test\nstring");
+    EXPECT_STREQ(decoder.UnescapeText("test\\Xstring").c_str(), "testXstring");
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_UnescapeChar, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    EXPECT_STREQ(decoder.UnescapeChar('n').c_str(), "\n");
+    EXPECT_STREQ(decoder.UnescapeChar('N').c_str(), "\n");
+    EXPECT_STREQ(decoder.UnescapeChar('X').c_str(), "X");
+}
+
+HWTEST_F(ContactDataTest, VCardEncoder, Function | MediumTest | Level3)
+{
+    VCardEncoder encoder;
+    int32_t errorCode = 0;
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+
+    EXPECT_STREQ((encoder.ContructVCard(nullptr, errorCode).c_str()), "");
+    EXPECT_STREQ((encoder.ContructVCard(resultSet, errorCode).c_str()), "");
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    errorCode = 0;
+    std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
+    encoder.ContructContact(contact, nullptr, errorCode);
+    EXPECT_EQ(errorCode, 0);
+}
+
+HWTEST_F(ContactDataTest, VCardFileUtils_Create, Function | MediumTest | Level3)
+{
+    VCardDecoder decoder;
+    int32_t errorCode = 0;
+    EXPECT_EQ(decoder.Create("",errorCode), nullptr);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+
+    EXPECT_EQ(decoder.Create("TestFile.vcf",errorCode), nullptr);
+}
+
+HWTEST_F(ContactDataTest, VCardManager_ImportLock, Function | MediumTest | Level3)
+{
+    VCardManager::GetInstance().listener_->OnRawDataCreated(nullptr);
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    VCardManager::GetInstance().listener_->OnRawDataCreated(rawData);
+
+    VCardManager::GetInstance().listener_->OnOneContactStarted();
+    VCardManager::GetInstance().listener_->OnRawDataCreated(rawData);
+
+    EXPECT_EQ(VCardManager::GetInstance().ImportLock("TestPath", nullptr, 1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ContactDataTest, VCardRawData_AppendParameter, Function | MediumTest | Level3)
+{
+    VCardRawData rawData;
+    rawData.AppendParameter("testParam", "testValue");
+    auto value = rawData.GetParameters("testParam");
+    EXPECT_EQ(value.size(), 1);
+    EXPECT_STREQ(value[0].c_str(), "testValue");
+
+    value = rawData.GetParameters("testErrParam");
+    EXPECT_EQ(value.size(), 0);
+
+    rawData.AppendParameter("testParam", "newTestValue");
+    value = rawData.GetParameters("testParam");
+    EXPECT_EQ(value.size(), 2);
+    EXPECT_STREQ(value[0].c_str(), "testValue");
+    EXPECT_STREQ(value[1].c_str(), "newTestValue");
+}
+
+HWTEST_F(ContactDataTest, VCardRdbHelper, Function | MediumTest | Level3)
+{
+    VCardRdbHelper::GetInstance().SetDataHelper(nullptr);
+
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContactMaxId(), DB_FAILD);
+
+    std::vector<DataShare::DataShareValuesBucket> rawContactValues;
+    OHOS::DataShare::DataShareValuesBucket rawContactValue;
+    EXPECT_EQ(VCardRdbHelper::GetInstance().BatchInsertRawContact(rawContactValues), DB_FAILD);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().InsertRawContact(rawContactValue), DB_FAILD);
+
+    std::vector<DataShare::DataShareValuesBucket> contactDataValues;
+    EXPECT_EQ(VCardRdbHelper::GetInstance().BatchInsertContactData(contactDataValues), DB_FAILD);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().InsertContactData(rawContactValues), DB_FAILD);
+
+    std::vector<std::string> columns;
+    OHOS::DataShare::DataSharePredicates predicates;
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryAccount(columns, predicates), nullptr);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContact(columns, predicates), nullptr);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates), nullptr);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContactData(columns, predicates), nullptr);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
