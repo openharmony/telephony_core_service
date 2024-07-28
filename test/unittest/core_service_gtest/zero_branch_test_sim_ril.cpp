@@ -983,5 +983,80 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
     ASSERT_FALSE(MccPool::MccCompare(mccAccessC, mccAccessB));
     ASSERT_FALSE(MccPool::MccCompare(mccAccessA, mccAccessD));
 }
+
+HWTEST_F(SimRilBranchTest, Telephony_IsChineseString001, Function | MediumTest | Level1)
+{
+    auto simCharDecode = std::make_shared<SimCharDecode>();
+
+    EXPECT_TRUE(simCharDecode->IsChineseString("测试文本"));
+    EXPECT_FALSE(simCharDecode->IsChineseString("testString"));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IsValidNumberString001, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+
+    EXPECT_TRUE(simNumberDecode->IsValidNumberString("123###"));
+    EXPECT_FALSE(simNumberDecode->IsValidNumberString("abc@abc"));
+
+    EXPECT_EQ(simNumberDecode->chooseExtendedByType(0), nullptr);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_CharToBCD001, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+    uint8_t result = 1;
+
+    EXPECT_TRUE(simNumberDecode->CharToBCD('0', result, 0));
+    EXPECT_EQ(result, 0);
+
+    result = 1;
+    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, 0));
+    EXPECT_EQ(result, 1);
+
+    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_ADN));
+    EXPECT_EQ(result, 1);
+
+    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, 0xc);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_BcdToChar, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+    uint8_t bcdCode = 9;
+    char result = 'a';
+
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, 0));
+    EXPECT_EQ(result, '9');
+
+    bcdCode = 0xa;
+    result = 'a';
+    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, 0));
+    EXPECT_EQ(result, 'a');
+
+    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_ADN));
+    EXPECT_EQ(result, 'a');
+
+    bcdCode = 0xff;
+    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, 'a');
+
+    bcdCode = 0xb;
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, '#');
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_TagService, Function | MediumTest | Level1)
+{
+    TagService tagService("");
+    EXPECT_EQ(tagService.data_.size(), 0);
+
+    TagService tagService1("1234");
+    EXPECT_EQ(tagService1.data_.size(), 0);
+
+    TagService tagService2("1234");
+    EXPECT_EQ(tagService2.data_.size(), 2);
+}
 } // namespace Telephony
 } // namespace OHOS
