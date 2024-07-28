@@ -1,0 +1,68 @@
+# Copyright (C) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+SOURCE_DIR = "../../../"
+
+ohos_unittest("utils_vcard_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "utils_vcard_gtest"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [ "contact_data_test.cpp" ]
+
+  include_dirs = [
+    "$SOURCE_DIR/interfaces/innerkits/include",
+    "$SOURCE_DIR/utils/vcard/include",
+    "$SOURCE_DIR/utils/vcard/include/contact_data",
+  ]
+
+  deps = [
+    "$SOURCE_DIR/utils:libtel_vcard",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "drivers_interface_ril:libril_proxy_1.2",
+    "drivers_interface_ril:libril_proxy_1.3",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  # defines += [ "TEL_TEST_PIN_PUK" ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":utils_vcard_gtest" ]
+}
