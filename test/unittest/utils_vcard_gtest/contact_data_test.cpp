@@ -659,7 +659,7 @@ HWTEST_F(ContactDataTest, VCardFileUtils_Create, Function | MediumTest | Level3)
 {
     VCardDecoder decoder;
     int32_t errorCode = 0;
-    EXPECT_EQ(decoder.Create("",errorCode), nullptr);
+    EXPECT_EQ(decoder.Create("", errorCode), nullptr);
     EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
     EXPECT_EQ(decoder.Create("TestFile.vcf", errorCode), nullptr);
 }
