@@ -1351,7 +1351,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | L
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->UpdateOpKeyInfo();
 }
 
