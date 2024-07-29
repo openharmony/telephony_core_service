@@ -1353,6 +1353,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | L
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->UpdateOpKeyInfo();
+    EXPECT_FALSE(multiSimController->IsValidData(-1));
 }
 
 /**
@@ -1394,16 +1395,13 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | L
     }
     multiSimController->AddExtraManagers(simStateManager[2], simFileManager[2]);
     multiSimController->ForgetAllData(0);
-    auto simStateHandle = simStateManager[0]->simStateHandle_;
     multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simStatus_ = 1;
     multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simType_ = 2;
-    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.iccid_ = "898600520123F0102670";
     multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "898600520123F0102670";
     multiSimController->simStateManager_[0]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
     multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
     EXPECT_FALSE(multiSimController->InitData(0));
     EXPECT_FALSE(multiSimController->InitData(0));
-    EXPECT_FALSE(multiSimController->IsValidData(-1));
     EXPECT_TRUE(multiSimController->InitShowNumber(0));
     std::vector<IccAccountInfo> iccAccountInfoList;
     EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
