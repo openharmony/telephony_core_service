@@ -1378,7 +1378,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | L
         }
     }
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->Init();
     telRilManager->InitTelExtraModule(2);
     simStateManager.resize(3);
@@ -1388,7 +1388,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | L
         simStateManager[2]->Init(2);
     }
     simFileManager[2] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
-            std::weak_ptr<SimStateManager>(simStateManager[2]));
+        std::weak_ptr<SimStateManager>(simStateManager[2]));
     if (simFileManager[2] != nullptr) {
         simFileManager[2]->Init(2);
     }
@@ -3066,15 +3066,15 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-            subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-                                                                                 simStateManagerPtr };
+        simStateManagerPtr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-            std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-            std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
@@ -3101,15 +3101,15 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_003, Function | MediumTest | Leve
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-            subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-                                                                                 simStateManagerPtr };
+        simStateManagerPtr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
-            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-            std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-            std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
     };
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
