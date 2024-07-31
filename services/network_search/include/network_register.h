@@ -106,7 +106,6 @@ private:
     bool isCsCapable_ = true;
     std::string currentNrConfig_ = "";
     std::string systemPropertiesConfig_ = "ConfigD";
-    RegServiceState regStatusResult_ = RegServiceState::REG_STATE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
