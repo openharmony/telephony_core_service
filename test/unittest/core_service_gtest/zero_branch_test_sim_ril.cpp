@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
+#include "core_manager_inner.h"
 #include "core_service.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_dialling_numbers_manager.h"
@@ -32,6 +33,7 @@
 #include "sim_file_controller.h"
 #include "sim_manager.h"
 #include "sim_rdb_helper.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
@@ -1017,7 +1019,7 @@ HWTEST_F(SimRilBranchTest, Telephony_CharToBCD001, Function | MediumTest | Level
     EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_ADN));
     EXPECT_EQ(result, 1);
 
-    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_TRUE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_CALLER));
     EXPECT_EQ(result, 0xc);
 }
 
@@ -1035,12 +1037,12 @@ HWTEST_F(SimRilBranchTest, Telephony_BcdToChar, Function | MediumTest | Level1)
     EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, 0));
     EXPECT_EQ(result, 'a');
 
-    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_ADN));
-    EXPECT_EQ(result, 'a');
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_ADN));
+    EXPECT_EQ(result, '*');
 
     bcdCode = 0xff;
     EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
-    EXPECT_EQ(result, 'a');
+    EXPECT_EQ(result, '*');
 
     bcdCode = 0xb;
     EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
@@ -1053,10 +1055,118 @@ HWTEST_F(SimRilBranchTest, Telephony_TagService, Function | MediumTest | Level1)
     EXPECT_EQ(tagService.data_.size(), 0);
 
     TagService tagService1("1234");
-    EXPECT_EQ(tagService1.data_.size(), 0);
+    EXPECT_EQ(tagService1.data_.size(), 2);
 
     TagService tagService2("1234");
     EXPECT_EQ(tagService2.data_.size(), 2);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    operatorConfigLoader->iccidFromSim_ = "";
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("testOpKey"), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    operatorConfigLoader->iccidFromSim_ = "12345678901234567890";
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    operatorConfigLoader->simFileManager_.reset();
+    EXPECT_STREQ((operatorConfigLoader->GetOpKey(resultSet, 0)).c_str(), DEFAULT_OPERATOR_KEY);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_VoiceMailConstants001, Function | MediumTest | Level1)
+{
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_, nullptr);
+    VoiceMailConstants voiceMailConstants(0);
+
+    CoreManagerInner mInner;
+    mInner.simManager_ = nullptr;
+    OperatorConfig operatorConfig;
+    ASSERT_EQ(mInner.GetOperatorConfigs(0, operatorConfig), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_STREQ((voiceMailConstants.GetStringValueFromCust(0, "key")).c_str(), "");
+
+    voiceMailConstants.isVoiceMailFixed_ = true;
+    voiceMailConstants.ResetVoiceMailLoadedFlag();
+    ASSERT_EQ(voiceMailConstants.isVoiceMailFixed_, false);
+
+    EXPECT_EQ(voiceMailConstants.GetVoiceMailFixed("test"), true);
+    EXPECT_STREQ((voiceMailConstants.GetVoiceMailNumber("test")).c_str(), "");
+    EXPECT_STREQ((voiceMailConstants.GetVoiceMailTag("test")).c_str(), "");
+    EXPECT_STREQ((voiceMailConstants.LoadVoiceMailConfigFromCard("testName", "testCarrier")).c_str(), "");
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IccOperatorRule_003, Function | MediumTest | Level1)
+{
+    auto iccOperatorRule = std::make_shared<IccOperatorRule>();
+
+    EXPECT_FALSE(iccOperatorRule->SetPackageNameByHexStr("G"));
+    EXPECT_FALSE(iccOperatorRule->SetPackageNameByHexStr("G1"));
+
+    std::string pkgHexStr = "E1E";
+    std::string::const_iterator pkgHexStrBeg = pkgHexStr.begin();
+    std::string::const_iterator pkgHexStrEnd = pkgHexStr.end();
+    IccOperatorRule result;
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagCertPkg(pkgHexStrBeg, pkgHexStrEnd, result));
+
+    std::string limitHexStr = "E3E";
+    std::string::const_iterator limitHexStrBeg = limitHexStr.begin();
+    std::string::const_iterator limitHexStrEnd = limitHexStr.end();
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagLimits(limitHexStrBeg, limitHexStrEnd, result));
+
+    std::string ruleHexStr = "E2E";
+    std::string::const_iterator ruleHexStrBeg = ruleHexStr.begin();
+    std::string::const_iterator ruleHexStrEnd = ruleHexStr.end();
+    int32_t len = 0;
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagRule(ruleHexStrBeg, ruleHexStrEnd, result, len));
+
+    ruleHexStr = "E202E1E";
+    ruleHexStrBeg = ruleHexStr.begin();
+    ruleHexStrEnd = ruleHexStr.end();
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagRule(ruleHexStrBeg, ruleHexStrEnd, result, len));
+
+    iccOperatorRule->SetCertificate("testCertificate");
+    iccOperatorRule->SetPackageName("testPackageName");
+
+    std::string_view certHash = "testCertificate";
+    std::string_view packageName = "testPackageName";
+    EXPECT_TRUE(iccOperatorRule->Matche(certHash, packageName));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    IccDiallingNumbersManager iccDiallingNumbersManager(simFileManager, nullptr);
+    std::shared_ptr<DiallingNumbersInfo> diallingNumbers = std::make_shared<DiallingNumbersInfo>();
+
+    EXPECT_EQ(iccDiallingNumbersManager.UpdateIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(iccDiallingNumbersManager.DelIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(iccDiallingNumbersManager.AddIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_ADN), ELEMENTARY_FILE_ADN);
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_FDN), ELEMENTARY_FILE_FDN);
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(-1), 0);
+
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_ADN));
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_FDN));
+    EXPECT_FALSE(iccDiallingNumbersManager.IsValidType(-1));
+
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_ADN, diallingNumbers));
+    EXPECT_FALSE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_FDN, diallingNumbers));
 }
 } // namespace Telephony
 } // namespace OHOS
