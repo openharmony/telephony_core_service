@@ -213,7 +213,7 @@ void OperatorName::UpdatePlmn(
                 break;
             case RegServiceState::REG_STATE_NO_SERVICE:
             case RegServiceState::REG_STATE_EMERGENCY_ONLY:
-            case RegServiceState::REG_STATE_SEARCH:
+            case RegServiceState::REG_STATE_SEARCH:cast
                 if (networkState->IsEmergency()) {
                     ResourceUtils::Get().GetStringValueByName(ResourceUtils::EMERGENCY_CALLS_ONLY, plmn);
                 } else {
@@ -269,7 +269,7 @@ void OperatorName::NotifyGsmSpnChanged(
     bool showPlmn = false;
     bool showPlmnOld = false;
     bool showSpn = false;
-    int32_t spnRule = GetSpnRule(networkState);
+    int32_t spnRule = static_cast<int32_t>(GetSpnRule(networkState));
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
@@ -420,7 +420,7 @@ unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
     int32_t spnRule = 0;
     bool roaming = networkState->IsRoaming();
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
-        spnRule = GetCustSpnRule(roaming);
+        spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
     } else if (!roaming && IsChinaCard()) {
         spnRule = SPN_CONDITION_DISPLAY_PLMN;
     } else {
