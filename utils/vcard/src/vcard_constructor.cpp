@@ -564,7 +564,7 @@ void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> post
             (needAddQuotedPrintable ? EncodeQuotedPrintable(postalCode) : DealCharacters(postalCode));
         std::string encodedCountry =
             (needAddQuotedPrintable ? EncodeQuotedPrintable(country) : DealCharacters(country));
-        postalLine << encodedPoBox << ITEM_SEPARATOR << ITEM_SEPARATOR;
+        postalLine << encodedPoBox << ITEM_SEPARATOR;
         postalLine << encodedStreet << ITEM_SEPARATOR;
         postalLine << encodedCity << ITEM_SEPARATOR;
         postalLine << encodedRegion << ITEM_SEPARATOR;

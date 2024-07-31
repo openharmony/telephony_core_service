@@ -473,7 +473,7 @@ enum class PostalType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home address.
