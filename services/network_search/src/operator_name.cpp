@@ -213,7 +213,7 @@ void OperatorName::UpdatePlmn(
                 break;
             case RegServiceState::REG_STATE_NO_SERVICE:
             case RegServiceState::REG_STATE_EMERGENCY_ONLY:
-            case RegServiceState::REG_STATE_SEARCH:cast
+            case RegServiceState::REG_STATE_SEARCH:
                 if (networkState->IsEmergency()) {
                     ResourceUtils::Get().GetStringValueByName(ResourceUtils::EMERGENCY_CALLS_ONLY, plmn);
                 } else {
