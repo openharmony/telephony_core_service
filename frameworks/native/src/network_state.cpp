@@ -156,7 +156,17 @@ bool NetworkState::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isEmergency_)) {
         return false;
     }
+    if (!MarshallingString(parcel)) {
+        return false;
+    }
+    if (!MarshallingInt(parcel)) {
+        return false;
+    }
+    return true;
+}
 
+bool NetworkState::MarshallingString(Parcel &parcel) const
+{
     if (!parcel.WriteString(psOperatorInfo_.fullName)) {
         return false;
     }
@@ -175,6 +185,11 @@ bool NetworkState::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(csOperatorInfo_.operatorNumeric)) {
         return false;
     }
+    return true;
+}
+
+bool NetworkState::MarshallingInt(Parcel &parcel) const
+{
     if (!parcel.WriteInt32(static_cast<int32_t>(csRoaming_))) {
         return false;
     }
