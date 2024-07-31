@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -269,7 +269,7 @@ void OperatorName::NotifyGsmSpnChanged(
     bool showPlmn = false;
     bool showPlmnOld = false;
     bool showSpn = false;
-    int32_t spnRule = GetSpnRule(networkState);
+    int32_t spnRule = static_cast<int32_t>(GetSpnRule(networkState));
     UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
     UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
@@ -420,7 +420,7 @@ unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
     int32_t spnRule = 0;
     bool roaming = networkState->IsRoaming();
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
-        spnRule = GetCustSpnRule(roaming);
+        spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
     } else if (!roaming && IsChinaCard()) {
         spnRule = SPN_CONDITION_DISPLAY_PLMN;
     } else {
