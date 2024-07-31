@@ -1472,10 +1472,8 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         TELEPHONY_LOGI("Has call, slotId:%{public}d", slotId);
         return false;
     }
-    RadioTech lastCfgTech;
-    inner->networkSearchState_->GetLastCfgTech(lastCfgTech);
-    RadioTech lastPsRadioTech;
-    inner->networkSearchState_->GetLastPsRadioTech(lastPsRadioTech);
+    RadioTech lastCfgTech = inner->networkSearchState_->GetNetworkStatus()->GetLastCfgTech();
+    RadioTech lastPsRadioTech = inner->networkSearchState_->GetNetworkStatus()->GetLastPsRadioTech();
     if ((lastCfgTech == RadioTech::RADIO_TECHNOLOGY_NR) && (lastPsRadioTech != RadioTech::RADIO_TECHNOLOGY_NR) &&
         (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE || (cfgTech == RadioTech::RADIO_TECHNOLOGY_LTE_CA))) {
         TELEPHONY_LOGI(

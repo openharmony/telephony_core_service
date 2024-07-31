@@ -1195,16 +1195,6 @@ void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::
     RadioOnState();
 }
 
-int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
-{
-    if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::GetRegServiceState networkRegister_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    regState = networkRegister_->GetRegServiceState();
-    return TELEPHONY_ERR_SUCCESS;
-}
-
 int32_t NetworkSearchHandler::HandleRrcStateChanged(int32_t status)
 {
     TELEPHONY_LOGI("NetworkSearchHandler::HandleRrcStateChanged slotId:%{public}d", slotId_);
