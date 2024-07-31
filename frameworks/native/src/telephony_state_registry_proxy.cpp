@@ -311,7 +311,7 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
     if (callback == nullptr) {
         return TELEPHONY_ERR_FAIL;
     }
-    if (!in.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
+    if (!in.WriteRemoteObject(callback->AsObject())) {
         return TELEPHONY_ERR_FAIL;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -346,6 +346,7 @@ int32_t TelephonyStateRegistryProxy::UnregisterStateChange(
     if (remote == nullptr) {
         return TELEPHONY_ERR_FAIL;
     }
+    TELEPHONY_LOGI("UnregisterStateChange slotId:%{public}d mask:%{public}d", slotId, mask);
     int result = remote->SendRequest(
         static_cast<uint32_t>(StateNotifyInterfaceCode::REMOVE_OBSERVER), in, out, option);
     if (result == ERR_NONE) {
