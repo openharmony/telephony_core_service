@@ -2377,7 +2377,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
     event = nullptr;
-    RegServiceState regState = RegServiceState::REG_STATE_UNKNOWN;
     int32_t status = RRC_IDLE_STATUS;
     networkSearchHandler->HandleDelayNotifyEvent(event);
     networkSearchHandler->NetworkSearchResult(event);
