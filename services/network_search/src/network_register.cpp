@@ -70,7 +70,6 @@ void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
                                                RoamingType roam,
                                                DomainType type)
 {
-    regStatusResult_ = regStatus;
     networkSearchState_->SetNetworkState(regStatus, type);
     networkSearchState_->SetEmergency(
         (regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
@@ -385,11 +384,6 @@ RegServiceState NetworkRegister::ConvertRegFromRil(RilRegister code) const
         default:
             return RegServiceState::REG_STATE_NO_SERVICE;
     }
-}
-
-RegServiceState NetworkRegister::GetRegServiceState() const
-{
-    return regStatusResult_;
 }
 
 RadioTech NetworkRegister::ConvertTechFromRil(TelRilRadioTech code) const

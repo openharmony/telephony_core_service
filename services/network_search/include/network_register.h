@@ -42,7 +42,6 @@ public:
     void UpdateCfgTech();
     void UpdateCellularCall(const RegServiceState &regStatus, const int32_t callType);
     int32_t HandleRrcStateChanged(int32_t status);
-    RegServiceState GetRegServiceState() const;
 
     enum class RilRegister {
         REG_STATE_NOT_REG = 0,
@@ -106,7 +105,6 @@ private:
     bool isCsCapable_ = true;
     std::string currentNrConfig_ = "";
     std::string systemPropertiesConfig_ = "ConfigD";
-    RegServiceState regStatusResult_ = RegServiceState::REG_STATE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS

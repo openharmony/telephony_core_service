@@ -108,6 +108,12 @@ public:
     RadioTech GetLastCfgTech() const;
 
 private:
+    bool ReadParcelString(Parcel &parcel);
+    bool ReadParcelInt(Parcel &parcel);
+    bool MarshallingString(Parcel &parcel) const;
+    bool MarshallingInt(Parcel &parcel) const;
+
+private:
     bool isEmergency_;
     OperatorInformation psOperatorInfo_;
     OperatorInformation csOperatorInfo_;
@@ -121,8 +127,6 @@ private:
     RadioTech csRadioTech_;
     RadioTech cfgTech_;
     NrState nrState_;
-    bool ReadParcelString(Parcel &parcel);
-    bool ReadParcelInt(Parcel &parcel);
 };
 } // namespace Telephony
 } // namespace OHOS
