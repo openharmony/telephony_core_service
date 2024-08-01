@@ -557,9 +557,9 @@ void NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn()
         TELEPHONY_LOGE("NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn failed to get NetworkSearchManager");
         return;
     }
-    if (NetworkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+    if (networkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
-    }   
+    }
 }
 
 void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Pointer &event)
