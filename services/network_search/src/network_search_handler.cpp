@@ -524,6 +524,11 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         case CORE_SERVICE_POWER_ON: {
             firstInit_ = false;
             InitGetNetworkSelectionMode();
+            boll isAirplaneMode = false;
+            if (NetworkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+                networkSearchManager->SetRadioState(slotId_,
+                    static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
+            }
             RadioOnState();
             break;
         }
