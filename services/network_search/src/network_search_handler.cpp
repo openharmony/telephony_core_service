@@ -524,11 +524,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         case CORE_SERVICE_POWER_ON: {
             firstInit_ = false;
             InitGetNetworkSelectionMode();
-            boll isAirplaneMode = false;
-            if (NetworkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
-                networkSearchManager->SetRadioState(slotId_,
-                    static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
-            }
+            SetRadioOffWhenAirplaneIsOn();
             RadioOnState();
             break;
         }
@@ -551,6 +547,19 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     if (operatorName_ != nullptr) {
         operatorName_->NotifySpnChanged();
     }
+}
+
+void NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn()
+{
+    bool isAirplaneMode = false;
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn failed to get NetworkSearchManager");
+        return;
+    }
+    if (NetworkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
+    }   
 }
 
 void NetworkSearchHandler::RadioRestrictedState(const AppExecFwk::InnerEvent::Pointer &event)
