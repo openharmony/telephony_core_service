@@ -526,6 +526,30 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
 }
 
 /**
+ * @tc.number   Telephony_IccDiallingNumbersManager_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    iccDiallingNumbersManager->ProcessSimStateChanged();
+    iccDiallingNumbersManager->Init();
+    iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1));
+    iccDiallingNumbersManager->ProcessSimStateChanged();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+        std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
+    EXPECT_FALSE(iccDiallingNumbersManager->IsValidParam(DiallingNumbersInfo::SIM_FDN, diallingNumber));
+    EXPECT_TRUE(iccDiallingNumbersManager->IsValidParam(DiallingNumbersInfo::SIM_ADN, diallingNumber));
+}
+
+/**
  * @tc.number   Telephony_UsimDiallingNumbersService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
