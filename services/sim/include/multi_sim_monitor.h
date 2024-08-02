@@ -128,7 +128,7 @@ private:
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 30;
     int32_t maxSlotCount_ = 0;
-    bool isDataShareReady = false;
+    bool isDataShareReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
