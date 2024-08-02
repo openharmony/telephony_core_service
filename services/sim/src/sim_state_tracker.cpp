@@ -117,8 +117,7 @@ void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("operatorConfigCache is nullptr");
         return;
     }
-    operatorConfigCache_->ClearOperatorValue(slotId);
-    operatorConfigCache_->ClearMemoryCache(slotId);
+    operatorConfigCache_->ClearMemoryAndOpkey(slotId);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
