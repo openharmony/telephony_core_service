@@ -103,6 +103,7 @@ public:
 
 private:
     void RadioOffOrUnavailableState(int32_t radioState) const;
+    void SetRadioOffWhenAirplaneIsOn();
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SimStateChange(const AppExecFwk::InnerEvent::Pointer &);
