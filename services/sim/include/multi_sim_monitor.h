@@ -21,6 +21,7 @@
 #include "common_event_subscriber.h"
 #include "iservice_registry.h"
 #include "multi_sim_controller.h"
+#include "os_account_manager_wrapper.h"
 #include "sim_constant.h"
 #include "sim_file_manager.h"
 #include "system_ability_definition.h"
@@ -73,6 +74,7 @@ private:
     std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
     void InitListener();
     void SubscribeDataShareReady();
+    void SubscribeUserSwitch();
     void UnSubscribeListeners();
     void CheckOpcNeedUpdata(const bool isDataShareError);
     int32_t CheckUpdateOpcVersion();
@@ -87,6 +89,16 @@ private:
             const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
             : CommonEventSubscriber(info), handler_(handler) {}
         ~DataShareEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        MultiSimMonitor &handler_;
+    };
+
+    class UserSwitchEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit UserSwitchEventSubscriber(
+            const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
+            : CommonEventSubscriber(info), handler_(handler) {}
+        ~UserSwitchEventSubscriber() = default;
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
         MultiSimMonitor &handler_;
     };
@@ -110,11 +122,13 @@ private:
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
+    std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 30;
     int32_t maxSlotCount_ = 0;
+    bool isDataShareReady = false;
 };
 } // namespace Telephony
 } // namespace OHOS

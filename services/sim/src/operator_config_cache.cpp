@@ -329,7 +329,7 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
         return true;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
-    std::string filename = EncryptIccId(iccid) + ".json";
+    std::string filename = EncryptIccId(iccid + opkey) + ".json";
     std::string path = parser_.GetOperatorConfigFilePath(filename);
     std::ifstream f(path.c_str());
     return !f.good();
