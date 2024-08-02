@@ -681,14 +681,6 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAc
 
 int32_t MultiSimController::GetDefaultVoiceSlotId()
 {
-    if (GetLocalCacheSize() == 0) {
-        TELEPHONY_LOGE("failed by nullptr");
-        if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("simDbHelper is nullptr");
-            return INVALID_VALUE;
-        }
-        return simDbHelper_->GetDefaultVoiceCardSlotId();
-    }
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() <= 0) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -777,14 +769,6 @@ int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
 
 int32_t MultiSimController::GetDefaultSmsSlotId()
 {
-    if (GetLocalCacheSize() == 0) {
-        TELEPHONY_LOGE("failed by nullptr");
-        if (simDbHelper_ == nullptr) {
-            TELEPHONY_LOGE("simDbHelper is nullptr");
-            return INVALID_VALUE;
-        }
-        return simDbHelper_->GetDefaultMessageCardSlotId();
-    }
     std::unique_lock<std::mutex> lock(mutex_);
     if (localCacheInfo_.size() <= 0) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -1031,10 +1015,6 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     if (!showNumber.empty()) {
         return TELEPHONY_ERR_SUCCESS;
     }
-    showNumber = Str8ToStr16(TelAesCryptoUtils::ObtainDecryptString(PHONE_NUMBER_PREF, curSimId, ""));
-    if (!showNumber.empty()) {
-        return TELEPHONY_ERR_SUCCESS;
-    }
     return GetSimTelephoneNumber(slotId, showNumber);
 }
 
@@ -1153,13 +1133,6 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     telephoneNumber = Str8ToStr16(result);
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
-    if (!telephoneNumber.empty()) {
-        int curSimId = GetSimId(slotId);
-        if (curSimId != INVALID_VALUE) {
-            TelAesCryptoUtils::SaveEncryptString(PHONE_NUMBER_PREF, curSimId, result);
-            TELEPHONY_LOGI("SaveEncryptString, slotId:%{public}d, curSimId:%{public}d", slotId, curSimId);
-        }
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 

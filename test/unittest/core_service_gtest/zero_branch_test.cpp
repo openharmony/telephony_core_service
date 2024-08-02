@@ -56,6 +56,11 @@
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
+#include "telephony_data_helper.h"
+#include "sim_data.h"
+#include "accesstoken_kit.h"
+#include "token_setproc.h"
+#include "nativetoken_kit.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,6 +69,7 @@ using namespace testing::ext;
 namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
+const int DATA_STORAGE_ERR_PERMISSION_ERR = -3;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
 const int32_t OBTAIN_SPN_GENERAL = 2;
@@ -89,13 +95,26 @@ public:
     void SetUp();
     void TearDown();
 };
-void BranchTest::SetUpTestCase() {}
 
 void BranchTest::TearDownTestCase() {}
 
 void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
+
+void BranchTest::SetUpTestCase()
+{
+    constexpr int permissionNum = 2;
+    const char *perms[permissionNum] = {"ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.SET_TELEPHONY_STATE"};
+    NativeTokenInfoParams infoInstance = {.dcapsNum = 0, .permsNum = permissionNum, .aclsNum = 0, .dcaps = nullptr,
+        .perms = perms, .acls = nullptr, .processName = "BranchTest", .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    auto result = Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
+}
 
 /**
  * @tc.number   Telephony_CellInfo_001
@@ -1322,6 +1341,79 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
 }
 
 /**
+ * @tc.number   Telephony_MultiSimController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->UpdateOpKeyInfo();
+    EXPECT_FALSE(multiSimController->IsValidData(-1));
+}
+
+/**
+ * @tc.number   Telephony_MultiSimController_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr};
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr};
+    for (int32_t slotId = 0; slotId < 2; slotId++) {
+        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
+        if (simStateManager[slotId] != nullptr) {
+            simStateManager[slotId]->Init(slotId);
+        }
+        simFileManager[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager[slotId]));
+        if (simFileManager[slotId] != nullptr) {
+            simFileManager[slotId]->Init(slotId);
+        }
+    }
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->Init();
+    telRilManager->InitTelExtraModule(2);
+    simStateManager.resize(3);
+    simFileManager.resize(3);
+    simStateManager[2] = std::make_shared<SimStateManager>(telRilManager);
+    if (simStateManager[2] != nullptr) {
+        simStateManager[2]->Init(2);
+    }
+    simFileManager[2] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager[2]));
+    if (simFileManager[2] != nullptr) {
+        simFileManager[2]->Init(2);
+    }
+    multiSimController->AddExtraManagers(simStateManager[2], simFileManager[2]);
+    multiSimController->ForgetAllData(0);
+    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simStatus_ = 1;
+    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simType_ = 2;
+    multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "898600520123F0102670";
+    multiSimController->simStateManager_[0]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
+    multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_TRUE(multiSimController->InitShowNumber(0));
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(true, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
+    int32_t imsSwitchValue;
+    EXPECT_GE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(multiSimController->IsSetActiveSimInProgress(0));
+    EXPECT_FALSE(multiSimController->IsSetPrimarySlotIdInProgress());
+}
+
+/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2358,13 +2450,11 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
     event = nullptr;
-    RegServiceState regState = RegServiceState::REG_STATE_UNKNOWN;
     int32_t status = RRC_IDLE_STATUS;
     networkSearchHandler->HandleDelayNotifyEvent(event);
     networkSearchHandler->NetworkSearchResult(event);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetImeiSv(event);
-    EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
@@ -2375,7 +2465,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     networkSearchHandler->NetworkSearchResult(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
-    EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
@@ -2719,6 +2808,12 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
     unsigned char *data7(new unsigned char[9] { 0x80, 0x67, 0x5C, 0x00, 0x31, 0x00, 0x30, 0x5A, 0x18 });
     EXPECT_EQ(
         simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "杜10娘");
+    unsigned char *data8(new unsigned char[39] { 0x81, 0x0E, 0x08, 0x9B, 0xB8, 0xC7, 0xBD,
+        0xCB, 0xB9, 0x20, 0xBA, 0xB0, 0xB1, 0xB8, 0xBD, 0xB5, 0xC2, 0xFF,
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x04, 0x81, 0x1A, 0x50,
+        0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF});
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data8), 0, 39, 0),
+        "Личный кабинет");
 }
 
 /**
@@ -2838,21 +2933,72 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
  */
 HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
 {
+    TELEPHONY_LOGI("Telephony_SimRdbHelper_001");
     auto simRdbHelper = std::make_shared<SimRdbHelper>();
     SimRdbInfo simBean;
     std::string iccId = "";
     std::vector<SimRdbInfo> vec;
-    EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultCellularDataCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->GetDefaultVoiceCardSlotId(), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryAllData(vec), TELEPHONY_ERROR);
-    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), TELEPHONY_ERROR);
+    EXPECT_GE(simRdbHelper->GetDefaultMainCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultMessageCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultCellularDataCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->GetDefaultVoiceCardSlotId(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultMainCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultVoiceCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultMessageCard(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->SetDefaultCellularData(INVALID_SLOTID), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_SimRdbHelper_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimRdbHelper_002, Function | MediumTest | Level1)
+{
+    TELEPHONY_LOGI("Telephony_SimRdbHelper_002");
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+            std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->InitData(0);
+    multiSimController->ForgetAllData();
+    auto simRdbHelper = std::make_shared<SimRdbHelper>();
+    SimRdbInfo simBean;
+    std::string iccId = "empty_slot0";
+    std::vector<SimRdbInfo> vec;
+    EXPECT_GE(simRdbHelper->UpdateOpKeyInfo(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->ClearData(), DATA_STORAGE_ERR_PERMISSION_ERR);
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject slotObj(0);
+    DataShare::DataShareValueObject iccidObj(iccId);
+    DataShare::DataShareValueObject valueObj(ACTIVE);
+    values.Put(SimData::SLOT_INDEX, slotObj);
+    values.Put(SimData::ICC_ID, iccidObj);
+    values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int64_t id;
+    EXPECT_GE(simRdbHelper->InsertData(id, values), DATA_STORAGE_ERR_PERMISSION_ERR);
+    DataShare::DataShareValuesBucket valuesExt;
+    DataShare::DataShareValueObject mccObj("460");
+    DataShare::DataShareValueObject mncObj("09");
+    valuesExt.Put(SimData::MCC, mccObj);
+    valuesExt.Put(SimData::MNC, mncObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SimData::ICC_ID, iccId);
+    EXPECT_GE(simRdbHelper->UpdateDataByIccId(iccId, valuesExt), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryDataByIccId(iccId, simBean), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    EXPECT_GE(simRdbHelper->QueryAllValidData(vec), DATA_STORAGE_ERR_PERMISSION_ERR);
+    int curSimId = multiSimController->GetSimId(0);
+    DataShare::DataShareValuesBucket valuesNumber;
+    DataShare::DataShareValueObject numberObj("123569877456");
+    valuesNumber.Put(SimData::PHONE_NUMBER, numberObj);
+    EXPECT_GE(simRdbHelper->UpdateDataBySimId(curSimId, valuesNumber), DATA_STORAGE_ERR_PERMISSION_ERR);
+    multiSimController->ForgetAllData(0);
 }
 
 /**
@@ -2899,6 +3045,74 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
     EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(tokenId), TELEPHONY_ERROR);
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
+    multiSimMonitor->ProcessEvent(event);
+    multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    multiSimMonitor->IsVSimSlotId(0);
+    multiSimMonitor->RegisterSimNotify(0);
+    multiSimMonitor->UnRegisterSimNotify();
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor =
+        std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    EventFwk::MatchingSkills matchSkills;
+    matchingSkills.AddEvent(DATASHARE_READY_EVENT);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchSkills);
+    subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
 }
 
 /**

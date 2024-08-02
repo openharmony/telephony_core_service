@@ -161,7 +161,7 @@ constexpr const int32_t CONTACTS_NOT_DELETED = 0;
 constexpr const int32_t ENCODEN_QUOTED_PRIN_MAX_LEN = 67;
 constexpr const int32_t NUM_MINUS_ONE = -1;
 constexpr const int32_t DECODE_CHAR_MAX_SIZE = 16;
-constexpr const int32_t BATCH_INSERT_MAX_SIZE = 300;
+constexpr const int32_t BATCH_INSERT_MAX_SIZE = 5000;
 constexpr const int32_t INT_64_LENTGH = 19;
 
 class TypeId {
@@ -473,7 +473,7 @@ enum class PostalType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home address.

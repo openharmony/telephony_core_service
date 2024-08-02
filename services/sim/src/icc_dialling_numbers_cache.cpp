@@ -211,7 +211,9 @@ void IccDiallingNumbersCache::UpdateDiallingNumberToIcc(int fileId,
     infor.isDel = isDel;
     AppExecFwk::InnerEvent::Pointer event =
         BuildCallerInfo(MSG_SIM_CHANGE_DIALLING_NUMBERS_DONE, fileId, index, diallingNumberInfor, caller);
-    diallingNumbersHandler_->UpdateDiallingNumbers(infor, event);
+    if (diallingNumbersHandler_ != nullptr) {
+        diallingNumbersHandler_->UpdateDiallingNumbers(infor, event);
+    }
 }
 
 bool IccDiallingNumbersCache::CheckValueAndOperation(
@@ -282,11 +284,15 @@ void IccDiallingNumbersCache::ObtainAllDiallingNumberFiles(
     if (fileId == ELEMENTARY_FILE_PBR) {
         TELEPHONY_LOGI("ObtainAllDiallingNumberFiles start usim adn");
         AppExecFwk::InnerEvent::Pointer pointer = CreateUsimPointer(MSG_SIM_OBTAIN_PBR_DETAILS_DONE, fileId, caller);
-        usimDiallingNumberSrv_->ObtainUsimElementaryFiles(pointer);
+        if (usimDiallingNumberSrv_ != nullptr) {
+            usimDiallingNumberSrv_->ObtainUsimElementaryFiles(pointer);
+        }
     } else {
         AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(
             MSG_SIM_OBTAIN_ADN_DETAILS_DONE, fileId, 0, nullptr, caller);
-        diallingNumbersHandler_->GetAllDiallingNumbers(fileId, extFileId, event);
+        if (diallingNumbersHandler_ != nullptr) {
+            diallingNumbersHandler_->GetAllDiallingNumbers(fileId, extFileId, event);
+        }
     }
 }
 
@@ -310,7 +316,15 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     auto owner = callPointer->GetOwner();
     uint32_t id = callPointer->GetInnerEventId();
     std::unique_ptr<ResultObtain> fd = callPointer->GetUniqueObject<ResultObtain>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return;
+    }
     std::unique_ptr<ResponseResult> data = std::make_unique<ResponseResult>(fd.get());
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr!");
+        return;
+    }
     data->result = static_cast<std::shared_ptr<void>>(ar);
     data->exception = object;
     if (owner != nullptr) {

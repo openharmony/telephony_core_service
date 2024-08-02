@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
+#include "core_manager_inner.h"
 #include "core_service.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_dialling_numbers_manager.h"
@@ -32,6 +33,7 @@
 #include "sim_file_controller.h"
 #include "sim_manager.h"
 #include "sim_rdb_helper.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
@@ -320,9 +322,12 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     diallingNumbersCache->SendBackResult(event, list, object);
     diallingNumbersCache->SendUpdateResult(event, object);
     data->result = static_cast<std::shared_ptr<void>>(list);
-    diallingNumbersCache->ProcessObtainPbrDetailsDone(event);
-    diallingNumbersCache->ProcessObtainAdnDetailsDone(event);
-    diallingNumbersCache->ProcessChangeDiallingNumbersDone(event);
+    auto owner = event->GetOwner();
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
+    diallingNumbersCache->ProcessObtainAdnDetailsDone(response);
+    diallingNumbersCache->ProcessChangeDiallingNumbersDone(response);
     diallingNumbersCache->LoadReadyDiallingNumbers(ELEMENTARY_FILE_ADN);
     diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
     std::u16string str1(u"Hello");
@@ -352,6 +357,78 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_003, Function | Med
     diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_ADN, diallingNumbers, 0, true, event);
     std::u16string str1(u"Hello");
     EXPECT_TRUE(diallingNumbersCache->StringEqual(str1, str1));
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersCache_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
+    AppExecFwk::InnerEvent::Pointer event = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
+    std::unique_ptr<UsimFetcher> fd = event->GetUniqueObject<UsimFetcher>();
+    std::unique_ptr<UsimResult> data = std::make_unique<UsimResult>(fd.get());
+    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> list =
+        std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+        std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
+    diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
+    diallingNumber->number_ = Str8ToStr16("12345678901");
+    std::shared_ptr<DiallingNumbersInfo> diallingNumberEx = std::make_shared<DiallingNumbersInfo>();
+    list->push_back(diallingNumber);
+    list->push_back(diallingNumberEx);
+    data->result = static_cast<std::shared_ptr<void>>(list);
+    auto owner = event->GetOwner();
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
+    event = iccDiallingNumbersManager->BuildCallerInfo(-1);
+    diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_PBR, diallingNumber, 0, true, event);
+    diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_PBR, diallingNumber, -1, true, event);
+    int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_PBR);
+    event = iccDiallingNumbersManager->BuildCallerInfo(-2);
+    diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_PBR, extensionEf, event);
+    diallingNumbersCache->IsDiallingNumberEqual(diallingNumber, diallingNumber);
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersCache_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_005, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
+    AppExecFwk::InnerEvent::Pointer event = iccDiallingNumbersManager->BuildCallerInfo(-1);
+    diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_ADN, extensionEf, event);
+    AppExecFwk::InnerEvent::Pointer caller = iccDiallingNumbersManager->BuildCallerInfo(-2);
+    extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_PBR);
+    diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_PBR, extensionEf, caller);
+    std::vector<std::u16string> args1 = { u"test", u"test1" };
+    std::vector<std::u16string> args2 = { u"test"};
+    diallingNumbersCache->ArrayEqual(args1, args2);
 }
 
 /**
@@ -478,6 +555,120 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_001, Function | 
     usimDiallingNumbersService->SetFileControllerAndDiallingNumberHandler(iccFileController, iccDiallingNumbersHandler);
     usimDiallingNumbersService->LoadPbrFiles();
     EXPECT_TRUE(usimDiallingNumbersService->fileController_ == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_002, Function | MediumTest | Level1)
+{
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
+    event = nullptr;
+    usimDiallingNumbersService->ProcessPbrLoadDone(event);
+    usimDiallingNumbersService->ProcessDiallingNumberLoadDone(event);
+    usimDiallingNumbersService->NextStep(0);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
+    AppExecFwk::InnerEvent::Pointer pointer = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
+    usimDiallingNumbersService->ObtainUsimElementaryFiles(pointer);
+    AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->BuildCallerInfo(-1);
+    std::unique_ptr<FileToControllerMsg> cmdData = event->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
+    std::vector<std::string> strValue = {"FFFFFFFFFFFFFFFF"};
+    object->fileResults.assign(strValue.begin(), strValue.end());
+    object->resultLength = static_cast<int>(strValue.size());
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, object, eventParam);
+    usimDiallingNumbersService->ProcessPbrLoadDone(response);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_004, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->CreateHandlerPointer(
+        MSG_USIM_USIM_ADN_LOAD_DONE, ELEMENTARY_FILE_PBR, 0, nullptr);
+    std::unique_ptr<DiallingNumbersHandleHolder> fd = event->GetUniqueObject<DiallingNumbersHandleHolder>();
+    std::unique_ptr<DiallingNumbersHandlerResult> data = std::make_unique<DiallingNumbersHandlerResult>(fd.get());
+    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
+        std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    data->result = diallingNumberList;
+    data->exception = nullptr;
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+}
+
+/**
+ * @tc.number   Telephony_UsimDiallingNumbersService_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
+    auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
+    diallingNumbersCache->simFileManager_ = nullptr;
+    diallingNumbersCache->Init();
+    auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
+    usimDiallingNumbersService->InitFuncMap();
+    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
+        std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber =
+        std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
+    diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
+    diallingNumber->number_ = Str8ToStr16("12345678901");
+    diallingNumberList->push_back(diallingNumber);
+    usimDiallingNumbersService->FillDiallingNumbersRecords(diallingNumberList);
+    std::string record = "record";
+    std::vector<std::string> records;
+    records.push_back(record);
+    usimDiallingNumbersService->GeneratePbrFile(records);
+    usimDiallingNumbersService->LoadDiallingNumberFiles(0);
 }
 
 /**
@@ -684,42 +875,6 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     ASSERT_TRUE(iccFileController->BuildCallerInfo(0, 0, 0, holder) != nullptr);
 }
 
-/**
- * @tc.number   Telephony_SimManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = nullptr;
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->InitSingleSimObject();
-    simManager->slotCount_ = 1;
-    int32_t slotId;
-    std::u16string testU = u"";
-    simManager->SetShowNumber(INVALID_SLOTID, testU);
-    simManager->GetShowNumber(INVALID_SLOTID, testU);
-    simManager->GetDefaultVoiceSimId(slotId);
-    simManager->GetDefaultSmsSlotId();
-    simManager->slotCount_ = 1;
-    int32_t dsdsMode = 0;
-    int32_t slotCount = 1;
-    std::string testS = "";
-    simManager->GetDsdsMode(dsdsMode);
-    simManager->stkManager_.resize(slotCount);
-    simManager->simFileManager_.resize(slotCount);
-    simManager->SendCallSetupRequestResult(INVALID_SLOTID, true);
-    simManager->GetSimGid2(INVALID_SLOTID);
-    simManager->GetOpName(INVALID_SLOTID, testU);
-    simManager->GetOpKey(INVALID_SLOTID, testU);
-    simManager->GetOpKeyExt(INVALID_SLOTID, testU);
-    simManager->GetSimTeleNumberIdentifier(INVALID_SLOTID);
-    simManager->ObtainSpnCondition(INVALID_SLOTID, false, testS);
-    simManager->slotCount_ = 0;
-    simManager->GetPrimarySlotId(slotId);
-    EXPECT_GT(simManager->GetDefaultSmsSlotId(), TELEPHONY_PERMISSION_ERROR);
-}
-
 AppExecFwk::InnerEvent::Pointer GetControllerToFileMsgEvent(int32_t code, bool withException)
 {
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
@@ -829,6 +984,189 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
     ASSERT_TRUE(MccPool::MccCompare(mccAccessA, mccAccessB));
     ASSERT_FALSE(MccPool::MccCompare(mccAccessC, mccAccessB));
     ASSERT_FALSE(MccPool::MccCompare(mccAccessA, mccAccessD));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IsChineseString001, Function | MediumTest | Level1)
+{
+    auto simCharDecode = std::make_shared<SimCharDecode>();
+
+    EXPECT_TRUE(simCharDecode->IsChineseString("测试文本"));
+    EXPECT_FALSE(simCharDecode->IsChineseString("testString"));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IsValidNumberString001, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+
+    EXPECT_TRUE(simNumberDecode->IsValidNumberString("123###"));
+    EXPECT_FALSE(simNumberDecode->IsValidNumberString("abc@abc"));
+
+    EXPECT_EQ(simNumberDecode->chooseExtendedByType(0), nullptr);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_CharToBCD001, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+    uint8_t result = 1;
+
+    EXPECT_TRUE(simNumberDecode->CharToBCD('0', result, 0));
+    EXPECT_EQ(result, 0);
+
+    result = 1;
+    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, 0));
+    EXPECT_EQ(result, 1);
+
+    EXPECT_FALSE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_ADN));
+    EXPECT_EQ(result, 1);
+
+    EXPECT_TRUE(simNumberDecode->CharToBCD('a', result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, 0xc);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_BcdToChar, Function | MediumTest | Level1)
+{
+    auto simNumberDecode = std::make_shared<SimNumberDecode>();
+    uint8_t bcdCode = 9;
+    char result = 'a';
+
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, 0));
+    EXPECT_EQ(result, '9');
+
+    bcdCode = 0xa;
+    result = 'a';
+    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, 0));
+    EXPECT_EQ(result, 'a');
+
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_ADN));
+    EXPECT_EQ(result, '*');
+
+    bcdCode = 0xff;
+    EXPECT_FALSE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, '*');
+
+    bcdCode = 0xb;
+    EXPECT_TRUE(simNumberDecode->BcdToChar(bcdCode, result, SimNumberDecode::BCD_TYPE_CALLER));
+    EXPECT_EQ(result, '#');
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_TagService, Function | MediumTest | Level1)
+{
+    TagService tagService("");
+    EXPECT_EQ(tagService.data_.size(), 0);
+
+    TagService tagService1("1234");
+    EXPECT_EQ(tagService1.data_.size(), 2);
+
+    TagService tagService2("1234");
+    EXPECT_EQ(tagService2.data_.size(), 2);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    operatorConfigLoader->iccidFromSim_ = "";
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("testOpKey"), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    operatorConfigLoader->iccidFromSim_ = "12345678901234567890";
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    operatorConfigLoader->simFileManager_.reset();
+    EXPECT_STREQ((operatorConfigLoader->GetOpKey(resultSet, 0)).c_str(), DEFAULT_OPERATOR_KEY);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_VoiceMailConstants001, Function | MediumTest | Level1)
+{
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_, nullptr);
+    VoiceMailConstants voiceMailConstants(0);
+
+    CoreManagerInner mInner;
+    mInner.simManager_ = nullptr;
+    OperatorConfig operatorConfig;
+    ASSERT_EQ(mInner.GetOperatorConfigs(0, operatorConfig), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_STREQ((voiceMailConstants.GetStringValueFromCust(0, "key")).c_str(), "");
+
+    voiceMailConstants.isVoiceMailFixed_ = true;
+    voiceMailConstants.ResetVoiceMailLoadedFlag();
+    ASSERT_EQ(voiceMailConstants.isVoiceMailFixed_, false);
+
+    EXPECT_EQ(voiceMailConstants.GetVoiceMailFixed("test"), true);
+    EXPECT_STREQ((voiceMailConstants.GetVoiceMailNumber("test")).c_str(), "");
+    EXPECT_STREQ((voiceMailConstants.GetVoiceMailTag("test")).c_str(), "");
+    EXPECT_STREQ((voiceMailConstants.LoadVoiceMailConfigFromCard("testName", "testCarrier")).c_str(), "");
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IccOperatorRule_003, Function | MediumTest | Level1)
+{
+    auto iccOperatorRule = std::make_shared<IccOperatorRule>();
+
+    EXPECT_FALSE(iccOperatorRule->SetPackageNameByHexStr("G"));
+    EXPECT_FALSE(iccOperatorRule->SetPackageNameByHexStr("G1"));
+
+    std::string pkgHexStr = "E1E";
+    std::string::const_iterator pkgHexStrBeg = pkgHexStr.begin();
+    std::string::const_iterator pkgHexStrEnd = pkgHexStr.end();
+    IccOperatorRule result;
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagCertPkg(pkgHexStrBeg, pkgHexStrEnd, result));
+
+    std::string limitHexStr = "E3E";
+    std::string::const_iterator limitHexStrBeg = limitHexStr.begin();
+    std::string::const_iterator limitHexStrEnd = limitHexStr.end();
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagLimits(limitHexStrBeg, limitHexStrEnd, result));
+
+    std::string ruleHexStr = "E2E";
+    std::string::const_iterator ruleHexStrBeg = ruleHexStr.begin();
+    std::string::const_iterator ruleHexStrEnd = ruleHexStr.end();
+    int32_t len = 0;
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagRule(ruleHexStrBeg, ruleHexStrEnd, result, len));
+
+    ruleHexStr = "E202E1E";
+    ruleHexStrBeg = ruleHexStr.begin();
+    ruleHexStrEnd = ruleHexStr.end();
+    EXPECT_FALSE(iccOperatorRule->DecodeTLVTagRule(ruleHexStrBeg, ruleHexStrEnd, result, len));
+
+    iccOperatorRule->SetCertificate("testCertificate");
+    iccOperatorRule->SetPackageName("testPackageName");
+
+    std::string_view certHash = "testCertificate";
+    std::string_view packageName = "testPackageName";
+    EXPECT_TRUE(iccOperatorRule->Matche(certHash, packageName));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    IccDiallingNumbersManager iccDiallingNumbersManager(simFileManager, nullptr);
+    std::shared_ptr<DiallingNumbersInfo> diallingNumbers = std::make_shared<DiallingNumbersInfo>();
+
+    EXPECT_EQ(iccDiallingNumbersManager.UpdateIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(iccDiallingNumbersManager.DelIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(iccDiallingNumbersManager.AddIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_ADN), ELEMENTARY_FILE_ADN);
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_FDN), ELEMENTARY_FILE_FDN);
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(-1), 0);
+
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_ADN));
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_FDN));
+    EXPECT_FALSE(iccDiallingNumbersManager.IsValidType(-1));
+
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_ADN, diallingNumbers));
+    EXPECT_FALSE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_FDN, diallingNumbers));
 }
 } // namespace Telephony
 } // namespace OHOS

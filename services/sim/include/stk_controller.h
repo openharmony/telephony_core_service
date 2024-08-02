@@ -16,8 +16,13 @@
 #ifndef OHOS_STK_CONTROLLER_H
 #define OHOS_STK_CONTROLLER_H
 
+#include "system_ability_definition.h"
+#include "system_ability_status_change_stub.h"
+#include "common_event_subscriber.h"
+#include "telephony_state_registry_client.h"
 #include "i_tel_ril_manager.h"
 #include "inner_event.h"
+#include "sim_constant.h"
 #include "sim_state_manager.h"
 #include "tel_event_handler.h"
 #include "want.h"
@@ -32,11 +37,14 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
+using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
+using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class StkController : public TelEventHandler {
 public:
     explicit StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
-    virtual ~StkController() = default;
+    ~StkController();
     void Init();
     std::string initStkBudleName();
     int32_t SendTerminalResponseCmd(const std::string &strCmd);
@@ -66,6 +74,32 @@ private:
     bool CheckIsBipCmd(const std::string &cmdData);
     sptr<OHOS::IRemoteObject> GetBundleMgr();
     void RetrySendRilProactiveCommand();
+    void UnSubscribeListeners();
+    void InitListener();
+    void SubscribeBundleScanFinished();
+    void OnReceiveBms();
+
+private:
+    class BundleScanFinishedEventSubscriber : public CommonEventSubscriber {
+    public:
+        explicit BundleScanFinishedEventSubscriber(
+            const CommonEventSubscribeInfo &info, StkController &handler)
+            : CommonEventSubscriber(info), handler_(handler) {}
+        ~BundleScanFinishedEventSubscriber() = default;
+        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        StkController &handler_;
+    };
+
+    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityStatusChangeListener(StkController &handler) : handler_(handler) {};
+        ~SystemAbilityStatusChangeListener() = default;
+        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    
+    private:
+        StkController &handler_;
+    };
 
 private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
@@ -81,6 +115,9 @@ private:
     std::condition_variable stkCv_;
     AAFwk::Want retryWant_;
     int32_t remainTryCount_ = 0;
+    bool isProactiveCommandSucc = false;
+    std::shared_ptr<BundleScanFinishedEventSubscriber> bundleScanFinishedSubscriber_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
