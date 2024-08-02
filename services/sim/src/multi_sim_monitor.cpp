@@ -325,7 +325,6 @@ void MultiSimMonitor::SubscribeDataShareReady()
         dataShareSubscriber_ = nullptr;
         TELEPHONY_LOGE("Subscribe datashare ready fail");
     }
-    CheckDataShareError();
 }
 
 void MultiSimMonitor::SubscribeUserSwitch()
