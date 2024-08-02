@@ -514,6 +514,15 @@ bool MultiSimController::IsSimActive(int32_t slotId)
     return localCacheInfo_[slotId].isActive == ACTIVE ? true : false;
 }
 
+void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
+{
+    if (TELEPHONY_EXT_WRAPPER.updateSubState_) {
+        TELEPHONY_LOGI("TELEPHONY_EXT_WRAPPER UpdateSubState slotId: %{public}d enable: %{public}d", slotId, enable);
+        TELEPHONY_EXT_WRAPPER.updateSubState_(slotId, enable);
+    }
+    isSetActiveSimInProgress_[slotId] = 0;
+}
+
 int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
 {
     TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
@@ -536,7 +545,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     }
     if (force) {
         TELEPHONY_LOGD("no need to update cache");
-        isSetActiveSimInProgress_[slotId] = 0;
+        UpdateSubState(slotId, enable);
         return TELEPHONY_ERR_SUCCESS;
     }
     if (simDbHelper_ == nullptr) {
@@ -561,8 +570,8 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     }
     localCacheInfo_[slotId].isActive = enable;
     lock.unlock();
+    UpdateSubState(slotId, enable);
     CheckIfNeedSwitchMainSlotId();
-    isSetActiveSimInProgress_[slotId] = 0;
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1290,6 +1299,18 @@ bool MultiSimController::IsSetPrimarySlotIdInProgress()
 {
     TELEPHONY_LOGD("isSetPrimarySlotIdInProgress_ is %{public}d", isSetPrimarySlotIdInProgress_);
     return isSetPrimarySlotIdInProgress_;
+}
+
+int32_t MultiSimController::SavePrimarySlotId(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SavePrimarySlotId invalid slotId: %{public}d", slotId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+
+    TELEPHONY_LOGI("SavePrimarySlotId: %{public}d", slotId);
+    SavePrimarySlotIdInfo(slotId);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 } // namespace Telephony
