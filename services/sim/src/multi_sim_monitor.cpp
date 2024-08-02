@@ -341,7 +341,7 @@ void MultiSimMonitor::SubscribeUserSwitch()
     if (CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_)) {
         TELEPHONY_LOGI("Subscribe UserSwitch success");
     } else {
-        dataShareSubscriber_ = nullptr;
+        userSwitchSubscriber_ = nullptr;
         TELEPHONY_LOGE("Subscribe UserSwitch fail");
     }
 }
@@ -354,7 +354,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
     std::vector<int32_t> activeList = { 0 };
     DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (action == DATASHARE_READY_EVENT) {
-        handler_.isDataShareReady = true;
+        handler_.isDataShareReady_ = true;
         if (activeList[0] == ACTIVE_USER_ID) {
             handler_.CheckDataShareError();
         }
@@ -369,7 +369,7 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEven
     if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         int32_t userId = data.GetCode();
         TELEPHONY_LOGI("current user id is :%{public}d", userId);
-        if (userId == ACTIVE_USER_ID && handler_.isDataShareReady) {
+        if (userId == ACTIVE_USER_ID && handler_.isDataShareReady_) {
             handler_.CheckDataShareError();
         }
     }
