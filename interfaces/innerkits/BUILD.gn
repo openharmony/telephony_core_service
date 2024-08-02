@@ -97,6 +97,11 @@ ohos_shared_library("tel_core_service_api") {
     "samgr:samgr_proxy",
   ]
 
+  cflags_cc = [
+    "-O2",
+    "-D_FORTIFY_SOURCE=2",
+  ]
+
   innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
   subsystem_name = "telephony"

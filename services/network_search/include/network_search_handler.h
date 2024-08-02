@@ -97,7 +97,6 @@ public:
     sptr<CellLocation> GetCellLocation();
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
-    int32_t GetRegServiceState(RegServiceState &regState);
     bool IsPowerOnPrimaryRadioWhenNoSim() const;
     void ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     void RadioOnState();

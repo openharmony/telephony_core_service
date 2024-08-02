@@ -112,23 +112,303 @@ ohos_unittest("tel_network_search_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    # Depends files
     "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
     "core_service_test_helper.cpp",
     "ims_reg_info_callback_gtest.cpp",
-    "network_search_test.cpp",
     "network_search_test_callback_stub.cpp",
-    "network_search_test_time_zone.cpp",
     "security_token.cpp",
+
+    # Test cases
+    "network_search_test.cpp",
+    "network_search_test_time_zone.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/utils:libtel_common",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "core_service:libtel_vcard",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  cflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+}
+
+ohos_unittest("tel_sim_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "tel_network_search_gtest"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    # Depends files
+    "core_service_test_helper.cpp",
+    "security_token.cpp",
+    "sim_operator_brocast_test.cpp",
+    "sim_test_util.cpp",
+
+    # Test cases
     "sim_core_service_test.cpp",
     "sim_elementary_file_test.cpp",
     "sim_icc_test.cpp",
-    "sim_operator_brocast_test.cpp",
     "sim_test.cpp",
-    "sim_test_util.cpp",
     "sim_type_convert_test.cpp",
     "vcard_test.cpp",
     "vsim_test.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/utils:libtel_common",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "core_service:libtel_vcard",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  cflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+}
+
+ohos_unittest("tel_core_zero_branch_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "tel_network_search_gtest"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    # Depends files
+    "core_service_test_helper.cpp",
+    "security_token.cpp",
+    "sim_operator_brocast_test.cpp",
+    "sim_test_util.cpp",
+
+    # Test cases
     "zero_branch_test.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/utils:libtel_common",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "core_service:libtel_vcard",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  cflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+}
+
+ohos_unittest("tel_sim_zero_branch_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "tel_network_search_gtest"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    # Depends files
+    "core_service_test_helper.cpp",
+    "security_token.cpp",
+    "sim_operator_brocast_test.cpp",
+    "sim_test_util.cpp",
+
+    # Test cases
     "zero_branch_test_sim_ril.cpp",
   ]
 
@@ -212,6 +492,9 @@ group("unittest") {
   testonly = true
   deps = [
     ":tel_core_service_gtest",
+    ":tel_core_zero_branch_gtest",
     ":tel_network_search_gtest",
+    ":tel_sim_gtest",
+    ":tel_sim_zero_branch_gtest",
   ]
 }

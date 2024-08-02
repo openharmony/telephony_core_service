@@ -228,6 +228,7 @@ void NapiAsyncBaseCompleteCallback(
         napi_value errorMessage = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
         NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, context.deferred, errorMessage));
         NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is false");
         return;
     }
 
@@ -236,6 +237,7 @@ void NapiAsyncBaseCompleteCallback(
             (funcIgnoreReturnVal ? NapiUtil::CreateUndefined(env) : GetNapiValue(env, asyncContext.callbackVal));
         NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, context.deferred, res));
         NAPI_CALL_RETURN_VOID(env, napi_delete_async_work(env, context.work));
+        TELEPHONY_LOGE("NapiAsyncBaseCompleteCallback deferred error and resolved is true");
         return;
     }
 
@@ -329,6 +331,16 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
     SetPropertyToNapiObject(env, val, "alphaTag", std::data(info.alphaTag));
     SetPropertyToNapiObject(env, val, "number", std::data(info.number));
     SetPropertyToNapiObject(env, val, "pin2", std::data(info.pin2));
+    return val;
+}
+
+napi_value SimAuthResultConversion(napi_env env, const SimAuthenticationResponse &responseResult)
+{
+    napi_value val = nullptr;
+    napi_create_object(env, &val);
+    NapiUtil::SetPropertyInt32(env, val, "sw1", responseResult.sw1);
+    NapiUtil::SetPropertyInt32(env, val, "sw2", responseResult.sw2);
+    NapiUtil::SetPropertyStringUtf8(env, val, "response", responseResult.response);
     return val;
 }
 
@@ -839,6 +851,67 @@ napi_value GetDsdsMode(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork3<AsyncDsdsInfo>(para, asyncContext, initPara);
     if (result) {
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    }
+    return result;
+}
+
+void NativeGetSimAuthentication(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncSimAuthInfo *asyncContext = static_cast<AsyncSimAuthInfo *>(data);
+    if (!IsValidSlotId(asyncContext->asyncContext.slotId)) {
+        TELEPHONY_LOGE("NativeGetSimAuthentication slotId is invalid");
+        asyncContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    SimAuthenticationResponse response;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(
+        asyncContext->asyncContext.slotId, static_cast<AuthType>(asyncContext->authType),
+        asyncContext->authData, response);
+    TELEPHONY_LOGI("NAPI NativeGetSimAuthentication %{public}d", errorCode);
+    if (errorCode == ERROR_NONE) {
+        asyncContext->responseResult = response;
+        asyncContext->asyncContext.context.resolved = true;
+    } else {
+        asyncContext->asyncContext.context.resolved = false;
+    }
+    asyncContext->asyncContext.context.errorCode = errorCode;
+}
+
+void GetSimAuthenticationCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncSimAuthInfo> context(static_cast<AsyncSimAuthInfo *>(data));
+    AsyncContext<napi_value> &asyncContext = context->asyncContext;
+    if (asyncContext.context.resolved) {
+        asyncContext.callbackVal =  SimAuthResultConversion(env, context->responseResult);
+    }
+
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "GetSimAuthentication", Permission::GET_TELEPHONY_STATE });
+}
+
+napi_value GetSimAuthentication(napi_env env, napi_callback_info info)
+{
+    auto asyncContext = new AsyncSimAuthInfo();
+    BaseContext &context = asyncContext->asyncContext.context;
+    char authDataStr[ARRAY_SIZE] = {0};
+
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &asyncContext->authType, authDataStr,
+        &context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetSimAuthentication",
+        .env = env,
+        .info = info,
+        .execute = NativeGetSimAuthentication,
+        .complete = GetSimAuthenticationCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncSimAuthInfo>(para, asyncContext, initPara);
+    if (result) {
+        asyncContext->authData = std::string(authDataStr);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -3110,6 +3183,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getOpName", GetOpName),
         DECLARE_NAPI_FUNCTION("getOpNameSync", GetOpNameSync),
         DECLARE_NAPI_FUNCTION("getDsdsMode", GetDsdsMode),
+        DECLARE_NAPI_FUNCTION("getSimAuthentication", GetSimAuthentication),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }

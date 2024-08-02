@@ -324,6 +324,10 @@ void UsimDiallingNumbersService::StorePbrDetailInfo(
 void UsimDiallingNumbersService::SendBackResult(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers)
 {
+    if (callerPointer_ == nullptr) {
+        TELEPHONY_LOGE("callerPointer_ is nullptr");
+        return;
+    }
     auto owner = callerPointer_->GetOwner();
     if (owner == nullptr) {
         TELEPHONY_LOGE("owner is nullptr");
