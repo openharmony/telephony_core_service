@@ -3207,5 +3207,69 @@ HWTEST_F(BranchTest, Telephony_SignalInformation_001, Function | MediumTest | Le
     std::shared_ptr<GsmCellLocation> gsmCellLocation = std::make_shared<GsmCellLocation>();
     EXPECT_GE(gsmCellLocation->GetCellId(), 0);
 }
+
+HWTEST_F(BranchTest, Telephony_NrSsbInfo, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto nrSsbInfo = std::make_shared<NrSsbInfo>(networkSearchManager, INVALID_SLOTID);
+
+    EXPECT_FALSE(nrSsbInfo->FillNrSsbIdInformation(nullptr));
+
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+    EXPECT_TRUE(nrSsbInfo->FillNrSsbIdInformation(nrCellSsbIdsInfo));
+
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    EXPECT_FALSE(nrSsbInfo->ProcessGetNrSsbId(event));
+
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nullptr));
+
+    std::shared_ptr<NrCellSsbIds> nrCellSsbIds = std::make_shared<NrCellSsbIds>();
+    nrSsbInfo->nrCellSsbIdsInfo_ = nullptr;
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+
+    nrSsbInfo->nrCellSsbIdsInfo_ = std::make_shared<NrCellSsbInfo>();
+    EXPECT_TRUE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+
+    nrCellSsbIds->nbCellCount = 5;
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+}
+
+HWTEST_F(BranchTest, Telephony_RadioInfo, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto radioInfo = std::make_shared<RadioInfo>(networkSearchManager, INVALID_SLOTID);
+
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    radioInfo->ProcessGetRadioState(event);
+    radioInfo->ProcessSetRadioState(event);
+
+    std::shared_ptr<NetworkSearchManager> nsm = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    radioInfo->RadioFirstPowerOn(nsm, ModemPowerState::CORE_SERVICE_POWER_OFF);
+    radioInfo->ProcessGetImei(event);
+    radioInfo->ProcessGetImeiSv(event);
+    radioInfo->ProcessGetMeid(event);
+    radioInfo->ProcessVoiceTechChange(event);
+    radioInfo->ProcessGetBasebandVersion(event);
+    radioInfo->ProcessGetRrcConnectionState(event);
+    radioInfo->ProcessSetNrOptionMode(event);
+    radioInfo->ProcessGetNrOptionMode(event);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_1XRTT, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_EVDO, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_EHRPD, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_GSM);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_LTE_CA),
+        PhoneType::PHONE_TYPE_IS_GSM);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_NR),
+        PhoneType::PHONE_TYPE_IS_GSM);
+}
 } // namespace Telephony
 } // namespace OHOS

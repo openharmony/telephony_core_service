@@ -33,6 +33,7 @@
 #include "sim_file_controller.h"
 #include "sim_manager.h"
 #include "sim_rdb_helper.h"
+#include "sim_sms_manager.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "usim_dialling_numbers_service.h"
@@ -1167,6 +1168,294 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | M
 
     EXPECT_TRUE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_ADN, diallingNumbers));
     EXPECT_FALSE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_FDN, diallingNumbers));
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_SimSmsManager, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+
+    SimSmsManager simSmsManager1(telRilManager, simFileManager, simStateManager);
+    simSmsManager1.stateSms_ = SimSmsManager::HandleRunningState::STATE_RUNNING;
+    simSmsManager1.Init(0);
+
+    SimSmsManager simSmsManager2(nullptr, simFileManager, simStateManager);
+    simSmsManager2.stateSms_ = SimSmsManager::HandleRunningState::STATE_NOT_START;
+    simSmsManager2.Init(1);
+
+    SimSmsManager simSmsManager3(telRilManager, nullptr, simStateManager);
+    simSmsManager3.stateSms_ = SimSmsManager::HandleRunningState::STATE_NOT_START;
+    simSmsManager3.Init(1);
+
+    EXPECT_EQ(simSmsManager3.smsController_, nullptr);
+
+    std::string testPdu = "testPdu";
+    std::string testSmsc = "testSmsc";
+    EXPECT_EQ(simSmsManager3.AddSmsToIcc(0, testPdu, testSmsc), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(simSmsManager3.UpdateSmsIcc(0, 0, testPdu, testSmsc), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(simSmsManager3.DelSmsIcc(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ((simSmsManager3.ObtainAllSmsOfIcc()).size(), 0);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_SimSmsController_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::SimSmsController> simSmsController = std::make_shared<SimSmsController>(simStateManager);
+
+    EXPECT_FALSE(simSmsController->loadDone_);
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    ASSERT_EQ(event, nullptr);
+    simSmsController->ProcessEvent(event);
+    simSmsController->ProcessLoadDone(event);
+    simSmsController->ProcessUpdateDone(event);
+    simSmsController->ProcessWriteDone(event);
+    simSmsController->ProcessDeleteDone(event);
+    EXPECT_FALSE(simSmsController->loadDone_);
+
+    simSmsController->stateManager_ = std::make_shared<SimStateManager>(telRilManager);
+    simSmsController->stateManager_->simStateHandle_  = std::make_shared<SimStateHandle>(simStateManager);
+    simSmsController->stateManager_->simStateHandle_->externalType_ = CardType::SINGLE_MODE_RUIM_CARD;
+    EXPECT_TRUE(simSmsController->IsCdmaCardType());
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_IccFileController_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+
+    int32_t fileSize[] = { 0, 0, 0 };
+    int32_t testLenNum = 3;
+    AppExecFwk::InnerEvent::Pointer respone(nullptr, nullptr);
+    iccFileController->SendEfLinearResult(respone, fileSize, testLenNum);
+    std::vector<std::string> strValue;
+
+    iccFileController->SendMultiRecordResult(respone, strValue);
+    unsigned char data[] = {0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1};
+    iccFileController->ParseFileSize(fileSize, testLenNum, data);
+    EXPECT_EQ(fileSize[0], 1);
+    EXPECT_EQ(fileSize[1], 2);
+    EXPECT_EQ(fileSize[2], 2);
+
+    fileSize[2] = 0;
+    data[SIZE_TWO_OF_FILE] = 1;
+    data[LENGTH_OF_RECORD] = 0;
+    iccFileController->ParseFileSize(fileSize, testLenNum, data);
+    EXPECT_EQ(fileSize[0], 0);
+    EXPECT_EQ(fileSize[1], 1);
+    EXPECT_EQ(fileSize[2], 0);
+
+    EXPECT_FALSE(iccFileController->IsValidRecordSizeData(data));
+    EXPECT_FALSE(iccFileController->IsValidBinarySizeData(data));
+
+    data[TYPE_OF_FILE] = ICC_ELEMENTARY_FILE;
+    EXPECT_FALSE(iccFileController->IsValidRecordSizeData(data));
+    EXPECT_FALSE(iccFileController->IsValidBinarySizeData(data));
+
+    data[STRUCTURE_OF_DATA] = 1;
+    EXPECT_TRUE(iccFileController->IsValidRecordSizeData(data));
+    data[STRUCTURE_OF_DATA] = ELEMENTARY_FILE_TYPE_TRANSPARENT;
+    EXPECT_TRUE(iccFileController->IsValidBinarySizeData(data));
+
+    EXPECT_STREQ((iccFileController->CheckRightPath("testPath", 0)).c_str(), "testPath");
+
+    auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
+    iccFileController->SendEvent(nullptr, 1, true, nullptr, objectUnique);
+    iccFileController->SendEvent(nullptr, 1, false, nullptr, objectUnique);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+
+    auto simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerTwo);
+    simStateManager->simStateHandle_ = simStateHandle;
+
+    EXPECT_EQ(simStateManager->SetModemInit(false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(simStateManager->IfModemInitDone());
+
+    simStateManager->simStateHandle_ = nullptr;
+    EXPECT_EQ(simStateManager->SetModemInit(false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_FALSE(simStateManager->IfModemInitDone());
+
+    LockInfo lockInfo;
+    lockInfo.lockType = static_cast<LockType>(0);
+    LockStatusResponse lockStatusResponse;
+    lockStatusResponse.result = UNLOCK_OK;
+    EXPECT_EQ(simStateManager->SetLockState(0, lockInfo, lockStatusResponse), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(lockStatusResponse.result, UNLOCK_FAIL);
+
+    lockInfo.lockType = LockType::FDN_LOCK;
+    EXPECT_EQ(simStateManager->SetLockState(0, lockInfo, lockStatusResponse), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    LockState lockState;
+    LockType lockType = static_cast<LockType>(0);
+    EXPECT_EQ(simStateManager->GetLockState(0, lockType, lockState), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(lockState, LockState::LOCK_ERROR);
+
+    lockType = LockType::FDN_LOCK;
+    EXPECT_EQ(simStateManager->GetLockState(0, lockType, lockState), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    SimIoRequestInfo simIoRequestInfo;
+    SimAuthenticationResponse response;
+    EXPECT_EQ(simStateManager->GetSimIO(0, simIoRequestInfo, response), SIM_AUTH_FAIL);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_StkController_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
+
+    EXPECT_FALSE(stkController->CheckIsBipCmd("01234567890000"));
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
+
+    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894000"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894300"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894200"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894400"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894100"));
+
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    stkController->OnSendTerminalResponseResult(event);
+    stkController->OnSendEnvelopeCmdResult(event);
+    stkController->OnSendCallSetupRequestResult(event);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->observerHandler_ = std::make_unique<ObserverHandler>();
+    LockReason reason = LockReason::SIM_NONE;
+
+    simStateHandle->SimStateEscape(ICC_CARD_ABSENT, 0, reason);
+    EXPECT_EQ(simStateHandle->externalState_, SimState::SIM_STATE_NOT_PRESENT);
+
+    simStateHandle->SimStateEscape(ICC_CONTENT_READY, 0, reason);
+    EXPECT_EQ(simStateHandle->externalState_, SimState::SIM_STATE_READY);
+
+    simStateHandle->SimStateEscape(ICC_CONTENT_PIN, 0, reason);
+    EXPECT_EQ(simStateHandle->externalState_, SimState::SIM_STATE_LOCKED);
+    EXPECT_EQ(reason, LockReason::SIM_PIN);
+
+    simStateHandle->SimStateEscape(ICC_CONTENT_PUK, 0, reason);
+    EXPECT_EQ(simStateHandle->externalState_, SimState::SIM_STATE_LOCKED);
+    EXPECT_EQ(reason, LockReason::SIM_PUK);
+
+    simStateHandle->SimStateEscape(-1, 0, reason);
+}
+
+
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->observerHandler_ = std::make_unique<ObserverHandler>();
+    LockReason reason = LockReason::SIM_NONE;
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_NET_PIN, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PN_PIN);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_NET_PUK, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PN_PUK);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_NET_SUB_PIN, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PU_PIN);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_NET_SUB_PUK, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PU_PUK);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_SP_PIN, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PP_PIN);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_PH_SP_PUK, 0, reason);
+    EXPECT_EQ(reason, LockReason::SIM_PP_PUK);
+
+    simStateHandle->SimLockStateEscape(ICC_CONTENT_UNKNOWN, 0, reason);
+    EXPECT_EQ(simStateHandle->externalState_, SimState::SIM_STATE_UNKNOWN);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+
+    simStateHandle->observerHandler_ = std::make_unique<ObserverHandler>();
+    simStateHandle->externalType_ = CardType::UNKNOWN_CARD;
+    simStateHandle->CardTypeEscape(-1, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::UNKNOWN_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_SIM_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::SINGLE_MODE_SIM_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_USIM_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::SINGLE_MODE_USIM_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_RUIM_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::SINGLE_MODE_RUIM_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_CG_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::DUAL_MODE_CG_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_DUAL_MODE_ROAMING_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::CT_NATIONAL_ROAMING_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_UNICOM_DUAL_MODE_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::CU_DUAL_MODE_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_4G_LTE_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::DUAL_MODE_TELECOM_LTE_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_UG_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::DUAL_MODE_UG_CARD);
+
+    simStateHandle->CardTypeEscape(ICC_IMS_TYPE, 0);
+    EXPECT_EQ(simStateHandle->externalType_, CardType::SINGLE_MODE_ISIM_CARD);
+
+    simStateHandle->UnRegisterCoreNotify(nullptr, RadioEvent::RADIO_SIM_STATE_CHANGE);
+    simStateHandle->UnRegisterCoreNotify(nullptr, RadioEvent::RADIO_SIM_STATE_READY);
+    simStateHandle->UnRegisterCoreNotify(nullptr, RadioEvent::RADIO_SIM_STATE_LOCKED);
+    simStateHandle->UnRegisterCoreNotify(nullptr, RadioEvent::RADIO_SIM_STATE_SIMLOCK);
+    simStateHandle->UnRegisterCoreNotify(nullptr, RadioEvent::RADIO_CARD_TYPE_CHANGE);
+    simStateHandle->UnRegisterCoreNotify(nullptr, -1);
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_OperatorFileParser, Function | MediumTest | Level1)
+{
+    OperatorFileParser parser;
+
+    EXPECT_FALSE(parser.WriteOperatorConfigJson("testName", nullptr));
+    EXPECT_STREQ((parser.GetOperatorConfigFilePath("")).c_str(), "");
+
+    parser.tempConfig_ = {{"valid_key", "{\"name\":\"valid_value\"}"}, {"invalid_key", ""}};
+
+    cJSON *root = cJSON_CreateObject();
+    parser.CreateJsonFromOperatorConfig(root);
+
+    EXPECT_NE(cJSON_GetObjectItem(root, "valid_key"), nullptr);
+    EXPECT_EQ(cJSON_GetObjectItem(root, "invalid_key"), nullptr);
+
+    cJSON_Delete(root);
+    root = nullptr;
+
+    OperatorConfig operatorConfig;
+    parser.ParseArray("testKey", nullptr, operatorConfig);
+
+    cJSON *value = cJSON_CreateArray();
+    ASSERT_NE(value, nullptr);
+    parser.ParseArray("testKey", value, operatorConfig);
+
+    cJSON_Delete(value);
+    value = nullptr;
 }
 } // namespace Telephony
 } // namespace OHOS
