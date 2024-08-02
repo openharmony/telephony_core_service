@@ -17,6 +17,7 @@
 
 #include "sim_data.h"
 #include "telephony_errors.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -550,8 +551,13 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::SLOT_INDEX, std::to_string(slotId));
     DataShare::DataShareValuesBucket value;
-    DataShare::DataShareValueObject valueObj(ACTIVE);
-    value.Put(SimData::IS_ACTIVE, valueObj);
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() &&
+        slotId != static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
+        TELEPHONY_LOGI("vsim enabled, not change slotId: %{public}d IS_ACTIVE state", slotId);
+    } else {
+        DataShare::DataShareValueObject valueObj(ACTIVE);
+        value.Put(SimData::IS_ACTIVE, valueObj);
+    }
     DataShare::DataShareValueObject valueIndex(INVALID_VALUE);
     value.Put(SimData::SLOT_INDEX, valueIndex);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();

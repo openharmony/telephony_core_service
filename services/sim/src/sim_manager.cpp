@@ -1236,5 +1236,15 @@ int32_t SimManager::GetSimIO(int32_t slotId, int32_t command,
     requestInfo.path = path;
     return simStateManager_[slotId]->GetSimIO(slotId, requestInfo, response);
 }
+
+int32_t SimManager::SavePrimarySlotId(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId) || multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("slotId: %{public}d is invalid or multiSimController_ is nullptr", slotId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return multiSimController_->SavePrimarySlotId(slotId);
+}
+
 } // namespace Telephony
 } // namespace OHOS

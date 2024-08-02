@@ -2460,6 +2460,15 @@ bool CoreManagerInner::IsSetPrimarySlotIdInProgress()
     return simManager_->IsSetPrimarySlotIdInProgress();
 }
 
+int32_t CoreManagerInner::SavePrimarySlotId(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SavePrimarySlotId(slotId);
+}
+
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
