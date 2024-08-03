@@ -189,6 +189,10 @@ std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
 
 std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
 {
+    if (slotId < 0 || static_cast<size_t>(slotId) >= observerHandler_.size()) {
+        TELEPHONY_LOGE("observerHandler_ slotId %{public}d is valid", slotId);
+        return nullptr;
+    }
     return observerHandler_[slotId];
 }
 
