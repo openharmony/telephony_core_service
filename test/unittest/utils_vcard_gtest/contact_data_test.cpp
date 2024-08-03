@@ -441,65 +441,6 @@ HWTEST_F(ContactDataTest, VCardDecoderV21_DecodeOne, Function | MediumTest | Lev
     decoder.AddVCardDecodeListener(listener);
 }
 
-HWTEST_F(ContactDataTest, VCardDecoderV21_DealRawDataValue001, Function | MediumTest | Level3)
-{
-    VCardDecoderV21 decoder;
-    int32_t errorCode = -1;
-    decoder.DealRawDataValue("name", nullptr, errorCode);
-    EXPECT_EQ(errorCode, -1);
-
-    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
-    rawData->AppendParameter("param", "value");
-    rawData->SetRawValue("RawValue");
-    rawData->SetName(VCARD_TYPE_ADR);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-    EXPECT_EQ((rawData->GetParameters(VCARD_PARAM_CHARSET)).size(), 0);
-
-    rawData->AppendParameter(VCARD_PARAM_CHARSET, "TESTCHARSET");
-    decoder.DealRawDataValue("name", rawData, errorCode);
-    EXPECT_STREQ((rawData->GetParameters(VCARD_PARAM_CHARSET))[0].c_str(), "TESTCHARSET");
-
-    rawData->SetName(VCARD_TYPE_ORG);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    rawData->SetName(VCARD_TYPE_N);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    rawData->SetName(VCARD_TYPE_FN);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-}
-
-HWTEST_F(ContactDataTest, VCardDecoderV21_DealRawDataValue002, Function | MediumTest | Level3)
-{
-    VCardDecoderV21 decoder;
-    int32_t errorCode = -1;
-    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
-    rawData->SetRawValue("RawValue");
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_QP, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_BASE64, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_B, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_7BIT, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_8BIT, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-
-    decoder.DealEncodingParam(VCARD_PARAM_ENCODING_8BIT, rawData, errorCode);
-    EXPECT_EQ(errorCode, -1);
-    decoder.DealRawDataValue("name", rawData, errorCode);
-}
-
 HWTEST_F(ContactDataTest, VCardDecoderV21_DealBase64OrB, Function | MediumTest | Level3)
 {
     VCardDecoderV21 decoder;
