@@ -43,6 +43,14 @@ void OperatorConfigCache::ClearAllCache(int32_t slotId)
     lock.unlock();
 }
 
+void OperatorConfigCache::ClearMemoryAndOpkey(int32_t slotId)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    ClearOperatorValue(slotId);
+    ClearMemoryCache(slotId);
+    lock.unlock();
+}
+
 void OperatorConfigCache::ClearOperatorValue(int32_t slotId)
 {
     auto simFileManager = simFileManager_.lock();
@@ -329,7 +337,7 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
         return true;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
-    std::string filename = EncryptIccId(iccid) + ".json";
+    std::string filename = EncryptIccId(iccid + opkey) + ".json";
     std::string path = parser_.GetOperatorConfigFilePath(filename);
     std::ifstream f(path.c_str());
     return !f.good();

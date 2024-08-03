@@ -241,10 +241,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_001, Function | MediumTest 
     simStateTracker->ProcessEvent(event);
     simFileManager = nullptr;
     simStateTracker->simFileManager_ = simFileManager;
-    std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
-    auto statusChangeListener_ =
-        new (std::nothrow) SimStateTracker::SystemAbilityStatusChangeListener(0, operatorConfigLoader_);
-    statusChangeListener_->OnAddSystemAbility(0, "test");
     EXPECT_FALSE(simStateTracker->RegisterForIccLoaded());
     EXPECT_FALSE(simStateTracker->UnRegisterForIccLoaded());
 }
