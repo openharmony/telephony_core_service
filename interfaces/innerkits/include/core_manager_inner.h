@@ -320,6 +320,7 @@ public:
     int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard);
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
+    int32_t SavePrimarySlotId(int32_t slotId);
     /******************** simManager end *****************************/
 private:
     CoreManagerInner();
