@@ -146,7 +146,6 @@ public:
     bool modemInitDone_ = false;
 
 private:
-    void SyncCmdResponse();
     void ObtainIccStatus(int32_t slotId);
     void GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetSimLockState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
