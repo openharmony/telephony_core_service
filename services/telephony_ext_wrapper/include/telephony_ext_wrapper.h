@@ -89,9 +89,11 @@ public:
     typedef bool (*GET_SIM_ID_EXT)(int32_t slotId, int32_t &simId);
     typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
     typedef bool (*IS_HANDLE_VSIM)(void);
+    typedef bool (*IS_VSIM_ENABLED)(void);
+    typedef void (*UPDATE_SUB_STATE)(int32_t slotId, int32_t subState);
+    /* add for vsim end */
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
-    /* add for vsim end */
     typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(
@@ -142,9 +144,11 @@ public:
     GET_SIM_ID_EXT getSimIdExt_ = nullptr;
     GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
     IS_HANDLE_VSIM isHandleVSim_ = nullptr;
+    IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
+    UPDATE_SUB_STATE updateSubState_ = nullptr;
+    /* add for vsim end */
     SEND_EVENT sendEvent_ = nullptr;
     INIT_BIP initBip_ = nullptr;
-    /* add for vsim end */
     IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
