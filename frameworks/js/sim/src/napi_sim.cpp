@@ -3100,6 +3100,20 @@ napi_status InitEnumOperatorSimCard(napi_env env, napi_value exports)
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
+napi_status InitEnumAuthType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "SIM_AUTH_EAP_SIM_TYPE", GetNapiValue(env, static_cast<int32_t>(AuthType::SIM_AUTH_EAP_SIM_TYPE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "SIM_AUTH_EAP_AKA_TYPE", GetNapiValue(env, static_cast<int32_t>(AuthType::SIM_AUTH_EAP_AKA_TYPE))),
+    };
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "AuthType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
 napi_status InitSimLockInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3204,6 +3218,7 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     NAPI_CALL(env, InitEnumPersoLockType(env, exports));
     NAPI_CALL(env, InitEnumOperatorConfigKey(env, exports));
     NAPI_CALL(env, InitEnumOperatorSimCard(env, exports));
+    NAPI_CALL(env, InitEnumAuthType(env, exports));
     return exports;
 }
 EXTERN_C_END
