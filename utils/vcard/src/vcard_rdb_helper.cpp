@@ -72,7 +72,7 @@ int32_t VCardRdbHelper::BatchInsertContactData(const std::vector<DataShare::Data
         TELEPHONY_LOGE("dataShareHelper_ is nullptr");
         return DB_FAILD;
     }
-    Uri uriContactDataBatch(uriContactData.ToString() + "?isFromBatch=true");
+    Uri uriContactDataBatch(uriContactData.ToString() + "?isFromBatch=true&isSyncFromCloud=true");
     int code = dataShareHelper_->BatchInsert(uriContactDataBatch, contactsDataValues);
     TELEPHONY_LOGI("insert code %{public}d", code);
     return code;
