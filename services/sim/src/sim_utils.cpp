@@ -233,6 +233,9 @@ std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int
     if (len > length - START_POS) {
         len = length - START_POS;
     }
+    if (len <= 0) {
+        return u"";
+    }
     unsigned char* dataUsc = new unsigned char[len * HALF_LEN]{ FF_DATA };
     int index = 0;
     int base = 0;
@@ -268,6 +271,9 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
     int len = data[offset + 1] & BYTE_VALUE;
     if (len > length - END_POS) {
         len = length - END_POS;
+    }
+    if (len <= 0) {
+        return u"";
     }
     int base = (data[offset + UCS_BASE_POS] << BYTE_BIT) + data[offset + UCS_BASE_POS + 1];
     unsigned char* dataUsc = new unsigned char[len * HALF_LEN]{ FF_DATA };

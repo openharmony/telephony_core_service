@@ -669,6 +669,19 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
 }
 
 /**
+ * @tc.number   Telephony_SimStateManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simStateManager->SyncCmdResponse();
+    EXPECT_FALSE(simStateManager->HasSimCard());
+}
+
+/**
  * @tc.number   Telephony_SimStateManager_002
  * @tc.name     test error branch
  * @tc.desc     Function test
