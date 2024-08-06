@@ -59,7 +59,6 @@ public:
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response);
     void SyncCmdResponse();
 
-
 public:
     bool responseReady_;
     std::mutex ctx_;
