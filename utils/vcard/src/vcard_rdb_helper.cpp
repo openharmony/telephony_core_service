@@ -25,6 +25,7 @@ OHOS::Uri uriRawContact("datashare:///com.ohos.contactsdataability/contacts/raw_
 OHOS::Uri uriContactData("datashare:///com.ohos.contactsdataability/contacts/contact_data");
 OHOS::Uri uriAccount("datashare:///com.ohos.contactsdataability/contacts/account");
 OHOS::Uri uriContact("datashare:///com.ohos.contactsdataability/contacts/contact");
+OHOS::Uri uriRawContactMaxId("datashare:///com.ohos.contactsdataability/raw_contact/get_inc_id");
 
 } // namespace
 
@@ -40,18 +41,27 @@ VCardRdbHelper &VCardRdbHelper::GetInstance()
 
 int32_t VCardRdbHelper::QueryRawContactMaxId()
 {
+    if (dataShareHelper_ == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper is nullptr");
+        return DB_FAILD;
+    }
+    Uri uriRawContactMaxIdQuery(uriRawContactMaxId.ToString() + "?isFromBatch=true");
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
-    predicates.GreaterThanOrEqualTo(RawContact::ID, "1");
-    auto resultSet = QueryRawContact(columns, predicates);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet =
+        dataShareHelper_->Query(uriRawContactMaxIdQuery, predicates, columns);
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
         return DB_FAILD;
     }
-    int rowCount = 0;
-    resultSet->GetRowCount(rowCount);
-    TELEPHONY_LOGI("rowCount= %{public}d", rowCount);
-    return static_cast<int32_t>(rowCount);
+    int rawMaxId = 0;
+    if (resultSet->GoToFirstRow() == TELEPHONY_ERR_SUCCESS) {
+        int curValueIndex;
+        resultSet->GetColumnIndex("seq", curValueIndex);
+        resultSet->GetInt(curValueIndex, rawMaxId);
+    }
+    TELEPHONY_LOGI("batchInsert rawId: %{public}d", rawMaxId);
+    return rawMaxId;
 }
 
 int32_t VCardRdbHelper::BatchInsertRawContact(const std::vector<DataShare::DataShareValuesBucket> &rawContactValues)
