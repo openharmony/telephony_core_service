@@ -526,11 +526,11 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
 }
 
 /**
- * @tc.number   Telephony_IccDiallingNumbersManager_002
+ * @tc.number   Telephony_IccDiallingNumbersManager_003
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | MediumTest | Level1)
+HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_003, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
