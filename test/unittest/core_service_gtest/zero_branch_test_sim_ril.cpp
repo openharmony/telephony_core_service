@@ -677,9 +677,8 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_001, Function | MediumTest 
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EXPECT_FALSE(simStateManager->HasSimCard());
-    simStateManager->Init(0);
     simStateManager->SyncCmdResponse();
+    EXPECT_FALSE(simStateManager->HasSimCard());
 }
 
 /**
