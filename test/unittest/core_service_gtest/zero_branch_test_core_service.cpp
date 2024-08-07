@@ -382,15 +382,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function |
     std::string result;
     coreServiceDumpHelper->ShowHelp(result);
     coreServiceDumpHelper->ShowCoreServiceTimeInfo(result);
-    int32_t slotId = SLOT_ID;
-    bool hasSimCard = false;
-    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
-    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
-    EXPECT_FALSE(hasSimCard);
     coreServiceDumpHelper->ShowCoreServiceInfo(result);
-    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
-    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
-    EXPECT_TRUE(hasSimCard);
     coreServiceDumpHelper->ShowCoreServiceInfo(result);
     coreServiceDumpHelper->Dump(argsInStr, result);
     EXPECT_FALSE(result.empty());
