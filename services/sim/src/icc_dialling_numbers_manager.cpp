@@ -52,7 +52,7 @@ void IccDiallingNumbersManager::Init()
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
     diallingNumbersCache_->Init();
-    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     TELEPHONY_LOGI("Init() end");
 }
 
@@ -77,8 +77,23 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
         case MSG_SIM_DIALLING_NUMBERS_DELETE_DONE:
             ProcessDeleteDone(event);
             break;
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
+            ProcessSimStateChanged();
+            break;
         default:
             break;
+    }
+}
+
+void IccDiallingNumbersManager::ProcessSimStateChanged()
+{
+    if (simStateManager_ == nullptr || diallingNumbersCache_ == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessSimStateChanged simStateManager_ is nullptr");
+        return;
+    }
+    if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
+        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
+        diallingNumbersCache_->ClearDiallingNumberCache();
     }
 }
 
@@ -308,7 +323,7 @@ void IccDiallingNumbersManager::FillResults(
             diallingNumbersList_.push_back(item);
         }
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::FillResults end");
+    TELEPHONY_LOGI("IccDiallingNumbersManager::FillResults %{public}zu", diallingNumbersList_.size());
 }
 
 bool IccDiallingNumbersManager::IsValidType(int type)
