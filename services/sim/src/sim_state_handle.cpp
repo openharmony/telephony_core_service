@@ -151,6 +151,11 @@ SimState SimStateHandle::GetSimState()
     return externalState_;
 }
 
+void SimStateHandle::SetSimState(SimState simState)
+{
+    externalState_ = simState;
+}
+
 CardType SimStateHandle::GetCardType()
 {
     TELEPHONY_LOGD("SimStateHandle::GetCardType() externalType_=%{public}d", static_cast<int32_t>(externalType_));
