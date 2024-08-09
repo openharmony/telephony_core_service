@@ -29,6 +29,7 @@ public:
     ~TelRilData() = default;
 
     HDI::Ril::V1_1::DataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
+    HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes ChangeDPToHalDataProfileWithApnTypes(DataProfile dataProfile);
     int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
