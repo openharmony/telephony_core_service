@@ -97,6 +97,16 @@ SimState SimStateManager::GetSimState()
     return ret;
 }
 
+void SimStateManager::SetSimState(SimState simState)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SimStateManager::SetSimState(), simStateHandle_ is nullptr!!!");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(mtx_);
+    simStateHandle_->SetSimState(simState);
+}
+
 bool SimStateManager::IfModemInitDone()
 {
     if (simStateHandle_ != nullptr) {

@@ -125,7 +125,14 @@ void RuimFile::ProcessLockedAllFilesFetched()
 void RuimFile::OnAllFilesFetched()
 {
     UpdateLoaded(true);
-    filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    TELEPHONY_LOGI("RuimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
+    if (filesFetchedObser_ != nullptr) {
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    }
+    if (stateManager_ != nullptr) {
+        CardType cardType = stateManager_->GetCardType();
+        NotifyRegistrySimState(cardType, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
 }

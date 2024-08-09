@@ -746,6 +746,22 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_002, Function | MediumTest 
 }
 
 /**
+ * @tc.number   Telephony_SimStateManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simStateManager->SetSimState(SimState::SIM_STATE_LOADED);
+    simStateManager->Init(0);
+    simStateManager->SetSimState(SimState::SIM_STATE_LOADED);
+    EXPECT_EQ(simStateManager->GetSimState(), SimState::SIM_STATE_LOADED);
+}
+
+/**
  * @tc.number   Telephony_SimStateHandle_002
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -770,6 +786,21 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
     std::string authData = "test";
     simStateHandle->UnlockSimLock(0, lockInfo);
     EXPECT_EQ(simStateHandle->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, authData), SIM_AUTH_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->Init(0);
+    simStateHandle->SetSimState(SimState::SIM_STATE_LOADED);
+    EXPECT_EQ(simStateHandle->GetSimState(), SimState::SIM_STATE_LOADED);
 }
 
 /**
