@@ -159,35 +159,35 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Network_001, Function | MediumTest 
     HDI::Ril::V1_1::CellNearbyInfo info;
     for (info.ratType = 0; info.ratType <= RAT_TYPE; info.ratType++) {
         telRilNetwork->FillCellNearbyInfo(cellInfo, info);
-        EXPECT_EQ(cellInfo.ratType , info.ratType);
+        EXPECT_EQ(cellInfo.ratType, info.ratType);
     }
 
     CellNearbyInfo cellInfo1;
     HDI::Ril::V1_2::CellNearbyInfo_1_2 info1;
     for (info.ratType = 0; info1.ratType <= RAT_TYPE; info1.ratType++) {
         telRilNetwork->FillCellNearbyInfo(cellInfo1, info1);
-        EXPECT_EQ(cellInfo1.ratType , info1.ratType);
+        EXPECT_EQ(cellInfo1.ratType, info1.ratType);
     }
 
     CurrentCellInfo currentCellInfo;
     HDI::Ril::V1_1::CurrentCellInfo CurrentInfo;
     for (info.ratType = 0; CurrentInfo.ratType <= RAT_TYPE; CurrentInfo.ratType++) {
         telRilNetwork->FillCurrentCellInfo(currentCellInfo, CurrentInfo);
-        EXPECT_EQ(currentCellInfo.ratType , CurrentInfo.ratType);
+        EXPECT_EQ(currentCellInfo.ratType, CurrentInfo.ratType);
     }
 
     CurrentCellInformation currentCellInformation;
     HDI::Ril::V1_1::CurrentCellInfo_1_1 currentInformation;
     for (info.ratType = 0; currentInformation.ratType <= RAT_TYPE; currentInformation.ratType++) {
         telRilNetwork->FillCurrentCellInformation(currentCellInformation, currentInformation);
-        EXPECT_EQ(currentCellInformation.ratType , currentInformation.ratType);
+        EXPECT_EQ(currentCellInformation.ratType, currentInformation.ratType);
     }
 
     CurrentCellInformation currentCellInformation1;
     HDI::Ril::V1_2::CurrentCellInfo_1_2 currentInformation1;
     for (info.ratType = 0; currentInformation1.ratType <= RAT_TYPE; currentInformation1.ratType++) {
         telRilNetwork->FillCurrentCellInformation(currentCellInformation1, currentInformation1);
-        EXPECT_EQ(currentCellInformation1.ratType , currentInformation1.ratType);
+        EXPECT_EQ(currentCellInformation1.ratType, currentInformation1.ratType);
     }
 }
 
