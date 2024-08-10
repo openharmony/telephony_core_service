@@ -3136,7 +3136,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Leve
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     auto simFileManagerWeak = std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeaks = {simFileManagerWeak, simFileManagerWeak};
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeaks = {simFileManagerWeak,
+        simFileManagerWeak};
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
     multiSimMonitor->RegisterSimNotify();
