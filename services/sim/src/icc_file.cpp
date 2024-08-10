@@ -707,9 +707,13 @@ AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
 
 void IccFile::NotifyRegistrySimState(CardType type, SimState state, LockReason reason)
 {
+    if (stateManager_ != nullptr) {
+        stateManager_->SetSimState(state);
+    }
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(slotId_, type, state, reason);
-    TELEPHONY_LOGI("NotifyRegistrySimState msgId is %{public}d ret %{public}d", state, result);
+    TELEPHONY_LOGI("NotifyRegistrySimState slotId: %{public}d, simState: %{public}d, ret: %{public}d", slotId_, state,
+        result);
 }
 
 bool IccFile::HasSimCard()
