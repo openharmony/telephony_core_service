@@ -589,9 +589,7 @@ ohos_unittest("tel_core_service_test") {
   test_module = "tel_network_search_gtest"
   module_out_path = part_name + "/" + test_module
 
-  sources = [
-    "core_service_test.cpp",
-  ]
+  sources = [ "core_service_test.cpp" ]
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
