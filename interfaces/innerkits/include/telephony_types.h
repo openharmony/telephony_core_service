@@ -190,6 +190,10 @@ struct DataProfile {
      * Roaming protocol version
      */
     std::string roamingProtocol = "";
+    /**
+     * Supported apn types bitmap
+     */
+    int32_t supportedApnTypesBitmap = 0;
 };
 
 /**
