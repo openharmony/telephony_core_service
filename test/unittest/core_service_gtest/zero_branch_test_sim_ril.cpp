@@ -746,11 +746,11 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_002, Function | MediumTest 
 }
 
 /**
- * @tc.number   Telephony_SimStateManager_003
+ * @tc.number   Telephony_SimStateManager_004
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_003, Function | MediumTest | Level1)
+HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_004, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -789,11 +789,11 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
 }
 
 /**
- * @tc.number   Telephony_SimStateHandle_003
+ * @tc.number   Telephony_SimStateHandle_006
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_006, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
