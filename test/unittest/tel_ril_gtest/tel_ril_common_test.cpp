@@ -432,5 +432,143 @@ HWTEST_F(TelRilCommonTest, TelRilCallback_CommonErrorResponse_001, Function | Me
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     EXPECT_EQ(telRilCallback->CommonErrorResponse(responseInfo), TELEPHONY_ERR_SUCCESS);
 }
+
+/**
+ * @tc.number   TelRilCall_GetCallListResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilCall_GetCallListResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::CallInfoList callInfoList;
+    auto result = telRilCall->GetCallListResponse(responseInfo, callInfoList);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   TelRilCall_GetCallWaitingResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilCall_GetCallWaitingResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::CallWaitResult callWaitResult;
+    auto result = telRilCall->GetCallWaitingResponse(responseInfo, callWaitResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   TelRilCall_GetCallTransferInfoResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilCall_GetCallTransferInfoResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::CallForwardQueryInfoList cFQueryList;
+    auto result = telRilCall->GetCallTransferInfoResponse(responseInfo, cFQueryList);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   TelRilCall_GetClipResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilCall_GetClipResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::GetClipResult getClipResult;
+    auto result = telRilCall->GetClipResponse(responseInfo, getClipResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   TelRilCall_GetCallRestrictionResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilCall_GetCallRestrictionResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    HDI::Ril::V1_1::CallRestrictionResult callRestrictionResult;
+    auto result = telRilCall->GetCallRestrictionResponse(responseInfo, callRestrictionResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   TelRilSim_SendDtmfResponse_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilSim_SendDtmfResponse_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    auto event = AppExecFwk::InnerEvent::Get(1, 1);
+    telRilCall->CreateTelRilRequest(event);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    responseInfo.serial = 1;
+    auto result = telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_NE(result, 1);
+    event = nullptr;
+    telRilCall->CreateTelRilRequest(event);
+    result = telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   TelRilSim_CallUssdNotice_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilSim_CallUssdNotice_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::UssdNoticeInfo ussdNoticeInfo;
+    auto result = telRilCall->CallUssdNotice(ussdNoticeInfo);
+    ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   TelRilSim_ResponseSupplement_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilCommonTest, TelRilSim_ResponseSupplement_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::RilRadioResponseInfo rilRadioResponseInfo;
+    rilRadioResponseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    auto result = telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, rilRadioResponseInfo);
+    ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS
