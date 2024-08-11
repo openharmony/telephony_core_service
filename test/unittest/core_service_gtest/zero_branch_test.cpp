@@ -3186,8 +3186,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->Init();
-    simStateManagerPtr->SetSimState(SimState::SIM_STATE_NOT_PRESENT);
-    multiSimMonitor->RefreshData(0);
 }
 
 /**
