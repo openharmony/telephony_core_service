@@ -243,7 +243,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | MediumTest | Level1)
 {
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
@@ -268,7 +268,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_002, Function | Mediu
 {
     SecurityToken token;
     int32_t slotId = SLOT_ID;
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         MessageParcel data;
         MessageParcel reply;
@@ -291,7 +291,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_003, Function | Mediu
 {
     SecurityToken token;
     int32_t slotId = SLOT_ID;
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
@@ -326,7 +326,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | Mediu
     DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
     DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = nullptr;
     DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, nullptr);
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         MessageParcel data;
         MessageParcel reply;
