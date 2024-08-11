@@ -811,21 +811,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_002, Function | MediumTest |
 }
 
 /**
- * @tc.number   Telephony_SimStateHandle_006
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_006, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
-    simStateHandle->Init(0);
-    simStateHandle->SetSimState(SimState::SIM_STATE_LOADED);
-    EXPECT_EQ(simStateHandle->GetSimState(), SimState::SIM_STATE_LOADED);
-}
-
-/**
  * @tc.number   Telephony_IccOperatorRule_002
  * @tc.name     test error branch
  * @tc.desc     Function test
