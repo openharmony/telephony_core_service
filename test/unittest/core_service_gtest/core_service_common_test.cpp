@@ -17,25 +17,32 @@
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
+#include "hks_api.h"
+#include "tel_aes_crypto_util.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
 #include "core_service_client.h"
 #include "core_service_dump_helper.h"
 #include "core_service_hisysevent.h"
+#include "enum_convert.h"
 #include "network_search_manager.h"
 #include "operator_name.h"
 #include "operator_name_utils.h"
 #include "security_token.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
+#include "telephony_config.h"
 #include "telephony_log_wrapper.h"
+
 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 static const int32_t SLEEP_TIME = 3;
+static const uint32_t MODEM_CAP_MIN_VALUE = 0;
+static const uint32_t MODEM_CAP_MAX_VALUE = 32;
 class CoreServiceCommonTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -233,6 +240,235 @@ HWTEST_F(CoreServiceCommonTest, CoreService_GetSimIO_003, Function | MediumTest 
     SimAuthenticationResponse response;
     auto result = DelayedSingleton<CoreService>::GetInstance()->GetSimIO(0, command, fileId, data, path, response);
     ASSERT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Enum_convert_GetCellularDataConnectionState_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, Enum_convert_GetCellularDataConnectionState_001, Function | MediumTest | Level1)
+{
+    int32_t state = static_cast<int32_t>(TelephonyDataConnectionStatus::DATA_STATE_DISCONNECTED);
+    std::string result = GetCellularDataConnectionState(state);
+    ASSERT_STREQ(result.c_str(), "DATA_STATE_DISCONNECTED");
+    state = static_cast<int32_t>(TelephonyDataConnectionStatus::DATA_STATE_CONNECTING);
+    result = GetCellularDataConnectionState(state);
+    ASSERT_STREQ(result.c_str(), "DATA_STATE_CONNECTING");
+    state = static_cast<int32_t>(TelephonyDataConnectionStatus::DATA_STATE_CONNECTED);
+    result = GetCellularDataConnectionState(state);
+    ASSERT_STREQ(result.c_str(), "DATA_STATE_CONNECTED");
+    state = static_cast<int32_t>(TelephonyDataConnectionStatus::DATA_STATE_SUSPENDED);
+    result = GetCellularDataConnectionState(state);
+    ASSERT_STREQ(result.c_str(), "DATA_STATE_SUSPENDED");
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_HexToDec_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_001, Function | MediumTest | Level1)
+{
+    uint8_t decodeValue;
+    bool result = TelAesCryptoUtils::HexToDec('5', decodeValue);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(decodeValue, 5);
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_HexToDec_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_002, Function | MediumTest | Level1)
+{
+    uint8_t decodeValue;
+    bool result = TelAesCryptoUtils::HexToDec('a', decodeValue);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(decodeValue, 10);
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_HexToDec_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_003, Function | MediumTest | Level1)
+{
+    uint8_t decodeValue;
+    bool result = TelAesCryptoUtils::HexToDec('g', decodeValue);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_DecToHexString_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_001, Function | MediumTest | Level1)
+{
+    const uint8_t *data = nullptr;
+    size_t len = 10;
+    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
+    ASSERT_EQ(result, "");
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_DecToHexString_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_002, Function | MediumTest | Level1)
+{
+    uint8_t data[10] = {0};
+    size_t len = 0;
+    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
+    ASSERT_EQ(result, "");
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_DecToHexString_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_003, Function | MediumTest | Level1)
+{
+    uint8_t data[10] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA};
+    size_t len = 10;
+    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
+    ASSERT_EQ(result, "0102030405060708090a");
+}
+
+/**
+ * @tc.number   TelAesCryptoUtils_HexToDecString_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDecString_001, Function | MediumTest | Level1)
+{
+    std::string hexString = "";
+    auto result = TelAesCryptoUtils::HexToDecString(hexString);
+    ASSERT_EQ(result.first, nullptr);
+    hexString = "12345";
+    result = TelAesCryptoUtils::HexToDecString(hexString);
+    ASSERT_EQ(result.first, nullptr);
+    hexString = "123456";
+    result = TelAesCryptoUtils::HexToDecString(hexString);
+    ASSERT_NE(result.first, nullptr);
+    hexString = "123456";
+    result = TelAesCryptoUtils::HexToDecString(hexString);
+    ASSERT_NE(result.first, nullptr);
+    hexString = "123456";
+    result = TelAesCryptoUtils::HexToDecString(hexString);
+    ASSERT_NE(result.first, nullptr);
+}
+
+/**
+ * @tc.number   TelephonyConfig_IsCapabilitySupport_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_IsCapabilitySupport_001, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t capablity = MODEM_CAP_MIN_VALUE - 1;
+    EXPECT_FALSE(telephonyConfig.IsCapabilitySupport(capablity));
+    capablity = MODEM_CAP_MAX_VALUE;
+    EXPECT_FALSE(telephonyConfig.IsCapabilitySupport(capablity));
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_001, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "1234567890";
+    uint32_t index = 11;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, -1);
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_002, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "12345678901";
+    uint32_t index = 10;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, 0);
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_003, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "1234567890";
+    uint32_t index = 0;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, 0);
+    ASSERT_EQ(retValue, 1);
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_004, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "abcdef";
+    uint32_t index = 0;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, 0);
+    ASSERT_EQ(retValue, 10);
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_005
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_005, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "ABCDEF";
+    uint32_t index = 0;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, 0);
+    ASSERT_EQ(retValue, 10);
+}
+
+/**
+ * @tc.number   TelephonyConfig_ConvertCharToInt_006
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_006, Function | MediumTest | Level1)
+{
+    TelephonyConfig telephonyConfig;
+    uint32_t retValue = 0;
+    std::string maxCap = "!@#$%^&*()";
+    uint32_t index = 0;
+    int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
+    ASSERT_EQ(result, -1);
 }
 } // namespace Telephony
 } // namespace OHOS
