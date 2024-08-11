@@ -32,6 +32,7 @@
 #include "vcard_decoder_v30.h"
 #include "vcard_decoder_v40.h"
 #include "vcard_encoder.h"
+#include "vcard_utils.h"
 #include "telephony_errors.h"
 
 #include <fcntl.h>
@@ -656,6 +657,132 @@ HWTEST_F(ContactDataTest, VCardRdbHelper, Function | MediumTest | Level3)
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContactData(columns, predicates), nullptr);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_001, Function | MediumTest | Level3)
+{
+    char nextCh = 'n';
+    std::string vcardType = VERSION_40;
+    std::string expected = "\n";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_002, Function | MediumTest | Level3)
+{
+    char nextCh = 'N';
+    std::string vcardType = VERSION_40;
+    std::string expected = "\n";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_003, Function | MediumTest | Level3)
+{
+    char nextCh = 'n';
+    std::string vcardType = VERSION_30;
+    std::string expected = "\n";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_004, Function | MediumTest | Level3)
+{
+    char nextCh = 'N';
+    std::string vcardType = VERSION_30;
+    std::string expected = "\n";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_005, Function | MediumTest | Level3)
+{
+    char nextCh = '\\';
+    std::string vcardType = "VERSION_21";
+    std::string expected = "\\";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_006, Function | MediumTest | Level3)
+{
+    char nextCh = ';';
+    std::string vcardType = "VERSION_21";
+    std::string expected = ";";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_007, Function | MediumTest | Level3)
+{
+    char nextCh = ':';
+    std::string vcardType = "VERSION_21";
+    std::string expected = ":";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_008, Function | MediumTest | Level3)
+{
+    char nextCh = ',';
+    std::string vcardType = "VERSION_21";
+    std::string expected = ",";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_HandleCh_009, Function | MediumTest | Level3)
+{
+    char nextCh = 'a';
+    std::string vcardType = "VERSION_21";
+    std::string expected = "";
+    std::string actual = VCardUtils::HandleCh(nextCh, vcardType);
+    ASSERT_EQ(expected, actual);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_001, Function | MediumTest | Level3)
+{
+    std::string value = "";
+    std::string vcardType = "VCARD";
+    std::vector<std::string> expected = {""};
+    std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
+    ASSERT_EQ(result, expected);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_002, Function | MediumTest | Level3)
+{
+    std::string value = "Hello;World";
+    std::string vcardType = "VCARD";
+    std::vector<std::string> expected = {"Hello", "HelloWorld"};
+    std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
+    ASSERT_EQ(result, expected);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_003, Function | MediumTest | Level3)
+{
+    std::string value = "Hello\\;World";
+    std::string vcardType = "VCARD";
+    std::vector<std::string> expected = {"Hello;World"};
+    std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
+    ASSERT_EQ(result, expected);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_004, Function | MediumTest | Level3)
+{
+    std::string value = "Hello;World;";
+    std::string vcardType = "VCARD";
+    std::vector<std::string> expected = {"Hello", "HelloWorld", "HelloWorld"};
+    std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
+    ASSERT_EQ(result, expected);
+}
+
+HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_005, Function | MediumTest | Level3)
+{
+    std::string value = "Hello\\;World\\;";
+    std::string vcardType = "VCARD";
+    std::vector<std::string> expected = {"Hello;World;"};
+    std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
+    ASSERT_EQ(result, expected);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
