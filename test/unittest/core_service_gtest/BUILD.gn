@@ -718,6 +718,7 @@ ohos_unittest("tel_core_service_common_test") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
