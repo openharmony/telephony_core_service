@@ -152,6 +152,7 @@ void OperatorName::CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> op
 
 sptr<NetworkState> OperatorName::GetNetworkStatus()
 {
+    sptr<NetworkState> networkState_ = nullptr;
     if (networkSearchState_ != nullptr) {
         std::unique_ptr<NetworkState> networkState = networkSearchState_->GetNetworkStatus();
         if (networkState != nullptr) {
@@ -160,7 +161,6 @@ sptr<NetworkState> OperatorName::GetNetworkStatus()
         }
     }
     TELEPHONY_LOGE("OperatorName::GetNetworkStatus networkState is nullptr slotId:%{public}d", slotId_);
-    networkState_ = nullptr;
     return networkState_;
 }
 
