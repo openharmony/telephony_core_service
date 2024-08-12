@@ -126,5 +126,40 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | L
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
+/**
+ * @tc.number   Telephony_Sim_SimManager_0600
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_006, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t ret = simManager->UpdateOperatorConfigs(slotId);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_0700
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_007, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t command = 0;
+    int32_t fileId = 0;
+    std::string data = "ABCDEFG";
+    std::string path = "";
+    SimAuthenticationResponse mResponse;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t ret = simManager->GetSimIO(slotId, command, fileId, data, path, mResponse);
+    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
 }
 }
