@@ -261,7 +261,7 @@ enum class EmailType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home email.
@@ -361,7 +361,7 @@ enum class PhoneVcType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home number.
