@@ -73,14 +73,10 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_001, Function | MediumTest | L
  */
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_002, Function | MediumTest | Level1)
 {
-    int32_t slotId = 2;
-    int32_t slotCount = 0;
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->OnInit(slotCount);
-    int32_t ret = simManager->InitTelExtraModule(slotId);
-    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    int32_t simId = 0;
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(nullptr);
+    int32_t ret = simManager->GetDefaultSmsSimId(simId);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -92,7 +88,7 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_003, Function | MediumTest | L
 {
     int32_t simId = 0;
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(nullptr);
-    int32_t ret = simManager->GetDefaultSmsSimId(simId);
+    int32_t ret = simManager->GetDefaultCellularDataSimId(simId);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -103,36 +99,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_003, Function | MediumTest | L
  */
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_004, Function | MediumTest | Level1)
 {
-    int32_t simId = 0;
-    int32_t slotCount = 0;
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->OnInit(slotCount);
-    int32_t ret = simManager->GetDefaultSmsSimId(simId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_0500
- * @tc.name     SimManager
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | Level1)
-{
-    int32_t simId = 0;
-    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(nullptr);
-    int32_t ret = simManager->GetDefaultCellularDataSimId(simId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_0600
- * @tc.name     SimManager
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_006, Function | MediumTest | Level1)
-{
     int32_t slotId = 0;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -142,11 +108,11 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_006, Function | MediumTest | L
 }
 
 /**
- * @tc.number   Telephony_Sim_SimManager_0700
+ * @tc.number   Telephony_Sim_SimManager_0500
  * @tc.name     SimManager
  * @tc.desc     Function test
  */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_007, Function | MediumTest | Level1)
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     int32_t command = 0;
