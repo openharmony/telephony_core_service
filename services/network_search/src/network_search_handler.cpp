@@ -500,7 +500,6 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange event is nullptr!");
         return;
     }
     std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
@@ -525,6 +524,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             firstInit_ = false;
             InitGetNetworkSelectionMode();
             SetRadioOffWhenAirplaneIsOn();
+            SetRadioOffWhenSimDeactive();
             RadioOnState();
             break;
         }
@@ -558,6 +558,29 @@ void NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn()
         return;
     }
     if (networkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
+    }
+}
+
+void NetworkSearchHandler::SetRadioOffWhenSimDeactive()
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetRadioOffWhenSimDeactive failed to get NetworkSearchManager");
+        return;
+    }
+    auto simManager = networkSearchManager->GetSimManager();
+    if (simManager == nullptr) {
+        return;
+    }
+    bool hasSim = false;
+    simManager->HasSimCard(slotId_, hasSim);
+    TELEPHONY_LOGD("SetRadioOffWhenSimDeactive slotId: %{public}d, IsSetActiveSimInProgress: %{public}d, IsSimActive:"
+        " %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
+        slotId_, simManager->IsSetActiveSimInProgress(slotId_),
+        simManager->IsSimActive(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+    if (hasSim && !IsPowerOnPrimaryRadioWhenNoSim()
+        && !simManager->IsSetActiveSimInProgress(slotId_) && !simManager->IsSimActive(slotId_)) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
 }
@@ -759,8 +782,15 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if (!isAirplaneMode && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF &&
-        !IsSatelliteOn()) {
+    TELEPHONY_LOGD("soltid: %{public}d, IsSimActive: %{public}d, hasSim: %{public}d, isAirplaneMode: "
+        "%{public}d, IsSetActiveSimInProgress: %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
+        slotId_, simManager->IsSimActive(slotId_), hasSim, isAirplaneMode,
+        simManager->IsSetActiveSimInProgress(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+    bool hasSimAndActive =
+        (hasSim && (!simManager->IsSetActiveSimInProgress(slotId_) && simManager->IsSimActive(slotId_)));
+    bool primarySimNoSim = (!hasSim && IsPowerOnPrimaryRadioWhenNoSim());
+    if (!isAirplaneMode && (hasSimAndActive || primarySimNoSim)
+        && radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn()) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
 }
