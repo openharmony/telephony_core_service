@@ -328,7 +328,6 @@ void RadioInfo::AirplaneModeChange()
         int32_t primarySlot = INVALID_SLOT_ID;
         simManager->GetPrimarySlotId(primarySlot);
         if (!hasSim && slotId_ == primarySlot) {
-            TELEPHONY_LOGI("set primary card%{public}d radio on when no card", slotId_);
             nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
         }
     }
