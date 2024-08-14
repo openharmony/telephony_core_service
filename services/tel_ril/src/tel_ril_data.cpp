@@ -50,7 +50,7 @@ HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes TelRilData::ChangeDPToHalDataPro
     dataProfileInfoWithApnTypes.apn = dataProfile.apn;
     dataProfileInfoWithApnTypes.protocol = dataProfile.protocol;
     dataProfileInfoWithApnTypes.roamingProtocol = dataProfile.roamingProtocol;
-    dataProfileInfoWithApnTypes.supportedApnTypesBitmap = dataProfile.supportedApnTypesBitmap;
+    dataProfileInfoWithApnTypes.supportedApnTypesBitmap = static_cast<uint64_t>(dataProfile.supportedApnTypesBitmap);
     return dataProfileInfoWithApnTypes;
 }
 
