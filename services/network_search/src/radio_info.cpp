@@ -350,7 +350,7 @@ void RadioInfo::SetRadioOnIfNeeded()
     simManager->HasSimCard(slotId_, hasSim);
     int32_t primarySlot = INVALID_SLOT_ID;
     simManager->GetPrimarySlotId(primarySlot);
-    if (isActive || (!hasSim && slotId_ == primarySlot) {
+    if (isActive || (!hasSim && slotId_ == primarySlot)) {
         TELEPHONY_LOGI("need set radio on. isActive:%{public}d, hasSim:%{public}d, primarySlot:%{public}d",
             isActive, hasSim, primarySlot);
         nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
