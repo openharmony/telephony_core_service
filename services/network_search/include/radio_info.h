@@ -55,6 +55,7 @@ private:
     bool WriteRadioStateObject(
         int64_t &index, MessageParcel &data, bool result, std::unique_ptr<RadioStateInfo> &object) const;
     void UpdateInfoOfSetRadioState(ModemPowerState &radioState, bool result, MessageParcel &data, int64_t index) const;
+    void SetRadioOnIfNeeded();
     PhoneType phoneType_ = PhoneType::PHONE_TYPE_IS_NONE;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
