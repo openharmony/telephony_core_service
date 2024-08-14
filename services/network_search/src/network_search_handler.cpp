@@ -497,6 +497,23 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
     }
 }
 
+void NetworkSearchHandler::GetDeviceId()
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetDeviceId failed to get NetworkSearchManager");
+        return;
+    }
+    std::u16string meid = u"";
+    std::u16string imei = u"";
+    std::u16string imeiSv = u"";
+    std::string basebandVersion = "";
+    networkSearchManager->GetImei(slotId_, imei);
+    networkSearchManager->GetImeiSv(slotId_, imeiSv);
+    networkSearchManager->GetMeid(slotId_, meid);
+    networkSearchManager->GetBasebandVersion(slotId_, basebandVersion);
+}
+
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -539,8 +556,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             inner->deviceStateHandler_->ProcessRadioState();
         }
         networkSearchManager->InitSimRadioProtocol(slotId_);
-        std::u16string imei = u"";
-        networkSearchManager->GetImei(slotId_, imei);
+        GetDeviceId();
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
