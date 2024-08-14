@@ -270,11 +270,11 @@ void OperatorName::NotifyGsmSpnChanged(
     bool showPlmnOld = false;
     bool showSpn = false;
     int32_t spnRule = static_cast<int32_t>(GetSpnRule(networkState));
-    UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
-    UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
     if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
         UpdateVSimSpn(spn, spnRule, showSpn);
     }
+    UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
+    UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
 
     showPlmnOld = showPlmn;
     if (spn.empty() && !plmn.empty()) {
