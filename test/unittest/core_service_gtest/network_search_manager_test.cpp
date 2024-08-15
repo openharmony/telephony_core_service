@@ -85,7 +85,10 @@ public:
     void TearDown();
 };
 
-void NetworkSearchBranchTest::TearDownTestCase() {}
+void NetworkSearchBranchTest::TearDownTestCase()
+{
+    sleep(SLEEP_TIME_SECONDS);
+}
 
 void NetworkSearchBranchTest::SetUp() {}
 
@@ -162,8 +165,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager2_001, Function 
     bool isGsm = false;
     EXPECT_EQ(networkSearchManager->IsGsm(SLOT_ID_0, isGsm), TELEPHONY_SUCCESS);
     EXPECT_EQ(networkSearchManager->IsCdma(SLOT_ID_0, isGsm), TELEPHONY_SUCCESS);
-
-    sleep(SLEEP_TIME_SECONDS);
 }
 } // namespace Telephony
 } // namespace OHOS

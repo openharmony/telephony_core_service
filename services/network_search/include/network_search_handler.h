@@ -153,6 +153,7 @@ private:
     bool IsSatelliteOn() const;
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
     void UpdateNetworkState();
+    void GetDeviceId();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
