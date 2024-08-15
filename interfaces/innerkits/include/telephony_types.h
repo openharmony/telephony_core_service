@@ -46,6 +46,8 @@ inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
+inline constexpr const char *VIRTUAL_MODEM_SWITCH = "const.booster.virtual_modem_switch";
+inline constexpr const char *VIRTUAL_MODEM_DEFAULT_SWITCH = "false";
 inline constexpr const char *DEFAULT_PREFERRED_NETWORK_TYPE = "5"; // CORE_NETWORK_MODE_LTE_WCDMA_GSM
 inline constexpr const char *TEL_PREFERRED_NETWORK_TYPE = "const.telephony.preferredNetworkType";
 inline constexpr const char *DEFAULT_OPERATOR_KEY = "";
@@ -58,12 +60,26 @@ inline constexpr const char *DEFAULT_VSIM_MODEM_COUNT = "0";
 inline constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 
 template<typename T>
+inline T GetVirtualModemSwitch()
+{
+    char virtualModemSwitch[SYSPARA_SIZE] = {0};
+    GetParameter(VIRTUAL_MODEM_SWITCH, VIRTUAL_MODEM_DEFAULT_SWITCH, virtualModemSwitch, SYSPARA_SIZE);
+    if (strcmp(virtualModemSwitch, "true") == 0) {
+        return true;
+    }
+    return false;
+}
+
+template<typename T>
 inline T GetMaxSlotCount()
 {
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
         maxSlotCount_ = std::atoi(simSlotCount);
+        if (GetVirtualModemSwitch<bool>() && maxSlotCount_ == 0) {
+            maxSlotCount_ = 1;
+        }
     }
     return maxSlotCount_;
 }
