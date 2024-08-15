@@ -97,7 +97,7 @@ SimState SimStateManager::GetSimState()
     return ret;
 }
 
-SimState SimStateManager::GetSimIccStatus()
+IccSimStatus SimStateManager::GetSimIccStatus()
 {
     IccSimStatus ret = IccSimStatus::ICC_CONTENT_UNKNOWN;
     if (simStateHandle_ != nullptr) {
