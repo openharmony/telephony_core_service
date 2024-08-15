@@ -163,7 +163,7 @@ int32_t SimManager::GetSimState(int32_t slotId, SimState &simState)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t GetSimIccStatus(int32_t slotId, IccSimStatus &iccStatus)
+int32_t SimManager::GetSimIccStatus(int32_t slotId, IccSimStatus &iccStatus)
 {
     if (!HasSimCardInner(slotId)) {
         iccStatus = IccSimStatus::ICC_CARD_ABSENT;
