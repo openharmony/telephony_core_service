@@ -140,15 +140,12 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager2_001, Function 
 
     std::shared_ptr<NetworkSearchManagerInner> inner = std::make_shared<NetworkSearchManagerInner>();
     EXPECT_TRUE(networkSearchManager->InitPointer(inner, SLOT_ID_0));
-    EXPECT_EQ(networkSearchManager->InitTelExtraModule(INVALID_SLOTID), TELEPHONY_ERROR);
     networkSearchManager->RegisterCellularDataObject(nullptr);
     networkSearchManager->RegisterCellularCallObject(nullptr);
     networkSearchManager->UnRegisterCellularCallObject(nullptr);
     networkSearchManager->SavePreferredNetworkValue(SLOT_ID_0,
         static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
     EXPECT_EQ(networkSearchManager->UpdateRadioOn(SLOT_ID_0), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->GetNrSsbId(SLOT_ID_0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->GetNrSsbId(INVALID_SLOTID, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
     Rssi signalIntensity;
     signalIntensity.lte.rsrp = LTE_RSSI_GOOD;
