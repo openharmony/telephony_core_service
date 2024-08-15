@@ -33,6 +33,7 @@ public:
     // SimState
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
     virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
+    virtual int32_t GetSimIccStatus(int32_t slotId, IccSimStatus &iccStatus) = 0;
     virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
     virtual int32_t SetModemInit(int32_t slotId, bool state) = 0;
     virtual int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response) = 0;
