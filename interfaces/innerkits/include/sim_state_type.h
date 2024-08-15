@@ -226,6 +226,25 @@ enum class LockState {
 };
 
 /**
+ * @brief icc sim status
+ */
+enum class IccSimStatus {
+    ICC_CONTENT_UNKNOWN = -1,
+    ICC_CARD_ABSENT = 0,
+    ICC_CONTENT_READY,
+    ICC_CONTENT_PIN,
+    ICC_CONTENT_PUK,
+    ICC_CONTENT_PIN2,
+    ICC_CONTENT_PUK2,
+    ICC_CONTENT_PH_NET_PIN,
+    ICC_CONTENT_PH_NET_PUK,
+    ICC_CONTENT_PH_NET_SUB_PIN,
+    ICC_CONTENT_PH_NET_SUB_PUK,
+    ICC_CONTENT_PH_SP_PIN,
+    ICC_CONTENT_PH_SP_PUK,
+};
+
+/**
  * @brief Lock information
  */
 struct LockInfo {

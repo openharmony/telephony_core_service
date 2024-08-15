@@ -97,6 +97,17 @@ SimState SimStateManager::GetSimState()
     return ret;
 }
 
+SimState SimStateManager::GetSimIccStatus()
+{
+    IccSimStatus ret = IccSimStatus::ICC_CONTENT_UNKNOWN;
+    if (simStateHandle_ != nullptr) {
+        std::lock_guard<std::mutex> lck(mtx_);
+        TELEPHONY_LOGD("SimStateManager::GetSimIccStatus()");
+        ret = simStateHandle_->GetSimIccStatus();
+    }
+    return ret;
+}
+
 bool SimStateManager::IfModemInitDone()
 {
     if (simStateHandle_ != nullptr) {
