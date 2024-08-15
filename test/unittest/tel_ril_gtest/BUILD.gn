@@ -24,7 +24,9 @@ ohos_unittest("tel_ril_gtest") {
   sources = [
     "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
     "tel_ril_call_test.cpp",
+    "tel_ril_common_test.cpp",
     "tel_ril_data_test.cpp",
+    "tel_ril_handler_test.cpp",
     "tel_ril_modem_test.cpp",
     "tel_ril_network_test.cpp",
     "tel_ril_sim_test.cpp",

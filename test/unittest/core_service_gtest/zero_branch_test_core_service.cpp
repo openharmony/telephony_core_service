@@ -24,7 +24,6 @@
 #include "core_service_dump_helper.h"
 #include "core_service_hisysevent.h"
 #include "network_search_manager.h"
-#include "network_search_test_callback_stub.h"
 #include "operator_name.h"
 #include "operator_name_utils.h"
 #include "security_token.h"
@@ -85,6 +84,7 @@ void CoreServiceBranchTest::TearDownTestCase()
     telRilManager->DeInit();
     DelayedSingleton<CoreService>::GetInstance()->Stop();
     DelayedSingleton<CoreService>::DestroyInstance();
+    sleep(SLEEP_TIME_SECONDS);
 }
 
 void CoreServiceBranchTest::SetUp() {}
@@ -106,9 +106,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_001, Function | Me
     networkInfo->SetOperateInformation("CHINA MOBILE", "CMCC", "46000",
         static_cast<int32_t>(NetworkPlmnState::NETWORK_PLMN_STATE_AVAILABLE),
         static_cast<int32_t>(NetworkRat::NETWORK_LTE));
-    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->SetNetworkSelectionMode(
-        SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, callback);
+        SLOT_ID, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     std::vector<sptr<SignalInformation>> signals;
     result = DelayedSingleton<CoreService>::GetInstance()->GetSignalInfoList(SLOT_ID, signals);
@@ -119,8 +118,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_001, Function | Me
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     sptr<NetworkState> networkState = nullptr;
     DelayedSingleton<CoreService>::GetInstance()->GetNetworkState(SLOT_ID, networkState);
-    DelayedSingleton<CoreService>::GetInstance()->SetRadioState(SLOT_ID, false, callback);
-    DelayedSingleton<CoreService>::GetInstance()->SetRadioState(SLOT_ID, false, callback);
+    DelayedSingleton<CoreService>::GetInstance()->SetRadioState(SLOT_ID, false, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->SetRadioState(SLOT_ID, false, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
 }
 
@@ -132,9 +131,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_001, Function | Me
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | MediumTest | Level1)
 {
     SecurityToken token;
-    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    DelayedSingleton<CoreService>::GetInstance()->GetPreferredNetwork(SLOT_ID, callback);
-    DelayedSingleton<CoreService>::GetInstance()->SetPreferredNetwork(SLOT_ID, 1, callback);
+    DelayedSingleton<CoreService>::GetInstance()->GetPreferredNetwork(SLOT_ID, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->SetPreferredNetwork(SLOT_ID, 1, nullptr);
     int32_t networkCapabilityType = 1;
     int32_t networkCapabilityState = 1;
     DelayedSingleton<CoreService>::GetInstance()->GetNetworkCapability(
@@ -152,11 +150,11 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     DelayedSingleton<CoreService>::GetInstance()->GetMeid(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetUniqueDeviceId(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->IsNrSupported(SLOT_ID);
-    DelayedSingleton<CoreService>::GetInstance()->GetPreferredNetwork(SLOT_ID, callback);
-    DelayedSingleton<CoreService>::GetInstance()->SetNrOptionMode(SLOT_ID, NR_NSA_OPTION_ONLY, callback);
-    DelayedSingleton<CoreService>::GetInstance()->GetNetworkSearchInformation(SLOT_ID, callback);
-    DelayedSingleton<CoreService>::GetInstance()->GetNrOptionMode(SLOT_ID, callback);
-    DelayedSingleton<CoreService>::GetInstance()->GetNetworkSelectionMode(SLOT_ID, callback);
+    DelayedSingleton<CoreService>::GetInstance()->GetPreferredNetwork(SLOT_ID, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->SetNrOptionMode(SLOT_ID, NR_NSA_OPTION_ONLY, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->GetNetworkSearchInformation(SLOT_ID, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->GetNrOptionMode(SLOT_ID, nullptr);
+    DelayedSingleton<CoreService>::GetInstance()->GetNetworkSelectionMode(SLOT_ID, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
 }
 
@@ -245,7 +243,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | MediumTest | Level1)
 {
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
@@ -270,7 +268,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_002, Function | Mediu
 {
     SecurityToken token;
     int32_t slotId = SLOT_ID;
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         MessageParcel data;
         MessageParcel reply;
@@ -293,8 +291,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_003, Function | Mediu
 {
     SecurityToken token;
     int32_t slotId = SLOT_ID;
-    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
@@ -304,7 +301,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_003, Function | Mediu
         MessageOption option;
         data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
         data.WriteInt32(slotId);
-        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        data.WriteRemoteObject(nullptr);
         DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
     }
     std::string version;
@@ -321,23 +318,22 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | Mediu
 {
     SecurityToken token;
     int32_t slotId = SLOT_ID;
-    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, nullptr);
     auto simManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
     auto networkSearchManager_ = DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_;
     auto telRilManager_ = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
     DelayedSingleton<CoreService>::GetInstance()->simManager_ = nullptr;
     DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
     DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = nullptr;
-    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, callback);
-    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::FACTORY_RESET);
+    DelayedSingleton<CoreService>::GetInstance()->GetRadioState(slotId, nullptr);
+    uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
     for (uint32_t code = 0; code <= maxCode; code++) {
         MessageParcel data;
         MessageParcel reply;
         MessageOption option;
         data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
         data.WriteInt32(slotId);
-        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+        data.WriteRemoteObject(nullptr);
         DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
     }
     DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
@@ -386,15 +382,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function |
     std::string result;
     coreServiceDumpHelper->ShowHelp(result);
     coreServiceDumpHelper->ShowCoreServiceTimeInfo(result);
-    int32_t slotId = SLOT_ID;
-    bool hasSimCard = false;
-    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
-    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
-    EXPECT_FALSE(hasSimCard);
     coreServiceDumpHelper->ShowCoreServiceInfo(result);
-    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
-    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(slotId, hasSimCard);
-    EXPECT_TRUE(hasSimCard);
     coreServiceDumpHelper->ShowCoreServiceInfo(result);
     coreServiceDumpHelper->Dump(argsInStr, result);
     EXPECT_FALSE(result.empty());

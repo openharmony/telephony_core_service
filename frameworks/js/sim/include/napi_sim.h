@@ -103,6 +103,13 @@ struct AsyncStkCallSetupResult {
 struct AsyncDsdsInfo {
     AsyncContext<int32_t> asyncContext;
 };
+
+struct AsyncSimAuthInfo {
+    AsyncContext<napi_value> asyncContext;
+    int32_t authType = ERROR_DEFAULT;
+    std::string authData {};
+    SimAuthenticationResponse responseResult;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_SIM_H

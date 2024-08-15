@@ -69,7 +69,7 @@ void RadioInfo::ProcessGetRadioState(const AppExecFwk::InnerEvent::Pointer &even
     } else {
         bool isAirplaneModeOn = false;
         nsm->GetAirplaneMode(isAirplaneModeOn);
-        if (nsm->GetRadioState(slotId_) != ModemPowerState::CORE_SERVICE_POWER_ON && !isAirplaneModeOn) {
+        if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && !isAirplaneModeOn) {
             nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
         }
         if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON) {

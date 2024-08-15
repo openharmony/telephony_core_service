@@ -564,7 +564,7 @@ void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> post
             (needAddQuotedPrintable ? EncodeQuotedPrintable(postalCode) : DealCharacters(postalCode));
         std::string encodedCountry =
             (needAddQuotedPrintable ? EncodeQuotedPrintable(country) : DealCharacters(country));
-        postalLine << encodedPoBox << ITEM_SEPARATOR << ITEM_SEPARATOR;
+        postalLine << encodedPoBox << ITEM_SEPARATOR;
         postalLine << encodedStreet << ITEM_SEPARATOR;
         postalLine << encodedCity << ITEM_SEPARATOR;
         postalLine << encodedRegion << ITEM_SEPARATOR;
@@ -582,7 +582,6 @@ void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> post
         (needAddQuotedPrintable ? EncodeQuotedPrintable(postalAddress) : DealCharacters(postalAddress));
     postalLine << ITEM_SEPARATOR;
     postalLine << encodedPostalAddress;
-    postalLine << ITEM_SEPARATOR;
     postalLine << ITEM_SEPARATOR;
     postalLine << ITEM_SEPARATOR;
     postalLine << ITEM_SEPARATOR;
@@ -632,7 +631,7 @@ int32_t VCardConstructor::ConstructWebsites(std::shared_ptr<VCardContact> contac
         if (website.empty()) {
             continue;
         }
-        AddLineWithCharsetAndQP(VCARD_TYPE_URL, { website, websiteData->GetLabelId(), websiteData->GetLabelName() });
+        AddLineWithCharsetAndQP(VCARD_TYPE_URL, { website });
     }
     return TELEPHONY_SUCCESS;
 }
@@ -788,7 +787,7 @@ void VCardConstructor::AddEmailLine(
     if (!postalTypeStr.empty()) {
         paramTypes.push_back(postalTypeStr);
     }
-    std::vector<std::string> valueList = { email, displayName };
+    std::vector<std::string> valueList = { email };
     bool needAddCharset = IsNeedCharsetParam(valueList);
     bool needAddQuotedPrintable = needQP_ && !VCardUtils::IsPrintableAscii(valueList);
     AddLine(VCARD_TYPE_EMAIL, paramTypes, valueList, needAddCharset, needAddQuotedPrintable);

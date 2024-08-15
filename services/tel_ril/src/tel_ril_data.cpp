@@ -39,6 +39,21 @@ HDI::Ril::V1_1::DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataPro
     return dataProfileInfo;
 }
 
+HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes TelRilData::ChangeDPToHalDataProfileWithApnTypes(
+    DataProfile dataProfile)
+{
+    HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes dataProfileInfoWithApnTypes;
+    dataProfileInfoWithApnTypes.profileId = dataProfile.profileId;
+    dataProfileInfoWithApnTypes.password = dataProfile.password;
+    dataProfileInfoWithApnTypes.authenticationType = dataProfile.verType;
+    dataProfileInfoWithApnTypes.userName = dataProfile.userName;
+    dataProfileInfoWithApnTypes.apn = dataProfile.apn;
+    dataProfileInfoWithApnTypes.protocol = dataProfile.protocol;
+    dataProfileInfoWithApnTypes.roamingProtocol = dataProfile.roamingProtocol;
+    dataProfileInfoWithApnTypes.supportedApnTypesBitmap = dataProfile.supportedApnTypesBitmap;
+    return dataProfileInfoWithApnTypes;
+}
+
 int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::UniInfo uniInfo;
@@ -55,12 +70,13 @@ int32_t TelRilData::DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioR
 int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_1::DataCallInfo dataCallInfo;
-    dataCallInfo.radioTechnology = radioTechnology;
-    dataCallInfo.dataProfileInfo = ChangeDPToHalDataProfile(dataProfile);
-    dataCallInfo.roamingAllowed = allowRoaming;
-    dataCallInfo.isRoaming = isRoaming;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::ActivatePdpContext, dataCallInfo);
+    HDI::Ril::V1_3::DataCallInfoWithApnTypes dataCallInfoWithApnTypes;
+    dataCallInfoWithApnTypes.radioTechnology = radioTechnology;
+    dataCallInfoWithApnTypes.dataProfileInfo = ChangeDPToHalDataProfileWithApnTypes(dataProfile);
+    dataCallInfoWithApnTypes.roamingAllowed = allowRoaming;
+    dataCallInfoWithApnTypes.isRoaming = isRoaming;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_3::IRil::ActivatePdpContextWithApnTypes,
+        dataCallInfoWithApnTypes);
 }
 
 int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,

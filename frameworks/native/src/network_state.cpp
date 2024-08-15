@@ -126,6 +126,14 @@ bool NetworkState::ReadParcelInt(Parcel &parcel)
         return false;
     }
     nrState_ = static_cast<NrState>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lastPsRadioTech_ = static_cast<RadioTech>(rat);
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
+    lastCfgTech_ = static_cast<RadioTech>(rat);
     return true;
 }
 
@@ -148,7 +156,17 @@ bool NetworkState::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isEmergency_)) {
         return false;
     }
+    if (!MarshallingString(parcel)) {
+        return false;
+    }
+    if (!MarshallingInt(parcel)) {
+        return false;
+    }
+    return true;
+}
 
+bool NetworkState::MarshallingString(Parcel &parcel) const
+{
     if (!parcel.WriteString(psOperatorInfo_.fullName)) {
         return false;
     }
@@ -167,6 +185,11 @@ bool NetworkState::Marshalling(Parcel &parcel) const
     if (!parcel.WriteString(csOperatorInfo_.operatorNumeric)) {
         return false;
     }
+    return true;
+}
+
+bool NetworkState::MarshallingInt(Parcel &parcel) const
+{
     if (!parcel.WriteInt32(static_cast<int32_t>(csRoaming_))) {
         return false;
     }
@@ -189,6 +212,12 @@ bool NetworkState::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(nrState_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(lastPsRadioTech_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(lastCfgTech_))) {
         return false;
     }
     return true;

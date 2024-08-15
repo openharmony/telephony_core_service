@@ -38,9 +38,6 @@
 using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
-std::mutex SimStateManager::ctx_;
-bool SimStateManager::responseReady_ = false;
-std::condition_variable SimStateManager::cv_;
 const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = {
     { MSG_SIM_UNLOCK_PIN_DONE,
         [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
@@ -663,14 +660,6 @@ LockStatusResponse SimStateHandle::GetSimlockResponse()
     return simlockRespon_;
 }
 
-void SimStateHandle::SyncCmdResponse()
-{
-    std::unique_lock<std::mutex> lck(SimStateManager::ctx_);
-    SimStateManager::responseReady_ = true;
-    TELEPHONY_LOGI("SimStateHandle::SyncCmdResponse(), responseReady_ = %{public}d", SimStateManager::responseReady_);
-    SimStateManager::cv_.notify_one();
-}
-
 bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, std::string eventData)
 {
     AAFwk::Want want;
@@ -700,7 +689,12 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         if (memberFunc != nullptr) {
             memberFunc(this, slotId_, event);
         }
-        SyncCmdResponse();
+        auto simStateManager = simStateManager_.lock();
+        if (simStateManager == nullptr) {
+            TELEPHONY_LOGE("simStateManager nullptr");
+            return;
+        }
+        simStateManager->SyncCmdResponse();
         return;
     }
 

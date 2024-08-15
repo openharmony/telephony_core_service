@@ -133,7 +133,7 @@ constexpr const char *VCARD_PARAM_LANGUAGE = "LANGUAGE";
 constexpr const char *VCARD_PARAM_SORT_AS = "SORT-AS";
 
 constexpr const char *VCARD_PARAM_EXTRA_TYPE_COMPANY = "COMPANY";
-constexpr const char *VCARD_EXPORT_FILE_PATH = "/data/storage/el2/base/files/";
+constexpr const char *VCARD_EXPORT_FILE_PATH = "/data/storage/el4/base/files/";
 constexpr const char *VCARD_TIME_FORMAT = "%Y%m%d_%H%M%S";
 constexpr const char *VCARD_FILE_EXTENSION = ".vcf";
 
@@ -261,7 +261,7 @@ enum class EmailType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home email.
@@ -361,7 +361,7 @@ enum class PhoneVcType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home number.
@@ -473,7 +473,7 @@ enum class PostalType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates a home address.

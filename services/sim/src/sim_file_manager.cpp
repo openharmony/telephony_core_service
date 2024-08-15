@@ -133,15 +133,18 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
     if (iccFileIt == iccFileCache_.end()) {
         if (type == SimFileManager::IccType::ICC_TYPE_CDMA) {
             simFile_ = std::make_shared<RuimFile>(simStateManager_.lock());
+            iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_CDMA, simFile_));
         } else if (type == SimFileManager::IccType::ICC_TYPE_IMS) {
             simFile_ = std::make_shared<IsimFile>(simStateManager_.lock());
+            iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_IMS, simFile_));
         } else {
             simFile_ = std::make_shared<SimFile>(simStateManager_.lock());
+            iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_USIM, simFile_));
+            iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_GSM, simFile_));
         }
         if (simFile_ != nullptr) {
             simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
-        iccFileCache_.insert(std::make_pair(type, simFile_));
     } else {
         simFile_ = iccFileIt->second;
     }
@@ -885,9 +888,7 @@ void SimFileManager::ChangeSimFileByCardType(SimFileManager::IccType type)
         TELEPHONY_LOGI("SimFileManager handle new icc invalid type received %{public}d", type);
         return;
     }
-    if (type == iccType_ || (iccType_ == SimFileManager::IccType::ICC_TYPE_USIM && type ==
-        SimFileManager::IccType::ICC_TYPE_GSM) || (iccType_ == SimFileManager::IccType::ICC_TYPE_GSM &&
-        type == SimFileManager::IccType::ICC_TYPE_USIM)) {
+    if (type == iccType_) {
         TELEPHONY_LOGI("SimFileManager same type as ready");
         return;
     }

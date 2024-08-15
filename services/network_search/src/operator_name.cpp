@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -263,30 +263,25 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_LOGE("OperatorName::NotifyGsmSpnChanged networkState is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    int32_t spnRule = 0;
+
     std::string plmn = "";
     std::string spn = "";
     bool showPlmn = false;
     bool showPlmnOld = false;
     bool showSpn = false;
-    bool roaming = networkState->IsRoaming();
-    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
-        spnRule = GetCustSpnRule(roaming);
-    } else {
-        std::string numeric = networkState->GetPlmnNumeric();
-        if (simManager_ != nullptr) {
-            spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
-        }
-    }
-    UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
-    UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
+    int32_t spnRule = static_cast<int32_t>(GetSpnRule(networkState));
     if (slotId_ == static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
         UpdateVSimSpn(spn, spnRule, showSpn);
     }
+    UpdatePlmn(regStatus, networkState, spnRule, plmn, showPlmn);
+    UpdateSpn(regStatus, networkState, spnRule, spn, showSpn);
 
     showPlmnOld = showPlmn;
-    if (spn.empty() || !plmn.empty()) {
+    if (spn.empty() && !plmn.empty()) {
         showPlmn = true;
+    }
+    if (showPlmn && spn == plmn) {
+        showSpn = false;
     }
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
@@ -418,6 +413,23 @@ std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool 
         return "";
     }
     return Str16ToStr8(simManager_->GetSimEons(slotId_, numeric, lac, longNameRequired));
+}
+
+unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
+{
+    int32_t spnRule = 0;
+    bool roaming = networkState->IsRoaming();
+    if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
+        spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
+    } else if (!roaming && IsChinaCard()) {
+        spnRule = SPN_CONDITION_DISPLAY_PLMN;
+    } else {
+        std::string numeric = networkState->GetPlmnNumeric();
+        if (simManager_ != nullptr) {
+            spnRule = simManager_->ObtainSpnCondition(slotId_, roaming, numeric);
+        }
+    }
+    return spnRule;
 }
 
 unsigned int OperatorName::GetCustSpnRule(bool roaming)
@@ -604,6 +616,17 @@ bool OperatorName::isCBDomestic(const std::string &numeric)
         return true;
     }
     return false;
+}
+
+bool OperatorName::IsChinaCard()
+{
+    std::string simPlmn = "";
+    if (simManager_ != nullptr) {
+        std::u16string operatorNumeric = u"";
+        simManager_->GetSimOperatorNumeric(slotId_, operatorNumeric);
+        simPlmn = Str16ToStr8(operatorNumeric);
+    }
+    return isCMCard(simPlmn) || isCUCard(simPlmn) || isCTCard(simPlmn) || isCBCard(simPlmn);
 }
 
 int32_t OperatorName::GetCurrentLac()

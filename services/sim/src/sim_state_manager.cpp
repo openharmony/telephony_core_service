@@ -135,6 +135,14 @@ int32_t SimStateManager::SetModemInit(bool state)
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+void SimStateManager::SyncCmdResponse()
+{
+    std::unique_lock<std::mutex> lck(ctx_);
+    responseReady_ = true;
+    TELEPHONY_LOGI("SimStateManager::SyncCmdResponse(), responseReady_ = %{public}d", responseReady_);
+    cv_.notify_one();
+}
+
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {

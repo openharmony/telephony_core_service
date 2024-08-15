@@ -31,6 +31,12 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t SLOT_ID_ZERO = 0;
+const int32_t SIM_IO_DATA_MIN_LEN = 6;
+const int32_t SIM_IO_DATA_STR_LEN = 2;
+const int32_t SIM_IO_DATA_P1_OFFSET = 0;
+const int32_t SIM_IO_DATA_P2_OFFSET = 2;
+const int32_t SIM_IO_DATA_P3_OFFSET = 4;
+const int32_t SIM_IO_HEX_SIGN = 16;
 class SimManager : public ISimManager {
 public:
     explicit SimManager(std::shared_ptr<ITelRilManager> telRilManager);
@@ -147,6 +153,7 @@ public:
     bool IsSetPrimarySlotIdInProgress() override;
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
+    int32_t SavePrimarySlotId(int32_t slotId) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);

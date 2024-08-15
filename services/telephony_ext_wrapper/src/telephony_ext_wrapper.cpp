@@ -168,10 +168,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     getSimIdExt_ = (GET_SIM_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSimIdExt");
     getSlotIdExt_ = (GET_SLOT_ID_EXT) dlsym(telephonyVSimWrapperHandle_, "GetSlotIdExt");
     isHandleVSim_ = (IS_HANDLE_VSIM) dlsym(telephonyVSimWrapperHandle_, "IsHandleVSim");
+    isVSimEnabled_ = (IS_VSIM_ENABLED) dlsym(telephonyVSimWrapperHandle_, "IsVSimEnabled");
+    updateSubState_ = (UPDATE_SUB_STATE) dlsym(telephonyVSimWrapperHandle_, "UpdateSubState");
 
     bool hasFuncNull = (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
         putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
-        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr || isHandleVSim_ == nullptr);
+        getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr || isHandleVSim_ == nullptr || isVSimEnabled_ == nullptr ||
+        updateSubState_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
