@@ -338,8 +338,8 @@ napi_value SimAuthResultConversion(napi_env env, const SimAuthenticationResponse
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    NapiUtil::SetPropertyInt32(env, val, "sw1", responseResult.sw1);
-    NapiUtil::SetPropertyInt32(env, val, "sw2", responseResult.sw2);
+    NapiUtil::SetPropertyInt32(env, val, "simStatusWord1", responseResult.sw1);
+    NapiUtil::SetPropertyInt32(env, val, "simStatusWord2", responseResult.sw2);
     NapiUtil::SetPropertyStringUtf8(env, val, "response", responseResult.response);
     return val;
 }
