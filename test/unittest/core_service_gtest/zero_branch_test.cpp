@@ -3069,5 +3069,24 @@ HWTEST_F(BranchTest, Telephony_SignalInformation_001, Function | MediumTest | Le
     std::shared_ptr<GsmCellLocation> gsmCellLocation = std::make_shared<GsmCellLocation>();
     EXPECT_GE(gsmCellLocation->GetCellId(), 0);
 }
+
+/**
+ * @tc.number   Telephony_RadioInfo_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RadioInfo_001, Function | MediumTest | Level1)
+{
+    auto simManager = std::make_shared<SimManager>(nullptr);
+    auto nsm = std::make_shared<NetworkSearchManager>(nullptr, simManager);
+    auto radioInfo = std::make_shared<radioInfo>(nsm, SLOT_ID_0);
+    radioInfo->SetRadioOnIfNeeded();
+    radioInfo->slotId_ = INVALID_SLOTID;
+    radioInfo->SetRadioOnIfNeeded();
+    nsm->simManager_ = nullptr;
+    radioInfo->SetRadioOnIfNeeded();
+    nsm.reset();
+    radioInfo->SetRadioOnIfNeeded();
+}
 } // namespace Telephony
 } // namespace OHOS
