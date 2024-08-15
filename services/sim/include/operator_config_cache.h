@@ -29,6 +29,7 @@ public:
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);
     void ClearOperatorValue(int32_t slotId);
+    void ClearMemoryAndOpkey(int32_t slotId);
     int32_t LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state = 0);
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc);
     int32_t UpdateOperatorConfigs(int32_t slotId);

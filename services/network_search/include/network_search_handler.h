@@ -97,13 +97,13 @@ public:
     sptr<CellLocation> GetCellLocation();
     void TimezoneRefresh();
     void SetCellRequestMinInterval(uint32_t minInterval);
-    int32_t GetRegServiceState(RegServiceState &regState);
     bool IsPowerOnPrimaryRadioWhenNoSim() const;
     void ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     void RadioOnState();
 
 private:
     void RadioOffOrUnavailableState(int32_t radioState) const;
+    void SetRadioOffWhenAirplaneIsOn();
     void GetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SetRadioStateResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void SimStateChange(const AppExecFwk::InnerEvent::Pointer &);
@@ -153,6 +153,7 @@ private:
     bool IsSatelliteOn() const;
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
     void UpdateNetworkState();
+    void GetDeviceId();
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;

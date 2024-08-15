@@ -1341,6 +1341,79 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
 }
 
 /**
+ * @tc.number   Telephony_MultiSimController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->UpdateOpKeyInfo();
+    EXPECT_FALSE(multiSimController->IsValidData(-1));
+}
+
+/**
+ * @tc.number   Telephony_MultiSimController_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr};
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr};
+    for (int32_t slotId = 0; slotId < 2; slotId++) {
+        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
+        if (simStateManager[slotId] != nullptr) {
+            simStateManager[slotId]->Init(slotId);
+        }
+        simFileManager[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager[slotId]));
+        if (simFileManager[slotId] != nullptr) {
+            simFileManager[slotId]->Init(slotId);
+        }
+    }
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->Init();
+    telRilManager->InitTelExtraModule(2);
+    simStateManager.resize(3);
+    simFileManager.resize(3);
+    simStateManager[2] = std::make_shared<SimStateManager>(telRilManager);
+    if (simStateManager[2] != nullptr) {
+        simStateManager[2]->Init(2);
+    }
+    simFileManager[2] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager[2]));
+    if (simFileManager[2] != nullptr) {
+        simFileManager[2]->Init(2);
+    }
+    multiSimController->AddExtraManagers(simStateManager[2], simFileManager[2]);
+    multiSimController->ForgetAllData(0);
+    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simStatus_ = 1;
+    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simType_ = 2;
+    multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "898600520123F0102670";
+    multiSimController->simStateManager_[0]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
+    multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_TRUE(multiSimController->InitShowNumber(0));
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(true, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
+    int32_t imsSwitchValue;
+    EXPECT_GE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(multiSimController->IsSetActiveSimInProgress(0));
+    EXPECT_FALSE(multiSimController->IsSetPrimarySlotIdInProgress());
+}
+
+/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2377,13 +2450,11 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
     event = nullptr;
-    RegServiceState regState = RegServiceState::REG_STATE_UNKNOWN;
     int32_t status = RRC_IDLE_STATUS;
     networkSearchHandler->HandleDelayNotifyEvent(event);
     networkSearchHandler->NetworkSearchResult(event);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetImeiSv(event);
-    EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
@@ -2394,7 +2465,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     networkSearchHandler->NetworkSearchResult(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
-    EXPECT_EQ(networkSearchHandler->GetRegServiceState(regState), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
@@ -2978,6 +3048,147 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   Telephony_MultiSimMonitor_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
+    multiSimMonitor->ProcessEvent(event);
+    multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
+    multiSimMonitor->IsVSimSlotId(0);
+    multiSimMonitor->RegisterSimNotify(0);
+    multiSimMonitor->UnRegisterSimNotify();
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor =
+        std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    EventFwk::MatchingSkills matchSkills;
+    matchingSkills.AddEvent(DATASHARE_READY_EVENT);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchSkills);
+    subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto simFileManagerWeak = std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeaks = {simFileManagerWeak,
+        simFileManagerWeak};
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor =
+        std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
+    multiSimMonitor->RegisterSimNotify();
+    multiSimMonitor->InitData(0);
+    simStateManager = { nullptr, nullptr };
+    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
+    multiSimMonitor->RegisterSimNotify(0);
+    multiSimMonitor->UnRegisterSimNotify();
+    simFileManagerWeak.reset();
+    simFileManagerWeaks = { simFileManagerWeak, simFileManagerWeak };
+    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
+    multiSimMonitor->RegisterSimNotify(0);
+    multiSimMonitor->UnRegisterSimNotify();
+    multiSimMonitor->RefreshData(0);
+    multiSimMonitor->UpdateAllOpkeyConfigs();
+    multiSimMonitor->ClearAllOpcCache();
+    EXPECT_FALSE(multiSimMonitor->IsValidSlotId(-1));
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    simStateManagerPtr->Init(0);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor =
+        std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->Init();
+}
+
+/**
  * @tc.number   Telephony_ImsCoreServiceCallbackProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -3070,18 +3281,70 @@ HWTEST_F(BranchTest, Telephony_SignalInformation_001, Function | MediumTest | Le
     EXPECT_GE(gsmCellLocation->GetCellId(), 0);
 }
 
-/**
- * @tc.number   Telephony_RadioInfo_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_RadioInfo_001, Function | MediumTest | Level1)
+HWTEST_F(BranchTest, Telephony_NrSsbInfo, Function | MediumTest | Level1)
 {
-    auto simManager = std::make_shared<SimManager>(nullptr);
-    auto nsm = std::make_shared<NetworkSearchManager>(nullptr, simManager);
-    auto radioInfo = std::make_shared<radioInfo>(nsm, SLOT_ID_0);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto nrSsbInfo = std::make_shared<NrSsbInfo>(networkSearchManager, INVALID_SLOTID);
+
+    EXPECT_FALSE(nrSsbInfo->FillNrSsbIdInformation(nullptr));
+
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+    EXPECT_TRUE(nrSsbInfo->FillNrSsbIdInformation(nrCellSsbIdsInfo));
+
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    EXPECT_FALSE(nrSsbInfo->ProcessGetNrSsbId(event));
+
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nullptr));
+
+    std::shared_ptr<NrCellSsbIds> nrCellSsbIds = std::make_shared<NrCellSsbIds>();
+    nrSsbInfo->nrCellSsbIdsInfo_ = nullptr;
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+
+    nrSsbInfo->nrCellSsbIdsInfo_ = std::make_shared<NrCellSsbInfo>();
+    EXPECT_TRUE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+
+    nrCellSsbIds->nbCellCount = 5;
+    EXPECT_FALSE(nrSsbInfo->UpdateNrSsbIdInfo(SLOT_ID_0, nrCellSsbIds));
+}
+
+HWTEST_F(BranchTest, Telephony_RadioInfo, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto radioInfo = std::make_shared<RadioInfo>(networkSearchManager, INVALID_SLOTID);
+
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    radioInfo->ProcessGetRadioState(event);
+    radioInfo->ProcessSetRadioState(event);
+
+    std::shared_ptr<NetworkSearchManager> nsm = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    radioInfo->RadioFirstPowerOn(nsm, ModemPowerState::CORE_SERVICE_POWER_OFF);
+    radioInfo->ProcessGetImei(event);
+    radioInfo->ProcessGetImeiSv(event);
+    radioInfo->ProcessGetMeid(event);
+    radioInfo->ProcessVoiceTechChange(event);
+    radioInfo->ProcessGetBasebandVersion(event);
+    radioInfo->ProcessGetRrcConnectionState(event);
+    radioInfo->ProcessSetNrOptionMode(event);
+    radioInfo->ProcessGetNrOptionMode(event);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_1XRTT, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_EVDO, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_EHRPD, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
+
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_GSM);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_LTE_CA),
+        PhoneType::PHONE_TYPE_IS_GSM);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_NR),
+        PhoneType::PHONE_TYPE_IS_GSM);
     radioInfo->SetRadioOnIfNeeded();
-    radioInfo->slotId_ = INVALID_SLOTID;
+    radioInfo->slotId_ = SLOT_ID_0;
     radioInfo->SetRadioOnIfNeeded();
     nsm->simManager_ = nullptr;
     radioInfo->SetRadioOnIfNeeded();

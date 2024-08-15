@@ -497,6 +497,23 @@ void NetworkSearchHandler::SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointe
     }
 }
 
+void NetworkSearchHandler::GetDeviceId()
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::GetDeviceId failed to get NetworkSearchManager");
+        return;
+    }
+    std::u16string meid = u"";
+    std::u16string imei = u"";
+    std::u16string imeiSv = u"";
+    std::string basebandVersion = "";
+    networkSearchManager->GetImei(slotId_, imei);
+    networkSearchManager->GetImeiSv(slotId_, imeiSv);
+    networkSearchManager->GetMeid(slotId_, meid);
+    networkSearchManager->GetBasebandVersion(slotId_, basebandVersion);
+}
+
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -524,6 +541,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
         case CORE_SERVICE_POWER_ON: {
             firstInit_ = false;
             InitGetNetworkSelectionMode();
+            SetRadioOffWhenAirplaneIsOn();
             RadioOnState();
             break;
         }
@@ -538,13 +556,25 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             inner->deviceStateHandler_->ProcessRadioState();
         }
         networkSearchManager->InitSimRadioProtocol(slotId_);
-        std::u16string imei = u"";
-        networkSearchManager->GetImei(slotId_, imei);
+        GetDeviceId();
     } else {
         networkSearchManager->SetRadioStateValue(slotId_, CORE_SERVICE_POWER_NOT_AVAILABLE);
     }
     if (operatorName_ != nullptr) {
         operatorName_->NotifySpnChanged();
+    }
+}
+
+void NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn()
+{
+    bool isAirplaneMode = false;
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn failed to get NetworkSearchManager");
+        return;
+    }
+    if (networkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
 }
 
@@ -1191,17 +1221,8 @@ void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
         return;
     }
+    RevertLastTechnology();
     RadioOnState();
-}
-
-int32_t NetworkSearchHandler::GetRegServiceState(RegServiceState &regState)
-{
-    if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::GetRegServiceState networkRegister_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    regState = networkRegister_->GetRegServiceState();
-    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchHandler::HandleRrcStateChanged(int32_t status)

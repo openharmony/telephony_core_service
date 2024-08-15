@@ -34,6 +34,44 @@ HapInfoParams testInfoParams = {
     .isSystemApp = true,
 };
 
+PermissionDef testPermLocationDef = {
+    .permissionName = "ohos.permission.LOCATION",
+    .bundleName = "tel_core_service_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testLocationState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.LOCATION",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermCellLocationDef = {
+    .permissionName = "ohos.permission.CELL_LOCATION",
+    .bundleName = "tel_core_service_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test core service",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testCellLocationState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.CELL_LOCATION",
+    .resDeviceID = { "local" },
+};
+
 PermissionDef testPermGetTelephonyStateDef = {
     .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
     .bundleName = "tel_core_service_gtest",
@@ -133,9 +171,9 @@ HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermGetTelephonyStateDef, testPermSetTelephonyStateDef, testPermGetNetworkInfoDef,
-        testSimPermWriteContactsDef, testSimPermReadContactsDef },
+        testSimPermWriteContactsDef, testSimPermReadContactsDef, testPermLocationDef, testPermCellLocationDef},
     .permStateList = { testGetTelephonyState, testSetTelephonyState, testPermGetNetworkInfo, testSimPermWriteContacts,
-        testSimPermReadContacts },
+        testSimPermReadContacts, testLocationState, testCellLocationState},
 };
 } // namespace
 

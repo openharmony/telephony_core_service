@@ -20,9 +20,12 @@
 #include "core_manager_inner.h"
 #include "core_service.h"
 #include "core_service_client.h"
+#include "multi_sim_controller.h"
 #include "operator_config_cache.h"
+#include "sim_manager.h"
 #include "sim_test_util.h"
 #include "tel_ril_callback.h"
+#include "tel_ril_manager.h"
 #include "telephony_ext_wrapper.h"
 
 namespace OHOS {
@@ -165,6 +168,8 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0100, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimEnabled_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateSubState_ != nullptr);
     }
 }
 
@@ -186,9 +191,54 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0200, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSimIdExt_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.getSlotIdExt_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimEnabled_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateSubState_ == nullptr);
     }
 }
 
+/**
+ * @tc.number SavePrimarySlotId_0100
+ * @tc.name InitExtraModule
+ * @tc.desc Function test
+ */
+HWTEST_F(SimTest, SavePrimarySlotId_0100, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    CoreManagerInner::GetInstance().OnInit(nullptr, simManager, telRilManager);
+    int32_t result = CoreManagerInner::GetInstance().SavePrimarySlotId(0);
+    EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, result);
+}
+
+/**
+* @tc.number SavePrimarySlotId_0200
+* @tc.name InitExtraModule
+* @tc.desc Function test
+*/
+HWTEST_F(SimTest, SavePrimarySlotId_0200, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+    std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, multiSimController->SavePrimarySlotId(0));
+}
+
+/**
+* @tc.number SavePrimarySlotId_0300
+* @tc.name InitExtraModule
+* @tc.desc Function test
+*/
+HWTEST_F(SimTest, SavePrimarySlotId_0300, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+    std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, multiSimController->SavePrimarySlotId(4));
+}
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_MockTest_0100
@@ -202,7 +252,6 @@ HWTEST_F(SimTest, Telephony_Sim_MockTest_0100, Function | MediumTest | Level3)
     }
     EXPECT_TRUE(true);
 }
-
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

@@ -17,8 +17,21 @@ group("unittest") {
   testonly = true
   deps = []
   deps += [
+    "unittest/core_service_gtest:tel_core_service_common_test",
     "unittest/core_service_gtest:tel_core_service_gtest",
+    "unittest/core_service_gtest:tel_core_service_native_branch_gtest",
+    "unittest/core_service_gtest:tel_core_service_test",
+    "unittest/core_service_gtest:tel_core_zero_branch_gtest",
+    "unittest/core_service_gtest:tel_network_search_branch_gtest",
     "unittest/core_service_gtest:tel_network_search_gtest",
+    "unittest/core_service_gtest:tel_network_search_manager_gtest",
+    "unittest/core_service_gtest:tel_sim_file_manager_branch_gtest",
+    "unittest/core_service_gtest:tel_sim_gtest",
+    "unittest/core_service_gtest:tel_sim_zero_branch_gtest",
+    "unittest/icc_dialling_numbers_handler_gtest:icc_dialling_numbers_handler_gtest",
+    "unittest/sim_manager_gtest:sim_manager_gtest",
+    "unittest/sim_state_handle_gtest:sim_state_handle_gtest",
     "unittest/tel_ril_gtest:tel_ril_gtest",
+    "unittest/utils_vcard_gtest:utils_vcard_gtest",
   ]
 }

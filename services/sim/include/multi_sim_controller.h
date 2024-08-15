@@ -76,6 +76,7 @@ public:
     int32_t UpdateOpKeyInfo();
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
+    int32_t SavePrimarySlotId(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -115,6 +116,7 @@ private:
     int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
     bool IsAllModemInitDone();
     int32_t IsSatelliteSupported();
+    void UpdateSubState(int32_t slotId, int32_t enable);
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;

@@ -327,10 +327,10 @@ void NetworkSearchState::NotifyPsRoamingStatusChange()
         return;
     }
     if (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
-        (processNetworkState_ || networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN)) {
+        networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
         networkSearchManager->NotifyPsRoamingOpenChanged(slotId_);
     }
-    if ((processNetworkState_ || networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN) &&
+    if (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
         networkSearchManager->NotifyPsRoamingCloseChanged(slotId_);
     }
