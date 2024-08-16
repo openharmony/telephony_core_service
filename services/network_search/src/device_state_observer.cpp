@@ -19,8 +19,10 @@
 #include "battery_srv_client.h"
 #endif
 #include "iservice_registry.h"
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
+#endif
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #include "power_mode_info.h"
@@ -51,6 +53,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
     subscriber_->SetEventHandler(deviceStateHandler);
     subscriber_->InitEventMap();
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
 
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -69,6 +72,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
         "SubscribeSystemAbility COMMON_EVENT_SERVICE_ID(result:%{public}d) POWER_MANAGER_SERVICE_ID(result:%{public}d) "
         "POWER_MANAGER_BATT_SERVICE_ID(result:%{public}d) COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID(result:%{public}d)",
         commonEventResult, powerManagerResult, powerManagerBattResult, netManagerResult);
+#endif
 }
 
 void DeviceStateObserver::StopEventSubscriber()
@@ -79,6 +83,7 @@ void DeviceStateObserver::StopEventSubscriber()
         TELEPHONY_LOGI("DeviceStateObserver::StopEventSubscriber subscribeResult = %{public}d", subscribeResult);
     }
 
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     if (sharingEventCallback_ == nullptr) {
         TELEPHONY_LOGE("DeviceStateObserver::StopEventSubscriber sharingEventCallback_ is nullptr");
         return;
@@ -90,6 +95,7 @@ void DeviceStateObserver::StopEventSubscriber()
     }
     networkShareClient->UnregisterSharingEvent(sharingEventCallback_);
     sharingEventCallback_ = nullptr;
+#endif
 }
 
 void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
