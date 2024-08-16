@@ -194,6 +194,7 @@ void DeviceStateEventSubscriber::InitEventMap()
     };
 }
 
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
     std::shared_ptr<DeviceStateEventSubscriber> &sub, sptr<NetManagerStandard::ISharingEventCallback> &callback)
     : sub_(sub), callback_(callback)
@@ -277,5 +278,6 @@ void SharingEventCallback::OnSharingStateChanged(const bool &isRunning)
     TELEPHONY_LOGI("DeviceStateObserver::OnSharingStateChanged: isSharing = %{public}d", isRunning);
     handler_->ProcessNetSharingState(isRunning);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
