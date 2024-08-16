@@ -1687,7 +1687,7 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     EXPECT_GE(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     simStateManager->simStateHandle_->GetSimIccStatus();
-    auto ret = simStateManager->GetSimIccStatus;
+    auto ret = simStateManager->GetSimIccStatus();
     EXPECT_EQ(static_cast<int>(ret), -1);
     simStateManager->simStateHandle_ = nullptr;
     ret = simStateManager->GetSimIccStatus();
