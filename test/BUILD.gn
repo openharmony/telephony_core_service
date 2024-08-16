@@ -33,6 +33,7 @@ group("unittest") {
     "unittest/sim_manager_gtest:sim_manager_gtest",
     "unittest/sim_state_handle_gtest:sim_state_handle_gtest",
     "unittest/tel_ril_gtest:tel_ril_gtest",
+    "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_gtest",
   ]
 }
