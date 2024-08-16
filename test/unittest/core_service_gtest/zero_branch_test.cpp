@@ -3343,6 +3343,13 @@ HWTEST_F(BranchTest, Telephony_RadioInfo, Function | MediumTest | Level1)
         PhoneType::PHONE_TYPE_IS_GSM);
     EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_UNKNOWN, RadioTech::RADIO_TECHNOLOGY_NR),
         PhoneType::PHONE_TYPE_IS_GSM);
+    radioInfo->SetRadioOnIfNeeded();
+    radioInfo->slotId_ = SLOT_ID_0;
+    radioInfo->SetRadioOnIfNeeded();
+    nsm->simManager_ = nullptr;
+    radioInfo->SetRadioOnIfNeeded();
+    nsm.reset();
+    radioInfo->SetRadioOnIfNeeded();
 }
 } // namespace Telephony
 } // namespace OHOS
