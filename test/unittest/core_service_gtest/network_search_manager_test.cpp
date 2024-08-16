@@ -72,7 +72,6 @@ using namespace testing::ext;
 
 namespace {
 const int32_t SLOT_ID_0 = 0;
-const int32_t INVALID_SLOTID = -1;
 constexpr int32_t LTE_RSSI_GOOD = -80;
 constexpr int32_t SLEEP_TIME_SECONDS = 3;
 } // namespace
