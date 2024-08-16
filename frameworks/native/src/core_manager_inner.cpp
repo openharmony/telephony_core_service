@@ -2212,6 +2212,15 @@ int32_t CoreManagerInner::GetSimState(int32_t slotId, SimState &simState)
     return simManager_->GetSimState(slotId, simState);
 }
 
+int32_t CoreManagerInner::GetSimIccStatus(int32_t slotId, IccSimStatus &iccStatus)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetSimIccStatus(slotId, iccStatus);
+}
+
 int32_t CoreManagerInner::GetCardType(int32_t slotId, CardType &cardType)
 {
     if (simManager_ == nullptr) {
