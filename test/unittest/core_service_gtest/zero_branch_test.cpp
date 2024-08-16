@@ -948,6 +948,12 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetOperatorInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    mInner.simManager_ = std::make_shared<SimManager>(telRilManager);
+    EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    mInner.simManager_ = nullptr;
+    EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1444,6 +1450,9 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     EXPECT_NE(simManager->GetLockState(INVALID_SLOTID, mLockType, lockState), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RefreshSimState(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
+    EXPECT_EQ(simManager->GetSimIccStatus(3, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simManager->GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1679,6 +1688,12 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManagerTwo);
     EXPECT_GE(simStateManager->GetCardType(), CardType::UNKNOWN_CARD);
     EXPECT_GT(simStateManager->UnlockSimLock(0, mPersoLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    simStateManager->simStateHandle_->GetSimIccStatus();
+    auto ret = simStateManager->GetSimIccStatus();
+    EXPECT_EQ(static_cast<int>(ret), -1);
+    simStateManager->simStateHandle_ = nullptr;
+    ret = simStateManager->GetSimIccStatus();
+    EXPECT_EQ(static_cast<int>(ret), -1);
 }
 
 /**
