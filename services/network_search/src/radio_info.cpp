@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t INVALID_SLOT_ID = -1;
+
 RadioInfo::RadioInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
@@ -313,14 +315,7 @@ void RadioInfo::AirplaneModeChange()
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_OFF && isAirplaneModeOn == false) {
         TELEPHONY_LOGI("radio is off, airplaneMode is closed, slotId:%{public}d", slotId_);
-        auto simManager = nsm->GetSimManager();
-        if (simManager == nullptr) {
-            TELEPHONY_LOGE("get simManager failed");
-            return;
-        }
-        if (simManager->IsSimActive(slotId_)) {
-            nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
-        }
+        SetRadioOnIfNeeded();
     }
     if (nsm->GetRadioState(slotId_) == ModemPowerState::CORE_SERVICE_POWER_ON && isAirplaneModeOn == true) {
         TELEPHONY_LOGI("radio is on, airplaneMode is opened, slotId:%{public}d", slotId_);
@@ -336,6 +331,30 @@ void RadioInfo::AirplaneModeChange()
     }
     nsm->SetLocalAirplaneMode(slotId_, isAirplaneModeOn);
     TELEPHONY_LOGI("airplaneMode:%{public}d, slotId:%{public}d", isAirplaneModeOn, slotId_);
+}
+
+void RadioInfo::SetRadioOnIfNeeded()
+{
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    auto simManager = nsm->GetSimManager();
+    if (simManager == nullptr) {
+        TELEPHONY_LOGE("get simManager failed");
+        return;
+    }
+    bool isActive = simManager->IsSimActive(slotId_);
+    bool hasSim = false;
+    simManager->HasSimCard(slotId_, hasSim);
+    int32_t primarySlot = INVALID_SLOT_ID;
+    simManager->GetPrimarySlotId(primarySlot);
+    if (isActive || (!hasSim && slotId_ == primarySlot)) {
+        TELEPHONY_LOGI("need set radio on. isActive:%{public}d, hasSim:%{public}d, primarySlot:%{public}d",
+            isActive, hasSim, primarySlot);
+        nsm->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
+    }
 }
 
 int32_t RadioInfo::ProcessGetBasebandVersion(const AppExecFwk::InnerEvent::Pointer &event) const
