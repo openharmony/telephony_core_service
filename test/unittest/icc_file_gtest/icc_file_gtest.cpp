@@ -62,6 +62,8 @@
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
 
+#define LENGTH_TWO 2
+
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
@@ -334,6 +336,93 @@ HWTEST_F(IccFileTest, Telephony_IccFile_015, Function | MediumTest | Level1)
     EXPECT_EQ(what2, RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
     iccFile->UnRegisterCoreNotify(eventHandler, what3);
     EXPECT_EQ(what3, RadioEvent::RADIO_QUERY_ICCID_DONE);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_016
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_016, Function | MediumTest | Level1)
+{
+    int eventId = 1;
+    int arg1 = 1;
+    int arg2 = 1;
+    int eventParam = 0;
+    std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->BuildCallerInfo(eventId, arg1, arg2);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    ASSERT_NE(event, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_017
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_017, Function | MediumTest | Level1)
+{
+    int eventId = 1;
+    int eventParam = 0;
+    std::shared_ptr<void> loader = nullptr;
+    std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->BuildCallerInfo(eventId, loader);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    ASSERT_NE(event, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_018
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_018, Function | MediumTest | Level1)
+{
+    std::string langLi = "ABC";
+    std::string langPl = "001";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->UpdateIccLanguage(langLi, langPl);
+    EXPECT_TRUE(iccFile->iccLanguage_.empty());
+}
+
+/**
+ * @tc.number   Telephony_IccFile_019
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_019, Function | MediumTest | Level1)
+{
+    std::string iccId = "1";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->SwapPairsForIccId(iccId);
+    EXPECT_FALSE(iccId.empty());
+    EXPECT_TRUE(iccId.length() < LENGTH_TWO);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_020
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_020, Function | MediumTest | Level1)
+{
+    std::string opkey = "";
+    std::string opName = "";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->OnOpkeyLoad(opkey, opName);
+    ASSERT_NE(iccFile->opkeyLoadObser_, nullptr);
 }
 
 }
