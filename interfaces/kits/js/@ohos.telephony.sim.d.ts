@@ -2206,11 +2206,11 @@ declare namespace sim {
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
    * 2. Incorrect parameter types.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300002 - Service connection failed.
    * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300004 - Do not have sim card.
-   * @throws { BusinessError } 8300999 - Unknown error code.
-   * @throws { BusinessError } 8301002 - SIM card operation error.
+   * @throws { BusinessError } 8300004 - No SIM card.
+   * @throws { BusinessError } 8300999 - Unknown error.
+   * @throws { BusinessError } 8301002 - An error occurred when operating the SIM card.
    * @syscap SystemCapability.Telephony.CoreService.
    * @systemapi Hide this for inner system use.
    * @since 12
@@ -3092,7 +3092,7 @@ declare namespace sim {
   }
 
   /**
-   * SIM card Authentication response.
+   * SIM card authentication response.
    *
    * @interface SimAuthenticationResponse
    * @syscap SystemCapability.Telephony.CoreService
@@ -3108,7 +3108,7 @@ declare namespace sim {
      * @systemapi Hide this for inner system use.
      * @since 12
      */
-    sw1: number;
+    simStatusWord1: number;
 
     /**
      * Status word 2 of the SIM card, which is returned by the SIM card after command execution.
@@ -3118,10 +3118,10 @@ declare namespace sim {
      * @systemapi Hide this for inner system use.
      * @since 12
      */
-    sw2: number;
-    
+    simStatusWord2: number;
+
     /**
-     * A string the response of authentication.
+     * Indicates the response of authentication.
      *
      * @type { string }
      * @syscap SystemCapability.Telephony.CoreService
