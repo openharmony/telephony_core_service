@@ -22,7 +22,9 @@
         "syscap": [
             "SystemCapability.Telephony.CoreService"
         ],
-        "features": [],
+        "features": [
+            "core_service_support_esim"
+        ],
         "hisysevent_config": [
             "//base/telephony/core_service/hisysevent.yaml"
         ],
