@@ -17,6 +17,12 @@ declare_args() {
       !defined(global_parts_info.hiviewdfx_hicollie)) {
     telephony_hicollie_able = false
   }
+
+  core_service_support_esim = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.core_service_support_esim)) {
+    core_service_support_esim = true
+  }
 }
 
 telephony_extra_defines = []
