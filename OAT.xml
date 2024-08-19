@@ -58,7 +58,6 @@ Note:If the text contains special characters, please escape them according to th
     <oatconfig> 
         <filefilterlist>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
-                <filteritem type="filename" name="*.bin" desc="used ind mccmnc changed to operator name."/>
                 <filteritem type="filepath" name="figures/zh-cn_architecture-of-the-core_service-module.png" desc="png文件,不参与打包不影响兼容性"/>
                 <filteritem type="filepath" name="figures/en-us_architecture-of-the-core_service-module.png" desc="png文件,不参与打包不影响兼容性"/>
             </filefilter>
