@@ -52,6 +52,7 @@
                 "hicollie",
                 "hilog",
                 "hisysevent",
+                "hitrace",
                 "i18n",
                 "init",
                 "ipc",

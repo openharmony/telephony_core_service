@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("../../core_service/telephony_core_service.gni")
 
 group("unittest") {
   testonly = true
@@ -36,4 +37,11 @@ group("unittest") {
     "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_gtest",
   ]
+
+  if (core_service_support_esim) {
+    deps += [
+      "unittest/esim_gtest:esim_service_client_branch_gtest",
+      "unittest/esim_parcel_gtest:parcel_gtest",
+    ]
+  }
 }

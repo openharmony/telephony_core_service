@@ -13,31 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef ESIM_SERVICE_INTERFACE_CODE_H
-#define ESIM_SERVICE_INTERFACE_CODE_H
+#ifndef OHOS_PROFILE_INFO_LIST_PARCEL_H
+#define OHOS_PROFILE_INFO_LIST_PARCEL_H
 
-/* SAID:4018 */
+#include <parcel.h>
+#include <string>
+#include <vector>
+
+#include "esim_state_type.h"
+
 namespace OHOS {
 namespace Telephony {
-enum class EsimServiceInterfaceCode {
-    GET_EID = 0,
-    GET_OSU_STATUS,
-    START_OSU,
-    GET_DOWNLOAD_ABLE_PROFILE_METADATA,
-    GET_AVAILABLE_DOWNLOADABLE_PROFILE_LIST,
-    DOWNLOAD_PROFILE,
-    GET_EUICC_PROFILE_INFO_LIST,
-    GET_EUICC_INFO,
-    DELETE_PROFILE,
-    SWITCH_TO_PROFILE,
-    SET_PROFILE_NICKNAME,
-    RESET_MEMORY,
-    RESERVE_PROFILES_FOR_FACTORY_RESTORE,
-    SET_DEFAULT_SMDP_ADDRESS,
-    GET_DEFAULT_SMDP_ADDRESS,
-    CANCEL_SESSION,
-    IS_ESIM_SUPPORTED,
+/**
+ * @brief Result of a operation.
+ */
+struct GetEuiccProfileInfoListResult : public Parcelable {
+    ResultState result_;
+    std::vector<EuiccProfile> profiles_{};
+    bool isRemovable_ = false;
+
+    bool ReadFromParcel(Parcel &parcel);
+    virtual bool Marshalling(Parcel &parcel) const override;
+    static GetEuiccProfileInfoListResult *Unmarshalling(Parcel &parcel);
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // ESIM_SERVICE_INTERFACE_CODE_H
+#endif // OHOS_PROFILE_INFO_LIST_PARCEL_H

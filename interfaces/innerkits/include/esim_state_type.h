@@ -26,7 +26,7 @@ namespace Telephony {
 /**
  * @brief Result state.
  */
-enum class Result {
+enum class ResultState {
     RESULT_RESOLVABLE_ERRORS = -2,
     RESULT_MUST_DEACTIVATE_SIM = -1,
     RESULT_OK = 0,
@@ -42,7 +42,7 @@ enum class OsuStatus {
     EUICC_OSU_FAILED = 2,
     EUICC_OSU_SUCCEEDED = 3,
     EUICC_OSU_NOT_NEEDED = 4,
-    EUICC_OSU_STATUS_UNAVAILABLE = 5,
+    EUICC_OSU_UNAVAILABLE = 5,
 };
 
 /**
@@ -59,129 +59,115 @@ enum class CancelReason {
  * @brief Options for resetting eUICC memory.
  */
 enum class ResetOption {
-    RESET_OPTION_DELETE_OPERATIONAL_PROFILES = 1,
-    RESET_OPTION_DELETE_FIELD_LOADED_TEST_PROFILES = 1 << 1,
-    RESET_OPTION_RESET_DEFAULT_SMDP_ADDRESS = 1 << 2,
+    DELETE_OPERATIONAL_PROFILES = 1,
+    DELETE_FIELD_LOADED_TEST_PROFILES = 1 << 1,
+    RESET_DEFAULT_SMDP_ADDRESS = 1 << 2,
 };
 
 /**
- * @brief Euicc Information.
+ * @brief The profile state.
  */
-struct EuiccInfo {
-    std::u16string osVersion = u"";
+enum class ProfileState {
+    PROFILE_STATE_UNSPECIFIED = -1,
+    PROFILE_STATE_DISABLED = 0,
+    PROFILE_STATE_ENABLED = 1,
 };
 
 /**
- * @brief Result set for downloading configuration files.
+ * @brief Profile class for the profile.
  */
-struct DownloadProfileResult {
-    int32_t result = 0;
-    int32_t resolvableErrors = 0;
-    int32_t cardId = 0;
+enum class ProfileClass {
+    PROFILE_CLASS_UNSPECIFIED = -1,
+    PROFILE_CLASS_TESTING = 0,
+    PROFILE_CLASS_PROVISIONING = 1,
+    PROFILE_CLASS_OPERATIONAL = 2,
+};
+
+/**
+ * @brief The policy rules of the profile.
+ */
+enum class PolicyRules {
+    POLICY_RULE_NO_DISABLE = 1,
+    POLICY_RULE_NO_DELETE = 1 << 1,
+    POLICY_RULE_DELETE_AFTER_DISABLING = 1 << 2,
+};
+
+/**
+ * @brief The bit map of resolvable errors.
+ */
+enum class ResolvableErrors {
+    RESOLVABLE_ERROR_CONFIRMATION_CODE = 1 << 0,
+    RESOLVABLE_ERROR_POLICY_RULES = 1 << 1,
 };
 
 /**
  * @brief Describes the UICC access rule according to the GlobalPlatform Secure Element Access Control specification.
  */
 struct AccessRule {
-    std::u16string certificateHashHexStr = u"";
-    std::u16string packageName = u"";
-    int32_t accessType = 0;
-};
-
-/**
- * @brief Information about a subscription which is downloadable to an eUICC using.
- */
-struct DownloadableProfile {
-    std::u16string encodedActivationCode = u"";
-    std::u16string confirmationCode = u"";
-    std::u16string carrierName = u"";
-    std::vector<AccessRule> accessRules {};
-};
-
-/**
- * @brief List of metadata for downloaded configuration files.
- */
-struct GetDownloadableProfileMetadataResult {
-    DownloadableProfile downloadableProfiles;
-    int32_t pprType = 0;
-    bool pprFlag = false;
-    int32_t resolvableErrors = 0;
-    int32_t result = 0;
-};
-
-/**
- *  @brief Series data of downloadable configuration files.
- */
-struct GetAvailableDownloadableProfileListResult {
-    int32_t result = 0;
-    std::vector<DownloadableProfile> downloadableProfiles {};
+    std::u16string certificateHashHexStr_ = u"";
+    std::u16string packageName_ = u"";
+    int32_t accessType_ = 0;
 };
 
 /**
  * @brief Information about the eUICC chip/device.
  */
 struct OperatorId {
-    std::u16string mcc = u"";
-    std::u16string mnc = u"";
-    std::u16string gid1 = u"";
-    std::u16string gid2 = u"";
+    std::u16string mcc_ = u"";
+    std::u16string mnc_ = u"";
+    std::u16string gid1_ = u"";
+    std::u16string gid2_ = u"";
 };
 
 /**
  * @brief Information about an embedded profile (subscription) on an eUICC.
  */
 struct EuiccProfile {
-    std::u16string iccId = u"";
-    std::u16string nickName = u"";
-    std::u16string serviceProviderName = u"";
-    std::u16string profileName = u"";
-    int32_t state = 0;
-    int32_t profileClass = 0;
-    OperatorId carrierId;
-    int32_t policyRules = 0;
-    std::vector<AccessRule> accessRules {};
-};
-
-/**
- * @brief Result of a operation.
- */
-struct GetEuiccProfileInfoListResult {
-    int32_t result = 0;
-    std::vector<EuiccProfile> profiles {};
-    bool isRemovable = false;
+    std::u16string iccId_ = u"";
+    std::u16string nickName_ = u"";
+    std::u16string serviceProviderName_ = u"";
+    std::u16string profileName_ = u"";
+    ProfileState state_;
+    ProfileClass profileClass_;
+    OperatorId carrierId_;
+    PolicyRules policyRules_;
+    std::vector<AccessRule> accessRules_{};
 };
 
 /**
  * @brief Information about the eUICC chip/device.
  */
 struct CarrierIdentifier {
-    std::u16string mcc = u"";
-    std::u16string mnc = u"";
-    std::u16string spn = u"";
-    std::u16string imsi = u"";
-    std::u16string gid1 = u"";
-    std::u16string gid2 = u"";
-    int32_t carrierId = 0;
-    int32_t specificCarrierId = 0;
+    std::u16string mcc_ = u"";
+    std::u16string mnc_ = u"";
+    std::u16string spn_ = u"";
+    std::u16string imsi_ = u"";
+    std::u16string gid1_ = u"";
+    std::u16string gid2_ = u"";
+    int32_t carrierId_ = 0;
+    int32_t specificCarrierId_ = 0;
 };
 
 /**
  * @brief the rules authorisation table stored on eUICC.
  */
 struct EuiccRulesAuthTable {
-    std::vector<int32_t> policyRules;
-    std::vector<CarrierIdentifier> carrierIds {};
-    std::vector<int32_t> policyRuleFlags;
-    int32_t position = 0;
+    std::vector<int32_t> policyRules_;
+    std::vector<CarrierIdentifier> carrierIds_{};
+    std::vector<int32_t> policyRuleFlags_;
+    int32_t position_ = 0;
 };
 
 /**
- * @brief Result of a operation.
+ * @brief Result of a bpp operation.
  */
-struct ResponseEsimResult {
-    int32_t resultCode = 0;
-    std::u16string response = u"";
+struct ResponseEsimBppResult {
+    int32_t resultCode_ = 0;
+    std::u16string response_ = u"";
+    int32_t seqNumber_ = 0;
+    int32_t profileManagementOperation_ = 0;
+    std::u16string notificationAddress_ = u"";
+    std::u16string iccId_ = u"";
 };
 
 /**
@@ -199,17 +185,17 @@ enum class Event {
  * @brief A signed notification which is defined in SGP.22.
  */
 struct EuiccNotification {
-    int32_t seq;
-    std::u16string targetAddr;
-    int32_t event;
-    std::u16string data = u"";
+    int32_t seq_;
+    std::u16string targetAddr_ = u"";
+    int32_t event_;
+    std::u16string data_ = u"";
 };
 
 /**
  * @brief List of notifications.
  */
 struct EuiccNotificationList {
-    std::vector<EuiccNotification> euiccNotification {};
+    std::vector<EuiccNotification> euiccNotification_{};
 };
 } // namespace Telephony
 } // namespace OHOS
