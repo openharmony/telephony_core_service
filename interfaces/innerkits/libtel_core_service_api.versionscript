@@ -22,6 +22,8 @@
       *CoreManagerInner*;
       *CoreServiceClient*;
       *CoreServiceProxy*;
+      *EsimServiceClient*;
+      *EsimServiceProxy*;
       *GsmCellInformation*;
       *GsmCellLocation*;
       *GsmSignalInformation*;

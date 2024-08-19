@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+sequenceable download_profile_result_parcel..OHOS.Telephony.EuiccInfo;
+sequenceable downloadable_profile_parcel..OHOS.Telephony.DownloadProfileResult;
+sequenceable euicc_info_parcel..OHOS.Telephony.DownloadableProfile;
+sequenceable get_downloadable_profiles_result_parcel..OHOS.Telephony.GetDownloadableProfileMetadataResult;
+sequenceable profile_info_list_parcel..OHOS.Telephony.GetDownloadableProfilesResult;
+sequenceable profile_metadata_result_parcel..OHOS.Telephony.GetEuiccProfileInfoListResult;
+sequenceable response_esim_result..OHOS.Telephony.ResponseEsimResult;
+
+interface OHOS.Telephony.IEsimService {
+    void GetEid([in] int slotId, [out] String eId);
+    void GetOsuStatus([in] int slotId, [out] int osuStatus);
+    void StartOsu([in] int slotId, [out] int startOsuResult);
+    void GetDownloadableProfileMetadata(
+        [in] int slotId,
+        [in] int portIndex,
+        [in] DownloadableProfile profile,
+        [in] boolean forceDeactivateSim,
+        [out] GetDownloadableProfileMetadataResult profileMetadataResult);
+    void GetDownloadableProfiles(
+        [in] int slotId,
+        [in] int portIndex,
+        [in] boolean forceDeactivateSim,
+        [out] GetDownloadableProfilesResult profileListResult);
+    void DownloadProfile(
+        [in] int slotId,
+        [in] int portIndex,
+        [in] DownloadableProfile profile,
+        [in] boolean switchAfterDownload,
+        [in] boolean forceDeactivateSim,
+        [out] DownloadProfileResult downloadProfileResult);
+    void GetEuiccProfileInfoList([in] int slotId, [out] GetEuiccProfileInfoListResult euiccProfileInfoList);
+    void GetEuiccInfo([in] int slotId, [out] EuiccInfo eUiccInfo);
+    void DeleteProfile([in] int slotId, [in] String iccId, [out] int deleteProfileResult);
+    void SwitchToProfile(
+        [in] int slotId,
+        [in] int portIndex,
+        [in] String iccId,
+        [in] boolean forceDeactivateSim,
+        [out] int switchToProfileResult);
+    void SetProfileNickname(
+        [in] int slotId,
+        [in] String iccId,
+        [in] String nickname,
+        [out] int setProfileNicknameResult);
+    void ResetMemory([in] int slotId, [in] int resetOption, [out] int resetMemoryResult);
+    void ReserveProfilesForFactoryRestore([in] int slotId, [out] int restoreResult);
+    void SetDefaultSmdpAddress(
+        [in] int slotId,
+        [in] String defaultSmdpAddress,
+        [out] int setDefaultSmdpAddressResult);
+    void GetDefaultSmdpAddress([in] int slotId, [out] String defaultSmdpAddress);
+    void CancelSession([in] int slotId, [in] String transactionId, [in] int cancelReason,
+        [out] ResponseEsimResult responseResult);
+    void IsEsimSupported([in] int slotId);
+}
