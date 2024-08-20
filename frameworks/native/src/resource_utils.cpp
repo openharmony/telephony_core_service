@@ -396,11 +396,10 @@ bool ResourceUtils::Init()
     if (IsFileExist(hapPath)) {
         beSourceAdd_ = resourceManager_->AddResource(hapPath.c_str());
         TELEPHONY_LOGI(
-            "ResourceUtils add hap path %{public}s %{public}d", hapPath.c_str(), static_cast<int32_t>(beSourceAdd_));
+            "ResourceUtils add hap path %{public}d", static_cast<int32_t>(beSourceAdd_));
     } else if (IsFileExist(resPath)) {
         beSourceAdd_ = resourceManager_->AddResource(resPath.c_str());
-        TELEPHONY_LOGI("ResourceUtils add resource path %{public}s %{public}d", resPath.c_str(),
-            static_cast<int32_t>(beSourceAdd_));
+        TELEPHONY_LOGI("ResourceUtils add resource path %{public}d", static_cast<int32_t>(beSourceAdd_));
     } else {
         TELEPHONY_LOGE("moduleResPath and moduleHapPath is invalid");
     }
