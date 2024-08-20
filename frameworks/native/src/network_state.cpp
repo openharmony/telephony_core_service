@@ -41,6 +41,8 @@ void NetworkState::Init()
     csOperatorInfo_.operatorNumeric = "";
     psRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     csRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    lastPsRadioTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    lastCfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     cfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     nrState_ = NrState::NR_STATE_NOT_SUPPORT;
 }
