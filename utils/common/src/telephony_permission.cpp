@@ -89,8 +89,9 @@ bool TelephonyPermission::CheckPermission(const std::string &permissionName)
     }
 
     if (result != PermissionState::PERMISSION_GRANTED) {
-        TELEPHONY_LOGD("permission check failed, permission:%{public}s, callerToken:%{public}u, tokenType:%{public}d",
-            permissionName.c_str(), callerToken, tokenType);
+        TELEPHONY_LOGE("permission check failed, permission:%{public}s, callerToken:%{public}u, "
+            "tokenType:%{public}d, pid:%{public}d",
+            permissionName.c_str(), callerToken, tokenType, IPCSkeleton::GetCallingPid());
         return false;
     }
     return true;
