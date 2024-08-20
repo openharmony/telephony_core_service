@@ -91,9 +91,7 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
-#endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
