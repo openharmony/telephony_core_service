@@ -2006,4 +2006,3 @@ void NetworkSearchManager::GetModemEflCapability()
 }
 } // namespace Telephony
 } // namespace OHOS
-123
