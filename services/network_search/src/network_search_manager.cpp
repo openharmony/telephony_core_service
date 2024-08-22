@@ -1961,3 +1961,4 @@ int32_t NetworkSearchManager::StartGetRilSignalIntensity(int32_t slotId)
 }
 } // namespace Telephony
 } // namespace OHOS
+123
