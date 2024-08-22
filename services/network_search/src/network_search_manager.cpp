@@ -2002,7 +2002,6 @@ void NetworkSearchManager::GetModemEflCapability()
     GetParameter(MODEM1_EFL_CAP, EFL_CAP_NOT_SUPPORT, param1, SYS_PARAMETER_SIZE);
     int32_t modem1_efl_cap = atoi(param1);
     modem1EflCapability_ = static_cast<NrMode>(modem1_efl_cap);
-    TELEPHONY_LOGI("cmttag modem1_efl_cap=%{public}d modem1EflCapability=%{public}d", modem1_efl_cap, modem1EflCapability_);
 }
 } // namespace Telephony
 } // namespace OHOS
