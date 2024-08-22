@@ -20,7 +20,9 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 #include "sharing_event_callback_stub.h"
+#endif
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
 #include "system_ability_status_change_stub.h"
