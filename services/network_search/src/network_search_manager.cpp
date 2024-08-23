@@ -47,6 +47,9 @@ const int32_t INVALID_DELAY_TIME = 0;
 constexpr const char *NO_DELAY_TIME__CONFIG = "0";
 constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
 constexpr static const int32_t GET_SSB_WAIT_TIME_SECOND = 5;
+constexpr const char *MODEM0_EFL_CAP = "const.telephony.modem0_efl_cap";
+constexpr const char *MODEM1_EFL_CAP = "const.telephony.modem1_efl_cap";
+constexpr const char *EFL_CAP_NOT_SUPPORT = "0";
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
