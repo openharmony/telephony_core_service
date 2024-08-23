@@ -1326,23 +1326,22 @@ int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode, NSCA
         if (modem1EflCapability_ == NrMode::NR_MODE_UNKNOWN) {
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
-        if (modem1EflCapability_ == NrMode::NR_MODE_SA_ONLY) {
-            if (mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY) ||
-                mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA)) {
-                bool ret = false;
-                if(mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY)) {
-                    ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
-                    CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
-                } else {
-                    ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
-                    CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
-                }
-                if (!ret) {
-                    TELEPHONY_LOGE("SetNrOptionMode::set preferred Network failed, mode:%{public}d", mode);
-                    return TELEPHONY_ERR_FAIL;
-                }
-                return TELEPHONY_ERR_SUCCESS;
+        if (modem1EflCapability_ == NrMode::NR_MODE_SA_ONLY && (mode ==
+            static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY) || mode ==
+            static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA))) {
+            bool ret = false;
+            if(mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY)) {
+                ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
+                CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            } else {
+                ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
+                CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
             }
+            if (!ret) {
+                TELEPHONY_LOGE("SetNrOptionMode::set preferred Network failed, mode:%{public}d", mode);
+                return TELEPHONY_ERR_FAIL;
+            }
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
     if (eventSender_ == nullptr) {
