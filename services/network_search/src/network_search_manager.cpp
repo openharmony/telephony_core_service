@@ -1333,7 +1333,7 @@ int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode, NSCA
             static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY) || mode ==
             static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA))) {
             bool ret = false;
-            if(mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY)) {
+            if (mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY)) {
                 ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
                 CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
             } else {
