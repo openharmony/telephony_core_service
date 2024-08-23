@@ -20,7 +20,9 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 #include "sharing_event_callback_stub.h"
+#endif
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
 #include "system_ability_status_change_stub.h"
@@ -65,6 +67,7 @@ private:
     std::map<std::string, DeviceStateEventIntValue> deviceStateEventMapIntValues_;
 };
 
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 class SharingEventCallback : public NetManagerStandard::SharingEventCallbackStub {
 public:
     explicit SharingEventCallback(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
@@ -77,6 +80,7 @@ public:
     private:
         std::shared_ptr<DeviceStateHandler> handler_ = nullptr;
 };
+#endif
 
 class DeviceStateObserver {
 public:
@@ -87,9 +91,12 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
+#endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
@@ -103,6 +110,7 @@ private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
     };
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS
