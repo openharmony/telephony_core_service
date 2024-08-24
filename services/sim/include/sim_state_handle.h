@@ -111,6 +111,7 @@ public:
     void Init(int32_t slotId);
     void UnInit();
     SimState GetSimState();
+    void SetSimState(SimState simState);
     IccSimStatus GetSimIccStatus();
     CardType GetCardType();
     std::string GetIccid();
