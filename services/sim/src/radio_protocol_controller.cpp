@@ -221,6 +221,7 @@ void RadioProtocolController::ProcessSetRadioProtocolComplete(const AppExecFwk::
 
 void RadioProtocolController::ProcessSetRadioProtocolTimeout(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    TELEPHONY_LOGI("RadioProtocolController::ProcessSetRadioProtocolTimeout");
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolTimeout event is nullptr");
         return;
@@ -240,6 +241,7 @@ void RadioProtocolController::ProcessSetRadioProtocolTimeout(const AppExecFwk::I
 
 void RadioProtocolController::ExecuteCheckCommunication()
 {
+    TELEPHONY_LOGI("RadioProtocolController::ExecuteCheckCommunication");
     sessionId_++;
     isCommunicating_ = true;
     SendEvent(RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT, sessionId_, COMMUNICATION_TIMEOUT);
@@ -279,6 +281,10 @@ void RadioProtocolController::BuildRadioProtocolForCommunication(RadioProtocolPh
 {
     switch (phase) {
         case RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK: {
+            if (static_cast<int32_t>(radioProtocol_.size()) < slotCount_) {
+                TELEPHONY_LOGE("error, size = %{public}zu, slotCount_ = %{public}d", radioProtocol_.size(), slotCount_);
+                break;
+            }
             for (int32_t i = 0; i < slotCount_; i++) {
                 RadioProtocol radioProtocol;
                 radioProtocol.slotId = i;
@@ -331,7 +337,12 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
         CleanUpCommunication();
         return;
     }
-
+    if (static_cast<int32_t>(radioProtocol.size()) < slotCount_) {
+        TELEPHONY_LOGE("error, size = %{public}zu, slotCount_ = %{public}d", radioProtocol_.size(), slotCount_);
+        ProcessCommunicationResponse(false);
+        CleanUpCommunication();
+        return;
+    }
     for (int32_t i = 0; i < slotCount_; i++) {
         AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
         if (event == nullptr) {
@@ -377,6 +388,7 @@ bool RadioProtocolController::ProcessResponseInfoOfEvent(const AppExecFwk::Inner
 
 void RadioProtocolController::CleanUpCommunication()
 {
+    TELEPHONY_LOGI("RadioProtocolController::CleanUpCommunication");
     RemoveEvent(RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT);
     communicationFailed_ = false;
     std::vector<RadioProtocol>().swap(oldRadioProtocol_);
