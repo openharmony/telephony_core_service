@@ -304,8 +304,11 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
 
 std::string SIMUtils::Decode8BitConvertToString(unsigned char *data, int length, int offset)
 {
+    if (data == nullptr || length <= offset + 1) {
+        return "";
+    }
     int i = 0;
-    for (i = offset; i < offset + length; i++) {
+    for (i = offset; i < length; i++) {
         int c = data[i] & BYTE_VALUE;
         if (c == BYTE_VALUE) {
             break;
