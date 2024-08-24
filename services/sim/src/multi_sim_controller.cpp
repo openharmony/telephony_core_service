@@ -613,6 +613,10 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
 
 int32_t MultiSimController::getDefaultMainSlotByIccId()
 {
+    if (SIM_SLOT_COUNT == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI("default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     int mainSlot = lastPrimarySlotId_;
     if (simFileManager_[SIM_SLOT_0] == nullptr || simFileManager_[SIM_SLOT_1] == nullptr) {
         TELEPHONY_LOGE("simFileManager_ is null");

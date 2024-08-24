@@ -61,7 +61,7 @@ public:
     void SyncCmdResponse();
 
 public:
-    bool responseReady_;
+    bool responseReady_ = false;
     std::mutex ctx_;
     std::condition_variable cv_;
 
