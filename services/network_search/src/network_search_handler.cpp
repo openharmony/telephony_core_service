@@ -1239,6 +1239,10 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
         return;
     }
     std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
+    if (imsServiceStatus == nullptr) {
+        TELEPHONY_LOGE("UpdateImsServiceStatus imsServiceStatus is null slotId:%{public}d", slotId_);
+        return;
+    }
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {
         networkSearchState->SetImsServiceStatus(*imsServiceStatus);
@@ -1254,6 +1258,10 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         return;
     }
     auto registerInfo = event->GetSharedObject<int32_t>();
+    if (registerInfo == nullptr) {
+        TELEPHONY_LOGE("UpdateImsRegisterState registerInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
     bool isRegister = (*registerInfo == 1);
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {
