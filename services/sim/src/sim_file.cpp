@@ -1602,6 +1602,10 @@ bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event
         return isFileProcessResponse;
     }
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
         std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
@@ -1698,6 +1702,10 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
     }
     bool hasNotify = false;
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
         std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
