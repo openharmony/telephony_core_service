@@ -79,14 +79,12 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
 }
 
 void OperatorConfigCache::UpdateCurrentOpc(
-    int32_t slotId, OperatorConfig &poc, int32_t state, bool canAnnounceChanged, bool needUpdateLoading)
+    int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading)
 {
     std::unique_lock<std::mutex> lock(mutex_);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
-    if (canAnnounceChanged) {
-        AnnounceOperatorConfigChanged(slotId, state);
-    }
+    AnnounceOperatorConfigChanged(slotId, state);
     if (needUpdateLoading) {
         isLoadingConfig = false;
     }
@@ -110,14 +108,12 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
     TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d simState = %{public}d", slotId, simState);
-    bool canAnnounceChanged = (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_READY ||
-                              simState == SimState::SIM_STATE_UNKNOWN);
     cJSON *root = nullptr;
     if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu", poc.configValue.size());
         if (poc.configValue.size() > 0) {
             // state indicate the case of load operator config
-            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, false);
+            UpdateCurrentOpc(slotId, poc, state, false);
             root = nullptr;
             return TELEPHONY_ERR_SUCCESS;
         }
@@ -129,7 +125,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
 
         if (poc.configValue.size() > 0) {
             // state indicate the case of load operator config
-            UpdateCurrentOpc(slotId, poc, state, canAnnounceChanged, true);
+            UpdateCurrentOpc(slotId, poc, state, true);
             if (root != nullptr) {
                 cJSON_Delete(root);
                 root = nullptr;
@@ -289,7 +285,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    if (simState != SimState::SIM_STATE_READY) {
+    if (simState != SimState::SIM_STATE_READY || simState != SimState::SIM_STATE_LOADED) {
         return;
     }
     auto helper = PdpProfileRdbHelper::GetInstance();
