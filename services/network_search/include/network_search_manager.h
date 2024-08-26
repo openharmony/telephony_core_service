@@ -334,6 +334,7 @@ private:
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
+    void GetModemEflCapability();
 
 private:
     struct ImsRegInfoCallbackRecord {
@@ -353,6 +354,8 @@ private:
     std::mutex mutexInner_;
     std::mutex mutexIms_;
     int32_t delayTime_ = 0;
+    NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
+    NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
