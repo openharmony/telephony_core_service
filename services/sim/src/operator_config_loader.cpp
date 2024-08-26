@@ -60,7 +60,7 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
     std::shared_ptr<SimFileManager> simFileManager = simFileManager_.lock();
-    if (simFileManager == nullptr || simState != SimState::SIM_STATE_READY) {
+    if (simFileManager == nullptr || simState != SimState::SIM_STATE_READY || simState != SimState::SIM_STATE_LOADED) {
         TELEPHONY_LOGE("LoadOpKeyOnMccMnc simState not ready");
         return DEFAULT_OPERATOR_KEY;
     }
