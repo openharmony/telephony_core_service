@@ -576,6 +576,10 @@ bool IccFile::ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &even
 {
     bool isFileProcessResponse = true;
     std::shared_ptr<ControllerToFileMsg> fd = event->GetSharedObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<void> baseLoad = fd->iccLoader;
     if (baseLoad != nullptr) {
         std::shared_ptr<IccFileLoaded> destLoad = std::static_pointer_cast<IccFileLoaded>(baseLoad);
@@ -583,7 +587,7 @@ bool IccFile::ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &even
         TELEPHONY_LOGI("ProcessIccFileObtained item %{public}s", destLoad->ObtainElementaryFileName().c_str());
     } else {
         isFileProcessResponse = false;
-        TELEPHONY_LOGE("IccFile::ProcessIccFileObtained null base ponter");
+        TELEPHONY_LOGE("IccFile::ProcessIccFileObtained null base pointer");
     }
     return isFileProcessResponse;
 }
