@@ -579,6 +579,11 @@ void NetworkSearchHandler::SetRadioOffWhenSimDeactive()
         " %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
         slotId_, simManager->IsSetActiveSimInProgress(slotId_),
         simManager->IsSimActive(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()
+        && slotId_ == static_cast<int>(SimSlotType::VSIM_SLOT_ID)) {
+        TELEPHONY_LOGI("vsim not handle power Radio");
+        return;
+    }
     if (hasSim && !IsPowerOnPrimaryRadioWhenNoSim()
         && !simManager->IsSetActiveSimInProgress(slotId_) && !simManager->IsSimActive(slotId_)) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
