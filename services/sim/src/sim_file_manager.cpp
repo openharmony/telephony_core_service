@@ -640,7 +640,7 @@ bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std:
     std::string number = Str16ToStr8(mailNumber);
     bool result = simFile_->UpdateVoiceMail(name, number);
     TELEPHONY_LOGI("SimFileManager::SetVoiceMail result:%{public}s ", (!result ? "false" : "true"));
-    return result;
+    return true;
 }
 
 bool SimFileManager::HasSimCard()
