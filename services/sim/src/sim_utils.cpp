@@ -191,7 +191,7 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
 std::string SIMUtils::DiallingNumberStringFieldConvertToString(
     std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
 {
-    if (length <= offset || array == nullptr) {
+    if (offset >= length || offset < 0 || array == nullptr) {
         return "";
     }
     unsigned char *data = array.get();
@@ -218,7 +218,6 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         std::u16string rtl = hs.substr(0, ucslen);
         std::string uz = Str16ToStr8(hs);
         std::string ns = Str16ToStr8(rtl);
-        TELEPHONY_LOGD("16be result %{public}s, %{public}s", uz.c_str(), ns.c_str());
         return ns;
     }
     return Decode8BitConvertToString(data, length, offset);
@@ -304,7 +303,7 @@ std::u16string SIMUtils::UcsWideConvertToString(unsigned char *data, int length,
 
 std::string SIMUtils::Decode8BitConvertToString(unsigned char *data, int length, int offset)
 {
-    if (data == nullptr || length <= offset + 1) {
+    if (data == nullptr || length <= offset + 1 || offset < 0) {
         return "";
     }
     int i = 0;
