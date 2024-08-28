@@ -281,7 +281,7 @@ void RadioProtocolController::BuildRadioProtocolForCommunication(RadioProtocolPh
 {
     switch (phase) {
         case RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK: {
-            if (static_cast<int32_t>(radioProtocol_.size()) < slotCount_) {
+            if (slotCount_ > static_cast<int32_t>(radioProtocol_.size()) || slotCount_ < 0) {
                 TELEPHONY_LOGE("error, size = %{public}zu, slotCount_ = %{public}d", radioProtocol_.size(), slotCount_);
                 break;
             }
@@ -337,7 +337,7 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
         CleanUpCommunication();
         return;
     }
-    if (static_cast<int32_t>(radioProtocol.size()) < slotCount_) {
+    if (slotCount_ > static_cast<int32_t>(radioProtocol.size()) || slotCount_ < 0) {
         TELEPHONY_LOGE("error, size = %{public}zu, slotCount_ = %{public}d", radioProtocol_.size(), slotCount_);
         ProcessCommunicationResponse(false);
         CleanUpCommunication();

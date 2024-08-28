@@ -506,8 +506,8 @@ int32_t SimStateManager::SimAuthentication(
     response.sw1 = simStateHandle_->GetSimAuthenticationResponse().sw1;
     response.sw2 = simStateHandle_->GetSimAuthenticationResponse().sw2;
     response.response = simStateHandle_->GetSimAuthenticationResponse().response;
-    TELEPHONY_LOGI("SimStateManager::SimAuthentication(), sw1: %{public}d, sw2: %{public}d, response: %{public}s",
-        response.sw1, response.sw2, response.response.c_str());
+    TELEPHONY_LOGI("SimStateManager::SimAuthentication(), sw1: %{public}d, sw2: %{public}d", response.sw1,
+        response.sw2);
     return ret;
 }
 
@@ -553,8 +553,7 @@ int32_t SimStateManager::GetSimIO(
     response.sw1 = retResponse.sw1;
     response.sw2 = retResponse.sw2;
     response.response = retResponse.response;
-    TELEPHONY_LOGI("SimStateManager::GetSimIO(), sw1: %{public}d, sw2: %{public}d",
-        response.sw1, response.sw2);
+    TELEPHONY_LOGI("SimStateManager::GetSimIO(), sw1: %{public}d, sw2: %{public}d", response.sw1, response.sw2);
     return ret;
 }
 
