@@ -116,7 +116,7 @@ bool OperatorFileParser::ParseFromCustomSystem(int32_t slotId, OperatorConfig &o
         if (filePath && *filePath != '\0') {
             bool ret = ParseOperatorConfigFromFile(opc, filePath, tempRoot, true);
             if (!ret) {
-                TELEPHONY_LOGE("ParseFromCustomSystem path %{public}s fail", filePath);
+                TELEPHONY_LOGE("ParseFromCustomSystem failed");
                 continue;
             }
         }
@@ -145,7 +145,7 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(
     char *content = nullptr;
     int contentLength = LoaderJsonFile(content, path);
     if (contentLength == LOADER_JSON_ERROR) {
-        TELEPHONY_LOGE("ParseOperatorConfigFromFile  %{public}s is fail!", path.c_str());
+        TELEPHONY_LOGE("ParseOperatorConfigFromFile failed!");
         return false;
     }
     root = cJSON_Parse(content);
@@ -216,7 +216,7 @@ int32_t OperatorFileParser::LoaderJsonFile(char *&content, const std::string &pa
     std::ifstream ifs;
     ifs.open(path);
     if (ifs.fail()) {
-        TELEPHONY_LOGE("LoaderJsonFile path PATH: %{public}s failed", path.c_str());
+        TELEPHONY_LOGE("LoaderJsonFile path failed");
         return LOADER_JSON_ERROR;
     }
     ifs.seekg(0, std::ios::end);
