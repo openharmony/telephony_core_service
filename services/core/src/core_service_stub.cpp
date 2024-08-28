@@ -1370,8 +1370,7 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
     }
     std::vector<IccAccountInfo>::iterator it = iccAccountInfoList.begin();
     while (it != iccAccountInfoList.end()) {
-        TELEPHONY_LOGI("OnGetActiveSimAccountInfoList slotIndex = %{public}d, showName = %{public}s", (*it).slotIndex,
-            Str16ToStr8((*it).showName).c_str());
+        TELEPHONY_LOGI("OnGetActiveSimAccountInfoList slotIndex = %{public}d", (*it).slotIndex);
         if (!(*it).Marshalling(reply)) {
             TELEPHONY_LOGE("OnGetActiveSimAccountInfoList IccAccountInfo reply Marshalling is false");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
