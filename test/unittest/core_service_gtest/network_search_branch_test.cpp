@@ -128,7 +128,9 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | Medi
     auto deviceStateObserver = std::make_shared<DeviceStateObserver>();
 
     deviceStateObserver->subscriber_ = nullptr;
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     deviceStateObserver->sharingEventCallback_ = nullptr;
+#endif
     deviceStateObserver->StopEventSubscriber();
 
     MatchingSkills matchingSkills;
