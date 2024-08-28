@@ -134,7 +134,6 @@ void OperatorFileParser::CreateJsonFromOperatorConfig(cJSON *root)
         cJSON *jsontemp = cJSON_Parse(it->second.c_str());
         if (jsontemp != nullptr) {
             cJSON_AddItemToObject(root, it->first.c_str(), jsontemp);
-            cJSON_Delete(jsontemp);
         }
     }
     tempConfig_.clear();
