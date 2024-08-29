@@ -78,6 +78,7 @@
         "build": {
             "group_type": {
                 "base_group": [
+                    "//base/telephony/core_service/interfaces/kits/c/telephony_radio:telephony_radio"
                 ],
                 "fwk_group": [
                     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
