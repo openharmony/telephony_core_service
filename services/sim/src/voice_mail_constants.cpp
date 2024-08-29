@@ -77,7 +77,9 @@ std::string VoiceMailConstants::GetVoiceMailNumber(std::string carrier)
 {
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_ != nullptr) {
         TELEPHONY_LOGI("VoiceMailConstants::GetVoiceMailNumber, getVoiceMailNumberExt_");
-        return TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_(slotId_, carrier.c_str());
+        std::string number = "";
+        TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_(slotId_, carrier.c_str(), number);
+        return number;
     }
     return GetStringValueFromCust(slotId_, KEY_VOICE_MAIL_NUMBER_STRING);
 }
@@ -86,7 +88,9 @@ std::string VoiceMailConstants::GetVoiceMailTag(std::string carrier)
 {
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_ != nullptr) {
         TELEPHONY_LOGI("VoiceMailConstants::GetVoiceMailTag, getVoiceMailTagExt_");
-        return TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_(slotId_, carrier.c_str());
+        std::string tag = "";
+        TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_(slotId_, carrier.c_str(), tag);
+        return tag;
     }
     return GetStringValueFromCust(slotId_, KEY_VOICE_MAIL_TAG_STRING);
 }
