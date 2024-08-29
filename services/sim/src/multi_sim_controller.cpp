@@ -297,7 +297,7 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         values.Put(SimData::IS_MESSAGE_CARD, mainCardObj);
         values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
-    if (simFileManager_[slotId] != nullptr) {
+    if (simFileManager_[slotId] != nullptr && Str16ToStr8(simFileManager_[slotId]->GetOpKey()) != "") {
         std::string operKey = Str16ToStr8(simFileManager_[slotId]->GetOpKey());
         std::string mcc = Str16ToStr8(simFileManager_[slotId]->GetMCC());
         std::string mnc = Str16ToStr8(simFileManager_[slotId]->GetMNC());
