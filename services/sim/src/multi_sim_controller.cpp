@@ -187,8 +187,8 @@ void MultiSimController::ReCheckPrimary()
 bool MultiSimController::IsAllCardsReady()
 {
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-        if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY
-            && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
+        if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
+            || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
             TELEPHONY_LOGI("slot:%{public}d not ready", i);
             return false;
         }

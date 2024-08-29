@@ -126,7 +126,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
-    std::atomic<int32_t> remainCount_ = 30;
+    std::atomic<int32_t> remainCount_ = 60;
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
 };

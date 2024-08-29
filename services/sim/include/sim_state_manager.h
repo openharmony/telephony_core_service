@@ -33,6 +33,7 @@ public:
     void Init(int32_t slotId);
     bool HasSimCard();
     SimState GetSimState();
+    void SetSimState(SimState simState);
     IccSimStatus GetSimIccStatus();
     CardType GetCardType();
     std::string GetIccid();
