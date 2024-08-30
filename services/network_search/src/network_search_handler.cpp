@@ -718,6 +718,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
             operatorName_->HandleOperatorInfo(operatorInfoResult_);
+            networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
