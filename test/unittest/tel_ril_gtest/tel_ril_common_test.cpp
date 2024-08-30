@@ -54,6 +54,7 @@ HWTEST_F(TelRilCommonTest, TelRilModem_BuildVoiceRadioTechnology_001, Function |
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTechnology;
     std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
     telRilModem->BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    ASSERT_TRUE(mVoiceRadioTechnology->actName == voiceRadioTechnology.actName);
 }
 
 /**

@@ -3096,6 +3096,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     multiSimMonitor->IsVSimSlotId(0);
     multiSimMonitor->RegisterSimNotify(0);
     multiSimMonitor->UnRegisterSimNotify();
+    ASSERT_TRUE(matchingSkills.CountEvent() == 1);
 }
 
 /**
@@ -3129,6 +3130,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_003, Function | MediumTest | Leve
     matchingSkills.AddEvent(DATASHARE_READY_EVENT);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
+    ASSERT_TRUE(matchingSkills.CountEvent() == 2);
 }
 
 /**

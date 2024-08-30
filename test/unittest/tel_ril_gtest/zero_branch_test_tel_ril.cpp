@@ -258,6 +258,7 @@ HWTEST_F(TelRilBranchTest, Telephony_observerhandler_001, Function | MediumTest 
         observerHandler->RegObserver(what, handler);
     }
     observerHandler->Remove(what, handler);
+    ASSERT_EQ(observerHandler->observerHandlerMap_.size(), 6);
 }
 
 /**
@@ -275,6 +276,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Modem_001, Function | MediumTest | 
     std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = nullptr;
     telRilModem->OnRilAdapterHostDied();
     telRilModem->BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    ASSERT_EQ(voiceRadioTechnology.actName, "");
 }
 
 /**
