@@ -39,11 +39,16 @@ bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleNam
 {
     OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager =
         OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("systemAbilityManager is nullptr");
+        return false;
+    }
     OHOS::sptr<OHOS::IRemoteObject> remoteObject =
         systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
 
     sptr<AppExecFwk::IBundleMgr> iBundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     if (iBundleMgr == nullptr) {
+        TELEPHONY_LOGE("iBundleMgr is nullptr");
         return false;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
