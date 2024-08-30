@@ -88,6 +88,10 @@ void TelRilTest::ReStartTelephony()
             pid = atoi(buf);
         }
     }
+    if (fp == nullptr) {
+        TELEPHONY_LOGE("fp is null");
+        return;
+    }
     kill(pid, SIGKILL);
     pclose(fp);
     sleep(WAIT_TELEPHONY_RETART_TIME);

@@ -725,6 +725,7 @@ void TestGetNrSsbId()
         std::shared_ptr<NrSsbInformation> nrSsbInformation = std::make_shared<NrSsbInformation>();
         if (nrSsbInformation == nullptr) {
             TELEPHONY_LOGE("nrSsbInformation is null");
+            return;
         }
         int32_t result = g_telephonyService->GetNrSsbIdInfo(InputSlotId(), nrSsbInformation);
         TELEPHONY_LOGI("TelephonyTestService::GetNrSsbIdInfo result:%{public}d", result);

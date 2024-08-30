@@ -109,6 +109,9 @@ bool CoreService::Init()
             TELEPHONY_LOGE("NetworkSearchManager init is failed!");
             return false;
         }
+    } else {
+        TELEPHONY_LOGI("NetworkSearchManager calloc failed");
+        return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
