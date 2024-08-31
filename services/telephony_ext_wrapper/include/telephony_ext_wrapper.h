@@ -45,15 +45,15 @@ public:
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
-    typedef char* (*GET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*);
+    typedef void (*GET_VOICE_MAIL_ICCID_PARAMETER)(int32_t slotId, const char* iccid, std::string &number);
     typedef void (*SET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*, const char*);
     typedef void (*INIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*DEINIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*RESET_VOICE_MAIL_LOADED_FLAG_EXT)(int32_t);
     typedef void (*SET_VOICE_MAIL_ON_SIM_EXT)(int32_t, const char*, const char*);
     typedef bool (*GET_VOICE_MAIL_FIXED_EXT)(int32_t, const char*);
-    typedef char* (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t, const char*);
-    typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
+    typedef void (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t slotId, const char* carrier, std::string &number);
+    typedef void (*GET_VOICE_MAIL_TAG_EXT)(int32_t slotId, const char* carrier, std::string &tag);
     typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*GET_NETWORK_STATUS_EXT)(int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState);
 
