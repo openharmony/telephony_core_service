@@ -43,8 +43,7 @@ private:
     std::weak_ptr<SimFileManager> simFileManager_;
     std::string GetOpKey(int32_t slotId);
     void CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to);
-    void UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc, int32_t state,
-        bool canAnnounceChanged, bool needUpdateLoading);
+    void UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading);
     void SendSimMatchedOperatorInfo(int32_t slotId);
     bool AnnounceOperatorConfigChanged(int32_t slotId, int32_t state);
     void notifyInitApnConfigs(int32_t slotId);
