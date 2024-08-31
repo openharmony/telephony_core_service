@@ -277,7 +277,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    if (simState != SimState::SIM_STATE_READY || simState != SimState::SIM_STATE_LOADED) {
+    if (!(simState == SimState::SIM_STATE_READY || simState == SimState::SIM_STATE_LOADED)) {
         return;
     }
     auto helper = PdpProfileRdbHelper::GetInstance();
