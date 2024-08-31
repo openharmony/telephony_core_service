@@ -137,6 +137,8 @@ private:
         std::map<std::string, std::vector<std::string>> parasMap);
     std::vector<std::string> GetValueListFromParasMap(
         std::string rawValue, std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
+    void CheckNameExist();
+    std::string ConvertHarmonyEvents(std::string type, std::string value);
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;
