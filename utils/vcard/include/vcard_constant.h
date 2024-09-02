@@ -84,6 +84,7 @@ constexpr const char *VCARD_TYPE_X_REDUCTION = "X-REDUCTION";
 constexpr const char *VCARD_TYPE_X_NO = "X-NO";
 constexpr const char *VCARD_TYPE_X_DCM_HMN_MODE = "X-DCM-HMN-MODE";
 constexpr const char *VCARD_TYPE_X_OHOS_CUSTOM = "X_OHOS_CUSTOM";
+constexpr const char *VCARD_TYPE_X_GROUP = "X-GROUP-MEMBERSHIP";
 
 constexpr const char *VCARD_TYPE_X_MOBILE_CUSTOM = "X-OHOS-CUSTOM";
 constexpr const char *VCARD_TYPE_X_MOBILE_RELATION = "RELATION";
@@ -179,6 +180,7 @@ public:
     static constexpr int32_t NAME = 6;
     static constexpr int32_t POSTAL_ADDRESS = 7;
     static constexpr int32_t PHOTO = 8;
+    static constexpr int32_t GROUP = 9;
     static constexpr int32_t NOTE = 10;
     static constexpr int32_t CONTACT_EVENT = 11;
     static constexpr int32_t WEBSITE = 12;
@@ -259,6 +261,15 @@ public:
     static constexpr const char *BLOB_DATA = "blob_data";
 };
 
+// group
+class Group {
+public:
+    static constexpr const char *GROUP_NAME = "group_name";
+    static constexpr const char *GROUP_ID = "id";
+    static constexpr const char *GROUP_ACCOUNT_ID = "account_id";
+    static constexpr const char *GROUP_IS_DELETED = "is_deleted";
+};
+ 
 enum class EmailType {
     /**
      * Indicates an invalid label ID.
