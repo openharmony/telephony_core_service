@@ -46,6 +46,10 @@ public:
     static int32_t QueryRawContactMaxId();
     static int32_t BatchInsertRawContact(const std::vector<DataShare::DataShareValuesBucket> &rawContactValues);
     static int32_t BatchInsertContactData(const std::vector<DataShare::DataShareValuesBucket> &contactsDataValues);
+    static int32_t QueryGroupId(std::string groupName);
+    static std::shared_ptr<DataShare::DataShareResultSet> QueryGroupData(
+        std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates);
+    static int32_t InsertGroupData(const DataShare::DataShareValuesBucket &groupDataValue);
 
 private:
     static std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;

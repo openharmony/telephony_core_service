@@ -26,6 +26,7 @@ OHOS::Uri uriContactData("datashare:///com.ohos.contactsdataability/contacts/con
 OHOS::Uri uriAccount("datashare:///com.ohos.contactsdataability/contacts/account");
 OHOS::Uri uriContact("datashare:///com.ohos.contactsdataability/contacts/contact");
 OHOS::Uri uriRawContactMaxId("datashare:///com.ohos.contactsdataability/raw_contact/get_inc_id");
+OHOS::Uri uriGroup("datashare:///com.ohos.contactsdataability/contacts/groups");
 
 } // namespace
 
@@ -108,6 +109,54 @@ int32_t VCardRdbHelper::InsertContactData(const std::vector<DataShare::DataShare
     int code = dataShareHelper_->BatchInsert(uriContactData, contactsDataValues);
     TELEPHONY_LOGI(" ContactsControl::ContactDataInsert insert code %{public}d", code);
     return code;
+}
+
+int32_t VCardRdbHelper::InsertGroupData(const DataShare::DataShareValuesBucket &groupDataValue)
+{
+    if (dataShareHelper_ == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper_ is nullptr");
+        return DB_FAILD;
+    }
+    int groupId = dataShareHelper_->Insert(uriGroup, groupDataValue);
+    TELEPHONY_LOGI("InsertGroupData insert groupId %{public}d", groupId);
+    return groupId;
+}
+ 
+std::shared_ptr<DataShare::DataShareResultSet> VCardRdbHelper::QueryGroupData(
+    std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates)
+{
+    if (dataShareHelper_ == nullptr) {
+        TELEPHONY_LOGE("dataShareHelper_ is nullptr");
+        return nullptr;
+    }
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet =
+        dataShareHelper_->Query(uriGroup, predicates, columns);
+    return resultSet;
+}
+ 
+int32_t VCardRdbHelper::QueryGroupId(std::string groupName)
+{
+    std::vector<std::string> columns;
+    OHOS::DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(Group::GROUP_NAME, groupName);
+    predicates.EqualTo(Group::GROUP_IS_DELETED, 0);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = QueryGroupData(columns, predicates);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("resultSet is nullptr");
+        return DB_FAILD;
+    }
+    int32_t groupId;
+    if (resultSet->GoToFirstRow() == TELEPHONY_ERR_SUCCESS) {
+        int curValueIndex;
+        resultSet->GetColumnIndex(Group::GROUP_ID, curValueIndex);
+        resultSet->GetInt(curValueIndex, groupId);
+        resultSet->Close();
+        return groupId;
+    }
+    OHOS::DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(Group::GROUP_NAME, groupName);
+    valuesBucket.Put(Group::GROUP_ACCOUNT_ID, 1);
+    return VCardRdbHelper::InsertGroupData(valuesBucket);
 }
 
 std::shared_ptr<DataShare::DataShareResultSet> VCardRdbHelper::QueryAccount(
