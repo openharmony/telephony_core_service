@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 #define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
+#define SIM_SLOT_COUNT_REAL GetRealMaxSlotCount<int32_t>()
 #define PREFERRED_NETWORK_TYPE GetPreferredNetworkType<int32_t>()
 #define VSIM_MODEM_COUNT GetVSimModemCount<int32_t>()
 #define IS_SUPPORT_VSIM (VSIM_MODEM_COUNT > 0)
@@ -41,6 +42,7 @@ inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline const int32_t DUAL_SLOT_COUNT = 2;
 inline const int32_t MAX_SLOT_COUNT = 3;
 inline const int32_t VSIM_DEFAULT_VALUE = -1;
+inline int32_t maxRealSlotCount_ = 0;
 inline int32_t maxSlotCount_ = 0;
 inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
@@ -82,6 +84,17 @@ inline T GetMaxSlotCount()
         }
     }
     return maxSlotCount_;
+}
+
+template<typename T>
+inline T GetRealMaxSlotCount()
+{
+    if (maxRealSlotCount_ == 0) {
+        char realSimSlotCount[SYSPARA_SIZE] = { 0 };
+        GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, realSimSlotCount, SYSPARA_SIZE);
+        maxRealSlotCount_ = std::atoi(realSimSlotCount);
+    }
+    return maxRealSlotCount_;
 }
 
 template<typename T>
