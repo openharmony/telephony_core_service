@@ -93,6 +93,7 @@ public:
     bool HasSimCard();
     void UnInit();
     virtual void ClearData();
+    void ProcessIccLocked();
     void SetId(int id);
     bool GetIsVoiceMailFixed();
     void LoadVoiceMail();
