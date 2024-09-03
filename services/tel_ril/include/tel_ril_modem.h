@@ -35,6 +35,8 @@ public:
     int32_t RadioStateUpdated(int32_t state);
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology);
     int32_t DsdsModeUpdated(int32_t mode);
+    int32_t NcfgFinishedResult(int32_t state);
+    int32_t RestartRildNvMatch(int32_t mode);
     int32_t SetRadioState(int32_t fun, int32_t rst, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetRadioState(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetImei(const AppExecFwk::InnerEvent::Pointer &response);
