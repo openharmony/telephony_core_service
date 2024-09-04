@@ -406,7 +406,7 @@ std::string SimFileManager::GetVoiceMailNumberKey()
     }
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_ != nullptr) {
         std::string iccid = simFile_->ObtainIccId();
-        number = TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_(slotId_, iccid.c_str());
+        TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_(slotId_, iccid.c_str(), number);
         if (!number.empty()) {
             return number;
         }
