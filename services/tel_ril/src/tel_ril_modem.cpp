@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t STATE_NV_REFREASH_FINNISHED = 1;
+constexpr int32_t STATE_NV_REFRESH_FINNISHED = 1;
 
 TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
@@ -168,7 +168,7 @@ int32_t TelRilModem::DsdsModeUpdated(int32_t mode)
 
 int32_t TelRilModem::NcfgFinishedResult(int32_t state)
 {
-    if (state == STATE_NV_REFREASH_FINNISHED) {
+    if (state == STATE_NV_REFRESH_FINNISHED) {
         return Notify<Int32Parcel>(
             TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_NV_REFRESH_FINISHED);
     }
