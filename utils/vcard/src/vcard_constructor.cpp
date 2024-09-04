@@ -285,7 +285,15 @@ void VCardConstructor::DealNoEmptyFimilyOrGivenName(const std::string &familyNam
     std::string encodedSuffix = (needAddQuotedPrintable ? EncodeQuotedPrintable(suffix) : DealCharacters(suffix));
     std::string encodedFormattedname =
         (needAddQuotedPrintableToFN ? EncodeQuotedPrintable(formattedName) : DealCharacters(formattedName));
-
+        // if (familyName + middleName + givenName) equals prefix, do not export prefix/suffix to avoid repeat
+    std::string combinedName = "";
+    combinedName.append(familyName).append(middleName).append(givenName);
+    if (combinedName == prefix) {
+        encodedPrefix = "";
+    }
+    if (combinedName == suffix) {
+        encodedSuffix = "";
+    }
     result_ << VCARD_TYPE_N;
     AddCharsetOrQuotedPrintable(needAddCharset, needAddQuotedPrintable);
     AddNameData(encodedFamily, encodedGiven, encodedMiddle, encodedPrefix, encodedSuffix);
