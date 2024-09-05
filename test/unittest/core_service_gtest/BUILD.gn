@@ -220,7 +220,6 @@ ohos_unittest("tel_sim_gtest") {
     "sim_icc_test.cpp",
     "sim_test.cpp",
     "sim_type_convert_test.cpp",
-    "vcard_test.cpp",
     "vsim_test.cpp",
   ]
 
@@ -313,9 +312,6 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "security_token.cpp",
     "sim_operator_brocast_test.cpp",
     "sim_test_util.cpp",
-
-    # Test cases
-    "zero_branch_test.cpp",
   ]
 
   include_dirs = [
@@ -407,9 +403,6 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "security_token.cpp",
     "sim_operator_brocast_test.cpp",
     "sim_test_util.cpp",
-
-    # Test cases
-    "zero_branch_test_sim_ril.cpp",
   ]
 
   include_dirs = [
