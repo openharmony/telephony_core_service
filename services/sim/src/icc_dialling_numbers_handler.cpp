@@ -121,7 +121,9 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             memberFunc(event, loadId);
-            SendBackResult(loadId);
+            if (pendingExtensionLoads_ == 0) {
+                SendBackResult(loadId);
+            }
         }
     } else {
         TELEPHONY_LOGI("IccDiallingNumbersHandler::ProcessEvent unknown id %{public}d", id);
@@ -261,10 +263,42 @@ void IccDiallingNumbersHandler::ProcessDiallingNumber(
     }
 }
 
+void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::InnerEvent::Pointer &event, int &id)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers event is nullptr!");
+        return;
+    }
+    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers fd is nullptr");
+        return;
+    }
+    id = fd->arg1;
+    std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(id);
+    if (fd->exception != nullptr) {
+        if (loadRequest != nullptr) {
+            loadRequest->SetException(fd->exception);
+        }
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers load failed with exception");
+        return;
+    }
+    std::string iccData = fd->resultData;
+    TELEPHONY_LOGI("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers handle start");
+    std::shared_ptr<void> diallingNumber = loadRequest->GetResult();
+    FetchExtensionContent(std::static_pointer_cast<DiallingNumbersInfo>(diallingNumber), iccData);
+    loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
+    pendingExtensionLoads_--;
+}
+
 void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
+    if (pendingExtensionLoads_ != 0) {
+        TELEPHONY_LOGE("waitintg pending ext record");
         return;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
@@ -290,9 +324,16 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
         return;
     }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber =
-    std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
+        std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
     FetchDiallingNumberContent(diallingNumber, iccData);
     loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
+    if (HasExtendedRecord()) {
+        pendingExtensionLoads_ = 1;
+        AppExecFwk::InnerEvent::Pointer ptExtensionRecordRead =
+            BuildCallerInfo(MSG_SIM_EXT_RECORD_LOAD_DONE, loadRequest->GetLoadId());
+        fileController_->ObtainLinearFixedFile(loadRequest->GetExEF(), GetFilePath(loadRequest->GetExEF()),
+            GetExtendedRecord(), ptExtensionRecordRead);
+    }
 }
 
 void IccDiallingNumbersHandler::SendUpdateCommand(const std::shared_ptr<DiallingNumbersInfo> &diallingNumber,
@@ -414,6 +455,44 @@ void IccDiallingNumbersHandler::ClearLoadRequest(int serial)
     IccDiallingNumbersHandler::requestMap_.erase(serial);
 }
 
+void IccDiallingNumbersHandler::FetchExtensionContent(
+    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData)
+{
+    TELEPHONY_LOGD("FetchExtensionContent start");
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(recordData, recordLen);
+    if (diallingNumber == nullptr || data == nullptr) {
+        TELEPHONY_LOGE("FetchExtensionContent null data");
+        return;
+    }
+    /* parse record lenth */
+    if (recordLen != MAX_EXT_RECORD_LENGTH_BYTES) {
+        TELEPHONY_LOGE("FetchExtensionContent record length error");
+        return;
+    }
+    unsigned char *record = data.get();
+    int offset = 0;
+    /* parse record type */
+    if (record[offset] != EXT_RECORD_TYPE_ADDITIONAL_DATA) {
+        TELEPHONY_LOGE("FetchExtensionContent invalid or empty record");
+        // invalid or empty record
+        return;
+    }
+    ++offset;
+    /* parse extension data lenth */
+    int length = static_cast<int>(record[offset]);
+    if (length > MAX_EXT_BCD_LENGTH) {
+        length = MAX_EXT_BCD_LENGTH;
+        TELEPHONY_LOGE("FetchExtensionContent number error");
+    }
+    ++offset;
+    /* parse extension data */
+    std::string tempStrExtensionNumber = SimNumberDecode::ExtensionBCDConvertToString(data, offset, length);
+    std::u16string diallingNumberAndExt = diallingNumber->GetNumber().append(Str8ToStr16(tempStrExtensionNumber));
+    diallingNumber->UpdateNumber(diallingNumberAndExt);
+    TELEPHONY_LOGD("FetchExtensionContent result end");
+}
+
 void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData)
 {
@@ -440,8 +519,9 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     /* parse number */
     ++offset;
     std::string tempStrNumber =
-    SimNumberDecode::BCDConvertToString(data, offset, length, SimNumberDecode::BCD_TYPE_ADN);
+        SimNumberDecode::BCDConvertToString(data, offset, length, SimNumberDecode::BCD_TYPE_ADN);
     diallingNumber->number_ = Str8ToStr16(tempStrNumber);
+    extensionRecord_ = record[recordLen - 1];
     TELEPHONY_LOGD("FetchDiallingNumberContent result end");
 }
 
@@ -602,6 +682,8 @@ void IccDiallingNumbersHandler::InitFuncMap()
         [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessLinearSizeDone(event, id); };
     memberFuncMap_[MSG_SIM_RENEW_ADN_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessUpdateRecordDone(event, id); };
+    memberFuncMap_[MSG_SIM_EXT_RECORD_LOAD_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event, int &id) { ProcessExtensionRecordNumbers(event, id); };
 }
 
 void IccDiallingNumbersHandler::UpdateFileController(const std::shared_ptr<IccFileController> &fileController)
