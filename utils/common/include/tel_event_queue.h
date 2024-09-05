@@ -47,6 +47,8 @@ private:
     AppExecFwk::InnerEvent::TimePoint GetHandleTime();
     int32_t GetNextQueueId();
     void SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePoint handleTime, int64_t delayTime);
+    AppExecFwk::InnerEvent::TimePoint GetCurHandleTime();
+    void SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint handleTime);
 
 private:
     static const uint32_t EVENT_QUEUE_NUM = 3;
@@ -54,6 +56,7 @@ private:
     AppExecFwk::InnerEvent::TimePoint curHandleTime_ { AppExecFwk::InnerEvent::TimePoint::max() };
     std::mutex eventCtx_;
     std::mutex taskCtx_;
+    std::mutex memberCtx_;
     ffrt::task_handle curTask_;
     std::string name_;
     std::atomic_int queueId_ { 0 };
