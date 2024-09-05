@@ -32,7 +32,8 @@ enum {
     MSG_SIM_OBTAIN_ADN_DONE = 1,
     MSG_SIM_OBTAIN_ALL_ADN_DONE = 2,
     MSG_SIM_OBTAIN_LINEAR_FILE_SIZE_DONE = 3,
-    MSG_SIM_RENEW_ADN_DONE = 4
+    MSG_SIM_RENEW_ADN_DONE = 4,
+    MSG_SIM_EXT_RECORD_LOAD_DONE = 5
 };
 
 enum {
@@ -220,10 +221,13 @@ private:
     void ProcessDiallingNumber(const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest,
         const std::shared_ptr<MultiRecordResult> &object);
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
+    void ProcessExtensionRecordNumbers(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessLinearSizeDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     bool SendBackResult(int loadId);
     void FetchDiallingNumberContent(
+        const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData);
+    void FetchExtensionContent(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData);
     std::shared_ptr<unsigned char> CreateSavingSequence(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int dataLength);
@@ -235,12 +239,24 @@ private:
     void SendUpdateCommand(const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int length,
         const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest, int loadId);
     void InitFuncMap();
+    bool HasExtendedRecord() const
+    {
+        return extensionRecord_ != 0 && extensionRecord_ != 0xff;
+    }
+    bool GetExtendedRecord() const
+    {
+        return extensionRecord_;
+    }
     const int RECORD_LENGTH = 28;
     const int LENGTH_RATE = 2;
     const int INVALID_LENGTH = 49;
     const static int32_t PRE_BYTES_NUM = 14;
     const static int32_t MAX_NUMBER_SIZE_BYTES = 11;
-    const static int32_t EXT_FILE_BITYES_NUM = 13;
+    const static int32_t MAX_EXT_RECORD_LENGTH_BYTES = 13;
+    const static int32_t MAX_EXT_BCD_LENGTH = 10;
+    const static int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
+    int pendingExtensionLoads_ = 0;
+    unsigned char extensionRecord_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

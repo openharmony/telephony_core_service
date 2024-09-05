@@ -242,5 +242,25 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
     }
     return true;
 }
+
+std::string SimNumberDecode::ExtensionBCDConvertToString(
+    const std::shared_ptr<unsigned char> bytesData, int offset, int length, int bcdExtType)
+{
+    uint8_t *arr = bytesData.get();
+    if (!arr) {
+        TELEPHONY_LOGE("BCDConvertToString fail because bytesData is nullptr!!");
+        return "";
+    }
+    std::vector<uint8_t> bcdCode;
+    for (int i = INIT_VAL; i < length; ++i) {
+        bcdCode.push_back(arr[offset + i]);
+    }
+    std::string res;
+    if (!BCDSectionConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
+        TELEPHONY_LOGE("occur error in BCDSectionConvertToString for '%{public}s by bcdExtType:%{public}d",
+            HexToStr(bcdCode).c_str(), bcdExtType);
+    }
+    return res;
+}
 } // namespace Telephony
 } // namespace OHOS
