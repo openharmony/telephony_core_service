@@ -756,6 +756,14 @@ void IccFile::ClearData()
         iccFileExt->ClearData();
     }
 }
+
+void IccFile::ProcessIccLocked()
+{
+    TELEPHONY_LOGI("IccFile ProcessIccLocked");
+    fileQueried_ = false;
+    UpdateLoaded(false);
+}
+
 void IccFile::UnInit()
 {
     if (stateManager_ != nullptr) {

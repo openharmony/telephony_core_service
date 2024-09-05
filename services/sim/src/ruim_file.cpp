@@ -145,9 +145,13 @@ bool RuimFile::ProcessIccLocked(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI(
         "only fetch ELEMENTARY_FILE_LI, ELEMENTARY_FILE_PL and ELEMENTARY_FILE_ICCID in locked state");
-
+    IccFile::ProcessIccLocked();
     lockQueried_ = true;
     AppExecFwk::InnerEvent::Pointer eventICCID = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is nullptr!");
+        return false;
+    }
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventICCID);
     fileToGet_++;
     return false;

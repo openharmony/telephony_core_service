@@ -752,6 +752,27 @@ HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
 }
 
 /**
+ * @tc.number   Telephony_SimFile_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SimFile_006, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager));
+    simFileManager->Init(0);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    event = nullptr;
+    EXPECT_FALSE(simFile->ProcessIccLocked(event));
+}
+
+/**
  * @tc.number   Telephony_ISimFile_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -837,6 +858,27 @@ HWTEST_F(BranchTest, Telephony_RuimFile_001, Function | MediumTest | Level1)
     EXPECT_TRUE(rUimFile->ProcessGetIccidDone(event));
     EXPECT_TRUE(rUimFile->ProcessGetSubscriptionDone(event));
     EXPECT_TRUE(rUimFile->ProcessGetSpnDone(event));
+}
+
+/**
+ * @tc.number   Telephony_RuimFile_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RuimFile_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<RuimFile> rUimFile = std::make_shared<RuimFile>(simStateManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager));
+    simFileManager->Init(0);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 1);
+    event = nullptr;
+    EXPECT_FALSE(rUimFile->ProcessIccLocked(event));
 }
 
 /**
