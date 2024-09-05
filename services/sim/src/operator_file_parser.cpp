@@ -170,13 +170,17 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
         if (needSaveTempOpc) {
             tempChar = cJSON_PrintUnformatted(value);
             tempConfig_[value->string] = tempChar != nullptr ? tempChar : "";
-            free(tempChar);
+            if (tempChar != nullptr) {
+                free(tempChar);
+            }
         }
         tempChar = cJSON_Print(value);
         configValue[Str8ToStr16(value->string)] = tempChar != nullptr ? Str8ToStr16(tempChar) : u"";
         TELEPHONY_LOGI("ParseOperatorConfigFromFile key %{public}s value %{public}s", value->string,
             Str16ToStr8(configValue[Str8ToStr16(value->string)]).c_str());
-        free(tempChar);
+        if (tempChar != nullptr) {
+            free(tempChar);
+        }
         if (value->type == cJSON_Array) {
             TELEPHONY_LOGD("parse type arrayValue");
             if (cJSON_GetArraySize(value) > 0) {
