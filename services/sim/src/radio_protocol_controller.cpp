@@ -306,7 +306,7 @@ void RadioProtocolController::BuildRadioProtocolForCommunication(RadioProtocolPh
         case RadioProtocolPhase::RADIO_PROTOCOL_PHASE_UPDATE:
         case RadioProtocolPhase::RADIO_PROTOCOL_PHASE_NOTIFY:
         case RadioProtocolPhase::RADIO_PROTOCOL_PHASE_COMPLETE: {
-            if (static_cast<int32_t>(oldRadioProtocol_.size()) < slotCount_ ||
+            if (slotCount_ < 0 || static_cast<int32_t>(oldRadioProtocol_.size()) < slotCount_ ||
                 static_cast<int32_t>(newRadioProtocol_.size()) < slotCount_) {
                 TELEPHONY_LOGE("error, old size = %{public}zu, new size = %{public}zu, slotCount_ = %{public}d",
                     oldRadioProtocol_.size(), newRadioProtocol_.size(), slotCount_);

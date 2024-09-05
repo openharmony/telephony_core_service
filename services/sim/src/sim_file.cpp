@@ -253,8 +253,13 @@ bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessIccLocked(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("only fetch ELEMENTARY_FILE_LI, ELEMENTARY_FILE_PL and ELEMENTARY_FILE_ICCID in locked state");
+    IccFile::ProcessIccLocked();
     lockQueried_ = true;
     AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is nullptr!");
+        return false;
+    }
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
     fileToGet_++;
     return false;
