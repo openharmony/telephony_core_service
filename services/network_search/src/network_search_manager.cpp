@@ -1705,9 +1705,9 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
 
 void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    TELEPHONY_LOGD(
-        "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-    bool isExisted = false;
+    TELEPHONY_LOGI("slotId:%{public}d, imsSrvType:%{public}d, ImsRegState:%{public}d, ImsRegTech:%{public}d",
+        slotId, imsSrvType, info.imsRegState, info.imsRegTech);
+    int32_t callbackCounts = 0;
     std::lock_guard<std::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
@@ -1716,12 +1716,12 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
-            isExisted = true;
+            callbackCounts++;
         }
     }
-    if (!isExisted) {
-        TELEPHONY_LOGI("this slot id %{public}d, ims service type %{public}d is not registered", slotId, imsSrvType);
-    }
+    TELEPHONY_LOGI(
+        "slotId:%{public}d, ImsServiceType:%{public}d, CallbackListSzie=%{public}zu, callbackCoutns:%{public}d",
+        slotId, imsSrvType, listImsRegInfoCallbackRecord_.size(), callbackCounts);
 }
 
 void NetworkSearchManager::InitSimRadioProtocol(int32_t slotId)
