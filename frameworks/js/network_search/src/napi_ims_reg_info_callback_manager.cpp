@@ -131,21 +131,6 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
     return TELEPHONY_SUCCESS;
 }
 
-void NapiImsRegInfoCallbackManager::ReportImsRegInfoWork(uv_work_t *work, int32_t status)
-{
-    ImsStateWorker *dataWorkerData = (ImsStateWorker *)work->data;
-    int32_t ret = ReportImsRegInfo(dataWorkerData->info, dataWorkerData->callback);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", ret);
-        return;
-    }
-    TELEPHONY_LOGI("ReportImsRegInfo successfully");
-}
-
 int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
     const ImsRegInfo &info, const ImsRegStateCallback &stateCallback)
 {
