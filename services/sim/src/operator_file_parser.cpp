@@ -162,7 +162,6 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(
 
 void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, OperatorConfig &opc, bool needSaveTempOpc)
 {
-    TELEPHONY_LOGD("ParseOperatorConfigFromJson");
     cJSON *value = root->child;
     char *tempChar = nullptr;
     std::map<std::u16string, std::u16string> &configValue = opc.configValue;
@@ -198,7 +197,6 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
                 TELEPHONY_LOGD("value is long");
                 opc.longValue[value->string] = lValue;
             } else {
-                TELEPHONY_LOGD("value is int");
                 opc.intValue[value->string] = static_cast<int32_t>(lValue);
             }
         } else if (value->type == cJSON_True) {
@@ -206,7 +204,6 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
             opc.boolValue[value->string] = true;
             configValue[Str8ToStr16(value->string)] = Str8ToStr16("true");
         } else if (value->type == cJSON_False) {
-            TELEPHONY_LOGD("parse type booleanValue false");
             opc.boolValue[value->string] = false;
             configValue[Str8ToStr16(value->string)] = Str8ToStr16("false");
         }
