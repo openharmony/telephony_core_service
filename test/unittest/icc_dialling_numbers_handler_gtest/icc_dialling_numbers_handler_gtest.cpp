@@ -228,7 +228,8 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_009,
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, objectUnique, eventParam);
     ASSERT_NE(event, nullptr);
-    std::shared_ptr<DiallingNumberLoadRequest> loadRequest = diallingNumberHandler->CreateLoadRequest(1, 1, 1, "", event);
+    std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
+        diallingNumberHandler->CreateLoadRequest(1, 1, 1, "", event);
     int id = loadRequest->GetLoadId();
     fd.sw1 = id;
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
