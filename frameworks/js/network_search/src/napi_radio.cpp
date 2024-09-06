@@ -2665,11 +2665,12 @@ static void NativeGetImsRegInfo(napi_env env, void *data)
 
 static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGI("status = %{public}d, resolved = %{public}d", status, context->resolved);
+    TELEPHONY_LOGI("status = %{public}d", status);
     auto context = static_cast<GetImsRegInfoContext *>(data);
     napi_value callbackValue = nullptr;
     JsError error = {};
     if (status == napi_ok) {
+        TELEPHONY_LOGI("context->resolved = %{public}d", context->resolved);
         TELEPHONY_LOGI(
             "slotId=%{public}d, imsSrvType=%{public}d, imsRegState=%{public}d, imsRegTech=%{public}d",
             context->slotId, context->imsSrvType, context->imsRegInfo.imsRegState, context->imsRegInfo.imsRegTech);
