@@ -157,7 +157,7 @@ std::string SimNumberDecode::BCDConvertToString(
 {
     uint8_t *arr = bytesData.get();
     if (!arr) {
-        TELEPHONY_LOGE("BCDConvertToString fail because bytesData is nullptr!!");
+        TELEPHONY_LOGE("BCDConvertToString fail because arr is nullptr!!");
         return "";
     }
     if (offset + length > dataLength) {
@@ -250,11 +250,11 @@ std::string SimNumberDecode::ExtensionBCDConvertToString(
 {
     uint8_t *arr = bytesData.get();
     if (!arr) {
-        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because bytesData is nullptr!");
+        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because arr is nullptr!!");
         return "";
     }
     if (offset + length > dataLength) {
-        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because bytesData length error!");
+        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because bytesData length error!!");
         return "";
     }
     std::vector<uint8_t> bcdCode;
