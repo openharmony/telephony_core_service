@@ -493,8 +493,8 @@ void IccDiallingNumbersHandler::FetchExtensionContent(
     }
     ++offset;
     /* parse extension data */
-    std::string tempStrExtensionNumber = SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
-    std::u16string diallingNumberAndExt = diallingNumber->GetNumber().append(Str8ToStr16(tempStrExtensionNumber));
+    std::string extensionNumber = SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
+    std::u16string diallingNumberAndExt = diallingNumber->GetNumber().append(Str8ToStr16(extensionNumber));
     diallingNumber->UpdateNumber(diallingNumberAndExt);
     TELEPHONY_LOGD("FetchExtensionContent result end");
 }
