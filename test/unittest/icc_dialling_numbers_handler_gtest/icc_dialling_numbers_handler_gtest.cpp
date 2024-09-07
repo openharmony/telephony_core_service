@@ -39,6 +39,7 @@
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
 #include "sim_constant.h"
+#include "sim_number_decode.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -228,12 +229,12 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_009,
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, objectUnique, eventParam);
     ASSERT_NE(event, nullptr);
-    std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
-        diallingNumberHandler->CreateLoadRequest(1, 1, 1, "", event);
+    std::shared_ptr<DiallingNumberLoadRequest> loadRequest = diallingNumberHandler->CreateLoadRequest(1, 1, 1, "",
+        event);
     int id = loadRequest->GetLoadId();
     fd.sw1 = id;
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
-
+    
     diallingNumberHandler->ProcessExtensionRecordNumbers(event, id);
     EXPECT_EQ(diallingNumber->GetNumber(), u"");
 }
@@ -269,7 +270,17 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_010,
 
     resultData = "0203112233FFFFFFFFFFFF#FFF";
     diallingNumberHandler->FetchExtensionContent(nullptr, resultData);
+    std::shared_ptr<unsigned char> data = nullptr;
+    int recordLen = 13;
+    int offset = 2;
+    int length = 10;
+    SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
+    recordLen = 0;
+    offset = 10;
+    data = SIMUtils::HexStringConvertToBytes(resultData, recordLen);
+    SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
     EXPECT_EQ(diallingNumber->GetNumber(), u"112233112233112233");
 }
+
 }
 }
