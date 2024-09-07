@@ -644,5 +644,122 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0012, Function 
     mInner.GetSimOperatorNumeric(1, u16str);
     EXPECT_NE(mInner.simManager_, nullptr);
 }
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0013, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    mInner.isInitExtraObj_ = true;
+    EXPECT_EQ(mInner.InitExtraModule(1), TELEPHONY_SUCCESS);
+    mInner.InitExtraModule(1);
+    EXPECT_TRUE(SIM_SLOT_COUNT != DUAL_SLOT_COUNT);
+    mInner.telRilManager_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> handler;
+    std::string testStr = "";
+    EXPECT_EQ(mInner.SetNetworkSelectionMode(-1, -1, 0, testStr, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    AppExecFwk::InnerEvent::Pointer response(nullptr, nullptr);
+    mInner.telRilManager_ = telRilManager;
+    mInner.SetNetworkSelectionMode(-1, -1, 0, testStr, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    mInner.InitExtraModule(1);
+    int32_t simId = -1;
+    EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultSmsSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    mInner.simManager_ = simManager;
+    std::u16string u16str = u"test";
+    mInner.GetSimOperatorNumeric(1, u16str);
+    mInner.InitExtraModule(1);
+    EXPECT_NE(mInner.simManager_, nullptr);
+    mInner.networkSearchManager_ = networkSearchManager;
+    mInner.InitExtraModule(1);
+    EXPECT_NE(mInner.networkSearchManager_, nullptr);
+    EXPECT_NE(mInner.simManager_, nullptr);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0014, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    mInner.networkSearchManager_ = networkSearchManager;
+    sptr<NetworkSearchCallBackBase> callback = nullptr;
+    mInner.RegisterCellularDataObject(callback);
+    mInner.UnRegisterCellularDataObject(callback);
+    mInner.RegisterCellularCallObject(callback);
+    mInner.UnRegisterCellularCallObject(callback);
+    mInner.simManager_ = nullptr;
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    int32_t simId = -1;
+    EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultSmsSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    mInner.telRilManager_ = telRilManager;
+    std::shared_ptr<AppExecFwk::EventHandler> handler;
+    std::string str = "test";
+    std::vector<EmergencyCall> eccVec;
+    auto core = mInner.SetUssd(1, 1, str, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core1 = mInner.CloseUnFinishedUssd(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core1, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core2 = mInner.GetUssd(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core2, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core3 = mInner.GetMute(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core3, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core4 = mInner.SetMute(1, 1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core4, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core5 = mInner.GetEmergencyCallList(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core5, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core6 = mInner.GetCallFailReason(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core6, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0015, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    mInner.networkSearchManager_ = networkSearchManager;
+    sptr<NetworkSearchCallBackBase> callback = nullptr;
+    mInner.RegisterCellularDataObject(callback);
+    mInner.UnRegisterCellularDataObject(callback);
+    mInner.RegisterCellularCallObject(callback);
+    mInner.UnRegisterCellularCallObject(callback);
+    mInner.simManager_ = nullptr;
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    int32_t simId = -1;
+    EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultSmsSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    mInner.telRilManager_ = telRilManager;
+    std::shared_ptr<AppExecFwk::EventHandler> handler;
+    std::string str = "test";
+    std::vector<EmergencyCall> eccVec;
+    auto core = mInner.SetCallPreferenceMode(1, 1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core1 = mInner.GetCallPreferenceMode(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core1, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core2 = mInner.SetPreferredNetworkPara(1, 1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core2, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto core3 = mInner.GetPreferredNetworkPara(1, 1, handler);
+    EXPECT_NE(mInner.telRilManager_, nullptr);
+    EXPECT_EQ(core3, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS
