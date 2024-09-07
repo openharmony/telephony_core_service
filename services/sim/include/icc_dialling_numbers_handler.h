@@ -252,7 +252,6 @@ private:
     const static int32_t MAX_EXT_RECORD_LENGTH_BYTES = 13;
     const static int32_t MAX_EXT_BCD_LENGTH = 10;
     const static int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
-    int pendingExtensionLoads_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
