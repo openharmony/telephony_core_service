@@ -115,15 +115,18 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
     }
     auto id = event->GetInnerEventId();
     int loadId = 0;
-    TELEPHONY_LOGD("IccDiallingNumbersHandler::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             memberFunc(event, loadId);
-            if (pendingExtensionLoads_ == 0) {
-                SendBackResult(loadId);
+            if (id == MSG_SIM_OBTAIN_ADN_DONE) {
+                std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(loadId);
+                if (loadRequest != nullptr && loadRequest->HasExtendedRecord()) {
+                    return;
+                }
             }
+            SendBackResult(loadId);
         }
     } else {
         TELEPHONY_LOGI("IccDiallingNumbersHandler::ProcessEvent unknown id %{public}d", id);
@@ -258,7 +261,7 @@ void IccDiallingNumbersHandler::ProcessDiallingNumber(
         std::string item = *it;
         std::shared_ptr<DiallingNumbersInfo> diallingNumber =
             std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), 1 + i);
-        FetchDiallingNumberContent(diallingNumber, item);
+        FetchDiallingNumberContent(diallingNumber, item, nullptr);
         diallingNumberList->push_back(diallingNumber);
     }
 }
@@ -267,26 +270,22 @@ void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers event is nullptr!");
-        pendingExtensionLoads_--;
         return;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers fd is nullptr");
-        pendingExtensionLoads_--;
         return;
     }
     id = fd->arg1;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(id);
     if (loadRequest == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers loadRequest is nullptr");
-        pendingExtensionLoads_--;
         return;
     }
     if (fd->exception != nullptr) {
         loadRequest->SetException(fd->exception);
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers load failed with exception");
-        pendingExtensionLoads_--;
         return;
     }
     std::string iccData = fd->resultData;
@@ -294,17 +293,12 @@ void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::
     std::shared_ptr<void> diallingNumber = loadRequest->GetResult();
     FetchExtensionContent(std::static_pointer_cast<DiallingNumbersInfo>(diallingNumber), iccData);
     loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
-    pendingExtensionLoads_--;
 }
 
 void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event, int &id)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
-        return;
-    }
-    if (pendingExtensionLoads_ != 0) {
-        TELEPHONY_LOGE("waitintg pending ext record");
         return;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
@@ -331,14 +325,13 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberLoadDone(const AppExecFwk::
     }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber =
         std::make_shared<DiallingNumbersInfo>(loadRequest->GetElementaryFileId(), loadRequest->GetIndex());
-    FetchDiallingNumberContent(diallingNumber, iccData);
+    FetchDiallingNumberContent(diallingNumber, iccData, loadRequest);
     loadRequest->SetResult(static_cast<std::shared_ptr<void>>(diallingNumber));
-    if (HasExtendedRecord()) {
-        pendingExtensionLoads_ = 1;
+    if (loadRequest->HasExtendedRecord()) {
         AppExecFwk::InnerEvent::Pointer ptExtensionRecordRead =
             BuildCallerInfo(MSG_SIM_EXT_RECORD_LOAD_DONE, loadRequest->GetLoadId());
         fileController_->ObtainLinearFixedFile(loadRequest->GetExEF(), GetFilePath(loadRequest->GetExEF()),
-            GetExtendedRecord(), ptExtensionRecordRead);
+            loadRequest->extensionRecord_, ptExtensionRecordRead);
     }
 }
 
@@ -500,7 +493,8 @@ void IccDiallingNumbersHandler::FetchExtensionContent(
 }
 
 void IccDiallingNumbersHandler::FetchDiallingNumberContent(
-    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData)
+    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData, 
+    const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest)
 {
     TELEPHONY_LOGD("FetchDiallingNumberContent start");
     int recordLen = 0;
@@ -527,8 +521,10 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     std::string tempStrNumber =
         SimNumberDecode::BCDConvertToString(data, recordLen, offset, length);
     diallingNumber->number_ = Str8ToStr16(tempStrNumber);
-    extensionRecord_ = record[recordLen - 1];
-    TELEPHONY_LOGD("FetchDiallingNumberContent result end");
+    if (loadRequest != nullptr) {
+        loadRequest->extensionRecord_ = record[recordLen - 1];
+    }
+    TELEPHONY_LOGI("FetchDiallingNumberContent result end %{pubulic}d", record[recordLen - 1]);
 }
 
 std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
