@@ -115,6 +115,7 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
     }
     auto id = event->GetInnerEventId();
     int loadId = 0;
+    TELEPHONY_LOGD("IccDiallingNumbersHandler::ProcessEvent id %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
