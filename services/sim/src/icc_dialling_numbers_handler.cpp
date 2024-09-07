@@ -284,9 +284,7 @@ void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::
         return;
     }
     if (fd->exception != nullptr) {
-        if (loadRequest != nullptr) {
-            loadRequest->SetException(fd->exception);
-        }
+        loadRequest->SetException(fd->exception);
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers load failed with exception");
         pendingExtensionLoads_--;
         return;
