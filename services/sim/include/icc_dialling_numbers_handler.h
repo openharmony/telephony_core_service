@@ -162,7 +162,11 @@ public:
     {
         moreFileToGet = 0;
     }
-
+    bool HasExtendedRecord() const
+    {
+        return extensionRecord_ != 0 && extensionRecord_ != 0xff;
+    }
+    unsigned char extensionRecord_ = 0;
 private:
     int elementaryFileId = 0;
     int extFileId = 0;
@@ -226,7 +230,8 @@ private:
     void ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     bool SendBackResult(int loadId);
     void FetchDiallingNumberContent(
-        const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData);
+        const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData,
+        const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest);
     void FetchExtensionContent(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData);
     std::shared_ptr<unsigned char> CreateSavingSequence(
@@ -239,14 +244,6 @@ private:
     void SendUpdateCommand(const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int length,
         const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest, int loadId);
     void InitFuncMap();
-    bool HasExtendedRecord() const
-    {
-        return extensionRecord_ != 0 && extensionRecord_ != 0xff;
-    }
-    bool GetExtendedRecord() const
-    {
-        return extensionRecord_;
-    }
     const int RECORD_LENGTH = 28;
     const int LENGTH_RATE = 2;
     const int INVALID_LENGTH = 49;
@@ -256,7 +253,6 @@ private:
     const static int32_t MAX_EXT_BCD_LENGTH = 10;
     const static int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
     int pendingExtensionLoads_ = 0;
-    unsigned char extensionRecord_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
