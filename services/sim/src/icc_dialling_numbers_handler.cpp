@@ -267,20 +267,28 @@ void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers event is nullptr!");
+        pendingExtensionLoads_--;
         return;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
     if (fd == nullptr) {
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers fd is nullptr");
+        pendingExtensionLoads_--;
         return;
     }
     id = fd->arg1;
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(id);
+    if (loadRequest == nullptr) {
+        TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers loadRequest is nullptr");
+        pendingExtensionLoads_--;
+        return;
+    }
     if (fd->exception != nullptr) {
         if (loadRequest != nullptr) {
             loadRequest->SetException(fd->exception);
         }
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers load failed with exception");
+        pendingExtensionLoads_--;
         return;
     }
     std::string iccData = fd->resultData;
@@ -487,7 +495,7 @@ void IccDiallingNumbersHandler::FetchExtensionContent(
     }
     ++offset;
     /* parse extension data */
-    std::string tempStrExtensionNumber = SimNumberDecode::ExtensionBCDConvertToString(data, offset, length);
+    std::string tempStrExtensionNumber = SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
     std::u16string diallingNumberAndExt = diallingNumber->GetNumber().append(Str8ToStr16(tempStrExtensionNumber));
     diallingNumber->UpdateNumber(diallingNumberAndExt);
     TELEPHONY_LOGD("FetchExtensionContent result end");
@@ -519,7 +527,7 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     /* parse number */
     ++offset;
     std::string tempStrNumber =
-        SimNumberDecode::BCDConvertToString(data, offset, length, SimNumberDecode::BCD_TYPE_ADN);
+        SimNumberDecode::BCDConvertToString(data, recordLen, offset, length);
     diallingNumber->number_ = Str8ToStr16(tempStrNumber);
     extensionRecord_ = record[recordLen - 1];
     TELEPHONY_LOGD("FetchDiallingNumberContent result end");
