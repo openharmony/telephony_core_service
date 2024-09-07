@@ -153,11 +153,15 @@ bool SimNumberDecode::NumberConvertToBCD(
 }
 
 std::string SimNumberDecode::BCDConvertToString(
-    const std::shared_ptr<unsigned char> bytesData, int offset, int length, int bcdExtType)
+    const std::shared_ptr<unsigned char> bytesData, int dataLength, int offset, int length, int bcdExtType)
 {
     uint8_t *arr = bytesData.get();
     if (!arr) {
         TELEPHONY_LOGE("BCDConvertToString fail because bytesData is nullptr!!");
+        return "";
+    }
+    if (offset + length > dataLength) {
+        TELEPHONY_LOGE("BCDConvertToString fail because bytesData length error!!");
         return "";
     }
     std::vector<uint8_t> bcdCode;
@@ -166,8 +170,7 @@ std::string SimNumberDecode::BCDConvertToString(
     }
     std::string res;
     if (!BCDConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
-        TELEPHONY_LOGE("occur error in BCDConvertToString for '%{public}s by bcdExtType:%{public}d",
-            HexToStr(bcdCode).c_str(), bcdExtType);
+        TELEPHONY_LOGE("occur error in BCDConvertToString bcdExtType:%{public}d", bcdExtType);
     }
     return res;
 }
@@ -209,9 +212,8 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
     const bool prependPlus = (*it == FLAG_INTERNATIONAL);
     ++it;
     if (!BCDSectionConvertToString(it, codeEnd, number, bcdExtType)) {
-        TELEPHONY_LOGE(
-            "occur error to BCDSectionConvertToString by codes:'%{public}s' and bcdExtType:'%{public}d'",
-            HexToStr(std::vector<uint8_t>(it, codeEnd)).c_str(), bcdExtType);
+        TELEPHONY_LOGE("BCDConvertToString occur error to BCDSectionConvertToString bcdExtType:'%{public}d'",
+            bcdExtType);
     }
     if (!prependPlus) {
         return true;
@@ -244,11 +246,15 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
 }
 
 std::string SimNumberDecode::ExtensionBCDConvertToString(
-    const std::shared_ptr<unsigned char> bytesData, int offset, int length, int bcdExtType)
+    const std::shared_ptr<unsigned char> bytesData, int dataLength, int offset, int length, int bcdExtType)
 {
     uint8_t *arr = bytesData.get();
     if (!arr) {
-        TELEPHONY_LOGE("BCDConvertToString fail because bytesData is nullptr!!");
+        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because bytesData is nullptr!!");
+        return "";
+    }
+    if (offset + length > dataLength) {
+        TELEPHONY_LOGE("ExtensionBCDConvertToString fail because bytesData length error!!");
         return "";
     }
     std::vector<uint8_t> bcdCode;
@@ -257,8 +263,8 @@ std::string SimNumberDecode::ExtensionBCDConvertToString(
     }
     std::string res;
     if (!BCDSectionConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
-        TELEPHONY_LOGE("occur error in BCDSectionConvertToString for '%{public}s by bcdExtType:%{public}d",
-            HexToStr(bcdCode).c_str(), bcdExtType);
+        TELEPHONY_LOGE("ExtensionBCDConvertToString occur error in BCDSectionConvertToString bcdExtType:%{public}d",
+            bcdExtType);
     }
     return res;
 }
