@@ -89,10 +89,11 @@ std::string OperatorConfigLoader::LoadOpKeyOnMccMnc(int32_t slotId)
     return DEFAULT_OPERATOR_KEY;
 }
 
-int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
+int OperatorConfigLoader::InsertOpkeyToSimDb(
+    std::string opKeyValue, std::string mccVal, std::string mncVal, std::string imsiVal)
 {
     if (opKeyValue.empty() || iccidFromSim_.empty()) {
-        TELEPHONY_LOGE("opKeyValue or imsi is null");
+        TELEPHONY_LOGE("opKeyValue or iccid is null");
         return Telephony::TELEPHONY_ERR_ARGUMENT_NULL;
     }
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateSimHelper();
@@ -101,12 +102,16 @@ int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
         return Telephony::TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValuesBucket values;
-    DataShare::DataShareValueObject valueObj(opKeyValue);
-    values.Put(SimData::OPKEY, valueObj);
+    DataShare::DataShareValueObject opkeyObj(opKeyValue);
+    DataShare::DataShareValueObject mccObj(mccVal);
+    DataShare::DataShareValueObject mncObj(mncVal);
+    DataShare::DataShareValueObject imsiObj(imsiVal);
+    values.Put(SimData::OPKEY, opkeyObj);
+    values.Put(SimData::MCC, mccObj);
+    values.Put(SimData::MNC, mncObj);
+    values.Put(SimData::IMSI, imsiObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccidFromSim_);
-    predicates.And();
-    predicates.EqualTo(SimData::IMSI, imsiFromSim_);
     Uri simUri(SIM_INFO_URI);
     std::vector<std::string> colume;
     auto resultSet = helper->Query(simUri, predicates, colume);
@@ -119,6 +124,7 @@ int OperatorConfigLoader::InsertOpkeyToSimDb(std::string opKeyValue)
         result = helper->Update(simUri, predicates, values);
     }
     helper->Release();
+    TELEPHONY_LOGI("InsertOpkeyToSimDb result is %{public}d, Opkey is: %{public}s", result, opKeyValue.data());
     return result;
 }
 
@@ -153,6 +159,7 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
         TELEPHONY_LOGE("GetOpKey count: %{public}d, use MccMnc as opkey, COMMON as opname", count);
         resultSet->Close();
         SetMatchResultToSimFileManager(opKeyVal, opNameVal, opKeyExtVal, slotId, simFileManager);
+        InsertOpkeyToSimDb(opKeyVal, GetMccFromMccMnc(mccmncFromSim_), GetMncFromMccMnc(mccmncFromSim_), imsiFromSim_);
         return opKeyVal;
     }
     int columnIndex;
@@ -168,8 +175,26 @@ std::string OperatorConfigLoader::GetOpKey(std::shared_ptr<DataShare::DataShareR
     }
     resultSet->Close();
     SetMatchResultToSimFileManager(opKeyVal, opNameVal, opKeyExtVal, slotId, simFileManager);
-    InsertOpkeyToSimDb(opKeyVal);
+    InsertOpkeyToSimDb(opKeyVal, GetMccFromMccMnc(mccmncFromSim_), GetMncFromMccMnc(mccmncFromSim_), imsiFromSim_);
     return opKeyVal;
+}
+
+std::string OperatorConfigLoader::GetMccFromMccMnc(std::string mccmnc)
+{
+    if (static_cast<int>(mccmnc.size()) < MCCMNC_SHORT_LEN || static_cast<int>(mccmnc.size()) > MCCMNC_LONG_LEN) {
+        TELEPHONY_LOGE("invalid mccmnc, mccmnc is %{public}s", mccmnc.data());
+        return "";
+    }
+    return mccmnc.substr(0, MCC_LEN);
+}
+
+std::string OperatorConfigLoader::GetMncFromMccMnc(std::string mccmnc)
+{
+    if (static_cast<int>(mccmnc.size()) < MCCMNC_SHORT_LEN || static_cast<int>(mccmnc.size()) > MCCMNC_LONG_LEN) {
+        TELEPHONY_LOGE("invalid mccmnc, mccmnc is %{public}s", mccmnc.data());
+        return "";
+    }
+    return mccmnc.substr(MCC_LEN);
 }
 
 void OperatorConfigLoader::SetMatchResultToSimFileManager(std::string opKeyVal, std::string opNameVal,
