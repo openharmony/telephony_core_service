@@ -467,7 +467,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     diallingNumberHandler->FillNumberFiledForDiallingNumber(diallingNumberStringPac, numbe, 0);
     diallingNumberHandler->FindLoadRequest(-1);
     std::string recordData = "test";
-    diallingNumberHandler->FetchDiallingNumberContent(telNumber, recordData);
+    diallingNumberHandler->FetchDiallingNumberContent(telNumber, recordData, nullptr);
     std::u16string name = u"电话联系人";
     int seqLength;
     diallingNumberHandler->CreateNameSequence(name, seqLength);
