@@ -27,7 +27,14 @@
 #include "tel_event_handler.h"
 #include "want.h"
 
-#define STK_CMD_TYPE_INDEX 10
+#define STK_CMD_CMD_LEN_INDEX 2
+#define STK_CMD_CMD_LEN_81 "81"
+#define STK_CMD_CMD_LEN_82 "82"
+#define STK_CMD_CMD_LEN_83 "83"
+#define STK_CMD_TYPE_80_INDEX 10
+#define STK_CMD_TYPE_81_INDEX 12
+#define STK_CMD_TYPE_82_INDEX 14
+#define STK_CMD_TYPE_83_INDEX 16
 #define STK_CMD_TYPE_LEN 2
 #define STK_BIP_CMD_OPEN_CHANNEL "40"
 #define STK_BIP_CMD_SEND_DATA "43"
