@@ -525,6 +525,7 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     if (loadRequest != nullptr) {
         loadRequest->extensionRecord_ = record[recordLen - 1];
     }
+    TELEPHONY_LOGD("FetchDiallingNumberContent result end");
 }
 
 std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
