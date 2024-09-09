@@ -228,6 +228,7 @@ private:
     void ProcessExtensionRecordNumbers(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessLinearSizeDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
     void ProcessUpdateRecordDone(const AppExecFwk::InnerEvent::Pointer &event, int &id);
+    bool IsAdnHasExtRecord(int eventId, int loadId);
     bool SendBackResult(int loadId);
     void FetchDiallingNumberContent(
         const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData,
