@@ -39,6 +39,7 @@
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
 #include "sim_constant.h"
+#include "sim_number_decode.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -191,6 +192,94 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_007,
     std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
     auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
     diallingNumberHandler->FillNumberFiledForDiallingNumber(diallingNumber, number, dataLength);
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_008
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_008, Function | MediumTest | Level1)
+{
+    int id = 1;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
+    event = nullptr;
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+    diallingNumberHandler->ProcessExtensionRecordNumbers(event, id);
+    EXPECT_EQ(event, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_009
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_009, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+
+    IccFileData fd;
+    fd.resultData = "0203112233FFFFFFFFFFFFFFFF";
+    auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, &fd);
+    int eventParam = 1;
+
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, objectUnique, eventParam);
+    ASSERT_NE(event, nullptr);
+    std::shared_ptr<DiallingNumberLoadRequest> loadRequest = diallingNumberHandler->CreateLoadRequest(1, 1, 1, "",
+        event);
+    int id = loadRequest->GetLoadId();
+    fd.sw1 = id;
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    
+    diallingNumberHandler->ProcessExtensionRecordNumbers(event, id);
+    EXPECT_EQ(diallingNumber->GetNumber(), u"");
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_010
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_010, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
+    int id = 1;
+
+    diallingNumberHandler->ProcessExtensionRecordNumbers(event, id);
+
+    std::string resultData = "0203112233FFFFFFFFFFFFFFFF";
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+    resultData = "0203112233FFFFFFFFFFFFFFFFFF";
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+    resultData = "";
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+    resultData = "0303112233FFFFFFFFFFFFFFFF";
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+    resultData = "0213112233FFFFFFFFFFFFFFFF";
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+    resultData = "0203112233FFFFFFFFFFFF#FFF";
+    diallingNumberHandler->FetchExtensionContent(diallingNumber, resultData);
+
+    resultData = "0203112233FFFFFFFFFFFF#FFF";
+    diallingNumberHandler->FetchExtensionContent(nullptr, resultData);
+    std::shared_ptr<unsigned char> data = nullptr;
+    int recordLen = 13;
+    int offset = 2;
+    int length = 10;
+    SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
+    recordLen = 0;
+    offset = 10;
+    data = SIMUtils::HexStringConvertToBytes(resultData, recordLen);
+    SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
+    EXPECT_EQ(diallingNumber->GetNumber(), u"112233112233112233");
 }
 
 }

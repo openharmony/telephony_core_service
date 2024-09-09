@@ -39,8 +39,11 @@ public:
         const std::vector<uint8_t>::const_iterator &codeEnd, std::string &number,
         const int bcdExtType = BCD_TYPE_ADN);
 
-    static std::string BCDConvertToString(const std::shared_ptr<unsigned char> bytesData, int offset, int length,
-        int bcdExtType = BCD_TYPE_ADN);
+    static std::string BCDConvertToString(const std::shared_ptr<unsigned char> bytesData, int dataLength,
+        int offset, int length, int bcdExtType = BCD_TYPE_ADN);
+
+    static std::string ExtensionBCDConvertToString(const std::shared_ptr<unsigned char> bytesData, int dataLength,
+        int offset, int length, int bcdExtType = BCD_TYPE_ADN);
 
     static bool IsValidNumberString(const std::string &number);
 
