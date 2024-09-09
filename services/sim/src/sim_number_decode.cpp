@@ -170,7 +170,7 @@ std::string SimNumberDecode::BCDConvertToString(
     }
     std::string res;
     if (!BCDConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
-        TELEPHONY_LOGE("occur error in BCDConvertToString bcdExtType:%{public}d", bcdExtType);
+        TELEPHONY_LOGE("occur error in BCDConvertToString bcdExtType: %{public}d", bcdExtType);
     }
     return res;
 }
@@ -212,7 +212,7 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
     const bool prependPlus = (*it == FLAG_INTERNATIONAL);
     ++it;
     if (!BCDSectionConvertToString(it, codeEnd, number, bcdExtType)) {
-        TELEPHONY_LOGE("BCDConvertToString occur error to BCDSectionConvertToString bcdExtType:'%{public}d'",
+        TELEPHONY_LOGE("BCDConvertToString occur error to BCDSectionConvertToString bcdExtType: %{public}d",
             bcdExtType);
     }
     if (!prependPlus) {
@@ -263,7 +263,7 @@ std::string SimNumberDecode::ExtensionBCDConvertToString(
     }
     std::string res;
     if (!BCDSectionConvertToString(bcdCode.begin(), bcdCode.end(), res, bcdExtType)) {
-        TELEPHONY_LOGE("ExtensionBCDConvertToString occur error in BCDSectionConvertToString bcdExtType:%{public}d",
+        TELEPHONY_LOGE("ExtensionBCDConvertToString occur error in BCDSectionConvertToString bcdExtType: %{public}d",
             bcdExtType);
     }
     return res;
