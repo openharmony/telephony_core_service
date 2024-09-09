@@ -107,6 +107,17 @@ void IccDiallingNumbersHandler::UpdateDiallingNumbers(
     fileController_->ObtainLinearFileSize(infor.fileId, GetFilePath(infor.fileId), linearFileSize);
 }
 
+bool IccDiallingNumbersHandler::IsAdnHasExtRecord(int eventId, int loadId)
+{
+    if (eventId == MSG_SIM_OBTAIN_ADN_DONE) {
+        std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(loadId);
+        if (loadRequest != nullptr && loadRequest->HasExtendedRecord()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -121,11 +132,8 @@ void IccDiallingNumbersHandler::ProcessEvent(const AppExecFwk::InnerEvent::Point
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             memberFunc(event, loadId);
-            if (id == MSG_SIM_OBTAIN_ADN_DONE) {
-                std::shared_ptr<DiallingNumberLoadRequest> loadRequest = FindLoadRequest(loadId);
-                if (loadRequest != nullptr && loadRequest->HasExtendedRecord()) {
-                    return;
-                }
+            if (IsAdnHasExtRecord(id, loadId)) {
+                return;
             }
             SendBackResult(loadId);
         }
@@ -494,7 +502,7 @@ void IccDiallingNumbersHandler::FetchExtensionContent(
 }
 
 void IccDiallingNumbersHandler::FetchDiallingNumberContent(
-    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData, 
+    const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData,
     const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest)
 {
     TELEPHONY_LOGD("FetchDiallingNumberContent start");
