@@ -247,6 +247,7 @@ HWTEST_F(SimTest, SavePrimarySlotId_0301, Function | MediumTest | Level1)
 
     std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
     int32_t status = CoreManagerInner::GetInstance().DelSimMessage(0, 0, 0, handler);
+    bool isSupported = true;
     EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 

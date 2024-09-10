@@ -145,6 +145,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     DelayedSingleton<CoreService>::GetInstance()->FactoryReset(SLOT_ID);
     std::u16string u16Ret = u"";
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetMeid(SLOT_ID, u16Ret);
