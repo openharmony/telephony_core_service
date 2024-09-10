@@ -191,7 +191,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetLocaleFromDefaultSim();
     DelayedSingleton<CoreService>::GetInstance()->GetSimGid1(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetSimGid2(SLOT_ID);
-    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     int32_t lac = 1;
     bool longNameRequired = true;
     std::string plmn = "46001";
