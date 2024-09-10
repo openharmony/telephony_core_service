@@ -91,6 +91,7 @@ public:
     typedef bool (*IS_HANDLE_VSIM)(void);
     typedef bool (*IS_VSIM_ENABLED)(void);
     typedef void (*UPDATE_SUB_STATE)(int32_t slotId, int32_t subState);
+    typedef bool (*IS_IN_ENABLE_DISABLE_VSIM)(void);
     /* add for vsim end */
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
@@ -146,6 +147,7 @@ public:
     IS_HANDLE_VSIM isHandleVSim_ = nullptr;
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
     UPDATE_SUB_STATE updateSubState_ = nullptr;
+    IS_IN_ENABLE_DISABLE_VSIM isInEnaDisableVSim_ = nullptr;
     /* add for vsim end */
     SEND_EVENT sendEvent_ = nullptr;
     INIT_BIP initBip_ = nullptr;

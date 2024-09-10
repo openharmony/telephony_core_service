@@ -118,18 +118,6 @@ HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0700, Function | MediumTest | L
 }
 
 /**
- * @tc.number Telephony_VSim_InitExtraModule_0800
- * @tc.name InitExtraModule
- * @tc.desc Function test
- */
-HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0800, Function | MediumTest | Level1)
-{
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
-    EXPECT_EQ(TELEPHONY_SUCCESS, CoreServiceClient::GetInstance().InitExtraModule(2));
-#endif
-}
-
-/**
  * @tc.number Telephony_VSim_GetMaxSimSlot_0100
  * @tc.name InitExtraModule
  * @tc.desc Function test
@@ -170,6 +158,7 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0100, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimEnabled_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateSubState_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_ != nullptr);
     }
 }
 
@@ -193,6 +182,7 @@ HWTEST_F(SimTest, Telephony_VSim_Wrapper_0200, Function | MediumTest | Level1)
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isVSimEnabled_ == nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateSubState_ == nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_ == nullptr);
     }
 }
 

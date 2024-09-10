@@ -880,14 +880,6 @@ public:
     int32_t FactoryReset(int32_t slotId);
 
     /**
-     * @brief init extra module function, for extra slot.
-     *
-     * @param slotId[in], sim slot id
-     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t InitExtraModule(int32_t slotId);
-
-    /**
      * @brief Check whether insert apn in table.
      *
      * @param value[in], apn value

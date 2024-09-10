@@ -234,8 +234,6 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSlotId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_SIMID)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimId(data, reply); };
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::INIT_EXTRA_MODULE)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnInitExtraModule(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_IO_DONE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimIO(data, reply); };
 }
@@ -1871,17 +1869,6 @@ int32_t CoreServiceStub::OnFactoryReset(MessageParcel &data, MessageParcel &repl
 {
     int32_t slotId = data.ReadInt32();
     int32_t result = FactoryReset(slotId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("Write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return NO_ERROR;
-}
-
-int32_t CoreServiceStub::OnInitExtraModule(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t slotId = data.ReadInt32();
-    int32_t result = InitExtraModule(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("Write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
