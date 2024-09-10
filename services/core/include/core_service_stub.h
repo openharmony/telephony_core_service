@@ -137,7 +137,6 @@ private:
     int32_t OnGetBasebandVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnFactoryReset(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNrSsbIdInfo(MessageParcel &data, MessageParcel &reply);
-    int32_t OnInitExtraModule(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);

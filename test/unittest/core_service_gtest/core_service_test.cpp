@@ -767,18 +767,6 @@ HWTEST_F(CoreServiceTest, CoreService_FactoryReset_001, Function | MediumTest | 
 }
 
 /**
- * @tc.number   CoreService_InitExtraModule_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceTest, CoreService_InitExtraModule_001, Function | MediumTest | Level1)
-{
-    SecurityToken token;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->InitExtraModule(0);
-    ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-}
-
-/**
  * @tc.number   CoreService_GetNrSsbIdInfo_001
  * @tc.name     test normal branch
  * @tc.desc     Function test

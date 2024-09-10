@@ -840,7 +840,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     networkSearchState->NotifyStateChange();
     networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
 
-    if (!TELEPHONY_EXT_WRAPPER.isHandleVSim_ || !TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+    if (!TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_ || !TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_()) {
         RadioOnWhenHasSim(networkSearchManager, radioState);
     }
 
