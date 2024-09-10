@@ -141,7 +141,6 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Base_001, Function | MediumTest | L
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_HANGUP_CONNECT);
     telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
-
 }
 
 /**
