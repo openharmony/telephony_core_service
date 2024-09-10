@@ -1406,7 +1406,10 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_003, Function | MediumTest | 
     EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894200"));
     EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894400"));
     EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894100"));
-
+    EXPECT_TRUE(stkController->CheckIsBipCmd("D0804567894100"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("D081D481030143"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("D082D4D481030143"));
+    EXPECT_TRUE(stkController->CheckIsBipCmd("D083D4D4D481030143"));
     AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
     stkController->OnSendTerminalResponseResult(event);
     stkController->OnSendEnvelopeCmdResult(event);
