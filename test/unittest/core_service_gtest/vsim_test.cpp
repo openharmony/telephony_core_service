@@ -247,7 +247,6 @@ HWTEST_F(SimTest, SavePrimarySlotId_0301, Function | MediumTest | Level1)
 
     std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
     int32_t status = CoreManagerInner::GetInstance().DelSimMessage(0, 0, 0, handler);
-    bool isSupported = true;
     EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -552,10 +551,12 @@ HWTEST_F(SimTest, SavePrimarySlotId_0330, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_MockTest_0100, Function | MediumTest | Level3)
 {
+    bool isSupported = true;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
+        isSupported = fasle;
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     }
-    EXPECT_TRUE(true);
+    EXPECT_TRUE(isSupported);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
