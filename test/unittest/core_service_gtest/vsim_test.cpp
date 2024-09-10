@@ -543,6 +543,243 @@ HWTEST_F(SimTest, SavePrimarySlotId_0330, Function | MediumTest | Level1)
     int32_t status = CoreManagerInner::GetInstance().SetVoNRSwitch(0, 0, 0, handler);
     EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(SimTest, SavePrimarySlotId_0331, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    DtmfParam param;
+    int32_t status = CoreManagerInner::GetInstance().SendDTMF(0, 0, param, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0332, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().SendDTMF(0, 0, 'c', 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0333, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().StartDTMF(0, 0, 'c', 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0334, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().StopDTMF(0, 0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0335, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().SetDataPermitted(0, 0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0336, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    DataProfile dataProfile;
+    int32_t status = CoreManagerInner::GetInstance().SetInitApnInfo(0, 0, dataProfile, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0337, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    ActivateDataParam dataParam;
+    int32_t status = CoreManagerInner::GetInstance().ActivatePdpContext(0, 0, dataParam, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0338, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    DeactivateDataParam dataParam;
+    int32_t status = CoreManagerInner::GetInstance().DeactivatePdpContext(0, 0, dataParam, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0339, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetPdpContextList(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0340, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    LinkBandwidthRule linkBandWithRule;
+    int32_t status = CoreManagerInner::GetInstance().SetLinkBandwidthReportingRule(0, 0, linkBandWithRule, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0341, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    LinkBandwidthRule linkBandWithRule;
+
+    int32_t status = CoreManagerInner::GetInstance().SetLinkBandwidthReportingRule(0, 0, linkBandWithRule, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0342, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetLinkBandwidthInfo(0, 0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0343, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetLinkCapability(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0344, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().CleanAllConnections(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0345, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetSignalStrength(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0346, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetCsRegStatus(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0347, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    CoreManagerInner::GetInstance().telRilManager_ = telRilManager;
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().GetPsRegStatus(0, 0, handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0348, Function | MediumTest | Level1)
+{
+    int32_t status = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(0, 0, "", "");
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<ISimManager> iSimManager = std::make_shared<SimManager>(telRilManager);
+    CoreManagerInner::GetInstance().simManager_ = iSimManager;
+    status = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(0, 0, "", "");
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0349, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    int32_t status = CoreManagerInner::GetInstance().SetNetworkSelectionMode(0, 0, 0, "", handler);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    sptr<NetworkState> networkState = nullptr;
+    status = CoreManagerInner::GetInstance().GetNetworkStatus(0, networkState);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    bool retCode = CoreManagerInner::GetInstance().IsSatelliteEnabled();
+    EXPECT_EQ(false, retCode);
+
+    bool airplaneMode = true;
+    status = CoreManagerInner::GetInstance().GetAirplaneMode(airplaneMode);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimTest, SavePrimarySlotId_0350, Function | MediumTest | Level1)
+{
+    int32_t status = CoreManagerInner::GetInstance().SetActiveSim(0, 0);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    int32_t simId = 0;
+    status = CoreManagerInner::GetInstance().GetDefaultVoiceSimId(simId);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    status = CoreManagerInner::GetInstance().GetDefaultSmsSimId(simId);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    status = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(0, 0, "", "");
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<ISimManager> iSimManager = std::make_shared<SimManager>(telRilManager);
+    CoreManagerInner::GetInstance().simManager_ = iSimManager;
+    status = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(0, 0, "", "");
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    status = CoreManagerInner::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    CoreManagerInner::GetInstance().simManager_ = nullptr;
+    status = CoreManagerInner::GetInstance().UpdateOperatorConfigs();
+    EXPECT_EQ(status, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_MockTest_0100
