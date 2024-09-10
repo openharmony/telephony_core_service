@@ -141,6 +141,11 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Base_001, Function | MediumTest | L
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_HANGUP_CONNECT);
     telRilRequest = std::make_shared<TelRilRequest>(0, event);
     telRilBase->DfxWriteCallFaultEvent(telRilRequest, 1);
+
+    EXPECT_GE(event->GetInnerEventId(), 1);
+    EXPECT_NE(event, nullptr);
+    EXPECT_GE(telRilRequest->GetRequestId(), 0);
+    EXPECT_NE(telRilRequest, nullptr);
 }
 
 /**
@@ -154,7 +159,6 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Network_001, Function | MediumTest 
     auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilNetwork = std::make_shared<TelRilNetwork>(SLOT_ID, rilInterface, observerHandler, nullptr);
-    EXPECT_EQ(EVENT->GetInnerEventId(), 1);
 
     CellNearbyInfo cellInfo;
     HDI::Ril::V1_1::CellNearbyInfo info;
@@ -205,27 +209,29 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sms_001, Function | MediumTest | Le
     auto telRilSms = std::make_shared<TelRilSms>(SLOT_ID, rilInterface, observerHandler, nullptr);
 
     uint8_t ch = 61;
-    telRilSms->ConvertHexCharToInt(ch);
+    EXPECT_GE(telRilSms->ConvertHexCharToInt(ch), 10);
     ch = 41;
-    telRilSms->ConvertHexCharToInt(ch);
+    EXPECT_EQ(telRilSms->ConvertHexCharToInt(ch), 65);
     ch = 30;
-    telRilSms->ConvertHexCharToInt(ch);
+    EXPECT_EQ(telRilSms->ConvertHexCharToInt(ch), 48);
     ch = 39;
-    telRilSms->ConvertHexCharToInt(ch);
+    EXPECT_EQ(telRilSms->ConvertHexCharToInt(ch), 57);
     ch = 67;
-    telRilSms->ConvertHexCharToInt(ch);
+    EXPECT_EQ(telRilSms->ConvertHexCharToInt(ch), 103);
 
     uint8_t hexString = 1;
     size_t length = 1;
-    telRilSms->ConvertHexStringToBytes(&hexString, length);
+    std::vector<uint8_t> expectedBytes = {1};
+    ASSERT_EQ(telRilSms->ConvertHexStringToBytes(&hexString, length), expectedBytes);
 
     hexString = 1;
     length = 0;
-    telRilSms->ConvertHexStringToBytes(&hexString, length);
+    ASSERT_EQ(telRilSms->ConvertHexStringToBytes(&hexString, length), std::vector<uint8_t>());
 
     hexString = 1;
     length = 2;
     telRilSms->ConvertHexStringToBytes(&hexString, length);
+    ASSERT_EQ(telRilSms->ConvertHexStringToBytes(&hexString, length), std::vector<uint8_t>());
 
     HDI::Ril::V1_1::SmsMessageInfo iSmsMessageInfo;
     telRilSms->NewSmsNotify(iSmsMessageInfo);
@@ -360,23 +366,25 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     telRilCall->CallRingbackVoiceNotice(ringbackVoice);
     telRilCall->CallSrvccStatusNotice(srvccStatus);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
+    ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    ASSERT_FALSE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     telRilCall->GetClirResponse(responseInfo, getClirResult);
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     responseInfo.serial = -1;
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_FALSE(telRilCall->SendDtmfResponse(responseInfo));
 
     responseInfo.serial = 1;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 
     event = nullptr;
     responseInfo.serial = 2;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_FALSE(telRilCall->SendDtmfResponse(responseInfo));
 }
 } // namespace Telephony
 } // namespace OHOS
