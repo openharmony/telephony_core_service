@@ -115,6 +115,12 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(
 int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
     const ImsRegStateCallback &stateCallback, const ImsRegInfo &info)
 {
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(stateCallback.env, &loop);
+    if (loop == nullptr) {
+        TELEPHONY_LOGE("stateCallback.env is null");
+        return TELEPHONY_ERROR;
+    }
     auto task = [stateCallback, info]() {
         int32_t ret = ReportImsRegInfo(info, stateCallback);
         if (ret != TELEPHONY_SUCCESS) {
