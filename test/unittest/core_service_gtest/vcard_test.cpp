@@ -228,7 +228,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
         EXPECT_GE(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 

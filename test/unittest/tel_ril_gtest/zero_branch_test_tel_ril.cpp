@@ -154,6 +154,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Network_001, Function | MediumTest 
     auto rilInterface = HDI::Ril::V1_3::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilNetwork = std::make_shared<TelRilNetwork>(SLOT_ID, rilInterface, observerHandler, nullptr);
+    EXPECT_EQ(EVENT->GetInnerEventId(), 1);
 
     CellNearbyInfo cellInfo;
     HDI::Ril::V1_1::CellNearbyInfo info;
