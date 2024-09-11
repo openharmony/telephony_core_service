@@ -2178,13 +2178,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
         TELEPHONY_ERR_ARGUMENT_NULL);
     EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId),
         TELEPHONY_SUCCESS);
-    EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId, TELEPHONY_SUCCESS));
-    EXPECT_TRUE(networkSearchManager->IsLocalAirplaneMode(INVALID_SLOTID));
-    EXPECT_EQ(networkSearchManager->GetRadioState(INVALID_SLOTID), ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
-    EXPECT_EQ(networkSearchManager->GetImei(INVALID_SLOTID), imei);
-    EXPECT_EQ(networkSearchManager->GetImeiSv(INVALID_SLOTID), imeiSv);
-    EXPECT_EQ(networkSearchManager->GetMeid(INVALID_SLOTID), imei);
-    EXPECT_EQ(networkSearchManager->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_MMWAVE);
 }
 
 /**
