@@ -1331,5 +1331,121 @@ HWTEST_F(VcardTest, Telephony_VCardTest_BigData_Import, Function | MediumTest | 
     }
 }
 
+HWTEST_F(VcardTest, Telephony_VCardTest_103, Function | MediumTest | Level1)
+{
+    auto constructor = std::make_shared<VCardConstructor>();
+    constructor->needCharsetParam_ = true;
+    std::vector<std::string> strs;
+    bool test = constructor->IsNeedCharsetParam(strs);
+    EXPECT_FALSE(test);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_104, Function | MediumTest | Level1)
+{
+    auto constructor = std::make_shared<VCardConstructor>();
+    std::string inputString = "BEGIN:VCARD\r\nVERSION:2.1\r\nN:test;;;;\r\nFN:test\r\nEND:VCARD\r\n";
+    WriteTestData(inputString);
+    int32_t errorCode;
+    VCardManager::GetInstance().Decode(TEL_FILE_NAME, errorCode);
+    std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
+    std::string name = contacts[0]->GetNameData()->GetDisplayName();
+    EXPECT_EQ(name, "test");
+    EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+    EXPECT_EQ(static_cast<int32_t>(contacts.size()), 1);
+    EXPECT_NE(contacts[0], nullptr);
+    auto date = constructor->ConstructNameV40(contacts[0]);
+    EXPECT_EQ(date, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_105, Function | MediumTest | Level1)
+{
+    auto constructor = std::make_shared<VCardConstructor>();
+    std::string phoneticType = "test";
+    std::string phoneticName = "";
+    auto temp = constructor->AddPhoneticName(phoneticType, phoneticName);
+    EXPECT_EQ(temp, TELEPHONY_SUCCESS);
+    std::shared_ptr<VCardContact> contact = nullptr;
+    EXPECT_EQ(constructor->ConstructName(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructPhones(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructRelation(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructIms(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructSipAddresses(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructNickNames(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructEmails(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructPostals(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructOrganizations(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructWebsites(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructPhotos(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructNotes(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(constructor->ConstructEvents(contact), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_106, Function | MediumTest | Level1)
+{
+    auto constructor = std::make_shared<VCardConstructor>();
+    std::string type = "test";
+    std::vector<std::string> paramList;
+    paramList.push_back("test");
+    std::string rawValue = "test1";
+    constructor->AddLine(type, paramList, rawValue, true, true);
+    EXPECT_TRUE(paramList.size() > 0);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_107, Function | MediumTest | Level1)
+{
+    auto contact = std::make_shared<VCardContact>();
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    EXPECT_NE(resultSet, nullptr);
+    EXPECT_EQ(contact->BuildOtherData(3, resultSet), TELEPHONY_SUCCESS);
+    EXPECT_EQ(contact->BuildOtherData(8, resultSet), TELEPHONY_SUCCESS);
+    EXPECT_EQ(contact->BuildOtherData(11, resultSet), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_108, Function | MediumTest | Level1)
+{
+    auto contact = std::make_shared<VCardContact>();
+    std::vector<std::string> orgListl;
+    orgListl.clear();
+    contact->organizations_.clear();
+    std::map<std::string, std::vector<std::string>> paramMap;
+    int32_t size = static_cast<int32_t>(orgListl.size());
+    contact->HandleOrgValue(1, orgListl, paramMap, true);
+    EXPECT_EQ(size, SIZE_ZERO);
+    orgListl.push_back("test");
+    contact->HandleOrgValue(1, orgListl, paramMap, true);
+    size = static_cast<int32_t>(orgListl.size());
+    EXPECT_EQ(size, SIZE_ONE);
+    auto data1 = std::make_shared<VCardOrganizationData>();
+    orgListl.push_back("test");
+    size = static_cast<int32_t>(orgListl.size());
+    EXPECT_EQ(size, 2);
+    contact->HandleOrgValue(1, orgListl, paramMap, true);
+    data1->company_ = "测试";
+    data1->title_ = "测试title";
+    auto data2 = std::make_shared<VCardOrganizationData>();
+    data2->company_ = "testCompany";
+    data2->title_ = "manager";
+    contact->organizations_.push_back(data1);
+    contact->organizations_.push_back(data2);
+    contact->HandleOrgValue(1, orgListl, paramMap, true);
+    EXPECT_FALSE(contact->organizations_.empty());
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_109, Function | MediumTest | Level1)
+{
+    auto contact = std::make_shared<VCardContact>();
+    std::string propValue = "st";
+    std::vector<std::string> typeCollection;
+    contact->HandleSipCase(propValue, typeCollection);
+    EXPECT_FALSE(VCardUtils::StartWith(propValue, "sip:"));
+}
+
+HWTEST_F(VcardTest, Telephony_VCardTest_110, Function | MediumTest | Level1)
+{
+    std::vector<std::shared_ptr<VCardContact>> contacts = VCardManager::GetInstance().listener_->contacts_;
+    size_t step = 10;
+    VCardManager::GetInstance().SplitContactsVector(contacts, step);
+    EXPECT_TRUE(step > contacts.size());
+}
 } // namespace Telephony
 } // namespace OHOS
