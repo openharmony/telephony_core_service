@@ -533,11 +533,11 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateNameSequence(
     if (SimCharDecode::IsChineseString(tempTag)) {
         std::string sq = SimCharDecode::CharCodeToSequence(name, true);
         seqResult = SIMUtils::HexStringConvertToBytes(sq, seqLength);
-        TELEPHONY_LOGI("chinese alphabet encode result %{public}s %{public}d", sq.c_str(), seqLength);
+        TELEPHONY_LOGI("chinese alphabet encode len:%{public}d", seqLength);
     } else {
         std::string sq = SimCharDecode::CharCodeToSequence(tempTag, false);
         seqResult = SIMUtils::HexStringConvertToBytes(sq, seqLength);
-        TELEPHONY_LOGI("english alphabet encode result %{public}s %{public}d", sq.c_str(), seqLength);
+        TELEPHONY_LOGI("english alphabet encode len:%{public}d", seqLength);
     }
     return seqResult;
 }
