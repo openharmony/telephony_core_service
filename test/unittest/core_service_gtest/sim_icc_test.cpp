@@ -93,15 +93,14 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        ASSERT_TRUE(true);
         return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
-        ASSERT_TRUE(true);
     }
-    ASSERT_TRUE(true);
+    ASSERT_FALSE(helper.boolResult_);
+    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -114,15 +113,14 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        ASSERT_TRUE(true);
         return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
-        ASSERT_TRUE(true);
     }
-    ASSERT_TRUE(true);
+    ASSERT_FALSE(helper.boolResult_);
+    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -159,7 +157,8 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0100, Function | Medium
         mInfoTemp.Marshalling(parcel);
         mInfoTemp.ReadFromParcel(parcel);
         mInfoTemp.UnMarshalling(parcel);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(mInfo.GetNumber(), Str8ToStr16("12345678901"));
+        ASSERT_FALSE(mInfo.IsEmpty());
     }
 }
 
@@ -180,7 +179,10 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0200, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("电话卡"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("00000000000"));
     }
 }
 
@@ -201,7 +203,10 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumber->number_ = Str8ToStr16("12345678901");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnZhang"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
     }
 }
 
@@ -222,7 +227,10 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("电话卡"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("00000000000"));
     }
 }
 
@@ -244,7 +252,10 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
     }
 }
 
@@ -266,7 +277,10 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0200, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
     }
 }
 
@@ -286,7 +300,10 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0100, Function | Medium
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, u"");
+        ASSERT_EQ(diallingNumber->number_, u"");
     }
 }
 
@@ -306,7 +323,10 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | Medium
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, u"");
+        ASSERT_EQ(diallingNumber->number_, u"");
     }
 }
 
@@ -350,15 +370,14 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        ASSERT_TRUE(true);
         return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
-        ASSERT_TRUE(true);
     }
-    ASSERT_TRUE(true);
+    ASSERT_FALSE(helper.boolResult_);
+    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -371,14 +390,14 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        ASSERT_TRUE(true);
         return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
     }
-    ASSERT_TRUE(true);
+    ASSERT_FALSE(helper.boolResult_);
+    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -399,7 +418,11 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0100, Function | Medium
         diallingNumber->pin2_ = Str8ToStr16("1234");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 2);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnZhang"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 
@@ -421,7 +444,11 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccFdnDiallingNumbers_0200, Function | Medium
         diallingNumber->pin2_ = Str8ToStr16("1234");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 2);
+        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnZhang"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 
@@ -444,7 +471,11 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0100, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 
@@ -467,7 +498,11 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccFdnDiallingNumbers_0200, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
+        ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 
@@ -488,7 +523,11 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0100, Function | Medium
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, u"");
+        ASSERT_EQ(diallingNumber->number_, u"");
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 
@@ -509,7 +548,11 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccFdnDiallingNumbers_0200, Function | Medium
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_FDN, diallingNumber);
-        EXPECT_TRUE(true);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->name_, u"");
+        ASSERT_EQ(diallingNumber->number_, u"");
+        ASSERT_EQ(diallingNumber->pin2_, Str8ToStr16("1234"));
     }
 }
 #endif // TEL_TEST_UNSUPPORT

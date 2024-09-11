@@ -417,6 +417,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function |
     coreServiceHiSysEvent->WriteDataActivateFaultEvent(
         slotId, argInt, CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, argStr);
     coreServiceHiSysEvent->WriteAirplaneModeChangeEvent(argInt);
+    ASSERT_NE(argStr, "Event");
 }
 
 /**
