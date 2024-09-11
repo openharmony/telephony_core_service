@@ -139,6 +139,8 @@ bool MultiSimController::InitData(int32_t slotId)
         TELEPHONY_LOGI("InitPrimary start");
         CheckIfNeedSwitchMainSlotId();
     }
+    TELEPHONY_LOGI("sim account loaded, slotId is %{public}d, simId is %{public}d", slotId,
+        localCacheInfo_[slotId].simId);
     return true;
 }
 
