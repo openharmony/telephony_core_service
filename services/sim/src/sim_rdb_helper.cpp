@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int WAIT_TIME = 10;
 SimRdbHelper::SimRdbHelper() {}
 
 SimRdbHelper::~SimRdbHelper() {}
@@ -34,6 +35,16 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
         return nullptr;
     }
     return mTelephonyDatahelper->CreateSimHelper();
+}
+
+std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper(const int waitTime)
+{
+    TELEPHONY_LOGD("start");
+    if (mTelephonyDatahelper == nullptr) {
+        TELEPHONY_LOGE("get CreateDataHelper Failed");
+        return nullptr;
+    }
+    return mTelephonyDatahelper->CreateSimHelper(waitTime);
 }
 
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateOpKeyHelper()
@@ -347,7 +358,7 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t simId)
 int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values)
 {
     TELEPHONY_LOGD("start");
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper(WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("need to retry CreateDataHelper");
         dataShareHelper = CreateDataHelper();
@@ -405,7 +416,7 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccId);
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper(WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
@@ -469,7 +480,7 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
     std::string id = std::to_string(INVALID_VALUE);
     DataShare::DataSharePredicates predicates;
     predicates.GreaterThan(SimData::SLOT_INDEX, id);
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper(WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGI("retry CreateDataHelper");
         dataShareHelper = CreateDataHelper();
@@ -517,7 +528,7 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
     TELEPHONY_LOGI("start");
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccId);
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper(WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
@@ -534,7 +545,7 @@ int32_t SimRdbHelper::ForgetAllData()
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(INVALID_VALUE);
     value.Put(SimData::SLOT_INDEX, valueObj);
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper(WAIT_TIME);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
