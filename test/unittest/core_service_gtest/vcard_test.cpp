@@ -228,7 +228,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
         EXPECT_GE(errorCode, TELEPHONY_SUCCESS);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -261,7 +261,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
         }
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -298,7 +298,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
         }
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -1177,7 +1177,7 @@ END:VCARD
         VCardManager::GetInstance().SetDataHelper(dataShareHelper);
         VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
     } else {
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -1198,7 +1198,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_021, Function | MediumTest | Level1)
         int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
         EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
     } else {
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -1222,7 +1222,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         EXPECT_EQ(errorCode, TELEPHONY_ERROR);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
@@ -1327,7 +1327,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_BigData_Import, Function | MediumTest | 
         EXPECT_GE(errorCode, TELEPHONY_ERROR);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_TRUE(true);
+        EXPECT_NE(dataShareHelper, nullptr);
     }
 }
 
