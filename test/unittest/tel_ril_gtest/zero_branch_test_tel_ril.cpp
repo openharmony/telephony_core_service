@@ -359,23 +359,25 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     telRilCall->CallRingbackVoiceNotice(ringbackVoice);
     telRilCall->CallSrvccStatusNotice(srvccStatus);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
+    ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    ASSERT_FALSE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     telRilCall->GetClirResponse(responseInfo, getClirResult);
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     responseInfo.serial = -1;
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 
     responseInfo.serial = 1;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 
     event = nullptr;
     responseInfo.serial = 2;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 }
 } // namespace Telephony
 } // namespace OHOS

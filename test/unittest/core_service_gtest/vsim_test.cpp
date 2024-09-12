@@ -788,10 +788,12 @@ HWTEST_F(SimTest, SavePrimarySlotId_0350, Function | MediumTest | Level1)
  */
 HWTEST_F(SimTest, Telephony_Sim_MockTest_0100, Function | MediumTest | Level3)
 {
+    bool isSupported = true;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
+        isSupported = fasle;
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     }
-    EXPECT_TRUE(true);
+    EXPECT_TRUE(isSupported);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony

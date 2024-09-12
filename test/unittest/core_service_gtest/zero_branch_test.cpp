@@ -301,15 +301,20 @@ HWTEST_F(BranchTest, Telephony_CellInfo_005, Function | MediumTest | Level1)
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto cellInfo = std::make_shared<CellInfo>(networkSearchManager, INVALID_SLOTID);
     auto event = AppExecFwk::InnerEvent::Get(0);
+    EXPECT_NE(event, nullptr);
     cellInfo->ProcessNeighboringCellInfo(event);
     cellInfo->ProcessCurrentCellInfo(event);
+    EXPECT_NE(event, nullptr);
     event = nullptr;
     cellInfo->ProcessNeighboringCellInfo(event);
     cellInfo->ProcessCurrentCellInfo(event);
+    EXPECT_NE(event, nullptr);
     auto cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
     auto cellListCurrentInfo = std::make_shared<CellListCurrentInformation>();
     auto eventNearby = AppExecFwk::InnerEvent::Get(0, cellListNearbyInfo);
     auto eventCurrent = AppExecFwk::InnerEvent::Get(0, cellListCurrentInfo);
+    EXPECT_NE(eventNearby, nullptr);
+    EXPECT_NE(eventCurrent, nullptr);
     cellInfo->ProcessNeighboringCellInfo(eventNearby);
     cellInfo->ProcessCurrentCellInfo(eventCurrent);
     CellNearbyInfo cellInfoNearby;
@@ -364,9 +369,12 @@ HWTEST_F(BranchTest, Telephony_NetworkType_001, Function | MediumTest | Level1)
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkType = std::make_unique<NetworkType>(networkSearchManager, INVALID_SLOTID);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE);
+    EXPECT_NE(event, nullptr);
     networkType->ProcessGetPreferredNetwork(event);
+    EXPECT_NE(event, nullptr);
     event = nullptr;
     networkType->ProcessGetPreferredNetwork(event);
+    EXPECT_EQ(event, nullptr);
 }
 
 /**
@@ -1290,16 +1298,16 @@ HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Lev
     auto eventUpdate = simSmsController->BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
     auto eventWrite = simSmsController->BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
     auto eventDelete = simSmsController->BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
-    simSmsController->ProcessLoadDone(event);
-    simSmsController->ProcessUpdateDone(event);
-    simSmsController->ProcessWriteDone(event);
-    simSmsController->ProcessDeleteDone(event);
-    simSmsController->ProcessDeleteDone(event);
-    simSmsController->ProcessEvent(event);
-    simSmsController->ProcessEvent(eventGet);
-    simSmsController->ProcessEvent(eventUpdate);
-    simSmsController->ProcessEvent(eventWrite);
-    simSmsController->ProcessEvent(eventDelete);
+    EXPECT_NO_THROW(simSmsController->ProcessLoadDone(event));
+    EXPECT_NO_THROW(simSmsController->ProcessUpdateDone(event));
+    EXPECT_NO_THROW(simSmsController->ProcessWriteDone(event));
+    EXPECT_NO_THROW(simSmsController->ProcessDeleteDone(event));
+    EXPECT_NO_THROW(simSmsController->ProcessDeleteDone(event));
+    EXPECT_NO_THROW(simSmsController->ProcessEvent(event));
+    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventGet));
+    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventUpdate));
+    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventWrite));
+    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventDelete));
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
@@ -2008,6 +2016,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
+    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "ChinaMobile");
+    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, true, false), "CMCC");
 }
 
 /**
