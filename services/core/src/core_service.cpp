@@ -1603,6 +1603,10 @@ int32_t CoreService::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbI
 
 bool CoreService::IsAllowedInsertApn(std::string &value)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return true;
+    }
     if (TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr) {
         return TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_(value);
     }
@@ -1611,6 +1615,10 @@ bool CoreService::IsAllowedInsertApn(std::string &value)
 
 int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return true;
+    }
     if (TELEPHONY_EXT_WRAPPER.getTargetOpkey_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getTargetOpkey_(slotId, opkey);
     }
