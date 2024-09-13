@@ -1543,15 +1543,6 @@ int32_t CoreService::FactoryReset(int32_t slotId)
     return networkSearchManager_->FactoryReset(slotId);
 }
 
-int32_t CoreService::InitExtraModule(int32_t slotId)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    return CoreManagerInner::GetInstance().InitExtraModule(slotId);
-}
-
 int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
 {
     if (fd < 0) {

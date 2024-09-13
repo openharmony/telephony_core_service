@@ -250,8 +250,6 @@ public:
 
     int32_t GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbInformation> &nrSsbInformation) override;
 
-    int32_t InitExtraModule(int32_t slotId) override;
-
     bool IsAllowedInsertApn(std::string &value) override;
 
     int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) override;
