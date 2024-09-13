@@ -1617,7 +1617,7 @@ int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return true;
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (TELEPHONY_EXT_WRAPPER.getTargetOpkey_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getTargetOpkey_(slotId, opkey);
