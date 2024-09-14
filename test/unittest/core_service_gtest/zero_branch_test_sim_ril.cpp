@@ -373,6 +373,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | Med
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
+    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
     AppExecFwk::InnerEvent::Pointer event = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
     std::unique_ptr<UsimFetcher> fd = event->GetUniqueObject<UsimFetcher>();
@@ -391,13 +392,15 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | Med
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
+    EXPECT_NE(diallingNumbersCache->diallingNumberFileList_.size(), 0);
     event = iccDiallingNumbersManager->BuildCallerInfo(-1);
     diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_PBR, diallingNumber, 0, true, event);
     diallingNumbersCache->UpdateDiallingNumberToIcc(ELEMENTARY_FILE_PBR, diallingNumber, -1, true, event);
     int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_PBR);
     event = iccDiallingNumbersManager->BuildCallerInfo(-2);
     diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_PBR, extensionEf, event);
-    diallingNumbersCache->IsDiallingNumberEqual(diallingNumber, diallingNumber);
+    auto result = diallingNumbersCache->IsDiallingNumberEqual(diallingNumber, diallingNumber);
+    EXPECT_TRUE(result);
 }
 
 /**
@@ -417,6 +420,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_005, Function | Med
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
+    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
     AppExecFwk::InnerEvent::Pointer event = iccDiallingNumbersManager->BuildCallerInfo(-1);
     diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_ADN, extensionEf, event);
@@ -425,7 +429,8 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_005, Function | Med
     diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_PBR, extensionEf, caller);
     std::vector<std::u16string> args1 = { u"test", u"test1" };
     std::vector<std::u16string> args2 = { u"test"};
-    diallingNumbersCache->ArrayEqual(args1, args2);
+    auto result = diallingNumbersCache->ArrayEqual(args1, args2);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -459,7 +464,8 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     EXPECT_TRUE(diallingNumberHandler->FormatNameAndNumber(telNumber, true));
     diallingNumberHandler->MakeExceptionResult(0);
     diallingNumberHandler->UpdateFileController(iccFileController);
-    diallingNumberHandler->CreateSavingSequence(telNumber, -1);
+    auto sequence = diallingNumberHandler->CreateSavingSequence(telNumber, -1);
+    EXPECT_NE(sequence, nullptr);
     telNumber = nullptr;
     diallingNumberHandler->FormatNameAndNumber(telNumber, true);
     std::shared_ptr<unsigned char> diallingNumberStringPac = nullptr;
@@ -470,7 +476,8 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     diallingNumberHandler->FetchDiallingNumberContent(telNumber, recordData, nullptr);
     std::u16string name = u"电话联系人";
     int seqLength;
-    diallingNumberHandler->CreateNameSequence(name, seqLength);
+    auto result = diallingNumberHandler->CreateNameSequence(name, seqLength);
+    EXPECT_NE(result, nullptr);
 }
 
 /**
@@ -563,8 +570,10 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_001, Function | 
     records.push_back(record);
     usimDiallingNumbersService->GeneratePbrFile(records);
     usimDiallingNumbersService->BuildCallerInfo(-1);
-    usimDiallingNumbersService->CreateHandlerPointer(-1, 1, 0, nullptr);
-    usimDiallingNumbersService->BuildNumberFileByRecord(record);
+    auto pointer = usimDiallingNumbersService->CreateHandlerPointer(-1, 1, 0, nullptr);
+    EXPECT_NE(pointer, nullptr);
+    auto fileByRecord = usimDiallingNumbersService->BuildNumberFileByRecord(record);
+    EXPECT_NE(fileByRecord, nullptr);
     std::shared_ptr<UsimDiallingNumberFile> file = std::make_shared<UsimDiallingNumberFile>();
     std::vector<uint8_t> datav;
     uint8_t data = 0;
@@ -592,6 +601,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_002, Function | 
     usimDiallingNumbersService->ProcessPbrLoadDone(event);
     usimDiallingNumbersService->ProcessDiallingNumberLoadDone(event);
     usimDiallingNumbersService->NextStep(0);
+    EXPECT_NE(usimDiallingNumbersService->memberFuncMap_.size(), 0);
 }
 
 /**
@@ -613,6 +623,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_003, Function | 
     diallingNumbersCache->Init();
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
+    EXPECT_NE(usimDiallingNumbersService->memberFuncMap_.size(), 0);
     auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
     AppExecFwk::InnerEvent::Pointer pointer = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
     usimDiallingNumbersService->ObtainUsimElementaryFiles(pointer);
@@ -625,6 +636,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_003, Function | 
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, object, eventParam);
     usimDiallingNumbersService->ProcessPbrLoadDone(response);
+    EXPECT_EQ(usimDiallingNumbersService->pbrIndex_, 0);
 }
 
 /**
@@ -644,18 +656,12 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_004, Function | 
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
+    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
     AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->CreateHandlerPointer(
         MSG_USIM_USIM_ADN_LOAD_DONE, ELEMENTARY_FILE_PBR, 0, nullptr);
-    std::unique_ptr<DiallingNumbersHandleHolder> fd = event->GetUniqueObject<DiallingNumbersHandleHolder>();
-    std::unique_ptr<DiallingNumbersHandlerResult> data = std::make_unique<DiallingNumbersHandlerResult>(fd.get());
-    std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
-        std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
-    data->result = diallingNumberList;
-    data->exception = nullptr;
-    int eventParam = 0;
-    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    EXPECT_NE(event, nullptr);
 }
 
 /**
@@ -675,8 +681,10 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
+    EXPECT_NE(diallingNumbersCache->usimDiallingNumberSrv_, nullptr);
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
+    EXPECT_NE(usimDiallingNumbersService->memberFuncMap_.size(), 0);
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber =
@@ -689,7 +697,8 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
     std::vector<std::string> records;
     records.push_back(record);
     usimDiallingNumbersService->GeneratePbrFile(records);
-    usimDiallingNumbersService->LoadDiallingNumberFiles(0);
+    auto result = usimDiallingNumbersService->LoadDiallingNumberFiles(0);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -878,12 +887,18 @@ HWTEST_F(SimRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
     telRilManager->ReduceRunningLock();
     telRilManager->SendAckAndLock();
     int32_t slotFaild = -1;
-    telRilManager->GetTelRilSms(slotFaild);
-    telRilManager->GetTelRilSim(slotFaild);
-    telRilManager->GetTelRilModem(slotFaild);
-    telRilManager->GetTelRilData(slotFaild);
-    telRilManager->GetTelRilNetwork(slotFaild);
-    telRilManager->GetTelRilCall(slotFaild);
+    auto sms = telRilManager->GetTelRilSms(slotFaild);
+    EXPECT_EQ(sms, nullptr);
+    auto sim = telRilManager->GetTelRilSim(slotFaild);
+    EXPECT_EQ(sim, nullptr);
+    auto modem = telRilManager->GetTelRilModem(slotFaild);
+    EXPECT_EQ(modem, nullptr);
+    auto data = telRilManager->GetTelRilData(slotFaild);
+    EXPECT_EQ(data, nullptr);
+    auto network = telRilManager->GetTelRilNetwork(slotFaild);
+    EXPECT_EQ(network, nullptr);
+    auto call = telRilManager->GetTelRilCall(slotFaild);
+    EXPECT_EQ(call, nullptr);
     int32_t slot_0 = SLOT_ID;
     telRilManager->GetTelRilSms(slot_0);
     telRilManager->GetTelRilSim(slot_0);
