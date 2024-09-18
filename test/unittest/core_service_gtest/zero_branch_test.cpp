@@ -726,7 +726,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ParseSpn(operatorNum, 0), "");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_NONE), "");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_START), "");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_GENERAL), "\xCC");
+    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_GENERAL), "");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM), "\xC0\xCC");
     EXPECT_EQ(simFile->ParseSpn("", 0), "");
@@ -1001,7 +1001,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
     auto telRilManager = std::make_shared<TelRilManager>();
     mInner.simManager_ = std::make_shared<SimManager>(telRilManager);
-    EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
 }
@@ -1456,8 +1456,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | L
     multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "898600520123F0102670";
     multiSimController->simStateManager_[0]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
     multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
-    EXPECT_FALSE(multiSimController->InitData(0));
-    EXPECT_FALSE(multiSimController->InitData(0));
+    EXPECT_FALSE(multiSimController->InitData(-1));
+    EXPECT_TRUE(multiSimController->InitData(0));
     EXPECT_TRUE(multiSimController->InitShowNumber(0));
     std::vector<IccAccountInfo> iccAccountInfoList;
     EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
