@@ -16,6 +16,7 @@
 
 #include <iomanip>
 #include <set>
+#include <map>
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -377,7 +378,7 @@ int32_t VCardConstructor::ConstructRelation(std::shared_ptr<VCardContact> contac
         if (relationData == nullptr) {
             continue;
         }
-        AddCustomType(TypeData::RELATION,
+        AddCustomType(VCARD_TYPE_X_MOBILE_RELATION,
             { relationData->GetRelationName(), relationData->GetLabelId(), relationData->GetLabelName() });
     }
     return TELEPHONY_SUCCESS;
@@ -387,7 +388,7 @@ void VCardConstructor::AddCustomType(const std::string &type, std::vector<std::s
 {
     bool needAddCharset = IsNeedCharsetParam(values);
     bool needAddQuotedPrintable = needQP_ && !VCardUtils::IsPrintableAscii(values);
-    result_ << VCARD_TYPE_X_OHOS_CUSTOM;
+    result_ << VCARD_TYPE_X_MOBILE_CUSTOM;
     AddCharsetOrQuotedPrintable(needAddCharset, needAddQuotedPrintable);
     result_ << DATA_SEPARATOR << type;
     for (auto value : values) {
@@ -594,7 +595,6 @@ void VCardConstructor::ConstructPostalLine(std::shared_ptr<VCardPostalData> post
     postalLine << ITEM_SEPARATOR;
     postalLine << ITEM_SEPARATOR;
     postalLine << ITEM_SEPARATOR;
-    postalLine << ITEM_SEPARATOR;
 }
 
 int32_t VCardConstructor::ConstructOrganizations(std::shared_ptr<VCardContact> contact)
@@ -640,7 +640,7 @@ int32_t VCardConstructor::ConstructWebsites(std::shared_ptr<VCardContact> contac
         if (website.empty()) {
             continue;
         }
-        AddLineWithCharsetAndQP(VCARD_TYPE_URL, { website, websiteData->GetLabelId(), websiteData->GetLabelName() });
+        AddLineWithCharsetAndQP(VCARD_TYPE_URL, { website });
     }
     return TELEPHONY_SUCCESS;
 }
@@ -699,23 +699,30 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string birthdayDate = "";
+    std::map<int32_t, int32_t> eventMap = {
+        {static_cast<int32_t>(EventType::EVENT_ANNIVERSARY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_ANNIVERSARY)},
+        {static_cast<int32_t>(EventType::EVENT_LUNAR_BIRTHDAY),
+            static_cast<int32_t>(EventHM4Type::EVENT_HM4_LUNAR_BIRTHDAY)},
+        {static_cast<int32_t>(EventType::EVENT_OTHER), static_cast<int32_t>(EventHM4Type::EVENT_HM4_OTHER)},
+        {static_cast<int32_t>(EventType::EVENT_BIRTHDAY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)}
+    };
     for (auto eventData : contact->GetEventDatas()) {
         if (eventData == nullptr) {
             continue;
         }
         int32_t labelId = static_cast<int32_t>(EventType::EVENT_OTHER);
         if (VCardUtils::IsNum(eventData->GetLabelId())) {
-            labelId = std::stoi(eventData->GetLabelId());
+            labelId = eventMap[std::stoi(eventData->GetLabelId())];
         }
-        if (labelId == static_cast<int32_t>(EventType::EVENT_BIRTHDAY)) {
+        if (labelId == static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)) {
             if (eventData->GetEventDate().empty()) {
                 continue;
             }
             birthdayDate = eventData->GetEventDate();
             continue;
         }
-        AddCustomType(
-            TypeData::CONTACT_EVENT, { eventData->GetEventDate(), eventData->GetLabelId(), eventData->GetLabelName() });
+        AddCustomType(VCARD_TYPE_X_MOBILE_EVENTS,
+            { eventData->GetEventDate(), std::to_string(labelId), eventData->GetLabelName() });
     }
     VCardUtils::Trim(birthdayDate);
     if (!birthdayDate.empty()) {
@@ -796,7 +803,7 @@ void VCardConstructor::AddEmailLine(
     if (!postalTypeStr.empty()) {
         paramTypes.push_back(postalTypeStr);
     }
-    std::vector<std::string> valueList = { email, displayName };
+    std::vector<std::string> valueList = { email };
     bool needAddCharset = IsNeedCharsetParam(valueList);
     bool needAddQuotedPrintable = needQP_ && !VCardUtils::IsPrintableAscii(valueList);
     AddLine(VCARD_TYPE_EMAIL, paramTypes, valueList, needAddCharset, needAddQuotedPrintable);
