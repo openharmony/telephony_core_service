@@ -86,7 +86,6 @@ private:
     bool curSpnShow_ = false;
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
     int32_t curSpnRule_ = 0;
-    sptr<NetworkState> networkState_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
     std::string csSpnFormat_;
