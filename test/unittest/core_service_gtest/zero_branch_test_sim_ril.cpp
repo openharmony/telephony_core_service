@@ -1086,12 +1086,12 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_002, Function | Medium
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->iccidFromSim_ = "";
-    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("", "", "", ""), TELEPHONY_ERR_ARGUMENT_NULL);
 
-    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("testOpKey"), TELEPHONY_ERR_ARGUMENT_NULL);
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("testOpKey", "", "", ""), TELEPHONY_ERR_ARGUMENT_NULL);
 
     operatorConfigLoader->iccidFromSim_ = "12345678901234567890";
-    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb(""), TELEPHONY_ERR_ARGUMENT_NULL);
+    EXPECT_EQ(operatorConfigLoader->InsertOpkeyToSimDb("", "", "", ""), TELEPHONY_ERR_ARGUMENT_NULL);
 
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     operatorConfigLoader->simFileManager_.reset();
