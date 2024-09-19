@@ -299,25 +299,6 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         values.Put(SimData::IS_MESSAGE_CARD, mainCardObj);
         values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
-    if (simFileManager_[slotId] != nullptr) {
-        std::string operKey = Str16ToStr8(simFileManager_[slotId]->GetOpKey());
-        std::string mcc = Str16ToStr8(simFileManager_[slotId]->GetMCC());
-        std::string mnc = Str16ToStr8(simFileManager_[slotId]->GetMNC());
-        std::string imsi = Str16ToStr8(simFileManager_[slotId]->GetIMSI());
-        DataShare::DataShareValuesBucket valuesExt;
-        DataShare::DataShareValueObject opkeyObj(operKey);
-        DataShare::DataShareValueObject mccObj(mcc);
-        DataShare::DataShareValueObject mncObj(mnc);
-        DataShare::DataShareValueObject imsiObj(imsi);
-        valuesExt.Put(SimData::OPKEY, opkeyObj);
-        valuesExt.Put(SimData::MCC, mccObj);
-        valuesExt.Put(SimData::MNC, mncObj);
-        valuesExt.Put(SimData::IMSI, imsiObj);
-        DataShare::DataSharePredicates predicates;
-        predicates.EqualTo(SimData::ICC_ID, newIccId);
-        int result = simDbHelper_->UpdateDataByIccId(newIccId, valuesExt);
-        TELEPHONY_LOGI("Update Opkey result is %{public}d", result);
-    }
     return simDbHelper_->UpdateDataByIccId(newIccId, values);
 }
 
@@ -336,21 +317,6 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
     values.Put(SimData::IS_ACTIVE, valueObj);
     const int32_t slotSingle = 1;
-    DataShare::DataShareValuesBucket valuesExt;
-    if (simFileManager_[slotId] != nullptr) {
-        std::string operKey = Str16ToStr8(simFileManager_[slotId]->GetOpKey());
-        std::string mcc = Str16ToStr8(simFileManager_[slotId]->GetMCC());
-        std::string mnc = Str16ToStr8(simFileManager_[slotId]->GetMNC());
-        std::string imsi = Str16ToStr8(simFileManager_[slotId]->GetIMSI());
-        DataShare::DataShareValueObject opkeyObj(operKey);
-        DataShare::DataShareValueObject mccObj(mcc);
-        DataShare::DataShareValueObject mncObj(mnc);
-        DataShare::DataShareValueObject imsiObj(imsi);
-        valuesExt.Put(SimData::OPKEY, opkeyObj);
-        valuesExt.Put(SimData::MCC, mccObj);
-        valuesExt.Put(SimData::MNC, mncObj);
-        values.Put(SimData::IMSI, imsiObj);
-    }
     if (SIM_SLOT_COUNT == slotSingle) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
@@ -365,11 +331,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
         values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
     }
     int64_t id;
-    int result = simDbHelper_->InsertData(id, values);
-    DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimData::ICC_ID, newIccId);
-    simDbHelper_->UpdateDataByIccId(newIccId, valuesExt);
-    return result;
+    return simDbHelper_->InsertData(id, values);
 }
 
 bool MultiSimController::InitShowNumber(int slotId)
