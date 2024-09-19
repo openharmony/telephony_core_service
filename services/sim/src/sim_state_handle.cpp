@@ -705,7 +705,11 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("simStateManager nullptr");
             return;
         }
-        simStateManager->SyncCmdResponse();
+        if (eventId == MSG_SIM_SEND_NCFG_OPER_INFO_DONE) {
+            simStateManager->SyncSimMatchResponse();
+        } else {
+            simStateManager->SyncCmdResponse();
+        }
         return;
     }
 
