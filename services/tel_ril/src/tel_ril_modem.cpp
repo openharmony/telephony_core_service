@@ -139,6 +139,7 @@ int32_t TelRilModem::OnRilAdapterHostDied()
 
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
+    radioState_ = static_cast<ModemPowerState>(state);
     AAFwk::Want want;
     want.SetParam("slotId", slotId_);
     want.SetParam("radioState", state);
