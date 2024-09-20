@@ -462,7 +462,7 @@ void VCardUtils::GetPhoneTypeFromStrings(
     }
 
     if (isFax) {
-        if (type == static_cast<int32_t>(PhoneVcType::NUM_HOME)) {
+        if (type == static_cast<int32_t>(PhoneVcType::NUM_MOBILE)) {
             type = static_cast<int32_t>(PhoneVcType::NUM_FAX_HOME);
         } else if (type == static_cast<int32_t>(PhoneVcType::NUM_WORK)) {
             type = static_cast<int32_t>(PhoneVcType::NUM_FAX_WORK);
