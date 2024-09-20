@@ -784,6 +784,7 @@ HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_005, Function | Medi
     std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
     ASSERT_EQ(result, expected);
 }
+
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

@@ -791,5 +791,6 @@ HWTEST_F(CoreServiceTest, CoreService_GetResidentNetworkNumeric_001, Function | 
     result = DelayedSingleton<CoreService>::GetInstance()->GetResidentNetworkNumeric(0);
     ASSERT_STREQ(result.c_str(), "");
 }
+
 } // namespace Telephony
 } // namespace OHOS
