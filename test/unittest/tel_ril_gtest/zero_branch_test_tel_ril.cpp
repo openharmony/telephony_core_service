@@ -80,6 +80,8 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
     telRilManager->GetTelRilModem(SLOT_ID)->RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_ON);
     EXPECT_EQ(telRilManager->RegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_OFF, nullptr),
         TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(telRilManager->RegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_STATE_CHANGED, nullptr),
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(
         telRilManager->UnRegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_OFF), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(telRilManager->DeInit(), true);
