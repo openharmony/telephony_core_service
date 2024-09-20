@@ -121,5 +121,6 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_004, Function | MediumTest
     telRilManager->handler_->ReleaseRunningLock(lockType);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
 }
+
 } // namespace Telephony
 } // namespace OHOS

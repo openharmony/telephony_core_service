@@ -458,5 +458,6 @@ HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_006, Function |
     int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
     ASSERT_EQ(result, -1);
 }
+
 } // namespace Telephony
 } // namespace OHOS
