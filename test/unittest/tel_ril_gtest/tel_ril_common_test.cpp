@@ -571,5 +571,6 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ResponseSupplement_001, Function | MediumTe
     auto result = telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, rilRadioResponseInfo);
     ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
 } // namespace Telephony
 } // namespace OHOS
