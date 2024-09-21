@@ -56,6 +56,7 @@ std::string VCardConstructor::ContactVCard(std::shared_ptr<VCardContact> contact
     ConstructPhotos(contact);
     ConstructNotes(contact);
     ConstructEvents(contact);
+    ConstructGroups(contact);
     ContactEnd();
     return result_.str();
 }
@@ -731,6 +732,26 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t VCardConstructor::ConstructGroups(std::shared_ptr<VCardContact> contact)
+{
+    if (contact == nullptr) {
+        TELEPHONY_LOGE("contact is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    for (auto groupData : contact->GetGroups()) {
+        if (groupData == nullptr) {
+            continue;
+        }
+        auto groupName = groupData->GetGroupName();
+        VCardUtils::Trim(groupName);
+        if (groupName.empty()) {
+            continue;
+        }
+        AddLineWithCharsetAndQP(VCARD_TYPE_X_GROUP, { groupName });
+    }
+    return TELEPHONY_SUCCESS;
+}
+ 
 void VCardConstructor::AddTelLine(const std::string &labelId, const std::string &labelName, const std::string &number)
 {
     result_ << VCARD_TYPE_TEL << PARAM_SEPARATOR;

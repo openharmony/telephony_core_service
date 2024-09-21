@@ -117,6 +117,7 @@ ohos_shared_library("libtel_vcard") {
     "vcard/src/contact_data/vcard_birthday_data.cpp",
     "vcard/src/contact_data/vcard_email_data.cpp",
     "vcard/src/contact_data/vcard_event_data.cpp",
+    "vcard/src/contact_data/vcard_group_data.cpp",
     "vcard/src/contact_data/vcard_im_data.cpp",
     "vcard/src/contact_data/vcard_name_data.cpp",
     "vcard/src/contact_data/vcard_nickname_data.cpp",
