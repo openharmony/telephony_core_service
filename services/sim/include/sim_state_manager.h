@@ -60,11 +60,15 @@ public:
     bool IfModemInitDone();
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response);
     void SyncCmdResponse();
+    void SyncSimMatchResponse();
 
 public:
     bool responseReady_ = false;
+    bool responseSimMatchReady_ = false;
     std::mutex ctx_;
+    std::mutex stx_;
     std::condition_variable cv_;
+    std::condition_variable sv_;
 
 private:
     void RequestUnlock(UnlockCmd type);
