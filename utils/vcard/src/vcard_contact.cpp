@@ -101,12 +101,11 @@ void VCardContact::AddOtherDatas(std::string name, std::string rawValue, std::st
     } else if (name == VCARD_TYPE_X_OHOS_CUSTOM || name == VCARD_TYPE_X_MOBILE_CUSTOM) {
         AddCustom(rawValue, parasMap, propValue);
     }
-    AddRemainDatas(name, rawValue, byte, values, propValue, groups, parasMap);
+    AddRemainDatas(name, rawValue, values, propValue, parasMap);
 }
 
-void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::string byte,
-    std::vector<std::string> values, std::string propValue, std::vector<std::string> groups,
-    std::map<std::string, std::vector<std::string>> parasMap)
+void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::vector<std::string> values,
+    std::string propValue, std::map<std::string, std::vector<std::string>> parasMap)
 {
     if (name == VCARD_TYPE_X_AIM || name == VCARD_TYPE_X_MSN || name == VCARD_TYPE_X_YAHOO ||
         name == VCARD_TYPE_X_ICQ || name == VCARD_TYPE_X_JABBER || name == VCARD_TYPE_X_QQ ||

@@ -16,6 +16,7 @@
 #define protected public
 #include "vcard_email_data.h"
 #include "vcard_event_data.h"
+#include "vcard_group_data.h"
 #include "vcard_im_data.h"
 #include "vcard_manager.h"
 #include "vcard_name_data.h"
@@ -657,6 +658,11 @@ HWTEST_F(ContactDataTest, VCardRdbHelper, Function | MediumTest | Level3)
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContactData(columns, predicates), nullptr);
+
+    DataShare::DataShareValuesBucket groupDataValue;
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryGroupData(columns, predicates), nullptr);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryGroupId(""), DB_FAILD);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().InsertGroupData(groupDataValue), DB_FAILD);
 }
 
 HWTEST_F(ContactDataTest, VCardUtils_HandleCh_001, Function | MediumTest | Level3)
@@ -783,6 +789,25 @@ HWTEST_F(ContactDataTest, VCardUtils_ConstructListFromValue_005, Function | Medi
     std::vector<std::string> expected = {"Hello;World;"};
     std::vector<std::string> result = VCardUtils::ConstructListFromValue(value, vcardType);
     ASSERT_EQ(result, expected);
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_BuildData, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    VCardGroupData groupData;
+    EXPECT_EQ(groupData.BuildData(resultSet), TELEPHONY_ERROR);
+    EXPECT_EQ(groupData.BuildData(nullptr), TELEPHONY_ERROR);
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTest | Level3)
+{
+    VCardGroupData groupData;
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string groupName = "";
+    int32_t groupId = 0;
+    groupData.SetGroupId(groupId);
+    groupData.SetGroupName(groupName);
+    EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
 }
 
 #endif // TEL_TEST_UNSUPPORT

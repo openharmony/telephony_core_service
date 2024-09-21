@@ -142,9 +142,8 @@ private:
     void CheckNameExist();
     std::string ConvertHarmonyEvents(std::string type, std::string value);
     void AddGroups(std::string rawValue);
-    void AddRemainDatas(std::string name, std::string rawValue, std::string byte, std::vector<std::string> values,
-        std::string propValue, std::vector<std::string> groups,
-        std::map<std::string, std::vector<std::string>> parasMap);
+    void AddRemainDatas(std::string name, std::string rawValue, std::vector<std::string> values,
+        std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;

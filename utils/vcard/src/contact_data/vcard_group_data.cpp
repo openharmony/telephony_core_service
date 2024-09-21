@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,8 +51,8 @@ int32_t VCardGroupData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
         int curValueIndex;
         nameResultSet->GetColumnIndex(Group::GROUP_NAME, curValueIndex);
         nameResultSet->GetString(curValueIndex, groupName);
-        nameResultSet->Close();
     }
+    nameResultSet->Close();
     groupName_ = groupName;
     return TELEPHONY_SUCCESS;
 }

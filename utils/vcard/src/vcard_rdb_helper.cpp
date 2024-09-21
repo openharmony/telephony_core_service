@@ -153,6 +153,7 @@ int32_t VCardRdbHelper::QueryGroupId(std::string groupName)
         resultSet->Close();
         return groupId;
     }
+    resultSet->Close();
     OHOS::DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put(Group::GROUP_NAME, groupName);
     valuesBucket.Put(Group::GROUP_ACCOUNT_ID, 1);
