@@ -90,6 +90,7 @@ private:
     int32_t ConstructNotes(std::shared_ptr<VCardContact> contact);
     int32_t ConstructEvents(std::shared_ptr<VCardContact> contact);
     int32_t ConstructNameV40(std::shared_ptr<VCardContact> contact);
+    int32_t ConstructGroups(std::shared_ptr<VCardContact> contact);
 
 private:
     size_t headLength_;
