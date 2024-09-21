@@ -735,7 +735,7 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
 int32_t VCardConstructor::ConstructGroups(std::shared_ptr<VCardContact> contact)
 {
     if (contact == nullptr) {
-        TELEPHONY_LOGI("contact is null");
+        TELEPHONY_LOGE("contact is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     for (auto groupData : contact->GetGroups()) {
