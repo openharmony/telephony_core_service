@@ -250,6 +250,17 @@ int32_t TelRilManager::RegisterCoreNotify(
                     observerHandler->NotifyObserver(what);
                 }
                 break;
+            case RadioEvent::RADIO_STATE_CHANGED:
+                {
+                    observerHandler->RegObserver(what, observerCallBack);
+                    if (GetTelRilModem(slotId) == nullptr) {
+                        TELEPHONY_LOGE("telRilModem_ slotId is valid");
+                        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+                    }
+                    auto state = static_cast<int32_t>(GetTelRilModem(slotId)->radioState_);
+                    TelEventHandler::SendTelEvent(observerCallBack, what, std::make_shared<Int32Parcel>(state));
+                }
+                break;
             default:
                 TELEPHONY_LOGD("RegisterCoreNotify default what:%{public}d, slotId:%{public}d", what, slotId);
                 observerHandler->RegObserver(what, observerCallBack);
