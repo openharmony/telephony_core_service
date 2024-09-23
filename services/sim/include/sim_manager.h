@@ -155,6 +155,11 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t SavePrimarySlotId(int32_t slotId) override;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t GetEid(int32_t slotId, std::u16string &eId) override;
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
+#endif
 
 private:
     bool IsValidSlotId(int32_t slotId);

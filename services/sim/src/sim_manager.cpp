@@ -20,6 +20,7 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
+#include "str_convert.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1256,5 +1257,36 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t SimManager::GetEid(int32_t slotId, std::u16string &eId)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    eId = simFileManager_[slotId]->GetEid();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    euiccProfileInfoList = simFileManager_[slotId]->GetEuiccProfileInfoList();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    eUiccInfo = simFileManager_[slotId]->GetEuiccInfo();
+    return TELEPHONY_ERR_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
