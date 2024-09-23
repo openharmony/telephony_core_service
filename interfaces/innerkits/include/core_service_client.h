@@ -918,6 +918,36 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+    /**
+     * @brief Obtain the international mobile subscriber identity
+     *
+     * @param slotId[in], sim slot id
+     * @param defaultSmdpAddress[out], the international mobile subscriber identity of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress);
+
+    /**
+     * @brief cancel session.
+     *
+     * @param slotId[in], sim slot id
+     * @param profile[in], the Bound Profile Package data returned by SM-DP+ server
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
+        ResponseEsimResult &responseResult);
+
+    /**
+     * @brief Requests the profile of the given iccid.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param iccId[in], the iccId of the profile
+     * @param eUiccProfile[out], the profile of the given iccid
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
