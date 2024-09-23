@@ -143,6 +143,9 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
             iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_GSM, simFile_));
         }
         if (simFile_ != nullptr) {
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+            eSimFile_ = std::make_shared<EsimFile>(simStateManager_.lock());
+#endif
             simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
     } else {
@@ -153,6 +156,10 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
         TELEPHONY_LOGE("SimFileManager::Init simFile create nullptr.");
         return false;
     }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    eSimFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
+#endif
     simFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
     simFile_->SetId(slotId_);
     simFile_->Init();
@@ -982,5 +989,42 @@ void SimFileManager::ClearData()
     }
     simFile_->ClearData();
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+std::shared_ptr<EsimFile> SimFileManager::GetEsimfile()
+{
+    return eSimFile_;
+}
+
+std::u16string SimFileManager::GetEid()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainEid();
+    return Str8ToStr16(result);
+}
+
+GetEuiccProfileInfoListResult SimFileManager::GetEuiccProfileInfoList()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return GetEuiccProfileInfoListResult();
+    }
+    GetEuiccProfileInfoListResult result = eSimFile_->GetEuiccProfileInfoList();
+    return result;
+}
+
+EuiccInfo SimFileManager::GetEuiccInfo()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile is nullptr");
+        return EuiccInfo();
+    }
+    EuiccInfo result = eSimFile_->GetEuiccInfo();
+    return result;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

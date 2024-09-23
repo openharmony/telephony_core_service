@@ -918,6 +918,35 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    /**
+     * @brief Get the EID identifying the eUICC hardware.
+     *
+     * @param slotId[in], ndicates the card slot index number
+     * @param eId[out], the EID identifying the eUICC hardware
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEid(int32_t slotId, std::u16string &eId);
+
+    /**
+     * @brief Obtain the list of all EuiccProfileInfos
+     *
+     * @param slotId[in], sim slot id
+     * @param euiccProfileInfoList[out], the list of all EuiccProfileInfos
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList);
+
+    /**
+     * @brief Obtain the info about the eUICC chip/device
+     *
+     * @param slotId[in], sim slot id
+     * @param eUiccInfo[out], the info about the eUICC chip/device
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
+#endif
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

@@ -40,6 +40,10 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerVoiceMailToMap();
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    AddHandlerEsimToMap();
+#endif
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -271,6 +275,18 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+void CoreServiceStub::AddHandlerEsimToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEid(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_PROFILE_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccProfileInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccInfo(data, reply); };
+}
+#endif
 
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -1938,5 +1954,72 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
 
     return NO_ERROR;
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceStub::OnGetEid(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string eId;
+    int32_t result = GetEid(slotId, eId);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eId));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    GetEuiccProfileInfoListResult euiccProfileInfoList;
+    int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(euiccProfileInfoList.profiles.size());
+        for (const auto& profile : euiccProfileInfoList.profiles) {
+            reply.WriteString16(profile.iccId);
+            reply.WriteString16(profile.nickName);
+            reply.WriteString16(profile.serviceProviderName);
+            reply.WriteString16(profile.profileName);
+            reply.WriteInt32(static_cast<int32_t>(profile.state));
+            reply.WriteInt32(static_cast<int32_t>(profile.profileClass));
+            reply.WriteString16(profile.carrierId.mcc);
+            reply.WriteString16(profile.carrierId.mnc);
+            reply.WriteString16(profile.carrierId.gid1);
+            reply.WriteString16(profile.carrierId.gid2);
+            reply.WriteInt32(static_cast<int32_t>(profile.policyRules));
+            reply.WriteInt32(profile.accessRules.size());
+            for (const auto& rule : profile.accessRules) {
+                reply.WriteString16(rule.certificateHashHexStr);
+                reply.WriteString16(rule.packageName);
+                reply.WriteInt32(rule.accessType);
+            }
+        }
+        reply.WriteBool(euiccProfileInfoList.isRemovable);
+        reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result));
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetEuiccInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    EuiccInfo eUiccInfo;
+    int32_t result = GetEuiccInfo(slotId, eUiccInfo);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eUiccInfo.osVersion) && reply.WriteString16(eUiccInfo.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

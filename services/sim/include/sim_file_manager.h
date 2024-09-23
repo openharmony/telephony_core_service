@@ -33,6 +33,9 @@
 #include "csim_file_controller.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_file.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -90,11 +93,19 @@ public:
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    std::shared_ptr<EsimFile> GetEsimfile();
+    std::u16string GetEid();
+    GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
+#endif
 
 protected:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    std::shared_ptr<EsimFile> eSimFile_ = nullptr;
+#endif
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;

@@ -38,6 +38,9 @@ private:
     void AddHandlerVoiceMailToMap();
     void AddHandlerPdpProfileToMap();
     void AddHandlerOpkeyVersionToMap();
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    void AddHandlerEsimToMap();
+#endif
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -141,6 +144,11 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t OnGetEid(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccProfileInfoList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccInfo(MessageParcel &data, MessageParcel &reply);
+#endif
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

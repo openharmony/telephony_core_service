@@ -1081,5 +1081,37 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceClient::GetEid(int32_t slotId, std::u16string &eId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEid(slotId, eId);
+}
+
+int32_t CoreServiceClient::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+}
+
+int32_t CoreServiceClient::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccInfo(slotId, eUiccInfo);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
