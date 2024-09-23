@@ -982,5 +982,35 @@ void SimFileManager::ClearData()
     }
     simFile_->ClearData();
 }
+
+std::u16string SimFileManager::GetDefaultSmdpAddress()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainDefaultSmdpAddress();
+    return Str8ToStr16(result);
+}
+
+ResponseEsimResult SimFileManager::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->CancelSession(transactionId, cancelReason);
+    return result;
+}
+
+EuiccProfile SimFileManager::GetProfile(int32_t portIndex, const std::u16string &iccId)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return EuiccProfile();
+    }
+    EuiccProfile result = eSimFile_->ObtainProfile(portIndex, iccId);
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

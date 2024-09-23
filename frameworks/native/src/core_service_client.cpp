@@ -1081,5 +1081,37 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
+
+int32_t CoreServiceClient::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+}
+
+int32_t CoreServiceClient::CancelSession(
+    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->CancelSession(slotId, transactionId, cancelReason, responseResult);
+}
+
+int32_t CoreServiceClient::GetProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetProfile(slotId, portIndex, iccId, eUiccProfile);
+}
 } // namespace Telephony
 } // namespace OHOS
