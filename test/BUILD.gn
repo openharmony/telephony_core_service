@@ -36,4 +36,8 @@ group("unittest") {
     "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_gtest",
   ]
+
+  if (core_service_support_esim) {
+    deps += [ "unittest/utils_codec_gtest:utils_codec_gtest" ]
+  }
 }
