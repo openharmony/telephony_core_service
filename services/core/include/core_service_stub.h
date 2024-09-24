@@ -141,6 +141,9 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRetrieveNotificationList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRetrieveNotification(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRemoveNotificationFromList(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

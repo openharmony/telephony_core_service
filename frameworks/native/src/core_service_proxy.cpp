@@ -3188,5 +3188,109 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     response.response = reply.ReadString();
     return ret;
 }
+
+int32_t CoreServiceProxy::RetrieveNotificationList(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteInt32(static_cast<int32_t>(events));
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION_LIST), data,
+        reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("RetrieveNotificationList sendRequest failed, errcode is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t euiccNotificationCount = reply.ReadInt32();
+        notificationList.euiccNotification.resize(euiccNotificationCount);
+        for (int i = 0; i < euiccNotificationCount; ++i) {
+            EuiccNotification &nf = notificationList.euiccNotification[i];
+            nf.seq = reply.ReadInt32();
+            nf.targetAddr = reply.ReadString16();
+            nf.event = reply.ReadInt32();
+            nf.data = reply.ReadString16();
+        }
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::RetrieveNotification(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteInt32(seqNumber);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("RetrieveNotification sendRequest failed, errcode is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t res = reply.ReadInt32();
+    if (res == TELEPHONY_ERR_SUCCESS) {
+        notification.seq = reply.ReadInt32();
+        notification.targetAddr = reply.ReadString16();
+        notification.event = reply.ReadInt32();
+        notification.data = reply.ReadString16();
+    }
+    return res;
+}
+
+int32_t CoreServiceProxy::RemoveNotificationFromList(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteInt32(seqNumber);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::REMOVE_NOTIFICATION), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("RemoveNotificationFromList sendRequest failed, errcode is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        enumResult = static_cast<ResultState>(reply.ReadInt32());
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS
