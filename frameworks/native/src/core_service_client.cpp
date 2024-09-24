@@ -1081,5 +1081,39 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->DeleteProfile(slotId, iccId, enumResult);
+}
+
+int32_t CoreServiceClient::SwitchToProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+}
+
+int32_t CoreServiceClient::SetProfileNickname(
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetProfileNickname(slotId, iccId, nickname, enumResult);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

@@ -149,6 +149,13 @@ public:
     virtual int32_t GetOpkeyVersion(std::string &versionInfo) = 0;
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    virtual int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) = 0;
+    virtual int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
+        const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult) = 0;
+    virtual int32_t SetProfileNickname(
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) = 0;
+#endif
 
 protected:
     const int32_t ERROR = -1;

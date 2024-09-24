@@ -91,6 +91,12 @@ public:
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    ResultState DeleteProfile(const std::u16string &iccId);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
+#endif
+
 protected:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::shared_ptr<IccFileController> fileController_ = nullptr;

@@ -1649,5 +1649,47 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->DeleteProfile(slotId, iccId, enumResult);
+}
+
+int32_t CoreService::SwitchToProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+}
+
+int32_t CoreService::SetProfileNickname(
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetProfileNickname(slotId, iccId, nickname, enumResult);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
