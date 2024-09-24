@@ -146,6 +146,17 @@ public:
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
+    int32_t PrepareDownload(
+        int32_t slotId, int32_t portIndex,
+        const std::u16string &hashCc,
+        const std::u16string &smdpSigned2,
+        const std::u16string &smdpSignature2,
+        const std::u16string &smdpCertificate,
+        ResponseEsimResult &responseResult) override;
+    int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
+        ResponseEsimBppResult &responseResult) override;
+    int32_t ListNotifications(
+        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList) override;
 
 private:
     template<class T>

@@ -3188,5 +3188,120 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     response.response = reply.ReadString();
     return ret;
 }
+
+int32_t CoreServiceProxy::PrepareDownload(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &hashCc,
+    const std::u16string &smdpSigned2,
+    const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate,
+    ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteString16(hashCc);
+    data.WriteString16(smdpSigned2);
+    data.WriteString16(smdpSignature2);
+    data.WriteString16(smdpCertificate);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("PrepareDownload sendRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteString16(boundProfilePackage);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
+        reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("LoadBoundProfilePackage sendRequest failed, errcode is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = reply.ReadInt32();
+        responseResult.response = reply.ReadString16();
+        responseResult.seqNumber = reply.ReadInt32();
+        responseResult.profileManagementOperation = reply.ReadInt32();
+        responseResult.notificationAddress = reply.ReadString16();
+        responseResult.iccId = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::ListNotifications(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteInt32(static_cast<int32_t>(events));
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::LIST_NOTIFICATIONS), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("ListNotifications sendRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t euiccNotificationCount = reply.ReadInt32();
+        notificationList.euiccNotification.resize(euiccNotificationCount);
+        for (int i = 0; i < euiccNotificationCount; ++i) {
+            EuiccNotification &nf = notificationList.euiccNotification[i];
+            nf.seq = reply.ReadInt32();
+            nf.targetAddr = reply.ReadString16();
+            nf.event = reply.ReadInt32();
+            nf.data = reply.ReadString16();
+        }
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

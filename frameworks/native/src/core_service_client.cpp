@@ -1081,5 +1081,44 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
+
+int32_t CoreServiceClient::PrepareDownload(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &hashCc,
+    const std::u16string &smdpSigned2,
+    const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate,
+    ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->PrepareDownload(
+        slotId, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+}
+
+int32_t CoreServiceClient::LoadBoundProfilePackage(
+    int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
+}
+
+int32_t CoreServiceClient::ListNotifications(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ListNotifications(slotId, portIndex, events, notificationList);
+}
 } // namespace Telephony
 } // namespace OHOS

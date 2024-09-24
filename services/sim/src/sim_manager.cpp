@@ -1256,5 +1256,43 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+int32_t SimManager::PrepareDownload(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &hashCc,
+    const std::u16string &smdpSigned2,
+    const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate,
+    ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->PrepareDownload(
+        portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->LoadBoundProfilePackage(portIndex, boundProfilePackage);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::ListNotifications(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    notificationList = simFileManager_[slotId]->ListNotifications(portIndex, events);
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

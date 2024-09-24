@@ -1649,5 +1649,53 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+int32_t CoreService::PrepareDownload(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &hashCc,
+    const std::u16string &smdpSigned2,
+    const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate,
+    ResponseEsimResult &responseResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->PrepareDownload(
+        slotId, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+}
+
+int32_t CoreService::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
+}
+
+int32_t CoreService::ListNotifications(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->ListNotifications(slotId, portIndex, events, notificationList);
+}
+
 } // namespace Telephony
 } // namespace OHOS
