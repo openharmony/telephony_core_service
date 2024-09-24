@@ -1113,37 +1113,5 @@ int32_t CoreServiceClient::GetProfile(
     }
     return proxy->GetProfile(slotId, portIndex, iccId, eUiccProfile);
 }
-
-int32_t CoreServiceClient::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
-}
-
-int32_t CoreServiceClient::GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->GetSmdsAddress(slotId, portIndex, smdsAddress);
-}
-
-int32_t CoreServiceClient::GetRulesAuthTable(
-    int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable)
-{
-    auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return proxy->GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
-}
 } // namespace Telephony
 } // namespace OHOS

@@ -1,63 +1,3 @@
-/*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#include "esim_file.h"
-
-#include <unistd.h>
-
-#include "common_event_manager.h"
-#include "common_event_support.h"
-#include "core_manager_inner.h"
-#include "core_service.h"
-#include "core_manager_inner.h"
-#include "parameters.h"
-#include "radio_event.h"
-#include "sim_number_decode.h"
-#include "str_convert.h"
-#include "telephony_common_utils.h"
-#include "telephony_ext_wrapper.h"
-#include "telephony_state_registry_client.h"
-#include "telephony_tag_def.h"
-#include "vcard_utils.h"
-
-using namespace OHOS::AppExecFwk;
-using namespace OHOS::EventFwk;
-
-#define NUMBER_ZERO (0)
-#define NUMBER_ONE (1)
-#define NUMBER_TWO (2)
-#define NUMBER_THREE (3)
-#define NUMBER_FOUR (4)
-#define NUMBER_FIVE (5)
-#define NUMBER_ELEVEN (11)
-
-#define SW1_MORE_RESPONSE 0x61
-#define INS_GET_MORE_RESPONSE 0xC0
-#define SW1_VALUE_90 0x90
-#define SW2_VALUE_00 0x00
-
-namespace OHOS {
-namespace Telephony {
-EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("EsimFile", simStateManager)
-{
-    currentChannelId = 0;
-    InitMemberFunc();
-}
-
-void EsimFile::StartLoad() {}
-
 std::string EsimFile::ObtainDefaultSmdpAddress()
 {
     SyncOpenChannel();
@@ -77,7 +17,7 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
     return defaultDpAddress_;
 }
 
-ResponseEsimResult EsimFile::CancelSession(std::u16string transactionId, CancelReason cancelReason)
+ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
 {
     esimProfile_.transactionId = transactionId;
     esimProfile_.cancelReason = cancelReason;
@@ -98,7 +38,7 @@ ResponseEsimResult EsimFile::CancelSession(std::u16string transactionId, CancelR
     return cancelSessionResult_;
 }
 
-EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, std::u16string iccId)
+EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &iccId)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
@@ -128,7 +68,10 @@ bool EsimFile::ProcessObtainDefaultSmdpAddress(int32_t slotId, const AppExecFwk:
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t transApduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -161,7 +104,7 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
             (unsigned char) TAG_ESIM_PROFILE_CLASS,
             (unsigned char) TAG_ESIM_PROFILE_POLICY_RULE,
             (unsigned char) (TAG_ESIM_CARRIER_PRIVILEGE_RULES / 256),
-                (unsigned char) (TAG_ESIM_CARRIER_PRIVILEGE_RULES % 256),
+            (unsigned char) (TAG_ESIM_CARRIER_PRIVILEGE_RULES % 256),
         };
         std::string getProfileTags;
         for (unsigned char tag : EUICC_PROFILE_TAGS) {
@@ -173,7 +116,10 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t transApduResult == telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -190,14 +136,17 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
         }
         std::string transactionIdStr = Str16ToStr8(profile->transactionId);
         std::string transactionIdByte = Asn1Utils::HexStrToBytes(transactionIdStr);
-        int ret = builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, transactionIdByte, transactionIdByte.length());
-        ret = builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, (uint)profile->cancelReason);
+        builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, transactionIdByte, transactionIdByte.length());
+        builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, (uint)profile->cancelReason);
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t transApduResult == telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+            return false;
+        }
         return true;
     }
     return false;
