@@ -918,6 +918,44 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    /**
+     * @brief Deletes the given profile.
+     *
+     * @param slotId[in], sim slot id
+     * @param iccId[in], the iccId of the profile
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult);
+
+    /**
+     * @brief Obtain the international mobile subscriber identity
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], index of the port from the slot
+     * @param iccId[in], the iccId of the profile
+     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * perform this action automatically
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim,
+        ResultState &enumResult);
+
+    /**
+     * @brief Obtain the international mobile subscriber identity
+     *
+     * @param slotId[in], sim slot id
+     * @param iccId[in], the iccId of the profile
+     * @param nickname[in], the nickname of the profile
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetProfileNickname(
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult);
+#endif
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

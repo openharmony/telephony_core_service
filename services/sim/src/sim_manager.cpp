@@ -1256,5 +1256,38 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t SimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->DeleteProfile(iccId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::SwitchToProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::SetProfileNickname(
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->SetProfileNickname(iccId, nickname);
+    return TELEPHONY_ERR_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
