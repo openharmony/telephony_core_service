@@ -1256,5 +1256,38 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+int32_t SimManager::RetrieveNotificationList(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    notificationList = simFileManager_[slotId]->RetrieveNotificationList(portIndex, events);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::RetrieveNotification(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    notification = simFileManager_[slotId]->RetrieveNotification(portIndex, seqNumber);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::RemoveNotificationFromList(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->RemoveNotificationFromList(portIndex, seqNumber);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 } // namespace Telephony
 } // namespace OHOS
