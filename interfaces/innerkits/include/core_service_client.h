@@ -918,6 +918,46 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+    /**
+     * @brief Obtain the international mobile subscriber identity
+     *
+     * @param slotId[in], sim slot id
+     * @param option[in], options for resetting eUICC memory
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult);
+
+    /**
+     * @brief This procedure is used to set or update the Default SM-DP+ address stored in an eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param defaultSmdpAddress[in], the default SM-DP+ address to set
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetDefaultSmdpAddress(int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult);
+
+    /**
+     * @brief Whether to support esim
+     *
+     * @param slotId[in], sim slot id
+     * @return returns true if the device support; returns false otherwise.
+     */
+    bool IsEsimSupported(int32_t slotId);
+
+    /**
+     * @brief Provide sending upgrade or card binding data to the ESIM channel.
+     *
+     * @param slotId[in], sim slot id
+     * @param aid[in], apud sender
+     * @param data[in], apud data
+     * @param responseResult[out], return the result of execute one apdu
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SendApduData(
+        int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

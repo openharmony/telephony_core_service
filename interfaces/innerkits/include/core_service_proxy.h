@@ -146,6 +146,12 @@ public:
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) override;
+    int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) override;
+    bool IsEsimSupported(int32_t slotId) override;
+    int32_t SendApduData(int32_t slotId, const std::u16string &aid, const std::u16string &apduData,
+        ResponseEsimResult &responseResult) override;
 
 private:
     template<class T>

@@ -1081,5 +1081,47 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
+
+int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ResetMemory(slotId, resetOption, enumResult);
+}
+
+int32_t CoreServiceClient::SetDefaultSmdpAddress(
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
+}
+
+bool CoreServiceClient::IsEsimSupported(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->IsEsimSupported(slotId);
+}
+
+int32_t CoreServiceClient::SendApduData(
+    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SendApduData(slotId, aid, apduData, responseResult);
+}
 } // namespace Telephony
 } // namespace OHOS
