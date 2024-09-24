@@ -3188,5 +3188,151 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     response.response = reply.ReadString();
     return ret;
 }
+
+int32_t CoreServiceProxy::DisableProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    data.WriteString16(iccId);
+    data.WriteBool(refresh);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::DISABLE_PROFILE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("DisableProfile senRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        enumResult = static_cast<ResultState>(reply.ReadInt32());
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SMDSADDRESS), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetSmdsAddress sendRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        smdsAddress = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRulesAuthTable &eUiccRulesAuthTable)
+{
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t policyRulesSize = reply.ReadInt32();
+        eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
+        for (int i = 0; i < policyRulesSize; ++i) {
+            eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
+        }
+        int32_t carrierIdsSize = reply.ReadInt32();
+        eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
+        for (int j = 0; j < carrierIdsSize; ++j) {
+            CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds[j];
+            ci.mcc = reply.ReadString16();
+            ci.mnc = reply.ReadString16();
+            ci.spn = reply.ReadString16();
+            ci.imsi = reply.ReadString16();
+            ci.gid1 = reply.ReadString16();
+            ci.gid2 = reply.ReadString16();
+            ci.carrierId = reply.ReadInt32();
+            ci.specificCarrierId = reply.ReadInt32();
+        }
+        int32_t policyRuleFlagsSize = reply.ReadInt32();
+        eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);
+        for (int k = 0; k < policyRuleFlagsSize; ++k) {
+            eUiccRulesAuthTable.policyRuleFlags[k] = reply.ReadInt32();
+        }
+        eUiccRulesAuthTable.position = reply.ReadInt32();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::GetRulesAuthTable(
+    int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("DisableProfile sendRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return ParseRulesAuthTableReply(reply, eUiccRulesAuthTable);
+}
+
+int32_t CoreServiceProxy::GetEuiccChallenge(
+    int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(portIndex);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetEuiccChallenge sendRequest failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response =reply.ReadString16();
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS

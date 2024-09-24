@@ -141,6 +141,13 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
+    virtual int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) = 0;
+    virtual int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) = 0;
+    virtual int32_t GetRulesAuthTable(
+        int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) = 0;
+    virtual int32_t GetEuiccChallenge(
+        int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

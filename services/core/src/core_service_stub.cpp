@@ -272,6 +272,18 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+void CoreServiceStub::AddHandlerEsimToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::DISABLE_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDisableProfile(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SMDSADDRESS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSmdsAddress(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetRulesAuthTable(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccChallenge(data, reply); };
+}
+
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -1936,6 +1948,97 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
     reply.WriteInt32(response.sw2);
     reply.WriteString(response.response);
 
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnDisableProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    bool refresh = data.ReadBool();
+    ResultState enumResult;
+    int32_t result = DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string smdsAddress;
+    int32_t result = GetSmdsAddress(slotId, portIndex, smdsAddress);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteString16(smdsAddress);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    int32_t result = GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(eUiccRulesAuthTable.policyRules.size());
+        for (auto& rules : eUiccRulesAuthTable.policyRules) {
+            reply.WriteInt32(rules);
+        }
+        reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size());
+        for (auto& carrier : eUiccRulesAuthTable.carrierIds) {
+            reply.WriteString16(carrier.mcc);
+            reply.WriteString16(carrier.mnc);
+            reply.WriteString16(carrier.spn);
+            reply.WriteString16(carrier.imsi);
+            reply.WriteString16(carrier.gid1);
+            reply.WriteString16(carrier.gid2);
+            reply.WriteInt32(carrier.carrierId);
+            reply.WriteInt32(carrier.specificCarrierId);
+        }
+        reply.WriteInt32(eUiccRulesAuthTable.policyRuleFlags.size());
+        for (auto& ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
+            reply.WriteInt32(ruleFlags);
+        }
+
+        reply.WriteInt32(eUiccRulesAuthTable.position);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    ResponseEsimResult responseResult;
+    int32_t result = GetEuiccChallenge(slotId, portIndex, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
+        reply.WriteString16(responseResult.response);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     return NO_ERROR;
 }
 } // namespace Telephony

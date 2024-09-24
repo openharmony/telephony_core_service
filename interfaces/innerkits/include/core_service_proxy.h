@@ -146,6 +146,13 @@ public:
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
+    int32_t DisableProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh,
+        ResultState &enumResult) override;
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
+    int32_t ParseRulesAuthTableReply(MessageParcel &reply, EuiccRulesAuthTable &eUiccRulesAuthTable);
+    int32_t GetRulesAuthTable(
+        int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) override;
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
 
 private:
     template<class T>
