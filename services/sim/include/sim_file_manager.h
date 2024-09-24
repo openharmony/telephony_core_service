@@ -90,6 +90,10 @@ public:
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
+    ResultState ResetMemory(ResetOption resetOption);
+    ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
+    bool IsEsimSupported();
+    ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
 
 protected:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
