@@ -27,7 +27,6 @@ public:
         std::shared_ptr<TelRilHandler> handler);
     ~TelRilSms() = default;
 
-    uint8_t *ConvertHexStringToBytes(const uint8_t *hexString, size_t length);
     uint8_t ConvertHexCharToInt(uint8_t ch);
 
     int32_t SendGsmSms(std::string &smsPdu, std::string &pdu, const AppExecFwk::InnerEvent::Pointer &response);
