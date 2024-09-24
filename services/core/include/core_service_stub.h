@@ -141,6 +141,10 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDisableProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
