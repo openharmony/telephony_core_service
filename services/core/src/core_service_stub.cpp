@@ -272,6 +272,16 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+void CoreServiceStub::AddHandlerEsimToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnPrepareDownload(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnLoadBoundProfilePackage(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LIST_NOTIFICATIONS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnListNotifications(data, reply); };
+}
+
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -1938,5 +1948,78 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
 
     return NO_ERROR;
 }
+
+int32_t CoreServiceStub::OnPrepareDownload(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string hashCc = data.ReadString16();
+    std::u16string smdpSigned2 = data.ReadString16();
+    std::u16string smdpSignature2 = data.ReadString16();
+    std::u16string smdpCertificate = data.ReadString16();
+
+    ResponseEsimResult responseResult;
+    int32_t result = PrepareDownload(slotId, portIndex, hashCc, smdpSigned2, smdpSignature2,
+        smdpCertificate, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
+        reply.WriteString16(responseResult.response);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnLoadBoundProfilePackage(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string boundProfilePackage = data.ReadString16();
+
+    ResponseEsimBppResult responseResult;
+    int32_t result = LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(responseResult.resultCode);
+        reply.WriteString16(responseResult.response);
+        reply.WriteInt32(responseResult.seqNumber);
+        reply.WriteInt32(responseResult.profileManagementOperation);
+        reply.WriteString16(responseResult.notificationAddress);
+        reply.WriteString16(responseResult.iccId);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnListNotifications(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    Event events = static_cast<Event>(data.ReadInt32());
+    EuiccNotificationList notificationList;
+    int32_t result = ListNotifications(slotId, portIndex, events, notificationList);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(notificationList.euiccNotification.size());
+        for (auto& notification : notificationList.euiccNotification) {
+            reply.WriteInt32(notification.seq);
+            reply.WriteString16(notification.targetAddr);
+            reply.WriteInt32(notification.event);
+            reply.WriteString16(notification.data);
+        }
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
 } // namespace Telephony
 } // namespace OHOS
