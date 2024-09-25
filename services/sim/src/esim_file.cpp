@@ -1,4 +1,4 @@
-ResultState EsimFile::DisableProfile(int32_t portIndex, std::u16string iccId)
+ResultState EsimFile::DisableProfile(int32_t portIndex, std::u16string &iccId)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
@@ -63,7 +63,6 @@ ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
-    slotId_ = 0;
     AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
     if (!ProcessObtainEUICCChallenge(slotId_, eventEUICCChanllenge)) {
         TELEPHONY_LOGE("ProcessObtainEUICCChallenge encode failed");
@@ -102,7 +101,10 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -121,7 +123,10 @@ bool EsimFile::ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerE
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);;
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -136,7 +141,10 @@ bool EsimFile::ProcessRequestRulesAuthTable(int32_t slotId, const AppExecFwk::In
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -155,7 +163,10 @@ bool EsimFile::ProcessObtainEUICCChallenge(int32_t slotId, const AppExecFwk::Inn
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -301,6 +312,9 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
         std::shared_ptr<Asn1Node> pNode = *it;
         std::shared_ptr<Asn1Node> pAGetChildChild = pNode->Asn1GetChildChild(TAG_NUM,
             TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_COMP_1);
+        if (pAGetChildChild == nullptr) {
+            return false;
+        }
         int opIdNodesRes = pAGetChildChild->Asn1GetChildren(TAG_ESIM_OPERATOR_ID, opIdNodes);
         if (opIdNodesRes != 0 ) {
             return isFileHandleResponse;
