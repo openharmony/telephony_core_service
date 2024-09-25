@@ -28,14 +28,14 @@ namespace OHOS {
 namespace Telephony {
 const int32_t DEFAULT_ERROR = -1;
 
-template<typename T>
+template <typename T>
 struct AsyncContext {
     BaseContext context;
     int32_t slotId = ERROR_DEFAULT;
     T callbackVal;
 };
 
-struct AsyncContext2 {
+struct AsyncContextInfo {
     AsyncContext<int32_t> asyncContext;
     std::string inputStr = "";
 };
@@ -71,7 +71,7 @@ struct AsyncDownloadableProfile {
     std::string encodedActivationCode = "";
     std::string confirmationCode = "";
     std::string carrierName = "";
-    std::vector<AsyncAccessRule> accessRules {};
+    std::vector<AsyncAccessRule> accessRules{};
 };
 
 struct AsyncDownloadProfileInfo {
