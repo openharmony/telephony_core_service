@@ -69,7 +69,7 @@ bool EsimFile::ProcessObtainDefaultSmdpAddress(int32_t slotId, const AppExecFwk:
             return false;
         }
         int32_t transApduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+        if (transApduResult == TELEPHONY_ERR_FAIL) {
             return false;
         }
         return true;
@@ -117,7 +117,7 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
             return false;
         }
         int32_t transApduResult == telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+        if (transApduResult == TELEPHONY_ERR_FAIL) {
             return false;
         }
         return true;
@@ -144,7 +144,7 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
             return false;
         }
         int32_t transApduResult == telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (transApduResult == TELEPHONY_ERR_LOCAL_PTR_NULL) {
+        if (transApduResult == TELEPHONY_ERR_FAIL) {
             return false;
         }
         return true;
