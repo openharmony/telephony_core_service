@@ -3198,16 +3198,22 @@ int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, R
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteInt32(static_cast<int32_t>(resetOption));
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(static_cast<int32_t>(resetOption))) {
+        TELEPHONY_LOGE("WriteInt32 resetOption is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RESET_MEMORY), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("ResetMemory failed, error code is %{public}d", st);
+    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RESET_MEMORY), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("ResetMemory failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -3227,16 +3233,22 @@ int32_t CoreServiceProxy::SetDefaultSmdpAddress(
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteString16(defaultSmdpAddress);
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(defaultSmdpAddress)) {
+        TELEPHONY_LOGE("WriteString16 defaultSmdpAddress is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("SetDefaultSmdpAddress failed, error code is %{public}d", st);
+    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("SetDefaultSmdpAddress failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -3255,15 +3267,18 @@ bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return false;
     }
-    data.WriteInt32(slotId);
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return false;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("IsEsimSupported sendRequest failed, error code is %{public}d", st);
+    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("IsEsimSupported sendRequest failed, error code is %{public}d", requestResult);
         return false;
     }
     return reply.ReadBool();
@@ -3279,17 +3294,26 @@ int32_t CoreServiceProxy::SendApduData(
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteString16(aid);
-    data.WriteString16(apduData);
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(aid)) {
+        TELEPHONY_LOGE("WriteString16 aid is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(apduData)) {
+        TELEPHONY_LOGE("WriteString16 apduData is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("SendApduData sendRequest failed, error code is %{public}d", st);
+    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("SendApduData sendRequest failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();

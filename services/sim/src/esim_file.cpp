@@ -1,3 +1,5 @@
+
+
 ResultState EsimFile::ResetMemory(ResetOption resetOption)
 {
     esimProfile_.option = resetOption;
@@ -7,10 +9,10 @@ ResultState EsimFile::ResetMemory(ResetOption resetOption)
         TELEPHONY_LOGE("ProcessResetMemory encode failed");
         return ResultState();
     }
-    areResetMemoryReady_ = false;
+    isResetMemoryReady_ = false;
     std::unique_lock<std::mutex> lock(resetMemoryMutex_);
     if (!resetMemoryCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areResetMemoryReady_; })) {
+        [this]() { return isResetMemoryReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
@@ -27,10 +29,10 @@ ResultState EsimFile::SetDefaultSmdpAddress(std::u16string defaultSmdpAddress)
         TELEPHONY_LOGE("ProcessEstablishDefaultSmdpAddress encode failed!!");
         return ResultState();
     }
-    areSetDefaultSmdpAddressReady_ = false;
+    isSetDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(setDefaultSmdpAddressMutex_);
     if (!setDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areSetDefaultSmdpAddressReady_; })) {
+        [this]() { return isSetDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
@@ -40,7 +42,6 @@ ResultState EsimFile::SetDefaultSmdpAddress(std::u16string defaultSmdpAddress)
 
 bool EsimFile::IsEsimSupported()
 {
-    const int ATR_LENGTH = 47;
     char buf[ATR_LENGTH + 1] = {0};
     const std::string ATR_PROP = "gsm.sim.hw_atr";
     GetParameter(ATR_PROP.c_str(), "", buf, ATR_LENGTH);
@@ -63,7 +64,7 @@ ResponseEsimResult EsimFile::SendApduData(std::u16string aid, std::u16string apd
     }
     std::unique_lock<std::mutex> lock(SendApduDataMutex_);
     if (!SendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areSendApduDataReady_; })) {
+        [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel();
         return ResponseEsimResult();
     }
@@ -121,13 +122,13 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
     resetResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
     {
         std::lock_guard<std::mutex> lock(resetMemoryMutex_);
-        areResetMemoryReady_ = true;
+        isResetMemoryReady_ = true;
     }
     resetMemoryCv_.notify_one();
     return isFileHandleResponse;
 }
 
-bool EsimFile::ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+bool EsimFile::setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
     if (IsLogicChannelOpen()) {
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
@@ -147,7 +148,7 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecF
     return false;
 }
 
-bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
+bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileHandleResponse = true;
     if (event == nullptr) {
@@ -174,7 +175,7 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEve
     setDpAddressResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
     {
         std::lock_guard<std::mutex> lock(setDefaultSmdpAddressMutex_);
-        areSetDefaultSmdpAddressReady_ = true;
+        isSetDefaultSmdpAddressReady_ = true;
     }
     setDefaultSmdpAddressCv_.notify_one();
     return isFileHandleResponse;
@@ -218,7 +219,7 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
 
     {
         std::lock_guard<std::mutex> lock(SendApduDataMutex_);
-        areSendApduDataReady_ = true;
+        isSendApduDataReady_ = true;
     }
     SendApduDataCv_.notify_one();
     return isFileHandleResponse;

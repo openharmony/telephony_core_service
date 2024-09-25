@@ -919,10 +919,10 @@ public:
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
     /**
-     * @brief Obtain the international mobile subscriber identity
+     * @brief Reset memory
      *
      * @param slotId[in], sim slot id
-     * @param option[in], options for resetting eUICC memory
+     * @param resetOption[in], options for resetting eUICC memory
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
