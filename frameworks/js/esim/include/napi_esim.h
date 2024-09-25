@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Telephony {
 const int32_t DEFAULT_ERROR = -1;
 
-template <typename T>
+template<typename T>
 struct AsyncContext {
     BaseContext context;
     int32_t slotId = ERROR_DEFAULT;
