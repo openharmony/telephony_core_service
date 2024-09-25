@@ -879,7 +879,7 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
     napi_value object = NapiUtil::CreateUndefined(env);
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
         &object, &profileContext->switchAfterDownload, &profileContext->forceDeactivateSim,
-		&context.callbackRef);
+        &context.callbackRef);
 
     AsyncPara para {
         .funcName = "DownloadProfile",
