@@ -1954,13 +1954,13 @@ int32_t CoreServiceStub::OnRequestDefaultSmdpAddress(MessageParcel &data, Messag
     int32_t slotId = data.ReadInt32();
     std::u16string defaultSmdpAddress;
     int32_t result = GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        bool ret = reply.WriteInt32(result);
-        if (!ret) {
-            TELEPHONY_LOGE("write reply failed");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
         ret = (ret && reply.WriteString16(defaultSmdpAddress));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
 }
@@ -1972,13 +1972,12 @@ int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &rep
     CancelReason cancelReason = static_cast<CancelReason>(data.ReadInt32());
     ResponseEsimResult responseResult;
     int32_t result = CancelSession(slotId, transactionId, cancelReason, responseResult);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        if (!reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)) ||
-            !reply.WriteString16(responseResult.response)) {
-                return TELEPHONY_ERR_WRITE_REPLY_FAIL
-            }
+        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
+        reply.WriteString16(responseResult.response);
     }
-    if (!reply.WriteInt32(result)) {
+    if (!ret) {
         TELEPHONY_LOGE("write reply failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
@@ -1992,6 +1991,7 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
     std::u16string iccId = data.ReadString16();
     EuiccProfile eUiccProfile;
     int32_t result = GetProfile(slotId, portIndex, iccId, eUiccProfile);
+    bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteString16(eUiccProfile.iccId);
         reply.WriteString16(eUiccProfile.nickName);
@@ -2011,7 +2011,7 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
             reply.WriteInt32(rule.accessType);
         }
     }
-    if (!reply.WriteInt32(result);) {
+    if (!ret) {
         TELEPHONY_LOGE("OnRequestDefaultSmdpAddress OnRemoteRequest::REQUEST_DEFAULT_SMDP_ADDRESS write reply failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
