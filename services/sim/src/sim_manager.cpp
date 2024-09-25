@@ -1263,6 +1263,9 @@ int32_t SimManager::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaul
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     defaultSmdpAddress = simFileManager_[slotId]->GetDefaultSmdpAddress();
+    if (defaultSmdpAddress == Str8ToStr16("")) {
+        return TELEPHONY_ERR_FAIL;
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1273,7 +1276,10 @@ int32_t SimManager::CancelSession(
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    simFileManager_[slotId]->CancelSession(transactionId, cancelReason);
+    responseResult = simFileManager_[slotId]->CancelSession(transactionId, cancelReason);
+    if (responseResult.resultCode != ResultState::RESULT_OK) {
+        return TELEPHONY_ERR_FAIL;
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1285,6 +1291,9 @@ int32_t SimManager::GetProfile(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccProfile = simFileManager_[slotId]->GetProfile(portIndex, iccId);
+    if (eUiccProfile.state != 0) {
+        return TELEPHONY_ERR_FAIL;
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
