@@ -54,7 +54,7 @@ template<typename T, napi_async_execute_callback exec, napi_async_complete_callb
 napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::string_view funcName)
 {
     size_t argc = PARAMETER_COUNT_TWO;
-    napi_value argv[] {nullptr, nullptr};
+    napi_value argv[]{nullptr, nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
 
     std::unique_ptr<AsyncContext<T>> asyncContext = std::make_unique<AsyncContext<T>>();
@@ -77,9 +77,8 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, funcName.data(), funcName.length(), &resourceName));
     AsyncContext<T> *pContext = asyncContext.release();
-    NAPI_CALL(env,
-        napi_create_async_work(
-            env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext), &context.work));
+    NAPI_CALL(env, napi_create_async_work(
+        env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext), &context.work));
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
         delete pContext;
         result = nullptr;
@@ -98,7 +97,7 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     BaseContext &context = asyncContext->asyncContext.context;
 
     size_t argc = sizeof...(Ts);
-    napi_value argv[sizeof...(Ts)] {nullptr};
+    napi_value argv[sizeof...(Ts)]{nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, para.info, &argc, argv, nullptr, nullptr));
 
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, theTuple);
@@ -118,7 +117,7 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
-            static_cast<void *>(asyncContext), &context.work));
+        static_cast<void *>(asyncContext), &context.work));
     return result;
 }
 
@@ -356,7 +355,7 @@ void AccessRuleInfoAnalyze(napi_env env, napi_value arg, AsyncAccessRule &access
         NapiValueToCppValue(env, nameState, napi_string, nameStr);
         accessType.packageName = std::string(nameStr);
     }
-    
+
     napi_value type = NapiUtil::GetNamedProperty(env, arg, "accessType");
     if (type) {
         NapiValueToCppValue(env, type, napi_number, &accessType.accessType);
@@ -472,7 +471,7 @@ void NativeGetEuiccInfo(napi_env env, void *data)
     EuiccInfo euiccInfo;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEuiccInfo(
         info->asyncContext.slotId, euiccInfo);
-    TELEPHONY_LOGI("NAPI NativeGetEuiccInfo %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeGetEuiccInfo %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         info->result = euiccInfo;
         info->asyncContext.context.resolved = true;
@@ -487,12 +486,12 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncEuiccInfo> context(static_cast<AsyncEuiccInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetEuiccInfoCallback context is nullptr");
+        TELEPHONY_LOGE("GetEuiccInfoCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
     if (asyncContext.context.resolved) {
-        asyncContext.callbackVal =  EuiccInfoConversion(env, context->result);
+        asyncContext.callbackVal = EuiccInfoConversion(env, context->result);
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "GetEuiccInfo", Permission::GET_TELEPHONY_ESIM_STATE });
@@ -500,7 +499,10 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetEuiccInfo(napi_env env, napi_callback_info info)
 {
-    auto euiccInfo = new AsyncEuiccInfo();
+    auto euiccInfo = new (std::nothrow) AsyncEuiccInfo();
+    if (euiccInfo == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = euiccInfo->asyncContext.context;
 
     auto initPara = std::make_tuple(&euiccInfo->asyncContext.slotId, &context.callbackRef);
@@ -532,7 +534,7 @@ void NativeGetDefaultSmdpAddress(napi_env env, void *data)
     std::string smdpAddress;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDefaultSmdpAddress(
         asyncContext->slotId, smdpAddress);
-    TELEPHONY_LOGI("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = smdpAddress;
         asyncContext->context.resolved = true;
@@ -547,7 +549,7 @@ void GetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetDefaultSmdpAddressCallback context is nullptr");
+        TELEPHONY_LOGE("GetDefaultSmdpAddressCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -565,7 +567,7 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
+    AsyncContextInfo *context = static_cast<AsyncContextInfo *>(data);
     if (!IsValidSlotId(context->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeSetDefaultSmdpAddress slotId is invalid");
         context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
@@ -575,7 +577,7 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetDefaultSmdpAddress(
         context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
-    TELEPHONY_LOGI("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
         context->asyncContext.context.resolved = true;
@@ -588,9 +590,9 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
 void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    std::unique_ptr<AsyncContextInfo> context(static_cast<AsyncContextInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("SetDefaultSmdpAddressCallback context is nullptr");
+        TELEPHONY_LOGE("SetDefaultSmdpAddressCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -599,7 +601,10 @@ void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
 {
-    auto asyncContext = new AsyncContext2();
+    auto asyncContext = new (std::nothrow) AsyncContextInfo();
+    if (asyncContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = asyncContext->asyncContext.context;
 
     char inputTepStr[ARRAY_SIZE] = {0};
@@ -611,7 +616,7 @@ napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
         .execute = NativeSetDefaultSmdpAddress,
         .complete = SetDefaultSmdpAddressCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext, initPara);
     if (result) {
         asyncContext->inputStr = std::string(inputTepStr);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
@@ -634,9 +639,9 @@ void NativeSwitchToProfile(napi_env env, void *data)
 
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SwitchToProfile(
-        asyncContext.slotId, profileContext->portIndex,
-        NapiUtil::ToUtf16(profileContext->iccid.data()), profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGI("NAPI NativeSwitchToProfile %{public}d", errorCode);
+        asyncContext.slotId, profileContext->portIndex, NapiUtil::ToUtf16(profileContext->iccid.data()),
+        profileContext->forceDeactivateSim, result);
+    TELEPHONY_LOGE("NAPI NativeSwitchToProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -651,7 +656,7 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncSwitchProfileInfo> context(static_cast<AsyncSwitchProfileInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("SwitchToProfileCallback context is nullptr");
+        TELEPHONY_LOGE("SwitchToProfileCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -660,7 +665,10 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value SwitchToProfile(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new AsyncSwitchProfileInfo();
+    auto profileContext = new (std::nothrow) AsyncSwitchProfileInfo();
+    if (profileContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = profileContext->asyncContext.context;
 
     char iccIdStr[ARRAY_SIZE] = {0};
@@ -687,7 +695,7 @@ void NativeDeleteProfile(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncContext2 *context = static_cast<AsyncContext2 *>(data);
+    AsyncContextInfo *context = static_cast<AsyncContextInfo *>(data);
     if (!IsValidSlotId(context->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeDeleteProfile slotId is invalid");
         context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
@@ -697,7 +705,7 @@ void NativeDeleteProfile(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DeleteProfile(
         context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
-    TELEPHONY_LOGI("NAPI NativeDeleteProfile %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeDeleteProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
         context->asyncContext.context.resolved = true;
@@ -710,9 +718,9 @@ void NativeDeleteProfile(napi_env env, void *data)
 void DeleteProfileCallback(napi_env env, napi_status status, void *data)
 {
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
-    std::unique_ptr<AsyncContext2> context(static_cast<AsyncContext2 *>(data));
+    std::unique_ptr<AsyncContextInfo> context(static_cast<AsyncContextInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("DeleteProfileCallback context is nullptr");
+        TELEPHONY_LOGE("DeleteProfileCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -721,7 +729,10 @@ void DeleteProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DeleteProfile(napi_env env, napi_callback_info info)
 {
-    auto asyncContext = new AsyncContext2();
+    auto asyncContext = new (std::nothrow) AsyncContextInfo();
+    if (asyncContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = asyncContext->asyncContext.context;
 
     char inputTmpStr[ARRAY_SIZE] = {0};
@@ -733,7 +744,7 @@ napi_value DeleteProfile(napi_env env, napi_callback_info info)
         .execute = NativeDeleteProfile,
         .complete = DeleteProfileCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext, initPara);
     if (result) {
         asyncContext->inputStr = std::string(inputTmpStr);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
@@ -760,7 +771,7 @@ void NativeResetMemory(napi_env env, void *data)
     }
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
         asyncContext.slotId, static_cast<ResetOption>(profileContext->option), result);
-    TELEPHONY_LOGI("NAPI NativeResetMemory %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeResetMemory %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -775,7 +786,7 @@ void ResetMemoryCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncResetMemory> context(static_cast<AsyncResetMemory *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("ResetMemoryCallback context is nullptr");
+        TELEPHONY_LOGE("ResetMemoryCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -793,7 +804,10 @@ napi_value ResetMemory(napi_env env, napi_callback_info info)
         return NapiCreateAsyncWork<int32_t, NativeResetMemory, ResetMemoryCallback>(env, info, "ResetMemory");
     }
 
-    auto profileContext = new AsyncResetMemory();
+    auto profileContext = new (std::nothrow) AsyncResetMemory();
+    if (profileContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = profileContext->asyncContext.context;
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId,
         &profileContext->option, &context.callbackRef);
@@ -829,7 +843,7 @@ void NativeDownloadProfile(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
         profileContext->asyncContext.slotId, profileContext->portIndex, profile,
         profileContext->switchAfterDownload, profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeDownloadProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -844,7 +858,7 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncDownloadProfileInfo> context(static_cast<AsyncDownloadProfileInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("DownloadProfileCallback context is nullptr");
+        TELEPHONY_LOGE("DownloadProfileCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
@@ -857,12 +871,15 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DownloadProfile(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new AsyncDownloadProfileInfo();
+    auto profileContext = new (std::nothrow) AsyncDownloadProfileInfo();
+    if (profileContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = profileContext->asyncContext.context;
     napi_value object = NapiUtil::CreateUndefined(env);
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        &object, &profileContext->switchAfterDownload,
-        &profileContext->forceDeactivateSim, &context.callbackRef);
+        &object, &profileContext->switchAfterDownload, &profileContext->forceDeactivateSim,
+		&context.callbackRef);
 
     AsyncPara para {
         .funcName = "DownloadProfile",
@@ -894,7 +911,7 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
     GetDownloadableProfilesResult result;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfiles(
         profileContext->asyncContext.slotId, profileContext->portIndex, profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGI("NAPI NativeGetDownloadableProfiles %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeGetDownloadableProfiles %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -909,7 +926,7 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncDefaultProfileList> context(static_cast<AsyncDefaultProfileList *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetDownloadableProfilesCallback context is nullptr");
+        TELEPHONY_LOGE("GetDownloadableProfilesCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
@@ -922,7 +939,10 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new AsyncDefaultProfileList();
+    auto profileContext = new (std::nothrow) AsyncDefaultProfileList();
+    if (profileContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = profileContext->asyncContext.context;
 
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
@@ -954,9 +974,9 @@ void NativeGetOsuStatus(napi_env env, void *data)
         return;
     }
     int32_t result = UNDEFINED_VALUE;
-    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetOsuStatus(asyncContext->slotId,
-        result);
-    TELEPHONY_LOGI("NAPI NativeGetOsuStatus %{public}d", errorCode);
+    int32_t errorCode =
+        DelayedRefSingleton<EsimServiceClient>::GetInstance().GetOsuStatus(asyncContext->slotId, result);
+    TELEPHONY_LOGE("NAPI NativeGetOsuStatus %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = result;
         asyncContext->context.resolved = true;
@@ -971,7 +991,7 @@ void GetOsuStatusCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetOsuStatusCallback context is nullptr");
+        TELEPHONY_LOGE("GetOsuStatusCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -997,7 +1017,7 @@ void NativeStartOsu(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode =
         DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(asyncContext->slotId, result);
-    TELEPHONY_LOGI("NAPI NativeStartOsu %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeStartOsu %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = result;
         asyncContext->context.resolved = true;
@@ -1012,7 +1032,7 @@ void StartOsuCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncContext<int32_t>> context(static_cast<AsyncContext<int32_t> *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("StartOsuCallback context is nullptr");
+        TELEPHONY_LOGE("StartOsuCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -1041,7 +1061,7 @@ void NativeSetProfileNickname(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetProfileNickname(
         asyncContext.slotId, NapiUtil::ToUtf16(profileContext->iccid.data()),
         NapiUtil::ToUtf16(profileContext->nickname.data()), result);
-    TELEPHONY_LOGI("NAPI NativeSetProfileNickname %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeSetProfileNickname %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -1056,7 +1076,7 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncProfileNickname> context(static_cast<AsyncProfileNickname *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("SetProfileNicknameCallback context is nullptr");
+        TELEPHONY_LOGE("SetProfileNicknameCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(
@@ -1065,7 +1085,10 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetProfileNickname(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new AsyncProfileNickname();
+    auto profileContext = new (std::nothrow) AsyncProfileNickname();
+    if (profileContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = profileContext->asyncContext.context;
 
     char iccIdStr[ARRAY_SIZE] = {0};
@@ -1105,7 +1128,7 @@ void NativeCancelSession(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().CancelSession(
         asyncContext.slotId, NapiUtil::ToUtf16(sessionContext->transactionId.data()),
         static_cast<CancelReason>(sessionContext->cancelReason), responseResult);
-    TELEPHONY_LOGI("NAPI NativeCancelSession %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeCancelSession %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         sessionContext->responseResult = responseResult;
         sessionContext->asyncContext.context.resolved = true;
@@ -1120,7 +1143,7 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncCancelSession> context(static_cast<AsyncCancelSession *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("CancelSessionCallback context is nullptr");
+        TELEPHONY_LOGE("CancelSessionCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
@@ -1133,7 +1156,10 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
 
 napi_value CancelSession(napi_env env, napi_callback_info info)
 {
-    auto sessionContext = new AsyncCancelSession();
+    auto sessionContext = new (std::nothrow) AsyncCancelSession();
+    if (sessionContext == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = sessionContext->asyncContext.context;
 
     char transactionIdStr[ARRAY_SIZE] = {0};
@@ -1170,10 +1196,8 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     GetDownloadableProfileMetadataResult result;
     DownloadableProfile profile = GetProfileInfo(metadata->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfileMetadata(
-        metadata->asyncContext.slotId, metadata->portIndex, profile,
-        metadata->forceDeactivateSim, result);
-    TELEPHONY_LOGI("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
-        TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
+        metadata->asyncContext.slotId, metadata->portIndex, profile, metadata->forceDeactivateSim, result);
+    TELEPHONY_LOGE("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         metadata->result = result;
         metadata->asyncContext.context.resolved = true;
@@ -1188,21 +1212,23 @@ void GetDownloadableProfileMetadataCallback(napi_env env, napi_status status, vo
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncProfileMetadataInfo> context(static_cast<AsyncProfileMetadataInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetDownloadableProfileMetadataCallback context is nullptr");
+        TELEPHONY_LOGE("GetDownloadableProfileMetadataCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = MetadataResultConversion(env, context->result);
     }
-    NapiAsyncPermissionCompleteCallback(
-        env, status, context->asyncContext, false,
+    NapiAsyncPermissionCompleteCallback(env, status, context->asyncContext, false,
         { "GetDownloadableProfileMetadata", Permission::SET_TELEPHONY_ESIM_STATE });
 }
 
 napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
 {
-    auto metadata = new AsyncProfileMetadataInfo();
+    auto metadata = new (std::nothrow) AsyncProfileMetadataInfo();
+    if (metadata == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = metadata->asyncContext.context;
     napi_value object = NapiUtil::CreateUndefined(env);
     auto initPara = std::make_tuple(&metadata->asyncContext.slotId, &metadata->portIndex,
@@ -1239,7 +1265,7 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
     GetEuiccProfileInfoListResult result;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEuiccProfileInfoList(
         profileContext->asyncContext.slotId, result);
-    TELEPHONY_LOGI("NAPI NativeGetEuiccProfileInfoList %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeGetEuiccProfileInfoList %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -1254,7 +1280,7 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncEuiccProfileInfoList> context(static_cast<AsyncEuiccProfileInfoList *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("GetEuiccProfileInfoListCallback context is nullptr");
+        TELEPHONY_LOGE("GetEuiccProfileInfoListCallback context is nullptr");
         return;
     }
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
@@ -1267,7 +1293,10 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetEuiccProfileInfoList(napi_env env, napi_callback_info info)
 {
-    auto euiccInfo = new AsyncEuiccProfileInfoList();
+    auto euiccInfo = new (std::nothrow) AsyncEuiccProfileInfoList();
+    if (euiccInfo == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = euiccInfo->asyncContext.context;
 
     auto initPara = std::make_tuple(&euiccInfo->asyncContext.slotId, &context.callbackRef);
@@ -1302,7 +1331,7 @@ void NativeReserveProfilesForFactoryRestore(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ReserveProfilesForFactoryRestore(
         asyncContext.slotId, result);
-    TELEPHONY_LOGI("NAPI NativeReserveProfilesForFactoryRestore %{public}d", errorCode);
+    TELEPHONY_LOGE("NAPI NativeReserveProfilesForFactoryRestore %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -1317,7 +1346,7 @@ void ReserveProfilesForFactoryRestoreCallback(napi_env env, napi_status status, 
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncCommonInfo> context(static_cast<AsyncCommonInfo *>(data));
     if (context == nullptr) {
-        TELEPHONY_LOGI("ReserveProfilesForFactoryRestoreCallback context is nullptr");
+        TELEPHONY_LOGE("ReserveProfilesForFactoryRestoreCallback context is nullptr");
         return;
     }
     NapiAsyncPermissionCompleteCallback(env, status, context->asyncContext, false,
@@ -1326,10 +1355,13 @@ void ReserveProfilesForFactoryRestoreCallback(napi_env env, napi_status status, 
 
 napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info info)
 {
-    auto euiccInfo = new AsyncCommonInfo();
-    BaseContext &context = euiccInfo->asyncContext.context;
+    auto asyncContext = new (std::nothrow) AsyncCommonInfo();
+    if (asyncContext == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = asyncContext->asyncContext.context;
 
-    auto initPara = std::make_tuple(&euiccInfo->asyncContext.slotId, &context.callbackRef);
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &context.callbackRef);
     AsyncPara para {
         .funcName = "ReserveProfilesForFactoryRestore",
         .env = env,
@@ -1337,7 +1369,7 @@ napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info inf
         .execute = NativeReserveProfilesForFactoryRestore,
         .complete = ReserveProfilesForFactoryRestoreCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncCommonInfo>(para, euiccInfo, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncCommonInfo>(para, asyncContext, initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
