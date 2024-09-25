@@ -3235,11 +3235,11 @@ int32_t CoreServiceProxy::CancelSession(
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteString16(transactionId)) {
-        TELEPHONY_LOGE("WriteString16 slotId is false");
+        TELEPHONY_LOGE("WriteString16 transactionId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(static_cast<int32_t>(cancelReason))) {
-        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        TELEPHONY_LOGE("WriteInt32 cancelReason is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
@@ -3276,11 +3276,11 @@ int32_t CoreServiceProxy::GetProfile(
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(portIndex)) {
-        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        TELEPHONY_LOGE("WriteInt32 portIndex is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteString16(iccId)) {
-        TELEPHONY_LOGE("WriteString16 slotId is false");
+        TELEPHONY_LOGE("WriteString16 iccId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 

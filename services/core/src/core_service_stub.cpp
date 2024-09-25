@@ -1973,8 +1973,10 @@ int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &rep
     ResponseEsimResult responseResult;
     int32_t result = CancelSession(slotId, transactionId, cancelReason, responseResult);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
-        reply.WriteString16(responseResult.response);
+        if (!reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)) ||
+            !reply.WriteString16(responseResult.response)) {
+                return TELEPHONY_ERR_WRITE_REPLY_FAIL
+            }
     }
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("write reply failed");
