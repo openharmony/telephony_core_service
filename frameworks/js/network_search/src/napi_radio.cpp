@@ -27,6 +27,7 @@
 #include "get_preferred_network_callback.h"
 #include "get_radio_state_callback.h"
 #include "napi_ims_reg_info_callback_manager.h"
+#include "parameters.h"
 #include "set_network_search_mode_callback.h"
 #include "set_nr_option_mode_callback.h"
 #include "set_preferred_network_callback.h"
@@ -49,6 +50,7 @@ static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHON
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *LOCATION = "ohos.permission.LOCATION";
 static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+static constexpr const char *EFL_FORBIDDEN = "const.telephony.efl_forbidden";
 
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
@@ -2590,8 +2592,8 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
-    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
-        TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_ != nullptr) {
+        isNrSupported = isNrSupported && TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_();
     }
 #endif
     TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
