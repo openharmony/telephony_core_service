@@ -2560,6 +2560,7 @@ HWTEST_F(BranchTest, Telephony_SimFileController_001, Function | MediumTest | Le
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_AD), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT6), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBI), "");
