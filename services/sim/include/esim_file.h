@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t NUMBER_THREE = 3;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
 class EsimFile : public IccFile {
 public:
