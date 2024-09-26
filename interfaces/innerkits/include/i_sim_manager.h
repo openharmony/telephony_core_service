@@ -17,13 +17,13 @@
 #define OHOS_I_SIM_MANAGER_H
 
 #include "dialling_numbers_info.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_state_type.h"
+#endif
 #include "event_handler.h"
 #include "operator_config_types.h"
 #include "sim_account_callback.h"
 #include "sim_state_type.h"
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-#include "esim_state_type.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {

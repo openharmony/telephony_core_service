@@ -19,6 +19,9 @@
 #include "common_event_subscriber.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_file.h"
+#endif
 #include "tel_ril_modem_parcel.h"
 #include "i_tel_ril_manager.h"
 #include "isim_file.h"
@@ -33,9 +36,6 @@
 #include "csim_file_controller.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-#include "esim_file.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {

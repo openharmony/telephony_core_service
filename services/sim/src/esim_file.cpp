@@ -32,29 +32,15 @@
 #include "telephony_tag_def.h"
 #include "vcard_utils.h"
 
-
-
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
-#define NUMBER_ZERO (0)
-#define NUMBER_ONE (1)
-#define NUMBER_TWO (2)
-#define NUMBER_THREE (3)
-#define NUMBER_FOUR (4)
-#define NUMBER_FIVE (5)
-#define NUMBER_ELEVEN (11)
-
-#define SW1_MORE_RESPONSE 0x61
-#define INS_GET_MORE_RESPONSE 0xC0
-#define SW1_VALUE_90 0x90
-#define SW2_VALUE_00 0x00
-
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t NUMBER_THREE = 3;
 EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("EsimFile", simStateManager)
 {
-    currentChannelId = 0;
+    currentChannelId_ = 0;
     InitMemberFunc();
 }
 
@@ -62,7 +48,7 @@ void EsimFile::StartLoad() {}
 
 void EsimFile::SyncOpenChannel()
 {
-    int tryCnt = 0;
+    uint32_t tryCnt = 0;
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel();
         std::unique_lock<std::mutex> lck(openChannelMutex_);
@@ -80,7 +66,7 @@ void EsimFile::SyncOpenChannel()
 
 void EsimFile::SyncOpenChannel(const std::u16string &aid)
 {
-    int tryCnt = 0;
+    uint32_t tryCnt = 0;
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
@@ -98,7 +84,7 @@ void EsimFile::SyncOpenChannel(const std::u16string &aid)
 
 void EsimFile::SyncCloseChannel()
 {
-    int tryCnt = 0;
+    uint32_t tryCnt = 0;
     while (IsLogicChannelOpen()) {
         ProcessEsimCloseChannel();
         std::unique_lock<std::mutex> lck(closeChannelMutex_);
@@ -108,7 +94,7 @@ void EsimFile::SyncCloseChannel()
         }
         tryCnt++;
         if (tryCnt >= NUMBER_THREE) {
-            currentChannelId = 0;
+            currentChannelId_ = 0;
             TELEPHONY_LOGE("failed to close the channel");
             break;
         }
@@ -173,25 +159,25 @@ EuiccInfo EsimFile::GetEuiccInfo()
     return eUiccInfo_;
 }
 
-void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *pReqInfo, ApduCommand *apdCmd)
+void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *requestInfo, ApduCommand *apduCommand)
 {
-    if (apdCmd == nullptr || pReqInfo == nullptr) {
+    if (apduCommand == nullptr || requestInfo == nullptr) {
         TELEPHONY_LOGE("CopyApdCmdToReqInfo failed");
         return;
     }
-    static int32_t cnt = 0;
-    pReqInfo->serial = cnt;
+    static uint32_t cnt = 0;
+    requestInfo->serial = cnt;
     cnt++;
-    pReqInfo->channelId = apdCmd->channel;
-    pReqInfo->type = apdCmd->data.cla;
-    pReqInfo->instruction = apdCmd->data.ins;
-    pReqInfo->p1 = apdCmd->data.p1;
-    pReqInfo->p2 = apdCmd->data.p2;
-    pReqInfo->p3 = apdCmd->data.p3;
-    pReqInfo->data = apdCmd->data.cmdHex;
+    requestInfo->channelId = apduCommand->channel;
+    requestInfo->type = apduCommand->data.cla;
+    requestInfo->instruction = apduCommand->data.ins;
+    requestInfo->p1 = apduCommand->data.p1;
+    requestInfo->p2 = apduCommand->data.p2;
+    requestInfo->p3 = apduCommand->data.p3;
+    requestInfo->data = apduCommand->data.cmdHex;
 }
 
-void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo& reqInfo, std::shared_ptr<Asn1Builder> &builder)
+void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo& requestInfo, std::shared_ptr<Asn1Builder> &builder)
 {
     if (builder == nullptr) {
         TELEPHONY_LOGE("builder is nullptr");
@@ -199,12 +185,12 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo& reqInfo, std::share
     }
     std::string hexStr;
     int hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
-    RequestApduBuild codec(currentChannelId);
+    RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
-    std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
-    CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
-    reqInfo.p2 = 0 ;
+    std::unique_ptr<ApduCommand> apduCommand = std::move(lst.front());
+    CopyApdCmdToReqInfo(&requestInfo, apduCommand.get());
+    requestInfo.p2 = 0;
 }
 
 bool EsimFile::ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -216,14 +202,14 @@ bool EsimFile::ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Po
             return false;
         }
         std::string eidTags;
-        eidTags += (unsigned char)TAG_ESIM_EID;
+        eidTags += static_cast<unsigned char>(TAG_ESIM_EID);
         builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, eidTags, eidTags.length());
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
+        ApduSimIORequestInfo requestInfo;
+        CommBuildOneApduReqInfo(requestInfo, builder);
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
         return true;
     }
     return false;
@@ -233,12 +219,12 @@ bool EsimFile::ProcessObtainEuiccInfo1(int32_t slotId, const AppExecFwk::InnerEv
 {
     if (IsLogicChannelOpen()) {
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_1);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
+        ApduSimIORequestInfo requestInfo;
+        CommBuildOneApduReqInfo(requestInfo, builder);
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
         return true;
     }
     return false;
@@ -270,12 +256,12 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
             euiccProfileTags += tag;
         }
         builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, euiccProfileTags, euiccProfileTags.length());
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
+        ApduSimIORequestInfo requestInfo;
+        CommBuildOneApduReqInfo(requestInfo, builder);
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
         return true;
     }
     return false;
@@ -283,7 +269,7 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
 
 bool EsimFile::IsLogicChannelOpen()
 {
-    if (currentChannelId > 0) {
+    if (currentChannelId_ > 0) {
         return true;
     }
     return false;
@@ -291,13 +277,12 @@ bool EsimFile::IsLogicChannelOpen()
 
 void EsimFile::ProcessEsimOpenChannel()
 {
-    std::string esimID = "A0000005591010FFFFFFFF8900000100";
     int32_t p2 = -1;
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_OPEN_CHANNEL_DONE);
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimOpenLogicalChannel(0, esimID, p2, response);
+    telRilManager_->SimOpenLogicalChannel(0, isdr_aid, p2, response);
     return;
 }
 
@@ -325,7 +310,7 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
         return false;
     }
     if (resultPtr->channelId > 0) {
-        currentChannelId = resultPtr->channelId;
+        currentChannelId_ = resultPtr->channelId;
         openChannelCv_.notify_one(); 
     } else {
         return false;
@@ -339,7 +324,7 @@ void EsimFile::ProcessEsimCloseChannel()
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimCloseLogicalChannel(0, currentChannelId, response);
+    telRilManager_->SimCloseLogicalChannel(0, currentChannelId_, response);
     return;
 }
 
@@ -347,7 +332,7 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
 {
     {
         std::lock_guard<std::mutex> lock(closeChannelMutex_); 
-        currentChannelId = 0;
+        currentChannelId_ = 0;
         TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     }
     closeChannelCv_.notify_one();

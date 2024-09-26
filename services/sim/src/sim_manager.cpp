@@ -17,10 +17,10 @@
 
 #include "core_service_errors.h"
 #include "radio_event.h"
+#include "str_convert.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
-#include "str_convert.h"
 
 namespace OHOS {
 namespace Telephony {

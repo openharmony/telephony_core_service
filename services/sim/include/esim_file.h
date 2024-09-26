@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,16 +46,13 @@ public:
     void OnAllFilesFetched();
     void StartLoad();
     ~EsimFile() = default;
-    // eSim Function
     std::string ObtainEid();
     GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
     EuiccInfo GetEuiccInfo();
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
-    std::map<int, FileProcessFunc> memberFuncMap_;
     void InitMemberFunc();
-    int32_t currentChannelId;
     void SyncCloseChannel();
     bool IsLogicChannelOpen();
     void ProcessEsimOpenChannel();
@@ -78,10 +75,12 @@ private:
     bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
 
 protected:
+    constexpr std::string isdr_aid = "A0000005591010FFFFFFFF8900000100";
+    std::map<int, FileProcessFunc> memberFuncMap_;
+    int32_t currentChannelId_ = -1;
     int slotId_ = 0;
     EsimProfile esimProfile_;
     std::string eid_ = "";
-    EuiccInfo2 euiccInfo2_; // 待修改，与responseInfo2Result_合并
     std::string defaultDpAddress_ = "";
     ResultState delProfile_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState setDpAddressResult_ = ResultState::RESULT_UNDEFINED_ERROR;
@@ -121,11 +120,11 @@ private:
 
     std::mutex allProfileInfoMutex_;
     std::condition_variable allProfileInfoCv_;
-    bool areAllProfileInfoReady_ = false;
+    bool isAllProfileInfoReady_ = false;
 
     std::mutex euiccInfo1Mutex_;
     std::condition_variable euiccInfo1Cv_;
-    bool areEuiccInfo1Ready_ = false;
+    bool isEuiccInfo1Ready_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
