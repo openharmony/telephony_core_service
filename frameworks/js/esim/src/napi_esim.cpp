@@ -471,7 +471,7 @@ void NativeGetEuiccInfo(napi_env env, void *data)
     EuiccInfo euiccInfo;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEuiccInfo(
         info->asyncContext.slotId, euiccInfo);
-    TELEPHONY_LOGE("NAPI NativeGetEuiccInfo %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetEuiccInfo %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         info->result = euiccInfo;
         info->asyncContext.context.resolved = true;
@@ -534,7 +534,7 @@ void NativeGetDefaultSmdpAddress(napi_env env, void *data)
     std::string smdpAddress;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDefaultSmdpAddress(
         asyncContext->slotId, smdpAddress);
-    TELEPHONY_LOGE("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = smdpAddress;
         asyncContext->context.resolved = true;
@@ -577,7 +577,7 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetDefaultSmdpAddress(
         context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
-    TELEPHONY_LOGE("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
         context->asyncContext.context.resolved = true;
@@ -641,7 +641,7 @@ void NativeSwitchToProfile(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SwitchToProfile(
         asyncContext.slotId, profileContext->portIndex, NapiUtil::ToUtf16(profileContext->iccid.data()),
         profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGE("NAPI NativeSwitchToProfile %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeSwitchToProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -705,7 +705,7 @@ void NativeDeleteProfile(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DeleteProfile(
         context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
-    TELEPHONY_LOGE("NAPI NativeDeleteProfile %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeDeleteProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
         context->asyncContext.context.resolved = true;
@@ -771,7 +771,7 @@ void NativeResetMemory(napi_env env, void *data)
     }
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
         asyncContext.slotId, static_cast<ResetOption>(profileContext->option), result);
-    TELEPHONY_LOGE("NAPI NativeResetMemory %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeResetMemory %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -843,7 +843,7 @@ void NativeDownloadProfile(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
         profileContext->asyncContext.slotId, profileContext->portIndex, profile,
         profileContext->switchAfterDownload, profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGE("NAPI NativeDownloadProfile %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -911,7 +911,7 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
     GetDownloadableProfilesResult result;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfiles(
         profileContext->asyncContext.slotId, profileContext->portIndex, profileContext->forceDeactivateSim, result);
-    TELEPHONY_LOGE("NAPI NativeGetDownloadableProfiles %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetDownloadableProfiles %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -976,7 +976,7 @@ void NativeGetOsuStatus(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode =
         DelayedRefSingleton<EsimServiceClient>::GetInstance().GetOsuStatus(asyncContext->slotId, result);
-    TELEPHONY_LOGE("NAPI NativeGetOsuStatus %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetOsuStatus %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = result;
         asyncContext->context.resolved = true;
@@ -1017,7 +1017,7 @@ void NativeStartOsu(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode =
         DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(asyncContext->slotId, result);
-    TELEPHONY_LOGE("NAPI NativeStartOsu %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeStartOsu %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext->callbackVal = result;
         asyncContext->context.resolved = true;
@@ -1061,7 +1061,7 @@ void NativeSetProfileNickname(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetProfileNickname(
         asyncContext.slotId, NapiUtil::ToUtf16(profileContext->iccid.data()),
         NapiUtil::ToUtf16(profileContext->nickname.data()), result);
-    TELEPHONY_LOGE("NAPI NativeSetProfileNickname %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeSetProfileNickname %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
@@ -1128,7 +1128,7 @@ void NativeCancelSession(napi_env env, void *data)
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().CancelSession(
         asyncContext.slotId, NapiUtil::ToUtf16(sessionContext->transactionId.data()),
         static_cast<CancelReason>(sessionContext->cancelReason), responseResult);
-    TELEPHONY_LOGE("NAPI NativeCancelSession %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeCancelSession %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         sessionContext->responseResult = responseResult;
         sessionContext->asyncContext.context.resolved = true;
@@ -1197,7 +1197,7 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     DownloadableProfile profile = GetProfileInfo(metadata->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfileMetadata(
         metadata->asyncContext.slotId, metadata->portIndex, profile, metadata->forceDeactivateSim, result);
-    TELEPHONY_LOGE("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         metadata->result = result;
         metadata->asyncContext.context.resolved = true;
@@ -1265,7 +1265,7 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
     GetEuiccProfileInfoListResult result;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEuiccProfileInfoList(
         profileContext->asyncContext.slotId, result);
-    TELEPHONY_LOGE("NAPI NativeGetEuiccProfileInfoList %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeGetEuiccProfileInfoList %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
         profileContext->asyncContext.context.resolved = true;
@@ -1331,7 +1331,7 @@ void NativeReserveProfilesForFactoryRestore(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ReserveProfilesForFactoryRestore(
         asyncContext.slotId, result);
-    TELEPHONY_LOGE("NAPI NativeReserveProfilesForFactoryRestore %{public}d", errorCode);
+    TELEPHONY_LOGI("NAPI NativeReserveProfilesForFactoryRestore %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
         asyncContext.context.resolved = true;
