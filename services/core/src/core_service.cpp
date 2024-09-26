@@ -1649,6 +1649,7 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
@@ -1702,5 +1703,6 @@ int32_t CoreService::SendApduData(
     }
     return simManager_->SendApduData(slotId, aid, apduData, responseResult);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

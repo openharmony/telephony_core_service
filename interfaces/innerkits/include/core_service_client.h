@@ -918,6 +918,7 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief Reset memory
      *
@@ -957,6 +958,7 @@ public:
      */
     int32_t SendApduData(
         int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult);
+#endif
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

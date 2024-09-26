@@ -272,6 +272,7 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RESET_MEMORY)] =
@@ -283,6 +284,7 @@ void CoreServiceStub::AddHandlerEsimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
 }
+#endif
 
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -1951,6 +1953,7 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
     return NO_ERROR;
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnResetMemory(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -2015,5 +2018,6 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
     }
     return NO_ERROR;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
