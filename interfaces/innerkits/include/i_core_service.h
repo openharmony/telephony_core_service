@@ -18,6 +18,9 @@
 
 #include "cell_information.h"
 #include "dialling_numbers_info.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_state_type.h"
+#endif
 #include "i_network_search_callback.h"
 #include "ims_reg_info_callback.h"
 #include "network_search_result.h"
@@ -26,9 +29,6 @@
 #include "operator_config_types.h"
 #include "signal_information.h"
 #include "sim_state_type.h"
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-#include "esim_state_type.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {
