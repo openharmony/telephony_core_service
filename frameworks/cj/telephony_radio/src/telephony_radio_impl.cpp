@@ -18,8 +18,8 @@
 
 #include "core_service_client.h"
 #include "telephony_config.h"
+#include "telephony_ext_utils_wrapper.h"
 #include "telephony_log_wrapper.h"
-
 
 namespace OHOS {
 namespace Telephony {
@@ -129,6 +129,24 @@ namespace Telephony {
         }
     }
 
+    static int32_t WrapRegState(int32_t nativeState)
+    {
+        RegServiceState state = static_cast<RegServiceState>(nativeState);
+        switch (state) {
+            case RegServiceState::REG_STATE_IN_SERVICE: {
+                return RegStatus::REGISTRATION_STATE_IN_SERVICE;
+            }
+            case RegServiceState::REG_STATE_EMERGENCY_ONLY: {
+                return RegStatus::REGISTRATION_STATE_EMERGENCY_CALL_ONLY;
+            }
+            case RegServiceState::REG_STATE_POWER_OFF: {
+                return RegStatus::REGISTRATION_STATE_POWER_OFF;
+            }
+            default:
+                return RegStatus::REGISTRATION_STATE_NO_SERVICE;
+        }
+    }
+
     static int32_t WrapSignalInformationType(SignalInformation::NetworkType type)
     {
         switch (type) {
@@ -215,8 +233,8 @@ namespace Telephony {
         cnetworkState.plmnNumeric = MallocCString(networkState->GetPlmnNumeric());
         cnetworkState.isRoaming = networkState->IsRoaming();
         cnetworkState.isEmergency = networkState->IsEmergency();
-        cnetworkState.regState = static_cast<int32_t>(networkState->GetRegStatus());
-        cnetworkState.cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
+        cnetworkState.regState = WrapRegState(static_cast<int32_t>(networkState->GetRegStatus()));
+        cnetworkState.cfgTech = WrapRadioTech(static_cast<int32_t>(networkState->GetCfgTech()));
         return cnetworkState;
     }
 
@@ -228,21 +246,22 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return selectMode;
         }
-        auto selectModeContext = std::make_shared<GetSelectModeContext>();
-        void* context = reinterpret_cast<void *>(selectModeContext.get());
-        auto asyncContext = static_cast<GetSelectModeContext *>(context);
+        auto selectModeContext = std::make_unique<GetSelectModeContext>();
+        auto asyncContext = static_cast<GetSelectModeContext *>(selectModeContext.get());
         asyncContext->slotId = slotId;
         std::unique_ptr<GetNetworkSearchModeCallback> callback =
             std::make_unique<GetNetworkSearchModeCallback>(asyncContext);
         std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSelectionMode(
+        asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkSelectionMode(
             asyncContext->slotId, callback.release());
-        errCode = ConvertCJErrCode(errCode);
         if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             asyncContext->cv.wait_for(
-                callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+                callbackLock,
+                std::chrono::seconds(WAIT_TIME_SECOND),
+                [asyncContext] { return asyncContext->callbackEnd; });
             TELEPHONY_LOGI("NativeGetNetworkSelectionMode after callback end");
         }
+        errCode = ConvertCJErrCode(asyncContext->errorCode);
         selectMode = asyncContext->selectMode;
         return selectMode;
     }
@@ -284,7 +303,7 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return csignalInfoList;
         }
-        errCode = 
+        errCode =
             DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(slotId, signalInfoList);
         errCode = ConvertCJErrCode(errCode);
         size_t infoSize = signalInfoList.size();
@@ -318,6 +337,12 @@ namespace Telephony {
         isNrSupported =
             telephonyConfig.IsCapabilitySupport(
                 static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
+        TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
+    }
+#endif
         return isNrSupported;
     }
 
@@ -329,21 +354,21 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return result;
         }
-        auto radioOnContext = std::make_shared<IsRadioOnContext>();
-        void* context = reinterpret_cast<void *>(radioOnContext.get());
-        auto asyncContext = static_cast<IsRadioOnContext *>(context);
+        auto radioOnContext = std::make_unique<IsRadioOnContext>();
+        auto asyncContext = static_cast<IsRadioOnContext *>(radioOnContext.get());
         asyncContext->slotId = slotId;
         std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
         std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-        errCode =
-            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(
-                asyncContext->slotId, callback.release());
-        errCode = ConvertCJErrCode(errCode);
+        asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(asyncContext->slotId,
+            callback.release());
         if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             asyncContext->cv.wait_for(
-                callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
+                callbackLock,
+                std::chrono::seconds(WAIT_TIME_SECOND),
+                [asyncContext] { return asyncContext->callbackEnd; });
             TELEPHONY_LOGI("NativeIsRadioOn after callback end");
         }
+        errCode = ConvertCJErrCode(asyncContext->errorCode);
         result = asyncContext->isRadioOn;
         return result;
     }

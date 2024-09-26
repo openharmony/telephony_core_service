@@ -21,47 +21,47 @@ namespace OHOS {
 namespace Telephony {
 extern "C" {
 
-    CNetworkRadioTech FfiOHOSTelephonyRadioGetRadioTech(int32_t slotId, int32_t *errCode)
+    CNetworkRadioTech FfiTelephonyRadioGetRadioTech(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetRadioTech(slotId, *errCode);
     }
 
-    CNetworkState FfiOHOSTelephonyRadioGetNetworkState(int32_t slotId, int32_t *errCode)
+    CNetworkState FfiTelephonyRadioGetNetworkState(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetNetworkState(slotId, *errCode);
     }
 
-    int32_t FfiOHOSTelephonyRadioGetNetworkSelectionMode(int32_t slotId, int32_t *errCode)
+    int32_t FfiTelephonyRadioGetNetworkSelectionMode(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetNetworkSelectionMode(slotId, *errCode);
     }
 
-    char* FfiOHOSTelephonyRadioGetISOCountryCodeForNetwork(int32_t slotId, int32_t *errCode)
+    char* FfiTelephonyRadioGetISOCountryCodeForNetwork(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetISOCountryCodeForNetwork(slotId, *errCode);
     }
 
-    int32_t FfiOHOSTelephonyRadioGetPrimarySlotId(int32_t *errCode)
+    int32_t FfiTelephonyRadioGetPrimarySlotId(int32_t *errCode)
     {
         return TelephonyRadioImpl::GetPrimarySlotId(*errCode);
     }
 
-    CArraySignalInformation FfiOHOSTelephonyRadioGetSignalInfoList(int32_t slotId, int32_t *errCode)
+    CArraySignalInformation FfiTelephonyRadioGetSignalInfoList(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetSignalInfoList(slotId, *errCode);
     }
 
-    bool FfiOHOSTelephonyRadioIsNRSupported()
+    bool FfiTelephonyRadioIsNRSupported()
     {
         return TelephonyRadioImpl::IsNRSupported();
     }
 
-    bool FfiOHOSTelephonyRadioIsRadioOn(int32_t slotId, int32_t *errCode)
+    bool FfiTelephonyRadioIsRadioOn(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::IsRadioOn(slotId, *errCode);
     }
 
-    char* FfiOHOSTelephonyGetOperatorName(int32_t slotId, int32_t *errCode)
+    char* FfiTelephonyRadioGetOperatorName(int32_t slotId, int32_t *errCode)
     {
         return TelephonyRadioImpl::GetOperatorName(slotId, *errCode);
     }

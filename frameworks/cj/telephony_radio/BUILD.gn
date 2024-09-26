@@ -52,6 +52,13 @@ ohos_shared_library("cj_radio_ffi") {
     "napi:cj_bind_ffi",
   ]
 
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceRadioFfiApi\"",
+    "LOG_DOMAIN = 0xD001F04",
+  ]
+
+  defines += telephony_extra_defines
+
   innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
   subsystem_name = "telephony"

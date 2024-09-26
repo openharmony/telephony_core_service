@@ -23,15 +23,15 @@
 namespace OHOS {
 namespace Telephony {
 extern "C" {
-    FFI_EXPORT CNetworkRadioTech FfiOHOSTelephonyRadioGetRadioTech(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT CNetworkState FfiOHOSTelephonyRadioGetNetworkState(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT int32_t FfiOHOSTelephonyRadioGetNetworkSelectionMode(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT char* FfiOHOSTelephonyRadioGetISOCountryCodeForNetwork(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT int32_t FfiOHOSTelephonyRadioGetPrimarySlotId(int32_t *errCode);
-    FFI_EXPORT CArraySignalInformation FfiOHOSTelephonyRadioGetSignalInfoList(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT bool FfiOHOSTelephonyRadioIsNRSupported();
-    FFI_EXPORT bool FfiOHOSTelephonyRadioIsRadioOn(int32_t slotId, int32_t *errCode);
-    FFI_EXPORT char* FfiOHOSTelephonyGetOperatorName(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT CNetworkRadioTech FfiTelephonyRadioGetRadioTech(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT CNetworkState FfiTelephonyRadioGetNetworkState(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT int32_t FfiTelephonyRadioGetNetworkSelectionMode(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT char* FfiTelephonyRadioGetISOCountryCodeForNetwork(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT int32_t FfiTelephonyRadioGetPrimarySlotId(int32_t *errCode);
+    FFI_EXPORT CArraySignalInformation FfiTelephonyRadioGetSignalInfoList(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT bool FfiTelephonyRadioIsNRSupported();
+    FFI_EXPORT bool FfiTelephonyRadioIsRadioOn(int32_t slotId, int32_t *errCode);
+    FFI_EXPORT char* FfiTelephonyRadioGetOperatorName(int32_t slotId, int32_t *errCode);
 }
 }
 }
