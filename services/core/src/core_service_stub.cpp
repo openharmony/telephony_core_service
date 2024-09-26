@@ -1982,7 +1982,7 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(euiccProfileInfoList.profiles.size());
+        reply.WriteUint32(static_cast<uint32_t>(euiccProfileInfoList.profiles.size()));
         for (const auto& profile : euiccProfileInfoList.profiles) {
             if (!reply.WriteString16(profile.iccId) ||
                 !reply.WriteString16(profile.nickName) ||
