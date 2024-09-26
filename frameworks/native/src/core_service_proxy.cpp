@@ -3210,7 +3210,8 @@ int32_t CoreServiceProxy::GetEid(int32_t slotId, std::u16string &eId)
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EID), data, reply, option);
+    int32_t sendRequestRet =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EID), data, reply, option);
     if (sendRequestRet != ERR_NONE) {
         TELEPHONY_LOGE("GetEid failed, error code is %{public}d", sendRequestRet);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

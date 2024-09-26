@@ -37,7 +37,6 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t NUMBER_THREE = 3;
 EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("EsimFile", simStateManager)
 {
     currentChannelId_ = 0;
@@ -88,7 +87,7 @@ void EsimFile::SyncCloseChannel()
     while (IsLogicChannelOpen()) {
         ProcessEsimCloseChannel();
         std::unique_lock<std::mutex> lck(closeChannelMutex_);
-        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM), 
+        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
             [this]() { return !IsLogicChannelOpen(); })) {
             break;
         }
@@ -190,7 +189,6 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
     std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
     std::unique_ptr<ApduCommand> apduCommand = std::move(lst.front());
     CopyApdCmdToReqInfo(&requestInfo, apduCommand.get());
-    requestInfo.p2 = 0;
 }
 
 bool EsimFile::ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -331,7 +329,7 @@ void EsimFile::ProcessEsimCloseChannel()
 bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     {
-        std::lock_guard<std::mutex> lock(closeChannelMutex_); 
+        std::lock_guard<std::mutex> lock(closeChannelMutex_);
         currentChannelId_ = 0;
         TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     }
@@ -352,6 +350,9 @@ bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -402,6 +403,9 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -430,7 +434,7 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
         TELEPHONY_LOGE("svnNode is nullptr");
         return false;
     }
-    std::string svnRaw;
+    std::string svnRaw = "";
     int svnRawlen = svnNode->Asn1AsBytes(svnRaw);
     if (svnRawlen < SVN_RAW_LENGTH_MIN) {
         TELEPHONY_LOGE("invalid SVN data");
@@ -492,7 +496,7 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
 
     std::list<std::shared_ptr<Asn1Node>> profileNodes;
     profileRoot->Asn1GetChildren(TAG_ESIM_PROFILE_INFO, profileNodes);
-    std::shared_ptr<Asn1Node> curNode = NULL;
+    std::shared_ptr<Asn1Node> curNode = nullptr;
     EuiccProfileInfo euiccProfileInfo = {{0}};
     for (auto it = profileNodes.begin(); it != profileNodes.end(); ++it) {
         curNode = *it;
