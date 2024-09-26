@@ -322,6 +322,28 @@ namespace Telephony {
         /** Manual network selection modes. */
         NETWORK_SELECTION_MANUAL
     };
+
+    enum RegStatus {
+        /**
+         * Indicates a state in which a device cannot use any service.
+         */
+        REGISTRATION_STATE_NO_SERVICE = 0,
+
+        /**
+         * Indicates a state in which a device can use services properly.
+         */
+        REGISTRATION_STATE_IN_SERVICE = 1,
+
+        /**
+         * Indicates a state in which a device can use only the emergency call service.
+         */
+        REGISTRATION_STATE_EMERGENCY_CALL_ONLY = 2,
+
+        /**
+         * Indicates that the cellular radio is powered off.
+         */
+        REGISTRATION_STATE_POWER_OFF = 3
+    };
 }
 }
 

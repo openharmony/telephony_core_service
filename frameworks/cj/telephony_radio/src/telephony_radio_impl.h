@@ -17,6 +17,7 @@
 
 #include "telephony_radio_utils.h"
 
+#include "network_search_types.h"
 #include "network_state.h"
 #include "signal_information.h"
 #include "telephony_napi_common_error.h"
