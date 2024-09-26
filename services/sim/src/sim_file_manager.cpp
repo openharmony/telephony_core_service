@@ -983,6 +983,7 @@ void SimFileManager::ClearData()
     simFile_->ClearData();
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 ResultState SimFileManager::ResetMemory(ResetOption resetOption)
 {
     if (eSimFile_ == nullptr) {
@@ -1022,5 +1023,6 @@ ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const
     ResponseEsimResult result = eSimFile_->SendApduData(aid, apduData);
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

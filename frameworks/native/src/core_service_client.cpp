@@ -1082,6 +1082,7 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
 {
     auto proxy = GetProxy();
@@ -1123,5 +1124,6 @@ int32_t CoreServiceClient::SendApduData(
     }
     return proxy->SendApduData(slotId, aid, apduData, responseResult);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

@@ -1256,6 +1256,7 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
@@ -1296,5 +1297,6 @@ int32_t SimManager::SendApduData(
     responseResult = simFileManager_[slotId]->SendApduData(aid, apduData);
     return TELEPHONY_ERR_SUCCESS;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

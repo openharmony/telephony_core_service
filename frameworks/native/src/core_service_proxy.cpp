@@ -3189,6 +3189,7 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     return ret;
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
 {
     MessageParcel data;
@@ -3323,5 +3324,6 @@ int32_t CoreServiceProxy::SendApduData(
     }
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

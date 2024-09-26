@@ -141,10 +141,12 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t OnResetMemory(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsEsimSupported(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
+#endif
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
