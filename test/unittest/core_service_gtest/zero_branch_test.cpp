@@ -86,6 +86,7 @@ const CellInformation::CellType WCDMA = CellInformation::CellType::CELL_TYPE_WCD
 const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_TDSCDMA;
 const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
 const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
+static const int32_t SLEEP_TIME = 3;
 } // namespace
 
 class BranchTest : public testing::Test {
@@ -96,7 +97,10 @@ public:
     void TearDown();
 };
 
-void BranchTest::TearDownTestCase() {}
+void BranchTest::TearDownTestCase()
+{
+    sleep(SLEEP_TIME);
+}
 
 void BranchTest::SetUp() {}
 
