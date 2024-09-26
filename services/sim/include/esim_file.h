@@ -64,7 +64,7 @@ private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncOpenChannel(const std::u16string &aid);
     void CopyApdCmdToReqInfo(ApduSimIORequestInfo *pReqInfo, ApduCommand *apdCmd);
-    void CommBuildOneApduReqInfo(ApduSimIORequestInfo& reqInfo, std::shared_ptr<Asn1Builder> &builder);
+    void CommBuildOneApduReqInfo(ApduSimIORequestInfo &reqInfo, std::shared_ptr<Asn1Builder> &builder);
     bool ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainEuiccInfo1(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
@@ -110,7 +110,7 @@ protected:
 private:
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
-    
+
     std::mutex openChannelMutex_;
     std::condition_variable openChannelCv_;
 

@@ -89,27 +89,27 @@ constexpr int32_t CMD_HEX_MAX_DATA_LENGTH = 255;
 
 typedef struct TagEuiccInfo {
     std::string raw;
-    uint rawLen;
+    uint32_t rawLen;
     std::string svn;
 } EuiccInfo1;
 
 typedef struct TagEuiccInfo2 {
     std::string raw;
-    uint rawLen;
+    uint32_t rawLen;
     std::string svn;
     std::string profileVersion;
-    std::string firmwareVer; // VersionType,
-    std::string extCardResource; // OCTET STRING,
-    std::string uiccCapability; // BIT STRING
+    std::string firmwareVer;
+    std::string extCardResource;
+    std::string uiccCapability;
     std::string ts102241Version;
     std::string globalPlatformVersion;
-    std::string rspCapability; // BIT STRING
+    std::string rspCapability;
     std::string euiccCiPKIdListForVerification;
     std::string euiccCiPKIdListForSigning;
     int32_t euiccCategory;
-    std::string forbiddenProfilePolicyRules; // BIT STRING
+    std::string forbiddenProfilePolicyRules;
     std::string ppVersion;
-    std::string sasAccreditationNumber; // UTF8String
+    std::string sasAccreditationNumber;
 } EuiccInfo2;
 
 typedef struct TagEsimProfile {
@@ -120,7 +120,7 @@ typedef struct TagEsimProfile {
     std::u16string smdpSigned2 = u"";
     std::u16string smdpSignature2 = u"";
     std::u16string smdpCertificate = u"";
-    int seqNumber = 0;
+    int32_t seqNumber = 0;
     bool activeAfterDown;
     bool forceDeactivateSim = false;
     OHOS::Telephony::ResetOption option = OHOS::Telephony::ResetOption::DELETE_OPERATIONAL_PROFILES;
@@ -150,10 +150,10 @@ typedef struct TagEs9PlusInitAuthResp {
 } Es9PlusInitAuthResp;
 
 typedef struct TagAuthServerResponse {
-    int errCode;
+    int32_t errCode;
     std::string transactionId;
     std::string respStr;
-    int respLength;
+    int32_t respLength;
 } AuthServerResponse;
 
 typedef struct TagOperatorId {
@@ -167,11 +167,11 @@ typedef struct TagEuiccProfileInfo {
     std::string nickname;
     std::string serviceProviderName;
     std::string profileName;
-    int profileClass; // Profile class for the subscription.
-    int profileState; // The profile state of the subscription.
-    EsimOperatorId operatorId; // The operator Id of the subscription.
-    int policyRules; // The policy rules of the subscription.
-    std::list<std::shared_ptr<Asn1Node>> accessRules; // UiccAccessRule
+    int32_t profileClass;
+    int32_t profileState;
+    EsimOperatorId operatorId;
+    int32_t policyRules;
+    std::list<std::shared_ptr<Asn1Node>> accessRules;
 } EuiccProfileInfo;
 
 typedef struct TagPrepareDownloadResp {
