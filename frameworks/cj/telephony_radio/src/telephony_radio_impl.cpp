@@ -26,7 +26,7 @@ namespace Telephony {
 
     static int32_t ConvertCJErrCode(int32_t errCode)
     {
-        TELEPHONY_LOGI("The original error code is displayed: %{public}d", errCode);
+        TELEPHONY_LOGD("The original error code is displayed: %{public}d", errCode);
         switch (errCode) {
             case TELEPHONY_ERR_ARGUMENT_MISMATCH:
             case TELEPHONY_ERR_ARGUMENT_INVALID:
@@ -166,7 +166,6 @@ namespace Telephony {
                 return static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
         }
     }
-
 
     static std::string ToUtf8(std::u16string str16)
     {
@@ -359,8 +358,8 @@ namespace Telephony {
         asyncContext->slotId = slotId;
         std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
         std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
-        asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(asyncContext->slotId,
-            callback.release());
+        asyncContext->errorCode =
+            DelayedRefSingleton<CoreServiceClient>::GetInstance().GetRadioState(slotId, callback.release());
         if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             asyncContext->cv.wait_for(
                 callbackLock,
