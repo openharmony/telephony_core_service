@@ -93,7 +93,8 @@ HWTEST_F(EsimManagerTest, GetEuiccProfileInfoList, Function | MediumTest | Level
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
-    std::shared_ptr<Telephony::SimFileManager> simFileManager = std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->GetEuiccProfileInfoList(slotId, result);

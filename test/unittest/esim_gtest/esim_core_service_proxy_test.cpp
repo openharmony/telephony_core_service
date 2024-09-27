@@ -130,7 +130,7 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEid_003, Function | MediumTest | Level2)
     EXPECT_EQ(proxy.GetEid(SLOT_ID, eId), 0);
 }
 
-HWTEST_F(EsimCoreServiceProxyTest,ReadEuiccProfileFromReply_001, Function | MediumTest | Level2)
+HWTEST_F(EsimCoreServiceProxyTest, ReadEuiccProfileFromReply_001, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
