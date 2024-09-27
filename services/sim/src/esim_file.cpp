@@ -287,7 +287,7 @@ void EsimFile::InitMemberFunc()
     memberFuncMap_[MSG_ESIM_SEND_APUD_DATA] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSendApduDataDone(event); };
     memberFuncMap_[MSG_ESIM_IS_ESIM_SUPPORT] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEUICCSupportDone(event); };  
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEUICCSupportDone(event); };
 }
 }
 }

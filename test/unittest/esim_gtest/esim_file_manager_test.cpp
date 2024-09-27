@@ -59,7 +59,6 @@ HWTEST_F(EsimFileManagerTest, ResetMemory_001, Function | MediumTest | Level2)
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     ResultState res = simFileManager.ResetMemory(resetOption);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.ResetMemory(resetOption);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
@@ -79,7 +78,6 @@ HWTEST_F(EsimFileManagerTest, SetDefaultSmdpAddress_001, Function | MediumTest |
     std::u16string defaultSmdpAddress = u"";
     ResultState res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
@@ -98,7 +96,6 @@ HWTEST_F(EsimFileManagerTest, IsEsimSupported_001, Function | MediumTest | Level
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     bool res = simFileManager.IsEsimSupported();
     EXPECT_EQ(res, false);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.IsEsimSupported();
     EXPECT_EQ(res, false);
@@ -119,7 +116,6 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
     std::u16string apduData = u"";
     ResponseEsimResult res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
