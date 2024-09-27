@@ -167,7 +167,6 @@ HWTEST_F(EsimTest, ProcessRequestAllProfiles_001, Function | MediumTest | Level2
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessRequestAllProfiles(slotId, eventRequestAllProfiles));
-
 }
 
 HWTEST_F(EsimTest, ProcessRequestAllProfilesDone_001, Function | MediumTest | Level2)
