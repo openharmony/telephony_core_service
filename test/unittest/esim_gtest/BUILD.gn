@@ -21,13 +21,13 @@ ohos_unittest("tel_esim_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "esim_core_service_proxy_test.cpp",
-    "esim_manager_test.cpp",
-    "esim_file_manager_test.cpp",
-    "esim_test.cpp",
     "esim_core_service_client_test.cpp",
-    "esim_core_service_test.cpp",
+    "esim_core_service_proxy_test.cpp",
     "esim_core_service_stub_test.cpp",
+    "esim_core_service_test.cpp",
+    "esim_file_manager_test.cpp",
+    "esim_manager_test.cpp",
+    "esim_test.cpp",
   ]
 
   include_dirs = [
@@ -49,8 +49,8 @@ ohos_unittest("tel_esim_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -138,8 +138,8 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
