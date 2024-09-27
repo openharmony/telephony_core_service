@@ -19,10 +19,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <securec.h>
-#include "telephony_log_wrapper.h"
 #include "asn1_builder.h"
 #include "asn1_node.h"
 #include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 #include "telephony_tag_def.h"
 
 using namespace testing::ext;

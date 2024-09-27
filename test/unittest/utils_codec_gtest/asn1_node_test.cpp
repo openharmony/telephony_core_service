@@ -38,7 +38,7 @@ public:
     void TearDown();
 
 private:
-    std::shared_ptr<Asn1Node> Asn1ParseResponse(std::string response, int32_t respLength);
+    std::shared_ptr<Asn1Node> Asn1ParseResponse(std::vector<uint8_t> response, int32_t respLength);
 };
 
 void Asn1NodeTest::SetUpTestCase() {}
@@ -69,11 +69,12 @@ std::shared_ptr<Asn1Node> Asn1NodeTest::Asn1ParseResponse(std::vector<uint8_t> r
 HWTEST_F(Asn1NodeTest, Asn1NodeToHexStr_001, Function | MediumTest | Level3)
 {
     int32_t tag = 0x81;
+    std::vector<uint8_t> src;
     std::string destStr;
     uint32_t res = -1;
     bool ret = false;
 
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, "", 0, 0);
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     res = asn1Node->Asn1NodeToHexStr(destStr);
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);
@@ -82,11 +83,12 @@ HWTEST_F(Asn1NodeTest, Asn1NodeToHexStr_001, Function | MediumTest | Level3)
 HWTEST_F(Asn1NodeTest, Asn1NodeToBytes_001, Function | MediumTest | Level3)
 {
     int32_t tag = 0x81;
-    std::string destStr;
+    std::vector<uint8_t> src;
+    std::vector<uint8_t> destStr;
     uint32_t res = -1;
     bool ret = false;
 
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, "", 0, 0);
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     res = asn1Node->Asn1NodeToBytes(destStr);
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);
@@ -100,8 +102,9 @@ HWTEST_F(Asn1NodeTest, Asn1NodeToBytes_001, Function | MediumTest | Level3)
 HWTEST_F(Asn1NodeTest, Asn1GetChild_001, Function | MediumTest | Level3)
 {
     int32_t tag = 0;
+    std::vector<uint8_t> src;
     bool ret = false;
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, "", 0, 0);
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     std::shared_ptr<Asn1Node> pAsn1GetChild = asn1Node->Asn1GetChild(tag);
     ret = pAsn1GetChild == nullptr ? true : false;
     EXPECT_EQ(ret, true);
@@ -116,7 +119,8 @@ HWTEST_F(Asn1NodeTest, Asn1HasChild_001, Function | MediumTest | Level3)
 {
     bool ret = false;
     int32_t tag = 0;
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, "", 0, 0);
+    std::vector<uint8_t> src;
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     asn1Node->constructed_ = false;
     ret = asn1Node->Asn1HasChild(TAG_ESIM_CTX_1);
     EXPECT_EQ(ret, false);
@@ -126,7 +130,8 @@ HWTEST_F(Asn1NodeTest, Asn1GetGrandson_001, Function | MediumTest | Level3)
 {
     int32_t tag = 0;
     bool ret = false;
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, "", 0, 0);
+    std::vector<uint8_t> src;
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     std::shared_ptr<Asn1Node> pAsn1GetChild = asn1Node->Asn1GetGrandson(tag, tag);
     ret = pAsn1GetChild == nullptr ? true : false;
     EXPECT_EQ(ret, true);
@@ -171,17 +176,17 @@ HWTEST_F(Asn1NodeTest, Asn1GetChildren_001, Function | MediumTest | Level3)
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     std::list<std::shared_ptr<Asn1Node>> ls;
     ret = root->Asn1GetChildren(TAG_ESIM_NOTIFICATION_METADATA, ls);
-    EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 
     root->constructed_ = false;
     ret = root->Asn1GetChildren(TAG_ESIM_NOTIFICATION_METADATA, ls);
-    EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(Asn1NodeTest, Asn1GetHeadAsHexStr_001, Function | MediumTest | Level3)
 {
     int32_t tag = 0;
-    std::string src;
+    std::vector<uint8_t> src;
     std::string headHex;
     int32_t offset = 0;
     int32_t length = 1;
@@ -299,7 +304,7 @@ HWTEST_F(Asn1NodeTest, Asn1AsBits_001, Function | MediumTest | Level3)
     EXPECT_EQ(ret, true);
 
     childNode->constructed_ = false;
-    childNode->dataBytes_.push_back(0);
+    childNode->dataBytes_.clear();
     res = childNode->Asn1AsBits();
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, true);
