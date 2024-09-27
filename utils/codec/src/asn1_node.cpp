@@ -136,21 +136,20 @@ std::shared_ptr<Asn1Node> Asn1Node::Asn1GetGrandson(const uint32_t firstLevelTag
 {
     std::shared_ptr<Asn1Node> resultNode = nullptr;
     resultNode = Asn1GetChild(firstLevelTag);
-    if (resultNode == nullptr)
-    {
+    if (resultNode == nullptr) {
         return nullptr;
     }
     resultNode = resultNode->Asn1GetChild(secondLevelTag);
     return resultNode;
 
 }
+
 std::shared_ptr<Asn1Node> Asn1Node::Asn1GetGreatGrandson(const uint32_t firstLevelTag, const uint32_t secondLevelTag,
     const uint32_t thirdLevelTag)
 {
     std::shared_ptr<Asn1Node> resultNode = nullptr;
     resultNode = Asn1GetGrandson(firstLevelTag, secondLevelTag);
-    if (resultNode == nullptr)
-    {
+    if (resultNode == nullptr) {
         return nullptr;
     }
     resultNode = resultNode->Asn1GetChild(thirdLevelTag);
