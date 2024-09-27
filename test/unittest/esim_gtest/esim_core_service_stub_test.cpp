@@ -76,5 +76,5 @@ HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccInfo_001, Function | MediumTest | Le
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_INFO);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

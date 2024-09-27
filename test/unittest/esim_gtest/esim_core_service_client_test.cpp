@@ -71,5 +71,5 @@ HWTEST_F(EsimCoreServiceClientTest, GetEuiccInfo_0001, Function | MediumTest | L
     int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

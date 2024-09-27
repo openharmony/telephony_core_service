@@ -126,5 +126,5 @@ HWTEST_F(EsimManagerTest, GetEuiccInfo, Function | MediumTest | Level1)
     ret = simManager->GetEuiccInfo(slotId, eUiccInfo);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

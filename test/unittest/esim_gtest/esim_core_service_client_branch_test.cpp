@@ -33,8 +33,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-//#ifdef CORE_SERVICE_SUPPORT_ESIM
-
 class EsimCoreServiceClientBranchTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -87,5 +85,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo_0001, Function | MediumTe
     int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
