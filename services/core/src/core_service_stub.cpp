@@ -1977,42 +1977,29 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     GetEuiccProfileInfoListResult euiccProfileInfoList;
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        TELEPHONY_LOGE("write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteUint32(static_cast<uint32_t>(euiccProfileInfoList.profiles.size()));
+        reply.WriteInt32(euiccProfileInfoList.profiles.size());
         for (const auto& profile : euiccProfileInfoList.profiles) {
-            if (!reply.WriteString16(profile.iccId) ||
-                !reply.WriteString16(profile.nickName) ||
-                !reply.WriteString16(profile.serviceProviderName) ||
-                !reply.WriteString16(profile.profileName) ||
-                !reply.WriteInt32(static_cast<int32_t>(profile.state)) ||
-                !reply.WriteInt32(static_cast<int32_t>(profile.profileClass)) ||
-                !reply.WriteString16(profile.carrierId.mcc) ||
-                !reply.WriteString16(profile.carrierId.mnc) ||
-                !reply.WriteString16(profile.carrierId.gid1) ||
-                !reply.WriteString16(profile.carrierId.gid2) ||
-                !reply.WriteInt32(static_cast<int32_t>(profile.policyRules)) ||
-                !reply.WriteUint32(static_cast<uint32_t>(profile.accessRules.size()))) {
-                    TELEPHONY_LOGE("write reply failed.");
-                    return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-                }
+            reply.WriteString16(profile.iccId);
+            reply.WriteString16(profile.nickName);
+            reply.WriteString16(profile.serviceProviderName);
+            reply.WriteString16(profile.profileName);
+            reply.WriteInt32(static_cast<int32_t>(profile.state));
+            reply.WriteInt32(static_cast<int32_t>(profile.profileClass));
+            reply.WriteString16(profile.carrierId.mcc);
+            reply.WriteString16(profile.carrierId.mnc);
+            reply.WriteString16(profile.carrierId.gid1);
+            reply.WriteString16(profile.carrierId.gid2);
+            reply.WriteInt32(static_cast<int32_t>(profile.policyRules));
+            reply.WriteInt32(profile.accessRules.size());
             for (const auto& rule : profile.accessRules) {
-                if (!reply.WriteString16(rule.certificateHashHexStr) ||
-                    !reply.WriteString16(rule.packageName) ||
-                    !reply.WriteInt32(rule.accessType)) {
-                        TELEPHONY_LOGE("write reply failed.");
-                        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-                    }
+                reply.WriteString16(rule.certificateHashHexStr);
+                reply.WriteString16(rule.packageName);
+                reply.WriteInt32(rule.accessType);
             }
         }
-        if (!reply.WriteBool(euiccProfileInfoList.isRemovable) ||
-            !reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result))) {
-                TELEPHONY_LOGE("write reply failed.");
-                return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
+        reply.WriteBool(euiccProfileInfoList.isRemovable);
+        reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result));
     }
     return result;
 }
