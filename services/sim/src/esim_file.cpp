@@ -134,7 +134,6 @@ bool EsimFile::ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::
 
 bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -145,6 +144,9 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -162,7 +164,7 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
         isResetMemoryReady_ = true;
     }
     resetMemoryCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -187,7 +189,6 @@ bool EsimFile::setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEven
 
 bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -198,6 +199,9 @@ bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -215,7 +219,7 @@ bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &
         isSetDefaultSmdpAddressReady_ = true;
     }
     setDefaultSmdpAddressCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -240,7 +244,6 @@ bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent:
 
 bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr");
         return false;
@@ -251,20 +254,22 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     transApduDataResponse_.resultCode = ResultState::RESULT_OK;
-    transApduDataResponse_.response = OHOS::Telephony::ToUtf16(rcvMsg->fileData.resultData);
+    transApduDataResponse_.response = OHOS::Telephony::ToUtf16(result->resultData);
 
     {
         std::lock_guard<std::mutex> lock(SendApduDataMutex_);
         isSendApduDataReady_ = true;
     }
     SendApduDataCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessObtainEUICCSupportDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -275,7 +280,10 @@ bool EsimFile::ProcessObtainEUICCSupportDone(const AppExecFwk::InnerEvent::Point
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    return isFileHandleResponse;
+    if (result == nullptr) {
+        return false;
+    }
+    return true;
 }
 
 void EsimFile::InitMemberFunc()
