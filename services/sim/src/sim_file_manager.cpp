@@ -1012,8 +1012,7 @@ GetEuiccProfileInfoListResult SimFileManager::GetEuiccProfileInfoList()
         TELEPHONY_LOGE("esimFile is nullptr");
         return GetEuiccProfileInfoListResult();
     }
-    GetEuiccProfileInfoListResult result = eSimFile_->GetEuiccProfileInfoList();
-    return result;
+    return eSimFile_->GetEuiccProfileInfoList();
 }
 
 EuiccInfo SimFileManager::GetEuiccInfo()
@@ -1022,8 +1021,7 @@ EuiccInfo SimFileManager::GetEuiccInfo()
         TELEPHONY_LOGE("simFile is nullptr");
         return EuiccInfo();
     }
-    EuiccInfo result = eSimFile_->GetEuiccInfo();
-    return result;
+    return eSimFile_->GetEuiccInfo();
 }
 #endif
 } // namespace Telephony

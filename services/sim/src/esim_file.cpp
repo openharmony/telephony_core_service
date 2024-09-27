@@ -51,7 +51,7 @@ void EsimFile::SyncOpenChannel()
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel();
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM), 
+        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
         }
