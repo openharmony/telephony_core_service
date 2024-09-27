@@ -2012,7 +2012,7 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
             !reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result))) {
                 TELEPHONY_LOGE("write reply failed.");
                 return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-            }
+        }
     }
     return result;
 }

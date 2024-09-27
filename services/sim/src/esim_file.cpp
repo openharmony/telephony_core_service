@@ -109,10 +109,10 @@ std::string EsimFile::ObtainEid()
         return "";
     }
     // wait profileInfo is ready
-    getEidReady_ = false;
+    isEidReady_ = false;
     std::unique_lock<std::mutex> lock(getEidMutex_);
     if (!getEidCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return getEidReady_; })) {
+        [this]() { return isEidReady_; })) {
         SyncCloseChannel();
         return "";
     }
@@ -128,10 +128,10 @@ GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
         TELEPHONY_LOGE("ProcessRequestAllProfiles encode failed");
         return GetEuiccProfileInfoListResult();
     }
-    areAllProfileInfoReady_ = false;
+    isAllProfileInfoReady_ = false;
     std::unique_lock<std::mutex> lock(allProfileInfoMutex_);
     if (!allProfileInfoCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areAllProfileInfoReady_; })) {
+        [this]() { return isAllProfileInfoReady_; })) {
         SyncCloseChannel();
         return GetEuiccProfileInfoListResult();
     }
@@ -147,10 +147,10 @@ EuiccInfo EsimFile::GetEuiccInfo()
         TELEPHONY_LOGE("ProcessObtainEuiccInfo1 encode failed");
         return EuiccInfo();
     }
-    areEuiccInfo1Ready_ = false;
+    isEuiccInfo1Ready_ = false;
     std::unique_lock<std::mutex> lock(euiccInfo1Mutex_);
     if (!euiccInfo1Cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areEuiccInfo1Ready_; })) {
+        [this]() { return isEuiccInfo1Ready_; })) {
         SyncCloseChannel();
         return EuiccInfo();
     }
@@ -242,12 +242,12 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
             static_cast<unsigned char>(TAG_ESIM_OBTAIN_OPERATOR_NAME),
             static_cast<unsigned char>(TAG_ESIM_PROFILE_NAME),
             static_cast<unsigned char>(TAG_ESIM_OPERATOR_ID),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE / 256),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE % 256),
+            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE / PROFILE_DEFAULT_NUMBER),
+            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE % PROFILE_DEFAULT_NUMBER),
             static_cast<unsigned char>(TAG_ESIM_PROFILE_CLASS),
             static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
-            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / 256),
-            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % 256),
+            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
+            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
         };
         std::string euiccProfileTags;
         for (unsigned char tag : EUICC_PROFILE_TAGS) {
@@ -339,7 +339,6 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
 
 bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -370,10 +369,10 @@ bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event
     {
         std::lock_guard<std::mutex> lock(getEidMutex_);
         eid_ = strResult;
-        getEidReady_ = true;
+        isEidReady_ = true;
     }
     getEidCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 std::shared_ptr<Asn1Node> EsimFile::Asn1ParseResponse(std::string response, int32_t respLength)
@@ -419,7 +418,7 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     eUiccInfo_.response = Str8ToStr16(result->resultData);
     {
         std::lock_guard<std::mutex> lock(euiccInfo1Mutex_);
-        areEuiccInfo1Ready_ = true;
+        isEuiccInfo1Ready_ = true;
     }
     euiccInfo1Cv_.notify_one();
     return true;
@@ -427,7 +426,6 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
 
 bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
 {
-    bool isFileHandleResponse = true;
     EuiccInfo1 euiccInfo1;
     std::shared_ptr<Asn1Node> svnNode = root->Asn1GetChild(TAG_ESIM_CTX_2);
     if (svnNode == nullptr) {
@@ -441,20 +439,18 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
         return false;
     }
     std::ostringstream oss;
-    oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_HIGH])
-        << "." << std::setw(2) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_MIDDLE])
-        << "." << std::setw(2) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_LOW]);
+    oss << std::hex << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_HIGH])
+        << "." << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_MIDDLE])
+        << "." << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_LOW]);
   
     std::string formattedVersion = oss.str();
     euiccInfo1.svn = formattedVersion;
-
     eUiccInfo_.osVersion = Str8ToStr16(euiccInfo1.svn);
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -469,7 +465,7 @@ bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Point
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
 
     if (!RequestAllProfilesParseProfileInfo(root)) {
@@ -479,21 +475,19 @@ bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Point
 
     {
         std::lock_guard<std::mutex> lock(allProfileInfoMutex_);
-        areAllProfileInfoReady_ = true;
+        isAllProfileInfoReady_ = true;
     }
     allProfileInfoCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root)
 {
-    bool isFileHandleResponse = true;
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     if (profileRoot == nullptr) {
         TELEPHONY_LOGE("profileRoot is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
-
     std::list<std::shared_ptr<Asn1Node>> profileNodes;
     profileRoot->Asn1GetChildren(TAG_ESIM_PROFILE_INFO, profileNodes);
     std::shared_ptr<Asn1Node> curNode = nullptr;
@@ -510,8 +504,7 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
         euiccProfileInfoList_.profiles.push_back(euiccProfile);
     }
     euiccProfileInfoList_.result = ResultState::RESULT_OK;
-
-    return isFileHandleResponse;
+    return true;
 }
 
 void EsimFile::InitMemberFunc()
@@ -547,7 +540,7 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
 }
 
-int EsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
+int32_t EsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     return 0;
 }

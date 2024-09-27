@@ -16,18 +16,18 @@
 #ifndef ESIM_SERVICE_PROFILE_H
 #define ESIM_SERVICE_PROFILE_H
 
+#include <stdbool.h>
+
 #include "asn1_builder.h"
 #include "asn1_decoder.h"
 #include "asn1_node.h"
 #include "asn1_utils.h"
 #include "esim_state_type.h"
 
-#include <stdbool.h>
-
 namespace OHOS {
 namespace Telephony {
-#define EUICC_MEMORY_RESET_BIT_STR_FILL_LEN (0x05)
-#define EUICC_MEMORY_RESET_BIT_STR_VALUE (0xA0)
+constexpr int32_t EUICC_MEMORY_RESET_BIT_STR_FILL_LEN = 0x05;
+constexpr int32_t EUICC_MEMORY_RESET_BIT_STR_VALUE = 0xA0;
 constexpr int32_t VERSION_BYTES_LEN = 3;
 constexpr int32_t BASE64_TO_HEX_RATIO 2;
 constexpr int32_t APDU_MSG_STATUS_WAIT_RSP = 1;
@@ -106,7 +106,7 @@ typedef struct TagEuiccInfo2 {
     std::string rspCapability;
     std::string euiccCiPKIdListForVerification;
     std::string euiccCiPKIdListForSigning;
-    int32_t euiccCategory;
+    int32_t euiccCategory = 0;
     std::string forbiddenProfilePolicyRules;
     std::string ppVersion;
     std::string sasAccreditationNumber;
@@ -121,7 +121,7 @@ typedef struct TagEsimProfile {
     std::u16string smdpSignature2 = u"";
     std::u16string smdpCertificate = u"";
     int32_t seqNumber = 0;
-    bool activeAfterDown;
+    bool activeAfterDown = false;
     bool forceDeactivateSim = false;
     OHOS::Telephony::ResetOption option = OHOS::Telephony::ResetOption::DELETE_OPERATIONAL_PROFILES;
     std::u16string transactionId = u"";
@@ -150,10 +150,10 @@ typedef struct TagEs9PlusInitAuthResp {
 } Es9PlusInitAuthResp;
 
 typedef struct TagAuthServerResponse {
-    int32_t errCode;
+    int32_t errCode = 0;
     std::string transactionId;
     std::string respStr;
-    int32_t respLength;
+    int32_t respLength = 0;
 } AuthServerResponse;
 
 typedef struct TagOperatorId {
@@ -167,11 +167,11 @@ typedef struct TagEuiccProfileInfo {
     std::string nickname;
     std::string serviceProviderName;
     std::string profileName;
-    int32_t profileClass;
-    int32_t profileState;
+    int32_t profileClass = 0;
+    int32_t profileState = 0;
     EsimOperatorId operatorId;
-    int32_t policyRules;
-    std::list<std::shared_ptr<Asn1Node>> accessRules;
+    int32_t policyRules = 0;
+    std::list<std::shared_ptr<Asn1Node>> accessRules = nullptr;
 } EuiccProfileInfo;
 
 typedef struct TagPrepareDownloadResp {
@@ -179,7 +179,7 @@ typedef struct TagPrepareDownloadResp {
     std::string smdpSigned2;
     std::string smdpSignature2;
     std::string smdpCertificate;
-}PrepareDownloadResp;
+} PrepareDownloadResp;
 } // namespace Telephony
 } // namespace OHOS
 #endif // ESIM_SERVICE_PROFILE_H

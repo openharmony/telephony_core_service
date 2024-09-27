@@ -17,12 +17,12 @@
 #define OHOS_SIM_FILE_MANAGER_H
 
 #include "common_event_subscriber.h"
+#include "csim_file_controller.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_file.h"
 #endif
-#include "tel_ril_modem_parcel.h"
 #include "i_tel_ril_manager.h"
 #include "isim_file.h"
 #include "isim_file_controller.h"
@@ -31,9 +31,7 @@
 #include "sim_file.h"
 #include "sim_file_controller.h"
 #include "system_ability_status_change_stub.h"
-#include "isim_file.h"
-#include "isim_file_controller.h"
-#include "csim_file_controller.h"
+#include "tel_ril_modem_parcel.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
 
@@ -110,7 +108,7 @@ protected:
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::weak_ptr<Telephony::SimStateManager> simStateManager_;
-    int slotId_ = 0;
+    int32_t slotId_ = 0;
     IccType iccType_ = IccType::ICC_TYPE_USIM;
     std::map<IccType, std::shared_ptr<IccFile>> iccFileCache_;
     std::map<IccType, std::shared_ptr<IccFileController>> iccFileControllerCache_;
