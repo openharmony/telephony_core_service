@@ -30,12 +30,14 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t NUMBER_TWO = 2;
 constexpr static const int32_t NUMBER_THREE = 3;
+constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
-    int ObtainSpnCondition(bool roaming, const std::string &operatorNum);
+    int32_t ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
     bool SetVoiceMailCount(int32_t voiceMailCount);
@@ -77,9 +79,9 @@ private:
 
 protected:
     constexpr std::string isdr_aid = "A0000005591010FFFFFFFF8900000100";
-    std::map<int, FileProcessFunc> memberFuncMap_;
+    std::map<int32_t, FileProcessFunc> memberFuncMap_;
     int32_t currentChannelId_ = -1;
-    int slotId_ = 0;
+    int32_t slotId_ = 0;
     EsimProfile esimProfile_;
     std::string eid_ = "";
     std::string defaultDpAddress_ = "";
@@ -117,7 +119,7 @@ private:
 
     std::mutex getEidMutex_;
     std::condition_variable getEidCv_;
-    bool getEidReady_ = false;
+    bool isEidReady_ = false;
 
     std::mutex allProfileInfoMutex_;
     std::condition_variable allProfileInfoCv_;
