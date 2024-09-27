@@ -129,8 +129,7 @@ int32_t Asn1Builder::Asn1AddChildAsBoolean(uint32_t tag, bool flag)
     std::vector<uint8_t> boolByteVec = {};
     if (flag) {
         boolByteVec.push_back(static_cast<uint8_t>(MAX_UINT8));
-    }
-    else {
+    } else {
         boolByteVec.push_back(static_cast<uint8_t>(0));
     }
     int32_t ret = Asn1AddChildAsBytes(tag, boolByteVec, boolByteVec.size());

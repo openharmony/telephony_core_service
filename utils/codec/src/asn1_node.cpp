@@ -141,7 +141,6 @@ std::shared_ptr<Asn1Node> Asn1Node::Asn1GetGrandson(const uint32_t firstLevelTag
     }
     resultNode = resultNode->Asn1GetChild(secondLevelTag);
     return resultNode;
-
 }
 
 std::shared_ptr<Asn1Node> Asn1Node::Asn1GetGreatGrandson(const uint32_t firstLevelTag, const uint32_t secondLevelTag,
