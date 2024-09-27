@@ -56,7 +56,6 @@ HWTEST_F(EsimCoreServiceTest, ResetMemory_0001, Function | MediumTest | Level1)
     const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EXPECT_NE(mCoreService->ResetMemory(
         slotId, resetOption, ResetMemoryResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->ResetMemory(
         slotId, resetOption, ResetMemoryResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -72,7 +71,6 @@ HWTEST_F(EsimCoreServiceTest, SetDefaultSmdpAddress_0001, Function | MediumTest 
     ResultState SetAddressResult;
     EXPECT_NE(mCoreService->SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -85,7 +83,6 @@ HWTEST_F(EsimCoreServiceTest, IsEsimSupported_0001, Function | MediumTest | Leve
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
-
     mCoreService->simManager_ = nullptr;
     EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
 }
@@ -101,7 +98,6 @@ HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);

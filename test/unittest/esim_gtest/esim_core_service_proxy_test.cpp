@@ -119,7 +119,6 @@ HWTEST_F(EsimCoreServiceProxyTest, ResetMemory_002, Function | MediumTest | Leve
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     ResultState resetMemoryResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
@@ -131,7 +130,6 @@ HWTEST_F(EsimCoreServiceProxyTest, ResetMemory_003, Function | MediumTest | Leve
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     ResultState resetMemoryResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
@@ -143,7 +141,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_001, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-
     std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
     ResultState setAddressResult;
     int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
@@ -154,7 +151,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_002, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
     ResultState setAddressResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
@@ -166,7 +162,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_003, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
     ResultState setAddressResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
@@ -201,7 +196,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_001, Function | MediumTest | Lev
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-
     std::u16string aid = Str8ToStr16("aid test");
     std::u16string apduData = Str8ToStr16("apduData test");
     ResponseEsimResult responseResult;
@@ -213,7 +207,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_002, Function | MediumTest | Lev
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     std::u16string aid = Str8ToStr16("aid test");
     std::u16string apduData = Str8ToStr16("apduData test");
     ResponseEsimResult responseResult;
@@ -226,7 +219,6 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_003, Function | MediumTest | Lev
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
     std::u16string aid = Str8ToStr16("aid test");
     std::u16string apduData = Str8ToStr16("apduData test");
     ResponseEsimResult responseResult;

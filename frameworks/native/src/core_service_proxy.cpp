@@ -3247,7 +3247,8 @@ int32_t CoreServiceProxy::SetDefaultSmdpAddress(
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS), data, reply, option);
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("SetDefaultSmdpAddress failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -3277,7 +3278,8 @@ bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
         TELEPHONY_LOGE("Remote is null");
         return false;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED), data, reply, option);
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("IsEsimSupported sendRequest failed, error code is %{public}d", requestResult);
         return false;
@@ -3312,7 +3314,8 @@ int32_t CoreServiceProxy::SendApduData(
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA), data, reply, option);
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("SendApduData sendRequest failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
