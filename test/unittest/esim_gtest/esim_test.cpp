@@ -456,5 +456,5 @@ HWTEST_F(EsimTest, InitMemberFunc_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     esimFile->InitMemberFunc();
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

@@ -196,5 +196,5 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo_003, Function | MediumTest | Lev
     int32_t ret = proxy.GetEuiccInfo(SLOT_ID, eUiccInfo);
     EXPECT_EQ(ret, 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

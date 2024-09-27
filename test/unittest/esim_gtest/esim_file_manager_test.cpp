@@ -27,8 +27,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-//#ifdef CORE_SERVICE_SUPPORT_ESIM
-
 class EsimFileManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -96,5 +94,5 @@ HWTEST_F(EsimFileManagerTest, GetEuiccInfo_001, Function | MediumTest | Level2)
     eUiccInfo = simFileManager.GetEuiccInfo();
     EXPECT_EQ(eUiccInfo.osVersion, u"");
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

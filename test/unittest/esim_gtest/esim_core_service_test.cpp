@@ -82,5 +82,5 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
