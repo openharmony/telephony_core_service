@@ -1,3 +1,42 @@
+/*
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "esim_file.h"
+
+#include <unistd.h>
+
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "core_manager_inner.h"
+#include "core_service.h"
+#include "core_manager_inner.h"
+#include "parameters.h"
+#include "radio_event.h"
+#include "sim_number_decode.h"
+#include "str_convert.h"
+#include "telephony_common_utils.h"
+#include "telephony_ext_wrapper.h"
+#include "telephony_state_registry_client.h"
+#include "telephony_tag_def.h"
+#include "vcard_utils.h"
+using namespace OHOS::AppExecFwk;
+using namespace OHOS::EventFwk;
+
+namespace OHOS {
+namespace Telephony {
+
 EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Event events)
 {
     esimProfile_.portIndex = portIndex;
@@ -10,7 +49,7 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
     }
     std::unique_lock<std::mutex> lock(retrieveNotificationListMutex_);
     if (!retrieveNotificationListCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areRetrieveNotificationListReady_; })) {
+        [this]() { return isRetrieveNotificationListReady_; })) {
         SyncCloseChannel();
         return EuiccNotificationList();
     }
@@ -30,7 +69,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
     }
     std::unique_lock<std::mutex> lock(retrieveNotificationMutex_);
     if (!retrieveNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areRetrieveNotificationReady_; })) {
+        [this]() { return isRetrieveNotificationReady_; })) {
         SyncCloseChannel();
         return EuiccNotification();
     }
@@ -50,7 +89,7 @@ ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqN
     }
     std::unique_lock<std::mutex> lock(removeNotificationMutex_);
     if (!removeNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areRemoveNotificationReady_; })) {
+        [this]() { return isRemoveNotificationReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
@@ -72,15 +111,19 @@ bool EsimFile::ProcessRetrieveNotificationList(
             TELEPHONY_LOGE("compBuilder is nullptr!");
             return false;
         }
-        compBuilder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, (int)events);
+        compBuilder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, static_cast<int32_t>(events));
         std::shared_ptr<Asn1Node> compNode = compBuilder->Asn1Build();
         builder->Asn1AddChild(compNode);
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
         if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -88,37 +131,39 @@ bool EsimFile::ProcessRetrieveNotificationList(
 
 bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = false;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == false) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero");
-        return isFileHandleResponse;
+        return false;
     }
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
 
     if (!RetrieveNotificationParseCompTag(root)) {
         TELEPHONY_LOGE("RetrieveNotificationParseCompTag error");
-        return isFileHandleResponse;
+        return false;
     }
 
     {
         std::lock_guard<std::mutex> lock(retrieveNotificationListMutex_);
-        areRetrieveNotificationListReady_ = true;
+        isRetrieveNotificationListReady_ = true;
     }
     retrieveNotificationListCv_.notify_one();
     return true;
@@ -126,23 +171,21 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
 
 bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
 {
-    bool isFileHandleResponse = false;
     std::list<std::shared_ptr<Asn1Node>> ls;
     std::shared_ptr<Asn1Node> compTag = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
-    if (nullptr == compTag) {
+    if (compTag == nullptr) {
         TELEPHONY_LOGE("compTag is nullptr");
-        return isFileHandleResponse;
+        return false;
     }
 
     int metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_SEQUENCE, ls);
     if (metaDataRes != 0) {
         TELEPHONY_LOGE("metaDataTag is zero");
-        return isFileHandleResponse;
+        return false;
     }
-    std::shared_ptr<Asn1Node> curNode = NULL;
+    std::shared_ptr<Asn1Node> curNode = nullptr;
     EuiccNotificationList euiccList;
-    for(auto it = ls.begin(); it != ls.end(); ++it)
-    {
+    for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
         createNotification(curNode, euicc);
@@ -168,9 +211,13 @@ bool EsimFile::ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::Inn
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
         if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -178,7 +225,6 @@ bool EsimFile::ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::Inn
 
 bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr");
         return false;
@@ -189,8 +235,11 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == false) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
@@ -203,15 +252,14 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
 
     {
         std::lock_guard<std::mutex> lock(retrieveNotificationMutex_);
-        areRetrieveNotificationReady_ = true;
+        isRetrieveNotificationReady_ = true;
     }
     retrieveNotificationCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &root)
 {
-    bool isFileHandleResponse = true;
     std::list<std::shared_ptr<Asn1Node>> nodes;
     std::shared_ptr<Asn1Node> compNode = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     if (nullptr == compNode) {
@@ -225,18 +273,17 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
     EuiccNotification notification;
     std::shared_ptr<Asn1Node> firstNode = nodes.front();
     createNotification(firstNode, notification);
-	int res = memcpy_s(&notification_, sizeof(EuiccNotification), &notification, sizeof(EuiccNotification));
-    if (res != 0) {
-        TELEPHONY_LOGI("memcpy_s fail: %d", res);
-        return false;
-    }
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
     if (IsLogicChannelOpen()) {
         EsimProfile *profile = &esimProfile_;
+         if (profile == nullptr) {
+            TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
+            return false;
+        } 
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_REMOVE_NOTIFICATION_FROM_LIST);
         if (builder == nullptr) {
             TELEPHONY_LOGE("builder is nullptr");
@@ -246,9 +293,13 @@ bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::Inner
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
         if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -256,7 +307,6 @@ bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::Inner
 
 bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -267,8 +317,11 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == false) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
@@ -283,10 +336,10 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
 
     {
         std::lock_guard<std::mutex> lock(removeNotificationMutex_);
-        areRemoveNotificationReady_ = true;
+        isRemoveNotificationReady_ = true;
     }
     removeNotificationCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 void EsimFile::InitMemberFunc()
@@ -316,4 +369,6 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     } else {
         IccFile::ProcessEvent(event);
     }
+}
+}
 }

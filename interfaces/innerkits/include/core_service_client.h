@@ -918,6 +918,7 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief  Retrieves contents of all notification of the given.
      *
@@ -952,6 +953,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t RemoveNotificationFromList(int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult);
+#endif
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

@@ -141,12 +141,14 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t RetrieveNotificationList(
         int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList) = 0;
     virtual int32_t RetrieveNotification(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) = 0;
     virtual int32_t RemoveNotificationFromList(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) = 0;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

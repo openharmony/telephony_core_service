@@ -1082,12 +1082,13 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceClient::RetrieveNotificationList(
     int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
+        TELEPHONY_LOGE("RetrieveNotificationList proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->RetrieveNotificationList(slotId, portIndex, events, notificationList);
@@ -1098,7 +1099,7 @@ int32_t CoreServiceClient::RetrieveNotification(
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
+        TELEPHONY_LOGE("RetrieveNotification proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->RetrieveNotification(slotId, portIndex, seqNumber, notification);
@@ -1109,10 +1110,11 @@ int32_t CoreServiceClient::RemoveNotificationFromList(
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        TELEPHONY_LOGE("proxy is null!");
+        TELEPHONY_LOGE("RemoveNotificationFromList proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
