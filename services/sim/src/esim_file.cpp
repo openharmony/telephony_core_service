@@ -470,7 +470,8 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
     if (node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA) {
         metadataNode = node;
     } else if (node->GetNodeTag() == TAG_ESIM_PROFILE_INSTALLATION_RESULT) {
-        std::shared_ptr<Asn1Node> findNode = node->Asn1GetChildChild(CHILD_COUNT, TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
+        std::shared_ptr<Asn1Node> findNode =
+            node->Asn1GetChildChild(CHILD_COUNT, TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
             TAG_ESIM_NOTIFICATION_METADATA);
         metadataNode = findNode;
     } else {
