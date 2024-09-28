@@ -32,27 +32,12 @@
 #include "telephony_tag_def.h"
 #include "vcard_utils.h"
 
-
-
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
-#define NUMBER_ZERO (0)
-#define NUMBER_ONE (1)
-#define NUMBER_TWO (2)
-#define NUMBER_THREE (3)
-#define NUMBER_FOUR (4)
-#define NUMBER_FIVE (5)
-#define NUMBER_ELEVEN (11)
-
-#define SW1_MORE_RESPONSE 0x61
-#define INS_GET_MORE_RESPONSE 0xC0
-#define SW1_VALUE_90 0x90
-#define SW2_VALUE_00 0x00
-
 namespace OHOS {
 namespace Telephony {
-ResultState EsimFile::DeleteProfile(std::u16string iccId)
+ResultState EsimFile::DeleteProfile(const std::u16string iccId)
 {
     esimProfile_.iccId = iccId;
     SyncOpenChannel();
@@ -61,18 +46,18 @@ ResultState EsimFile::DeleteProfile(std::u16string iccId)
         TELEPHONY_LOGE("ProcessDeleteProfile encode failed");
         return ResultState();
     }
-    areDeleteProfileReady_ = false;
+    isDeleteProfileReady_ = false;
     std::unique_lock<std::mutex> lock(deleteProfileMutex_);
     if (!deleteProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areDeleteProfileReady_; })) {
+        [this]() { return isDeleteProfileReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
     SyncCloseChannel();
-    return disableProfileResult_;
+    return delProfile_;
 }
 
-ResultState EsimFile::SwitchToProfile(int32_t portIndex, std::u16string iccId, bool forceDeactivateSim)
+ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string iccId, bool forceDeactivateSim)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
@@ -83,10 +68,10 @@ ResultState EsimFile::SwitchToProfile(int32_t portIndex, std::u16string iccId, b
         TELEPHONY_LOGE("ProcessSwitchToProfile encode failed");
         return ResultState();
     }
-    areSwitchToProfileReady_ = false;
+    isSwitchToProfileReady_ = false;
     std::unique_lock<std::mutex> lock(switchToProfileMutex_);
     if (!switchToProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areSwitchToProfileReady_; })) {
+        [this]() { return isSwitchToProfileReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
@@ -94,7 +79,7 @@ ResultState EsimFile::SwitchToProfile(int32_t portIndex, std::u16string iccId, b
     return switchResult_;
 }
 
-ResultState EsimFile::SetProfileNickname(std::u16string iccId, std::u16string nickname)
+ResultState EsimFile::SetProfileNickname(const std::u16string iccId, const std::u16string nickname)
 {
     esimProfile_.iccId = iccId;
     esimProfile_.nickname = nickname;
@@ -104,15 +89,15 @@ ResultState EsimFile::SetProfileNickname(std::u16string iccId, std::u16string ni
         TELEPHONY_LOGE("ProcessSetNickname encode failed");
         return ResultState();
     }
-    areSetNicknameReady_ = false;
+    isSetNicknameReady_ = false;
     std::unique_lock<std::mutex> lock(setNicknameMutex_);
     if (!setNicknameCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areSetNicknameReady_; })) {
+        [this]() { return isSetNicknameReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
     SyncCloseChannel();
-    return updateNicknameResult_;
+    return setNicknameResult_;
 }
 
 bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -133,7 +118,10 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -160,7 +148,10 @@ bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -168,7 +159,6 @@ bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::
 
 bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -193,10 +183,10 @@ bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &e
     delProfile_ = (ResultState)pAsn1Node->Asn1AsInteger();
     {
         std::lock_guard<std::mutex> lock(deleteProfileMutex_);
-        areDeleteProfileReady_ = true;
+        isDeleteProfileReady_ = true;
     }
     deleteProfileCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
@@ -221,7 +211,10 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
         if (telRilManager_ == nullptr) {
             return false;
         }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (apduResult == TELEPHONY_ERR_FAIL) {
+            return false;
+        }
         return true;
     }
     return false;
@@ -229,7 +222,6 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
 
 bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -255,15 +247,14 @@ bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer 
 
     {
         std::lock_guard<std::mutex> lock(switchToProfileMutex_);
-        areSwitchToProfileReady_ = true;
+        isSwitchToProfileReady_ = true;
     }
     switchToProfileCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -288,10 +279,10 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
     updateNicknameResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
     {
         std::lock_guard<std::mutex> lock(setNicknameMutex_);
-        areSetNicknameReady_ = true;
+        isSetNicknameReady_ = true;
     }
     setNicknameCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 void EsimFile::InitMemberFunc()

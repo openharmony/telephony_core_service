@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,9 +33,9 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
 class EsimFile : public IccFile {
 public:
-    ResultState DeleteProfile(std::u16string iccId);
-    ResultState SwitchToProfile(int32_t portIndex, std::u16string iccId, bool forceDeactivateSim);
-    ResultState SetProfileNickname(std::u16string iccId, std::u16string nickname);
+    ResultState DeleteProfile(const std::u16string iccId);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string iccId, bool forceDeactivateSim);
+    ResultState SetProfileNickname(const std::u16string iccId, const std::u16string nickname);
 
 private:
     bool ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
@@ -45,18 +45,23 @@ private:
     bool ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event);
 
+protected:
+    ResultState delProfile_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultState switchResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultState setNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+
 private:
     std::mutex deleteProfileMutex_;
     std::condition_variable deleteProfileCv_;
-    bool areDeleteProfileReady_ = false;
+    bool isDeleteProfileReady_ = false;
 
     std::mutex switchToProfileMutex_;
     std::condition_variable switchToProfileCv_;
-    bool areSwitchToProfileReady_ = false;
+    bool isSwitchToProfileReady_ = false;
 
     std::mutex setNicknameMutex_;
     std::condition_variable setNicknameCv_;
-    bool areSetNicknameReady_ = false;
+    bool isSetNicknameReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
