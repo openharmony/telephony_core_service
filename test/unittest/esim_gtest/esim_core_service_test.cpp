@@ -60,7 +60,6 @@ HWTEST_F(EsimCoreServiceTest, PrepareDownload_0001, Function | MediumTest | Leve
     std::u16string smdpCertificate;
     EXPECT_NE(mCoreService->PrepareDownload(slotId, portIndex, hashCc,
         smdpSigned2, smdpSignature2, smdpCertificate, responseResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->PrepareDownload(slotId, portIndex, hashCc,
         smdpSigned2, smdpSignature2, smdpCertificate, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -77,7 +76,6 @@ HWTEST_F(EsimCoreServiceTest, LoadBoundProfilePackage_0001, Function | MediumTes
     ResponseEsimBppResult responseResult;
     EXPECT_NE(mCoreService->LoadBoundProfilePackage(
         slotId, portIndex, boundProfilePackage, responseResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->LoadBoundProfilePackage(
         slotId, portIndex, boundProfilePackage, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -94,7 +92,6 @@ HWTEST_F(EsimCoreServiceTest, ListNotifications_0001, Function | MediumTest | Le
     EuiccNotificationList notificationList1;
     EXPECT_NE(mCoreService->ListNotifications(
         slotId, portIndex, events, notificationList1), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->ListNotifications(
         slotId, portIndex, events, notificationList1), TELEPHONY_ERR_LOCAL_PTR_NULL);

@@ -272,6 +272,7 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD)] =
@@ -281,6 +282,7 @@ void CoreServiceStub::AddHandlerEsimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LIST_NOTIFICATIONS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnListNotifications(data, reply); };
 }
+#endif
 
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
