@@ -141,10 +141,11 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t OnPrepareDownload(MessageParcel &data, MessageParcel &reply);
     int32_t OnLoadBoundProfilePackage(MessageParcel &data, MessageParcel &reply);
     int32_t OnListNotifications(MessageParcel &data, MessageParcel &reply);
-
+#endif
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {

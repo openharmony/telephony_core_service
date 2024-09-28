@@ -28,7 +28,7 @@ class ISimManager {
 public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     // Init
-    virtual bool OnInit(int32_t slotCount) = 0;
+    virtual bool OnInit(int32_t slotCount) =  0;
     virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
     // SimState
     virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
@@ -141,17 +141,15 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
-    virtual int32_t PrepareDownload(
-        int32_t slotId, int32_t portIndex,
-        const std::u16string &hashCc,
-        const std::u16string &smdpSigned2,
-        const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate,
-        ResponseEsimResult &responseResult) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    virtual int32_t PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
+        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
+        const std::u16string &smdpCertificate, ResponseEsimResult &responseResult) = 0;
     virtual int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
         const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult) = 0;
-    virtual int32_t ListNotifications(
-        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList) = 0;
+    virtual int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
+        EuiccNotificationList &notificationList) = 0;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -918,6 +918,7 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief Prepares the profile download request sent to SM-DP+.
      *
@@ -931,13 +932,9 @@ public:
      * @param result[out], get the result code and a byte array
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t PrepareDownload(
-        int32_t slotId, int32_t portIndex,
-        const std::u16string &hashCc,
-        const std::u16string &smdpSigned2,
-        const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate,
-        ResponseEsimResult &responseResult);
+    int32_t PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
+        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
+        const std::u16string &smdpCertificate, ResponseEsimResult &responseResult);
 
     /**
      * @brief Loads a downloaded bound profile package onto the eUICC.
@@ -961,6 +958,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList);
+#endif
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

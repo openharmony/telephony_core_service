@@ -983,15 +983,12 @@ void SimFileManager::ClearData()
     simFile_->ClearData();
 }
 
-ResponseEsimResult SimFileManager::PrepareDownload(
-    int32_t portIndex,
-    const std::u16string &hashCc,
-    const std::u16string &smdpSigned2,
-    const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate)
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+ResponseEsimResult SimFileManager::PrepareDownload(int32_t portIndex, const std::u16string &hashCc,
+    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2, const std::u16string &smdpCertificate)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("eSimFile is nullptr");
         return ResponseEsimResult();
     }
     ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(
@@ -1003,7 +1000,7 @@ ResponseEsimBppResult SimFileManager::LoadBoundProfilePackage(
     int32_t portIndex, const std::u16string &boundProfilePackage)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("eSimFile is nullptr");
         return ResponseEsimBppResult();
     }
     ResponseEsimBppResult result = eSimFile_->ObtainLoadBoundProfilePackage(portIndex, boundProfilePackage);
@@ -1013,11 +1010,12 @@ ResponseEsimBppResult SimFileManager::LoadBoundProfilePackage(
 EuiccNotificationList SimFileManager::ListNotifications(int32_t portIndex, Event events)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("eSimFile is nullptr");
         return EuiccNotificationList();
     }
     EuiccNotificationList result = eSimFile_->ListNotifications(portIndex, events);
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
