@@ -1256,6 +1256,7 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t SimManager::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
@@ -1296,5 +1297,6 @@ int32_t SimManager::GetProfile(
     }
     return TELEPHONY_ERR_SUCCESS;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

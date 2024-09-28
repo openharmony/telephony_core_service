@@ -3189,6 +3189,7 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     return ret;
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceProxy::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
 {
     MessageParcel data;
@@ -3283,7 +3284,6 @@ int32_t CoreServiceProxy::GetProfile(
         TELEPHONY_LOGE("WriteString16 iccId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
@@ -3300,5 +3300,6 @@ int32_t CoreServiceProxy::GetProfile(
     }
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

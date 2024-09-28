@@ -1082,6 +1082,7 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceClient::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
 {
     auto proxy = GetProxy();
@@ -1113,5 +1114,6 @@ int32_t CoreServiceClient::GetProfile(
     }
     return proxy->GetProfile(slotId, portIndex, iccId, eUiccProfile);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
