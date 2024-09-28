@@ -90,9 +90,11 @@ public:
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
     EuiccNotification RetrieveNotification(int32_t portIndex, int32_t seqNumber);
     ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
+#endif
 
 protected:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;

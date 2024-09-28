@@ -983,34 +983,33 @@ void SimFileManager::ClearData()
     simFile_->ClearData();
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 EuiccNotificationList SimFileManager::RetrieveNotificationList(int32_t portIndex, Event events)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("RetrieveNotificationList eSimFile_ is nullptr");
         return EuiccNotificationList();
     }
-    EuiccNotificationList result = eSimFile_->RetrieveNotificationList(portIndex, events);
-    return result;
+    return eSimFile_->RetrieveNotificationList(portIndex, events);
 }
 
 EuiccNotification SimFileManager::RetrieveNotification(int32_t portIndex, int32_t seqNumber)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("RetrieveNotification eSimFile_ is nullptr");
         return EuiccNotification();
     }
-    EuiccNotification result = eSimFile_->ObtainRetrieveNotification(portIndex, seqNumber);
-    return result;
+    return eSimFile_->ObtainRetrieveNotification(portIndex, seqNumber);
 }
 
 ResultState SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
 {
     if (eSimFile_ == nullptr) {
-        TELEPHONY_LOGE("esimFile is nullptr");
+        TELEPHONY_LOGE("RemoveNotificationFromList eSimFile_ is nullptr");
         return ResultState::RESULT_UNDEFINED_ERROR;
     }
-    ResultState result = eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
-    return result;
+    return eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

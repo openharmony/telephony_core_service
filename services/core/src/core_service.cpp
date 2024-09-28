@@ -1649,6 +1649,7 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::RetrieveNotificationList(
     int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
 {
@@ -1657,7 +1658,7 @@ int32_t CoreService::RetrieveNotificationList(
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
+        TELEPHONY_LOGE("RetrieveNotificationList simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->RetrieveNotificationList(slotId, portIndex, events, notificationList);
@@ -1671,7 +1672,7 @@ int32_t CoreService::RetrieveNotification(
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
+        TELEPHONY_LOGE("RetrieveNotification simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->RetrieveNotification(slotId, portIndex, seqNumber, notification);
@@ -1685,11 +1686,11 @@ int32_t CoreService::RemoveNotificationFromList(
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
+        TELEPHONY_LOGE("RemoveNotificationFromList simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
 }
-
+#endif
 } // namespace Telephony
 } // namespace OHOS
