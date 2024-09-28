@@ -195,7 +195,8 @@ HWTEST_F(EsimTest, ProcessRequestRulesAuthTableDone_001, Function | MediumTest |
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
-    AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable = iccFile->BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
+    AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable =
+        iccFile->BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData = "BF434B"
