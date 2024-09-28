@@ -146,11 +146,13 @@ public:
     int32_t GetOpkeyVersion(std::string &versionInfo) override;
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress) override;
     int32_t CancelSession(int32_t slotId, const std::u16string &transactionId,
         CancelReason cancelReason, ResponseEsimResult &responseResult) override;
     int32_t GetProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId,
         EuiccProfile &eUiccProfile) override;
+#endif
 
 private:
     template<class T>

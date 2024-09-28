@@ -983,6 +983,7 @@ void SimFileManager::ClearData()
     simFile_->ClearData();
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 std::u16string SimFileManager::GetDefaultSmdpAddress()
 {
     if (eSimFile_ == nullptr) {
@@ -1012,5 +1013,6 @@ EuiccProfile SimFileManager::GetProfile(int32_t portIndex, const std::u16string 
     EuiccProfile result = eSimFile_->ObtainProfile(portIndex, iccId);
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

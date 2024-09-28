@@ -272,6 +272,7 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS)] =
@@ -281,6 +282,7 @@ void CoreServiceStub::AddHandlerEsimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PROFILE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetProfile(data, reply); };
 }
+#endif
 
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -1949,6 +1951,7 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
     return NO_ERROR;
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -2017,5 +2020,6 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
     }
     return NO_ERROR;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

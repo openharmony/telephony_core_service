@@ -149,11 +149,13 @@ public:
     virtual int32_t GetOpkeyVersion(std::string &versionInfo) = 0;
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress) = 0;
     virtual int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
         ResponseEsimResult &responseResult) = 0;
     virtual int32_t GetProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) = 0;
+#endif
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;

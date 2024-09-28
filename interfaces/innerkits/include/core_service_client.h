@@ -918,6 +918,7 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief Obtain the international mobile subscriber identity
      *
@@ -947,6 +948,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile);
+#endif
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
