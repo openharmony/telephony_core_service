@@ -983,6 +983,7 @@ void SimFileManager::ClearData()
     simFile_->ClearData();
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 ResultState SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
     if (eSimFile_ == nullptr) {
@@ -1022,5 +1023,6 @@ ResponseEsimResult SimFileManager::GetEuiccChallenge(int32_t portIndex)
     ResponseEsimResult result = eSimFile_->ObtainEuiccChallenge(portIndex);
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

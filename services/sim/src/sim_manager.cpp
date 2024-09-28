@@ -1256,6 +1256,7 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t SimManager::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
 {
@@ -1297,6 +1298,6 @@ int32_t SimManager::GetEuiccChallenge(int32_t slotId, int32_t portIndex, Respons
     responseResult = simFileManager_[slotId]->GetEuiccChallenge(portIndex);
     return TELEPHONY_ERR_SUCCESS;
 }
-
+#endif
 } // namespace Telephony
 } // namespace OHOS

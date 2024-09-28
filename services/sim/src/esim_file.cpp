@@ -1,3 +1,41 @@
+/*
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "esim_file.h"
+
+#include <unistd.h>
+
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "core_manager_inner.h"
+#include "core_service.h"
+#include "core_manager_inner.h"
+#include "parameters.h"
+#include "radio_event.h"
+#include "sim_number_decode.h"
+#include "str_convert.h"
+#include "telephony_common_utils.h"
+#include "telephony_ext_wrapper.h"
+#include "telephony_state_registry_client.h"
+#include "telephony_tag_def.h"
+#include "vcard_utils.h"
+using namespace OHOS::AppExecFwk;
+using namespace OHOS::EventFwk;
+
+namespace OHOS {
+namespace Telephony {
 ResultState EsimFile::DisableProfile(int32_t portIndex, std::u16string &iccId)
 {
     esimProfile_.portIndex = portIndex;
@@ -8,10 +46,10 @@ ResultState EsimFile::DisableProfile(int32_t portIndex, std::u16string &iccId)
         TELEPHONY_LOGE("ProcessDisableProfile encode failed");
         return ResultState();
     }
-    areDisableProfileReady_ = false;
+    isDisableProfileReady_ = false;
     std::unique_lock<std::mutex> lock(disableProfileMutex_);
     if (!disableProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areDisableProfileReady_; })) {
+        [this]() { return isDisableProfileReady_; })) {
         SyncCloseChannel();
         return ResultState();
     }
@@ -28,10 +66,10 @@ std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
         TELEPHONY_LOGE("ProcessObtainSmdsAddress encode failed");
         return "";
     }
-    areSmdsAddressReady_ = false;
+    isSmdsAddressReady_ = false;
     std::unique_lock<std::mutex> lock(smdsAddressMutex_);
     if (!smdsAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areSmdsAddressReady_; })) {
+        [this]() { return isSmdsAddressReady_; })) {
         SyncCloseChannel();
         return "";
     }
@@ -48,10 +86,10 @@ EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
         TELEPHONY_LOGE("ProcessRequestRulesAuthTable encode failed");
         return EuiccRulesAuthTable();
     }
-    areRulesAuthTableReady_ = false;
+    isRulesAuthTableReady_ = false;
     std::unique_lock<std::mutex> lock(rulesAuthTableMutex_);
     if (!rulesAuthTableCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areRulesAuthTableReady_; })) {
+        [this]() { return isRulesAuthTableReady_; })) {
         SyncCloseChannel();
         return EuiccRulesAuthTable();
     }
@@ -68,10 +106,10 @@ ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
         TELEPHONY_LOGE("ProcessObtainEUICCChallenge encode failed");
         return ResponseEsimResult();
     }
-    areEuiccChallengeReady_ = false;
+    isEuiccChallengeReady_ = false;
     std::unique_lock<std::mutex> lock(euiccChallengeMutex_);
     if (!euiccChallengeCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return areEuiccChallengeReady_; })) {
+        [this]() { return isEuiccChallengeReady_; })) {
         SyncCloseChannel();
         return ResponseEsimResult();
     }
@@ -185,6 +223,9 @@ bool EsimFile::ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -199,7 +240,7 @@ bool EsimFile::ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &
     disableProfileResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
     {
         std::lock_guard<std::mutex> lock(disableProfileMutex_);
-        areDisableProfileReady_ = true;
+        isDisableProfileReady_ = true;
     }
     disableProfileCv_.notify_one();
     return isFileHandleResponse;
@@ -218,6 +259,9 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
     if (root == nullptr) {
@@ -238,7 +282,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
     smdsAddress_ = outPutBytes;
     {
         std::lock_guard<std::mutex> lock(smdsAddressMutex_);
-        areSmdsAddressReady_ = true;
+        isSmdsAddressReady_ = true;
     }
     smdsAddressCv_.notify_one();
     return isFileHandleResponse;
@@ -351,6 +395,9 @@ bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Po
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     uint32_t byteLen = responseByte.length();
@@ -366,7 +413,7 @@ bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Po
 
     {
         std::lock_guard<std::mutex> lock(rulesAuthTableMutex_);
-        areRulesAuthTableReady_ = true;
+        isRulesAuthTableReady_ = true;
     }
     rulesAuthTableCv_.notify_one();
     return isFileHandleResponse;
@@ -386,6 +433,9 @@ bool EsimFile::ProcessObtainEUICCChallengeDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
+    if (result == nullptr) {
+        return false;
+    }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     uint32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
@@ -404,7 +454,7 @@ bool EsimFile::ProcessObtainEUICCChallengeDone(const AppExecFwk::InnerEvent::Poi
     responseChallengeResult_.response = OHOS::Telephony::ToUtf16(strResult);
     {
         std::lock_guard<std::mutex> lock(euiccChallengeMutex_);
-        areEuiccChallengeReady_ = true;
+        isEuiccChallengeReady_ = true;
     }
     euiccChallengeCv_.notify_one();
     return isFileHandleResponse;
@@ -420,4 +470,6 @@ void EsimFile::InitMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainSmdsAddressDone(event); };
     memberFuncMap_[MSG_ESIM_DISABLE_PROFILE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessDisableProfileDone(event); };
+}
+}
 }
