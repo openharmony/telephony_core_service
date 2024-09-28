@@ -149,6 +149,7 @@ public:
     virtual int32_t GetOpkeyVersion(std::string &versionInfo) = 0;
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t DisableProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) = 0;
     virtual int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) = 0;
@@ -156,6 +157,7 @@ public:
         int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) = 0;
     virtual int32_t GetEuiccChallenge(
         int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;
+#endif
 
 protected:
     const int32_t ERROR = -1;

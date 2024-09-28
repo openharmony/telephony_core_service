@@ -1649,6 +1649,7 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
 {
@@ -1701,5 +1702,6 @@ int32_t CoreService::GetEuiccChallenge(int32_t slotId, int32_t portIndex, Respon
     }
     return simManager_->GetEuiccChallenge(slotId, portIndex, responseResult);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
