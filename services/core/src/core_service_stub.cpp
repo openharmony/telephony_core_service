@@ -1949,6 +1949,7 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
     return NO_ERROR;
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnPrepareDownload(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -1963,11 +1964,11 @@ int32_t CoreServiceStub::OnPrepareDownload(MessageParcel &data, MessageParcel &r
         smdpCertificate, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
-        reply.WriteString16(responseResult.response);
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
     }
     if (!ret) {
-        TELEPHONY_LOGE("write reply failed.");
+        TELEPHONY_LOGE("OnPrepareDownload write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
@@ -1983,15 +1984,15 @@ int32_t CoreServiceStub::OnLoadBoundProfilePackage(MessageParcel &data, MessageP
     int32_t result = LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(responseResult.resultCode);
-        reply.WriteString16(responseResult.response);
-        reply.WriteInt32(responseResult.seqNumber);
-        reply.WriteInt32(responseResult.profileManagementOperation);
-        reply.WriteString16(responseResult.notificationAddress);
-        reply.WriteString16(responseResult.iccId);
+        ret = (ret && reply.WriteInt32(responseResult.resultCode));
+        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(responseResult.seqNumber));
+        ret = (ret && reply.WriteInt32(responseResult.profileManagementOperation));
+        ret = (ret && reply.WriteString16(responseResult.notificationAddress));
+        ret = (ret && reply.WriteString16(responseResult.iccId));
     }
     if (!ret) {
-        TELEPHONY_LOGE("write reply failed.");
+        TELEPHONY_LOGE("OnLoadBoundProfilePackage write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
@@ -2008,18 +2009,18 @@ int32_t CoreServiceStub::OnListNotifications(MessageParcel &data, MessageParcel 
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(notificationList.euiccNotification.size());
         for (auto& notification : notificationList.euiccNotification) {
-            reply.WriteInt32(notification.seq);
-            reply.WriteString16(notification.targetAddr);
-            reply.WriteInt32(notification.event);
-            reply.WriteString16(notification.data);
+            ret = (ret && reply.WriteInt32(notification.seq));
+            ret = (ret && reply.WriteString16(notification.targetAddr));
+            ret = (ret && reply.WriteInt32(notification.event));
+            ret = (ret && reply.WriteString16(notification.data));
         }
     }
     if (!ret) {
-        TELEPHONY_LOGE("write reply failed.");
+        TELEPHONY_LOGE("OnListNotifications write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
 }
-
+#endif
 } // namespace Telephony
 } // namespace OHOS

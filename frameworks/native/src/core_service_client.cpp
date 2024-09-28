@@ -1082,13 +1082,10 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }
 
-int32_t CoreServiceClient::PrepareDownload(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &hashCc,
-    const std::u16string &smdpSigned2,
-    const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate,
-    ResponseEsimResult &responseResult)
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceClient::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
+    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1099,8 +1096,8 @@ int32_t CoreServiceClient::PrepareDownload(
         slotId, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
 }
 
-int32_t CoreServiceClient::LoadBoundProfilePackage(
-    int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+int32_t CoreServiceClient::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1110,8 +1107,8 @@ int32_t CoreServiceClient::LoadBoundProfilePackage(
     return proxy->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
 }
 
-int32_t CoreServiceClient::ListNotifications(
-    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+int32_t CoreServiceClient::ListNotifications(int32_t slotId, int32_t portIndex,
+    Event events, EuiccNotificationList &notificationList)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1120,5 +1117,6 @@ int32_t CoreServiceClient::ListNotifications(
     }
     return proxy->ListNotifications(slotId, portIndex, events, notificationList);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

@@ -90,15 +90,12 @@ public:
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
-    ResponseEsimResult PrepareDownload(
-        int32_t portIndex,
-        const std::u16string &hashCc,
-        const std::u16string &smdpSigned2,
-        const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    ResponseEsimResult PrepareDownload(int32_t portIndex, const std::u16string &hashCc,
+        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2, const std::u16string &smdpCertificate);
     ResponseEsimBppResult LoadBoundProfilePackage(int32_t portIndex, const std::u16string &boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
-
+#endif
 protected:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     std::shared_ptr<IccFileController> fileController_ = nullptr;

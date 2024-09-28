@@ -1256,13 +1256,10 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
-int32_t SimManager::PrepareDownload(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &hashCc,
-    const std::u16string &smdpSigned2,
-    const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate,
-    ResponseEsimResult &responseResult)
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t SimManager::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
+    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
@@ -1294,5 +1291,6 @@ int32_t SimManager::ListNotifications(
     notificationList = simFileManager_[slotId]->ListNotifications(portIndex, events);
     return TELEPHONY_ERR_SUCCESS;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

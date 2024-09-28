@@ -1648,14 +1648,10 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     }
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
-
-int32_t CoreService::PrepareDownload(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &hashCc,
-    const std::u16string &smdpSigned2,
-    const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate,
-    ResponseEsimResult &responseResult)
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreService::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
+    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
+    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1696,6 +1692,6 @@ int32_t CoreService::ListNotifications(
     }
     return simManager_->ListNotifications(slotId, portIndex, events, notificationList);
 }
-
+#endif
 } // namespace Telephony
 } // namespace OHOS
