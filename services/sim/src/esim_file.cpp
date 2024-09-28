@@ -288,9 +288,9 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
 void EsimFile::InitMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_DELETE_PROFILE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessDeleteProfileDone(event); }; 
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessDeleteProfileDone(event); };
     memberFuncMap_[MSG_ESIM_SWITCH_PROFILE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSwitchToProfileDone(event); }; 
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSwitchToProfileDone(event); };
     memberFuncMap_[MSG_ESIM_SET_NICK_NAME] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetNicknameDone(event); };
 }

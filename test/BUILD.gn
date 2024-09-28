@@ -1,0 +1,40 @@
+# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../core_service/telephony_core_service.gni")
+
+group("unittest") {
+  testonly = true
+  deps = []
+  deps += [
+    "unittest/core_service_gtest:tel_core_service_common_test",
+    "unittest/core_service_gtest:tel_core_service_gtest",
+    "unittest/core_service_gtest:tel_core_service_native_branch_gtest",
+    "unittest/core_service_gtest:tel_core_service_test",
+    "unittest/core_service_gtest:tel_core_zero_branch_gtest",
+    "unittest/core_service_gtest:tel_network_search_branch_gtest",
+    "unittest/core_service_gtest:tel_network_search_gtest",
+    "unittest/core_service_gtest:tel_network_search_manager_gtest",
+    "unittest/core_service_gtest:tel_sim_file_manager_branch_gtest",
+    "unittest/core_service_gtest:tel_sim_gtest",
+    "unittest/core_service_gtest:tel_sim_zero_branch_gtest",
+    "unittest/icc_dialling_numbers_handler_gtest:icc_dialling_numbers_handler_gtest",
+    "unittest/icc_file_gtest:icc_file_gtest",
+    "unittest/sim_manager_gtest:sim_manager_gtest",
+    "unittest/sim_state_handle_gtest:sim_state_handle_gtest",
+    "unittest/tel_ril_gtest:tel_ril_gtest",
+    "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
+    "unittest/utils_vcard_gtest:utils_vcard_gtest",
+  ]
+}

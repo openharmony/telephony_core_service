@@ -107,4 +107,4 @@ HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Le
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
 }
 } // Telephony
-}// OHOS
+} // OHOS
