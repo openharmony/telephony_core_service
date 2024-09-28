@@ -59,7 +59,6 @@ HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level
     std::u16string smdpSigned2 = u"";
     std::u16string smdpSignature2 = u"";
     std::u16string smdpCertificate = u"";
-    
     ResponseEsimResult res = simFileManager.PrepareDownload(portIndex, hashCc, smdpSigned2,
         smdpSignature2, smdpCertificate);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
@@ -85,7 +84,6 @@ HWTEST_F(EsimFileManagerTest, LoadBoundProfilePackage_001, Function | MediumTest
     std::u16string boundProfilePackage = u"";
     ResponseEsimBppResult res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
     EXPECT_EQ(res.resultCode, 0);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
     EXPECT_EQ(res.resultCode, 0);
@@ -106,7 +104,6 @@ HWTEST_F(EsimFileManagerTest, ListNotifications_001, Function | MediumTest | Lev
     Event events = Event::EVENT_DONOTHING;
     EuiccNotificationList lst = simFileManager.ListNotifications(portIndex, events);
     EXPECT_EQ(lst.euiccNotification.empty(), true);
-    
     simFileManager.eSimFile_ = nullptr;
     lst = simFileManager.ListNotifications(portIndex, events);
     EXPECT_EQ(lst.euiccNotification.empty(), true);

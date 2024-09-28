@@ -35,6 +35,10 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+const int32_t CHILD_COUNT = 2;
+const int32_t CHILD_CHILD_COUNT = 3;
+}
 
 ResponseEsimResult EsimFile::ObtainPrepareDownload(int32_t portIndex, const std::u16string hashCc,
     const std::u16string smdpSigned2, const std::u16string smdpSignature2, const std::u16string smdpCertificate)
@@ -143,12 +147,10 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         return false;
     }
     IccFileData &iccFileData = rcvMsg->fileData;
-    if(!MergeRecvLongDataComplete(iccFileData))
-    {
+    if (!MergeRecvLongDataComplete(iccFileData)) {
         return true;
     }
-    std::string responseByte;
-    responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
+    std::string responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
@@ -227,8 +229,7 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild& codec, std::shared_ptr
     cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    for(auto it = metaDataSeqs.begin(); it != metaDataSeqs.end(); ++it)
-    {
+    for (auto it = metaDataSeqs.begin(); it != metaDataSeqs.end(); ++it) {
         curNode = *it;
         curNode->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
@@ -259,8 +260,7 @@ void EsimFile::BuildApduForSequenceOf86(RequestApduBuild& codec, std::shared_ptr
     cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    for(auto it = elementSeqs.begin(); it != elementSeqs.end(); ++it)
-    {
+    for (auto it = elementSeqs.begin(); it != elementSeqs.end(); ++it) {
         curNode = *it;
         curNode->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
@@ -324,8 +324,7 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
         return false;
     }
     IccFileData &iccFileData = rcvMsg->fileData;
-    if(!MergeRecvLongDataComplete(iccFileData))
-    {
+    if (!MergeRecvLongDataComplete(iccFileData)) {
         return true;
     }
     return RealProcessLoadBoundProfilePackageDone(recvCombineStr_);
@@ -422,7 +421,7 @@ std::shared_ptr<Asn1Node> EsimFile::LoadBoundProfilePackageParseProfileInstallRe
         TELEPHONY_LOGE("failed to find ProfileInstallationResult tag");
         return nullptr;
     }
-    std::shared_ptr<Asn1Node> errNode = resultData->Asn1GetChildChild(3, TAG_ESIM_CTX_COMP_2,
+    std::shared_ptr<Asn1Node> errNode = resultData->Asn1GetChildChild(CHILD_CHILD_COUNT, TAG_ESIM_CTX_COMP_2,
         TAG_ESIM_CTX_COMP_1, TAG_ESIM_CTX_1);
     if (errNode != nullptr) {
         int errCode = errNode->Asn1AsInteger();
@@ -471,7 +470,7 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
     if (node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA) {
         metadataNode = node;
     } else if (node->GetNodeTag() == TAG_ESIM_PROFILE_INSTALLATION_RESULT) {
-        std::shared_ptr<Asn1Node> findNode = node->Asn1GetChildChild(2, TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
+        std::shared_ptr<Asn1Node> findNode = node->Asn1GetChildChild(CHILD_COUNT, TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
             TAG_ESIM_NOTIFICATION_METADATA);
         metadataNode = findNode;
     } else {
@@ -530,7 +529,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> ro
     }
     std::shared_ptr<Asn1Node> curNode = nullptr;
     EuiccNotificationList euiccList;
-    for(auto it = ls.begin(); it != ls.end(); ++it) {
+    for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
         createNotification(curNode, euicc);
@@ -557,11 +556,10 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr ) {
+    if (result == nullptr) {
         return false;
     }
-    std::string responseByte;
-    responseByte = Asn1Utils::HexStrToBytes(result->resultData);
+    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     int32_t byteLen = responseByte.length();
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero");

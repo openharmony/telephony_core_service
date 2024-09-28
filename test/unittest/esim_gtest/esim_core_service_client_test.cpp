@@ -56,7 +56,6 @@ HWTEST_F(EsimCoreServiceClientTest, PrepareDownload_0001, Function | MediumTest 
     std::u16string smdpSigned2;
     std::u16string smdpSignature2;
     std::u16string smdpCertificate;
-
     int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, portIndex, hashCc,
         smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);

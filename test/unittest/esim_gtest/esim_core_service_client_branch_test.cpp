@@ -67,7 +67,6 @@ HWTEST_F(EsimCoreServiceClientBranchTest, PrepareDownload_0100, Function | Mediu
     std::u16string smdpSigned2;
     std::u16string smdpSignature2;
     std::u16string smdpCertificate;
-
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, portIndex, hashCc,
         smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
@@ -80,7 +79,6 @@ HWTEST_F(EsimCoreServiceClientBranchTest, LoadBoundProfilePackage_0100, Function
     int32_t portIndex = 0;
     std::u16string boundProfilePackage = Str8ToStr16("0");
     ResponseEsimBppResult responseResult;
-
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().LoadBoundProfilePackage(
         slotId, portIndex, boundProfilePackage, responseResult);
@@ -93,7 +91,6 @@ HWTEST_F(EsimCoreServiceClientBranchTest, ListNotifications_0100, Function | Med
     int32_t portIndex = 0;
     const Event events = Event::EVENT_DELETE;
     EuiccNotificationList notificationList1;
-
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().ListNotifications(slotId, portIndex, events, notificationList1);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
