@@ -3199,16 +3199,18 @@ int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &ic
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteString16(iccId);
+    if (!data.WriteInt32(slotId) || data.WriteString16(iccId)) {
+        TELEPHONY_LOGE("WriteInt32 or WriteString16 is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(static_cast<uint32_t>(
+    int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(
         CoreServiceInterfaceCode::DELETE_PROFILE), data, reply, option);
-    if (st != ERR_NONE) {
+    if (sendRequestRet != ERR_NONE) {
         TELEPHONY_LOGE("DeleteProfile failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -3229,18 +3231,19 @@ int32_t CoreServiceProxy::SwitchToProfile(
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteInt32(portIndex);
-    data.WriteString16(iccId);
-    data.WriteBool(forceDeactivateSim);
+    if (!data.WriteInt32(slotId) || !data.WriteInt32(portIndex) ||
+        !data.WriteString16(iccId) || !data.WriteBool(forceDeactivateSim)) {
+        TELEPHONY_LOGE("Write is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(static_cast<uint32_t>(
+    int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(
         CoreServiceInterfaceCode::SWITCH_TO_PROFILE), data, reply, option);
-    if (st != ERR_NONE) {
+    if (sendRequestRet != ERR_NONE) {
         TELEPHONY_LOGE("SwitchToProfile failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -3261,16 +3264,17 @@ int32_t CoreServiceProxy::SetProfileNickname(
         TELEPHONY_LOGE("WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    data.WriteInt32(slotId);
-    data.WriteString16(iccId);
-    data.WriteString16(nickname);
+    if (!data.WriteInt32(slotId) || data.WriteString16(iccId) || !data.WriteString16(nickname)) {
+        TELEPHONY_LOGE("Write is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME), data, reply, option);
-    if (st != ERR_NONE) {
+    int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME), data, reply, option);
+    if (sendRequestRet != ERR_NONE) {
         TELEPHONY_LOGE("SetProfileNickname failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
