@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("../../core_service/telephony_core_service.gni")
 
 group("unittest") {
   testonly = true
