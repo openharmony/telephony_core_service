@@ -275,7 +275,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
     }
     std::string outPutBytes;
     uint32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
-    if(byteLen == 0) {
+    if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero!");
         return false;
     }
@@ -291,8 +291,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
 struct CarrierIdentifier CarrierIdentifiers(const std::string mccMncData, int mccMncLen,
     const std::u16string& gid1, const std::u16string& gid2)
 {
-    std::string strResult;
-    strResult = Asn1Utils::BytesToHexStr(mccMncData);
+    std::string strResult = Asn1Utils::BytesToHexStr(mccMncData);
 
     std::string mMcc(NUMBER_THREE, '\0');
     mMcc[NUMBER_ZERO] = strResult[NUMBER_ONE];
@@ -351,8 +350,7 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
     std::list<std::shared_ptr<Asn1Node>> Nodes;
     std::list<std::shared_ptr<Asn1Node>> opIdNodes;
     root->Asn1GetChildren(TAG_ESIM_CTX_COMP_0, Nodes);
-    for(auto it = Nodes.begin(); it != Nodes.end(); ++it)
-    {
+    for (auto it = Nodes.begin(); it != Nodes.end(); ++it) {
         std::shared_ptr<Asn1Node> pNode = *it;
         std::shared_ptr<Asn1Node> pAGetChildChild = pNode->Asn1GetChildChild(TAG_NUM,
             TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_COMP_1);
@@ -360,11 +358,10 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             return false;
         }
         int opIdNodesRes = pAGetChildChild->Asn1GetChildren(TAG_ESIM_OPERATOR_ID, opIdNodes);
-        if (opIdNodesRes != 0 ) {
+        if (opIdNodesRes != 0) {
             return isFileHandleResponse;
         }
-        for(auto iter = opIdNodes.begin(); iter != opIdNodes.end(); ++iter)
-        {
+        for (auto iter = opIdNodes.begin(); iter != opIdNodes.end(); ++iter) {
             std::shared_ptr<Asn1Node> curNode = nullptr;
             curNode = *iter;
             if (curNode == nullptr) {
@@ -398,8 +395,7 @@ bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Po
     if (result == nullptr) {
         return false;
     }
-    std::string responseByte;
-    responseByte = Asn1Utils::HexStrToBytes(result->resultData);
+    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
     uint32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {

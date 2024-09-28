@@ -214,7 +214,7 @@ HWTEST_F(EsimTest, ProcessRequestRulesAuthTableDone_001, Function | MediumTest |
                                 "9000";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessRequestRulesAuthTableDone(event));
-    auto event1 = AppExecFwk::InnerEvent::Get(0); 
+    auto event1 = AppExecFwk::InnerEvent::Get(0);
     EXPECT_EQ(esimFile->ProcessRequestRulesAuthTableDone(event1), true);
     event1 = nullptr;
     EXPECT_EQ(esimFile->ProcessRequestRulesAuthTableDone(event1), true);
@@ -227,7 +227,8 @@ HWTEST_F(EsimTest, ProcessRequestRulesAuthTable_001, Function | MediumTest | Lev
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
-    AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable = iccFile->BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
+    AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable =
+        iccFile->BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
     esimFile->currentChannelId = 1;
     EXPECT_FALSE(esimFile->ProcessRequestRulesAuthTable(slotId, eventRequestRulesAuthTable));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
@@ -270,7 +271,6 @@ HWTEST_F(EsimTest, ProcessObtainSmdsAddress_001, Function | MediumTest | Level2)
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessObtainSmdsAddress(slotId, eventObtainSmdsAddress));
-
 }
 
 HWTEST_F(EsimTest, ProcessObtainEUICCChallenge_001, Function | MediumTest | Level2)
@@ -280,7 +280,8 @@ HWTEST_F(EsimTest, ProcessObtainEUICCChallenge_001, Function | MediumTest | Leve
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
-    AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge = iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
+    AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge =
+        iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
     esimFile->currentChannelId = 0;
     EXPECT_EQ(esimFile->ProcessObtainEUICCChallenge(slotId, eventEUICCChanllenge), false);
     esimFile->currentChannelId = 2;
