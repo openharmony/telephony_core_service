@@ -3273,7 +3273,8 @@ int32_t CoreServiceProxy::SetProfileNickname(
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME), data, reply, option);
+    int32_t sendRequestRet = remote->SendRequest(
+        static_cast<uint32_t>(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME), data, reply, option);
     if (sendRequestRet != ERR_NONE) {
         TELEPHONY_LOGE("SetProfileNickname failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

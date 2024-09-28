@@ -72,7 +72,8 @@ HWTEST_F(EsimManagerTest, DeleteProfile, Function | MediumTest | Level1)
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
-    std::shared_ptr<Telephony::SimFileManager> simFileManager = std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->DeleteProfile(slotId, iccId, DeleteProfileResult);
@@ -101,7 +102,8 @@ HWTEST_F(EsimManagerTest, SwitchToProfile, Function | MediumTest | Level1)
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
-    std::shared_ptr<Telephony::SimFileManager> simFileManager = std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
@@ -129,7 +131,8 @@ HWTEST_F(EsimManagerTest, SetProfileNickname, Function | MediumTest | Level1)
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
-    std::shared_ptr<Telephony::SimFileManager> simFileManager = std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->SetProfileNickname(slotId, iccId, nickname, UpdateResult);

@@ -200,7 +200,7 @@ HWTEST_F(EsimTest, ProcessSwitchToProfileDone_001, Function | MediumTest | Level
 }
 
 HWTEST_F(EsimTest, ProcessSetNickname_001, Function | MediumTest | Level2)
-{    
+{
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
