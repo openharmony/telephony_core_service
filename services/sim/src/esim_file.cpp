@@ -280,10 +280,10 @@ bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::Inner
 {
     if (IsLogicChannelOpen()) {
         EsimProfile *profile = &esimProfile_;
-         if (profile == nullptr) {
+        if (profile == nullptr) {
             TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
             return false;
-        } 
+        }
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_REMOVE_NOTIFICATION_FROM_LIST);
         if (builder == nullptr) {
             TELEPHONY_LOGE("builder is nullptr");

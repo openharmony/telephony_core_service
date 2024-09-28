@@ -193,7 +193,7 @@ HWTEST_F(EsimTest, ProcessRetrieveNotificationListDone_001, Function | MediumTes
 
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessRetrieveNotificationListDone(event));
-    auto event1 = AppExecFwk::InnerEvent::Get(0); 
+    auto event1 = AppExecFwk::InnerEvent::Get(0);
     EXPECT_EQ(esimFile->ProcessRetrieveNotificationListDone(event1), false);
     event1 = nullptr;
     EXPECT_EQ(esimFile->ProcessRetrieveNotificationListDone(event1), false);
