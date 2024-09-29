@@ -108,5 +108,5 @@ HWTEST_F(EsimFileManagerTest, ListNotifications_001, Function | MediumTest | Lev
     lst = simFileManager.ListNotifications(portIndex, events);
     EXPECT_EQ(lst.euiccNotification.empty(), true);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

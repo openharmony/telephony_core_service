@@ -69,5 +69,5 @@ HWTEST_F(EsimCoreServiceStubTest, OnListNotifications_001, Function | MediumTest
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::LIST_NOTIFICATIONS);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

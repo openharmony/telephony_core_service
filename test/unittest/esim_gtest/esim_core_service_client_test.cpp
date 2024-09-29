@@ -82,5 +82,5 @@ HWTEST_F(EsimCoreServiceClientTest, ListNotifications_0001, Function | MediumTes
         slotId, portIndex, events, notificationList1);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

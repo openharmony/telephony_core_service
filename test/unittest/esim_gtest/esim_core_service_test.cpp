@@ -96,5 +96,5 @@ HWTEST_F(EsimCoreServiceTest, ListNotifications_0001, Function | MediumTest | Le
     EXPECT_EQ(mCoreService->ListNotifications(
         slotId, portIndex, events, notificationList1), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

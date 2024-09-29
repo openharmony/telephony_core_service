@@ -95,5 +95,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, ListNotifications_0100, Function | Med
     int32_t result = CoreServiceClient::GetInstance().ListNotifications(slotId, portIndex, events, notificationList1);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
