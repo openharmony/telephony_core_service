@@ -69,5 +69,5 @@ HWTEST_F(EsimCoreServiceStubTest, OnGetProfile_001, Function | MediumTest | Leve
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_PROFILE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

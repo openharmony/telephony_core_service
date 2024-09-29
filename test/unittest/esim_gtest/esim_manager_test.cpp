@@ -133,5 +133,5 @@ HWTEST_F(EsimManagerTest, GetProfile, Function | MediumTest | Level1)
     ret = simManager->GetProfile(slotId, portIndex, iccId, eUiccProfile);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

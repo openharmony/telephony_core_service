@@ -202,5 +202,5 @@ HWTEST_F(EsimCoreServiceProxyTest, GetProfile_003, Function | MediumTest | Level
     int32_t ret = proxy.GetProfile(SLOT_ID, portIndex, iccId, eUiccProfile);
     EXPECT_EQ(ret, 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

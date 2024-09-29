@@ -89,5 +89,5 @@ HWTEST_F(EsimCoreServiceTest, GetProfile_0001, Function | MediumTest | Level1)
     EXPECT_EQ(mCoreService->GetProfile(
         slotId, portIndex, iccId, eUiccProfile), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

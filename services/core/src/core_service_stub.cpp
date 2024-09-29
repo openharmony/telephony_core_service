@@ -2008,7 +2008,7 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
         reply.WriteString16(eUiccProfile.carrierId.gid2);
         reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules));
         reply.WriteInt32(eUiccProfile.accessRules.size());
-        for (const auto& rule : eUiccProfile.accessRules) {
+        for (const auto &rule : eUiccProfile.accessRules) {
             reply.WriteString16(rule.certificateHashHexStr);
             reply.WriteString16(rule.packageName);
             reply.WriteInt32(rule.accessType);
