@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr static const int32_t ATR_LENGTH = 47;
+constexpr static const int32_t ATR_LEN = 47;
 class EsimFile : public IccFile {
 public:
 void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
