@@ -139,7 +139,6 @@ HWTEST_F(EsimCoreServiceProxyTest, DeleteProfile_003, Function | MediumTest | Le
     EXPECT_EQ(ret, 0);
 }
 
-
 HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_001, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = nullptr;
