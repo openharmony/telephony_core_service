@@ -1987,6 +1987,71 @@ int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &rep
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::WriteIccIdDatas(EuiccProfile &eUiccProfile)
+{
+    if (!reply.WriteString16(eUiccProfile.iccId))
+    {
+        TELEPHONY_LOGE("WriteString16 iccId error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.nickName))
+    {
+        TELEPHONY_LOGE("WriteString16 nickName error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.serviceProviderName))
+    {
+        TELEPHONY_LOGE("WriteString16 serviceProviderName error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.profileName))
+    {
+        TELEPHONY_LOGE("WriteString16 profileName error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state)))
+    {
+        TELEPHONY_LOGE("WriteInt32 state error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass)))
+    {
+        TELEPHONY_LOGE("WriteInt32 profileClass error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.carrierId.mcc))
+    {
+        TELEPHONY_LOGE("WriteString16 mcc error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.carrierId.mnc))
+    {
+        TELEPHONY_LOGE("WriteString16 mnc error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.carrierId.gid1))
+    {
+        TELEPHONY_LOGE("WriteString16 gid1 error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString16(eUiccProfile.carrierId.gid2))
+    {
+        TELEPHONY_LOGE("WriteString16 gid2 error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules)))
+    {
+        TELEPHONY_LOGE("WriteInt32 policyRules error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(eUiccProfile.accessRules.size()))
+    {
+        TELEPHONY_LOGE("WriteInt32 accessRules.size error");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
 int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
@@ -1996,22 +2061,27 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
     int32_t result = GetProfile(slotId, portIndex, iccId, eUiccProfile);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteString16(eUiccProfile.iccId);
-        reply.WriteString16(eUiccProfile.nickName);
-        reply.WriteString16(eUiccProfile.serviceProviderName);
-        reply.WriteString16(eUiccProfile.profileName);
-        reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state));
-        reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass));
-        reply.WriteString16(eUiccProfile.carrierId.mcc);
-        reply.WriteString16(eUiccProfile.carrierId.mnc);
-        reply.WriteString16(eUiccProfile.carrierId.gid1);
-        reply.WriteString16(eUiccProfile.carrierId.gid2);
-        reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules));
-        reply.WriteInt32(eUiccProfile.accessRules.size());
+        if (NO_ERROR != WriteIccIdDatas(eUiccProfile))
+        {
+            TELEPHONY_LOGE("WriteIccIdDatas error");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
         for (const auto &rule : eUiccProfile.accessRules) {
-            reply.WriteString16(rule.certificateHashHexStr);
-            reply.WriteString16(rule.packageName);
-            reply.WriteInt32(rule.accessType);
+            if (!reply.WriteString16(rule.certificateHashHexStr))
+            {
+                TELEPHONY_LOGE("WriteString16 error");
+                return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+            }
+            if (!reply.WriteString16(rule.packageName))
+            {
+                TELEPHONY_LOGE("WriteString16 error");
+                return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+            }
+            if (!reply.WriteInt32(rule.accessType))
+            {
+                TELEPHONY_LOGE("WriteInt32 error");
+                return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+            }
         }
     }
     if (!ret) {
