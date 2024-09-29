@@ -192,7 +192,7 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
 {
     if (IsLogicChannelOpen()) {
         EsimProfile *profile = &esimProfile_;
-        std::shared_ptr<Asn1Builder> builder =std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
+        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
         std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
         if (builder == nullptr || subBuilder == nullptr) {
             TELEPHONY_LOGE("get builder failed");

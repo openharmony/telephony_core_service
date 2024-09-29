@@ -58,7 +58,6 @@ HWTEST_F(EsimFileManagerTest, DeleteProfile_001, Function | MediumTest | Level2)
     std::u16string iccId = u"";
     ResultState res = simFileManager.DeleteProfile(iccId);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.DeleteProfile(iccId);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
@@ -80,7 +79,6 @@ HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level
     bool forceDeactivateSim = false;
     ResultState res = simFileManager.SwitchToProfile(portIndex, iccId, forceDeactivateSim);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SwitchToProfile(portIndex, iccId, forceDeactivateSim);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
@@ -101,7 +99,6 @@ HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Le
     std::u16string nickname = u"";
     ResultState res = simFileManager.SetProfileNickname(iccId, nickname);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetProfileNickname(iccId, nickname);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
