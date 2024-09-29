@@ -3365,7 +3365,7 @@ int32_t CoreServiceProxy::GetEuiccChallenge(
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response =reply.ReadString16();
+        responseResult.response = reply.ReadString16();
     }
     return result;
 }

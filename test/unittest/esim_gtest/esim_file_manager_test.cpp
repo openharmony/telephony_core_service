@@ -20,9 +20,9 @@
 
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "gtest/gtest.h"
 #include "sim_file_manager.h"
 #include "tel_ril_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -120,5 +120,5 @@ HWTEST_F(EsimFileManagerTest, GetEuiccChallenge_001, Function | MediumTest | Lev
     res = simFileManager.GetEuiccChallenge(portIndex);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

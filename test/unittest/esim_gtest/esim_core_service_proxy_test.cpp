@@ -19,12 +19,12 @@
 #include "core_service_proxy.h"
 #include "esim_state_type.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 class MockIRemoteObject : public IRemoteObject {
@@ -247,5 +247,5 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccChallenge_003, Function | MediumTest 
     int32_t ret = proxy.GetEuiccChallenge(SLOT_ID, portIndex, responseResult);
     EXPECT_EQ(ret, 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

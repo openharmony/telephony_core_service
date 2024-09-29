@@ -21,12 +21,12 @@
 
 #include "core_service_client.h"
 #include "esim_state_type.h"
-#include "gtest/gtest.h"
 #include "securec.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -85,5 +85,5 @@ HWTEST_F(EsimCoreServiceClientTest, GetEuiccChallenge_0001, Function | MediumTes
     int32_t result = CoreServiceClient::GetInstance().GetEuiccChallenge(slotId, portIndex, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

@@ -22,7 +22,6 @@
 #include "core_service.h"
 #include "core_service_client.h"
 #include "enum_convert.h"
-#include "gtest/gtest.h"
 #include "operator_config_cache.h"
 #include "operator_file_parser.h"
 #include "sim_manager.h"
@@ -32,6 +31,7 @@
 #include "tel_profile_util.h"
 #include "telephony_ext_wrapper.h"
 #include "tel_ril_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -165,5 +165,5 @@ HWTEST_F(EsimManagerTest, GetEuiccChallenge, Function | MediumTest | Level1)
     ret = simManager->GetEuiccChallenge(slotId, portIndex, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

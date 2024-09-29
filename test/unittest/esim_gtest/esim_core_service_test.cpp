@@ -19,13 +19,13 @@
 #include "core_service.h"
 #include "esim_state_type.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "string_ex.h"
 #include "str_convert.h"
 #include "sim_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -107,5 +107,5 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccChallenge_0001, Function | MediumTest | Le
     EXPECT_EQ(mCoreService->GetEuiccChallenge(
         slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
