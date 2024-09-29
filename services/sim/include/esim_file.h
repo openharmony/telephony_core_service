@@ -60,10 +60,10 @@ private:
     bool CombineResponseDataFinish(IccFileData &fileData);
     void Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const std::string &base64Src);
     void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
-    void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp* pbytes);
+    void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp *pbytes);
     void GetImeiBytes(std::string &imeiBytes, const std::string &imei);
-    void CovertAuthToApiStruct(ResponseEsimResult& dst, AuthServerResponse& src);
-    void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp& dst, EsimProfile& src);
+    void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
+    void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool MergeRecvLongDataComplete(IccFileData &fileData);
 
     ResponseEsimResult responseInfo2Result_;
