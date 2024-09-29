@@ -3218,7 +3218,7 @@ int32_t CoreServiceProxy::RetrieveNotificationList(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
 
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION_LIST), data,
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION_LIST), data,
         reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("RetrieveNotificationList sendRequest failed, errcode is %{public}d", requestResult);
@@ -3271,7 +3271,7 @@ int32_t CoreServiceProxy::RetrieveNotification(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
 
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION),
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION),
         data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("RetrieveNotification sendRequest failed, errcode is %{public}d", requestResult);
@@ -3315,7 +3315,7 @@ int32_t CoreServiceProxy::RemoveNotificationFromList(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
 
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::REMOVE_NOTIFICATION),
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REMOVE_NOTIFICATION),
         data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("RemoveNotificationFromList sendRequest failed, errcode is %{public}d", requestResult);
