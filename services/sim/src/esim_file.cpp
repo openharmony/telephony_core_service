@@ -114,6 +114,9 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
         PrepareDownloadResp dst;
         ConvertPreDownloadParaFromApiStru(dst, esimProfile_);
         EsimProfile *profile = &esimProfile_;
+        if (profile == nullptr) {
+            return false;
+        }
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_PREPARE_DOWNLOAD);
         if (builder == nullptr) {
             return false;
