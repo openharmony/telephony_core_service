@@ -62,7 +62,6 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo2_0100, Function | MediumT
     int32_t slotId = 0;
     int32_t portIndex = 0;
     ResponseEsimResult responseResult;
-
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo2(slotId, portIndex, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -78,7 +77,6 @@ HWTEST_F(EsimCoreServiceClientBranchTest, AuthenticateServer_0100, Function | Me
     std::u16string serverSignature1;
     std::u16string euiccCiPKIdToBeUsed;
     std::u16string serverCertificate;
-
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult);

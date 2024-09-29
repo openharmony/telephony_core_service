@@ -3212,7 +3212,8 @@ int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Respo
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t resultSend = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO2), data, reply, option);
+    int32_t resultSend = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EUICC_INFO2),
+        data, reply, option);
     if (resultSend != ERR_NONE) {
         TELEPHONY_LOGE("GetEuiccInfo2 sendRequest failed, error code is %{public}d", resultSend);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

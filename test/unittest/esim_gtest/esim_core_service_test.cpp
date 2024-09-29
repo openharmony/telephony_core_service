@@ -55,7 +55,6 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccInfo2_0001, Function | MediumTest | Level1
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->GetEuiccInfo2(
         slotId, portIndex, responseResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetEuiccInfo2(
         slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -76,7 +75,6 @@ HWTEST_F(EsimCoreServiceTest, AuthenticateServer_0001, Function | MediumTest | L
     std::u16string serverCertificate;
     EXPECT_NE(mCoreService->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);

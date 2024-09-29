@@ -65,7 +65,6 @@ HWTEST_F(EsimCoreServiceClientTest, AuthenticateServer_0001, Function | MediumTe
     std::u16string serverSignature1;
     std::u16string euiccCiPKIdToBeUsed;
     std::u16string serverCertificate;
-
     int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);

@@ -58,7 +58,6 @@ HWTEST_F(EsimFileManagerTest, GetEuiccInfo2_001, Function | MediumTest | Level2)
     int32_t portIndex = 0;
     ResponseEsimResult res = simFileManager.GetEuiccInfo2(portIndex);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetEuiccInfo2(portIndex);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
@@ -84,7 +83,6 @@ HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Le
     ResponseEsimResult res = simFileManager.AuthenticateServer(portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.AuthenticateServer(portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
