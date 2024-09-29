@@ -89,7 +89,6 @@ HWTEST_F(EsimCoreServiceTest, SetProfileNickname_0001, Function | MediumTest | L
     ResultState UpdateResult;
     EXPECT_NE(mCoreService->SetProfileNickname(
         slotId, iccId, nickname, UpdateResult), TELEPHONY_ERR_SUCCESS);
-
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->SetProfileNickname(
         slotId, iccId, nickname, UpdateResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
