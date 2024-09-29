@@ -21,7 +21,6 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "core_service.h"
-#include "core_manager_inner.h"
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
@@ -280,7 +279,7 @@ void EsimFile::ProcessEsimOpenChannel()
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimOpenLogicalChannel(0, isdr_aid, p2, response);
+    telRilManager_->SimOpenLogicalChannel(0, ISDR_AID, p2, response);
     return;
 }
 

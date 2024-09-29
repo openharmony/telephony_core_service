@@ -21,8 +21,8 @@
 #include "asn1_decoder.h"
 #include "asn1_node.h"
 #include "asn1_utils.h"
-#include "esim_state_type.h"
 #include "esim_service.h"
+#include "esim_state_type.h"
 #include "icc_file.h"
 #include "request_apdu_build.h"
 #include "reset_response.h"
@@ -78,7 +78,7 @@ private:
     bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
 
 protected:
-    constexpr std::string isdr_aid = "A0000005591010FFFFFFFF8900000100";
+    constexpr std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     int32_t currentChannelId_ = -1;
     int32_t slotId_ = 0;
