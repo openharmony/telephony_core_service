@@ -142,8 +142,8 @@ public:
         return 0;
     }
 
-    int32_t AlterPin(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response) override
+    int32_t AlterPin(int32_t slotId, const std::u16string &newPin,
+        const std::u16string &oldPin, LockStatusResponse &response) override
     {
         return 0;
     }
@@ -153,14 +153,14 @@ public:
         return 0;
     }
 
-    int32_t UnlockPuk2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response) override
+    int32_t UnlockPuk2(int32_t slotId, const std::u16string &newPin2,
+        const std::u16string &puk2, LockStatusResponse &response) override
     {
         return 0;
     }
 
-    int32_t AlterPin2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response) override
+    int32_t AlterPin2(int32_t slotId, const std::u16string &newPin2,
+        const std::u16string &oldPin2, LockStatusResponse &response) override
     {
         return 0;
     }
