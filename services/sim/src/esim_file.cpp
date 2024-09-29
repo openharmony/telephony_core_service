@@ -45,6 +45,11 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
     }
     isObtainDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(obtainDefaultSmdpAddressMutex_);
+    if (this == nullptr)
+    {
+        TELEPHONY_LOGE("this is null!");
+        return "";
+    }
     if (!obtainDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
@@ -66,6 +71,11 @@ ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, 
     }
     isCancelSessionReady_ = false;
     std::unique_lock<std::mutex> lock(cancelSessionMutex_);
+    if (this == nullptr)
+    {
+        TELEPHONY_LOGE("this is null!");
+        return "";
+    }
     if (!cancelSessionCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isCancelSessionReady_; })) {
         SyncCloseChannel();
@@ -87,6 +97,11 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
     }
     isObtainProfileReady_ = false;
     std::unique_lock<std::mutex> lock(obtainProfileMutex_);
+    if (this == nullptr)
+    {
+        TELEPHONY_LOGE("this is null!");
+        return "";
+    }
     if (!obtainProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainProfileReady_; })) {
         SyncCloseChannel();
@@ -211,14 +226,16 @@ bool EsimFile::ProcessObtainDefaultSmdpAddressDone(const AppExecFwk::InnerEvent:
         return false;
     }
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (profileRoot == nullptr) {
+        return false;
+    }
     std::string outPutBytes;
     int32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero!");
         return false;
     }
-    std::string strResult = Asn1Utils::BytesToHexStr(outPutBytes);
-    defaultDpAddress_ = strResult;
+    defaultDpAddress_ = Asn1Utils::BytesToHexStr(outPutBytes);
     return true;
 }
 
