@@ -27,7 +27,7 @@ public:
     bool IsEuiccAvailable();
 
 private:
-    bool CheckOperationRes(uint8_t chr, const int32_t tMask, const int32_t comparedVal);
+    bool CheckOperationRes(uint8_t chr, const uint32_t tMask, const uint32_t comparedVal);
     bool AnalysisInterfaceData(const std::vector<uint8_t> &atrData, uint32_t atrDataLen, uint32_t &index);
     bool CheckIsEuiccAvailable(uint8_t charB, uint8_t charD);
     bool CheckAtrDataParam(const std::string &atr);
