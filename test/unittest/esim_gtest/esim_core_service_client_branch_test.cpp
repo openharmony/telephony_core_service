@@ -97,5 +97,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SendApduData_0100, Function | MediumTe
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

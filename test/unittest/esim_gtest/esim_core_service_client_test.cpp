@@ -82,5 +82,5 @@ HWTEST_F(EsimCoreServiceClientTest, SendApduData_0001, Function | MediumTest | L
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

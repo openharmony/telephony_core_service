@@ -226,5 +226,5 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_003, Function | MediumTest | Lev
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     EXPECT_EQ(proxy.SendApduData(SLOT_ID, aid, apduData, responseResult), 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

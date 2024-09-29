@@ -138,5 +138,5 @@ HWTEST_F(EsimManagerTest, SendApduData, Function | MediumTest | Level1)
     ret = simManager->SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

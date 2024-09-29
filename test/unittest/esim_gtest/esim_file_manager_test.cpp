@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-//#ifdef CORE_SERVICE_SUPPORT_ESIM
 
 class EsimFileManagerTest : public testing::Test {
 public:
@@ -120,5 +119,5 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
     res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
