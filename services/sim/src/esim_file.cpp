@@ -21,7 +21,6 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "core_service.h"
-#include "core_manager_inner.h"
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
@@ -683,5 +682,5 @@ void EsimFile::InitMemberFunc()
     memberFuncMap_[MSG_ESIM_AUTHENTICATE_SERVER] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessAuthenticateServerDone(event); };
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
