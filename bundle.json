@@ -85,6 +85,7 @@
                 "fwk_group": [
                     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
                     "//base/telephony/core_service/frameworks/cj/telephony_radio:cj_radio_ffi",
+                    "//base/telephony/core_service/frameworks/cj/telephony_sim:cj_sim_ffi",
                     "//base/telephony/core_service/frameworks/js/network_search:radio",
                     "//base/telephony/core_service/frameworks/js/sim:sim",
                     "//base/telephony/core_service/frameworks/js/vcard:vcard"

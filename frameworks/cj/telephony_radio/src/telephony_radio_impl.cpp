@@ -309,6 +309,10 @@ namespace Telephony {
         TELEPHONY_LOGD("NativeGetSignalInfoList size = %{public}zu", signalInfoList.size());
         CSignalInformation* head =
             reinterpret_cast<CSignalInformation *>(malloc(sizeof(CSignalInformation) * infoSize));
+        if (head == nullptr && infoSize > 0) {
+            TELEPHONY_LOGE("NativeGetSignalInfoList malloc failed!");
+            return csignalInfoList;
+        }
         int i = 0;
         for (sptr<SignalInformation> infoItem : signalInfoList) {
             int32_t signalType = static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
