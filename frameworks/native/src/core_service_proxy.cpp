@@ -3218,7 +3218,7 @@ int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, int32_t portIndex, con
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD),
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::PREPARE_DOWNLOAD),
         data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("PrepareDownload sendRequest failed, error code is %{public}d", requestResult);
@@ -3256,7 +3256,7 @@ int32_t CoreServiceProxy::LoadBoundProfilePackage(int32_t slotId, int32_t portIn
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
         reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("LoadBoundProfilePackage sendRequest failed, errcode is %{public}d", requestResult);
@@ -3298,7 +3298,7 @@ int32_t CoreServiceProxy::ListNotifications(
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::LIST_NOTIFICATIONS),
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LIST_NOTIFICATIONS),
         data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("ListNotifications sendRequest failed, error code is %{public}d", requestResult);
