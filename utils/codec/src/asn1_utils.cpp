@@ -161,7 +161,7 @@ int32_t Asn1Utils::BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, 
     }
     std::vector<uint8_t> subByteStream(src.begin() + offset, src.begin() + offset + length);
     std::string hexStr = BytesToHexStr(subByteStream);
-    int32_t valInt = std::stoi(hexStr, nullptr, HEX_DATA_LEN);
+    int32_t valInt = static_cast<int32_t>(strtol(hexStr.c_str(), nullptr, HEX_DATA_LEN));
     return valInt;
 }
 

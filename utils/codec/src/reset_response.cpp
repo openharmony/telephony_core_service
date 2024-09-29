@@ -22,13 +22,13 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-const int32_t BIT2_MASK = 0x02;
-const int32_t BIT5_MASK = 0x10;
-const int32_t BIT7_MASK = 0x40;
-const int32_t HIGH_BITS_MASK = 0xF0;
-const int32_t LOW_BITS_MASK = 0x0F;
+const uint32_t BIT2_MASK = 0x02;
+const uint32_t BIT5_MASK = 0x10;
+const uint32_t BIT7_MASK = 0x40;
+const uint32_t HIGH_BITS_MASK = 0xF0;
+const uint32_t LOW_BITS_MASK = 0x0F;
 const uint32_t MIN_ATR_DATA_LENGTH = 4;
-const int32_t MAX_INTERFACE_VALUE = 0x0F;
+const uint32_t MAX_INTERFACE_VALUE = 0x0F;
 const uint8_t REVERSED_AGREEMENT = 0x3B;
 const uint8_t POSITIVE_AGREEMENT = 0x3F;
 }
@@ -49,12 +49,9 @@ bool ResetResponse::CheckIsEuiccAvailable(uint8_t charB, uint8_t charD)
     return false;
 }
 
-bool ResetResponse::CheckOperationRes(uint8_t chr, const int32_t tMask, const int32_t comparedVal)
+bool ResetResponse::CheckOperationRes(uint8_t chr, const uint32_t tMask, const uint32_t comparedVal)
 {
-    if ((chr & tMask) != comparedVal) {
-        return false;
-    }
-    return true;
+    return ((chr & tMask) == comparedVal);
 }
 
 bool ResetResponse::AnalysisInterfaceData(const std::vector<uint8_t> &atrData, uint32_t atrDataLen, uint32_t &index)

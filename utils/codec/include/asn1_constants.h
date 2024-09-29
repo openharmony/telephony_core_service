@@ -23,8 +23,8 @@ namespace OHOS {
 namespace Telephony {
 const uint32_t BYTE_TO_HEX_LEN = 2;
 const uint32_t OFFSET_EIGHT_BIT = 8;
-const int32_t BIT6_MASK = 0x20;
-const int32_t BIT8_MASK = 0x80;
+const uint32_t BIT6_MASK = 0x20;
+const uint32_t BIT8_MASK = 0x80;
 const uint32_t MAX_UINT8 = std::numeric_limits<uint8_t>::max();
 const uint32_t MAX_UINT16 = std::numeric_limits<uint16_t>::max();
 const uint32_t MAX_UINT24 = (std::numeric_limits<uint32_t>::max() >> 8);
