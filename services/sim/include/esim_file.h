@@ -36,7 +36,7 @@ public:
     ResultState ResetMemory(ResetOption resetOption);
     ResultState SetDefaultSmdpAddress(std::u16string defaultSmdpAddress);
     bool IsEsimSupported();
-    ResponseEsimResult SendApduData(std::u16string aid, std::u16string apduData);
+    ResponseEsimResult SendApduData(std::u16string &aid, std::u16string &apduData);
 
 private:
     bool ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);

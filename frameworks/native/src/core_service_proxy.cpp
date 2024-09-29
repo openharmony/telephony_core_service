@@ -3212,7 +3212,8 @@ int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, R
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RESET_MEMORY), data, reply, option);
+    int32_t requestResult =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RESET_MEMORY), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("ResetMemory failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -3248,7 +3249,8 @@ int32_t CoreServiceProxy::SetDefaultSmdpAddress(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t requestResult =
-        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS), data, reply, option);
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS),
+        data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("SetDefaultSmdpAddress failed, error code is %{public}d", requestResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

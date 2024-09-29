@@ -89,8 +89,11 @@ bool EsimFile::IsEsimSupported()
     return isSupported_;
 }
 
-ResponseEsimResult EsimFile::SendApduData(std::u16string aid, std::u16string apduData)
+ResponseEsimResult EsimFile::SendApduData(std::u16string &aid, std::u16string &apduData)
 {
+    if (aid.empty() || apduData.empty()) {
+        return ResponseEsimResult();
+    }
     esimProfile_.aid = aid;
     esimProfile_.apduData = apduData;
     SyncOpenChannel(aid);
@@ -118,8 +121,8 @@ bool EsimFile::ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::
             return false;
         }
         std::string resetMemoryTags;
-        resetMemoryTags += (unsigned char)EUICC_MEMORY_RESET_BIT_STR_FILL_LEN;
-        resetMemoryTags += (unsigned char)EUICC_MEMORY_RESET_BIT_STR_VALUE;
+        resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_FILL_LEN);
+        resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_VALUE);
         builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, resetMemoryTags, resetMemoryTags.length());
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
