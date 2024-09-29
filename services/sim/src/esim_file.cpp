@@ -141,7 +141,7 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    if (result == false) {
+    if (result == nullptr) {
         return false;
     }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
@@ -199,6 +199,10 @@ bool EsimFile::ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::Inn
 {
     if (IsLogicChannelOpen()) {
         EsimProfile *profile = &esimProfile_;
+        if (profile == nullptr) {
+            TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
+            return false;
+        }
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_RETRIEVE_NOTIFICATIONS_LIST);
         std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
         if (builder == nullptr || subBuilder == nullptr) {
@@ -235,7 +239,7 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    if (result == false) {
+    if (result == nullptr) {
         return false;
     }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
@@ -317,7 +321,7 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    if (result == false) {
+    if (result == nullptr) {
         return false;
     }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
