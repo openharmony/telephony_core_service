@@ -1999,11 +1999,11 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(eUiccRulesAuthTable.policyRules.size());
-        for (auto& rules : eUiccRulesAuthTable.policyRules) {
+        for (auto &rules : eUiccRulesAuthTable.policyRules) {
             reply.WriteInt32(rules);
         }
         reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size());
-        for (auto& carrier : eUiccRulesAuthTable.carrierIds) {
+        for (auto &carrier : eUiccRulesAuthTable.carrierIds) {
             reply.WriteString16(carrier.mcc);
             reply.WriteString16(carrier.mnc);
             reply.WriteString16(carrier.spn);
@@ -2014,7 +2014,7 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
             reply.WriteInt32(carrier.specificCarrierId);
         }
         reply.WriteInt32(eUiccRulesAuthTable.policyRuleFlags.size());
-        for (auto& ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
+        for (auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
             reply.WriteInt32(ruleFlags);
         }
 

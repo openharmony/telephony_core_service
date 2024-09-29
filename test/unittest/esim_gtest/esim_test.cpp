@@ -22,13 +22,13 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "esim_file.h"
-#include "gtest/gtest.h"
 #include "icc_file.h"
 #include "sim_file_manager.h"
 #include "sim_constant.h"
 #include "sim_file_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_tag_def.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -166,19 +166,19 @@ HWTEST_F(EsimTest, RequestRulesAuthTableParseTagCtxComp0_001, Function | MediumT
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
     std::string resultData = "BF434B"
-                                "A0233021"
-                                "800206C0"
-                                "A118"
-                                "B70A800312F3458103010203"
-                                "B70A800312F3458203040506"
-                                "820108"
-                                "A0243022"
-                                "80020780"
-                                "A118"
-                                "B70A800312E3458103010203"
-                                "B70A8003EEEE458203040506"
-                                "82020780"
-                                "9000";
+        "A0233021"
+        "800206C0"
+        "A118"
+        "B70A800312F3458103010203"
+        "B70A800312F3458203040506"
+        "820108"
+        "A0243022"
+        "80020780"
+        "A118"
+        "B70A800312E3458103010203"
+        "B70A8003EEEE458203040506"
+        "82020780"
+        "9000";
     std::string responseByte;
     responseByte =
         Asn1Utils::HexStrToBytes(resultData);
@@ -200,19 +200,19 @@ HWTEST_F(EsimTest, ProcessRequestRulesAuthTableDone_001, Function | MediumTest |
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData = "BF434B"
-                                "A0233021"
-                                "800206C0"
-                                "A118"
-                                "B70A800312F3458103010203"
-                                "B70A800312F3458203040506"
-                                "820108"
-                                "A0243022"
-                                "80020780"
-                                "A118"
-                                "B70A800312E3458103010203"
-                                "B70A8003EEEE458203040506"
-                                "82020780"
-                                "9000";
+        "A0233021"
+        "800206C0"
+        "A118"
+        "B70A800312F3458103010203"
+        "B70A800312F3458203040506"
+        "820108"
+        "A0243022"
+        "80020780"
+        "A118"
+        "B70A800312E3458103010203"
+        "B70A8003EEEE458203040506"
+        "82020780"
+        "9000";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessRequestRulesAuthTableDone(event));
     auto event1 = AppExecFwk::InnerEvent::Get(0);
@@ -308,5 +308,5 @@ HWTEST_F(EsimTest, ProcessObtainEUICCChallengeDone_001, Function | MediumTest | 
     eventEUICCChanllenge = nullptr;
     EXPECT_EQ(esimFile->ProcessObtainEUICCChallengeDone(eventEUICCChanllenge), false);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

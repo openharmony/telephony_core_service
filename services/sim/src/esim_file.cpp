@@ -21,7 +21,6 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "core_service.h"
-#include "core_manager_inner.h"
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
@@ -289,7 +288,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
 }
 
 struct CarrierIdentifier CarrierIdentifiers(const std::string mccMncData, int mccMncLen,
-    const std::u16string& gid1, const std::u16string& gid2)
+    const std::u16string &gid1, const std::u16string &gid2)
 {
     std::string strResult = Asn1Utils::BytesToHexStr(mccMncData);
 

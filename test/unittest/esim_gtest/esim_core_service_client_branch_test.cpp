@@ -21,7 +21,6 @@
 
 #include "core_service_client.h"
 #include "esim_state_type.h"
-#include "gtest/gtest.h"
 #include "if_system_ability_manager_mock.h"
 #include "iservice_registry.h"
 #include "securec.h"
@@ -29,6 +28,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -100,5 +100,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccChallenge_0100, Function | Med
     int32_t result = CoreServiceClient::GetInstance().GetEuiccChallenge(slotId, portIndex, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
