@@ -144,5 +144,5 @@ HWTEST_F(EsimTest, ProcessSendApduData_001, Function | MediumTest | Level2)
     esimFile->currentChannelId = 0;
     EXPECT_FALSE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

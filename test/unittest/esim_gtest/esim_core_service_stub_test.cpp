@@ -69,5 +69,5 @@ HWTEST_F(EsimCoreServiceStubTest, OnSendApduData_001, Function | MediumTest | Le
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SEND_APDU_DATA);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

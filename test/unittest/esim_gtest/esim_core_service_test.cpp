@@ -102,5 +102,5 @@ HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
     EXPECT_EQ(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
