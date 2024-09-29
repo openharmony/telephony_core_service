@@ -95,7 +95,7 @@ class IccOperatorPrivilegeController::LogicalStateMachine {
 
 public:
     std::chrono::system_clock::time_point openChannelTp = std::chrono::system_clock::now();
-    int32_t currentChannelId_ = INT32_FST_NEGATIVE;
+    int32_t currentChannelId = INT32_FST_NEGATIVE;
     std::string currData;
 
 public:
