@@ -1962,7 +1962,7 @@ int32_t CoreServiceStub::OnRetrieveNotificationList(MessageParcel &data, Message
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(notificationList.euiccNotification.size());
-        for (auto& notification : notificationList.euiccNotification) {
+        for (auto &notification : notificationList.euiccNotification) {
             ret = (ret && reply.WriteInt32(notification.seq));
             ret = (ret && reply.WriteString16(notification.targetAddr));
             ret = (ret && reply.WriteInt32(notification.event));
@@ -1988,7 +1988,7 @@ int32_t CoreServiceStub::OnRetrieveNotification(MessageParcel &data, MessageParc
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteInt32(notification.seq));
         ret = (ret && reply.WriteString16(notification.targetAddr));
-        ret = (ret && reply.WriteInt32(notification. event));
+        ret = (ret && reply.WriteInt32(notification.event));
         ret = (ret && reply.WriteString16(notification.data));
     }
     if (!ret) {

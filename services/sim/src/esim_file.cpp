@@ -21,7 +21,6 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "core_service.h"
-#include "core_manager_inner.h"
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
@@ -31,6 +30,7 @@
 #include "telephony_state_registry_client.h"
 #include "telephony_tag_def.h"
 #include "vcard_utils.h"
+
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
@@ -374,5 +374,5 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         IccFile::ProcessEvent(event);
     }
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

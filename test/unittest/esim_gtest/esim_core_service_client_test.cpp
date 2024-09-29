@@ -26,7 +26,6 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-
 #include "gtest/gtest.h"
 
 namespace OHOS {
@@ -79,5 +78,5 @@ HWTEST_F(EsimCoreServiceClientTest, RemoveNotificationFromList_0001, Function | 
         slotId, portIndex, seqNumber, enumResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

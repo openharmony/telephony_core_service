@@ -22,13 +22,12 @@
 
 #include "core_service_client.h"
 #include "esim_state_type.h"
+#include "if_system_ability_manager_mock.h"
+#include "iservice_registry.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-#include "if_system_ability_manager_mock.h"
-#include "iservice_registry.h"
-
 #include "gtest/gtest.h"
 
 namespace OHOS {
@@ -96,5 +95,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, RemoveNotificationFromList_0100, Funct
         seqNumber, enumResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

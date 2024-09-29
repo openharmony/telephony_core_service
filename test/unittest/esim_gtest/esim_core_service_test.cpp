@@ -16,16 +16,15 @@
 #define private public
 #define protected public
 
-#include "gtest/gtest.h"
 #include "core_service.h"
-#include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
 #include "esim_state_type.h"
+#include "gmock/gmock.h"
 #include "string_ex.h"
 #include "str_convert.h"
-#include "gmock/gmock.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
-#include "sim_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -96,5 +95,5 @@ HWTEST_F(EsimCoreServiceTest, RemoveNotificationFromList_0001, Function | Medium
     EXPECT_EQ(mCoreService->RemoveNotificationFromList(
         slotId, portIndex, seqNumber, removeNotifFromListResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
