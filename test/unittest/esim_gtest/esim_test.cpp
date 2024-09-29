@@ -43,6 +43,7 @@ HWTEST_F(EsimTest, RetrieveNotificationList_001, Function | MediumTest | Level2)
     Event events = Event::EVENT_DONOTHING;
     esimFile->currentChannelId = 0;
     EXPECT_TRUE((esimFile->RetrieveNotificationList(portIndex, events)).euiccNotification.empty());
+
     int32_t slotId = 0;
     esimFile->currentChannelId = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
