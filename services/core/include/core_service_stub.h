@@ -141,6 +141,10 @@ private:
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t OnGetEuiccInfo2(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAuthenticateServer(MessageParcel &data, MessageParcel &reply);
+#endif
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

@@ -272,6 +272,16 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+void CoreServiceStub::AddHandlerEsimToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO2)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccInfo2(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::AUTHENTICATE_SERVER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAuthenticateServer(data, reply); };
+}
+#endif
+
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -1938,5 +1948,49 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
 
     return NO_ERROR;
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceStub::OnGetEuiccInfo2(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    ResponseEsimResult responseResult;
+    int32_t result = GetEuiccInfo2(slotId, portIndex, responseResult);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
+        reply.WriteString16(responseResult.response);
+    }
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnAuthenticateServer(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string matchingId = data.ReadString16();
+    std::u16string serverSigned1 = data.ReadString16();
+    std::u16string serverSignature1 = data.ReadString16();
+    std::u16string euiccCiPkIdToBeUsed = data.ReadString16();
+    std::u16string serverCertificate = data.ReadString16();
+    ResponseEsimResult responseResult;
+    int32_t result = AuthenticateServer(slotId, portIndex, matchingId, serverSigned1, serverSignature1,
+        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
+        reply.WriteString16(responseResult.response);
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
