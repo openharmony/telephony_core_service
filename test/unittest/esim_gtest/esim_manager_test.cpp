@@ -138,5 +138,5 @@ HWTEST_F(EsimManagerTest, ListNotifications, Function | MediumTest | Level1)
     ret = simManager->ListNotifications(slotId, portIndex, events, notificationList);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

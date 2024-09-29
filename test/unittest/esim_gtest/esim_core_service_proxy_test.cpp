@@ -221,5 +221,5 @@ HWTEST_F(EsimCoreServiceProxyTest, ListNotifications_003, Function | MediumTest 
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     EXPECT_EQ(proxy.ListNotifications(SLOT_ID, portIndex, events, notificationList), 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

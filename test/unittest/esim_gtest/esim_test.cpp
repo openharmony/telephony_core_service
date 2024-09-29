@@ -403,5 +403,5 @@ HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_001, Function | MediumTe
     bool isFileHandleResponse = false;
     EXPECT_EQ(esimFile->ProcessListNotificationsAsn1Response(profileNode, isFileHandleResponse), false);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

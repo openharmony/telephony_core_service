@@ -41,12 +41,12 @@ public:
 private:
     bool ProcessPrepareDownload(int32_t slotId);
     bool ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool DecodeBoundProfilePackage(const std::string& boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode);
+    bool DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode);
     void BuildApduForInitSecureChannel(
         RequestApduBuild& codec, std::shared_ptr<Asn1Node> &bppNode, std::shared_ptr<Asn1Node> &initSecureChannelReq);
-    void BuildApduForFirstSequenceOf87(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &firstSequenceOf87);
-    void BuildApduForSequenceOf88(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &sequenceOf88);
-    void BuildApduForSequenceOf86(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &bppNode,
+    void BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87);
+    void BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &sequenceOf88);
+    void BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &bppNode,
         std::shared_ptr<Asn1Node> &sequenceOf86);
     bool ProcessLoadBoundProfilePackage(int32_t slotId);
     bool ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -56,7 +56,7 @@ private:
     bool ProcessListNotifications(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
-    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc);
+    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> root);
 
 protected:

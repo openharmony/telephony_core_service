@@ -20,7 +20,6 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "core_service.h"
-#include "core_manager_inner.h"
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
@@ -182,7 +181,7 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     return true;
 }
 
-bool EsimFile::DecodeBoundProfilePackage(const std::string& boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode)
+bool EsimFile::DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode)
 {
     uint32_t byteLen = 0;
     std::string destString = VCardUtils::DecodeBase64(boundProfilePackageStr);
@@ -212,7 +211,7 @@ void EsimFile::BuildApduForInitSecureChannel(
     codec.BuildStoreData(hexStr);
 }
 
-void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &firstSequenceOf87)
+void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87)
 {
     int cursorLen = 0;
     std::string hexStr;
@@ -220,7 +219,7 @@ void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild& codec, std::share
     codec.BuildStoreData(hexStr);
 }
 
-void EsimFile::BuildApduForSequenceOf88(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &sequenceOf88)
+void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &sequenceOf88)
 {
     int cursorLen = 0;
     std::list<std::shared_ptr<Asn1Node>> metaDataSeqs;
@@ -239,7 +238,7 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild& codec, std::shared_ptr
     }
 }
 
-void EsimFile::BuildApduForSequenceOf86(RequestApduBuild& codec, std::shared_ptr<Asn1Node> &bppNode,
+void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &bppNode,
     std::shared_ptr<Asn1Node> &sequenceOf86)
 {
     int cursorLen = 0;
@@ -463,7 +462,7 @@ bool EsimFile::ProcessListNotifications(
     return false;
 }
 
-void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc)
+void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
 {
     if (node == nullptr) {
         TELEPHONY_LOGE("createNotification node is nullptr");
@@ -589,5 +588,5 @@ void EsimFile::InitMemberFunc()
     memberFuncMap_[MSG_ESIM_PREPARE_DOWNLOAD_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessPrepareDownloadDone(event); };
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
