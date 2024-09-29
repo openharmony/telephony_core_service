@@ -3256,7 +3256,8 @@ int32_t CoreServiceProxy::LoadBoundProfilePackage(int32_t slotId, int32_t portIn
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
+    int32_t requestResult =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
         reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("LoadBoundProfilePackage sendRequest failed, errcode is %{public}d", requestResult);
