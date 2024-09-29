@@ -945,13 +945,9 @@ public:
      * @param responseResult[out], get the result code and the challenge
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t AuthenticateServer(
-        int32_t slotId, int32_t portIndex,
-        const std::u16string &matchingId,
-        const std::u16string &serverSigned1,
-        const std::u16string &serverSignature1,
-        const std::u16string &euiccCiPkIdToBeUsed,
-        const std::u16string &serverCertificate,
+    int32_t AuthenticateServer(int32_t slotId, int32_t portIndex, const std::u16string &matchingId,
+        const std::u16string &serverSigned1, const std::u16string &serverSignature1,
+        const std::u16string &euiccCiPkIdToBeUsed, const std::u16string &serverCertificate,
         ResponseEsimResult &responseResult);
 #endif
 

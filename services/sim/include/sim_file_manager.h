@@ -105,13 +105,9 @@ protected:
     std::map<IccType, std::shared_ptr<IccFileController>> iccFileControllerCache_;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     ResponseEsimResult GetEuiccInfo2(int32_t portIndex);
-    ResponseEsimResult AuthenticateServer(
-        int32_t portIndex,
-        const std::u16string &matchingId,
-        const std::u16string &serverSigned1,
-        const std::u16string &serverSignature1,
-        const std::u16string &euiccCiPkIdToBeUsed,
-        const std::u16string &serverCertificate);
+    ResponseEsimResult AuthenticateServer(int32_t portIndex, const std::u16string &matchingId,
+        const std::u16string &serverSigned1, const std::u16string &serverSignature1,
+        const std::u16string &euiccCiPkIdToBeUsed, const std::u16string &serverCertificate);
 #endif
 
 private:
