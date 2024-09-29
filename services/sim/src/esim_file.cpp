@@ -30,6 +30,7 @@
 #include "telephony_state_registry_client.h"
 #include "telephony_tag_def.h"
 #include "vcard_utils.h"
+
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
@@ -118,7 +119,7 @@ bool EsimFile::ProcessObtainEUICCInfo2(int32_t slotId, const AppExecFwk::InnerEv
     return false;
 }
 
-void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp& dst, EsimProfile& src)
+void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src)
 {
     dst.serverSigned1 = OHOS::Telephony::ToUtf8(src.serverSigned1);
     dst.serverSignature1 = OHOS::Telephony::ToUtf8(src.serverSignature1);
@@ -132,7 +133,7 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
 {
     if (IsLogicChannelOpen()) {
         Es9PlusInitAuthResp bytes;
-        Es9PlusInitAuthResp* pbytes = &bytes;
+        Es9PlusInitAuthResp *pbytes = &bytes;
         ConvertAuthInputParaFromApiStru(bytes, esimProfile_);
         std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_AUTHENTICATE_SERVER);
         if (builder == nullptr) {
@@ -202,7 +203,7 @@ void EsimFile::GetImeiBytes(std::string &imeiBytes, const std::string &imei)
     }
 }
 
-void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp* pbytes)
+void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp *pbytes)
 {
     if (pbytes == nullptr || ctxParams1Builder == nullptr) {
         TELEPHONY_LOGE("AddCtxParams1 pbytes is nullptr");
@@ -668,7 +669,7 @@ bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData)
     return true;
 }
 
-void EsimFile::CovertAuthToApiStruct(ResponseEsimResult& dst, AuthServerResponse& src)
+void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src)
 {
     dst.resultCode = (ResultState)src.errCode;
     std::string hexStr = Asn1Utils::BytesToHexStr(src.respStr);

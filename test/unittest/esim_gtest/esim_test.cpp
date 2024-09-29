@@ -95,7 +95,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseProfileVersion_001, Function | MediumTest | Le
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseProfileVersion(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseEuiccFirmwareVer_001, Function | MediumTest | Level2)
@@ -110,7 +110,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccFirmwareVer_001, Function | MediumTest | 
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccFirmwareVer(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseExtCardResource_001, Function | MediumTest | Level2)
@@ -125,7 +125,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseExtCardResource_001, Function | MediumTest | L
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseExtCardResource(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseUiccCapability_001, Function | MediumTest | Level2)
@@ -140,7 +140,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseUiccCapability_001, Function | MediumTest | Le
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseUiccCapability(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseTs102241Version_001, Function | MediumTest | Level2)
@@ -155,7 +155,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseTs102241Version_001, Function | MediumTest | L
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseTs102241Version(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseGlobalPlatformVersion_001, Function | MediumTest | Level2)
@@ -170,7 +170,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseGlobalPlatformVersion_001, Function | MediumTe
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseGlobalPlatformVersion(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseRspCapability_001, Function | MediumTest | Level2)
@@ -185,7 +185,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseRspCapability_001, Function | MediumTest | Lev
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseRspCapability(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForVerification_001, Function | MediumTest | Level2)
@@ -200,7 +200,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForVerification_001, Function |
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForSigning_001, Function | MediumTest | Level2)
@@ -215,7 +215,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForSigning_001, Function | Medi
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCategory_001, Function | MediumTest | Level2)
@@ -230,7 +230,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCategory_001, Function | MediumTest | Lev
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCategory(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, EuiccInfo2ParsePpVersion_001, Function | MediumTest | Level2)
@@ -245,7 +245,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParsePpVersion_001, Function | MediumTest | Level2)
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParsePpVersion(euiccInfo2, root);
-    delete(euiccInfo2);
+    delete (euiccInfo2);
 }
 
 HWTEST_F(EsimTest, AuthenticateServer_001, Function | MediumTest | Level2)
@@ -340,9 +340,9 @@ HWTEST_F(EsimTest, ProcessListNotifications_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventListNotif = iccFile->BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
-    esimFile->currentChannelId =0 ;
+    esimFile->currentChannelId = 0;
     EXPECT_FALSE(esimFile->ProcessListNotifications(slotId, Event::EVENT_ENABLE, eventListNotif));
-    esimFile->currentChannelId =2 ;
+    esimFile->currentChannelId = 2;
     EXPECT_FALSE(esimFile->ProcessListNotifications(slotId, Event::EVENT_ENABLE, eventListNotif));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -933,10 +933,10 @@ HWTEST_F(EsimTest, ProcessPrepareDownloadDone_001, Function | MediumTest | Level
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
-    rcvMsg->fileData.resultData = "BF218196A08193304E8008D14FE1DE62C340D75F494104B067E0DF2D080C747D76DF98198D \
-        B8766625CB216E62A2796003287E41E8DAD1D28229C14B9F5D7901D03D224D6AEC6EF031BA9176D50298ECB42F56739014365 \
-        F37400A3F852229A3A0606F5E90FF9D2F2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E \
-        629CD27CF9DC6A5768A93B0165E0F54D";
+    rcvMsg->fileData.resultData = "BF218196A08193304E8008D14FE1DE62C340D75F494104B067E0DF2D080C747D76DF98198D"
+        "B8766625CB216E62A2796003287E41E8DAD1D28229C14B9F5D7901D03D224D6AEC6EF031BA9176D50298ECB42F56739014365"
+        "F37400A3F852229A3A0606F5E90FF9D2F2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E"
+        "629CD27CF9DC6A5768A93B0165E0F54D";
     rcvMsg->fileData.sw1 = 0x90;
     rcvMsg->fileData.sw2 = 0x00;
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
@@ -1007,7 +1007,7 @@ HWTEST_F(EsimTest, Asn1AddChildAsBase64_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_AUTHENTICATE_SERVER);
     Es9PlusInitAuthResp bytes;
-    Es9PlusInitAuthResp* pbytes = &bytes;
+    Es9PlusInitAuthResp *pbytes = &bytes;
     esimFile->Asn1AddChildAsBase64(builder, pbytes->serverSigned1);
     esimFile->Asn1AddChildAsBase64(builder, pbytes->serverSignature1);
     esimFile->Asn1AddChildAsBase64(builder, pbytes->euiccCiPKIdToBeUsed);
@@ -1021,7 +1021,7 @@ HWTEST_F(EsimTest, AddCtxParams1_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     Es9PlusInitAuthResp bytes;
-    Es9PlusInitAuthResp* pbytes = &bytes;
+    Es9PlusInitAuthResp *pbytes = &bytes;
     esimFile->AddCtxParams1(ctxParams1Builder, pbytes);
 }
 
@@ -1032,7 +1032,7 @@ HWTEST_F(EsimTest, AddDeviceCapability_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Builder> devCapsBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
     Es9PlusInitAuthResp bytes;
-    Es9PlusInitAuthResp* pbytes = &bytes;
+    Es9PlusInitAuthResp *pbytes = &bytes;
     esimFile->AddDeviceCapability(devCapsBuilder, pbytes);
 }
 
@@ -1042,7 +1042,7 @@ HWTEST_F(EsimTest, GetImeiBytes_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     Es9PlusInitAuthResp bytes;
-    Es9PlusInitAuthResp* pbytes = &bytes;
+    Es9PlusInitAuthResp *pbytes = &bytes;
     std::string imeiBytes;
     esimFile->GetImeiBytes(imeiBytes, pbytes->imei);
 }
@@ -1157,8 +1157,7 @@ HWTEST_F(EsimTest, RequestRulesAuthTableParseTagCtxComp0_001, Function | MediumT
                                 "82020780"
                                 "9000";
     std::string responseByte;
-    responseByte =
-        Asn1Utils::HexStrToBytes(resultData);
+    responseByte = Asn1Utils::HexStrToBytes(resultData);
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     EXPECT_TRUE(esimFile->RequestRulesAuthTableParseTagCtxComp0(root));
@@ -1355,7 +1354,6 @@ HWTEST_F(EsimTest, BuildProfile_001, Function | MediumTest | Level2)
         profileNode->Asn1GetChildChild(2, TAG_ESIM_CTX_COMP_0, TAG_ESIM_PROFILE_INFO);
     esimFile->BuildProfile(&euiccProfileInfo, profileInfo);
 }
-
 
 HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_001, Function | MediumTest | Level2)
 {
