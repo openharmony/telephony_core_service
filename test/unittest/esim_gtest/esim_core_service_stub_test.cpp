@@ -49,38 +49,32 @@ int32_t EsimCoreServiceStubTest::SendRemoteRequest(MessageParcel &data, CoreServ
 
 HWTEST_F(EsimCoreServiceStubTest, OnDeleteProfile_001, Function | MediumTest | Level2)
 {
-    TELEPHONY_LOGE("======OnDeleteProfile_001 start======");
     MessageParcel data;
     if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::DELETE_PROFILE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    TELEPHONY_LOGE("======OnDeleteProfile_001 end======");
 }
 
 HWTEST_F(EsimCoreServiceStubTest, OnSwitchToProfile_001, Function | MediumTest | Level2)
 {
-    TELEPHONY_LOGE("======OnSwitchToProfile_001 start======");
     MessageParcel data;
     if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SWITCH_TO_PROFILE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    TELEPHONY_LOGE("======OnSwitchToProfile_001 end======");
 }
 
 HWTEST_F(EsimCoreServiceStubTest, OnSetProfileNickname_001, Function | MediumTest | Level2)
 {
-    TELEPHONY_LOGE("======OnUpdateProfileNickname_001 start======");
     MessageParcel data;
     if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    TELEPHONY_LOGE("======OnUpdateProfileNickname_001 end======");
 }
 } // namespace Telephony
 } // namespace OHOS
