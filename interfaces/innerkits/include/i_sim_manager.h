@@ -141,6 +141,17 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    virtual int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;
+    virtual int32_t AuthenticateServer(
+        int32_t slotId, int32_t portIndex,
+        const std::u16string &matchingId,
+        const std::u16string &serverSigned1,
+        const std::u16string &serverSignature1,
+        const std::u16string &euiccCiPkIdToBeUsed,
+        const std::u16string &serverCertificate,
+        ResponseEsimResult &responseResult) = 0;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

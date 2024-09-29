@@ -1256,5 +1256,34 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t SimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->GetEuiccInfo2(portIndex);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::AuthenticateServer(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &matchingId,
+    const std::u16string &serverSigned1,
+    const std::u16string &serverSignature1,
+    const std::u16string &euiccCiPkIdToBeUsed,
+    const std::u16string &serverCertificate,
+    ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->AuthenticateServer(
+        portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
+    return TELEPHONY_ERR_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

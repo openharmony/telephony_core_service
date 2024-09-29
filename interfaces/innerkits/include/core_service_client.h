@@ -918,6 +918,43 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    /**
+     * @brief Gets the eUICC info2 defined in GSMA RSP v2.0+ for new profile downloading.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param result[out], get the result code and the info2
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
+
+    /**
+     * @brief  Authenticates the SM-DP+ server by the eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0+
+     * or empty when it is not required
+     * @param serverSigned1[in], ASN.1 data in byte array signed and returned by the SM-DP+ server
+     * @param serverSignature1[in], ASN.1 data in byte array indicating a SM-DP+ signature which is
+     * returned by SM-DP+ server
+     * @param euiccCiPkIdToBeUsed[in], ASN.1 data in byte array indicating CI Public Key Identifier to be
+     * used by the eUICC for signature which is returned by SM-DP+ server. This is defined in GSMA RSP v2.0+
+     * @param serverCertificate[in], ASN.1 data in byte array indicating SM-DP+ Certificate returned by SM-DP+ server
+     * @param responseResult[out], get the result code and the challenge
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t AuthenticateServer(
+        int32_t slotId, int32_t portIndex,
+        const std::u16string &matchingId,
+        const std::u16string &serverSigned1,
+        const std::u16string &serverSignature1,
+        const std::u16string &euiccCiPkIdToBeUsed,
+        const std::u16string &serverCertificate,
+        ResponseEsimResult &responseResult);
+#endif
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

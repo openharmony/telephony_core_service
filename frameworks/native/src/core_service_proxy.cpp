@@ -3188,5 +3188,111 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     response.response = reply.ReadString();
     return ret;
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t resultSend = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO2), data, reply, option);
+    if (resultSend != ERR_NONE) {
+        TELEPHONY_LOGE("GetEuiccInfo2 sendRequest failed, error code is %{public}d", resultSend);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::RealAuthenticateServer(const MessageParcel &data, const MessageParcel &reply,
+    const MessageParcel &option)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t resultSend = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::AUTHENTICATE_SERVER),
+        data, reply, option);
+    if (resultSend != ERR_NONE) {
+        TELEPHONY_LOGE("GetEuiccChallenge sendRequest failed, error code is %{public}d", resultSend);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::AuthenticateServer(
+    int32_t slotId, int32_t portIndex,
+    const std::u16string &matchingId,
+    const std::u16string &serverSigned1,
+    const std::u16string &serverSignature1,
+    const std::u16string &euiccCiPkIdToBeUsed,
+    const std::u16string &serverCertificate,
+    ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(matchingId)) {
+        TELEPHONY_LOGE("WriteString16 matchingId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(serverSigned1)) {
+        TELEPHONY_LOGE("WriteString16 serverSigned1 is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(serverSignature1)) {
+        TELEPHONY_LOGE("WriteString16 serverSignature1 is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(euiccCiPkIdToBeUsed)) {
+        TELEPHONY_LOGE("WriteString16 euiccCiPkIdToBeUsed is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(serverCertificate)) {
+        TELEPHONY_LOGE("WriteString16 serverCertificate is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return RealAuthenticateServer(data, reply, option);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
