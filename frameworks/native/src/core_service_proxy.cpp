@@ -3222,7 +3222,7 @@ int32_t CoreServiceProxy::DisableProfile(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t profileResult =
-        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::DISABLE_PROFILE), data, reply, option);
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::DISABLE_PROFILE), data, reply, option);
     if (profileResult != ERR_NONE) {
         TELEPHONY_LOGE("DisableProfile senRequest failed, error code is %{public}d", profileResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -3257,7 +3257,7 @@ int32_t CoreServiceProxy::GetSmdsAddress(int32_t slotId, int32_t portIndex, std:
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t addressResult =
-        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SMDSADDRESS), data, reply, option);
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SMDSADDRESS), data, reply, option);
     if (addressResult != ERR_NONE) {
         TELEPHONY_LOGE("GetSmdsAddress sendRequest failed, error code is %{public}d", addressResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -3325,7 +3325,7 @@ int32_t CoreServiceProxy::GetRulesAuthTable(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t getRulesResult =
-        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE), data, reply, option);
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE), data, reply, option);
     if (getRulesResult != ERR_NONE) {
         TELEPHONY_LOGE("DisableProfile sendRequest failed, error code is %{public}d", getRulesResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -3357,7 +3357,7 @@ int32_t CoreServiceProxy::GetEuiccChallenge(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t euiccResult =
-        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE), data, reply, option);
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE), data, reply, option);
     if (euiccResult != ERR_NONE) {
         TELEPHONY_LOGE("GetEuiccChallenge sendRequest failed, error code is %{public}d", euiccResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
