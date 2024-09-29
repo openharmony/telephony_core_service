@@ -37,7 +37,7 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 namespace {
-const uint32_t BYTE_TO_HEX_LEN = 2;
+const uint32_t BYTE_TO_HEX_LENGTH = 2;
 const uint32_t OFFSET_FOUR_BIT = 4;
 const uint32_t VERSION_NUMBER = 11;
 const int32_t ATR_LENGTH = 47;
