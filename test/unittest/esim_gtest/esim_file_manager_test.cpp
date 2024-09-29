@@ -101,5 +101,5 @@ HWTEST_F(EsimFileManagerTest, GetProfile_001, Function | MediumTest | Level2)
     res = simFileManager.GetProfile(portIndex, iccId);
     EXPECT_EQ(res.state, ProfileState::PROFILE_STATE_DISABLED);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

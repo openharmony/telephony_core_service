@@ -75,5 +75,5 @@ HWTEST_F(EsimCoreServiceClientTest, GetProfile_0001, Function | MediumTest | Lev
     int32_t result = CoreServiceClient::GetInstance().GetProfile(slotId, portIndex, iccId, eUiccProfile);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

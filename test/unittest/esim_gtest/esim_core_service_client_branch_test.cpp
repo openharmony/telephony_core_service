@@ -89,5 +89,5 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetProfile_0100, Function | MediumTest
     int32_t result = CoreServiceClient::GetInstance().GetProfile(slotId, portIndex, iccId, eUiccProfile);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
