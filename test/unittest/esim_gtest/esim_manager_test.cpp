@@ -61,14 +61,12 @@ HWTEST_F(EsimManagerTest, GetEuiccInfo2, Function | MediumTest | Level1)
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     int32_t ret = simManager->GetEuiccInfo2(slotId, portIndex, responseResult);
     EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     simManager->simStateManager_.push_back(simStateManager);
     simManager->simStateManager_[slotId]->Init(slotId);
     simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
     ret = simManager->GetEuiccInfo2(slotId, portIndex, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
@@ -95,7 +93,6 @@ HWTEST_F(EsimManagerTest, AuthenticateServer, Function | MediumTest | Level1)
     int32_t ret = simManager->AuthenticateServer(slotId, portIndex, matchingId,
         serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
     EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     simManager->simStateManager_.push_back(simStateManager);
     simManager->simStateManager_[slotId]->Init(slotId);
@@ -103,7 +100,6 @@ HWTEST_F(EsimManagerTest, AuthenticateServer, Function | MediumTest | Level1)
     ret = simManager->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
         serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
     std::weak_ptr<Telephony::SimStateManager> state = simStateManager;

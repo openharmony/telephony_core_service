@@ -67,4 +67,3 @@ HWTEST_F(EsimCoreServiceStubTest, OnAuthenticateServer_001, Function | MediumTes
 }
 } // namespace Telephony
 } // namespace OHOS
-//#endif // TEL_ESIM_TEST_SUPPORT

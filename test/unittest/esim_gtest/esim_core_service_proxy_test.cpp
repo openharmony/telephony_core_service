@@ -150,7 +150,8 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_001, Function | MediumTest
     std::u16string euiccCiPkIdToBeUsed;
     std::u16string serverCertificate;
     ResponseEsimResult responseResult;
-    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1,
+        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -167,7 +168,8 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_002, Function | MediumTest
     std::u16string serverCertificate;
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1,
+        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
