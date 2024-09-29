@@ -17,20 +17,21 @@
 
 #include <string>
 #include <unistd.h>
-#include "sim_manager.h"
+
 #include "core_manager_inner.h"
 #include "core_service.h"
 #include "core_service_client.h"
 #include "enum_convert.h"
 #include "operator_config_cache.h"
 #include "operator_file_parser.h"
+#include "sim_manager.h"
 #include "sim_state_type.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "tel_profile_util.h"
 #include "telephony_ext_wrapper.h"
-#include "gtest/gtest.h"
 #include "tel_ril_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {

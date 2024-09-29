@@ -16,16 +16,15 @@
 #include <chrono>
 #include <thread>
 
-#include "gtest/gtest.h"
-#include "core_service_proxy.h"
-#include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
 #include "core_service_proxy.h"
 #include "esim_state_type.h"
-#include "string_ex.h"
 #include "gmock/gmock.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
+#include "string_ex.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 class MockIRemoteObject : public IRemoteObject {
@@ -206,5 +205,5 @@ HWTEST_F(EsimCoreServiceProxyTest, RemoveNotificationFromList_003, Function | Me
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     EXPECT_EQ(proxy.RemoveNotificationFromList(SLOT_ID, portIndex, seqNumber, enumResult), 0);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

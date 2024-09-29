@@ -21,8 +21,8 @@
 #include "asn1_decoder.h"
 #include "asn1_node.h"
 #include "asn1_utils.h"
-#include "esim_state_type.h"
 #include "esim_service.h"
+#include "esim_state_type.h"
 #include "icc_file.h"
 #include "request_apdu_build.h"
 #include "reset_response.h"
@@ -39,31 +39,31 @@ EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumbe
 ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
 
 private:
-bool ProcessRetrieveNotificationList(
-    int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
-bool RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root);
-bool ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-bool ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
-bool RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
-bool ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-bool ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessRetrieveNotificationList(
+        int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root);
+    bool ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
+    bool ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
 
-ResultState removeNotifResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-EuiccNotificationList eUiccNotificationList_;
-EuiccNotificationList retrieveNotificationList_;
+    ResultState removeNotifResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    EuiccNotificationList eUiccNotificationList_;
+    EuiccNotificationList retrieveNotificationList_;
 
-std::mutex retrieveNotificationListMutex_;
-std::condition_variable retrieveNotificationListCv_;
-bool isRetrieveNotificationListReady_ = false;
+    std::mutex retrieveNotificationListMutex_;
+    std::condition_variable retrieveNotificationListCv_;
+    bool isRetrieveNotificationListReady_ = false;
 
-std::mutex retrieveNotificationMutex_;
-std::condition_variable retrieveNotificationCv_;
-bool isRetrieveNotificationReady_ = false;
+    std::mutex retrieveNotificationMutex_;
+    std::condition_variable retrieveNotificationCv_;
+    bool isRetrieveNotificationReady_ = false;
 
-std::mutex removeNotificationMutex_;
-std::condition_variable removeNotificationCv_;
-bool isRemoveNotificationReady_ = false;
+    std::mutex removeNotificationMutex_;
+    std::condition_variable removeNotificationCv_;
+    bool isRemoveNotificationReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -20,9 +20,9 @@
 
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "gtest/gtest.h"
-#include "tel_ril_manager.h"
 #include "sim_file_manager.h"
+#include "tel_ril_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -58,7 +58,6 @@ HWTEST_F(EsimFileManagerTest, RetrieveNotificationList_001, Function | MediumTes
     Event events = Event::EVENT_DONOTHING;
     EuiccNotificationList lst = simFileManager.RetrieveNotificationList(portIndex, events);
     EXPECT_EQ(lst.euiccNotification.empty(), true);
-    
     simFileManager.eSimFile_ = nullptr;
     lst = simFileManager.RetrieveNotificationList(portIndex, events);
     EXPECT_EQ(lst.euiccNotification.empty(), true);
@@ -79,7 +78,6 @@ HWTEST_F(EsimFileManagerTest, RetrieveNotification_001, Function | MediumTest | 
     int32_t seqNumber = 0;
     EuiccNotification res = simFileManager.RetrieveNotification(portIndex, seqNumber);
     EXPECT_EQ(res.data, u"");
-    
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.RetrieveNotification(portIndex, seqNumber);
     EXPECT_EQ(res.data, u"");
@@ -104,5 +102,5 @@ HWTEST_F(EsimFileManagerTest, RemoveNotificationFromList_001, Function | MediumT
     res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS

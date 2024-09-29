@@ -14,10 +14,9 @@
  */
 
 #include "core_service_ipc_interface_code.h"
+#include "esim_core_service_stub_test.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-#include "esim_core_service_stub_test.h"
-
 #include "gtest/gtest.h"
 
 using namespace testing::ext;
@@ -77,5 +76,5 @@ HWTEST_F(EsimCoreServiceStubTest, OnRemoveNotificationFromList_001, Function | M
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::REMOVE_NOTIFICATION);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
-}
-}
+} // namespace Telephony
+} // namespace OHOS
