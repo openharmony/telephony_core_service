@@ -107,7 +107,6 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_001, Function | MediumTest | Le
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-
     int32_t portIndex = 0;
     ResponseEsimResult responseResult;
     int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
