@@ -95,7 +95,7 @@ void Asn1Node::Asn1Write(std::vector<uint8_t> &dest)
     std::lock_guard<std::mutex> lock(mutex_);
     if (constructed_ && dataBytes_.empty()) {
         std::shared_ptr<Asn1Node> asn1Node = nullptr;
-        for (const auto &it = children_.begin(); it != children_.end(); ++it) {
+        for (auto it = children_.begin(); it != children_.end(); ++it) {
             asn1Node = *it;
             if (asn1Node == nullptr) {
                 break;
@@ -120,7 +120,7 @@ std::shared_ptr<Asn1Node> Asn1Node::Asn1GetChild(const uint32_t tag)
     }
     std::shared_ptr<Asn1Node> curNode = nullptr;
     std::lock_guard<std::mutex> lock(mutex_);
-    for (const auto &it = children_.begin(); it != children_.end(); ++it) {
+    for (auto it = children_.begin(); it != children_.end(); ++it) {
         curNode = *it;
         if (curNode == nullptr) {
             break;
@@ -173,7 +173,7 @@ int32_t Asn1Node::Asn1GetChildren(const uint32_t tag, std::list<std::shared_ptr<
     }
     std::shared_ptr<Asn1Node> curNode = nullptr;
     std::lock_guard<std::mutex> lock(mutex_);
-    for (const auto &it = children_.begin(); it != children_.end(); ++it) {
+    for (auto it = children_.begin(); it != children_.end(); ++it) {
         curNode = *it;
         if (curNode == nullptr) {
             break;
