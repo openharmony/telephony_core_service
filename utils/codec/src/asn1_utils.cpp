@@ -147,7 +147,8 @@ std::vector<uint8_t> Asn1Utils::HexStrToBytes(const std::string& hexStr)
     }
 
     for (size_t i = 0; i < hexStr.length(); i += BYTE_TO_HEX_LEN) {
-        uint8_t byte = static_cast<uint8_t>(std::stoi(hexStr.substr(i, BYTE_TO_HEX_LEN), nullptr, HEX_DATA_LEN));
+        uint8_t byte = static_cast<uint8_t>(strtol((hexStr.substr(i, BYTE_TO_HEX_LEN)).c_str(),
+            nullptr, HEX_DATA_LEN));
         ret.push_back(byte);
     }
     return ret;
