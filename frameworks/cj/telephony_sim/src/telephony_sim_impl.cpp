@@ -137,6 +137,11 @@ namespace Telephony {
     bool TelephonySimImpl::hasOperatorPrivileges(int32_t slotId, int32_t &errCode)
     {
         bool hasOperatorPrivileges = false;
+        if (!IsValidSlotId(slotId)) {
+            TELEPHONY_LOGE("NativeHasOperatorPrivileges slotId is invalid");
+            errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
+            return hasOperatorPrivileges;
+        }
         errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().HasOperatorPrivileges(
             slotId, hasOperatorPrivileges);
         errCode = ConvertCJErrCode(errCode);
