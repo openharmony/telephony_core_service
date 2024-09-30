@@ -81,6 +81,9 @@ ohos_shared_library("libtel_common") {
       "codec/src/asn1_builder.cpp",
       "codec/src/asn1_decoder.cpp",
       "codec/src/asn1_node.cpp",
+      "codec/src/asn1_utils.cpp",
+      "codec/src/request_apdu_build.cpp",
+      "codec/src/reset_response.cpp",
     ]
   }
 

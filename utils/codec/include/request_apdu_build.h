@@ -13,24 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef ASN1_CONSTANTS_H
-#define ASN1_CONSTANTS_H
+#ifndef REQUEST_APDU_BUILD_H
+#define REQUEST_APDU_BUILD_H
 
-#include <cctype>
-#include <iomanip>
+#include <list>
+#include <mutex>
+#include "apdu_command.h"
 
 namespace OHOS {
 namespace Telephony {
-const uint32_t BYTE_TO_HEX_LEN = 2;
-const uint32_t OFFSET_EIGHT_BIT = 8;
-const uint32_t BIT6_MASK = 0x20;
-const uint32_t BIT8_MASK = 0x80;
-const uint32_t MAX_UINT8 = std::numeric_limits<uint8_t>::max();
-const uint32_t MAX_UINT16 = std::numeric_limits<uint16_t>::max();
-const uint32_t MAX_UINT24 = (std::numeric_limits<uint32_t>::max() >> 8);
-const uint32_t MAX_INT8 = std::numeric_limits<int8_t>::max();
-const uint32_t MAX_INT16 = std::numeric_limits<int16_t>::max();
-const uint32_t MAX_INT24 = (std::numeric_limits<int32_t>::max() >> 8);
+class RequestApduBuild {
+public:
+    explicit RequestApduBuild(int32_t channelId): channelId_(channelId) {}
+    void BuildStoreData(const std::string &cmdHex);
+    std::list<std::unique_ptr<ApduCommand>> GetCommands();
+
+private:
+    void AddApdu(const ApduData &apduData);
+    void ConstructApduData(uint32_t packetTag, uint32_t packetIndex, uint32_t packetLen,
+        const std::string &cmdHex, ApduData &apduData);
+    int32_t channelId_ = 0;
+    std::list<std::unique_ptr<ApduCommand>> apduCommandLst_;
+    std::mutex mutex_;
+};
 } // namespace Telephony
 } // namespace OHOS
-#endif // ASN1_CONSTANTS_H
+#endif

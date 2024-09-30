@@ -25,6 +25,9 @@ ohos_unittest("utils_codec_gtest") {
     "asn1_builder_test.cpp",
     "asn1_decoder_test.cpp",
     "asn1_node_test.cpp",
+    "asn1_utils_test.cpp",
+    "request_apdu_build_test.cpp",
+    "reset_reponse_test.cpp",
   ]
 
   include_dirs = [ "$SOURCE_DIR/utils/codec/include" ]

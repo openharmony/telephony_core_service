@@ -26,8 +26,11 @@
       OHOS::Telephony::Asn1Builder*;
       OHOS::Telephony::Asn1Decoder*;
       OHOS::Telephony::Asn1Node*;
+      OHOS::Telephony::Asn1Utils*;
       OHOS::Telephony::TelAesCryptoUtils*;
       OHOS::Telephony::ToUtf*;
+      OHOS::Telephony::RequestApduBuild*;
+      OHOS::Telephony::ResetResponse*;
       "OHOS::Telephony::GetBoolValue(int)";
       "OHOS::Telephony::GetBundleName()";
       "OHOS::Telephony::GetTokenID()";
