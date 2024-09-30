@@ -76,6 +76,10 @@ protected:
         std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc);
     template<typename T>
     inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+        const HDI::Ril::V1_1::SetupDataCallResultInfo &iSetupDataCallResultInfo,
+        std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc);
+    template<typename T>
+    inline int32_t Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
         std::function<T(std::shared_ptr<TelRilRequest>)> getDataFunc);
     inline int32_t Notify(const char *funcName, RadioEvent notifyId);
     template<typename T>
@@ -159,6 +163,26 @@ inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::
     std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc)
 {
     return Response<std::shared_ptr<T>>(funcName, iResponseInfo, getDataFunc);
+}
+
+template<typename T>
+inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo,
+    const HDI::Ril::V1_1::SetupDataCallResultInfo &iSetupDataCallResultInfo,
+    std::function<std::shared_ptr<T>(std::shared_ptr<TelRilRequest>)> getDataFunc)
+{
+    const auto &radioResponseInfo = BuildHRilRadioResponseInfo(iResponseInfo);
+    std::shared_ptr<TelRilRequest> telRilRequest = FindTelRilRequest(radioResponseInfo);
+    if (telRilRequest == nullptr || telRilRequest->pointer_ == nullptr) {
+        TELEPHONY_LOGE("func %{public}s telRilReques or telRilRequest->pointer or data is null", funcName);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((radioResponseInfo.error == ErrType::ERR_GENERIC_FAILURE) && (iSetupDataCallResultInfo.reason != 0)) {
+        return SendHandlerEvent<std::shared_ptr<T>>(funcName, telRilRequest, getDataFunc);
+    }
+    if (radioResponseInfo.error != ErrType::NONE) {
+        return ErrorResponse(telRilRequest, radioResponseInfo);
+    }
+    return SendHandlerEvent<std::shared_ptr<T>>(funcName, telRilRequest, getDataFunc);
 }
 
 template<typename T>

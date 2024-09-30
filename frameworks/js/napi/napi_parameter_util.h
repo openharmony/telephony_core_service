@@ -151,6 +151,12 @@ napi_status NapiValueToCppValue(napi_env env, napi_value arg, napi_valuetype arg
     return napi_invalid_arg;
 }
 
+template<typename T, std::enable_if_t<std::is_same_v<T, bool>, int32_t> = 0>
+napi_valuetype GetInputArgvType(T *)
+{
+    return napi_boolean;
+}
+
 template<typename... Ts, size_t N>
 std::optional<NapiError> MatchParameters(
     napi_env env, const napi_value (&argv)[N], size_t argc, std::tuple<Ts...> &theTuple)

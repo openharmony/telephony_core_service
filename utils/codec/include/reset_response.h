@@ -13,24 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef ASN1_CONSTANTS_H
-#define ASN1_CONSTANTS_H
+#ifndef RESET_RESPONSE_H
+#define RESET_RESPONSE_H
 
-#include <cctype>
-#include <iomanip>
+#include <cstdint>
+#include <string>
 
 namespace OHOS {
 namespace Telephony {
-const uint32_t BYTE_TO_HEX_LEN = 2;
-const uint32_t OFFSET_EIGHT_BIT = 8;
-const uint32_t BIT6_MASK = 0x20;
-const uint32_t BIT8_MASK = 0x80;
-const uint32_t MAX_UINT8 = std::numeric_limits<uint8_t>::max();
-const uint32_t MAX_UINT16 = std::numeric_limits<uint16_t>::max();
-const uint32_t MAX_UINT24 = (std::numeric_limits<uint32_t>::max() >> 8);
-const uint32_t MAX_INT8 = std::numeric_limits<int8_t>::max();
-const uint32_t MAX_INT16 = std::numeric_limits<int16_t>::max();
-const uint32_t MAX_INT24 = (std::numeric_limits<int32_t>::max() >> 8);
+class ResetResponse {
+public:
+    bool AnalysisAtrData(const std::string &atr);
+    bool IsEuiccAvailable();
+
+private:
+    bool CheckOperationRes(uint8_t chr, const uint32_t tMask, const uint32_t comparedVal);
+    bool AnalysisInterfaceData(const std::vector<uint8_t> &atrData, uint32_t atrDataLen, uint32_t &index);
+    bool CheckIsEuiccAvailable(uint8_t charB, uint8_t charD);
+    bool CheckAtrDataParam(const std::string &atr);
+    bool isEuiccAvailable_ = false;
+    uint8_t formatByte_ = 0;
+};
 } // namespace Telephony
 } // namespace OHOS
-#endif // ASN1_CONSTANTS_H
+#endif // RESET_RESPONSE_H
