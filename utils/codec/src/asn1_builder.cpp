@@ -155,7 +155,7 @@ std::shared_ptr<Asn1Node> Asn1Builder::Asn1Build()
         return nullptr;
     }
 
-    for (const auto &it = children_.begin(); it != children_.end(); ++it) {
+    for (auto it = children_.begin(); it != children_.end(); ++it) {
         asn1Node = *it;
         if (asn1Node == nullptr) {
             break;
@@ -173,7 +173,6 @@ std::shared_ptr<Asn1Node> Asn1Builder::Asn1Build()
     newNode->SetConstructed(true);
     newNode->SetEncodedLength(Asn1Utils::ByteCountForUint(tag_) +
         Asn1Utils::CalculateEncodedBytesNumForLength(dataLen) + dataLen);
-
     return newNode;
 }
 
