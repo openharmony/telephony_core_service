@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
+SUBSYSTEM_DIR = "../.."
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 group("unittest") {
   testonly = true
@@ -36,4 +38,8 @@ group("unittest") {
     "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_gtest",
   ]
+
+  if (core_service_support_esim) {
+    deps += [ "unittest/utils_codec_gtest:utils_codec_gtest" ]
+  }
 }
