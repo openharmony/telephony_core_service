@@ -124,7 +124,7 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
         Asn1AddChildAsBase64(builder, dst.smdpSignature2);
         if (dst.hashCc.size() != 0) {
             std::string bytes = VCardUtils::DecodeBase64(dst.hashCc);
-            int32_t byteLen = bytes.length();
+            uint32_t byteLen = bytes.length();
             builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, byteLen);
         }
         Asn1AddChildAsBase64(builder, dst.smdpCertificate);
@@ -153,7 +153,7 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         return true;
     }
     std::string responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
@@ -281,7 +281,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
         TELEPHONY_LOGE("DecodeBoundProfilePackage failed");
         return false;
     }
-    RequestApduBuild codec(currentChannelId_);
+    RequestApduBuild codec(currentChannelId);
     std::shared_ptr<Asn1Node> initSecureChannelReq = bppNode->Asn1GetChild(TAG_ESIM_INITIALISE_SECURE_CHANNEL);
     if (initSecureChannelReq != nullptr) {
         BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
@@ -335,7 +335,7 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
 bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
 {
     std::string responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     loadBPPResult_.response = OHOS::Telephony::ToUtf16(combineHexStr);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
@@ -563,7 +563,7 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
         return false;
     }
     std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    int32_t byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.length();
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero");
         return false;
