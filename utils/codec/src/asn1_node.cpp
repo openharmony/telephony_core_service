@@ -25,6 +25,11 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+const uint32_t MAX_DATA_LENGTH = 4;
+const uint32_t MIN_DATA_LENGTH = 1;
+}
+
 Asn1Node::Asn1Node(const uint32_t tag, const std::vector<uint8_t> &src, uint32_t offset, uint32_t length)
 {
     TELEPHONY_LOGD("enter InitAsn1Node %{public}u", tag);
@@ -266,7 +271,7 @@ uint32_t Asn1Node::Asn1AsBytes(std::vector<uint8_t> &output)
     }
     std::vector<uint8_t> byteSteamSegment(dataBytes.begin() + dataOffset_, dataBytes.begin() + dataLength_);
     output = byteSteamSegment;
-    dataLen = static_cast<int32_t>(dataLength_ - dataOffset_);
+    dataLen = dataLength_ - dataOffset_;
     return dataLen;
 }
 
@@ -311,6 +316,11 @@ int32_t Asn1Node::Asn1AsBits()
 
     if (dataBytes_.empty()) {
         TELEPHONY_LOGE("Data bytes cannot be nullptr.");
+        return integerVal;
+    }
+
+    if (dataLength_ > MAX_DATA_LENGTH || dataLength_ < MIN_DATA_LENGTH) {
+        TELEPHONY_LOGE("dataLength_ is invalid.");
         return integerVal;
     }
 
