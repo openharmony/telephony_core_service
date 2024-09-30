@@ -26,7 +26,7 @@ namespace Telephony {
 Asn1Decoder::Asn1Decoder(const std::vector<uint8_t> &src, uint32_t offset, uint32_t decodeLen)
 {
     TELEPHONY_LOGD("enter Asn1Decoder");
-    if ((offset < 0) || (decodeLen < 0) || ((offset + decodeLen) > src.size())) {
+    if ((offset > (std::numeric_limits<uint32_t>::max() - decodeLen)) || ((offset + decodeLen) > src.size())) {
         TELEPHONY_LOGE("Out of the bounds: byteLen=%{public}zu, offset=%{public}u, decodeLen=%{public}u.",
             src.size(), offset, decodeLen);
         return;

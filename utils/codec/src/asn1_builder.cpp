@@ -28,6 +28,7 @@ namespace Telephony {
 namespace {
 const uint32_t FIVE_BYTE_LENGTH = 5;
 const uint32_t ONE_BYTE_OCCPUPIED_BIT_COUNT = 8;
+const uint32_t MAX_ENCODE_DATA_LENGTH = 10240;
 }
 
 void Asn1Builder::Asn1AddChild(const std::shared_ptr<Asn1Node> node)
@@ -149,10 +150,18 @@ std::shared_ptr<Asn1Node> Asn1Builder::Asn1Build()
     std::shared_ptr<Asn1Node> asn1Node = nullptr;
     uint32_t dataLen = 0;
     std::lock_guard<std::mutex> lock(mutex_);
+    if (children_.size() > MAX_UINT8) {
+        TELEPHONY_LOGE("children_ is out of the bounds.");
+        return nullptr;
+    }
+
     for (const auto &it = children_.begin(); it != children_.end(); ++it) {
         asn1Node = *it;
         if (asn1Node == nullptr) {
             break;
+        }
+        if (asn1Node->GetEncodedLength() > MAX_ENCODE_DATA_LENGTH) {
+            return nullptr;
         }
         dataLen += asn1Node->GetEncodedLength();
         newNode->AddNodeChildren(std::move(asn1Node));
@@ -177,7 +186,6 @@ uint32_t Asn1Builder::Asn1BuilderToHexStr(std::string &destStr)
         return strLen;
     }
     strLen = node->Asn1NodeToHexStr(destStr);
-    TELEPHONY_LOGD("destStr:%{public}s", destStr.c_str());
     return strLen;
 }
 } // namespace Telephony
