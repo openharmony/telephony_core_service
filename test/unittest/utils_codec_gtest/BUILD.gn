@@ -22,6 +22,9 @@ ohos_unittest("utils_codec_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    "asn1_builder_test.cpp",
+    "asn1_decoder_test.cpp",
+    "asn1_node_test.cpp",
     "asn1_utils_test.cpp",
     "request_apdu_build_test.cpp",
     "reset_reponse_test.cpp",
