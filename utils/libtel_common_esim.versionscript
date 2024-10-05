@@ -23,6 +23,9 @@
       OHOS::Telephony::TelephonyExtUtilsWrapper*;
       OHOS::Telephony::TelEventHandler*;
       OHOS::Telephony::TelProfileUtil*;
+      OHOS::Telephony::Asn1Builder*;
+      OHOS::Telephony::Asn1Decoder*;
+      OHOS::Telephony::Asn1Node*;
       OHOS::Telephony::Asn1Utils*;
       OHOS::Telephony::TelAesCryptoUtils*;
       OHOS::Telephony::ToUtf*;
