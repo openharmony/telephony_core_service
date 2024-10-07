@@ -488,6 +488,10 @@ int32_t TelRilSim::SendSimMatchedOperatorInfo(
 void TelRilSim::BuildIccIoResult(
     std::shared_ptr<IccIoResultInfo> iccIoResult, const HDI::Ril::V1_1::IccIoResultInfo &result)
 {
+    if (iccIoResult == nullptr) {
+        TELEPHONY_LOGE("BuildIccIoResult iccIoResult is nullptr");
+        return;
+    }
     iccIoResult->response = result.response;
     iccIoResult->sw1 = result.sw1;
     iccIoResult->sw2 = result.sw2;
@@ -496,6 +500,10 @@ void TelRilSim::BuildIccIoResult(
 void TelRilSim::BuildCardStatusInfo(
     std::shared_ptr<CardStatusInfo> cardStatusInfo, const HDI::Ril::V1_1::CardStatusInfo &result)
 {
+    if (cardStatusInfo == nullptr) {
+        TELEPHONY_LOGE("BuildCardStatusInfo cardStatusInfo is nullptr");
+        return;
+    }
     cardStatusInfo->index = result.index;
     cardStatusInfo->simType = result.simType;
     cardStatusInfo->simState = result.simState;
@@ -506,6 +514,10 @@ void TelRilSim::BuildCardStatusInfo(
 void TelRilSim::BuildSimCardStatusInfo(std::shared_ptr<SimCardStatusInfo> simCardStatusInfo,
     const HDI::Ril::V1_3::SimCardStatusInfo &result)
 {
+    if (simCardStatusInfo == nullptr) {
+        TELEPHONY_LOGE("BuildSimCardStatusInfo simCardStatusInfo is nullptr");
+        return;
+    }
     simCardStatusInfo->index = result.index;
     simCardStatusInfo->simType = result.simType;
     simCardStatusInfo->simState = result.simState;
@@ -517,6 +529,10 @@ void TelRilSim::BuildSimCardStatusInfo(std::shared_ptr<SimCardStatusInfo> simCar
 void TelRilSim::BuildLockStatusResp(
     std::shared_ptr<LockStatusResp> lockStatusResp, const HDI::Ril::V1_1::LockStatusResp &lockStatus)
 {
+    if (lockStatusResp == nullptr) {
+        TELEPHONY_LOGE("BuildLockStatusResp lockStatusResp is nullptr");
+        return;
+    }
     lockStatusResp->result = lockStatus.result;
     lockStatusResp->remain = lockStatus.remain;
 }
@@ -524,6 +540,10 @@ void TelRilSim::BuildLockStatusResp(
 void TelRilSim::BuildRadioProtocol(
     std::shared_ptr<RadioProtocol> protocol, const HDI::Ril::V1_1::RadioProtocol &radioProtocol)
 {
+    if (protocol == nullptr) {
+        TELEPHONY_LOGE("BuildRadioProtocol protocol is nullptr");
+        return;
+    }
     protocol->slotId = radioProtocol.slotId;
     protocol->sessionId = radioProtocol.sessionId;
     protocol->phase = static_cast<RadioProtocolPhase>(radioProtocol.phase);
@@ -535,6 +555,10 @@ void TelRilSim::BuildRadioProtocol(
 void TelRilSim::BuildOpenLogicalChannelResp(std::shared_ptr<OpenLogicalChannelResponse> openLogicalChannelResp,
     const HDI::Ril::V1_1::OpenLogicalChannelResponse &pOpenLogicalChannelResponse)
 {
+    if (openLogicalChannelResp == nullptr) {
+        TELEPHONY_LOGE("BuildOpenLogicalChannelResp openLogicalChannelResp is nullptr");
+        return;
+    }
     openLogicalChannelResp->sw1 = pOpenLogicalChannelResponse.sw1;
     openLogicalChannelResp->sw2 = pOpenLogicalChannelResponse.sw2;
     openLogicalChannelResp->channelId = pOpenLogicalChannelResponse.channelId;

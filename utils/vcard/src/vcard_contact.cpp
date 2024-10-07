@@ -98,18 +98,57 @@ void VCardContact::AddOtherDatas(std::string name, std::string rawValue, std::st
         AddImppDatas(propValue, parasMap);
     } else if (name == VCARD_TYPE_X_SIP) {
         AddSipData(rawValue, parasMap, propValue);
-    } else if (name == VCARD_TYPE_X_OHOS_CUSTOM) {
+    } else if (name == VCARD_TYPE_X_OHOS_CUSTOM || name == VCARD_TYPE_X_MOBILE_CUSTOM) {
         AddCustom(rawValue, parasMap, propValue);
-    } else if (name == VCARD_TYPE_X_AIM || name == VCARD_TYPE_X_MSN || name == VCARD_TYPE_X_YAHOO ||
-               name == VCARD_TYPE_X_ICQ || name == VCARD_TYPE_X_JABBER || name == VCARD_TYPE_X_QQ) {
+    }
+    AddRemainDatas(name, rawValue, values, propValue, parasMap);
+}
+
+void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::vector<std::string> values,
+    std::string propValue, std::map<std::string, std::vector<std::string>> parasMap)
+{
+    if (name == VCARD_TYPE_X_AIM || name == VCARD_TYPE_X_MSN || name == VCARD_TYPE_X_YAHOO ||
+        name == VCARD_TYPE_X_ICQ || name == VCARD_TYPE_X_JABBER || name == VCARD_TYPE_X_QQ ||
+        name == VCARD_TYPE_X_SKYPE_USERNAME || name == VCARD_TYPE_X_HUANLIAO) {
         AddIms(name, rawValue, propValue, values, parasMap);
+    } else if (name == VCARD_TYPE_X_GROUP) {
+        AddGroups(rawValue);
     } else {
         TELEPHONY_LOGI("No need to do anything");
     }
 }
 
+void VCardContact::CheckNameExist()
+{
+    if (nameData_ == nullptr) {
+        return;
+    }
+    if (!nameData_->GetPrefix().empty() || !nameData_->GetFamily().empty() || !nameData_->GetMiddle().empty() ||
+        !nameData_->GetSuffix().empty() || !nameData_->GetFormatted().empty() || !nameData_->GetSort().empty() ||
+        !nameData_->GetFormatted().empty() || !nameData_->GetPhoneticFamily().empty() ||
+        !nameData_->GetPhoneticGiven().empty() || !nameData_->GetPhoneticMiddle().empty() ||
+        !nameData_->GetDisplayName().empty()) {
+        return;
+    }
+    for (auto data : phones_) {
+        if (data != nullptr && !data->GetNumber().empty()) {
+            TELEPHONY_LOGI("replace phone as name: %{public}s", data->GetNumber().c_str());
+            nameData_->setDispalyName(data->GetNumber());
+            return;
+        }
+    }
+    for (auto data : emails_) {
+        if (data != nullptr && !data->GetAddress().empty()) {
+            TELEPHONY_LOGI("replace email as name: %{public}s", data->GetAddress().c_str());
+            nameData_->setDispalyName(data->GetAddress());
+            return;
+        }
+    }
+}
+ 
 int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues)
 {
+    CheckNameExist();
     BuildValuesBucket(rawId, contactDataValues, nameData_);
     if (!birthday_->GetBirthday().empty()) {
         BuildValuesBucket(rawId, contactDataValues, birthday_);
@@ -129,6 +168,7 @@ int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::Dat
     BuildValuesBuckets(rawId, contactDataValues, notes_);
     BuildValuesBuckets(rawId, contactDataValues, relations_);
     BuildValuesBuckets(rawId, contactDataValues, events_);
+    BuildValuesBuckets(rawId, contactDataValues, groups_);
     return TELEPHONY_SUCCESS;
 }
 
@@ -238,6 +278,10 @@ int32_t VCardContact::BuildOtherData(int32_t typeId, std::shared_ptr<DataShare::
             BuildData(resultSet, events_);
             return TELEPHONY_SUCCESS;
         }
+        case TypeId::GROUP: {
+            BuildData(resultSet, groups_);
+            return TELEPHONY_SUCCESS;
+        }
         default:
             break;
     }
@@ -326,6 +370,11 @@ std::vector<std::shared_ptr<VCardNoteData>> VCardContact::GetNotes()
 std::shared_ptr<VCardBirthdayData> VCardContact::GetBirthdays()
 {
     return birthday_;
+}
+
+std::vector<std::shared_ptr<VCardGroupData>> VCardContact::GetGroups()
+{
+    return groups_;
 }
 
 void VCardContact::HandleName(std::vector<std::string> values, std::map<std::string, std::vector<std::string>> parasMap)
@@ -721,13 +770,15 @@ void VCardContact::AddCustom(
             i++;
         }
         nicknames_.push_back(object);
-    } else if (type == TypeData::RELATION) {
+    } else if (type == TypeData::RELATION || type == VCARD_TYPE_X_MOBILE_RELATION) {
         std::shared_ptr<VCardRelationData> object = std::make_shared<VCardRelationData>();
         int i = 0;
         for (std::string value : values) {
             if (i == SIZE_ONE) {
                 object->SetRelationName(value);
             } else if (i == SIZE_TWO) {
+                value = value == std::to_string(VALUE_INDEX_ZERO) ?
+                    std::to_string(static_cast<int32_t>(RelationType::CUSTOM_LABEL)) : value;
                 object->SetLabelId(value);
             } else if (i == SIZE_THREE) {
                 object->SetLabelName(value);
@@ -736,13 +787,14 @@ void VCardContact::AddCustom(
             i++;
         }
         relations_.push_back(object);
-    } else if (type == TypeData::CONTACT_EVENT) {
+    } else if (type == TypeData::CONTACT_EVENT || type == VCARD_TYPE_X_MOBILE_EVENTS) {
         std::shared_ptr<VCardEventData> object = std::make_shared<VCardEventData>();
         int i = 0;
         for (std::string value : values) {
             if (i == SIZE_ONE) {
                 object->SetEventDate(value);
             } else if (i == SIZE_TWO) {
+                value = ConvertHarmonyEvents(type, value);
                 object->SetLabelId(value);
             } else if (i == SIZE_THREE) {
                 object->SetLabelName(value);
@@ -752,6 +804,24 @@ void VCardContact::AddCustom(
         }
         events_.push_back(object);
     }
+}
+
+std::string VCardContact::ConvertHarmonyEvents(std::string type, std::string value)
+{
+    if (type != VCARD_TYPE_X_MOBILE_EVENTS) {
+        return value;
+    }
+    std::string convertedValue = value;
+    if (value == std::to_string(static_cast<int32_t>(EventHM4Type::EVENT_HM4_ANNIVERSARY))) {
+        convertedValue = std::to_string(static_cast<int32_t>(EventType::EVENT_ANNIVERSARY));
+    }
+    if (value == std::to_string(static_cast<int32_t>(EventHM4Type::EVENT_HM4_OTHER))) {
+        convertedValue = std::to_string(static_cast<int32_t>(EventType::EVENT_OTHER));
+    }
+    if (value == std::to_string(static_cast<int32_t>(EventHM4Type::EVENT_HM4_LUNAR_BIRTHDAY))) {
+        convertedValue = std::to_string(static_cast<int32_t>(EventType::EVENT_LUNAR_BIRTHDAY));
+    }
+    return convertedValue;
 }
 
 void VCardContact::SetSip(
@@ -1091,6 +1161,19 @@ void VCardContact::AddImppDatas(std::string propValue, std::map<std::string, std
         }
         HandleSipCase(propValue, typeCollection);
     }
+}
+
+void VCardContact::AddGroups(std::string rawValue)
+{
+    std::shared_ptr<VCardGroupData> object = std::make_shared<VCardGroupData>();
+    object->SetGroupName(rawValue);
+    int groupId = VCardRdbHelper::QueryGroupId(rawValue);
+    if (groupId < 0) {
+        TELEPHONY_LOGE("query group Id for %{public}s failed", rawValue.c_str());
+        return;
+    }
+    object->SetGroupId(groupId);
+    groups_.push_back(object);
 }
 
 std::vector<std::string> VCardContact::GetValueListFromParasMap(

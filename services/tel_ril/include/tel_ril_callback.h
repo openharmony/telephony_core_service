@@ -111,6 +111,9 @@ public:
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology) override;
     int32_t DsdsModeUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode) override;
+    int32_t NcfgFinishedResult(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t mode) override;
+    int32_t RestartRildNvMatch(const HDI::Ril::V1_3::RilRadioResponseInfo &responseInfo, int32_t mode) override;
+
     int32_t ShutDownResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t SetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t GetRadioStateResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;

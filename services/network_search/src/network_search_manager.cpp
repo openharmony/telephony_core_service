@@ -47,6 +47,9 @@ const int32_t INVALID_DELAY_TIME = 0;
 constexpr const char *NO_DELAY_TIME__CONFIG = "0";
 constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
 constexpr static const int32_t GET_SSB_WAIT_TIME_SECOND = 5;
+constexpr const char *MODEM0_EFL_CAP = "const.telephony.modem0_efl_cap";
+constexpr const char *MODEM1_EFL_CAP = "const.telephony.modem1_efl_cap";
+constexpr const char *EFL_CAP_NOT_SUPPORT = "0";
 
 NetworkSearchManager::NetworkSearchManager(
     std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
@@ -60,7 +63,6 @@ NetworkSearchManager::~NetworkSearchManager()
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
         if (inner != nullptr) {
-            inner->UnRegisterSetting();
             inner->UnRegisterDeviceStateObserver();
         }
     }
@@ -185,6 +187,7 @@ bool NetworkSearchManager::OnInit()
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
+    GetModemEflCapability();
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
@@ -1314,6 +1317,35 @@ int32_t NetworkSearchManager::SetNrOptionMode(int32_t slotId, int32_t mode, NSCA
         mode > static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA)) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    if (modem0EflCapability_ == NrMode::NR_MODE_UNKNOWN) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    int32_t masterSlotId = -1;
+    if (simManager_ != nullptr) {
+        simManager_->GetPrimarySlotId(masterSlotId);
+    }
+    if (slotId != masterSlotId) {
+        if (modem1EflCapability_ == NrMode::NR_MODE_UNKNOWN) {
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
+        }
+        if (modem1EflCapability_ == NrMode::NR_MODE_SA_ONLY && (mode ==
+            static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY) || mode ==
+            static_cast<int32_t>(NrMode::NR_MODE_NSA_AND_SA))) {
+            bool ret = false;
+            if (mode == static_cast<int32_t>(NrMode::NR_MODE_NSA_ONLY)) {
+                ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
+                CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            } else {
+                ret = SetPreferredNetwork(slotId, static_cast<int32_t>(PreferredNetworkMode::
+                CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+            }
+            if (!ret) {
+                TELEPHONY_LOGE("SetNrOptionMode::set preferred Network failed, mode:%{public}d", mode);
+                return TELEPHONY_ERR_FAIL;
+            }
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
     if (eventSender_ == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1672,9 +1704,9 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
 
 void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    TELEPHONY_LOGD(
-        "slotId:%{public}d, ImsRegState:%{public}d,  ImsRegTech:%{public}d", slotId, info.imsRegState, info.imsRegTech);
-    bool isExisted = false;
+    TELEPHONY_LOGI("slotId:%{public}d, imsSrvType:%{public}d, ImsRegState:%{public}d, ImsRegTech:%{public}d",
+        slotId, imsSrvType, info.imsRegState, info.imsRegTech);
+    int32_t callbackCounts = 0;
     std::lock_guard<std::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
@@ -1683,12 +1715,12 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
-            isExisted = true;
+            callbackCounts++;
         }
     }
-    if (!isExisted) {
-        TELEPHONY_LOGI("this slot id %{public}d, ims service type %{public}d is not registered", slotId, imsSrvType);
-    }
+    TELEPHONY_LOGI(
+        "slotId:%{public}d, ImsServiceType:%{public}d, CallbackListSzie=%{public}zu, callbackCoutns:%{public}d",
+        slotId, imsSrvType, listImsRegInfoCallbackRecord_.size(), callbackCounts);
 }
 
 void NetworkSearchManager::InitSimRadioProtocol(int32_t slotId)
@@ -1958,6 +1990,19 @@ int32_t NetworkSearchManager::StartGetRilSignalIntensity(int32_t slotId)
     }
     inner->networkSearchHandler_->GetRilSignalIntensity(false);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+void NetworkSearchManager::GetModemEflCapability()
+{
+    char param0[SYS_PARAMETER_SIZE] = { 0 };
+    GetParameter(MODEM0_EFL_CAP, EFL_CAP_NOT_SUPPORT, param0, SYS_PARAMETER_SIZE);
+    int32_t modem0_efl_cap = atoi(param0);
+    modem0EflCapability_ = static_cast<NrMode>(modem0_efl_cap);
+ 
+    char param1[SYS_PARAMETER_SIZE] = { 0 };
+    GetParameter(MODEM1_EFL_CAP, EFL_CAP_NOT_SUPPORT, param1, SYS_PARAMETER_SIZE);
+    int32_t modem1_efl_cap = atoi(param1);
+    modem1EflCapability_ = static_cast<NrMode>(modem1_efl_cap);
 }
 } // namespace Telephony
 } // namespace OHOS

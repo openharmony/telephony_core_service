@@ -25,41 +25,41 @@ namespace Telephony {
 
 struct SsbInfo {
     /** SSB index. */
-    int32_t ssbId;
+    int32_t ssbId = 0;
     /** Reference Signal Received Power -140~-44, dBm */
-    int32_t rsrp;
+    int32_t rsrp = 0;
 };
 
 struct NeighboringCellSsbInformation {
     /** Physical cell ID. */
-    int32_t pci;
+    int32_t pci = 0;
     /** Absolute Radio Frequency Channel Number of the BCCH carrier 0~1023 */
-    int32_t arfcn;
+    int32_t arfcn = 0;
     /** Reference Signal Received Power -140~-44, dBm */
-    int32_t rsrp;
+    int32_t rsrp = 0;
     /** Signal To Interference Plus Noise Ratio. */
-    int32_t sinr;
+    int32_t sinr = 0;
     /** Neighboring cell ssbId list, always size is 4 */
     std::vector<SsbInfo> ssbList;
 };
 
 struct NrCellSsbInfo {
     /** Absolute Radio Frequency Channel Number of the BCCH carrier 0~1023 */
-    int32_t arfcn;
+    int32_t arfcn = 0;
     /** Context Identifier. */
-    int64_t cid;
+    int64_t cid = 0;
     /** Physical cell ID. */
-    int32_t pci;
+    int32_t pci = 0;
     /** Reference Signal Received Power -140~-44, dBm */
-    int32_t rsrp;
+    int32_t rsrp = 0;
     /** Signal To Interference Plus Noise Ratio. */
-    int32_t sinr;
+    int32_t sinr = 0;
     /** Time advance. */
-    int32_t timeAdvance;
+    int32_t timeAdvance = 0;
     /** Service cell ssbId list, always size is 8 */
     std::vector<SsbInfo> sCellSsbList;
     /** Neighboring cell ssb list count, max size is 4 */
-    int32_t nbCellCount;
+    int32_t nbCellCount = 0;
     /** Neighboring cell ssb info list, max size is 4 */
     std::vector<NeighboringCellSsbInformation> nbCellSsbList;
 };

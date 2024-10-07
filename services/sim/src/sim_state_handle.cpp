@@ -156,6 +156,11 @@ IccSimStatus SimStateHandle::GetSimIccStatus()
     return static_cast<IccSimStatus>(oldSimStatus_);
 }
 
+void SimStateHandle::SetSimState(SimState simState)
+{
+    externalState_ = simState;
+}
+
 CardType SimStateHandle::GetCardType()
 {
     TELEPHONY_LOGD("SimStateHandle::GetCardType() externalType_=%{public}d", static_cast<int32_t>(externalType_));
@@ -675,6 +680,7 @@ bool SimStateHandle::PublishSimStateEvent(std::string event, int32_t eventCode, 
     data.SetData(eventData);
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(false);
+    publishInfo.SetSticky(true);
     bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("SimStateHandle::PublishSimStateEvent result : %{public}d", publishResult);
     return publishResult;
@@ -699,7 +705,11 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             TELEPHONY_LOGE("simStateManager nullptr");
             return;
         }
-        simStateManager->SyncCmdResponse();
+        if (eventId == MSG_SIM_SEND_NCFG_OPER_INFO_DONE) {
+            simStateManager->SyncSimMatchResponse();
+        } else {
+            simStateManager->SyncCmdResponse();
+        }
         return;
     }
 

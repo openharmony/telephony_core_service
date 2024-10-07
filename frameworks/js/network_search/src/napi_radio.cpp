@@ -2590,8 +2590,8 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
-    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
-        TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_ != nullptr) {
+        isNrSupported = isNrSupported && TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_();
     }
 #endif
     TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
@@ -2659,18 +2659,21 @@ static void NativeGetImsRegInfo(napi_env env, void *data)
     }
     context->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(
         context->slotId, static_cast<ImsServiceType>(context->imsSrvType), context->imsRegInfo);
-    TELEPHONY_LOGD("result is %{public}d", context->errorCode);
+    TELEPHONY_LOGI("result is %{public}d", context->errorCode);
     context->resolved = (context->errorCode == TELEPHONY_SUCCESS);
 }
 
 static void GetImsRegInfoCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGD("status = %{public}d", status);
+    TELEPHONY_LOGI("status = %{public}d", status);
     auto context = static_cast<GetImsRegInfoContext *>(data);
     napi_value callbackValue = nullptr;
     JsError error = {};
     if (status == napi_ok) {
-        TELEPHONY_LOGD("context->resolved = %{public}d", context->resolved);
+        TELEPHONY_LOGI("context->resolved = %{public}d", context->resolved);
+        TELEPHONY_LOGI(
+            "slotId=%{public}d, imsSrvType=%{public}d, imsRegState=%{public}d, imsRegTech=%{public}d",
+            context->slotId, context->imsSrvType, context->imsRegInfo.imsRegState, context->imsRegInfo.imsRegTech);
         if (context->resolved) {
             napi_create_object(env, &callbackValue);
             NapiUtil::SetPropertyInt32(

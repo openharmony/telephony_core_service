@@ -22,7 +22,7 @@ namespace Telephony {
 int32_t VCardPhotoData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::PHOTO);
-    valuesBucket.Put(ContactData::DETAIL_INFO, bytes_);
+    valuesBucket.Put(ContactData::BLOB_DATA, std::vector<uint8_t>(bytes_.begin(), bytes_.end()));
     return TELEPHONY_SUCCESS;
 }
 
@@ -32,8 +32,10 @@ int32_t VCardPhotoData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, bytes_);
+    std::vector<uint8_t> photoBlobData;
+    resultSet->GetColumnIndex(ContactData::BLOB_DATA, index);
+    resultSet->GetBlob(index, photoBlobData);
+    bytes_.assign(reinterpret_cast<const char *>(photoBlobData.data()), photoBlobData.size());
     return TELEPHONY_SUCCESS;
 }
 

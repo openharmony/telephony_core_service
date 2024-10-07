@@ -81,12 +81,14 @@
         "build": {
             "group_type": {
                 "base_group": [
+                    "//base/telephony/core_service/interfaces/kits/c/telephony_radio:telephony_radio"
                 ],
                 "fwk_group": [
                     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
                     "//base/telephony/core_service/frameworks/js/network_search:radio",
                     "//base/telephony/core_service/frameworks/js/sim:sim",
-                    "//base/telephony/core_service/frameworks/js/vcard:vcard"
+                    "//base/telephony/core_service/frameworks/js/vcard:vcard",
+                    "//base/telephony/core_service/frameworks/js/esim:esim"
                 ],
                 "service_group": [
                     "//base/telephony/core_service:tel_core_service",
@@ -95,7 +97,6 @@
                     "//base/telephony/core_service/services/etc/init:telephony.cfg",
                     "//base/telephony/core_service/services/etc/carrier:operator_config",
                     "//base/telephony/core_service/services/etc/operatorname:operator_name",
-                    "//base/telephony/core_service/services/etc/ons:ons.bin",
                     "//base/telephony/core_service/services/etc/param:telephony.para",
                     "//base/telephony/core_service/services/etc/param:telephony.para.dac",
                     "//base/telephony/core_service/telephonyres:telephonyres_hap"

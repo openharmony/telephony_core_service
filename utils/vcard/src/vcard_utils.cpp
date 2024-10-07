@@ -37,9 +37,10 @@ namespace {
 std::map<ImType, std::string> imLabelIdToType = { { ImType::IM_AIM, VCARD_TYPE_X_AIM },
     { ImType::IM_MSN, VCARD_TYPE_X_MSN }, { ImType::IM_YAHOO, VCARD_TYPE_X_YAHOO },
     { ImType::IM_ICQ, VCARD_TYPE_X_ICQ }, { ImType::IM_JABBER, VCARD_TYPE_X_JABBER },
-    { ImType::IM_SKYPE, VCARD_TYPE_X_SKYPE_USERNAME }, { ImType::IM_QQ, VCARD_TYPE_X_QQ } };
-std::map<PhoneVcType, std::string> phoneLabelIdToType = { { PhoneVcType::NUM_HOME, VCARD_PARAM_TYPE_HOME },
-    { PhoneVcType::NUM_MOBILE, VCARD_PARAM_TYPE_CELL }, { PhoneVcType::NUM_WORK, VCARD_PARAM_TYPE_WORK },
+    { ImType::IM_SKYPE, VCARD_TYPE_X_SKYPE_USERNAME }, { ImType::IM_QQ, VCARD_TYPE_X_QQ },
+    { ImType::IM_HUANLIAO, VCARD_TYPE_X_HUANLIAO} };
+std::map<PhoneVcType, std::string> phoneLabelIdToType = { { PhoneVcType::NUM_HOME, VCARD_PARAM_TYPE_CELL },
+    { PhoneVcType::NUM_MOBILE, VCARD_PARAM_TYPE_HOME }, { PhoneVcType::NUM_WORK, VCARD_PARAM_TYPE_WORK },
     { PhoneVcType::NUM_PAGER, VCARD_PARAM_TYPE_PAGER }, { PhoneVcType::NUM_OTHER, VCARD_PARAM_TYPE_VOICE },
     { PhoneVcType::NUM_CALLBACK, VCARD_PARAM_PHONE_EXTRA_TYPE_CALLBACK },
     { PhoneVcType::NUM_CAR, VCARD_PARAM_TYPE_CAR }, { PhoneVcType::NUM_COMPANY_MAIN, VCARD_PARAM_TYPE_WORK },
@@ -50,8 +51,8 @@ std::map<PhoneVcType, std::string> phoneLabelIdToType = { { PhoneVcType::NUM_HOM
     { PhoneVcType::NUM_MMS, VCARD_PARAM_TYPE_MSG } };
 std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR, PhoneVcType::NUM_CAR },
     { VCARD_PARAM_TYPE_PAGER, PhoneVcType::NUM_PAGER }, { VCARD_PARAM_TYPE_ISDN, PhoneVcType::NUM_ISDN },
-    { VCARD_PARAM_TYPE_HOME, PhoneVcType::NUM_HOME }, { VCARD_PARAM_TYPE_WORK, PhoneVcType::NUM_WORK },
-    { VCARD_PARAM_TYPE_CELL, PhoneVcType::NUM_MOBILE },
+    { VCARD_PARAM_TYPE_HOME, PhoneVcType::NUM_MOBILE }, { VCARD_PARAM_TYPE_WORK, PhoneVcType::NUM_WORK },
+    { VCARD_PARAM_TYPE_CELL, PhoneVcType::NUM_HOME },
     { VCARD_PARAM_PHONE_EXTRA_TYPE_CALLBACK, PhoneVcType::NUM_CALLBACK },
     { VCARD_PARAM_PHONE_EXTRA_TYPE_RADIO, PhoneVcType::NUM_RADIO },
     { VCARD_PARAM_PHONE_EXTRA_TYPE_TTY_TDD, PhoneVcType::NUM_TTY_TDD },
@@ -282,6 +283,10 @@ int32_t VCardUtils::GetLabelIdFromImType(std::string type)
         return static_cast<int32_t>(ImType::IM_JABBER);
     } else if (type == VCARD_TYPE_X_QQ) {
         return static_cast<int32_t>(ImType::IM_QQ);
+    } else if (type == VCARD_TYPE_X_SKYPE_USERNAME) {
+        return static_cast<int32_t>(ImType::IM_SKYPE);
+    } else if (type == VCARD_TYPE_X_HUANLIAO) {
+        return static_cast<int32_t>(ImType::IM_HUANLIAO);
     } else {
         return static_cast<int32_t>(ImType::CUSTOM_LABEL);
     }
@@ -457,7 +462,7 @@ void VCardUtils::GetPhoneTypeFromStrings(
     }
 
     if (isFax) {
-        if (type == static_cast<int32_t>(PhoneVcType::NUM_HOME)) {
+        if (type == static_cast<int32_t>(PhoneVcType::NUM_MOBILE)) {
             type = static_cast<int32_t>(PhoneVcType::NUM_FAX_HOME);
         } else if (type == static_cast<int32_t>(PhoneVcType::NUM_WORK)) {
             type = static_cast<int32_t>(PhoneVcType::NUM_FAX_WORK);

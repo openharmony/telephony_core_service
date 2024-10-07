@@ -77,12 +77,18 @@ constexpr const char *VCARD_TYPE_X_SKYPE_USERNAME = "X-SKYPE-USERNAME";
 constexpr const char *VCARD_TYPE_X_QQ = "X-QQ";
 constexpr const char *VCARD_TYPE_X_NETMEETING = "X-NETMEETING";
 constexpr const char *VCARD_TYPE_X_SKYPE_PSTNNUMBER = "X-SKYPE-PSTNNUMBER";
+constexpr const char *VCARD_TYPE_X_HUANLIAO = "X-HUANLIAO";
 
 constexpr const char *VCARD_TYPE_X_CLASS = "X-CLASS";
 constexpr const char *VCARD_TYPE_X_REDUCTION = "X-REDUCTION";
 constexpr const char *VCARD_TYPE_X_NO = "X-NO";
 constexpr const char *VCARD_TYPE_X_DCM_HMN_MODE = "X-DCM-HMN-MODE";
 constexpr const char *VCARD_TYPE_X_OHOS_CUSTOM = "X_OHOS_CUSTOM";
+constexpr const char *VCARD_TYPE_X_GROUP = "X-GROUP-MEMBERSHIP";
+
+constexpr const char *VCARD_TYPE_X_MOBILE_CUSTOM = "X-OHOS-CUSTOM";
+constexpr const char *VCARD_TYPE_X_MOBILE_RELATION = "RELATION";
+constexpr const char *VCARD_TYPE_X_MOBILE_EVENTS = "CONTACT_EVENT";
 
 constexpr const char *VCARD_PARAM_TYPE = "TYPE";
 constexpr const char *VCARD_PARAM_X_IRMC_N = "X-IRMC-N";
@@ -174,6 +180,7 @@ public:
     static constexpr int32_t NAME = 6;
     static constexpr int32_t POSTAL_ADDRESS = 7;
     static constexpr int32_t PHOTO = 8;
+    static constexpr int32_t GROUP = 9;
     static constexpr int32_t NOTE = 10;
     static constexpr int32_t CONTACT_EVENT = 11;
     static constexpr int32_t WEBSITE = 12;
@@ -251,8 +258,18 @@ public:
     static constexpr const char *CITY = "city";
     static constexpr const char *POSITION = "position";
     static constexpr const char *PHONETIC_NAME = "phonetic_name";
+    static constexpr const char *BLOB_DATA = "blob_data";
 };
 
+// group
+class Group {
+public:
+    static constexpr const char *GROUP_NAME = "group_name";
+    static constexpr const char *GROUP_ID = "id";
+    static constexpr const char *GROUP_ACCOUNT_ID = "account_id";
+    static constexpr const char *GROUP_IS_DELETED = "is_deleted";
+};
+ 
 enum class EmailType {
     /**
      * Indicates an invalid label ID.
@@ -292,17 +309,29 @@ enum class EventType {
     /**
      * Indicates an anniversary event.
      */
-    EVENT_ANNIVERSARY = 1,
+    EVENT_ANNIVERSARY = 3,
 
     /**
      * Indicates an event of the OTHER type.
      */
-    EVENT_OTHER = 2,
+    EVENT_OTHER = 4,
 
     /**
      * Indicates an birthday event.
      */
-    EVENT_BIRTHDAY = 3,
+    EVENT_BIRTHDAY = 1,
+
+    /**
+     * Indicates a lunar birthday event.
+     */
+    EVENT_LUNAR_BIRTHDAY = 2,
+};
+
+enum class EventHM4Type {
+    EVENT_HM4_ANNIVERSARY = 1,
+    EVENT_HM4_OTHER = 2,
+    EVENT_HM4_BIRTHDAY = 3,
+    EVENT_HM4_LUNAR_BIRTHDAY = 4,
 };
 
 enum class ImType {
@@ -319,37 +348,42 @@ enum class ImType {
     /**
      * Indicates an AIM instant message.
      */
-    IM_AIM = 0,
+    IM_AIM = 1,
 
     /**
      * Indicates a Windows Live instant message.
      */
-    IM_MSN = 1,
+    IM_MSN = 2,
 
     /**
      * Indicates a Yahoo instant message.
      */
-    IM_YAHOO = 2,
+    IM_YAHOO = 3,
 
     /**
      * Indicates a Skype instant message.
      */
-    IM_SKYPE = 3,
+    IM_SKYPE = 4,
 
     /**
      * Indicates a QQ instant message.
      */
-    IM_QQ = 4,
+    IM_QQ = 5,
 
     /**
      * Indicates an ICQ instant message.
      */
-    IM_ICQ = 6,
+    IM_ICQ = 7,
+
+    /**
+     * Indicates a huanliao instant message.
+     */
+    IM_HUANLIAO = 6,
 
     /**
      * Indicates a Jabber instant message.
      */
-    IM_JABBER = 7,
+    IM_JABBER = 8,
 };
 
 enum class PhoneVcType {
@@ -527,7 +561,7 @@ enum class RelationType {
     /**
      * Indicates a custom label.
      */
-    CUSTOM_LABEL = 0,
+    CUSTOM_LABEL = 10000,
 
     /**
      * Indicates an assistant.

@@ -125,7 +125,14 @@ void RuimFile::ProcessLockedAllFilesFetched()
 void RuimFile::OnAllFilesFetched()
 {
     UpdateLoaded(true);
-    filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    TELEPHONY_LOGI("RuimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
+    if (filesFetchedObser_ != nullptr) {
+        filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    }
+    if (stateManager_ != nullptr) {
+        CardType cardType = stateManager_->GetCardType();
+        NotifyRegistrySimState(cardType, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+    }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
 }
@@ -145,9 +152,13 @@ bool RuimFile::ProcessIccLocked(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI(
         "only fetch ELEMENTARY_FILE_LI, ELEMENTARY_FILE_PL and ELEMENTARY_FILE_ICCID in locked state");
-
+    IccFile::ProcessIccLocked();
     lockQueried_ = true;
     AppExecFwk::InnerEvent::Pointer eventICCID = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is nullptr!");
+        return false;
+    }
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventICCID);
     fileToGet_++;
     return false;
@@ -234,6 +245,10 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
             isSizeEnough = imsiSize >= MCC_LEN + lengthOfMnc_;
             if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC) && isSizeEnough) {
                 mnc = imsi_.substr(MCC_LEN, lengthOfMnc_);
+            }
+            if (!IsValidDecValue(mcc)) {
+                TELEPHONY_LOGE("mcc is invalid decimal value");
+                return false;
             }
             int mncLength = MccPool::ShortestMncLengthFromMcc(std::stoi(mcc));
             isSizeEnough = imsiSize >= MCC_LEN + mncLength;

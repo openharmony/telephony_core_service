@@ -30,6 +30,8 @@ namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
 const int32_t ACTIVE_USER_ID = 100;
+const int INIT_TIMES = 15;
+const int INIT_DATA_TIMES = 5;
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
@@ -51,6 +53,7 @@ void MultiSimMonitor::Init()
 {
     TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
+    initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
 }
@@ -62,6 +65,7 @@ void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManage
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
         isSimAccountLoaded_.push_back(0);
+        initDataRemainCount_.push_back(INIT_DATA_TIMES);
         RegisterSimNotify(SIM_SLOT_2);
     }
 }
@@ -75,9 +79,15 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     auto eventCode = event->GetInnerEventId();
     TELEPHONY_LOGI("eventCode is %{public}d", eventCode);
     switch (eventCode) {
+        case MultiSimMonitor::INIT_DATA_RETRY_EVENT:{
+            auto slotId = event->GetParam();
+            InitData(slotId);
+            break;
+        }
         case RadioEvent::RADIO_QUERY_ICCID_DONE:
         case RadioEvent::RADIO_SIM_STATE_LOCKED:
         case RadioEvent::RADIO_SIM_STATE_READY: {
+            RemoveEvent(MultiSimMonitor::INIT_DATA_RETRY_EVENT);
             auto slotId = event->GetParam();
             InitData(slotId);
             break;
@@ -88,6 +98,11 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         }
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT: {
+            RemoveEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT);
+            RegisterSimNotify();
+            break;
+        }
+        case MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT: {
             RegisterSimNotify();
             break;
         }
@@ -166,12 +181,21 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
         return;
     }
+    if (isSimAccountLoaded_[slotId]) {
+        TELEPHONY_LOGI("MultiSimMonitor::InitData simAccountInfo is already loaded");
+        return;
+    }
     if (controller_ == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData controller_ is nullptr");
         return;
     }
     if (!controller_->InitData(slotId)) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData failed");
+        if (initDataRemainCount_[slotId] > 0) {
+            SendEvent(MultiSimMonitor::INIT_DATA_RETRY_EVENT, slotId, DELAY_TIME);
+            TELEPHONY_LOGI("retry remain %{public}d", initDataRemainCount_[slotId]);
+            initDataRemainCount_[slotId]--;
+        }
         return;
     }
     isSimAccountLoaded_[slotId] = 1;
@@ -199,6 +223,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         isSimAccountLoaded_[slotId] = 0;
+        initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         simFileManager->ClearData();
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
@@ -357,6 +382,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
         handler_.isDataShareReady_ = true;
         if (activeList[0] == ACTIVE_USER_ID) {
             handler_.CheckDataShareError();
+            handler_.CheckSimNotifyRegister();
         }
     }
 }
@@ -371,8 +397,16 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEven
         TELEPHONY_LOGI("current user id is :%{public}d", userId);
         if (userId == ACTIVE_USER_ID && handler_.isDataShareReady_) {
             handler_.CheckDataShareError();
+            handler_.CheckSimNotifyRegister();
         }
     }
+}
+
+void MultiSimMonitor::CheckSimNotifyRegister()
+{
+    RemoveEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT);
+    setRemainCount(INIT_TIMES);
+    RegisterSimNotify();
 }
 
 void MultiSimMonitor::CheckDataShareError()
@@ -381,6 +415,11 @@ void MultiSimMonitor::CheckDataShareError()
         controller_->ResetDataShareError();
         CheckOpcNeedUpdata(true);
     }
+}
+
+void MultiSimMonitor::setRemainCount(int remainCount)
+{
+    remainCount_ = remainCount;
 }
 
 int32_t MultiSimMonitor::RegisterSimAccountCallback(
@@ -453,18 +492,23 @@ void MultiSimMonitor::NotifySimAccountChanged()
 
 void MultiSimMonitor::RegisterSimNotify()
 {
+    if (isForgetAllDataDone_) {
+        TELEPHONY_LOGI("RegisterSimNotify has done");
+        return;
+    }
     if (controller_ == nullptr) {
         TELEPHONY_LOGE("MultiSimController is null");
         return;
     }
     if (!controller_->ForgetAllData()) {
         if (remainCount_ > 0) {
-            SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT, 0, DELAY_TIME);
+            SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT, 0, DELAY_TIME);
             TELEPHONY_LOGI("retry remain %{public}d", static_cast<int32_t>(remainCount_));
             remainCount_--;
         }
         return;
     }
+    isForgetAllDataDone_ = true;
     TELEPHONY_LOGI("Register with time left %{public}d", static_cast<int32_t>(remainCount_));
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         RegisterSimNotify(static_cast<int32_t>(slotId));

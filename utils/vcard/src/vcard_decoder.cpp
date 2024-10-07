@@ -38,7 +38,7 @@ std::shared_ptr<VCardDecoder> VCardDecoder::Create(const std::string &path, int3
     fileUtils_.Close();
     errorCode = fileUtils_.Open(path);
     if (errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Failed to read path %{public}s", path.c_str());
+        TELEPHONY_LOGE("Failed to read path");
         fileUtils_.Close();
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return nullptr;

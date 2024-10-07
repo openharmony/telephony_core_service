@@ -76,9 +76,6 @@ void SimSmsController::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &ev
             if (object->exception == nullptr) {
                 smsList_.assign(object->fileResults.begin(), object->fileResults.end());
             }
-            for (std::string str : object->fileResults) {
-                TELEPHONY_LOGI("SimSmsController::ProcessLoadDone: %{public}s", str.c_str());
-            }
         } else {
             TELEPHONY_LOGE("ProcessLoadDone: get null pointer!!!");
         }
