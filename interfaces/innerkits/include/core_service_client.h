@@ -924,7 +924,7 @@ private:
     public:
         explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
         ~CoreServiceDeathRecipient() override = default;
-        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        __attribute__((no_sanitize("cfi"))) void OnRemoteDied(const wptr<IRemoteObject> &remote) override
         {
             client_.OnRemoteDied(remote);
         }
