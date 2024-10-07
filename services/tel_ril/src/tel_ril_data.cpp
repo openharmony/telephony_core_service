@@ -50,7 +50,7 @@ HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes TelRilData::ChangeDPToHalDataPro
     dataProfileInfoWithApnTypes.apn = dataProfile.apn;
     dataProfileInfoWithApnTypes.protocol = dataProfile.protocol;
     dataProfileInfoWithApnTypes.roamingProtocol = dataProfile.roamingProtocol;
-    dataProfileInfoWithApnTypes.supportedApnTypesBitmap = dataProfile.supportedApnTypesBitmap;
+    dataProfileInfoWithApnTypes.supportedApnTypesBitmap = static_cast<uint64_t>(dataProfile.supportedApnTypesBitmap);
     return dataProfileInfoWithApnTypes;
 }
 
@@ -88,7 +88,8 @@ int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioRes
         setupDataCallResultInfo->flag = telRilRequest->pointer_->GetParam();
         return setupDataCallResultInfo;
     };
-    return Response<SetupDataCallResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
+    return Response<SetupDataCallResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, iSetupDataCallResultInfo,
+        getDataFunc);
 }
 
 int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response)

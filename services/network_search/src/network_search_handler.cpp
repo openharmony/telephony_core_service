@@ -517,7 +517,6 @@ void NetworkSearchHandler::GetDeviceId()
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RadioStateChange event is nullptr!");
         return;
     }
     std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
@@ -542,6 +541,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             firstInit_ = false;
             InitGetNetworkSelectionMode();
             SetRadioOffWhenAirplaneIsOn();
+            SetRadioOffWhenSimDeactive();
             RadioOnState();
             break;
         }
@@ -574,6 +574,34 @@ void NetworkSearchHandler::SetRadioOffWhenAirplaneIsOn()
         return;
     }
     if (networkSearchManager->GetAirplaneMode(isAirplaneMode) == TELEPHONY_SUCCESS && isAirplaneMode) {
+        networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
+    }
+}
+
+void NetworkSearchHandler::SetRadioOffWhenSimDeactive()
+{
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::SetRadioOffWhenSimDeactive failed to get NetworkSearchManager");
+        return;
+    }
+    auto simManager = networkSearchManager->GetSimManager();
+    if (simManager == nullptr) {
+        return;
+    }
+    bool hasSim = false;
+    simManager->HasSimCard(slotId_, hasSim);
+    TELEPHONY_LOGD("SetRadioOffWhenSimDeactive slotId: %{public}d, IsSetActiveSimInProgress: %{public}d, IsSimActive:"
+        " %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
+        slotId_, simManager->IsSetActiveSimInProgress(slotId_),
+        simManager->IsSimActive(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+    if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_()
+        && slotId_ == static_cast<int>(SimSlotType::VSIM_SLOT_ID)) {
+        TELEPHONY_LOGI("vsim not handle power Radio");
+        return;
+    }
+    if (hasSim && !IsPowerOnPrimaryRadioWhenNoSim()
+        && !simManager->IsSetActiveSimInProgress(slotId_) && !simManager->IsSimActive(slotId_)) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_OFF), 0);
     }
 }
@@ -690,6 +718,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
             operatorName_->HandleOperatorInfo(operatorInfoResult_);
+            networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
@@ -775,8 +804,15 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    if (!isAirplaneMode && (hasSim || IsPowerOnPrimaryRadioWhenNoSim()) && radioState == CORE_SERVICE_POWER_OFF &&
-        !IsSatelliteOn()) {
+    TELEPHONY_LOGD("soltid: %{public}d, IsSimActive: %{public}d, hasSim: %{public}d, isAirplaneMode: "
+        "%{public}d, IsSetActiveSimInProgress: %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
+        slotId_, simManager->IsSimActive(slotId_), hasSim, isAirplaneMode,
+        simManager->IsSetActiveSimInProgress(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+    bool hasSimAndActive =
+        (hasSim && (!simManager->IsSetActiveSimInProgress(slotId_) && simManager->IsSimActive(slotId_)));
+    bool primarySimNoSim = (!hasSim && IsPowerOnPrimaryRadioWhenNoSim());
+    if (!isAirplaneMode && (hasSimAndActive || primarySimNoSim)
+        && radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn()) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
 }
@@ -804,7 +840,7 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     networkSearchState->NotifyStateChange();
     networkSearchManager->UpdateNrOptionMode(slotId_, NrMode::NR_MODE_UNKNOWN);
 
-    if (!TELEPHONY_EXT_WRAPPER.isHandleVSim_ || !TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+    if (!TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_ || !TELEPHONY_EXT_WRAPPER.isInEnaDisableVSim_()) {
         RadioOnWhenHasSim(networkSearchManager, radioState);
     }
 
@@ -1255,6 +1291,10 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
         return;
     }
     std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
+    if (imsServiceStatus == nullptr) {
+        TELEPHONY_LOGE("UpdateImsServiceStatus imsServiceStatus is null slotId:%{public}d", slotId_);
+        return;
+    }
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {
         networkSearchState->SetImsServiceStatus(*imsServiceStatus);
@@ -1270,6 +1310,10 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         return;
     }
     auto registerInfo = event->GetSharedObject<int32_t>();
+    if (registerInfo == nullptr) {
+        TELEPHONY_LOGE("UpdateImsRegisterState registerInfo is null slotId:%{public}d", slotId_);
+        return;
+    }
     bool isRegister = (*registerInfo == 1);
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {

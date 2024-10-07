@@ -145,14 +145,18 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     DelayedSingleton<CoreService>::GetInstance()->FactoryReset(SLOT_ID);
     std::u16string u16Ret = u"";
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
-    DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->GetMeid(SLOT_ID, u16Ret);
-    DelayedSingleton<CoreService>::GetInstance()->GetUniqueDeviceId(SLOT_ID, u16Ret);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetUniqueDeviceId(SLOT_ID, u16Ret);
     DelayedSingleton<CoreService>::GetInstance()->IsNrSupported(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetPreferredNetwork(SLOT_ID, nullptr);
-    DelayedSingleton<CoreService>::GetInstance()->SetNrOptionMode(SLOT_ID, NR_NSA_OPTION_ONLY, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    result = DelayedSingleton<CoreService>::GetInstance()->SetNrOptionMode(SLOT_ID, NR_NSA_OPTION_ONLY, nullptr);
     DelayedSingleton<CoreService>::GetInstance()->GetNetworkSearchInformation(SLOT_ID, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->GetNrOptionMode(SLOT_ID, nullptr);
     DelayedSingleton<CoreService>::GetInstance()->GetNetworkSelectionMode(SLOT_ID, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
@@ -174,33 +178,38 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetCardType(SLOT_ID, cardType);
     std::u16string countryCode;
     DelayedSingleton<CoreService>::GetInstance()->GetISOCountryCodeForSim(SLOT_ID, countryCode);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     std::u16string testU16Str = u"";
-    DelayedSingleton<CoreService>::GetInstance()->GetSimSpn(SLOT_ID, testU16Str);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetSimSpn(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetSimIccId(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetSimOperatorNumeric(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetIMSI(SLOT_ID, testU16Str);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->IsSimActive(SLOT_ID);
     int32_t simId = 1;
-    DelayedSingleton<CoreService>::GetInstance()->GetSlotId(simId);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetSlotId(simId);
     DelayedSingleton<CoreService>::GetInstance()->GetLocaleFromDefaultSim();
     DelayedSingleton<CoreService>::GetInstance()->GetSimGid1(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetSimGid2(SLOT_ID);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     int32_t lac = 1;
     bool longNameRequired = true;
     std::string plmn = "46001";
     DelayedSingleton<CoreService>::GetInstance()->GetSimEons(SLOT_ID, plmn, lac, longNameRequired);
     IccAccountInfo info;
-    DelayedSingleton<CoreService>::GetInstance()->GetSimAccountInfo(SLOT_ID, info);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetSimAccountInfo(SLOT_ID, info);
     DelayedSingleton<CoreService>::GetInstance()->SetDefaultVoiceSlotId(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSlotId();
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSimId(simId);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     int32_t dsdsMode = 0;
     DelayedSingleton<CoreService>::GetInstance()->GetDsdsMode(dsdsMode);
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-    DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber);
+    result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber);
     DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(SLOT_ID, testU16Str);
     const std::u16string cardName = Str8ToStr16("SimNameZhang");
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->SetShowName(SLOT_ID, cardName);
     DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, testU16Str);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
@@ -223,10 +232,13 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
     std::string number = "01234567890123456789";
     DelayedSingleton<CoreService>::GetInstance()->SetVoiceCallForwarding(SLOT_ID, true, number);
     DelayedSingleton<CoreService>::GetInstance()->GetOpKey(SLOT_ID, testU16Str);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    result = DelayedSingleton<CoreService>::GetInstance()->GetOpKeyExt(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetOpKeyExt(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetOpName(SLOT_ID, testU16Str);
     ImsRegInfo mImsRegInfo;
     DelayedSingleton<CoreService>::GetInstance()->GetImsRegStatus(SLOT_ID, ImsServiceType::TYPE_VOICE, mImsRegInfo);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     SimAuthenticationResponse response = { 0 };
     AuthType authType = AuthType::SIM_AUTH_EAP_SIM_TYPE;
     std::string authData = "1234";
@@ -244,6 +256,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | MediumTest | Level1)
 {
     uint32_t maxCode = static_cast<uint32_t>(CoreServiceInterfaceCode::GET_SIM_IO_DONE);
+    int32_t result = 0;
     for (uint32_t code = 0; code <= maxCode; code++) {
         if (code == static_cast<uint32_t>(CoreServiceInterfaceCode::HAS_OPERATOR_PRIVILEGES)) {
             continue;
@@ -252,7 +265,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_001, Function | Mediu
         MessageParcel reply;
         MessageOption option;
         data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
-        DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+        result = DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, data, reply, option);
+        EXPECT_GE(result, NO_ERROR);
     }
     std::string version;
     EXPECT_GE(
@@ -417,6 +431,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function |
     coreServiceHiSysEvent->WriteDataActivateFaultEvent(
         slotId, argInt, CellularDataErrorCode::DATA_ERROR_PS_NOT_ATTACH, argStr);
     coreServiceHiSysEvent->WriteAirplaneModeChangeEvent(argInt);
+    ASSERT_NE(argStr, "Event");
 }
 
 /**

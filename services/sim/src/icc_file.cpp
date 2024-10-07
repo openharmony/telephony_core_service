@@ -576,6 +576,10 @@ bool IccFile::ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &even
 {
     bool isFileProcessResponse = true;
     std::shared_ptr<ControllerToFileMsg> fd = event->GetSharedObject<ControllerToFileMsg>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<void> baseLoad = fd->iccLoader;
     if (baseLoad != nullptr) {
         std::shared_ptr<IccFileLoaded> destLoad = std::static_pointer_cast<IccFileLoaded>(baseLoad);
@@ -583,7 +587,7 @@ bool IccFile::ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &even
         TELEPHONY_LOGI("ProcessIccFileObtained item %{public}s", destLoad->ObtainElementaryFileName().c_str());
     } else {
         isFileProcessResponse = false;
-        TELEPHONY_LOGE("IccFile::ProcessIccFileObtained null base ponter");
+        TELEPHONY_LOGE("IccFile::ProcessIccFileObtained null base pointer");
     }
     return isFileProcessResponse;
 }
@@ -707,9 +711,13 @@ AppExecFwk::InnerEvent::Pointer IccFile::CreateDiallingNumberPointer(
 
 void IccFile::NotifyRegistrySimState(CardType type, SimState state, LockReason reason)
 {
+    if (stateManager_ != nullptr) {
+        stateManager_->SetSimState(state);
+    }
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(slotId_, type, state, reason);
-    TELEPHONY_LOGI("NotifyRegistrySimState msgId is %{public}d ret %{public}d", state, result);
+    TELEPHONY_LOGI("NotifyRegistrySimState slotId: %{public}d, simState: %{public}d, ret: %{public}d", slotId_, state,
+        result);
 }
 
 bool IccFile::HasSimCard()
@@ -752,6 +760,14 @@ void IccFile::ClearData()
         iccFileExt->ClearData();
     }
 }
+
+void IccFile::ProcessIccLocked()
+{
+    TELEPHONY_LOGI("IccFile ProcessIccLocked");
+    fileQueried_ = false;
+    UpdateLoaded(false);
+}
+
 void IccFile::UnInit()
 {
     if (stateManager_ != nullptr) {

@@ -16,6 +16,7 @@
 
 #include <iomanip>
 #include <set>
+#include <map>
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -55,6 +56,7 @@ std::string VCardConstructor::ContactVCard(std::shared_ptr<VCardContact> contact
     ConstructPhotos(contact);
     ConstructNotes(contact);
     ConstructEvents(contact);
+    ConstructGroups(contact);
     ContactEnd();
     return result_.str();
 }
@@ -284,7 +286,15 @@ void VCardConstructor::DealNoEmptyFimilyOrGivenName(const std::string &familyNam
     std::string encodedSuffix = (needAddQuotedPrintable ? EncodeQuotedPrintable(suffix) : DealCharacters(suffix));
     std::string encodedFormattedname =
         (needAddQuotedPrintableToFN ? EncodeQuotedPrintable(formattedName) : DealCharacters(formattedName));
-
+        // if (familyName + middleName + givenName) equals prefix, do not export prefix/suffix to avoid repeat
+    std::string combinedName = "";
+    combinedName.append(familyName).append(middleName).append(givenName);
+    if (combinedName == prefix) {
+        encodedPrefix = "";
+    }
+    if (combinedName == suffix) {
+        encodedSuffix = "";
+    }
     result_ << VCARD_TYPE_N;
     AddCharsetOrQuotedPrintable(needAddCharset, needAddQuotedPrintable);
     AddNameData(encodedFamily, encodedGiven, encodedMiddle, encodedPrefix, encodedSuffix);
@@ -369,7 +379,7 @@ int32_t VCardConstructor::ConstructRelation(std::shared_ptr<VCardContact> contac
         if (relationData == nullptr) {
             continue;
         }
-        AddCustomType(TypeData::RELATION,
+        AddCustomType(VCARD_TYPE_X_MOBILE_RELATION,
             { relationData->GetRelationName(), relationData->GetLabelId(), relationData->GetLabelName() });
     }
     return TELEPHONY_SUCCESS;
@@ -379,7 +389,7 @@ void VCardConstructor::AddCustomType(const std::string &type, std::vector<std::s
 {
     bool needAddCharset = IsNeedCharsetParam(values);
     bool needAddQuotedPrintable = needQP_ && !VCardUtils::IsPrintableAscii(values);
-    result_ << VCARD_TYPE_X_OHOS_CUSTOM;
+    result_ << VCARD_TYPE_X_MOBILE_CUSTOM;
     AddCharsetOrQuotedPrintable(needAddCharset, needAddQuotedPrintable);
     result_ << DATA_SEPARATOR << type;
     for (auto value : values) {
@@ -690,23 +700,30 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string birthdayDate = "";
+    std::map<int32_t, int32_t> eventMap = {
+        {static_cast<int32_t>(EventType::EVENT_ANNIVERSARY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_ANNIVERSARY)},
+        {static_cast<int32_t>(EventType::EVENT_LUNAR_BIRTHDAY),
+            static_cast<int32_t>(EventHM4Type::EVENT_HM4_LUNAR_BIRTHDAY)},
+        {static_cast<int32_t>(EventType::EVENT_OTHER), static_cast<int32_t>(EventHM4Type::EVENT_HM4_OTHER)},
+        {static_cast<int32_t>(EventType::EVENT_BIRTHDAY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)}
+    };
     for (auto eventData : contact->GetEventDatas()) {
         if (eventData == nullptr) {
             continue;
         }
         int32_t labelId = static_cast<int32_t>(EventType::EVENT_OTHER);
         if (VCardUtils::IsNum(eventData->GetLabelId())) {
-            labelId = std::stoi(eventData->GetLabelId());
+            labelId = eventMap[std::stoi(eventData->GetLabelId())];
         }
-        if (labelId == static_cast<int32_t>(EventType::EVENT_BIRTHDAY)) {
+        if (labelId == static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)) {
             if (eventData->GetEventDate().empty()) {
                 continue;
             }
             birthdayDate = eventData->GetEventDate();
             continue;
         }
-        AddCustomType(
-            TypeData::CONTACT_EVENT, { eventData->GetEventDate(), eventData->GetLabelId(), eventData->GetLabelName() });
+        AddCustomType(VCARD_TYPE_X_MOBILE_EVENTS,
+            { eventData->GetEventDate(), std::to_string(labelId), eventData->GetLabelName() });
     }
     VCardUtils::Trim(birthdayDate);
     if (!birthdayDate.empty()) {
@@ -715,6 +732,26 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t VCardConstructor::ConstructGroups(std::shared_ptr<VCardContact> contact)
+{
+    if (contact == nullptr) {
+        TELEPHONY_LOGE("contact is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    for (auto groupData : contact->GetGroups()) {
+        if (groupData == nullptr) {
+            continue;
+        }
+        auto groupName = groupData->GetGroupName();
+        VCardUtils::Trim(groupName);
+        if (groupName.empty()) {
+            continue;
+        }
+        AddLineWithCharsetAndQP(VCARD_TYPE_X_GROUP, { groupName });
+    }
+    return TELEPHONY_SUCCESS;
+}
+ 
 void VCardConstructor::AddTelLine(const std::string &labelId, const std::string &labelName, const std::string &number)
 {
     result_ << VCARD_TYPE_TEL << PARAM_SEPARATOR;

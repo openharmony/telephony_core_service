@@ -108,6 +108,16 @@ IccSimStatus SimStateManager::GetSimIccStatus()
     return ret;
 }
 
+void SimStateManager::SetSimState(SimState simState)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SimStateManager::SetSimState(), simStateHandle_ is nullptr!!!");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(mtx_);
+    simStateHandle_->SetSimState(simState);
+}
+
 bool SimStateManager::IfModemInitDone()
 {
     if (simStateHandle_ != nullptr) {
@@ -152,6 +162,15 @@ void SimStateManager::SyncCmdResponse()
     responseReady_ = true;
     TELEPHONY_LOGI("SimStateManager::SyncCmdResponse(), responseReady_ = %{public}d", responseReady_);
     cv_.notify_one();
+}
+
+void SimStateManager::SyncSimMatchResponse()
+{
+    std::unique_lock<std::mutex> lck(stx_);
+    responseSimMatchReady_ = true;
+    TELEPHONY_LOGI(
+        "SimStateManager::SyncSimMatchResponse(), responseSimMatchReady = %{public}d", responseSimMatchReady_);
+    sv_.notify_one();
 }
 
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
@@ -517,8 +536,8 @@ int32_t SimStateManager::SimAuthentication(
     response.sw1 = simStateHandle_->GetSimAuthenticationResponse().sw1;
     response.sw2 = simStateHandle_->GetSimAuthenticationResponse().sw2;
     response.response = simStateHandle_->GetSimAuthenticationResponse().response;
-    TELEPHONY_LOGI("SimStateManager::SimAuthentication(), sw1: %{public}d, sw2: %{public}d, response: %{public}s",
-        response.sw1, response.sw2, response.response.c_str());
+    TELEPHONY_LOGI("SimStateManager::SimAuthentication(), sw1: %{public}d, sw2: %{public}d", response.sw1,
+        response.sw2);
     return ret;
 }
 
@@ -529,12 +548,12 @@ int32_t SimStateManager::SendSimMatchedOperatorInfo(
         TELEPHONY_LOGE("SendSimMatchedOperatorInfo(), simStateHandle_ is nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
-    responseReady_ = false;
+    std::unique_lock<std::mutex> lck(stx_);
+    responseSimMatchReady_ = false;
     simStateHandle_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
-    while (!responseReady_) {
+    while (!responseSimMatchReady_) {
         TELEPHONY_LOGI("SendSimMatchedOperatorInfo::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (sv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -564,8 +583,7 @@ int32_t SimStateManager::GetSimIO(
     response.sw1 = retResponse.sw1;
     response.sw2 = retResponse.sw2;
     response.response = retResponse.response;
-    TELEPHONY_LOGI("SimStateManager::GetSimIO(), sw1: %{public}d, sw2: %{public}d",
-        response.sw1, response.sw2);
+    TELEPHONY_LOGI("SimStateManager::GetSimIO(), sw1: %{public}d, sw2: %{public}d", response.sw1, response.sw2);
     return ret;
 }
 

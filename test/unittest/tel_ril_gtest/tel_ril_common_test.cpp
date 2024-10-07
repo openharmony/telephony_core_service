@@ -54,6 +54,7 @@ HWTEST_F(TelRilCommonTest, TelRilModem_BuildVoiceRadioTechnology_001, Function |
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTechnology;
     std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
     telRilModem->BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    ASSERT_TRUE(mVoiceRadioTechnology->actName == voiceRadioTechnology.actName);
 }
 
 /**
@@ -570,5 +571,6 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ResponseSupplement_001, Function | MediumTe
     auto result = telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, rilRadioResponseInfo);
     ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
 } // namespace Telephony
 } // namespace OHOS

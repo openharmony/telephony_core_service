@@ -45,15 +45,15 @@ public:
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
-    typedef char* (*GET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*);
+    typedef void (*GET_VOICE_MAIL_ICCID_PARAMETER)(int32_t slotId, const char* iccid, std::string &number);
     typedef void (*SET_VOICE_MAIL_ICCID_PARAMETER)(int32_t, const char*, const char*);
     typedef void (*INIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*DEINIT_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*RESET_VOICE_MAIL_LOADED_FLAG_EXT)(int32_t);
     typedef void (*SET_VOICE_MAIL_ON_SIM_EXT)(int32_t, const char*, const char*);
     typedef bool (*GET_VOICE_MAIL_FIXED_EXT)(int32_t, const char*);
-    typedef char* (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t, const char*);
-    typedef char* (*GET_VOICE_MAIL_TAG_EXT)(int32_t, const char*);
+    typedef void (*GET_VOICE_MAIL_NUMBER_EXT)(int32_t slotId, const char* carrier, std::string &number);
+    typedef void (*GET_VOICE_MAIL_TAG_EXT)(int32_t slotId, const char* carrier, std::string &tag);
     typedef void (*RESET_VOICE_MAIL_MANAGER_EXT)(int32_t);
     typedef void (*GET_NETWORK_STATUS_EXT)(int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState);
 
@@ -91,6 +91,7 @@ public:
     typedef bool (*IS_HANDLE_VSIM)(void);
     typedef bool (*IS_VSIM_ENABLED)(void);
     typedef void (*UPDATE_SUB_STATE)(int32_t slotId, int32_t subState);
+    typedef bool (*IS_IN_ENABLE_DISABLE_VSIM)(void);
     /* add for vsim end */
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
@@ -146,6 +147,7 @@ public:
     IS_HANDLE_VSIM isHandleVSim_ = nullptr;
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
     UPDATE_SUB_STATE updateSubState_ = nullptr;
+    IS_IN_ENABLE_DISABLE_VSIM isInEnaDisableVSim_ = nullptr;
     /* add for vsim end */
     SEND_EVENT sendEvent_ = nullptr;
     INIT_BIP initBip_ = nullptr;

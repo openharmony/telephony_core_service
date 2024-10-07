@@ -334,6 +334,16 @@ int32_t TelRilCallback::DsdsModeUpdated(const HDI::Ril::V1_1::RilRadioResponseIn
     return Notify(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::DsdsModeUpdated, mode);
 }
 
+int32_t TelRilCallback::NcfgFinishedResult(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::NcfgFinishedResult, state);
+}
+
+int32_t TelRilCallback::RestartRildNvMatch(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t mode)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::RestartRildNvMatch, mode);
+}
+
 int32_t TelRilCallback::ShutDownResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilModem, &TelRilModem::ShutDownResponse);

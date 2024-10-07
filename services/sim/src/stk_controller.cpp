@@ -334,7 +334,19 @@ void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &e
 
 bool StkController::CheckIsBipCmd(const std::string &cmdData)
 {
-    std::string commandType = cmdData.substr(STK_CMD_TYPE_INDEX, STK_CMD_TYPE_LEN);
+    std::string commandLen = cmdData.substr(STK_CMD_CMD_LEN_INDEX, STK_CMD_TYPE_LEN);
+    uint32_t typeOffset;
+    if (commandLen == STK_CMD_CMD_LEN_81) {
+        typeOffset = STK_CMD_TYPE_81_INDEX;
+    } else if (commandLen == STK_CMD_CMD_LEN_82) {
+        typeOffset = STK_CMD_TYPE_82_INDEX;
+    } else if (commandLen == STK_CMD_CMD_LEN_83) {
+        typeOffset = STK_CMD_TYPE_83_INDEX;
+    } else {
+        typeOffset = STK_CMD_TYPE_80_INDEX;
+    }
+ 
+    std::string commandType = cmdData.substr(typeOffset, STK_CMD_TYPE_LEN);
     if (commandType == STK_BIP_CMD_OPEN_CHANNEL || commandType == STK_BIP_CMD_SEND_DATA ||
         commandType == STK_BIP_CMD_RECEVIE_DATA || commandType == STK_BIP_CMD_GET_CHANNEL_STATUS ||
         commandType == STK_BIP_CMD_CLOSE_CHANNEL) {

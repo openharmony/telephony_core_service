@@ -116,40 +116,25 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
     const ImsRegStateCallback &stateCallback, const ImsRegInfo &info)
 {
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback.env, &loop);
-#endif
-    ImsStateWorker *dataWorker = new ImsStateWorker();
-    dataWorker->info = info;
-    dataWorker->callback = stateCallback;
-    uv_work_t *work = new uv_work_t();
-    work->data = (void *)(dataWorker);
-    int32_t resultCode =
-        uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportImsRegInfoWork, uv_qos_default);
+    if (loop == nullptr) {
+        TELEPHONY_LOGE("stateCallback.env is null");
+        return TELEPHONY_ERROR;
+    }
+    auto task = [stateCallback, info]() {
+        int32_t ret = ReportImsRegInfo(info, stateCallback);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", ret);
+            return;
+        }
+        TELEPHONY_LOGI("ReportImsRegInfo successfully");
+    };
+    int32_t resultCode = napi_send_event(stateCallback.env, task, napi_eprio_immediate);
     if (resultCode != TELEPHONY_SUCCESS) {
-        delete dataWorker;
-        dataWorker = nullptr;
         TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", resultCode);
-        delete work;
-        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
-}
-
-void NapiImsRegInfoCallbackManager::ReportImsRegInfoWork(uv_work_t *work, int32_t status)
-{
-    ImsStateWorker *dataWorkerData = (ImsStateWorker *)work->data;
-    int32_t ret = ReportImsRegInfo(dataWorkerData->info, dataWorkerData->callback);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", ret);
-        return;
-    }
-    TELEPHONY_LOGI("ReportImsRegInfo successfully");
 }
 
 int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfo(

@@ -49,6 +49,7 @@ ohos_executable("tel_sim_test") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
 
   external_deps = [
@@ -58,6 +59,7 @@ ohos_executable("tel_sim_test") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",

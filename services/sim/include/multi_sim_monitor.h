@@ -58,6 +58,8 @@ public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
         RESET_OPKEY_CONFIG = 1,
+        REGISTER_SIM_NOTIFY_RETRY_EVENT = 2,
+        INIT_DATA_RETRY_EVENT = 3
     };
 
 private:
@@ -75,12 +77,15 @@ private:
     void InitListener();
     void SubscribeDataShareReady();
     void SubscribeUserSwitch();
+    void SubscribeBundleScanFinished();
     void UnSubscribeListeners();
     void CheckOpcNeedUpdata(const bool isDataShareError);
     int32_t CheckUpdateOpcVersion();
     void ClearAllOpcCache();
     void UpdateAllOpkeyConfigs();
     void CheckDataShareError();
+    void CheckSimNotifyRegister();
+    void setRemainCount(int remainCount);
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
@@ -119,6 +124,7 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<int> isSimAccountLoaded_;
+    std::vector<int> initDataRemainCount_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
@@ -126,9 +132,10 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
-    std::atomic<int32_t> remainCount_ = 30;
+    std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
+    bool isForgetAllDataDone_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

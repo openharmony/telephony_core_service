@@ -102,18 +102,6 @@ HWTEST_F(CoreServiceCommonTest, CoreService_GetCellInfoList_001, Function | Medi
 }
 
 /**
- * @tc.number   CoreService_InitExtraModule_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, CoreService_InitExtraModule_001, Function | MediumTest | Level1)
-{
-    SecurityToken token;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->InitExtraModule(0);
-    ASSERT_EQ(result, TELEPHONY_ERROR);
-}
-
-/**
  * @tc.number   CoreService_GetNrSsbIdInfo_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
@@ -470,5 +458,6 @@ HWTEST_F(CoreServiceCommonTest, TelephonyConfig_ConvertCharToInt_006, Function |
     int32_t result = telephonyConfig.ConvertCharToInt(retValue, maxCap, index);
     ASSERT_EQ(result, -1);
 }
+
 } // namespace Telephony
 } // namespace OHOS

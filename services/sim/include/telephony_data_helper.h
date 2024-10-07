@@ -41,11 +41,13 @@ public:
     std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
     std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper();
     std::shared_ptr<DataShare::DataShareHelper> CreatePdpHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper(const int waitTime);
     bool IsDataShareError();
     void ResetDataShareError();
 
 private:
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const std::string &strUri, const std::string &extUri);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const std::string &strUri, const std::string &extUri,
+        const int waitTime = 2);
     std::mutex lock_;
     bool mIsDataShareError = false;
 };

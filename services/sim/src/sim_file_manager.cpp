@@ -409,7 +409,7 @@ std::string SimFileManager::GetVoiceMailNumberKey()
     }
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_ != nullptr) {
         std::string iccid = simFile_->ObtainIccId();
-        number = TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_(slotId_, iccid.c_str());
+        TELEPHONY_EXT_WRAPPER.getVoiceMailIccidParameter_(slotId_, iccid.c_str(), number);
         if (!number.empty()) {
             return number;
         }
@@ -643,7 +643,7 @@ bool SimFileManager::SetVoiceMailInfo(const std::u16string &mailName, const std:
     std::string number = Str16ToStr8(mailNumber);
     bool result = simFile_->UpdateVoiceMail(name, number);
     TELEPHONY_LOGI("SimFileManager::SetVoiceMail result:%{public}s ", (!result ? "false" : "true"));
-    return result;
+    return true;
 }
 
 bool SimFileManager::HasSimCard()

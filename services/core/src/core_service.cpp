@@ -109,6 +109,9 @@ bool CoreService::Init()
             TELEPHONY_LOGE("NetworkSearchManager init is failed!");
             return false;
         }
+    } else {
+        TELEPHONY_LOGE("NetworkSearchManager calloc failed");
+        return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
@@ -1540,15 +1543,6 @@ int32_t CoreService::FactoryReset(int32_t slotId)
     return networkSearchManager_->FactoryReset(slotId);
 }
 
-int32_t CoreService::InitExtraModule(int32_t slotId)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    return CoreManagerInner::GetInstance().InitExtraModule(slotId);
-}
-
 int32_t CoreService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
 {
     if (fd < 0) {
@@ -1609,6 +1603,10 @@ int32_t CoreService::GetNrSsbIdInfo(int32_t slotId, const std::shared_ptr<NrSsbI
 
 bool CoreService::IsAllowedInsertApn(std::string &value)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return true;
+    }
     if (TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_ != nullptr) {
         return TELEPHONY_EXT_WRAPPER.isAllowedInsertApn_(value);
     }
@@ -1617,6 +1615,10 @@ bool CoreService::IsAllowedInsertApn(std::string &value)
 
 int32_t CoreService::GetTargetOpkey(int32_t slotId, std::u16string &opkey)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (TELEPHONY_EXT_WRAPPER.getTargetOpkey_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.getTargetOpkey_(slotId, opkey);
     }

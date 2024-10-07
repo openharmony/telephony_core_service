@@ -80,6 +80,8 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
     telRilManager->GetTelRilModem(SLOT_ID)->RadioStateUpdated(ModemPowerState::CORE_SERVICE_POWER_ON);
     EXPECT_EQ(telRilManager->RegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_OFF, nullptr),
         TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(telRilManager->RegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_STATE_CHANGED, nullptr),
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(
         telRilManager->UnRegisterCoreNotify(SLOT_ID, observerCallBack, RadioEvent::RADIO_OFF), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(telRilManager->DeInit(), true);
@@ -258,6 +260,7 @@ HWTEST_F(TelRilBranchTest, Telephony_observerhandler_001, Function | MediumTest 
         observerHandler->RegObserver(what, handler);
     }
     observerHandler->Remove(what, handler);
+    ASSERT_EQ(observerHandler->observerHandlerMap_.size(), 6);
 }
 
 /**
@@ -275,6 +278,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Modem_001, Function | MediumTest | 
     std::shared_ptr<VoiceRadioTechnology> mVoiceRadioTechnology = nullptr;
     telRilModem->OnRilAdapterHostDied();
     telRilModem->BuildVoiceRadioTechnology(voiceRadioTechnology, mVoiceRadioTechnology);
+    ASSERT_EQ(voiceRadioTechnology.actName, "");
 }
 
 /**
@@ -357,23 +361,25 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     telRilCall->CallRingbackVoiceNotice(ringbackVoice);
     telRilCall->CallSrvccStatusNotice(srvccStatus);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
+    ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
+    ASSERT_FALSE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     telRilCall->GetClirResponse(responseInfo, getClirResult);
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     responseInfo.serial = -1;
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 
     responseInfo.serial = 1;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 
     event = nullptr;
     responseInfo.serial = 2;
     telRilCall->CreateTelRilRequest(event);
-    telRilCall->SendDtmfResponse(responseInfo);
+    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 }
 } // namespace Telephony
 } // namespace OHOS

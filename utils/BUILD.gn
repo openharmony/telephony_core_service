@@ -10,11 +10,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+SUBSYSTEM_DIR = "../.."
 import("//build/ohos.gni")
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 group("common_target") {
   deps = [ ":libtel_common" ]
+}
+
+config("telephony_codec_config") {
+  include_dirs = [ "codec/include" ]
 }
 
 config("telephony_log_config") {
@@ -51,7 +56,12 @@ ohos_shared_library("libtel_common") {
     debug = false
   }
   branch_protector_ret = "pac_ret"
-  version_script = "libtel_common.versionscript"
+  if (core_service_support_esim) {
+    version_script = "libtel_common_esim.versionscript"
+  } else {
+    version_script = "libtel_common.versionscript"
+  }
+
   sources = [
     "../frameworks/js/napi/napi_util.cpp",
     "common/src/enum_convert.cpp",
@@ -66,6 +76,17 @@ ohos_shared_library("libtel_common") {
     "preferences/src/tel_profile_util.cpp",
   ]
 
+  if (core_service_support_esim) {
+    sources += [
+      "codec/src/asn1_builder.cpp",
+      "codec/src/asn1_decoder.cpp",
+      "codec/src/asn1_node.cpp",
+      "codec/src/asn1_utils.cpp",
+      "codec/src/request_apdu_build.cpp",
+      "codec/src/reset_response.cpp",
+    ]
+  }
+
   defines = [
     "TELEPHONY_LOG_TAG = \"TelephonyCommon\"",
     "LOG_DOMAIN = 0xD001F04",
@@ -76,6 +97,10 @@ ohos_shared_library("libtel_common") {
   }
 
   configs = [ "../utils:telephony_log_config" ]
+
+  if (core_service_support_esim) {
+    configs += [ "../utils:telephony_codec_config" ]
+  }
 
   public_configs = [
     ":tel_napi_config",
@@ -117,6 +142,7 @@ ohos_shared_library("libtel_vcard") {
     "vcard/src/contact_data/vcard_birthday_data.cpp",
     "vcard/src/contact_data/vcard_email_data.cpp",
     "vcard/src/contact_data/vcard_event_data.cpp",
+    "vcard/src/contact_data/vcard_group_data.cpp",
     "vcard/src/contact_data/vcard_im_data.cpp",
     "vcard/src/contact_data/vcard_name_data.cpp",
     "vcard/src/contact_data/vcard_nickname_data.cpp",

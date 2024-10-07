@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t STATE_NV_REFRESH_FINNISHED = 1;
+
 TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
@@ -137,6 +139,7 @@ int32_t TelRilModem::OnRilAdapterHostDied()
 
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
+    radioState_ = static_cast<ModemPowerState>(state);
     AAFwk::Want want;
     want.SetParam("slotId", slotId_);
     want.SetParam("radioState", state);
@@ -162,6 +165,21 @@ int32_t TelRilModem::DsdsModeUpdated(int32_t mode)
 {
     return Notify<Int32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(mode), RadioEvent::RADIO_DSDS_MODE_CHANGED);
+}
+
+int32_t TelRilModem::NcfgFinishedResult(int32_t state)
+{
+    if (state == STATE_NV_REFRESH_FINNISHED) {
+        return Notify<Int32Parcel>(
+            TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_NV_REFRESH_FINISHED);
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t TelRilModem::RestartRildNvMatch(int32_t state)
+{
+    return Notify<Int32Parcel>(
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_DSDS_MODE_CHANGED);
 }
 
 void TelRilModem::BuildVoiceRadioTechnology(const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology,

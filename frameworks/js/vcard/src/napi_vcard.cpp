@@ -323,6 +323,10 @@ static DataShare::DataSharePredicates UnwrapDataSharePredicates(napi_env env, na
     }
     JSProxy::JSProxy<DataShare::DataShareAbsPredicates> *jsProxy = nullptr;
     napi_unwrap(env, value, reinterpret_cast<void **>(&jsProxy));
+    if (jsProxy == nullptr) {
+        TELEPHONY_LOGE("jsProxy is nullptr.");
+        return {};
+    }
     std::shared_ptr<DataShare::DataShareAbsPredicates> predicates = jsProxy->GetInstance();
     if (predicates == nullptr) {
         TELEPHONY_LOGE("GetNativePredicates is nullptr.");

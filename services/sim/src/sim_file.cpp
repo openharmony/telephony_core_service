@@ -227,9 +227,13 @@ void SimFile::OnAllFilesFetched()
 {
     UpdateSimLanguage();
     UpdateLoaded(true);
-    TELEPHONY_LOGI("SimFile SimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
+    TELEPHONY_LOGI("SimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+    }
+    if (stateManager_ != nullptr) {
+        CardType cardType = stateManager_->GetCardType();
+        NotifyRegistrySimState(cardType, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
     }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
@@ -253,8 +257,13 @@ bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessIccLocked(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("only fetch ELEMENTARY_FILE_LI, ELEMENTARY_FILE_PL and ELEMENTARY_FILE_ICCID in locked state");
+    IccFile::ProcessIccLocked();
     lockQueried_ = true;
     AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("fileController_ is nullptr!");
+        return false;
+    }
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
     fileToGet_++;
     return false;
@@ -1602,6 +1611,10 @@ bool SimFile::ProcessSetCphsMailbox(const AppExecFwk::InnerEvent::Pointer &event
         return isFileProcessResponse;
     }
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
         std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
@@ -1698,6 +1711,10 @@ bool SimFile::ProcessSetMbdn(const AppExecFwk::InnerEvent::Pointer &event)
     }
     bool hasNotify = false;
     std::unique_ptr<DiallingNumbersHandlerResult> fd = event->GetUniqueObject<DiallingNumbersHandlerResult>();
+    if (fd == nullptr) {
+        TELEPHONY_LOGE("fd is nullptr!");
+        return isFileProcessResponse;
+    }
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::static_pointer_cast<DiallingNumbersInfo>(fd->result);
     if (fd->exception == nullptr) {
         std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);

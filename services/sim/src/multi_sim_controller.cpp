@@ -139,6 +139,8 @@ bool MultiSimController::InitData(int32_t slotId)
         TELEPHONY_LOGI("InitPrimary start");
         CheckIfNeedSwitchMainSlotId();
     }
+    TELEPHONY_LOGI("sim account loaded, slotId is %{public}d, simId is %{public}d", slotId,
+        localCacheInfo_[slotId].simId);
     return true;
 }
 
@@ -187,8 +189,8 @@ void MultiSimController::ReCheckPrimary()
 bool MultiSimController::IsAllCardsReady()
 {
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-        if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() != SimState::SIM_STATE_READY
-            && simStateManager_[i]->GetSimState() != SimState::SIM_STATE_LOCKED)) {
+        if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
+            || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
             TELEPHONY_LOGI("slot:%{public}d not ready", i);
             return false;
         }
@@ -297,25 +299,6 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         values.Put(SimData::IS_MESSAGE_CARD, mainCardObj);
         values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
-    if (simFileManager_[slotId] != nullptr) {
-        std::string operKey = Str16ToStr8(simFileManager_[slotId]->GetOpKey());
-        std::string mcc = Str16ToStr8(simFileManager_[slotId]->GetMCC());
-        std::string mnc = Str16ToStr8(simFileManager_[slotId]->GetMNC());
-        std::string imsi = Str16ToStr8(simFileManager_[slotId]->GetIMSI());
-        DataShare::DataShareValuesBucket valuesExt;
-        DataShare::DataShareValueObject opkeyObj(operKey);
-        DataShare::DataShareValueObject mccObj(mcc);
-        DataShare::DataShareValueObject mncObj(mnc);
-        DataShare::DataShareValueObject imsiObj(imsi);
-        valuesExt.Put(SimData::OPKEY, opkeyObj);
-        valuesExt.Put(SimData::MCC, mccObj);
-        valuesExt.Put(SimData::MNC, mncObj);
-        valuesExt.Put(SimData::IMSI, imsiObj);
-        DataShare::DataSharePredicates predicates;
-        predicates.EqualTo(SimData::ICC_ID, newIccId);
-        int result = simDbHelper_->UpdateDataByIccId(newIccId, valuesExt);
-        TELEPHONY_LOGI("Update Opkey result is %{public}d", result);
-    }
     return simDbHelper_->UpdateDataByIccId(newIccId, values);
 }
 
@@ -334,21 +317,6 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
     values.Put(SimData::IS_ACTIVE, valueObj);
     const int32_t slotSingle = 1;
-    DataShare::DataShareValuesBucket valuesExt;
-    if (simFileManager_[slotId] != nullptr) {
-        std::string operKey = Str16ToStr8(simFileManager_[slotId]->GetOpKey());
-        std::string mcc = Str16ToStr8(simFileManager_[slotId]->GetMCC());
-        std::string mnc = Str16ToStr8(simFileManager_[slotId]->GetMNC());
-        std::string imsi = Str16ToStr8(simFileManager_[slotId]->GetIMSI());
-        DataShare::DataShareValueObject opkeyObj(operKey);
-        DataShare::DataShareValueObject mccObj(mcc);
-        DataShare::DataShareValueObject mncObj(mnc);
-        DataShare::DataShareValueObject imsiObj(imsi);
-        valuesExt.Put(SimData::OPKEY, opkeyObj);
-        valuesExt.Put(SimData::MCC, mccObj);
-        valuesExt.Put(SimData::MNC, mncObj);
-        values.Put(SimData::IMSI, imsiObj);
-    }
     if (SIM_SLOT_COUNT == slotSingle) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
@@ -363,11 +331,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
         values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
     }
     int64_t id;
-    int result = simDbHelper_->InsertData(id, values);
-    DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SimData::ICC_ID, newIccId);
-    simDbHelper_->UpdateDataByIccId(newIccId, valuesExt);
-    return result;
+    return simDbHelper_->InsertData(id, values);
 }
 
 bool MultiSimController::InitShowNumber(int slotId)
@@ -613,6 +577,10 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
 
 int32_t MultiSimController::getDefaultMainSlotByIccId()
 {
+    if (SIM_SLOT_COUNT == std::atoi(DEFAULT_SLOT_COUNT)) {
+        TELEPHONY_LOGI("default slotId is 0 for single card version");
+        return DEFAULT_SIM_SLOT_ID;
+    }
     int mainSlot = lastPrimarySlotId_;
     if (simFileManager_[SIM_SLOT_0] == nullptr || simFileManager_[SIM_SLOT_1] == nullptr) {
         TELEPHONY_LOGE("simFileManager_ is null");

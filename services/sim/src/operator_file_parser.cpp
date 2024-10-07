@@ -116,7 +116,7 @@ bool OperatorFileParser::ParseFromCustomSystem(int32_t slotId, OperatorConfig &o
         if (filePath && *filePath != '\0') {
             bool ret = ParseOperatorConfigFromFile(opc, filePath, tempRoot, true);
             if (!ret) {
-                TELEPHONY_LOGE("ParseFromCustomSystem path %{public}s fail", filePath);
+                TELEPHONY_LOGE("ParseFromCustomSystem failed");
                 continue;
             }
         }
@@ -145,7 +145,7 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(
     char *content = nullptr;
     int contentLength = LoaderJsonFile(content, path);
     if (contentLength == LOADER_JSON_ERROR) {
-        TELEPHONY_LOGE("ParseOperatorConfigFromFile  %{public}s is fail!", path.c_str());
+        TELEPHONY_LOGE("ParseOperatorConfigFromFile failed!");
         return false;
     }
     root = cJSON_Parse(content);
@@ -162,7 +162,6 @@ bool OperatorFileParser::ParseOperatorConfigFromFile(
 
 void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, OperatorConfig &opc, bool needSaveTempOpc)
 {
-    TELEPHONY_LOGD("ParseOperatorConfigFromJson");
     cJSON *value = root->child;
     char *tempChar = nullptr;
     std::map<std::u16string, std::u16string> &configValue = opc.configValue;
@@ -170,13 +169,17 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
         if (needSaveTempOpc) {
             tempChar = cJSON_PrintUnformatted(value);
             tempConfig_[value->string] = tempChar != nullptr ? tempChar : "";
-            free(tempChar);
+            if (tempChar != nullptr) {
+                free(tempChar);
+            }
         }
         tempChar = cJSON_Print(value);
         configValue[Str8ToStr16(value->string)] = tempChar != nullptr ? Str8ToStr16(tempChar) : u"";
         TELEPHONY_LOGI("ParseOperatorConfigFromFile key %{public}s value %{public}s", value->string,
             Str16ToStr8(configValue[Str8ToStr16(value->string)]).c_str());
-        free(tempChar);
+        if (tempChar != nullptr) {
+            free(tempChar);
+        }
         if (value->type == cJSON_Array) {
             TELEPHONY_LOGD("parse type arrayValue");
             if (cJSON_GetArraySize(value) > 0) {
@@ -194,7 +197,6 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
                 TELEPHONY_LOGD("value is long");
                 opc.longValue[value->string] = lValue;
             } else {
-                TELEPHONY_LOGD("value is int");
                 opc.intValue[value->string] = static_cast<int32_t>(lValue);
             }
         } else if (value->type == cJSON_True) {
@@ -202,7 +204,6 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
             opc.boolValue[value->string] = true;
             configValue[Str8ToStr16(value->string)] = Str8ToStr16("true");
         } else if (value->type == cJSON_False) {
-            TELEPHONY_LOGD("parse type booleanValue false");
             opc.boolValue[value->string] = false;
             configValue[Str8ToStr16(value->string)] = Str8ToStr16("false");
         }
@@ -216,7 +217,7 @@ int32_t OperatorFileParser::LoaderJsonFile(char *&content, const std::string &pa
     std::ifstream ifs;
     ifs.open(path);
     if (ifs.fail()) {
-        TELEPHONY_LOGE("LoaderJsonFile path PATH: %{public}s failed", path.c_str());
+        TELEPHONY_LOGE("LoaderJsonFile path failed");
         return LOADER_JSON_ERROR;
     }
     ifs.seekg(0, std::ios::end);
