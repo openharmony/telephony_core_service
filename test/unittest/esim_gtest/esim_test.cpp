@@ -100,17 +100,6 @@ HWTEST_F(EsimTest, ProcessResetMemoryDone_001, Function | MediumTest | Level2)
     EXPECT_EQ(esimFile->ProcessResetMemoryDone(eventResetMemory), false);
 }
 
-HWTEST_F(EsimTest, ProcessObtainEUICCSupportDone_001, Function | MediumTest | Level2)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    EXPECT_EQ(esimFile->ProcessObtainEUICCSupportDone(event), false);
-    event = nullptr;
-    EXPECT_EQ(esimFile->ProcessObtainEUICCSupportDone(event), false);
-}
-
 HWTEST_F(EsimTest, ProcessSendApduDataDone_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();

@@ -3273,7 +3273,7 @@ bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
     }
     if (!data.WriteInt32(slotId)) {
         TELEPHONY_LOGE("WriteInt32 slotId is false");
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        return false;
     }
     auto remote = Remote();
     if (remote == nullptr) {

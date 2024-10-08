@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -74,8 +74,8 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SetDefaultSmdpAddress_0100, Function |
     std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
     ResultState SetAddressResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
-    int32_t result =
-        CoreServiceClient::GetInstance().SetDefaultSmdpAddress(slotId, defaultSmdpAddress, SetAddressResult);
+    int32_t result = CoreServiceClient::GetInstance().
+        SetDefaultSmdpAddress(slotId, defaultSmdpAddress, SetAddressResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
