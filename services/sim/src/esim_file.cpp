@@ -115,8 +115,7 @@ bool EsimFile::ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::
 {
     if (!IsLogicChannelOpen()) {
         return false;
-    } 
-        
+    }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_EUICC_MEMORY_RESET);
     if (builder == nullptr) {
         TELEPHONY_LOGE("get builder failed");
