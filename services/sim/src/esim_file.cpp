@@ -163,6 +163,7 @@ void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *requestInfo, ApduComman
         TELEPHONY_LOGE("CopyApdCmdToReqInfo failed");
         return;
     }
+    
     static uint32_t cnt = 0;
     requestInfo->serial = cnt;
     cnt++;
