@@ -274,7 +274,7 @@ HWTEST_F(EsimTest, ProcessObtainSmdsAddress_001, Function | MediumTest | Level2)
     EXPECT_TRUE(esimFile->ProcessObtainSmdsAddress(slotId, eventObtainSmdsAddress));
 }
 
-HWTEST_F(EsimTest, ProcessObtainEUICCChallenge_001, Function | MediumTest | Level2)
+HWTEST_F(EsimTest, ProcessObtainEuiccChallenge_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
@@ -284,16 +284,16 @@ HWTEST_F(EsimTest, ProcessObtainEUICCChallenge_001, Function | MediumTest | Leve
     AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge =
         iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
     esimFile->currentChannelId = 0;
-    EXPECT_EQ(esimFile->ProcessObtainEUICCChallenge(slotId, eventEUICCChanllenge), false);
+    EXPECT_EQ(esimFile->ProcessObtainEuiccChallenge(slotId, eventEUICCChanllenge), false);
     esimFile->currentChannelId = 2;
-    EXPECT_EQ(esimFile->ProcessObtainEUICCChallenge(slotId, eventEUICCChanllenge), false);
+    EXPECT_EQ(esimFile->ProcessObtainEuiccChallenge(slotId, eventEUICCChanllenge), false);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(esimFile->ProcessObtainEUICCChallenge(slotId, eventEUICCChanllenge), true);
+    EXPECT_EQ(esimFile->ProcessObtainEuiccChallenge(slotId, eventEUICCChanllenge), true);
 }
 
-HWTEST_F(EsimTest, ProcessObtainEUICCChallengeDone_001, Function | MediumTest | Level2)
+HWTEST_F(EsimTest, ProcessObtainEuiccChallengeDone_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
@@ -302,11 +302,11 @@ HWTEST_F(EsimTest, ProcessObtainEUICCChallengeDone_001, Function | MediumTest | 
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData = "BF2E1280105DAD74D9F1734CF96CDE5C78FDB0565B";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
-    EXPECT_TRUE(esimFile->ProcessObtainEUICCChallengeDone(event));
+    EXPECT_TRUE(esimFile->ProcessObtainEuiccChallengeDone(event));
     auto eventEUICCChanllenge = AppExecFwk::InnerEvent::Get(0);
-    EXPECT_EQ(esimFile->ProcessObtainEUICCChallengeDone(eventEUICCChanllenge), false);
+    EXPECT_EQ(esimFile->ProcessObtainEuiccChallengeDone(eventEUICCChanllenge), false);
     eventEUICCChanllenge = nullptr;
-    EXPECT_EQ(esimFile->ProcessObtainEUICCChallengeDone(eventEUICCChanllenge), false);
+    EXPECT_EQ(esimFile->ProcessObtainEuiccChallengeDone(eventEUICCChanllenge), false);
 }
 } // namespace Telephony
 } // namespace OHOS

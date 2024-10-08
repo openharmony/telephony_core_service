@@ -1998,27 +1998,26 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
     int32_t result = GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(eUiccRulesAuthTable.policyRules.size());
-        for (auto &rules : eUiccRulesAuthTable.policyRules) {
-            reply.WriteInt32(rules);
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.policyRules.size()));
+        for (const auto &rules : eUiccRulesAuthTable.policyRules) {
+            ret = (ret && reply.WriteInt32(rules));
         }
         reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size());
-        for (auto &carrier : eUiccRulesAuthTable.carrierIds) {
-            reply.WriteString16(carrier.mcc);
-            reply.WriteString16(carrier.mnc);
-            reply.WriteString16(carrier.spn);
-            reply.WriteString16(carrier.imsi);
-            reply.WriteString16(carrier.gid1);
-            reply.WriteString16(carrier.gid2);
-            reply.WriteInt32(carrier.carrierId);
-            reply.WriteInt32(carrier.specificCarrierId);
+        for (const auto &carrier : eUiccRulesAuthTable.carrierIds) {
+            ret = (ret && reply.WriteString16(carrier.mcc));
+            ret = (ret && reply.WriteString16(carrier.mnc));
+            ret = (ret && reply.WriteString16(carrier.spn));
+            ret = (ret && reply.WriteString16(carrier.imsi));
+            ret = (ret && reply.WriteString16(carrier.gid1));
+            ret = (ret && reply.WriteString16(carrier.gid2));
+            ret = (ret && reply.WriteInt32(carrier.carrierId));
+            ret = (ret && reply.WriteInt32(carrier.specificCarrierId));
         }
-        reply.WriteInt32(eUiccRulesAuthTable.policyRuleFlags.size());
-        for (auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
-            reply.WriteInt32(ruleFlags);
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.policyRuleFlags.size()));
+        for (const auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
+            ret = (ret && reply.WriteInt32(ruleFlags));
         }
-
-        reply.WriteInt32(eUiccRulesAuthTable.position);
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.position));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2035,8 +2034,8 @@ int32_t CoreServiceStub::OnGetEuiccChallenge(MessageParcel &data, MessageParcel 
     int32_t result = GetEuiccChallenge(slotId, portIndex, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
-        reply.WriteString16(responseResult.response);
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

@@ -37,8 +37,8 @@ public:
     std::string ObtainSmdsAddress(int32_t portIndex);
     EuiccRulesAuthTable ObtainRulesAuthTable(int32_t portIndex);
     ResponseEsimResult ObtainEuiccChallenge(int32_t portIndex);
-    bool ProcessObtainEUICCChallenge(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-    bool ProcessObtainEUICCChallengeDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainEuiccChallenge(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
