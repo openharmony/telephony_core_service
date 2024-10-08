@@ -100,33 +100,33 @@ ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqN
 bool EsimFile::ProcessRetrieveNotificationList(
     int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_RETRIEVE_NOTIFICATIONS_LIST);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr!");
-            return false;
-        }
-        std::shared_ptr<Asn1Builder> compBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-        if (compBuilder == nullptr) {
-            TELEPHONY_LOGE("compBuilder is nullptr!");
-            return false;
-        }
-        compBuilder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, static_cast<int32_t>(events));
-        std::shared_ptr<Asn1Node> compNode = compBuilder->Asn1Build();
-        builder->Asn1AddChild(compNode);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            TELEPHONY_LOGE("telRilManager_ is nullptr");
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_RETRIEVE_NOTIFICATIONS_LIST);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr!");
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> compBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    if (compBuilder == nullptr) {
+        TELEPHONY_LOGE("compBuilder is nullptr!");
+        return false;
+    }
+    compBuilder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, static_cast<int32_t>(events));
+    std::shared_ptr<Asn1Node> compNode = compBuilder->Asn1Build();
+    builder->Asn1AddChild(compNode);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager_ is nullptr");
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -135,27 +135,11 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
         TELEPHONY_LOGE("event is nullptr");
         return false;
     }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
-    if (byteLen == 0) {
-        TELEPHONY_LOGE("byteLen is zero");
-        return false;
-    }
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
     }
-
     if (!RetrieveNotificationParseCompTag(root)) {
         TELEPHONY_LOGE("RetrieveNotificationParseCompTag error");
         return false;
@@ -177,7 +161,6 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
         TELEPHONY_LOGE("compTag is nullptr");
         return false;
     }
-
     int metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_SEQUENCE, ls);
     if (metaDataRes != 0) {
         TELEPHONY_LOGE("metaDataTag is zero");
@@ -197,34 +180,34 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
 
 bool EsimFile::ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        if (profile == nullptr) {
-            TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
-            return false;
-        }
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_RETRIEVE_NOTIFICATIONS_LIST);
-        std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-        if (builder == nullptr || subBuilder == nullptr) {
-            TELEPHONY_LOGE("get builder failed");
-            return false;
-        }
-        subBuilder->Asn1AddChildAsSignedInteger(TAG_ESIM_CTX_0, profile->seqNumber);
-        std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
-        builder->Asn1AddChild(subNode);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            TELEPHONY_LOGE("telRilManager_ is nullptr");
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    EsimProfile *profile = &esimProfile_;
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_RETRIEVE_NOTIFICATIONS_LIST);
+    std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    if (builder == nullptr || subBuilder == nullptr) {
+        TELEPHONY_LOGE("get builder failed");
+        return false;
+    }
+    subBuilder->Asn1AddChildAsSignedInteger(TAG_ESIM_CTX_0, profile->seqNumber);
+    std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    builder->Asn1AddChild(subNode);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager_ is nullptr");
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -233,18 +216,7 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("event is nullptr");
         return false;
     }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
@@ -266,7 +238,7 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
 {
     std::list<std::shared_ptr<Asn1Node>> nodes;
     std::shared_ptr<Asn1Node> compNode = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
-    if (nullptr == compNode) {
+    if (compNode == nullptr) {
         TELEPHONY_LOGE("compNode is nullptr");
         return false;
     }
@@ -282,31 +254,31 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
 
 bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        if (profile == nullptr) {
-            TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
-            return false;
-        }
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_REMOVE_NOTIFICATION_FROM_LIST);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        builder->Asn1AddChildAsSignedInteger(TAG_ESIM_CTX_0, profile->seqNumber);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            TELEPHONY_LOGE("telRilManager_ is nullptr");
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    EsimProfile *profile = &esimProfile_;
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("ProcessRemoveNotification profile is nullptr");
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_REMOVE_NOTIFICATION_FROM_LIST);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    builder->Asn1AddChildAsSignedInteger(TAG_ESIM_CTX_0, profile->seqNumber);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager_ is nullptr");
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -315,29 +287,17 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("event is nullptr!");
         return false;
     }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
     }
-    std::shared_ptr<Asn1Node> pAsn1Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
-    if (pAsn1Node == nullptr) {
-        TELEPHONY_LOGE("pAsn1Node is nullptr");
+    std::shared_ptr<Asn1Node> node = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (node == nullptr) {
+        TELEPHONY_LOGE("node is nullptr");
         return false;
     }
-    removeNotifResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
-
+    removeNotifResult_ = static_cast<ResultState>(node->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(removeNotificationMutex_);
         isRemoveNotificationReady_ = true;

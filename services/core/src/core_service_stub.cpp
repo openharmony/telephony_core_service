@@ -1962,7 +1962,7 @@ int32_t CoreServiceStub::OnRetrieveNotificationList(MessageParcel &data, Message
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(notificationList.euiccNotification.size());
-        for (auto &notification : notificationList.euiccNotification) {
+        for (const auto &notification : notificationList.euiccNotification) {
             ret = (ret && reply.WriteInt32(notification.seq));
             ret = (ret && reply.WriteString16(notification.targetAddr));
             ret = (ret && reply.WriteInt32(notification.event));
