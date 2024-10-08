@@ -150,7 +150,7 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    virtual int32_t PrepareDownload(int32_t slotId,const DownLoadConfigInfo &downLoadConfigInfo,
+    virtual int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
         ResponseEsimResult &responseResult) = 0;
     virtual int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
         const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult) = 0;
