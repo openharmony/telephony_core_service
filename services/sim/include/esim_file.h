@@ -33,9 +33,9 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
 class EsimFile : public IccFile {
 public:
-    ResultState DeleteProfile(const std::u16string iccId);
-    ResultState SwitchToProfile(int32_t portIndex, const std::u16string iccId, bool forceDeactivateSim);
-    ResultState SetProfileNickname(const std::u16string iccId, const std::u16string nickname);
+    ResultState DeleteProfile(const std::u16string &iccId);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
 
 private:
     bool ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
