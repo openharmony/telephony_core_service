@@ -56,12 +56,13 @@ ResultState EsimFile::ResetMemory(ResetOption resetOption)
     return resetResult_;
 }
 
-ResultState EsimFile::SetDefaultSmdpAddress(std::u16string defaultSmdpAddress)
+ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress = BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
-    if (!ProcessEstablishDefaultSmdpAddress(slotId_, eventSetSmdpAddress)) {
+    int32_t eSimSlotId = slotId_;
+    if (!ProcessEstablishDefaultSmdpAddress(eSimSlotId, eventSetSmdpAddress)) {
         TELEPHONY_LOGE("ProcessEstablishDefaultSmdpAddress encode failed!!");
         return ResultState();
     }
@@ -79,8 +80,7 @@ ResultState EsimFile::SetDefaultSmdpAddress(std::u16string defaultSmdpAddress)
 bool EsimFile::IsEsimSupported()
 {
     char buf[ATR_LENGTH + 1] = {0};
-    const std::string ATR_PROP = "gsm.sim.hw_atr";
-    GetParameter(ATR_PROP.c_str(), "", buf, ATR_LENGTH);
+    GetParameter(TEl_HW_ATR, "", buf, ATR_LENGTH);
     ResetResponse resetResponse;
     std::string atr(buf);
     resetResponse.AnalysisAtrData(atr);
@@ -88,7 +88,7 @@ bool EsimFile::IsEsimSupported()
     return isSupported_;
 }
 
-ResponseEsimResult EsimFile::SendApduData(std::u16string &aid, std::u16string &apduData)
+ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const std::u16string &apduData)
 {
     if (aid.empty() || apduData.empty()) {
         return ResponseEsimResult();
@@ -113,28 +113,29 @@ ResponseEsimResult EsimFile::SendApduData(std::u16string &aid, std::u16string &a
 
 bool EsimFile::ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_EUICC_MEMORY_RESET);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("get builder failed");
-            return false;
-        }
-        std::string resetMemoryTags;
-        resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_FILL_LEN);
-        resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_VALUE);
-        builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, resetMemoryTags, resetMemoryTags.length());
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
+    } 
+        
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_EUICC_MEMORY_RESET);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("get builder failed");
+        return false;
     }
-    return false;
+    std::string resetMemoryTags;
+    resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_FILL_LEN);
+    resetMemoryTags += static_cast<unsigned char>(EUICC_MEMORY_RESET_BIT_STR_VALUE);
+    builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, resetMemoryTags, resetMemoryTags.length());
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -158,12 +159,12 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
     }
-    std::shared_ptr<Asn1Node> pAsn1Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
-    if (pAsn1Node == nullptr) {
-        TELEPHONY_LOGE("pAsn1Node is nullptr");
+    std::shared_ptr<Asn1Node> asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (asn1NodeData == nullptr) {
+        TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    resetResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
+    resetResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(resetMemoryMutex_);
         isResetMemoryReady_ = true;
@@ -174,54 +175,41 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
 
 bool EsimFile::setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+      
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
     }
-    std::shared_ptr<Asn1Node> pAsn1Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
-    if (pAsn1Node == nullptr) {
-        TELEPHONY_LOGE("pAsn1Node is nullptr");
+    std::shared_ptr<Asn1Node> asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (asn1NodeData == nullptr) {
+        TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    setDpAddressResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
+    setDpAddressResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(setDefaultSmdpAddressMutex_);
         isSetDefaultSmdpAddressReady_ = true;
@@ -232,25 +220,26 @@ bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &
 
 bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        std::string hexStr = OHOS::Telephony::ToUtf8(profile->toBeSendApduDataHexStr);
-        RequestApduBuild codec(currentChannelId);
-        codec.BuildStoreData(hexStr);
-        std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
-        std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
-        ApduSimIORequestInfo reqInfo;
-        CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+
+    EsimProfile *profile = &esimProfile_;
+    std::string hexStr = OHOS::Telephony::ToUtf8(profile->toBeSendApduDataHexStr);
+    RequestApduBuild codec(currentChannelId);
+    codec.BuildStoreData(hexStr);
+    std::list<std::unique_ptr<ApduCommand>> list = codec.getCommands();
+    std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());
+    ApduSimIORequestInfo reqInfo;
+    CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -279,24 +268,6 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
     return true;
 }
 
-bool EsimFile::ProcessObtainEUICCSupportDone(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    return true;
-}
-
 void EsimFile::InitMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE] =
@@ -305,8 +276,6 @@ void EsimFile::InitMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessResetMemoryDone(event); };
     memberFuncMap_[MSG_ESIM_SEND_APUD_DATA] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSendApduDataDone(event); };
-    memberFuncMap_[MSG_ESIM_IS_ESIM_SUPPORT] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEUICCSupportDone(event); };
 }
 }
 }

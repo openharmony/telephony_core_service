@@ -940,7 +940,7 @@ public:
     int32_t SetDefaultSmdpAddress(int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult);
 
     /**
-     * @brief Whether to support esim
+     * @brief Whether support for esim
      *
      * @param slotId[in], sim slot id
      * @return returns true if the device support; returns false otherwise.
@@ -952,7 +952,7 @@ public:
      *
      * @param slotId[in], sim slot id
      * @param aid[in], apud sender
-     * @param data[in], apud data
+     * @param apduData[in], apud data
      * @param responseResult[out], return the result of execute one apdu
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */

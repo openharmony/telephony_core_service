@@ -1679,10 +1679,6 @@ int32_t CoreService::SetDefaultSmdpAddress(
 
 bool CoreService::IsEsimSupported(int32_t slotId)
 {
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return false;

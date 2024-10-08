@@ -34,9 +34,9 @@ constexpr static const int32_t ATR_LENGTH = 47;
 class EsimFile : public IccFile {
 public:
     ResultState ResetMemory(ResetOption resetOption);
-    ResultState SetDefaultSmdpAddress(std::u16string defaultSmdpAddress);
+    ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
     bool IsEsimSupported();
-    ResponseEsimResult SendApduData(std::u16string &aid, std::u16string &apduData);
+    ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
 
 private:
     bool ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
