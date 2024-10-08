@@ -177,6 +177,18 @@ struct EuiccRulesAuthTable {
 };
 
 /**
+ * @brief Config information about Authenticate.
+ */
+struct AuthenticateConfigInfo {
+    int32_t portIndex = 0;
+    std::u16string matchingId = u"";
+    std::u16string serverSigned1 = u"";
+    std::u16string serverSignature1 = u"";
+    std::u16string euiccCiPkIdToBeUsed = u"";
+    std::u16string serverCertificate = u"";
+};
+
+/**
  * @brief Result of a operation.
  */
 struct ResponseEsimResult {

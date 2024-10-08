@@ -33,13 +33,10 @@ namespace Telephony {
 class EsimFile : public IccFile {
 public:
     ResponseEsimResult ObtainEuiccInfo2(int32_t portIndex);
-    ResponseEsimResult AuthenticateServer(
-        int32_t portIndex, const std::u16string &matchingId, const std::u16string &serverSigned1,
-        const std::u16string &serverSignature1, const std::u16string &euiccCiPkIdToBeUsed,
-        const std::u16string serverCertificate);
+    ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 private:
-    bool ProcessObtainEUICCInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-    bool ProcessObtainEUICCInfo2Done(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer &event);
     void EuiccInfo2ParseProfileVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
     void EuiccInfo2ParseSvn(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root, uint32_t byteLen);
     void EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
@@ -52,11 +49,11 @@ private:
     void EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
     void EuiccInfo2ParseEuiccCategory(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
     void EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
-    void CopyApdCmdToReqInfo(ApduSimIORequestInfo *pReqInfo, ApduCommand *apdCmd);
+    void CopyApdCmdToReqInfo(ApduSimIORequestInfo *reqInfo, ApduCommand *apdCmd);
     bool ProcessAuthenticateServer(int32_t slotId);
     bool ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RealProcsessAuthenticateServerDone(std::string combineHexStr);
-    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId);
+    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
     bool CombineResponseDataFinish(IccFileData &fileData);
     void Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const std::string &base64Src);
     void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
@@ -65,6 +62,7 @@ private:
     void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool MergeRecvLongDataComplete(IccFileData &fileData);
+    std::string MakeVersionString(std::vector<uint8_t> &versionRaw);
 
     ResponseEsimResult responseInfo2Result_;
     ResponseEsimResult responseAuthenticateResult_;

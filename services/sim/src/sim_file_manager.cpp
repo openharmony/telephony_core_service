@@ -994,20 +994,13 @@ ResponseEsimResult SimFileManager::GetEuiccInfo2(int32_t portIndex)
     return result;
 }
 
-ResponseEsimResult SimFileManager::AuthenticateServer(
-    int32_t portIndex,
-    const std::u16string &matchingId,
-    const std::u16string &serverSigned1,
-    const std::u16string &serverSignature1,
-    const std::u16string &euiccCiPkIdToBeUsed,
-    const std::u16string &serverCertificate)
+ResponseEsimResult SimFileManager::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
         return ResponseEsimResult();
     }
-    ResponseEsimResult result = eSimFile_->AuthenticateServer(
-        portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
+    ResponseEsimResult result = eSimFile_->AuthenticateServer(authenticateConfigInfo);
     return result;
 }
 #endif

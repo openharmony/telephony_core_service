@@ -3249,13 +3249,7 @@ int32_t CoreServiceProxy::RealAuthenticateServer(const MessageParcel &data, cons
 }
 
 int32_t CoreServiceProxy::AuthenticateServer(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &matchingId,
-    const std::u16string &serverSigned1,
-    const std::u16string &serverSignature1,
-    const std::u16string &euiccCiPkIdToBeUsed,
-    const std::u16string &serverCertificate,
-    ResponseEsimResult &responseResult)
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3268,27 +3262,27 @@ int32_t CoreServiceProxy::AuthenticateServer(
         TELEPHONY_LOGE("WriteInt32 slotId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteInt32(portIndex)) {
+    if (!data.WriteInt32(authenticateConfigInfo.portIndex)) {
         TELEPHONY_LOGE("WriteInt32 portIndex is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(matchingId)) {
+    if (!data.WriteString16(authenticateConfigInfo.matchingId)) {
         TELEPHONY_LOGE("WriteString16 matchingId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(serverSigned1)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverSigned1)) {
         TELEPHONY_LOGE("WriteString16 serverSigned1 is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(serverSignature1)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverSignature1)) {
         TELEPHONY_LOGE("WriteString16 serverSignature1 is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(euiccCiPkIdToBeUsed)) {
+    if (!data.WriteString16(authenticateConfigInfo.euiccCiPkIdToBeUsed)) {
         TELEPHONY_LOGE("WriteString16 euiccCiPkIdToBeUsed is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(serverCertificate)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverCertificate)) {
         TELEPHONY_LOGE("WriteString16 serverCertificate is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }

@@ -70,16 +70,13 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo2_0100, Function | MediumT
 HWTEST_F(EsimCoreServiceClientBranchTest, AuthenticateServer_0100, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPKIdToBeUsed;
-    std::u16string serverCertificate;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
-    int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult);
+    int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, authenticateConfigInfo,
+        responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 } // namespace Telephony

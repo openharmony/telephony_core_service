@@ -1268,20 +1268,13 @@ int32_t SimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsi
 }
 
 int32_t SimManager::AuthenticateServer(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &matchingId,
-    const std::u16string &serverSigned1,
-    const std::u16string &serverSignature1,
-    const std::u16string &euiccCiPkIdToBeUsed,
-    const std::u16string &serverCertificate,
-    ResponseEsimResult &responseResult)
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    responseResult = simFileManager_[slotId]->AuthenticateServer(
-        portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
+    responseResult = simFileManager_[slotId]->AuthenticateServer(authenticateConfigInfo);
     return TELEPHONY_ERR_SUCCESS;
 }
 #endif

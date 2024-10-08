@@ -58,15 +58,12 @@ HWTEST_F(EsimCoreServiceClientTest, GetEuiccInfo2_0001, Function | MediumTest | 
 HWTEST_F(EsimCoreServiceClientTest, AuthenticateServer_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPKIdToBeUsed;
-    std::u16string serverCertificate;
-    int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPKIdToBeUsed, serverCertificate, responseResult);
+    int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, authenticateConfigInfo,
+        responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 } // namespace Telephony

@@ -141,16 +141,11 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_001, Function | MediumTest
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPkIdToBeUsed;
-    std::u16string serverCertificate;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1,
-        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -158,17 +153,12 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_002, Function | MediumTest
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPkIdToBeUsed;
-    std::u16string serverCertificate;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1, serverSignature1,
-        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -176,17 +166,12 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_003, Function | MediumTest
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPkIdToBeUsed;
-    std::u16string serverCertificate;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
-    int32_t ret = proxy.AuthenticateServer(SLOT_ID, portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, 0);
 }
 } // namespace Telephony
