@@ -101,8 +101,8 @@ ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
-    if (!ProcessObtainEUICCChallenge(slotId_, eventEUICCChanllenge)) {
-        TELEPHONY_LOGE("ProcessObtainEUICCChallenge encode failed");
+    if (!ProcessObtainEuiccChallenge(slotId_, eventEUICCChanllenge)) {
+        TELEPHONY_LOGE("ProcessObtainEuiccChallenge encode failed");
         return ResponseEsimResult();
     }
     isEuiccChallengeReady_ = false;
@@ -118,100 +118,100 @@ ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 
 bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DISABLE_PROFILE);
-        std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-        if (builder == nullptr || subBuilder == nullptr) {
-            TELEPHONY_LOGE("get builder failed");
-            return false;
-        }
-        std::string iccidBytes;
-        std::string str = OHOS::Telephony::ToUtf8(profile->iccId);
-        Asn1Utils::BcdToBytes(str, iccidBytes);
-        subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.length());
-        std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
-        builder->Asn1AddChild(subNode);
-        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    EsimProfile *profile = &esimProfile_;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DISABLE_PROFILE);
+    std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    if (builder == nullptr || subBuilder == nullptr) {
+        TELEPHONY_LOGE("get builder failed");
+        return false;
+    }
+    std::string iccidBytes;
+    std::string str = OHOS::Telephony::ToUtf8(profile->iccId);
+    Asn1Utils::BcdToBytes(str, iccidBytes);
+    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.length());
+    std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    builder->Asn1AddChild(subNode);
+    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONFIGURED_ADDRESSES);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONFIGURED_ADDRESSES);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
+
 }
 
 bool EsimFile::ProcessRequestRulesAuthTable(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_RAT);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_RAT);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
-bool EsimFile::ProcessObtainEUICCChallenge(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+bool EsimFile::ProcessObtainEuiccChallenge(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_CHALLENGE);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_CHALLENGE);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -236,18 +236,17 @@ bool EsimFile::ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &
         TELEPHONY_LOGE("pAsn1Node is nullptr");
         return false;
     }
-    disableProfileResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
+    disableProfileResult_ = static_cast<ResultState>(pAsn1Node->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(disableProfileMutex_);
         isDisableProfileReady_ = true;
     }
     disableProfileCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return false;
@@ -284,29 +283,20 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
         isSmdsAddressReady_ = true;
     }
     smdsAddressCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
-struct CarrierIdentifier CarrierIdentifiers(const std::string mccMncData, int mccMncLen,
+struct CarrierIdentifier CarrierIdentifiers(const std::string &mccMncData, int mccMncLen,
     const std::u16string &gid1, const std::u16string &gid2)
 {
     std::string strResult = Asn1Utils::BytesToHexStr(mccMncData);
-
-    std::string mMcc(NUMBER_THREE, '\0');
-    mMcc[NUMBER_ZERO] = strResult[NUMBER_ONE];
-    mMcc[NUMBER_ONE] = strResult[NUMBER_ZERO];
+    std::string mMcc(NUMBER_THREE + NUMBER_ONE, '\0');
+    mMnc[NUMBER_ZERO] = strResult[NUMBER_FIVE];
+    mMnc[NUMBER_ONE] = strResult[NUMBER_FOUR];
     mMcc[NUMBER_TWO] = strResult[NUMBER_THREE];
-
-    std::string mMnc(NUMBER_THREE, '\0');
-    if (strResult[NUMBER_TWO] == 'F') {
-        mMnc[NUMBER_ZERO] = strResult[NUMBER_FIVE];
-        mMnc[NUMBER_ONE] = strResult[NUMBER_FOUR];
-    } else {
-        mMnc[NUMBER_ZERO] = strResult[NUMBER_FIVE];
-        mMnc[NUMBER_ONE] = strResult[NUMBER_FOUR];
+    if (strResult[NUMBER_TWO] != 'F') {
         mMnc[NUMBER_TWO] = strResult[NUMBER_TWO];
     }
-
     struct CarrierIdentifier carrierId;
     carrierId.mcc = OHOS::Telephony::ToUtf16(mMcc);
     carrierId.mnc = OHOS::Telephony::ToUtf16(mMnc);
@@ -322,43 +312,54 @@ struct CarrierIdentifier buildCarrierIdentifiers(std::shared_ptr<Asn1Node> &root
     std::string gid1Byte;
     std::string gid2Byte;
     std::string strResult;
+    CarrierIdentifier defaultCarrier = CarrierIdentifiers("", 0, u"", u"");
     if (root->Asn1HasChild(TAG_ESIM_CTX_1)) {
         std::shared_ptr<Asn1Node> node = root->Asn1GetChild(TAG_ESIM_CTX_1);
+        if (node == nullptr) {
+            return defaultCarrier;
+        }
         node->Asn1AsBytes(gid1Byte);
         strResult = Asn1Utils::BytesToHexStr(gid1Byte);
         gid1 = OHOS::Telephony::ToUtf16(strResult);
     }
     if (root->Asn1HasChild(TAG_ESIM_CTX_2)) {
         std::shared_ptr<Asn1Node> node = root->Asn1GetChild(TAG_ESIM_CTX_2);
+        if (node == nullptr) {
+            return defaultCarrier;
+        }
         node->Asn1AsBytes(gid2Byte);
         strResult = Asn1Utils::BytesToHexStr(gid2Byte);
         gid2 = OHOS::Telephony::ToUtf16(strResult);
     }
 
     std::string mccMnc;
-    std::shared_ptr<Asn1Node> pAsn1Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
-    int mccMncLen = pAsn1Node->Asn1AsBytes(mccMnc);
+    std::shared_ptr<Asn1Node> ctx0Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (ctx0Node == nullptr) {
+        return defaultCarrier;
+    }
+    int32_t mccMncLen = ctx0Node->Asn1AsBytes(mccMnc);
     CarrierIdentifier myCarrier = CarrierIdentifiers(mccMnc, mccMncLen, gid1, gid2);
     return myCarrier;
 }
 
 bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &root)
 {
-    const int TAG_NUM = 2;
-    bool isFileHandleResponse = true;
+    constexpr int32_t TAG_NUM = 2;
     std::list<std::shared_ptr<Asn1Node>> Nodes;
     std::list<std::shared_ptr<Asn1Node>> opIdNodes;
     root->Asn1GetChildren(TAG_ESIM_CTX_COMP_0, Nodes);
     for (auto it = Nodes.begin(); it != Nodes.end(); ++it) {
-        std::shared_ptr<Asn1Node> pNode = *it;
-        std::shared_ptr<Asn1Node> pAGetChildChild = pNode->Asn1GetChildChild(TAG_NUM,
-            TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_COMP_1);
-        if (pAGetChildChild == nullptr) {
+        std::shared_ptr<Asn1Node> node = *it;
+        if (node == nullptr) {
             return false;
         }
-        int opIdNodesRes = pAGetChildChild->Asn1GetChildren(TAG_ESIM_OPERATOR_ID, opIdNodes);
+        std::shared_ptr<Asn1Node> grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_COMP_1);
+        if (grandson == nullptr) {
+            return false;
+        }
+        int32_t opIdNodesRes = grandson->Asn1GetChildren(TAG_ESIM_OPERATOR_ID, opIdNodes);
         if (opIdNodesRes != 0) {
-            return isFileHandleResponse;
+            return false;
         }
         for (auto iter = opIdNodes.begin(); iter != opIdNodes.end(); ++iter) {
             std::shared_ptr<Asn1Node> curNode = nullptr;
@@ -368,35 +369,47 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             }
             eUiccRulesAuthTable_.carrierIds.push_back(buildCarrierIdentifiers(curNode));
         }
-        pAGetChildChild = pNode->Asn1GetChildChild(TAG_NUM, TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_0);
-        int policyRules = pAGetChildChild->Asn1AsInteger();
-        pAGetChildChild = pNode->Asn1GetChildChild(TAG_NUM, TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_2);
-        int policyRuleFlags = pAGetChildChild->Asn1AsInteger();
+        grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_0);
+        if (grandson == nullptr) {
+            return false;
+        }
+        int32_t policyRules = grandson->Asn1AsInteger();
+        grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_2);
+        if (grandson == nullptr) {
+            return false;
+        }
+        int32_t policyRuleFlags = grandson->Asn1AsInteger();
         eUiccRulesAuthTable_.policyRules.push_back(policyRules);
         eUiccRulesAuthTable_.policyRuleFlags.push_back(policyRuleFlags);
     }
-    return isFileHandleResponse;
+    return true;
 }
 
-bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Pointer &event)
+std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    bool isFileHandleResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
-        return false;
+        return nullptr;
     }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
+        return nullptr;
     }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
+    std::shared_ptr<IccFileData> resultDataPtr = nullptr;
+    resultDataPtr = &(rcvMsg->fileData);
+    if (resultDataPtr == nullptr) {
+        TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
+        return nullptr;
     }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
+    std::string responseByte = Asn1Utils::HexStrToBytes(resultDataPtr->resultData);
     uint32_t byteLen = responseByte.length();
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    return Asn1ParseResponse(responseByte, byteLen);
+}
+
+bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
@@ -411,38 +424,25 @@ bool EsimFile::ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Po
         isRulesAuthTableReady_ = true;
     }
     rulesAuthTableCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
-bool EsimFile::ProcessObtainEUICCChallengeDone(const AppExecFwk::InnerEvent::Pointer &event)
+bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    responseChallengeResult_.resultCode = ResultState::RESULT_UNDEFINED_ERROR;
-    bool isFileHandleResponse = true;
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
-        TELEPHONY_LOGE("Asn1ParseResponse failed");
+        TELEPHONY_LOGE("root is nullptr");
         return false;
     }
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (profileRoot == nullptr) {
+        TELEPHONY_LOGE("Asn1GetChild failed");
+        return false;
+    }
     std::string profileResponseByte;
     byteLen = profileRoot->Asn1AsBytes(profileResponseByte);
     if (byteLen == 0) {
-        return isFileHandleResponse;
+        return false;
     }
     std::string strResult = Asn1Utils::BytesToHexStr(profileResponseByte);
     responseChallengeResult_.resultCode = ResultState::RESULT_OK;
@@ -452,13 +452,13 @@ bool EsimFile::ProcessObtainEUICCChallengeDone(const AppExecFwk::InnerEvent::Poi
         isEuiccChallengeReady_ = true;
     }
     euiccChallengeCv_.notify_one();
-    return isFileHandleResponse;
+    return true;
 }
 
 void EsimFile::InitMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEUICCChallengeDone(event); };
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEuiccChallengeDone(event); };
     memberFuncMap_[MSG_ESIM_REQUEST_RULES_AUTH_TABLE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessRequestRulesAuthTableDone(event); };
     memberFuncMap_[MSG_ESIM_OBTAIN_SMDS_ADDRESS] =

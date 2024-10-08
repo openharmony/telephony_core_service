@@ -3274,27 +3274,33 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t policyRulesSize = reply.ReadInt32();
-        eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
-        for (int32_t i = 0; i < policyRulesSize; ++i) {
-            eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
+        if (policyRulesSize == TELEPHONY_ERR_SUCCESS) {
+            eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
+            for (int32_t i = 0; i < policyRulesSize; ++i) {
+                eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
+            }
         }
         int32_t carrierIdsSize = reply.ReadInt32();
-        eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
-        for (int32_t j = 0; j < carrierIdsSize; ++j) {
-            CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds[j];
-            ci.mcc = reply.ReadString16();
-            ci.mnc = reply.ReadString16();
-            ci.spn = reply.ReadString16();
-            ci.imsi = reply.ReadString16();
-            ci.gid1 = reply.ReadString16();
-            ci.gid2 = reply.ReadString16();
-            ci.carrierId = reply.ReadInt32();
-            ci.specificCarrierId = reply.ReadInt32();
+        if (carrierIdsSize == TELEPHONY_ERR_SUCCESS) {
+            eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
+            for (int32_t j = 0; j < carrierIdsSize; ++j) {
+                CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds[j];
+                ci.mcc = reply.ReadString16();
+                ci.mnc = reply.ReadString16();
+                ci.spn = reply.ReadString16();
+                ci.imsi = reply.ReadString16();
+                ci.gid1 = reply.ReadString16();
+                ci.gid2 = reply.ReadString16();
+                ci.carrierId = reply.ReadInt32();
+                ci.specificCarrierId = reply.ReadInt32();
+            }
         }
         int32_t policyRuleFlagsSize = reply.ReadInt32();
-        eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);
-        for (int32_t k = 0; k < policyRuleFlagsSize; ++k) {
-            eUiccRulesAuthTable.policyRuleFlags[k] = reply.ReadInt32();
+        if (policyRuleFlagsSize == TELEPHONY_ERR_SUCCESS) {
+            eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);
+            for (int32_t k = 0; k < policyRuleFlagsSize; ++k) {
+                eUiccRulesAuthTable.policyRuleFlags[k] = reply.ReadInt32();
+            }
         }
         eUiccRulesAuthTable.position = reply.ReadInt32();
     }
