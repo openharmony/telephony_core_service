@@ -103,7 +103,7 @@ std::string EsimFile::ObtainEid()
 {
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventGetEid = BuildCallerInfo(MSG_ESIM_OBTAIN_EID_DONE);
-    if (!ProcessObtainEid(0, eventGetEid)) {
+    if (!ProcessObtainEid(slotid_, eventGetEid)) {
         TELEPHONY_LOGE("ProcessObtainEid encode failed");
         return "";
     }
@@ -282,7 +282,7 @@ void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid)
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimOpenLogicalChannel(0, appId, p2, response);
+    telRilManager_->SimOpenLogicalChannel(slotid_, appId, p2, response);
     return;
 }
 
@@ -312,7 +312,7 @@ void EsimFile::ProcessEsimCloseChannel()
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimCloseLogicalChannel(0, currentChannelId_, response);
+    telRilManager_->SimCloseLogicalChannel(slotid_, currentChannelId_, response);
     return;
 }
 
