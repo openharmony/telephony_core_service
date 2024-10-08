@@ -273,8 +273,6 @@ bool EsimFile::IsLogicChannelOpen()
     return false;
 }
 
-
-
 void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid)
 {
     std::string appId = OHOS::Telephony::ToUtf8(aid);
