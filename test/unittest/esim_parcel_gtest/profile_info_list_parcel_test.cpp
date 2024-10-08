@@ -1777,7 +1777,19 @@ HWTEST_F(GetEuiccProfileInfoListResultTest, Unmarshalling_1600, Function | Mediu
 
     std::list<bool> readString16List;
     readString16List.push_back(true);
-    readString16List.push_back(t
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    MockReadString16(true, &readString16List);
+    EXPECT_EQ(euiccProfileInfoListResult.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
 
 HWTEST_F(GetEuiccProfileInfoListResultTest, Unmarshalling_1700, Function | MediumTest | Level1)
 {
