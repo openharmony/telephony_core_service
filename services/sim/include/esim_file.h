@@ -58,7 +58,6 @@ private:
     void InitMemberFunc();
     void SyncCloseChannel();
     bool IsLogicChannelOpen();
-    void ProcessEsimOpenChannel();
     void ProcessEsimOpenChannel(const std::u16string &aid);
     bool ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessEsimCloseChannel();
@@ -76,8 +75,8 @@ private:
     bool ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
-
-protected:
+    std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
+private:
     constexpr std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     int32_t currentChannelId_ = -1;
@@ -110,7 +109,6 @@ protected:
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
 
-private:
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
 
