@@ -33,8 +33,7 @@ namespace Telephony {
 constexpr static const int32_t ATR_LENGTH = 47;
 class EsimFile : public IccFile {
 public:
-    ResponseEsimResult ObtainPrepareDownload(int32_t portIndex, const std::u16string hashCc,
-        const std::u16string smdpSigned2, const std::u16string smdpSignature2, const std::u16string smdpCertificate);
+    ResponseEsimResult ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult ObtainLoadBoundProfilePackage(int32_t portIndex, const std::u16string boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
 
@@ -57,7 +56,8 @@ private:
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
-    bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> root);
+    bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
+    std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
 
 protected:
     ResponseEsimResult preDownloadResult_;

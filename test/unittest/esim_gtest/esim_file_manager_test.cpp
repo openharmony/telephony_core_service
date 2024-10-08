@@ -54,18 +54,14 @@ HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level
     SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
-    int32_t portIndex = 0;
-    std::u16string hashCc = u"";
-    std::u16string smdpSigned2 = u"";
-    std::u16string smdpSignature2 = u"";
-    std::u16string smdpCertificate = u"";
-    ResponseEsimResult res = simFileManager.PrepareDownload(portIndex, hashCc, smdpSigned2,
-        smdpSignature2, smdpCertificate);
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = u"";
+    ResponseEsimResult res = simFileManager.PrepareDownload(downLoadConfigInfo);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
     
     simFileManager.eSimFile_ = nullptr;
-    res = simFileManager.PrepareDownload(portIndex, hashCc, smdpSigned2,
-        smdpSignature2, smdpCertificate);
+    res = simFileManager.PrepareDownload(downLoadConfigInfo);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
 }
 

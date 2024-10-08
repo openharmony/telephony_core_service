@@ -142,9 +142,8 @@ public:
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    virtual int32_t PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate, ResponseEsimResult &responseResult) = 0;
+    virtual int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+        ResponseEsimResult &responseResult) = 0;
     virtual int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
         const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult) = 0;
     virtual int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,

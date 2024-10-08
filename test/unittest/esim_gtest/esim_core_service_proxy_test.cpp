@@ -108,44 +108,35 @@ HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_001, Function | MediumTest | 
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate,
-        responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_002, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate,
-        responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_003, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
-    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, portIndex, hashCc, smdpSigned2, smdpSignature2,
-        smdpCertificate, responseResult), 0);
+    EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), 0);
 }
 
 HWTEST_F(EsimCoreServiceProxyTest, LoadBoundProfilePackage_001, Function | MediumTest | Level2)

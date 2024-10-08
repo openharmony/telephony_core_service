@@ -60,16 +60,13 @@ void EsimCoreServiceClientBranchTest::TearDown() {}
 
 HWTEST_F(EsimCoreServiceClientBranchTest, PrepareDownload_0100, Function | MediumTest | Level1)
 {
+    DownLoadConfigInfo downLoadConfigInfo;
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
-    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, portIndex, hashCc,
-        smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 

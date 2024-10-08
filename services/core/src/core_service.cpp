@@ -1649,9 +1649,8 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-int32_t CoreService::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
+int32_t CoreService::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1661,8 +1660,7 @@ int32_t CoreService::PrepareDownload(int32_t slotId, int32_t portIndex, const st
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->PrepareDownload(
-        slotId, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+    return simManager_->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
 }
 
 int32_t CoreService::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,

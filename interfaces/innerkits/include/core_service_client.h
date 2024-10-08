@@ -923,18 +923,17 @@ public:
      * @brief Prepares the profile download request sent to SM-DP+.
      *
      * @param slotId[in], sim slot id
-     * @param portIndex[in], the Id of the eUICC
-     * @param hashCc[in], the hash of confirmation code. It can be null if there is no confirmation code required
-     * @param smdpSigned2[in], ASN.1 data in byte array indicating the data to be signed by the SM-DP+
+     * @param downLoadConfigInfo.portIndex[in], the Id of the eUICC
+     * @param downLoadConfigInfo.hashCc[in], the hash of confirmation code. It can be null if there is no confirmation code required
+     * @param downLoadConfigInfo.smdpSigned2[in], ASN.1 data in byte array indicating the data to be signed by the SM-DP+
      * returned by SM-DP+ server
-     * @param smdpSignature2[in], ASN.1 data in byte array indicating the SM-DP+ signature returned by SM-DP+ server
-     * @param smdpCertificate[in], ASN.1 data in byte array indicating the SM-DP+ Certificate returned by SM-DP+ server
-     * @param result[out], get the result code and a byte array
+     * @param downLoadConfigInfo.smdpSignature2[in], ASN.1 data in byte array indicating the SM-DP+ signature returned by SM-DP+ server
+     * @param downLoadConfigInfo.smdpCertificate[in], ASN.1 data in byte array indicating the SM-DP+ Certificate returned by SM-DP+ server
+     * @param responseResult[out], get the result code and a byte array
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate, ResponseEsimResult &responseResult);
+    int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+        ResponseEsimResult &responseResult);
 
     /**
      * @brief Loads a downloaded bound profile package onto the eUICC.
@@ -942,7 +941,7 @@ public:
      * @param slotId[in], sim slot id
      * @param portIndex[in], the Id of the eUICC
      * @param boundProfilePackage[in], the Bound Profile Package data returned by SM-DP+ server
-     * @param result[out], get the result code and a byte array
+     * @param responseResult[out], get the result code and a byte array
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,

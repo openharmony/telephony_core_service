@@ -1083,17 +1083,15 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-int32_t CoreServiceClient::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
+int32_t CoreServiceClient::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->PrepareDownload(
-        slotId, portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+    return proxy->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
 }
 
 int32_t CoreServiceClient::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,

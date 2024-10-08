@@ -55,23 +55,19 @@ void EsimManagerTest::SetUpTestCase() {}
 HWTEST_F(EsimManagerTest, PrepareDownload, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t ret = simManager->PrepareDownload(slotId, portIndex, hashCc, smdpSigned2, smdpSignature2,
-        smdpCertificate, responseResult);
+    int32_t ret = simManager->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     simManager->simStateManager_.push_back(simStateManager);
     simManager->simStateManager_[slotId]->Init(slotId);
     simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
-    ret = simManager->PrepareDownload(slotId, portIndex, hashCc, smdpSigned2, smdpSignature2,
-        smdpCertificate, responseResult);
+    ret = simManager->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
@@ -80,8 +76,7 @@ HWTEST_F(EsimManagerTest, PrepareDownload, Function | MediumTest | Level1)
         std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
-    ret = simManager->PrepareDownload(slotId, portIndex, hashCc, smdpSigned2, smdpSignature2,
-        smdpCertificate, responseResult);
+    ret = simManager->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 

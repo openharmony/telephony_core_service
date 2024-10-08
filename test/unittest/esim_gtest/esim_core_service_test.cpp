@@ -52,17 +52,13 @@ HWTEST_F(EsimCoreServiceTest, PrepareDownload_0001, Function | MediumTest | Leve
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
-    EXPECT_NE(mCoreService->PrepareDownload(slotId, portIndex, hashCc,
-        smdpSigned2, smdpSignature2, smdpCertificate, responseResult), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
-    EXPECT_EQ(mCoreService->PrepareDownload(slotId, portIndex, hashCc,
-        smdpSigned2, smdpSignature2, smdpCertificate, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mCoreService->PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(EsimCoreServiceTest, LoadBoundProfilePackage_0001, Function | MediumTest | Level1)

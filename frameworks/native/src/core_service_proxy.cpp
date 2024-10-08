@@ -3190,9 +3190,8 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
+int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3203,11 +3202,11 @@ int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, int32_t portIndex, con
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     bool ret = data.WriteInt32(slotId);
-    ret = (ret && data.WriteInt32(portIndex));
-    ret = (ret && data.WriteString16(hashCc));
-    ret = (ret && data.WriteString16(smdpSigned2));
-    ret = (ret && data.WriteString16(smdpSignature2));
-    ret = (ret && data.WriteString16(smdpCertificate));
+    ret = (ret && data.WriteInt32(downLoadConfigInfo.portIndex));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.hashCc));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSigned2));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSignature2));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpCertificate));
     if (!ret) {
         TELEPHONY_LOGE("Write data false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
