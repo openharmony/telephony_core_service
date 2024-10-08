@@ -95,8 +95,7 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
     }
     isObtainProfileReady_ = false;
     std::unique_lock<std::mutex> lock(obtainProfileMutex_);
-    if (this == nullptr)
-    {
+    if (this == nullptr) {
         TELEPHONY_LOGE("this is null!");
         return "";
     }
@@ -115,7 +114,7 @@ bool EsimFile::ProcessObtainDefaultSmdpAddress(int32_t slotId, const AppExecFwk:
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONFIGURED_ADDRESSES);
-    if (builder == nullptr ) {
+    if (builder == nullptr) {
         TELEPHONY_LOGE("get builder failed");
         return false;
     }
@@ -163,7 +162,7 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
     return true;
 }
 
-std::string EsimFile::GetProfileTagList() 
+std::string EsimFile::GetProfileTagList()
 {
     unsigned char EUICC_PROFILE_TAGS[] = {
         static_cast<unsigned char>(TAG_ESIM_ICCID),
