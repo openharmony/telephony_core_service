@@ -933,21 +933,22 @@ public:
      * @brief  Authenticates the SM-DP+ server by the eUICC.
      *
      * @param slotId[in], sim slot id
-     * @param portIndex[in], the Id of the eUICC
-     * @param matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0+
+     * @param authenticateConfigInfo.portIndex[in], the Id of the eUICC
+     * @param authenticateConfigInfo.matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0+
      * or empty when it is not required
-     * @param serverSigned1[in], ASN.1 data in byte array signed and returned by the SM-DP+ server
-     * @param serverSignature1[in], ASN.1 data in byte array indicating a SM-DP+ signature which is
+     * @param authenticateConfigInfo.serverSigned1[in], ASN.1 data in byte array signed and returned
+     * by the SM-DP+ server
+     * @param authenticateConfigInfo.serverSignature1[in], ASN.1 data in byte array indicating a SM-DP+ signature
+     * which is returned by SM-DP+ server
+     * @param authenticateConfigInfo.euiccCiPkIdToBeUsed[in], ASN.1 data in byte array indicating CI Public Key
+     * Identifier to be used by the eUICC for signature which is returned by SM-DP+ server.
+     * This is defined in GSMA RSP v2.0+
+     * @param authenticateConfigInfo.serverCertificate[in], ASN.1 data in byte array indicating SM-DP+ Certificate
      * returned by SM-DP+ server
-     * @param euiccCiPkIdToBeUsed[in], ASN.1 data in byte array indicating CI Public Key Identifier to be
-     * used by the eUICC for signature which is returned by SM-DP+ server. This is defined in GSMA RSP v2.0+
-     * @param serverCertificate[in], ASN.1 data in byte array indicating SM-DP+ Certificate returned by SM-DP+ server
      * @param responseResult[out], get the result code and the challenge
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t AuthenticateServer(int32_t slotId, int32_t portIndex, const std::u16string &matchingId,
-        const std::u16string &serverSigned1, const std::u16string &serverSignature1,
-        const std::u16string &euiccCiPkIdToBeUsed, const std::u16string &serverCertificate,
+    int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult);
 #endif
 

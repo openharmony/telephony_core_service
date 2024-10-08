@@ -74,18 +74,11 @@ HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Le
     SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
-    int32_t portIndex = 0;
-    std::u16string matchingId = u"";
-    std::u16string serverSigned1 = u"";
-    std::u16string serverSignature1 = u"";
-    std::u16string euiccCiPkIdToBeUsed = u"";
-    std::u16string serverCertificate = u"";
-    ResponseEsimResult res = simFileManager.AuthenticateServer(portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
+    AuthenticateConfigInfo authenticateConfigInfo;
+    ResponseEsimResult res = simFileManager.AuthenticateServer(authenticateConfigInfo);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
     simFileManager.eSimFile_ = nullptr;
-    res = simFileManager.AuthenticateServer(portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPkIdToBeUsed, serverCertificate);
+    res = simFileManager.AuthenticateServer(authenticateConfigInfo);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
 }
 } // namespace Telephony

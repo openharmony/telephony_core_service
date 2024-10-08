@@ -81,24 +81,18 @@ HWTEST_F(EsimManagerTest, GetEuiccInfo2, Function | MediumTest | Level1)
 HWTEST_F(EsimManagerTest, AuthenticateServer, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string matchingId = Str8ToStr16("4131423243332D583459355A36");
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPkIdToBeUsed;
-    std::u16string serverCertificate;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t ret = simManager->AuthenticateServer(slotId, portIndex, matchingId,
-        serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    int32_t ret = simManager->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
     EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     simManager->simStateManager_.push_back(simStateManager);
     simManager->simStateManager_[slotId]->Init(slotId);
     simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
-    ret = simManager->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    ret = simManager->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
     EventFwk::CommonEventSubscribeInfo sp;
     std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
@@ -107,8 +101,7 @@ HWTEST_F(EsimManagerTest, AuthenticateServer, Function | MediumTest | Level1)
         std::make_shared<SimFileManager>(sp, iTelRilManager, state);
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
-    ret = simManager->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1,
-        serverSignature1, euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    ret = simManager->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 } // namespace Telephony

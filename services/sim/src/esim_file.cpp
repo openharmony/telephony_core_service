@@ -37,10 +37,10 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 namespace {
-const uint32_t BYTE_TO_HEX_LENGTH = 2;
-const uint32_t OFFSET_FOUR_BIT = 4;
-const uint32_t VERSION_NUMBER = 11;
-const int32_t ATR_LENGTH = 47;
+constexpr uint32_t BYTE_TO_HEX_LENGTH = 2;
+constexpr uint32_t OFFSET_FOUR_BIT = 4;
+constexpr uint32_t VERSION_NUMBER = 11;
+constexpr int32_t ATR_LENGTH = 47;
 }
 
 ResponseEsimResult EsimFile::ObtainEuiccInfo2(int32_t portIndex)
@@ -48,8 +48,8 @@ ResponseEsimResult EsimFile::ObtainEuiccInfo2(int32_t portIndex)
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
-    if (!ProcessObtainEUICCInfo2(slotId_, eventEUICCInfo2)) {
-        TELEPHONY_LOGE("ProcessObtainEUICCInfo2 encode failed");
+    if (!ProcessObtainEuiccInfo2(slotId_, eventEUICCInfo2)) {
+        TELEPHONY_LOGE("ProcessObtainEuiccInfo2 encode failed");
         return ResponseEsimResult();
     }
     isEuiccInfo2Ready_ = false;
@@ -63,17 +63,14 @@ ResponseEsimResult EsimFile::ObtainEuiccInfo2(int32_t portIndex)
     return responseInfo2Result_;
 }
 
-ResponseEsimResult EsimFile::AuthenticateServer(
-    int32_t portIndex, const std::u16string &matchingId, const std::u16string &serverSigned1,
-    const std::u16string &serverSignature1, const std::u16string &euiccCiPkIdToBeUsed,
-    const std::u16string serverCertificate)
+ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
-    esimProfile_.portIndex = portIndex;
-    esimProfile_.matchingId = matchingId;
-    esimProfile_.serverSigned1 = serverSigned1;
-    esimProfile_.serverSignature1 = serverSignature1;
-    esimProfile_.euiccCiPkIdToBeUsed = euiccCiPkIdToBeUsed;
-    esimProfile_.serverCertificate = serverCertificate;
+    esimProfile_.portIndex = authenticateConfigInfo.portIndex;
+    esimProfile_.matchingId = authenticateConfigInfo.matchingId;
+    esimProfile_.serverSigned1 = authenticateConfigInfo.serverSigned1;
+    esimProfile_.serverSignature1 = authenticateConfigInfo.serverSignature1;
+    esimProfile_.euiccCiPkIdToBeUsed = authenticateConfigInfo.euiccCiPkIdToBeUsed;
+    esimProfile_.serverCertificate = authenticateConfigInfo.serverCertificate;
 
     std::u16string imei = u"";
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
@@ -95,28 +92,28 @@ ResponseEsimResult EsimFile::AuthenticateServer(
     return responseAuthenticateResult_;
 }
 
-bool EsimFile::ProcessObtainEUICCInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+bool EsimFile::ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
     if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_2);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        std::string hexStr;
-        int32_t strLen = builder->Asn1BuilderToHexStr(hexStr);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_2);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    std::string hexStr;
+    int32_t strLen = builder->Asn1BuilderToHexStr(hexStr);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src)
@@ -132,28 +129,32 @@ void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimPro
 bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
 {
     if (IsLogicChannelOpen()) {
-        Es9PlusInitAuthResp bytes;
-        Es9PlusInitAuthResp *pbytes = &bytes;
-        ConvertAuthInputParaFromApiStru(bytes, esimProfile_);
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_AUTHENTICATE_SERVER);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder create failed");
-            return false;
-        }
-        Asn1AddChildAsBase64(builder, pbytes->serverSigned1);
-        Asn1AddChildAsBase64(builder, pbytes->serverSignature1);
-        Asn1AddChildAsBase64(builder, pbytes->euiccCiPKIdToBeUsed);
-        Asn1AddChildAsBase64(builder, pbytes->serverCertificate);
-        std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-        AddCtxParams1(ctxParams1Builder, pbytes);
-        std::shared_ptr<Asn1Node> ctxNode = ctxParams1Builder->Asn1Build();
-        builder->Asn1AddChild(ctxNode);
-        std::string hexStr;
-        int32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
-        SplitSendLongData(slotId, hexStr);
-        return true;
+        return false;
     }
-    return false;
+    Es9PlusInitAuthResp bytes;
+    ConvertAuthInputParaFromApiStru(bytes, esimProfile_);
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_AUTHENTICATE_SERVER);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder create failed");
+        return false;
+    }
+    Asn1AddChildAsBase64(builder, bytes.serverSigned1);
+    Asn1AddChildAsBase64(builder, bytes.serverSignature1);
+    Asn1AddChildAsBase64(builder, bytes.euiccCiPKIdToBeUsed);
+    Asn1AddChildAsBase64(builder, bytes.serverCertificate);
+    std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    AddCtxParams1(ctxParams1Builder, &bytes);
+    if (ctxParams1Builder == nullptr)
+    {
+        TELEPHONY_LOGE("AddCtxParams1 failed");
+        return false;
+    }
+    std::shared_ptr<Asn1Node> ctxNode = ctxParams1Builder->Asn1Build();
+    builder->Asn1AddChild(ctxNode);
+    std::string hexStr;
+    int32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    SplitSendLongData(slotId, hexStr);
+    return true;
 }
 
 void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const std::string &base64Src)
@@ -187,7 +188,7 @@ void EsimFile::AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder)
 
 void EsimFile::GetImeiBytes(std::string &imeiBytes, const std::string &imei)
 {
-    int imeiLen = imei.length();
+    size_t imeiLen = imei.length();
     if (imeiLen < AUTH_SERVER_IMEI_LEN * BYTE_TO_HEX_LEN - 1) {
         return;
     }
@@ -235,7 +236,7 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     ctxParams1Builder->Asn1AddChild(subNode);
 }
 
-bool EsimFile::ProcessObtainEUICCInfo2Done(const AppExecFwk::InnerEvent::Pointer &event)
+bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
@@ -278,6 +279,23 @@ bool EsimFile::ProcessObtainEUICCInfo2Done(const AppExecFwk::InnerEvent::Pointer
     return true;
 }
 
+std::string EsimFile::MakeVersionString(std::vector<uint8_t> &versionRaw)
+{
+    if (versionRaw.size() < BYTE_NUM3)
+    {
+        TELEPHONY_LOGE("versionRaw.size error!");
+        return "";
+    }
+    std::string versionHigh("");
+    std::string versionMid("");
+    std::string versionLow("");
+    Asn1Utils::ByteToHexStr(versionRaw[VERSION_HIGH], versionHigh);
+    Asn1Utils::ByteToHexStr(versionRaw[VERSION_MIDDLE], versionMid);
+    Asn1Utils::ByteToHexStr(versionRaw[VERSION_LOW], versionLow);
+    std::string result = versionHigh + "." + versionMid + "." + versionLow;
+    return result;
+}
+
 void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
     if (euiccInfo2 == nullptr) {
@@ -289,22 +307,13 @@ void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 *euiccInfo2, std::shared
         TELEPHONY_LOGE("profileVerNode is nullptr");
         return;
     }
-    std::string profileVersionRaw;
-    int32_t profileVersionRawLen = profileVerNode->Asn1AsBytes(profileVersionRaw);
+    std::vector<uint8_t> profileVersionRaw = {};
+    uint32_t profileVersionRawLen = profileVerNode->Asn1AsBytes(profileVersionRaw);
     if (profileVersionRawLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid profileVersion data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(profileVersionRaw[VERSION_HIGH]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(profileVersionRaw[VERSION_MIDDLE]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') << static_cast<unsigned char>(profileVersionRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->profileVersion = formattedVersion;
+    euiccInfo2->profileVersion = MakeVersionString(profileVersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseSvn(
@@ -319,21 +328,13 @@ void EsimFile::EuiccInfo2ParseSvn(
         TELEPHONY_LOGE("svnNode is nullptr");
         return;
     }
-    std::string svnRaw;
-    int32_t svnRawLen = svnNode->Asn1AsBytes(svnRaw);
+    std::vector<uint8_t> svnRaw = {};
+    uint32_t svnRawLen = svnNode->Asn1AsBytes(svnRaw);
     if (svnRawLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid SVN data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0')
-        << static_cast<unsigned char>(svnRaw[VERSION_HIGH])
-        << "." << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_MIDDLE])
-        << "." << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->svn = formattedVersion;
+    euiccInfo2->svn = MakeVersionString(svnRaw);
 }
 
 void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -347,23 +348,13 @@ void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 *euiccInfo2, std::shar
         TELEPHONY_LOGE("euiccFirmwareVerNode is nullptr");
         return;
     }
-    std::string euiccFirmwareVerRaw;
-    int versionLen = euiccFirmwareVerNode->Asn1AsBytes(euiccFirmwareVerRaw);
+    std::vector<uint8_t> euiccFirmwareVerRaw = {};
+    uint32_t versionLen = euiccFirmwareVerNode->Asn1AsBytes(euiccFirmwareVerRaw);
     if (versionLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid firmwareVer data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0')
-        << static_cast<unsigned char>(euiccFirmwareVerRaw[VERSION_HIGH])
-        << "." << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0')
-        << static_cast<unsigned char>(euiccFirmwareVerRaw[VERSION_MIDDLE])
-        << "." << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0')
-        << static_cast<unsigned char>(euiccFirmwareVerRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->svn = formattedVersion;
+    euiccInfo2->svn = MakeVersionString(euiccFirmwareVerRaw);
 }
 
 void EsimFile::EuiccInfo2ParseExtCardResource(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -405,22 +396,13 @@ void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 *euiccInfo2, std::share
         TELEPHONY_LOGE("ts102241VersionNode is nullptr");
         return;
     }
-    std::string ts102241VersionRaw;
-    int versionLen = ts102241VersionNode->Asn1AsBytes(ts102241VersionRaw);
+    std::vector<uint8_t> ts102241VersionRaw = {};
+    uint32_t versionLen = ts102241VersionNode->Asn1AsBytes(ts102241VersionRaw);
     if (versionLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid ts102241VersionNode data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(ts102241VersionRaw[VERSION_HIGH]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(ts102241VersionRaw[VERSION_MIDDLE]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') << static_cast<unsigned char>(ts102241VersionRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->ts102241Version = formattedVersion;
+    euiccInfo2->ts102241Version = MakeVersionString(ts102241VersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -434,23 +416,13 @@ void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 *euiccInfo2, std:
         TELEPHONY_LOGE("globalPlatformVersionNode is nullptr");
         return;
     }
-    std::string globalPlatformVersionRaw;
+    std::vector<uint8_t> globalPlatformVersionRaw = {};
     uint32_t versionLen = globalPlatformVersionNode->Asn1AsBytes(globalPlatformVersionRaw);
     if (versionLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid globalplatformVersionRaw data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(globalPlatformVersionRaw[VERSION_HIGH]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(globalPlatformVersionRaw[VERSION_MIDDLE]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(globalPlatformVersionRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->globalPlatformVersion = formattedVersion;
+    euiccInfo2->globalPlatformVersion = MakeVersionString(globalPlatformVersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseRspCapability(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -520,67 +492,59 @@ void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<
         TELEPHONY_LOGE("ppVersionNode is nullptr");
         return;
     }
-    std::string ppVersionNodeRaw;
-    int versionLen = ppVersionNode->Asn1AsBytes(ppVersionNodeRaw);
+    std::vector<uint8_t> ppVersionNodeRaw = {};
+    uint32_t versionLen = ppVersionNode->Asn1AsBytes(ppVersionNodeRaw);
     if (versionLen < EUICC_INFO_VERSION_MIN_LENGTH) {
         TELEPHONY_LOGE("invalid ppVersion data");
         return;
     }
-
-    std::ostringstream oss;
-    oss << std::hex << std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(ppVersionNodeRaw[VERSION_HIGH]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') <<
-        static_cast<unsigned char>(ppVersionNodeRaw[VERSION_MIDDLE]) << "." <<
-        std::setw(BYTE_TO_HEX_LEN) << std::setfill('0') << static_cast<unsigned char>(ppVersionNodeRaw[VERSION_LOW]);
-
-    std::string formattedVersion = oss.str();
-    euiccInfo2->ppVersion = formattedVersion;
+    euiccInfo2->ppVersion = MakeVersionString(ppVersionNodeRaw);
 }
 
-void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *pReqInfo, ApduCommand *apdCmd)
+void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *reqInfo, ApduCommand *apdCmd)
 {
-    if (apdCmd == nullptr || pReqInfo == nullptr) {
+    if (apdCmd == nullptr || reqInfo == nullptr) {
         TELEPHONY_LOGE("CopyApdCmdToReqInfo failed");
         return;
     }
-    static int32_t cnt = 0;
-    pReqInfo->serial = cnt;
+    static uint32_t cnt = 0;
+    reqInfo->serial = cnt;
     cnt++;
-    pReqInfo->channelId = apdCmd->channel;
-    pReqInfo->type = apdCmd->data.cla;
-    pReqInfo->instruction = apdCmd->data.ins;
-    pReqInfo->p1 = apdCmd->data.p1;
-    pReqInfo->p2 = apdCmd->data.p2;
-    pReqInfo->p3 = apdCmd->data.p3;
-    pReqInfo->data = apdCmd->data.cmdHex;
+    reqInfo->channelId = apdCmd->channel;
+    reqInfo->type = apdCmd->data.cla;
+    reqInfo->instruction = apdCmd->data.ins;
+    reqInfo->p1 = apdCmd->data.p1;
+    reqInfo->p2 = apdCmd->data.p2;
+    reqInfo->p3 = apdCmd->data.p3;
+    reqInfo->data = apdCmd->data.cmdHex;
 }
 
-bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId)
+bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId)
 {
-    if (fileData.sw1 == SW1_MORE_RESPONSE) {
-        ApduSimIORequestInfo reqInfo;
-        RequestApduBuild codec(currentChannelId);
-        codec.BuildStoreData("");
-        std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
-        std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
-        if (apdCmd == nullptr) {
-            return false;
-        }
-        apdCmd->data.cla = 0;
-        apdCmd->data.ins = INS_GET_MORE_RESPONSE;
-        apdCmd->data.p1 = 0;
-        apdCmd->data.p2 = 0;
-        apdCmd->data.p3 = static_cast<int32_t>(fileData.sw2);
-        CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
-        AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
-        return true;
+    if (fileData.sw1 != SW1_MORE_RESPONSE) {
+        return false;
     }
-    return false;
+    ApduSimIORequestInfo reqInfo;
+    RequestApduBuild codec(currentChannelId);
+    codec.BuildStoreData("");
+    std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
+    std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
+    if (apdCmd == nullptr) {
+        return false;
+    }
+    apdCmd->data.cla = 0;
+    apdCmd->data.ins = INS_GET_MORE_RESPONSE;
+    apdCmd->data.p1 = 0;
+    apdCmd->data.p2 = 0;
+    apdCmd->data.p3 = static_cast<int32_t>(fileData.sw2);
+    CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
+    AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
+    return true;
+
 }
 
 bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
@@ -615,13 +579,12 @@ bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
                 TELEPHONY_LOGE("authServerRespNode failed");
                 return false;
             }
-            int32_t tidByteLen = transactionIdNode->Asn1AsBytes(authServerResp.transactionId);
+            uint32_t tidByteLen = transactionIdNode->Asn1AsBytes(authServerResp.transactionId);
             if (tidByteLen == 0) {
                 TELEPHONY_LOGE("tidByteLen is zero.");
                 return false;
             }
             authServerResp.errCode = errCodeNode->Asn1AsInteger();
-            std::string hexStr = Asn1Utils::BytesToHexStr(authServerResp.transactionId);
         } else {
             TELEPHONY_LOGE("the auth server response has no right child");
             return false;
@@ -671,7 +634,7 @@ bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData)
 
 void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src)
 {
-    dst.resultCode = (ResultState)src.errCode;
+    dst.resultCode = static_cast<ResultState>(src.errCode);
     std::string hexStr = Asn1Utils::BytesToHexStr(src.respStr);
     dst.response = OHOS::Telephony::ToUtf16(hexStr);
 }
@@ -679,7 +642,7 @@ void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse
 void EsimFile::InitMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_OBTAIN_EUICC_INFO2_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEUICCInfo2Done(event); };
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEuiccInfo2Done(event); };
     memberFuncMap_[MSG_ESIM_AUTHENTICATE_SERVER] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessAuthenticateServerDone(event); };
 }

@@ -253,23 +253,18 @@ HWTEST_F(EsimTest, AuthenticateServer_001, Function | MediumTest | Level2)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    int32_t portIndex = 0;
-    std::u16string matchingId;
-    std::u16string serverSigned1;
-    std::u16string serverSignature1;
-    std::u16string euiccCiPkIdToBeUsed;
-    std::u16string serverCertificate;
+    AuthenticateConfigInfo authenticateConfigInfo;
     ResponseEsimResult responseAuthenticateResult;
     esimFile->currentChannelId = 0;
-    EXPECT_EQ(responseAuthenticateResult.resultCode, (esimFile->AuthenticateServer(
-        portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate)).resultCode);
+    EXPECT_EQ(responseAuthenticateResult.resultCode,
+        (esimFile->AuthenticateServer(authenticateConfigInfo)).resultCode);
     int32_t slotId = 0;
     esimFile->currentChannelId = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(responseAuthenticateResult.resultCode, (esimFile->AuthenticateServer(
-        portIndex, matchingId, serverSigned1, serverSignature1, euiccCiPkIdToBeUsed, serverCertificate)).resultCode);
+    EXPECT_EQ(responseAuthenticateResult.resultCode,
+        (esimFile->AuthenticateServer(authenticateConfigInfo)).resultCode);
 }
 
 HWTEST_F(EsimTest, ObtainPrepareDownload_001, Function | MediumTest | Level2)

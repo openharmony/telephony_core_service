@@ -1095,21 +1095,14 @@ int32_t CoreServiceClient::GetEuiccInfo2(
 }
 
 int32_t CoreServiceClient::AuthenticateServer(
-    int32_t slotId, int32_t portIndex,
-    const std::u16string &matchingId,
-    const std::u16string &serverSigned1,
-    const std::u16string &serverSignature1,
-    const std::u16string &euiccCiPkIdToBeUsed,
-    const std::u16string &serverCertificate,
-    ResponseEsimResult &responseResult)
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->AuthenticateServer(slotId, portIndex, matchingId, serverSigned1, serverSignature1,
-        euiccCiPkIdToBeUsed, serverCertificate, responseResult);
+    return proxy->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
 }
 #endif
 } // namespace Telephony
