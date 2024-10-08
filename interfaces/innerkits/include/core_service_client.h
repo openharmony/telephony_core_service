@@ -932,7 +932,9 @@ public:
      * @brief cancel session.
      *
      * @param slotId[in], sim slot id
-     * @param profile[in], the Bound Profile Package data returned by SM-DP+ server
+     * @param transactionId[in], the Id of the transaction
+     * @param cancelReason[in], reason for canceling a profile download session
+     * @param responseResult[out], the result of the session
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,

@@ -45,10 +45,6 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
     }
     isObtainDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(obtainDefaultSmdpAddressMutex_);
-    if (this == nullptr) {
-        TELEPHONY_LOGE("this is null!");
-        return "";
-    }
     if (!obtainDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
@@ -70,10 +66,6 @@ ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, 
     }
     isCancelSessionReady_ = false;
     std::unique_lock<std::mutex> lock(cancelSessionMutex_);
-    if (this == nullptr) {
-        TELEPHONY_LOGE("this is null!");
-        return "";
-    }
     if (!cancelSessionCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isCancelSessionReady_; })) {
         SyncCloseChannel();
@@ -95,10 +87,6 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
     }
     isObtainProfileReady_ = false;
     std::unique_lock<std::mutex> lock(obtainProfileMutex_);
-    if (this == nullptr) {
-        TELEPHONY_LOGE("this is null!");
-        return "";
-    }
     if (!obtainProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainProfileReady_; })) {
         SyncCloseChannel();
@@ -198,7 +186,7 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
     std::string transactionIdStr = Str16ToStr8(profile->transactionId);
     std::string transactionIdByte = Asn1Utils::HexStrToBytes(transactionIdStr);
     builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, transactionIdByte, transactionIdByte.length());
-    builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, (uint)profile->cancelReason);
+    builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, static_cast<unit>(profile->cancelReason));
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -227,7 +215,7 @@ bool EsimFile::ProcessObtainDefaultSmdpAddressDone(const AppExecFwk::InnerEvent:
         return false;
     }
     std::string outPutBytes;
-    int32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
+    uint32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero!");
         return false;
@@ -248,7 +236,7 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
         return false;
     }
     std::string responseResult;
-    int32_t byteLen = root->Asn1AsBytes(responseResult);
+    uint32_t byteLen = root->Asn1AsBytes(responseResult);
     cancelSessionResult_.resultCode = ResultState::RESULT_OK;
     cancelSessionResult_.response = OHOS::Telephony::ToUtf16(responseResult);
     {
