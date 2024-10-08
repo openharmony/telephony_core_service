@@ -139,21 +139,7 @@ bool EsimFile::ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::
 
 bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
