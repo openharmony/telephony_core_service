@@ -91,8 +91,7 @@ public:
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    ResponseEsimResult PrepareDownload(int32_t portIndex, const std::u16string &hashCc,
-        const std::u16string &smdpSigned2, const std::u16string &smdpSignature2, const std::u16string &smdpCertificate);
+    ResponseEsimResult PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult LoadBoundProfilePackage(int32_t portIndex, const std::u16string &boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
 #endif

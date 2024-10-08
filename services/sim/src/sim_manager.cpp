@@ -1257,16 +1257,14 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-int32_t SimManager::PrepareDownload(int32_t slotId, int32_t portIndex, const std::u16string &hashCc,
-    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2,
-    const std::u16string &smdpCertificate, ResponseEsimResult &responseResult)
+int32_t SimManager::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    responseResult = simFileManager_[slotId]->PrepareDownload(
-        portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate);
+    responseResult = simFileManager_[slotId]->PrepareDownload(downLoadConfigInfo);
     return TELEPHONY_ERR_SUCCESS;
 }
 

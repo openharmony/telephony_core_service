@@ -984,15 +984,13 @@ void SimFileManager::ClearData()
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-ResponseEsimResult SimFileManager::PrepareDownload(int32_t portIndex, const std::u16string &hashCc,
-    const std::u16string &smdpSigned2, const std::u16string &smdpSignature2, const std::u16string &smdpCertificate)
+ResponseEsimResult SimFileManager::PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("eSimFile is nullptr");
         return ResponseEsimResult();
     }
-    ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(
-        portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate);
+    ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(downLoadConfigInfo);
     return result;
 }
 

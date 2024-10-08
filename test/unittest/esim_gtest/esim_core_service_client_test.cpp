@@ -49,15 +49,12 @@ void EsimCoreServiceClientTest::TearDown() {}
 
 HWTEST_F(EsimCoreServiceClientTest, PrepareDownload_0001, Function | MediumTest | Level1)
 {
+    DownLoadConfigInfo downLoadConfigInfo;
     int32_t slotId = 0;
-    int32_t portIndex = 0;
-    std::u16string hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
-    std::u16string smdpSigned2;
-    std::u16string smdpSignature2;
-    std::u16string smdpCertificate;
-    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, portIndex, hashCc,
-        smdpSigned2, smdpSignature2, smdpCertificate, responseResult);
+    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 

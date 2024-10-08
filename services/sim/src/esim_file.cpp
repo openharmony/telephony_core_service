@@ -34,19 +34,13 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-namespace {
-const int32_t CHILD_COUNT = 2;
-const int32_t CHILD_CHILD_COUNT = 3;
-}
-
-ResponseEsimResult EsimFile::ObtainPrepareDownload(int32_t portIndex, const std::u16string hashCc,
-    const std::u16string smdpSigned2, const std::u16string smdpSignature2, const std::u16string smdpCertificate)
+ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
-    esimProfile_.portIndex = portIndex;
-    esimProfile_.hashCc = hashCc;
-    esimProfile_.smdpSigned2 = smdpSigned2;
-    esimProfile_.smdpSignature2 = smdpSignature2;
-    esimProfile_.smdpCertificate = smdpCertificate;
+    esimProfile_.portIndex = downLoadConfigInfo.portIndex;
+    esimProfile_.hashCc = downLoadConfigInfo.hashCc;
+    esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2;
+    esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2;
+    esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate;
     SyncOpenChannel();
     recvCombineStr_ = "";
     if (!ProcessPrepareDownload(slotId_)) {
@@ -109,32 +103,54 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
 
 bool EsimFile::ProcessPrepareDownload(int32_t slotId)
 {
-    if (IsLogicChannelOpen()) {
-        PrepareDownloadResp dst;
-        ConvertPreDownloadParaFromApiStru(dst, esimProfile_);
-        EsimProfile *profile = &esimProfile_;
-        if (profile == nullptr) {
-            return false;
-        }
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_PREPARE_DOWNLOAD);
-        if (builder == nullptr) {
-            return false;
-        }
-        Asn1AddChildAsBase64(builder, dst.smdpSigned2);
-        Asn1AddChildAsBase64(builder, dst.smdpSignature2);
-        if (dst.hashCc.size() != 0) {
-            std::string bytes = VCardUtils::DecodeBase64(dst.hashCc);
-            uint32_t byteLen = bytes.length();
-            builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, byteLen);
-        }
-        Asn1AddChildAsBase64(builder, dst.smdpCertificate);
-        int hexStrLen = 0;
-        std::string hexStr;
-        hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
-        SplitSendLongData(slotId, hexStr);
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    PrepareDownloadResp dst;
+    ConvertPreDownloadParaFromApiStru(dst, esimProfile_);
+    EsimProfile *profile = &esimProfile_;
+    if (profile == nullptr) {
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_PREPARE_DOWNLOAD);
+    if (builder == nullptr) {
+        return false;
+    }
+    Asn1AddChildAsBase64(builder, dst.smdpSigned2);
+    Asn1AddChildAsBase64(builder, dst.smdpSignature2);
+    if (dst.hashCc.size() != 0) {
+        std::string bytes = VCardUtils::DecodeBase64(dst.hashCc);
+        uint32_t byteLen = bytes.length();
+        builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, byteLen);
+    }
+    Asn1AddChildAsBase64(builder, dst.smdpCertificate);
+    int32_t hexStrLen = 0;
+    std::string hexStr;
+    hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    SplitSendLongData(slotId, hexStr);
+    return true;
+}
+
+std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return nullptr;
+    }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return nullptr;
+    }
+    std::shared_ptr<IccFileData> resultDataPtr = nullptr;
+    resultDataPtr = &(rcvMsg->fileData);
+    if (resultDataPtr == nullptr) {
+        TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
+        return nullptr;
+    }
+    std::string responseByte = Asn1Utils::HexStrToBytes(resultDataPtr->resultData);
+    uint32_t byteLen = responseByte.length();
+    return Asn1ParseResponse(responseByte, byteLen);
 }
 
 bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -163,9 +179,9 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     if (childNode != nullptr) {
         std::shared_ptr<Asn1Node> errCodeNode = childNode->Asn1GetChild(TAG_ESIM_CTX_COMP_1);
         if (errCodeNode != nullptr) {
-            int protocolErr = errCodeNode->Asn1AsInteger();
+            int32_t protocolErr = errCodeNode->Asn1AsInteger();
             if (protocolErr != TELEPHONY_ERR_ARGUMENT_INVALID) {
-                TELEPHONY_LOGE("Prepare download error, es10x errcode: %d", protocolErr);
+                TELEPHONY_LOGE("Prepare download error, es10x errcode: %{public}d", protocolErr);
                 return false;
             }
         }
@@ -183,9 +199,8 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
 
 bool EsimFile::DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode)
 {
-    uint32_t byteLen = 0;
     std::string destString = VCardUtils::DecodeBase64(boundProfilePackageStr);
-    byteLen = destString.length();
+    uint32_t byteLen = destString.length();
     std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(destString, 0, byteLen);
     if (decoder == nullptr) {
         TELEPHONY_LOGE("decoder is nullptr");
@@ -204,8 +219,7 @@ void EsimFile::BuildApduForInitSecureChannel(
 {
     std::string hexStr;
     std::string destStr;
-    int cursorLen = 0;
-    cursorLen = bppNode->Asn1GetHeadAsHexStr(hexStr);
+    int32_t cursorLen = bppNode->Asn1GetHeadAsHexStr(hexStr);
     cursorLen += initSecureChannelReq->Asn1NodeToHexStr(destStr);
     hexStr += destStr;
     codec.BuildStoreData(hexStr);
@@ -213,26 +227,27 @@ void EsimFile::BuildApduForInitSecureChannel(
 
 void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87)
 {
-    int cursorLen = 0;
     std::string hexStr;
-    cursorLen = firstSequenceOf87->Asn1NodeToHexStr(hexStr);
+    int32_t cursorLen = firstSequenceOf87->Asn1NodeToHexStr(hexStr);
     codec.BuildStoreData(hexStr);
 }
 
 void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &sequenceOf88)
 {
-    int cursorLen = 0;
     std::list<std::shared_ptr<Asn1Node>> metaDataSeqs;
-    int metaDataRes = sequenceOf88->Asn1GetChildren(TAG_ESIM_CTX_8, metaDataSeqs);
+    int32_t metaDataRes = sequenceOf88->Asn1GetChildren(TAG_ESIM_CTX_8, metaDataSeqs);
     if (metaDataRes != 0) {
         return;
     }
     std::string hexStr;
-    cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
+    int32_t cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = metaDataSeqs.begin(); it != metaDataSeqs.end(); ++it) {
         curNode = *it;
+        if (curNode == nullptr) {
+            break;
+        }
         curNode->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
     }
@@ -241,10 +256,9 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr
 void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &bppNode,
     std::shared_ptr<Asn1Node> &sequenceOf86)
 {
-    int cursorLen = 0;
     std::string hexStr;
     std::list<std::shared_ptr<Asn1Node>> elementSeqs;
-    int elementRes = sequenceOf86->Asn1GetChildren(TAG_ESIM_CTX_6, elementSeqs);
+    int32_t elementRes = sequenceOf86->Asn1GetChildren(TAG_ESIM_CTX_6, elementSeqs);
     if (elementRes != 0) {
         TELEPHONY_LOGE("sequenceOf86 encode error");
         return;
@@ -259,11 +273,14 @@ void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr
         pGetChild->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
     }
-    cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
+    int32_t cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = elementSeqs.begin(); it != elementSeqs.end(); ++it) {
         curNode = *it;
+        if (curNode == nullptr) {
+            break;
+        }
         curNode->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
     }
@@ -405,7 +422,7 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
     }
     std::string iccid;
     std::string iccString;
-    int iccidLen = iccidAsn->Asn1AsBytes(iccid);
+    int32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
     Asn1Utils::BchToString(iccid, iccString);
     loadBPPResult_.iccId = OHOS::Telephony::ToUtf16(iccString);
 
@@ -423,11 +440,10 @@ std::shared_ptr<Asn1Node> EsimFile::LoadBoundProfilePackageParseProfileInstallRe
         TELEPHONY_LOGE("failed to find ProfileInstallationResult tag");
         return nullptr;
     }
-    std::shared_ptr<Asn1Node> errNode = resultData->Asn1GetChildChild(CHILD_CHILD_COUNT, TAG_ESIM_CTX_COMP_2,
+    std::shared_ptr<Asn1Node> errNode = resultData->Asn1GetGreatGrandson(TAG_ESIM_CTX_COMP_2,
         TAG_ESIM_CTX_COMP_1, TAG_ESIM_CTX_1);
     if (errNode != nullptr) {
-        int errCode = errNode->Asn1AsInteger();
-        loadBPPResult_.resultCode = errCode;
+        loadBPPResult_.resultCode = errNode->Asn1AsInteger();
         return nullptr;
     }
     std::shared_ptr<Asn1Node> notificationMetadataAsn = resultData->Asn1GetChild(TAG_ESIM_NOTIFICATION_METADATA);
@@ -441,25 +457,25 @@ std::shared_ptr<Asn1Node> EsimFile::LoadBoundProfilePackageParseProfileInstallRe
 bool EsimFile::ProcessListNotifications(
     int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_LIST_NOTIFICATION);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        builder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, (int)events);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_LIST_NOTIFICATION);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    builder->Asn1AddChildAsBits(TAG_ESIM_CTX_1, static_cast<int32_t>(events));
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
@@ -473,7 +489,7 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
         metadataNode = node;
     } else if (node->GetNodeTag() == TAG_ESIM_PROFILE_INSTALLATION_RESULT) {
         std::shared_ptr<Asn1Node> findNode =
-            node->Asn1GetChildChild(CHILD_COUNT, TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
+            node->Asn1GetGrandson(TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
             TAG_ESIM_NOTIFICATION_METADATA);
         metadataNode = findNode;
     } else {
@@ -497,9 +513,9 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
         TELEPHONY_LOGE("nodeTargetAddr is nullptr");
         return;
     }
-    std::string strResult;
-    nodeTargetAddr->Asn1AsBytes(strResult);
-    euicc.targetAddr = OHOS::Telephony::ToUtf16(strResult);
+    std::string resultStr;
+    nodeTargetAddr->Asn1AsBytes(resultStr);
+    euicc.targetAddr = OHOS::Telephony::ToUtf16(resultStr);
 
     std::shared_ptr<Asn1Node> nodeEvent = metadataNode->Asn1GetChild(TAG_ESIM_EVENT);
     if (nodeEvent == nullptr) {
@@ -513,7 +529,7 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
     euicc.data = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
 }
 
-bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> root)
+bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root)
 {
     if (root->Asn1HasChild(TAG_ESIM_CTX_1)) {
         TELEPHONY_LOGE("child is nullptr");
@@ -525,7 +541,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> ro
         TELEPHONY_LOGE("compTag is nullptr");
         return false;
     }
-    int metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_NOTIFICATION_METADATA, ls);
+    int32_t metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_NOTIFICATION_METADATA, ls);
     if (metaDataRes != 0) {
         TELEPHONY_LOGE("metaDataTag is zero");
         return false;
@@ -549,26 +565,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> ro
 
 bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
-    if (byteLen == 0) {
-        TELEPHONY_LOGE("byteLen is zero");
-        return false;
-    }
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;

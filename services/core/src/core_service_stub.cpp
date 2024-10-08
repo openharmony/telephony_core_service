@@ -1954,16 +1954,16 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnPrepareDownload(MessageParcel &data, MessageParcel &reply)
 {
+    DownLoadConfigInfo downLoadConfigInfo;
     int32_t slotId = data.ReadInt32();
-    int32_t portIndex = data.ReadInt32();
-    std::u16string hashCc = data.ReadString16();
-    std::u16string smdpSigned2 = data.ReadString16();
-    std::u16string smdpSignature2 = data.ReadString16();
-    std::u16string smdpCertificate = data.ReadString16();
+    downLoadConfigInfo.portIndex = data.ReadInt32();
+    downLoadConfigInfo.hashCc = data.ReadString16();
+    downLoadConfigInfo.smdpSigned2 = data.ReadString16();
+    downLoadConfigInfo.smdpSignature2 = data.ReadString16();
+    downLoadConfigInfo.smdpCertificate = data.ReadString16();
 
     ResponseEsimResult responseResult;
-    int32_t result = PrepareDownload(slotId, portIndex, hashCc, smdpSigned2, smdpSignature2,
-        smdpCertificate, responseResult);
+    int32_t result = PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
@@ -2009,8 +2009,8 @@ int32_t CoreServiceStub::OnListNotifications(MessageParcel &data, MessageParcel 
     int32_t result = ListNotifications(slotId, portIndex, events, notificationList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(notificationList.euiccNotification.size());
-        for (auto &notification : notificationList.euiccNotification) {
+        ret = (ret && reply.WriteInt32(notificationList.euiccNotification.size()));
+        for (const auto &notification : notificationList.euiccNotification) {
             ret = (ret && reply.WriteInt32(notification.seq));
             ret = (ret && reply.WriteString16(notification.targetAddr));
             ret = (ret && reply.WriteInt32(notification.event));
