@@ -153,6 +153,30 @@ HWTEST_F(EuiccInfoTest, Unmarshalling_0200, Function | MediumTest | Level1)
     Parcel parcel;
     std::list<bool> readString16List;
     readString16List.push_back(false);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    EXPECT_EQ(info.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(EuiccInfoTest, Unmarshalling_0300, Function | MediumTest | Level1)
+{
+    EuiccInfo info;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    MockReadString16(true, &readString16List);
+    EXPECT_EQ(info.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(EuiccInfoTest, Unmarshalling_0400, Function | MediumTest | Level1)
+{
+    EuiccInfo info;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(false);
     readString16List.push_back(false);
     MockReadString16(true, &readString16List);
     EXPECT_EQ(info.Unmarshalling(parcel), nullptr);

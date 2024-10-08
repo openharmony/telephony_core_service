@@ -168,5 +168,31 @@ HWTEST_F(DownloadProfileResultTest, Unmarshalling_0200, Function | MediumTest | 
     EXPECT_EQ(downloadProfileResult.Unmarshalling(parcel), nullptr);
     ResetParcelState();
 }
+
+HWTEST_F(DownloadProfileResultTest, Unmarshalling_0300, Function | MediumTest | Level1)
+{
+    DownloadProfileResult downloadProfileResult;
+    Parcel parcel;
+    std::list<bool> readInt32List;
+    readInt32List.push_back(true);
+    readInt32List.push_back(false);
+    MockReadInt32(true, &readInt32List);
+    MockReadUint32(true);
+    EXPECT_EQ(downloadProfileResult.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadProfileResultTest, Unmarshalling_0400, Function | MediumTest | Level1)
+{
+    DownloadProfileResult downloadProfileResult;
+    Parcel parcel;
+    std::list<bool> readInt32List;
+    readInt32List.push_back(true);
+    readInt32List.push_back(true);
+    MockReadInt32(true, &readInt32List);
+    MockReadUint32(false);
+    EXPECT_EQ(downloadProfileResult.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
 } // namespace Telephony
 } // namespace OHOS

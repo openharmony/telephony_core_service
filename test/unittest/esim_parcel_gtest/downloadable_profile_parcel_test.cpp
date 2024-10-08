@@ -51,7 +51,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0100, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_TRUE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -68,7 +68,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0200, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -85,7 +85,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0300, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -102,7 +102,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0400, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -119,7 +119,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0500, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(false, 5);
+    MockReadUint32(false, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -136,7 +136,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0600, Function | MediumTest | L
     readString16List.push_back(false);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -153,7 +153,7 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0700, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(false);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
@@ -170,9 +170,8 @@ HWTEST_F(DownloadableProfileTest, ReadFromParcel_0800, Function | MediumTest | L
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(false);
-    downloadableProfile.accessRules_.resize(5);
     EXPECT_FALSE(downloadableProfile.ReadFromParcel(parcel));
     ResetParcelState();
 }
@@ -181,7 +180,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0100, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -199,7 +198,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0200, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(false);
     writeString16List.push_back(true);
@@ -217,7 +216,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0300, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(false);
@@ -235,7 +234,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0400, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -253,7 +252,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0500, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -271,7 +270,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0600, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -289,7 +288,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0700, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -307,7 +306,7 @@ HWTEST_F(DownloadableProfileTest, Marshalling_0800, Function | MediumTest | Leve
 {
     DownloadableProfile downloadableProfile;
     Parcel parcel;
-    downloadableProfile.accessRules_.resize(5);
+    downloadableProfile.accessRules_.resize(1);
     std::list<bool> writeString16List;
     writeString16List.push_back(true);
     writeString16List.push_back(true);
@@ -332,7 +331,7 @@ HWTEST_F(DownloadableProfileTest, Unmarshalling_0100, Function | MediumTest | Le
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(true, 5);
+    MockReadUint32(true, 1);
     MockReadInt32(true);
     EXPECT_NE(downloadableProfile.Unmarshalling(parcel), nullptr);
     ResetParcelState();
@@ -343,14 +342,116 @@ HWTEST_F(DownloadableProfileTest, Unmarshalling_0200, Function | MediumTest | Le
     DownloadableProfile downloadableProfile;
     Parcel parcel;
     std::list<bool> readString16List;
+    readString16List.push_back(false);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0300, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0400, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0500, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
     readString16List.push_back(true);
     readString16List.push_back(true);
     readString16List.push_back(true);
     readString16List.push_back(true);
     readString16List.push_back(true);
     MockReadString16(true, &readString16List);
-    MockReadUint32(false, 5);
+    MockReadUint32(false, 1);
     MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0600, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0700, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(false);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(true);
+    EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(DownloadableProfileTest, Unmarshalling_0800, Function | MediumTest | Level1)
+{
+    DownloadableProfile downloadableProfile;
+    Parcel parcel;
+    std::list<bool> readString16List;
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    readString16List.push_back(true);
+    MockReadString16(true, &readString16List);
+    MockReadUint32(true, 1);
+    MockReadInt32(false);
     EXPECT_EQ(downloadableProfile.Unmarshalling(parcel), nullptr);
     ResetParcelState();
 }

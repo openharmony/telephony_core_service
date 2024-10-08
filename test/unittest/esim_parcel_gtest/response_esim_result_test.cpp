@@ -138,5 +138,25 @@ HWTEST_F(ResponseEsimResultTest, Unmarshalling_0200, Function | MediumTest | Lev
     EXPECT_EQ(responseEsimResultTest.Unmarshalling(parcel), nullptr);
     ResetParcelState();
 }
+
+HWTEST_F(ResponseEsimResultTest, Unmarshalling_0300, Function | MediumTest | Level1)
+{
+    ResponseEsimResult responseEsimResultTest;
+    Parcel parcel;
+    MockReadInt32(true);
+    MockReadString16(false);
+    EXPECT_EQ(responseEsimResultTest.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
+
+HWTEST_F(ResponseEsimResultTest, Unmarshalling_0400, Function | MediumTest | Level1)
+{
+    ResponseEsimResult responseEsimResultTest;
+    Parcel parcel;
+    MockReadInt32(false);
+    MockReadString16(false);
+    EXPECT_EQ(responseEsimResultTest.Unmarshalling(parcel), nullptr);
+    ResetParcelState();
+}
 } // namespace Telephony
 } // namespace OHOS
