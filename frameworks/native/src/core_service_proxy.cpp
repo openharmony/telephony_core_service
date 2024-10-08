@@ -3249,16 +3249,16 @@ int32_t CoreServiceProxy::CancelSession(
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t responseResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::CANCEL_SESSION),
+    int32_t sendResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::CANCEL_SESSION),
         data, reply, option);
-    if (responseResult != ERR_NONE) {
-        TELEPHONY_LOGE("CancelSession failed, error code is %{public}d", responseResult);
+    if (sendResult != ERR_NONE) {
+        TELEPHONY_LOGE("CancelSession failed, error code is %{public}d", sendResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        sendResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        sendResult.response = reply.ReadString16();
     }
     return result;
 }

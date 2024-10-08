@@ -183,9 +183,11 @@ HWTEST_F(EsimTest, ProcessGetProfile_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventGetProfile = iccFile->BuildCallerInfo(MSG_ESIM_GET_PROFILE);
-    esimFile->currentChannelId = 0;
+    const int32_t CHANEL_ID_ZERO = 0;
+    esimFile->currentChannelId = CHANEL_ID_ZERO;
     EXPECT_FALSE(esimFile->ProcessGetProfile(slotId, eventGetProfile));
-    esimFile->currentChannelId = 2;
+    const int32_t CHANEL_ID_TWO = 0;
+    esimFile->currentChannelId = CHANEL_ID_TWO;
     std::string str = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(str);
     EXPECT_FALSE(esimFile->ProcessGetProfile(slotId, eventGetProfile));
