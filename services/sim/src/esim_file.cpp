@@ -167,7 +167,6 @@ bool EsimFile::ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerE
         return false;
     }
     return true;
-
 }
 
 bool EsimFile::ProcessRequestRulesAuthTable(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
