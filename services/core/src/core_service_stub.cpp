@@ -1963,6 +1963,8 @@ int32_t CoreServiceStub::OnGetEid(MessageParcel &data, MessageParcel &reply)
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteString16(eId));
+    } else {
+        return TELEPHONY_ERR_FAIL;
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -1977,29 +1979,37 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     GetEuiccProfileInfoListResult euiccProfileInfoList;
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(euiccProfileInfoList.profiles.size());
-        for (const auto& profile : euiccProfileInfoList.profiles) {
-            reply.WriteString16(profile.iccId);
-            reply.WriteString16(profile.nickName);
-            reply.WriteString16(profile.serviceProviderName);
-            reply.WriteString16(profile.profileName);
-            reply.WriteInt32(static_cast<int32_t>(profile.state));
-            reply.WriteInt32(static_cast<int32_t>(profile.profileClass));
-            reply.WriteString16(profile.carrierId.mcc);
-            reply.WriteString16(profile.carrierId.mnc);
-            reply.WriteString16(profile.carrierId.gid1);
-            reply.WriteString16(profile.carrierId.gid2);
-            reply.WriteInt32(static_cast<int32_t>(profile.policyRules));
-            reply.WriteInt32(profile.accessRules.size());
-            for (const auto& rule : profile.accessRules) {
-                reply.WriteString16(rule.certificateHashHexStr);
-                reply.WriteString16(rule.packageName);
-                reply.WriteInt32(rule.accessType);
+        for (const auto &profile : euiccProfileInfoList.profiles) {
+            ret = (ret && reply.WriteString16(profile.iccId));
+            ret = (ret && reply.WriteString16(profile.nickName));
+            ret = (ret && reply.WriteString16(profile.serviceProviderName));
+            ret = (ret && reply.WriteString16(profile.profileName));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.state)));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.profileClass)));
+            ret = (ret && reply.WriteString16(profile.carrierId.mcc));
+            ret = (ret && reply.WriteString16(profile.carrierId.mnc));
+            ret = (ret && reply.WriteString16(profile.carrierId.gid1));
+            ret = (ret && reply.WriteString16(profile.carrierId.gid2));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.policyRules)));
+            ret = (ret && reply.WriteInt32(profile.accessRules.size()));
+            for (const auto &rule : profile.accessRules) {
+                ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
+                ret = (ret && reply.WriteString16(rule.packageName));
+                ret = (ret && reply.WriteInt32(rule.accessType));
             }
         }
-        reply.WriteBool(euiccProfileInfoList.isRemovable);
-        reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result));
+        ret = (ret && reply.WriteBool(euiccProfileInfoList.isRemovable));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result)));
+        if (!ret) {
+            TELEPHONY_LOGE("write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
     return result;
 }
@@ -2012,6 +2022,9 @@ int32_t CoreServiceStub::OnGetEuiccInfo(MessageParcel &data, MessageParcel &repl
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteString16(eUiccInfo.osVersion) && reply.WriteString16(eUiccInfo.response));
+    } else {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

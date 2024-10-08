@@ -48,7 +48,7 @@ void EsimFile::SyncOpenChannel()
 {
     uint32_t tryCnt = 0;
     while (!IsLogicChannelOpen()) {
-        ProcessEsimOpenChannel();
+        ProcessEsimOpenChannel(ISDR_AID);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
         if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
@@ -272,16 +272,7 @@ bool EsimFile::IsLogicChannelOpen()
     return false;
 }
 
-void EsimFile::ProcessEsimOpenChannel()
-{
-    int32_t p2 = -1;
-    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_OPEN_CHANNEL_DONE);
-    if (telRilManager_ == nullptr) {
-        return;
-    }
-    telRilManager_->SimOpenLogicalChannel(0, ISDR_AID, p2, response);
-    return;
-}
+
 
 void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid)
 {
@@ -338,21 +329,7 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
 
 bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
@@ -391,21 +368,7 @@ std::shared_ptr<Asn1Node> EsimFile::Asn1ParseResponse(std::string response, int3
 
 bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
@@ -441,27 +404,15 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
     oss << std::hex << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_HIGH])
         << "." << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_MIDDLE])
         << "." << std::setw(NUMBER_TWO) << std::setfill('0') << static_cast<unsigned char>(svnRaw[VERSION_LOW]);
-  
-    std::string formattedVersion = oss.str();
-    euiccInfo1.svn = formattedVersion;
+
+    euiccInfo1.svn = oss.str();
     eUiccInfo_.osVersion = Str8ToStr16(euiccInfo1.svn);
     return true;
 }
 
 bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return false;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return false;
-    }
-    IccFileData *result = &(rcvMsg->fileData);
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, responseByte.length());
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
@@ -537,6 +488,28 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     } else {
         IccFile::ProcessEvent(event);
     }
+}
+
+std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return nullptr;
+    }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return nullptr;
+    }
+    std::shared_ptr<IccFileData> resultDataPtr = nullptr;
+    resultDataPtr = &(rcvMsg->fileData);
+    if (resultDataPtr == nullptr) {
+        TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
+        return nullptr;
+    }
+    vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(resultDataPtr->resultData);
+    uint32_t byteLen = responseByte.size();
+    return Asn1ParseResponse(responseByte, byteLen);
 }
 
 int32_t EsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
