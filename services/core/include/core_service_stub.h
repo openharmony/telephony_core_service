@@ -145,7 +145,6 @@ private:
     int32_t OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
     int32_t OnCancelSession(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProfile(MessageParcel &data, MessageParcel &reply);
-    int32_t WriteIccIdDatas(EuiccProfile &eUiccProfile);
 #endif
 
 private:

@@ -42,6 +42,7 @@ private:
     bool ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    std::string GetProfileTagList();
     bool ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
 
     EsimProfile esimProfile_;
