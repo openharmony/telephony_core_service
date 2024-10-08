@@ -186,12 +186,19 @@ HWTEST_F(EsimTest, ProcessPrepareDownload_001, Function | MediumTest | Level2)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     esimFile->currentChannelId = 0;
     EXPECT_FALSE(esimFile->ProcessPrepareDownload(slotId));
+
     esimFile->currentChannelId = 2;
     EXPECT_TRUE(esimFile->ProcessPrepareDownload(slotId));
+
+    std::u16string str = u"hashCctest";
+    esimFile->esimProfile_.hashCc = str;
+    EXPECT_TRUE(esimFile->ProcessPrepareDownload(slotId));
+
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -203,18 +210,29 @@ HWTEST_F(EsimTest, ProcessPrepareDownloadDone_001, Function | MediumTest | Level
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
-    rcvMsg->fileData.resultData = "BF218196A08193304E8008D14FE1DE62C340D75F494104B067E0DF2D080C747D76DF98198DB876" +
-        "6625CB216E62A2796003287E41E8DAD1D28229C14B9F5D7901D03D224D6AEC6EF031BA9176D50298ECB42F56739014365F37400A" +
-        "3F852229A3A0606F5E90FF9D2F2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E629CD27CF9" +
-        "DC6A5768A93B0165E0F54D";
+    rcvMsg->fileData.resultData =
+        "BF218196A08193304E8008D14FE1DE62C340D75F494104B067E0DF2D080C747D76DF98198DB8766625CB216E62A2796003287E41"
+        "E8DAD1D28229C14B9F5D7901D03D224D6AEC6EF031BA9176D50298ECB42F56739014365F37400A3F852229A3A0606F5E90FF9D2F"
+        "2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E629CD27CF9DC6A5768A93B0165E0F54D";
     rcvMsg->fileData.sw1 = 0x90;
     rcvMsg->fileData.sw2 = 0x00;
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_FALSE(esimFile->ProcessPrepareDownloadDone(event));
+
+    rcvMsg->fileData.sw1 = 0x61;
+    auto eventRecevMore = AppExecFwk::InnerEvent::Get(0, rcvMsg);
+    EXPECT_FALSE(esimFile->ProcessPrepareDownloadDone(eventRecevMore));
+
+    rcvMsg->fileData.resultData = "";
+    rcvMsg->fileData.sw1 = 0x90;
+    EXPECT_FALSE(esimFile->ProcessPrepareDownloadDone(eventRecevMore));
+
     auto event1 = AppExecFwk::InnerEvent::Get(0);
     EXPECT_FALSE(esimFile->ProcessPrepareDownloadDone(event1));
+
     event1 = nullptr;
     EXPECT_FALSE(esimFile->ProcessPrepareDownloadDone(event1));
 }
@@ -364,14 +382,21 @@ HWTEST_F(EsimTest, ProcessListNotificationsDone_001, Function | MediumTest | Lev
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData =
         "BF282BA029BF2F118001010C08736D64702E636F6081020410BF2F128001020C09736D6470322E636F60810204209000";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_FALSE(esimFile->ProcessListNotificationsDone(event));
+
+    rcvMsg->fileData.resultData = "";
+    auto eventMsgEmpty = AppExecFwk::InnerEvent::Get(0, rcvMsg);
+    EXPECT_FALSE(esimFile->ProcessListNotificationsDone(eventMsgEmpty));
+
     auto eventListNotif = AppExecFwk::InnerEvent::Get(0);
     EXPECT_EQ(esimFile->ProcessListNotificationsDone(eventListNotif), false);
+
     eventListNotif = nullptr;
     EXPECT_EQ(esimFile->ProcessListNotificationsDone(eventListNotif), false);
 }
@@ -389,16 +414,79 @@ HWTEST_F(EsimTest, createNotification_001, Function | MediumTest | Level2)
     esimFile->createNotification(node, euicc);
 }
 
+HWTEST_F(EsimTest, createNotification_002, Function | MediumTest | Level2)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
+    std::string resultData = "BF282BA029BF2F118001010C00736D64702E636F6D8100";
+    std::string responseByte = Asn1Utils::HexStrToBytes(resultData.c_str());
+    int32_t byteLen = responseByte.length();
+    std::shared_ptr<Asn1Node> node = esimFile->Asn1ParseResponse(responseByte, byteLen);
+    EuiccNotification euicc;
+    esimFile->createNotification(node, euicc);
+}
+
+HWTEST_F(EsimTest, createNotification_003, Function | MediumTest | Level2)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    std::string resultData = "BF2F118001010C08736D64702E636F6D81020410";
+    std::string responseByte = Asn1Utils::HexStrToBytes(resultData.c_str());
+    int32_t byteLen = responseByte.length();
+    std::shared_ptr<Asn1Node> node = esimFile->Asn1ParseResponse(responseByte, byteLen);
+    EuiccNotification euicc;
+    esimFile->createNotification(node, euicc);
+}
+
 HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
     std::string resultData =
         "BF282BA029BF2F118001010C08736D64702E636F6D81020410BF2F128001020C09736D6470322E636F6D810204209000";
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
     int32_t byteLen = responseByte.length();
+
+    std::shared_ptr<Asn1Node> profileNode = esimFile->Asn1ParseResponse(responseByte, byteLen);
+    bool isFileHandleResponse = false;
+    EXPECT_EQ(esimFile->ProcessListNotificationsAsn1Response(profileNode, isFileHandleResponse), false);
+}
+
+HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_002, Function | MediumTest | Level2)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
+    std::string resultData =
+        "BF2803810101";
+    std::string responseByte;
+    responseByte = Asn1Utils::HexStrToBytes(resultData);
+    int32_t byteLen = responseByte.length();
+
+    std::shared_ptr<Asn1Node> profileNode = esimFile->Asn1ParseResponse(responseByte, byteLen);
+    bool isFileHandleResponse = false;
+    EXPECT_EQ(esimFile->ProcessListNotificationsAsn1Response(profileNode, isFileHandleResponse), false);
+}
+
+HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_003, Function | MediumTest | Level2)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+
+    std::string resultData =
+        "BF2803A00101";
+    std::string responseByte;
+    responseByte = Asn1Utils::HexStrToBytes(resultData);
+    int32_t byteLen = responseByte.length();
+
     std::shared_ptr<Asn1Node> profileNode = esimFile->Asn1ParseResponse(responseByte, byteLen);
     bool isFileHandleResponse = false;
     EXPECT_EQ(esimFile->ProcessListNotificationsAsn1Response(profileNode, isFileHandleResponse), false);
