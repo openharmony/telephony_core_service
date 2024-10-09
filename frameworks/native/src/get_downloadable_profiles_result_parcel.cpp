@@ -31,7 +31,7 @@ bool GetDownloadableProfilesResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
     downloadableProfiles_.resize(size);
-    for (auto const &profile : downloadableProfiles_) {
+    for (auto &profile : downloadableProfiles_) {
         if (!parcel.ReadString16(profile.encodedActivationCode_) ||
             !parcel.ReadString16(profile.confirmationCode_) ||
             !parcel.ReadString16(profile.carrierName_)) {
@@ -43,7 +43,7 @@ bool GetDownloadableProfilesResult::ReadFromParcel(Parcel &parcel)
             return false;
         }
         profile.accessRules_.resize(count);
-        for (auto const &rule : profile.accessRules_) {
+        for (auto &rule : profile.accessRules_) {
             if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
                 !parcel.ReadString16(rule.packageName_) ||
                 !parcel.ReadInt32(rule.accessType_)) {
