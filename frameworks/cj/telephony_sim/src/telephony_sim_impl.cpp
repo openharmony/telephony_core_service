@@ -37,7 +37,6 @@ namespace Telephony {
 
     static int32_t ConvertCJErrCode(int32_t errCode)
     {
-        TELEPHONY_LOGD("The original error code is displayed: %{public}d", errCode);
         switch (errCode) {
             case TELEPHONY_ERR_ARGUMENT_MISMATCH:
             case TELEPHONY_ERR_ARGUMENT_INVALID:
@@ -286,7 +285,10 @@ namespace Telephony {
         errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetActiveSimAccountInfoList(activeInfo);
         if (errCode == ERROR_NONE) {
             size_t infoSize = activeInfo.size();
-            CIccAccountInfo* head = reinterpret_cast<CIccAccountInfo *>(malloc(sizeof(CIccAccountInfo) * infoSize));
+            CIccAccountInfo* head = nullptr;
+            if (infoSize > 0) {
+                head = reinterpret_cast<CIccAccountInfo *>(malloc(sizeof(CIccAccountInfo) * infoSize));
+            }
             if (head == nullptr && infoSize > 0) {
                 TELEPHONY_LOGE("NativeGetSimAccountInfo malloc failed!");
                 return accountInfoList;
