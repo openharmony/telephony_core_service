@@ -1963,8 +1963,6 @@ int32_t CoreServiceStub::OnGetEid(MessageParcel &data, MessageParcel &reply)
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteString16(eId));
-    } else {
-        return TELEPHONY_ERR_FAIL;
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -1979,10 +1977,6 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     GetEuiccProfileInfoListResult euiccProfileInfoList;
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
-    if (!ret) {
-        TELEPHONY_LOGE("write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
     if (result == TELEPHONY_ERR_SUCCESS) {
         reply.WriteInt32(euiccProfileInfoList.profiles.size());
         for (const auto &profile : euiccProfileInfoList.profiles) {
@@ -2022,9 +2016,6 @@ int32_t CoreServiceStub::OnGetEuiccInfo(MessageParcel &data, MessageParcel &repl
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteString16(eUiccInfo.osVersion) && reply.WriteString16(eUiccInfo.response));
-    } else {
-        TELEPHONY_LOGE("write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
