@@ -58,11 +58,11 @@ HWTEST_F(EsimTest, DeleteProfile_001, Function | MediumTest | Level2)
 
     std::u16string iccId;
     ResultState disableProfileResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_NE(disableProfileResult_, esimFile->DeleteProfile(iccId));
 
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -79,11 +79,11 @@ HWTEST_F(EsimTest, SwitchToProfile_001, Function | MediumTest | Level2)
     std::u16string iccId;
     bool forceDeactivateSim = false;
     ResultState switchResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_NE(switchResult_, esimFile->SwitchToProfile(portIndex, iccId, forceDeactivateSim));
 
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -99,11 +99,11 @@ HWTEST_F(EsimTest, SetProfileNickname_001, Function | MediumTest | Level2)
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
     ResultState updateNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_NE(updateNicknameResult_, esimFile->SetProfileNickname(iccId, nickname));
 
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -119,10 +119,10 @@ HWTEST_F(EsimTest, ProcessDeleteProfile_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventDeleteProfile = iccFile->BuildCallerInfo(MSG_ESIM_DELETE_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessDeleteProfile(slotId, eventDeleteProfile));
 
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessDeleteProfile(slotId, eventDeleteProfile));
@@ -159,10 +159,10 @@ HWTEST_F(EsimTest, ProcessSwitchToProfile_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSwitchToProfile = iccFile->BuildCallerInfo(MSG_ESIM_SWITCH_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
 
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
@@ -204,10 +204,10 @@ HWTEST_F(EsimTest, ProcessSetNickname_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSetNickName = iccFile->BuildCallerInfo(MSG_ESIM_SET_NICK_NAME);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSetNickname(slotId, eventSetNickName));
 
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessSetNickname(slotId, eventSetNickName));
