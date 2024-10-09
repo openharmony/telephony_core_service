@@ -104,7 +104,6 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
     if (IsLogicChannelOpen()) {
         return false;
     }
-    
     EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DELETE_PROFILE);
     if (builder == nullptr) {
@@ -124,7 +123,7 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
     if (apduResult == TELEPHONY_ERR_FAIL) {
         return false;
     }
-    return true;  
+    return true;
 }
 
 bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
