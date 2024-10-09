@@ -197,76 +197,76 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
 
 bool EsimFile::ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EID);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        std::string eidTags;
-        eidTags += static_cast<unsigned char>(TAG_ESIM_EID);
-        builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, eidTags, eidTags.length());
-        ApduSimIORequestInfo requestInfo;
-        CommBuildOneApduReqInfo(requestInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EID);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    std::string eidTags;
+    eidTags += static_cast<unsigned char>(TAG_ESIM_EID);
+    builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, eidTags, eidTags.length());
+    ApduSimIORequestInfo requestInfo;
+    CommBuildOneApduReqInfo(requestInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
+    return true;
 }
 
 bool EsimFile::ProcessObtainEuiccInfo1(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_1);
-        ApduSimIORequestInfo requestInfo;
-        CommBuildOneApduReqInfo(requestInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_1);
+    ApduSimIORequestInfo requestInfo;
+    CommBuildOneApduReqInfo(requestInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
+    return true;
 }
 
 bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_PROFILES);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        unsigned char EUICC_PROFILE_TAGS[] = {
-            static_cast<unsigned char>(TAG_ESIM_ICCID),
-            static_cast<unsigned char>(TAG_ESIM_NICKNAME),
-            static_cast<unsigned char>(TAG_ESIM_OBTAIN_OPERATOR_NAME),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_NAME),
-            static_cast<unsigned char>(TAG_ESIM_OPERATOR_ID),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE / PROFILE_DEFAULT_NUMBER),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE % PROFILE_DEFAULT_NUMBER),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_CLASS),
-            static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
-            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
-            static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
-        };
-        std::string euiccProfileTags;
-        for (unsigned char tag : EUICC_PROFILE_TAGS) {
-            euiccProfileTags += tag;
-        }
-        builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, euiccProfileTags, euiccProfileTags.length());
-        ApduSimIORequestInfo requestInfo;
-        CommBuildOneApduReqInfo(requestInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_PROFILES);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    unsigned char EUICC_PROFILE_TAGS[] = {
+        static_cast<unsigned char>(TAG_ESIM_ICCID),
+        static_cast<unsigned char>(TAG_ESIM_NICKNAME),
+        static_cast<unsigned char>(TAG_ESIM_OBTAIN_OPERATOR_NAME),
+        static_cast<unsigned char>(TAG_ESIM_PROFILE_NAME),
+        static_cast<unsigned char>(TAG_ESIM_OPERATOR_ID),
+        static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE / PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PROFILE_STATE % PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PROFILE_CLASS),
+        static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
+        static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
+    };
+    std::string euiccProfileTags;
+    for (unsigned char tag : EUICC_PROFILE_TAGS) {
+        euiccProfileTags += tag;
+    }
+    builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, euiccProfileTags, euiccProfileTags.length());
+    ApduSimIORequestInfo requestInfo;
+    CommBuildOneApduReqInfo(requestInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    telRilManager_->SimTransmitApduLogicalChannel(slotId, requestInfo, responseEvent);
+    return true;
 }
 
 bool EsimFile::IsLogicChannelOpen()
@@ -280,12 +280,11 @@ bool EsimFile::IsLogicChannelOpen()
 void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid)
 {
     std::string appId = OHOS::Telephony::ToUtf8(aid);
-    int32_t p2 = -1;
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_OPEN_CHANNEL_DONE);
     if (telRilManager_ == nullptr) {
         return;
     }
-    telRilManager_->SimOpenLogicalChannel(slotid_, appId, p2, response);
+    telRilManager_->SimOpenLogicalChannel(slotid_, appId, PARAMETER_TWO, response);
     return;
 }
 
@@ -380,6 +379,12 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("ObtainEuiccInfo1ParseTagCtx2 error!");
         return false;
     }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return false;
+    }
+    IccFileData *result = &(rcvMsg->fileData);
     eUiccInfo_.response = Str8ToStr16(result->resultData);
     {
         std::lock_guard<std::mutex> lock(euiccInfo1Mutex_);
@@ -504,8 +509,7 @@ std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return nullptr;
     }
-    std::shared_ptr<IccFileData> resultDataPtr = nullptr;
-    resultDataPtr = &(rcvMsg->fileData);
+    std::shared_ptr<IccFileData> resultDataPtr = &(rcvMsg->fileData);
     if (resultDataPtr == nullptr) {
         TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
         return nullptr;

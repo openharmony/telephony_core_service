@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t PARAMETER_TWO = -1;
 constexpr static const int32_t NUMBER_TWO = 2;
 constexpr static const int32_t NUMBER_THREE = 3;
 constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
