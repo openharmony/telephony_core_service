@@ -275,7 +275,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
         TELEPHONY_LOGE("DecodeBoundProfilePackage failed");
         return false;
     }
-    RequestApduBuild codec(currentChannelId);
+    RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> initSecureChannelReq = bppNode->Asn1GetChild(TAG_ESIM_INITIALISE_SECURE_CHANNEL);
     if (initSecureChannelReq != nullptr) {
         BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
