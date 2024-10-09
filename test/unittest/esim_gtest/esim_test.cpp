@@ -55,10 +55,10 @@ HWTEST_F(EsimTest, ObtainEuiccInfo2_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     ResponseEsimResult responseInfo2Result;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(responseInfo2Result.resultCode, (esimFile->ObtainEuiccInfo2(portIndex)).resultCode);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -73,9 +73,9 @@ HWTEST_F(EsimTest, ProcessObtainEUICCInfo2_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(esimFile->ProcessObtainEUICCInfo2(slotId, eventEUICCInfo2), false);
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_EQ(esimFile->ProcessObtainEUICCInfo2(slotId, eventEUICCInfo2), false);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -255,11 +255,11 @@ HWTEST_F(EsimTest, AuthenticateServer_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     AuthenticateConfigInfo authenticateConfigInfo;
     ResponseEsimResult responseAuthenticateResult;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(responseAuthenticateResult.resultCode,
         (esimFile->AuthenticateServer(authenticateConfigInfo)).resultCode);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -278,11 +278,11 @@ HWTEST_F(EsimTest, ObtainPrepareDownload_001, Function | MediumTest | Level2)
     std::u16string smdpSignature2;
     std::u16string smdpCertificate;
     ResponseEsimResult preDownloadResult;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(preDownloadResult.resultCode, (esimFile->ObtainPrepareDownload(
         portIndex, hashCc, smdpSigned2, smdpSignature2, smdpCertificate)).resultCode);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -298,11 +298,11 @@ HWTEST_F(EsimTest, ObtainLoadBoundProfilePackage_001, Function | MediumTest | Le
     int32_t portIndex = 0;
     std::u16string boundProfilePackage;
     ResponseEsimBppResult loadBPPResult;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(loadBPPResult.resultCode, (esimFile->ObtainLoadBoundProfilePackage(
         portIndex, boundProfilePackage)).resultCode);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -317,10 +317,10 @@ HWTEST_F(EsimTest, ListNotifications_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     Event events = Event::EVENT_DONOTHING;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_TRUE((esimFile->ListNotifications(portIndex, events)).euiccNotification.empty());
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -335,9 +335,9 @@ HWTEST_F(EsimTest, ProcessListNotifications_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventListNotif = iccFile->BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessListNotifications(slotId, Event::EVENT_ENABLE, eventListNotif));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessListNotifications(slotId, Event::EVENT_ENABLE, eventListNotif));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -369,10 +369,10 @@ HWTEST_F(EsimTest, RetrieveNotificationList_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     Event events = Event::EVENT_DONOTHING;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_TRUE((esimFile->RetrieveNotificationList(portIndex, events)).euiccNotification.empty());
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -387,10 +387,10 @@ HWTEST_F(EsimTest, ObtainRetrieveNotification_001, Function | MediumTest | Level
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
     EuiccNotification notification;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(notification.seq, (esimFile->ObtainRetrieveNotification(portIndex, seqNumber)).seq);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -405,10 +405,10 @@ HWTEST_F(EsimTest, RemoveNotificationFromList_001, Function | MediumTest | Level
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
     ResultState removeNotifResult = ResultState::RESULT_OK;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(removeNotifResult, esimFile->RemoveNotificationFromList(portIndex, seqNumber));
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -423,9 +423,9 @@ HWTEST_F(EsimTest, ProcessRemoveNotification_001, Function | MediumTest | Level2
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventRemoveNotif = iccFile->BuildCallerInfo(MSG_ESIM_REMOVE_NOTIFICATION);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessRemoveNotification(slotId, eventRemoveNotif));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessRemoveNotification(slotId, eventRemoveNotif));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -465,10 +465,10 @@ HWTEST_F(EsimTest, SendApduData_001, Function | MediumTest | Level2)
     std::u16string aid;
     std::u16string apduData;
     ResponseEsimResult transApduDataResponse_;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(transApduDataResponse_.resultCode, (esimFile->SendApduData(aid, apduData)).resultCode);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -483,9 +483,9 @@ HWTEST_F(EsimTest, ProcessObtainEuiccInfo1_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo1 = iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO_1_DONE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(esimFile->ProcessObtainEuiccInfo1(slotId, eventEUICCInfo1), false);
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_EQ(esimFile->ProcessObtainEuiccInfo1(slotId, eventEUICCInfo1), false);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -531,9 +531,9 @@ HWTEST_F(EsimTest, ProcessDeleteProfile_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventDeleteProfile = iccFile->BuildCallerInfo(MSG_ESIM_DELETE_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessDeleteProfile(slotId, eventDeleteProfile));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessDeleteProfile(slotId, eventDeleteProfile));
@@ -566,9 +566,9 @@ HWTEST_F(EsimTest, ProcessSwitchToProfile_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSwitchToProfile = iccFile->BuildCallerInfo(MSG_ESIM_SWITCH_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
@@ -605,9 +605,9 @@ HWTEST_F(EsimTest, ProcessSetNickname_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSetNickName = iccFile->BuildCallerInfo(MSG_ESIM_SET_NICK_NAME);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSetNickname(slotId, eventSetNickName));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string iccIdStr = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(iccIdStr);
     EXPECT_FALSE(esimFile->ProcessSetNickname(slotId, eventSetNickName));
@@ -645,9 +645,9 @@ HWTEST_F(EsimTest, ProcessEstablishDefaultSmdpAddress_001, Function | MediumTest
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress =
         iccFile->BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessEstablishDefaultSmdpAddress(slotId, eventSetSmdpAddress));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessEstablishDefaultSmdpAddress(slotId, eventSetSmdpAddress));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -680,9 +680,9 @@ HWTEST_F(EsimTest, ProcessObtainDefaultSmdpAddress_001, Function | MediumTest | 
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSmdpAddress =
         iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_DEFAULT_SMDP_ADDRESS_DONE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessObtainDefaultSmdpAddress(slotId, eventSmdpAddress));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessObtainDefaultSmdpAddress(slotId, eventSmdpAddress));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -714,9 +714,9 @@ HWTEST_F(EsimTest, ProcessCancelSession_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventCancelSession = iccFile->BuildCallerInfo(MSG_ESIM_CANCEL_SESSION);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessCancelSession(slotId, eventCancelSession));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessCancelSession(slotId, eventCancelSession));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -753,9 +753,9 @@ HWTEST_F(EsimTest, ProcessGetProfile_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventGetProfile = iccFile->BuildCallerInfo(MSG_ESIM_GET_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessGetProfile(slotId, eventGetProfile));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::string str = "ABCDEFG";
     esimFile->esimProfile_.iccId = Str8ToStr16(str);
     EXPECT_FALSE(esimFile->ProcessGetProfile(slotId, eventGetProfile));
@@ -816,9 +816,9 @@ HWTEST_F(EsimTest, ProcessObtainSmdsAddress_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventObtainSmdsAddress = iccFile->BuildCallerInfo(MSG_ESIM_OBTAIN_SMDS_ADDRESS);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessObtainSmdsAddress(slotId, eventObtainSmdsAddress));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessObtainSmdsAddress(slotId, eventObtainSmdsAddress));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -848,9 +848,9 @@ HWTEST_F(EsimTest, ProcessAuthenticateServer_001, Function | MediumTest | Level2
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t slotId = 0;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessAuthenticateServer(slotId));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_TRUE(esimFile->ProcessAuthenticateServer(slotId));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -911,9 +911,9 @@ HWTEST_F(EsimTest, ProcessPrepareDownload_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessPrepareDownload(slotId));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_TRUE(esimFile->ProcessPrepareDownload(slotId));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -951,9 +951,9 @@ HWTEST_F(EsimTest, ProcessRetrieveNotification_001, Function | MediumTest | Leve
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventRetrieveNotification =
         iccFile->BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessRetrieveNotification(slotId, eventRetrieveNotification));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessRetrieveNotification(slotId, eventRetrieveNotification));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -1122,13 +1122,13 @@ HWTEST_F(EsimTest, ProcessRequestRulesAuthTable_001, Function | MediumTest | Lev
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable =
         iccFile->BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
-    esimFile->currentChannelId = 1;
+    esimFile->currentChannelId_ = 1;
     EXPECT_FALSE(esimFile->ProcessRequestRulesAuthTable(slotId, eventRequestRulesAuthTable));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessRequestRulesAuthTable(slotId, eventRequestRulesAuthTable));
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessRequestRulesAuthTable(slotId, eventRequestRulesAuthTable));
 }
 
@@ -1200,13 +1200,13 @@ HWTEST_F(EsimTest, ProcessSendApduData_001, Function | MediumTest | Level2)
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSendApduData = iccFile->BuildCallerInfo(MSG_ESIM_SEND_APUD_DATA);
-    esimFile->currentChannelId = 1;
+    esimFile->currentChannelId_ = 1;
     EXPECT_FALSE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
 }
 
@@ -1236,13 +1236,13 @@ HWTEST_F(EsimTest, ProcessRetrieveNotificationList_001, Function | MediumTest | 
     AppExecFwk::InnerEvent::Pointer eventRetrieveListNotif =
         iccFile->BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_LIST);
     Event events = Event::EVENT_ENABLE;
-    esimFile->currentChannelId = 1;
+    esimFile->currentChannelId_ = 1;
     EXPECT_FALSE(esimFile->ProcessRetrieveNotificationList(slotId, events, eventRetrieveListNotif));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessRetrieveNotificationList(slotId, events, eventRetrieveListNotif));
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessRetrieveNotificationList(slotId, events, eventRetrieveListNotif));
 }
 
@@ -1374,9 +1374,9 @@ HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_001, Function | MediumTest | L
     int32_t slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventGetProfile = iccFile->BuildCallerInfo(MSG_ESIM_GET_PROFILE);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
     esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(boundProfilePackage);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
@@ -1402,8 +1402,8 @@ HWTEST_F(EsimTest, BuildApduForInitSecureChannel_001, Function | MediumTest | Le
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Node> bppNode = nullptr;
     esimFile->DecodeBoundProfilePackage(boundProfilePackage, bppNode);
-    int32_t currentChannelId = 1;
-    RequestApduBuild codec(currentChannelId);
+    int32_t currentChannelId_ = 1;
+    RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> initSecureChannelReq = bppNode->Asn1GetChild(TAG_ESIM_INITIALISE_SECURE_CHANNEL);
     esimFile->BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
 }
@@ -1415,8 +1415,8 @@ HWTEST_F(EsimTest, BuildApduForFirstSequenceOf87_001, Function | MediumTest | Le
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Node> bppNode = nullptr;
     esimFile->DecodeBoundProfilePackage(boundProfilePackage, bppNode);
-    int32_t currentChannelId = 1;
-    RequestApduBuild codec(currentChannelId);
+    int32_t currentChannelId_ = 1;
+    RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> firstSequenceOf87 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     esimFile->BuildApduForFirstSequenceOf87(codec, firstSequenceOf87);
 }
@@ -1428,8 +1428,8 @@ HWTEST_F(EsimTest, BuildApduForSequenceOf88_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Node> bppNode = nullptr;
     esimFile->DecodeBoundProfilePackage(boundProfilePackage, bppNode);
-    int32_t currentChannelId = 1;
-    RequestApduBuild codec(currentChannelId);
+    int32_t currentChannelId_ = 1;
+    RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> sequenceOf88 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_1);
     esimFile->BuildApduForSequenceOf88(codec, sequenceOf88);
 }
@@ -1441,8 +1441,8 @@ HWTEST_F(EsimTest, BuildApduForSequenceOf86_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Node> bppNode = nullptr;
     esimFile->DecodeBoundProfilePackage(boundProfilePackage, bppNode);
-    int32_t currentChannelId = 1;
-    RequestApduBuild codec(currentChannelId);
+    int32_t currentChannelId_ = 1;
+    RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> sequenceOf86 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_3);
     esimFile->BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
 }
