@@ -61,8 +61,7 @@ ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAdd
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress = BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
-    int32_t eSimSlotId = slotId_;
-    if (!ProcessEstablishDefaultSmdpAddress(eSimSlotId, eventSetSmdpAddress)) {
+    if (!ProcessEstablishDefaultSmdpAddress(slotId_, eventSetSmdpAddress)) {
         TELEPHONY_LOGE("ProcessEstablishDefaultSmdpAddress encode failed!!");
         return ResultState();
     }
@@ -211,7 +210,7 @@ bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent:
 
     EsimProfile *profile = &esimProfile_;
     std::string hexStr = OHOS::Telephony::ToUtf8(profile->toBeSendApduDataHexStr);
-    RequestApduBuild codec(currentChannelId);
+    RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> list = codec.getCommands();
     std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());

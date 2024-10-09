@@ -56,10 +56,10 @@ HWTEST_F(EsimTest, ResetMemory_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     ResetOption resetOption = ResetOption::DELETE_FIELD_LOADED_TEST_PROFILES;
     ResultState resetResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_NE(resetResult_, esimFile->ResetMemory(resetOption));
     int32_t slotId = 0;
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
@@ -74,9 +74,9 @@ HWTEST_F(EsimTest, ProcessResetMemory_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventResetMemory = iccFile->BuildCallerInfo(MSG_ESIM_RESET_MEMORY);
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_EQ(esimFile->ProcessResetMemory(slotId, eventResetMemory), false);
-    esimFile->currentChannelId = 2;
+    esimFile->currentChannelId_ = 2;
     EXPECT_EQ(esimFile->ProcessResetMemory(slotId, eventResetMemory), false);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
@@ -124,13 +124,13 @@ HWTEST_F(EsimTest, ProcessSendApduData_001, Function | MediumTest | Level2)
     int slotId = 0;
     std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer eventSendApduData = iccFile->BuildCallerInfo(MSG_ESIM_SEND_APUD_DATA);
-    esimFile->currentChannelId = 1;
+    esimFile->currentChannelId_ = 1;
     EXPECT_FALSE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
     EXPECT_TRUE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
-    esimFile->currentChannelId = 0;
+    esimFile->currentChannelId_ = 0;
     EXPECT_FALSE(esimFile->ProcessSendApduData(slotId, eventSendApduData));
 }
 } // namespace Telephony
