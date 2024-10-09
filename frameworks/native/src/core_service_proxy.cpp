@@ -3211,7 +3211,7 @@ int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &ic
     int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(
         CoreServiceInterfaceCode::DELETE_PROFILE), data, reply, option);
     if (sendRequestRet != ERR_NONE) {
-        TELEPHONY_LOGE("DeleteProfile failed, error code is %{public}d", st);
+        TELEPHONY_LOGE("DeleteProfile failed, error code is %{public}d", sendRequestRet);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -3244,7 +3244,7 @@ int32_t CoreServiceProxy::SwitchToProfile(
     int32_t sendRequestRet = remote->SendRequest(static_cast<uint32_t>(
         CoreServiceInterfaceCode::SWITCH_TO_PROFILE), data, reply, option);
     if (sendRequestRet != ERR_NONE) {
-        TELEPHONY_LOGE("SwitchToProfile failed, error code is %{public}d", st);
+        TELEPHONY_LOGE("SwitchToProfile failed, error code is %{public}d", sendRequestRet);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
