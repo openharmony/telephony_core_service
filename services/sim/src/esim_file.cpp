@@ -42,7 +42,6 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
     esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2;
     esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate;
     SyncOpenChannel();
-    recvCombineStr_ = "";
     if (!ProcessPrepareDownload(slotId_)) {
         TELEPHONY_LOGE("ProcessPrepareDownload encode failed");
         return ResponseEsimResult();
@@ -64,7 +63,6 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     esimProfile_.portIndex = portIndex;
     esimProfile_.boundProfilePackage = boundProfilePackage;
     SyncOpenChannel();
-    recvCombineStr_ = "";
     isLoadBppReady_ = false;
     if (!ProcessLoadBoundProfilePackage(slotId_)) {
         TELEPHONY_LOGE("ProcessLoadBoundProfilePackage encode failed");
@@ -124,33 +122,13 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
         builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, byteLen);
     }
     Asn1AddChildAsBase64(builder, dst.smdpCertificate);
-    int32_t hexStrLen = 0;
     std::string hexStr;
-    hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    if (hexStrLen == 0) {
+        return false;
+    }
     SplitSendLongData(slotId, hexStr);
     return true;
-}
-
-std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
-        return nullptr;
-    }
-    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
-    if (rcvMsg == nullptr) {
-        TELEPHONY_LOGE("rcvMsg is nullptr");
-        return nullptr;
-    }
-    std::shared_ptr<IccFileData> resultDataPtr = nullptr;
-    resultDataPtr = &(rcvMsg->fileData);
-    if (resultDataPtr == nullptr) {
-        TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
-        return nullptr;
-    }
-    std::string responseByte = Asn1Utils::HexStrToBytes(resultDataPtr->resultData);
-    uint32_t byteLen = responseByte.length();
-    return Asn1ParseResponse(responseByte, byteLen);
 }
 
 bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -219,7 +197,7 @@ void EsimFile::BuildApduForInitSecureChannel(
 {
     std::string hexStr;
     std::string destStr;
-    int32_t cursorLen = bppNode->Asn1GetHeadAsHexStr(hexStr);
+    uint32_t cursorLen = bppNode->Asn1GetHeadAsHexStr(hexStr);
     cursorLen += initSecureChannelReq->Asn1NodeToHexStr(destStr);
     hexStr += destStr;
     codec.BuildStoreData(hexStr);
@@ -228,7 +206,7 @@ void EsimFile::BuildApduForInitSecureChannel(
 void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87)
 {
     std::string hexStr;
-    int32_t cursorLen = firstSequenceOf87->Asn1NodeToHexStr(hexStr);
+    uint32_t cursorLen = firstSequenceOf87->Asn1NodeToHexStr(hexStr);
     codec.BuildStoreData(hexStr);
 }
 
@@ -240,7 +218,7 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr
         return;
     }
     std::string hexStr;
-    int32_t cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
+    uint32_t cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = metaDataSeqs.begin(); it != metaDataSeqs.end(); ++it) {
@@ -263,8 +241,7 @@ void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr
         TELEPHONY_LOGE("sequenceOf86 encode error");
         return;
     }
-    bool isHasChild = bppNode->Asn1HasChild(TAG_ESIM_CTX_COMP_2);
-    if (isHasChild) {
+    if (bppNode->Asn1HasChild(TAG_ESIM_CTX_COMP_2)) {
         std::shared_ptr<Asn1Node> pGetChild = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_2);
         if (pGetChild == nullptr) {
             TELEPHONY_LOGE("pGetChild is nullptr");
@@ -273,7 +250,7 @@ void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr
         pGetChild->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
     }
-    int32_t cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
+    uint32_t cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = elementSeqs.begin(); it != elementSeqs.end(); ++it) {
@@ -422,10 +399,9 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
     }
     std::string iccid;
     std::string iccString;
-    int32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
+    uint32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
     Asn1Utils::BchToString(iccid, iccString);
     loadBPPResult_.iccId = OHOS::Telephony::ToUtf16(iccString);
-
     return true;
 }
 
