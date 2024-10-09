@@ -103,7 +103,7 @@ bool EsimFile::ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEv
         return false;
     }
     std::string hexStr;
-    int32_t strLen = builder->Asn1BuilderToHexStr(hexStr);
+    uint32_t strLen = builder->Asn1BuilderToHexStr(hexStr);
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -144,15 +144,14 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     Asn1AddChildAsBase64(builder, bytes.serverCertificate);
     std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     AddCtxParams1(ctxParams1Builder, &bytes);
-    if (ctxParams1Builder == nullptr)
-    {
+    if (ctxParams1Builder == nullptr) {
         TELEPHONY_LOGE("AddCtxParams1 failed");
         return false;
     }
     std::shared_ptr<Asn1Node> ctxNode = ctxParams1Builder->Asn1Build();
     builder->Asn1AddChild(ctxNode);
     std::string hexStr;
-    int32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
     SplitSendLongData(slotId, hexStr);
     return true;
 }
@@ -281,8 +280,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
 
 std::string EsimFile::MakeVersionString(std::vector<uint8_t> &versionRaw)
 {
-    if (versionRaw.size() < BYTE_NUM3)
-    {
+    if (versionRaw.size() < BYTE_NUM3) {
         TELEPHONY_LOGE("versionRaw.size error!");
         return "";
     }
@@ -544,7 +542,6 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId
     }
     telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
     return true;
-
 }
 
 bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
