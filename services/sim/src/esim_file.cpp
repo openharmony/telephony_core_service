@@ -308,14 +308,13 @@ struct CarrierIdentifier buildCarrierIdentifiers(std::shared_ptr<Asn1Node> &root
     if (ctx0Node == nullptr) {
         return defaultCarrier;
     }
-    int32_t mccMncLen = ctx0Node->Asn1AsBytes(mccMnc);
+    uint32_t mccMncLen = ctx0Node->Asn1AsBytes(mccMnc);
     CarrierIdentifier myCarrier = CarrierIdentifiers(mccMnc, mccMncLen, gid1, gid2);
     return myCarrier;
 }
 
 bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &root)
 {
-    constexpr int32_t TAG_NUM = 2;
     std::list<std::shared_ptr<Asn1Node>> Nodes;
     std::list<std::shared_ptr<Asn1Node>> opIdNodes;
     root->Asn1GetChildren(TAG_ESIM_CTX_COMP_0, Nodes);
@@ -411,13 +410,13 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     std::string profileResponseByte;
-    byteLen = profileRoot->Asn1AsBytes(profileResponseByte);
+    uint32_t byteLen = profileRoot->Asn1AsBytes(profileResponseByte);
     if (byteLen == 0) {
         return false;
     }
-    std::string strResult = Asn1Utils::BytesToHexStr(profileResponseByte);
+    std::string resultStr = Asn1Utils::BytesToHexStr(profileResponseByte);
     responseChallengeResult_.resultCode = ResultState::RESULT_OK;
-    responseChallengeResult_.response = OHOS::Telephony::ToUtf16(strResult);
+    responseChallengeResult_.response = OHOS::Telephony::ToUtf16(resultStr);
     {
         std::lock_guard<std::mutex> lock(euiccChallengeMutex_);
         isEuiccChallengeReady_ = true;
