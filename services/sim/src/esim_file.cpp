@@ -161,7 +161,7 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
         TELEPHONY_LOGE("compTag is nullptr");
         return false;
     }
-    int metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_SEQUENCE, ls);
+    int32_t metaDataRes = compTag->Asn1GetChildren(TAG_ESIM_SEQUENCE, ls);
     if (metaDataRes != 0) {
         TELEPHONY_LOGE("metaDataTag is zero");
         return false;
