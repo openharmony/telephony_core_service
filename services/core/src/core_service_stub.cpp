@@ -1956,11 +1956,11 @@ int32_t CoreServiceStub::OnGetEuiccInfo2(MessageParcel &data, MessageParcel &rep
     int32_t portIndex = data.ReadInt32();
     ResponseEsimResult responseResult;
     int32_t result = GetEuiccInfo2(slotId, portIndex, responseResult);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
-        reply.WriteString16(responseResult.response);
-    }
     bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
+    }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -1982,8 +1982,8 @@ int32_t CoreServiceStub::OnAuthenticateServer(MessageParcel &data, MessageParcel
     int32_t result = AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode));
-        reply.WriteString16(responseResult.response);
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
