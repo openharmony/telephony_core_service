@@ -166,7 +166,7 @@ std::string EsimFile::GetProfileTagList()
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
     };
     std::string getProfileTags;
-    for (unsigned char tag : EUICC_PROFILE_TAGS) {
+    for (const unsigned char tag : EUICC_PROFILE_TAGS) {
         getProfileTags += tag;
     }
     return getProfileTags;
