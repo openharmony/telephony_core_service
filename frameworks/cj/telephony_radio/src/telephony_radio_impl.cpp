@@ -26,7 +26,6 @@ namespace Telephony {
 
     static int32_t ConvertCJErrCode(int32_t errCode)
     {
-        TELEPHONY_LOGD("The original error code is displayed: %{public}d", errCode);
         switch (errCode) {
             case TELEPHONY_ERR_ARGUMENT_MISMATCH:
             case TELEPHONY_ERR_ARGUMENT_INVALID:
@@ -267,7 +266,7 @@ namespace Telephony {
 
     char* TelephonyRadioImpl::GetISOCountryCodeForNetwork(int32_t slotId, int32_t &errCode)
     {
-         if (!IsValidSlotId(slotId)) {
+        if (!IsValidSlotId(slotId)) {
             TELEPHONY_LOGE("NativeGetCountryCode slotId is invalid");
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return nullptr;
@@ -307,8 +306,10 @@ namespace Telephony {
         errCode = ConvertCJErrCode(errCode);
         size_t infoSize = signalInfoList.size();
         TELEPHONY_LOGD("NativeGetSignalInfoList size = %{public}zu", signalInfoList.size());
-        CSignalInformation* head =
-            reinterpret_cast<CSignalInformation *>(malloc(sizeof(CSignalInformation) * infoSize));
+        CSignalInformation* head = nullptr;
+        if (infoSize > 0) {
+            head = reinterpret_cast<CSignalInformation *>(malloc(sizeof(CSignalInformation) * infoSize));
+        }
         if (head == nullptr && infoSize > 0) {
             TELEPHONY_LOGE("NativeGetSignalInfoList malloc failed!");
             return csignalInfoList;
