@@ -31,7 +31,7 @@ bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
     profiles_.resize(size);
-    for (auto &profile : profiles_) {
+    for (auto const &profile : profiles_) {
         int32_t stateValue = static_cast<int32_t>(profile.state_);
         int32_t profileClassValue = static_cast<int32_t>(profile.profileClass_);
         int32_t policyRulesValue = static_cast<int32_t>(profile.policyRules_);
@@ -53,7 +53,7 @@ bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
         if (!parcel.ReadUint32(count)) {
             return false;
         }
-        for (auto &rule : profile.accessRules_) {
+        for (auto const &rule : profile.accessRules_) {
             if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
                 !parcel.ReadString16(rule.packageName_) || !parcel.ReadInt32(rule.accessType_)) {
                 return false;
@@ -69,7 +69,7 @@ bool GetEuiccProfileInfoListResult::Marshalling(Parcel &parcel) const
         !parcel.WriteUint32(static_cast<uint32_t>(profiles_.size()))) {
         return false;
     }
-    for (const auto &profile : profiles_) {
+    for (auto const &profile : profiles_) {
         int32_t stateValue = static_cast<int32_t>(profile.state_);
         int32_t profileClassValue = static_cast<int32_t>(profile.profileClass_);
         int32_t policyRulesValue = static_cast<int32_t>(profile.policyRules_);
@@ -87,7 +87,7 @@ bool GetEuiccProfileInfoListResult::Marshalling(Parcel &parcel) const
             !parcel.WriteUint32(static_cast<uint32_t>(profile.accessRules_.size()))) {
             return false;
         }
-        for (const auto &rule : profile.accessRules_) {
+        for (auto const &rule : profile.accessRules_) {
             if (!parcel.WriteString16(rule.certificateHashHexStr_) ||
                 !parcel.WriteString16(rule.packageName_) ||
                 !parcel.WriteInt32(rule.accessType_)) {

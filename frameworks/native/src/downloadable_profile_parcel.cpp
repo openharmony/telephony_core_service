@@ -32,7 +32,7 @@ bool DownloadableProfile::ReadFromParcel(Parcel &parcel)
     }
 
     accessRules_.resize(size);
-    for (auto &rule : accessRules_) {
+    for (auto const &rule : accessRules_) {
         if (!parcel.ReadString16(rule.certificateHashHexStr_) || !parcel.ReadString16(rule.packageName_) ||
             !parcel.ReadInt32(rule.accessType_)) {
             return false;
@@ -48,7 +48,7 @@ bool DownloadableProfile::Marshalling(Parcel &parcel) const
         !parcel.WriteUint32(static_cast<uint32_t>(accessRules_.size()))) {
         return false;
     }
-    for (const auto &rule : accessRules_) {
+    for (auto const &rule : accessRules_) {
         if (!parcel.WriteString16(rule.certificateHashHexStr_) || !parcel.WriteString16(rule.packageName_) ||
             !parcel.WriteInt32(rule.accessType_)) {
             return false;
