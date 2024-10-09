@@ -1981,7 +1981,7 @@ int32_t CoreServiceStub::OnGetSmdsAddress(MessageParcel &data, MessageParcel &re
     int32_t result = GetSmdsAddress(slotId, portIndex, smdsAddress);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteString16(smdsAddress);
+        ret = (ret && reply.WriteString16(smdsAddress));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2002,7 +2002,7 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
         for (const auto &rules : eUiccRulesAuthTable.policyRules) {
             ret = (ret && reply.WriteInt32(rules));
         }
-        reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size());
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size()));
         for (const auto &carrier : eUiccRulesAuthTable.carrierIds) {
             ret = (ret && reply.WriteString16(carrier.mcc));
             ret = (ret && reply.WriteString16(carrier.mnc));
