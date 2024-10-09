@@ -32,7 +32,7 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
     }
 
     downloadableProfiles_.accessRules_.resize(size);
-    for (auto const &rule : downloadableProfiles_.accessRules_) {
+    for (auto &rule : downloadableProfiles_.accessRules_) {
         if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
             !parcel.ReadString16(rule.packageName_) ||
             !parcel.ReadInt32(rule.accessType_)) {

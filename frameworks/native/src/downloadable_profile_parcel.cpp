@@ -32,7 +32,7 @@ bool DownloadableProfile::ReadFromParcel(Parcel &parcel)
     }
 
     accessRules_.resize(size);
-    for (auto const &rule : accessRules_) {
+    for (auto &rule : accessRules_) {
         if (!parcel.ReadString16(rule.certificateHashHexStr_) || !parcel.ReadString16(rule.packageName_) ||
             !parcel.ReadInt32(rule.accessType_)) {
             return false;
