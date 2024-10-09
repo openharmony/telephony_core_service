@@ -183,7 +183,11 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
         return;
     }
     std::string hexStr;
-    int hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    if (hexStrLen == 0) {
+        TELEPHONY_LOGE("hexStrLen is zero!");
+        return;
+    }
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
@@ -335,7 +339,7 @@ bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event
     }
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_EID);
     std::string outPutBytes;
-    int32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
+    uint32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
     if (byteLen == 0) {
         TELEPHONY_LOGE("byteLen is zero!");
         return false;
@@ -394,7 +398,7 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
         return false;
     }
     std::string svnRaw = "";
-    int svnRawlen = svnNode->Asn1AsBytes(svnRaw);
+    uint32_t svnRawlen = svnNode->Asn1AsBytes(svnRaw);
     if (svnRawlen < SVN_RAW_LENGTH_MIN) {
         TELEPHONY_LOGE("invalid SVN data");
         return false;
