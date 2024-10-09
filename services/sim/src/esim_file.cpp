@@ -237,6 +237,9 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
     }
     std::string responseResult;
     uint32_t byteLen = root->Asn1AsBytes(responseResult);
+    if (byteLen == 0) {
+        return false;
+    }
     cancelSessionResult_.resultCode = ResultState::RESULT_OK;
     cancelSessionResult_.response = OHOS::Telephony::ToUtf16(responseResult);
     {
