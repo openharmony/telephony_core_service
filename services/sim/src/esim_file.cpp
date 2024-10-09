@@ -523,7 +523,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId
         return false;
     }
     ApduSimIORequestInfo reqInfo;
-    RequestApduBuild codec(currentChannelId);
+    RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData("");
     std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
     std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
