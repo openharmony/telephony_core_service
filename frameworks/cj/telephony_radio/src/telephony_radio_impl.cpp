@@ -179,8 +179,8 @@ namespace Telephony {
         int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         int32_t csRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CNetworkRadioTech networkRadioTech = {
-            .csRadioTech = csRadioTech,
-            .psRadioTech = psRadioTech
+            .csRadioTech = WrapRadioTech(csRadioTech),
+            .psRadioTech = WrapRadioTech(psRadioTech)
         };
         if (!IsValidSlotId(slotId)) {
             TELEPHONY_LOGE("TelephonyRadioImpl::GetRadioTech slotId is invalid");
@@ -238,7 +238,7 @@ namespace Telephony {
 
     int32_t TelephonyRadioImpl::GetNetworkSelectionMode(int32_t slotId, int32_t &errCode)
     {
-        int32_t selectMode = DEFAULT_ERROR;
+        int32_t selectMode = NETWORK_SELECTION_UNKNOWN;
         if (!IsValidSlotId(slotId)) {
             TELEPHONY_LOGE("NativeGetNetworkSelectionMode slotId is invalid");
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
@@ -342,10 +342,10 @@ namespace Telephony {
             telephonyConfig.IsCapabilitySupport(
                 static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
-    TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
-    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
-        TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
-    }
+        TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
+        if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
+            TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
+        }
 #endif
         return isNrSupported;
     }
