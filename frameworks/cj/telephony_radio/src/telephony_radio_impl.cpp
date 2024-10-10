@@ -169,7 +169,7 @@ namespace Telephony {
     static std::string ToUtf8(std::u16string str16)
     {
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-        // 将std::u16string转换为std::string
+        // std::u16string -> std::string
         std::string result = convert.to_bytes(str16);
         return result;
     }
@@ -293,7 +293,7 @@ namespace Telephony {
     {
         std::vector<sptr<SignalInformation>> signalInfoList;
         CArraySignalInformation csignalInfoList = {
-            .head  = nullptr,
+            .head = nullptr,
             .size = 0
         };
         if (!IsValidSlotIdEx(slotId)) {
@@ -315,7 +315,7 @@ namespace Telephony {
             return csignalInfoList;
         }
         int i = 0;
-        for (sptr<SignalInformation> infoItem : signalInfoList) {
+        for (const sptr<SignalInformation> infoItem : signalInfoList) {
             int32_t signalType = static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
             int32_t signalLevel = 0;
             int32_t signalIntensity = 0;
