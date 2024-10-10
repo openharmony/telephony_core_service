@@ -286,15 +286,15 @@ HWTEST_F(EsimServiceClientBranchTest, OnLoadSystemAbilityFail_0001, Function | M
     int32_t systemAbilityId = 66250;
     EsimServiceClientCallback call;
     call.OnLoadSystemAbilityFail(systemAbilityId);
-    EXPECT_TRUE(call.loadSAFailed_);
+    EXPECT_TRUE(call.isLoadSAFailed_);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, IsFailed_0001, Function | MediumTest | Level1)
 {
     EsimServiceClientCallback call;
-    call.loadSAFailed_ = true;
+    call.isLoadSAFailed_ = true;
     call.IsFailed();
-    EXPECT_TRUE(call.loadSAFailed_);
+    EXPECT_TRUE(call.isLoadSAFailed_);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, GetRemoteObject_0001, Function | MediumTest | Level1)
