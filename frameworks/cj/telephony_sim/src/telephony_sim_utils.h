@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace Telephony {
-
     enum CJErrorCode {
         /**
          * The input parameter value is out of range.
@@ -125,7 +124,6 @@ namespace Telephony {
         CIccAccountInfo* head;
         int64_t size;
     };
-
 }
 }
 
