@@ -20,6 +20,41 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+bool GetEuiccProfileInfoListResult::ReadProfileFromParcel(Parcel &parcel, EuiccProfile &profile)
+{
+    int32_t stateValue;
+    int32_t profileClassValue;
+    int32_t policyRulesValue;
+    if (!parcel.ReadString16(profile.iccId_) || !parcel.ReadString16(profile.nickName_) ||
+        !parcel.ReadString16(profile.serviceProviderName_) || !parcel.ReadString16(profile.profileName_) ||
+        !parcel.ReadInt32(stateValue) || !parcel.ReadInt32(profileClassValue) ||
+        !parcel.ReadString16(profile.carrierId_.mcc_) || !parcel.ReadString16(profile.carrierId_.mnc_) ||
+        !parcel.ReadString16(profile.carrierId_.gid1_) || !parcel.ReadString16(profile.carrierId_.gid2_) ||
+        !parcel.ReadInt32(policyRulesValue)) {
+        return false;
+    }
+    profile.state_ = static_cast<ProfileState>(stateValue);
+    profile.profileClass_ = static_cast<ProfileClass>(profileClassValue);
+    profile.policyRules_ = static_cast<PolicyRules>(policyRulesValue);
+
+    uint32_t count;
+    if (!parcel.ReadUint32(count) || count > MAX_SIZE) {
+        return false;
+    }
+    if (count > MAX_SIZE) {
+        TELEPHONY_LOGE("over max size");
+        return false;
+    }
+    profile.accessRules_.resize(count);
+    for (auto &rule : profile.accessRules_) {
+        if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
+            !parcel.ReadString16(rule.packageName_) || !parcel.ReadInt32(rule.accessType_)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
 {
     int32_t resultValue;
@@ -29,36 +64,17 @@ bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
     result_ = static_cast<ResultState>(resultValue);
 
     uint32_t size;
-    if (!parcel.ReadUint32(size) || size > MAX_SIZE) {
+    if (!parcel.ReadUint32(size)) {
+        return false;
+    }
+    if (size > MAX_SIZE) {
+        TELEPHONY_LOGE("over max size");
         return false;
     }
     profiles_.resize(size);
     for (auto &profile : profiles_) {
-        int32_t stateValue;
-        int32_t profileClassValue;
-        int32_t policyRulesValue;
-        if (!parcel.ReadString16(profile.iccId_) || !parcel.ReadString16(profile.nickName_) ||
-            !parcel.ReadString16(profile.serviceProviderName_) || !parcel.ReadString16(profile.profileName_) ||
-            !parcel.ReadInt32(stateValue) || !parcel.ReadInt32(profileClassValue) ||
-            !parcel.ReadString16(profile.carrierId_.mcc_) || !parcel.ReadString16(profile.carrierId_.mnc_) ||
-            !parcel.ReadString16(profile.carrierId_.gid1_) || !parcel.ReadString16(profile.carrierId_.gid2_) ||
-            !parcel.ReadInt32(policyRulesValue)) {
+        if (!ReadProfileFromParcel(parcel, profile)) {
             return false;
-        }
-        profile.state_ = static_cast<ProfileState>(stateValue);
-        profile.profileClass_ = static_cast<ProfileClass>(profileClassValue);
-        profile.policyRules_ = static_cast<PolicyRules>(policyRulesValue);
-
-        uint32_t count;
-        if (!parcel.ReadUint32(count) || count > MAX_SIZE) {
-            return false;
-        }
-        profile.accessRules_.resize(count);
-        for (auto &rule : profile.accessRules_) {
-            if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
-                !parcel.ReadString16(rule.packageName_) || !parcel.ReadInt32(rule.accessType_)) {
-                return false;
-            }
         }
     }
     return true;

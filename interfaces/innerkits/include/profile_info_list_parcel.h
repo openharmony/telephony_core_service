@@ -32,6 +32,7 @@ struct GetEuiccProfileInfoListResult : public Parcelable {
     std::vector<EuiccProfile> profiles_{};
     bool isRemovable_ = false;
 
+    bool ReadProfileFromParcel(Parcel &parcel, EuiccProfile &profile);
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static GetEuiccProfileInfoListResult *Unmarshalling(Parcel &parcel);
