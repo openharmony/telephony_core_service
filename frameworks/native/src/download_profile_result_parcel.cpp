@@ -21,11 +21,15 @@ namespace OHOS {
 namespace Telephony {
 bool DownloadProfileResult::ReadFromParcel(Parcel &parcel)
 {
-    int32_t resultValue = static_cast<int32_t>(result_);
-    int32_t resolvableErrorsValue = static_cast<int32_t>(resolvableErrors_);
-    if (!parcel.ReadInt32(resultValue) || !parcel.ReadInt32(resolvableErrorsValue) || !parcel.ReadUint32(cardId_)) {
+    int32_t resultValue;
+    int32_t resolvableErrorsValue;
+    if (!parcel.ReadInt32(resultValue) ||
+        !parcel.ReadInt32(resolvableErrorsValue) ||
+        !parcel.ReadUint32(cardId_)) {
         return false;
     }
+    result_ = static_cast<ResultState>(resultValue);
+    resolvableErrors_ = static_cast<ResolvableErrors>(resolvableErrorsValue);
     return true;
 }
 

@@ -22,8 +22,14 @@
       *CoreManagerInner*;
       *CoreServiceClient*;
       *CoreServiceProxy*;
+      *DownloadProfileResult*;
+      *DownloadableProfile*;
       *EsimServiceClient*;
       *EsimServiceProxy*;
+      *EuiccInfo*;
+      *GetDownloadableProfilesResult*;
+      *GetEuiccProfileInfoListResult*;
+      *GetDownloadableProfileMetadataResult*;
       *GsmCellInformation*;
       *GsmCellLocation*;
       *GsmSignalInformation*;
@@ -48,6 +54,7 @@
       *WcdmaCellInformation*;
       *WcdmaSignalInformation*;
       *SatelliteServiceClient*;
+      *ResponseEsimResult*;
       OHOS::Telephony::TelRilBaseParcel*;
       OHOS::Telephony::BaseParcel::Read*;
       OHOS::Telephony::BaseParcel::Write*;
