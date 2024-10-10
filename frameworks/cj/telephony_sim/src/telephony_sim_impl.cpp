@@ -171,13 +171,12 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return nullptr;
         }
-        std::u16string operatorNumeric = u"";
-        std::string operatorName;
+        std::u16string u16OperatorNumeric = u"";
         errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(
-            slotId, operatorNumeric);
-        operatorName = errCode == ERROR_NONE ? ToUtf8(operatorNumeric) : "";
+            slotId, u16OperatorNumeric);
+        std::string operatorNumeric = errCode == ERROR_NONE ? ToUtf8(u16OperatorNumeric) : "";
         errCode = ConvertCJErrCode(errCode);
-        char* result = MallocCString(operatorName);
+        char* result = MallocCString(operatorNumeric);
         return result;
     }
 
@@ -188,12 +187,11 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return nullptr;
         }
-        std::u16string spn = u"";
-        std::string operatorName;
-        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId, spn);
-        operatorName = errCode == ERROR_NONE ? ToUtf8(spn) : "";
+        std::u16string u16Spn = u"";
+        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId, u16Spn);
+        std::string spn = errCode == ERROR_NONE ? ToUtf8(u16Spn) : "";
         errCode = ConvertCJErrCode(errCode);
-        char* result = MallocCString(operatorName);
+        char* result = MallocCString(spn);
         return result;
     }
 
@@ -315,11 +313,11 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return nullptr;
         }
-        std::u16string opkey = u"";
-        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, opkey);
-        std::string value = errCode == ERROR_NONE ? ToUtf8(opkey) : "";
+        std::u16string u16Opkey = u"";
+        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, u16Opkey);
+        std::string opkey = errCode == ERROR_NONE ? ToUtf8(u16Opkey) : "";
         errCode = ConvertCJErrCode(errCode);
-        char* result = MallocCString(value);
+        char* result = MallocCString(opkey);
         return result;
     }
 
@@ -330,11 +328,11 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return nullptr;
         }
-        std::u16string opname = u"";
-        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, opname);
-        std::string value = errCode == ERROR_NONE ? ToUtf8(opname) : "";
+        std::u16string u16OpName = u"";
+        errCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, u16OpName);
+        std::string opName = errCode == ERROR_NONE ? ToUtf8(u16OpName) : "";
         errCode = ConvertCJErrCode(errCode);
-        char* result = MallocCString(value);
+        char* result = MallocCString(opName);
         return result;
     }
 
@@ -345,6 +343,5 @@ namespace Telephony {
         errCode = ConvertCJErrCode(errCode);
         return simId;
     }
-
 }
 }
