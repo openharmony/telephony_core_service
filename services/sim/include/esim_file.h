@@ -60,7 +60,7 @@ public:
     std::string ObtainEid();
     GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
     EuiccInfo GetEuiccInfo();
-    ResultState DisableProfile(int32_t portIndex, std::u16string &iccId);
+    ResultState DisableProfile(int32_t portIndex, const std::u16string &iccId);
     std::string ObtainSmdsAddress(int32_t portIndex);
     EuiccRulesAuthTable ObtainRulesAuthTable(int32_t portIndex);
     ResponseEsimResult ObtainEuiccChallenge(int32_t portIndex);
@@ -135,10 +135,6 @@ private:
     EuiccNotificationList retrieveNotificationList_;
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
-    std::string smdsAddress_ = "";
-    EuiccRulesAuthTable eUiccRulesAuthTable_;
-    ResultState disableProfileResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    ResponseEsimResult responseChallengeResult_;
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
