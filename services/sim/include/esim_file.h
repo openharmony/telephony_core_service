@@ -30,11 +30,17 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr static const int32_t PARAMETER_TWO = -1;
+constexpr static const int32_t NUMBER_ZERO = 0;
+constexpr static const int32_t NUMBER_ONE = 1;
 constexpr static const int32_t NUMBER_TWO = 2;
 constexpr static const int32_t NUMBER_THREE = 3;
+constexpr static const int32_t NUMBER_FOUR = 4;
+constexpr static const int32_t NUMBER_FIVE = 5;
+constexpr static const int32_t NUMBER_ELEVEN = 11;
+constexpr static const int32_t PARAMETER_TWO = -1;
 constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
+static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -76,9 +82,14 @@ private:
     bool ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
+    bool SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::string &mnc);
+    void BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
+    void BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &operatorIdNode);
+    void ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo &src);
     std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    std::string MakeVersionString(std::vector<uint8_t> &versionRaw);
+    std::shared_ptr<Asn1Node> Asn1ParseResponse(const std::vector<uint8_t> &response, uint32_t respLength);
 private:
-    constexpr std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     int32_t currentChannelId_ = -1;
     int32_t slotId_ = 0;

@@ -95,6 +95,7 @@ public:
     std::shared_ptr<EsimFile> GetEsimfile();
     std::u16string GetEid();
     GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
+    EuiccInfo GetEuiccInfo();
 #endif
 
 protected:
