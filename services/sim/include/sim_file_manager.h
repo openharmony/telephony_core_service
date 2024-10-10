@@ -96,6 +96,10 @@ public:
     std::u16string GetEid();
     GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
     EuiccInfo GetEuiccInfo();
+    ResultState DisableProfile(int32_t portIndex, const std::u16string &iccId);
+    std::u16string GetSmdsAddress(int32_t portIndex);
+    EuiccRulesAuthTable GetRulesAuthTable(int32_t portIndex);
+    ResponseEsimResult GetEuiccChallenge(int32_t portIndex);
 #endif
 
 protected:

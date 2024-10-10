@@ -148,6 +148,10 @@ private:
     int32_t OnGetEid(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetEuiccProfileInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetEuiccInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDisableProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:

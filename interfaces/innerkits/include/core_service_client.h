@@ -945,6 +945,49 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
+
+    /**
+     * @brief Disables the profile of the given iccid.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param iccId[in], the iccId of the profile
+     * @param refresh[in], whether sending the REFRESH command to modem
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult);
+
+    /**
+     * @brief Requests the SM-DS address from eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param smdsAddress[out], the result code and the SM-DS address
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress);
+
+    /**
+     * @brief Requests Rules Authorisation Table.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param eUiccRulesAuthTable[out], get the rule authorisation table
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable);
+
+    /**
+     * @brief Requests the eUICC challenge for new profile downloading.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param responseResult[out], get the result code and the challenge
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
 #endif
 
 private:
@@ -953,7 +996,7 @@ private:
     public:
         explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
         ~CoreServiceDeathRecipient() override = default;
-        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        __attribute__((no_sanitize("cfi"))) void OnRemoteDied(const wptr<IRemoteObject> &remote) override
         {
             client_.OnRemoteDied(remote);
         }

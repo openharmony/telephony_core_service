@@ -148,6 +148,13 @@ public:
     virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
     virtual int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) = 0;
     virtual int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) = 0;
+    virtual int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) = 0;
+    virtual int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) = 0;
+    virtual int32_t GetRulesAuthTable(
+        int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) = 0;
+    virtual int32_t GetEuiccChallenge(
+        int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;
 #endif
 };
 } // namespace Telephony

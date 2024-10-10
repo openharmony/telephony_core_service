@@ -2590,8 +2590,8 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
-    if (TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_ != nullptr) {
-        TELEPHONY_EXT_UTILS_WRAPPER.isNrSupported_(isNrSupported);
+    if (TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_ != nullptr) {
+        isNrSupported = isNrSupported && TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_();
     }
 #endif
     TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);

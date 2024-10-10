@@ -15,9 +15,9 @@
 
 #include "core_service_ipc_interface_code.h"
 #include "esim_core_service_stub_test.h"
-#include "gtest/gtest.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -74,6 +74,46 @@ HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccInfo_001, Function | MediumTest | Le
         return;
     }
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_INFO);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnDisableProfile_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::DISABLE_PROFILE);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetSmdsAddress_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_SMDSADDRESS);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetRulesAuthTable_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccChallenge_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_CHALLENGE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 } // namespace Telephony

@@ -151,6 +151,13 @@ public:
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
     int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
     void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
+    int32_t DisableProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh,
+        ResultState &enumResult) override;
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
+    int32_t ParseRulesAuthTableReply(MessageParcel &reply, EuiccRulesAuthTable &eUiccRulesAuthTable);
+    int32_t GetRulesAuthTable(
+        int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) override;
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
 #endif
 
 private:
