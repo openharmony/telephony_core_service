@@ -22,19 +22,14 @@ namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
 bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
 {
-    int32_t resultValue = static_cast<int32_t>(result_);
+    int32_t resultValue;
     if (!parcel.ReadInt32(resultValue)) {
         return false;
     }
     result_ = static_cast<ResultState>(resultValue);
 
     uint32_t size;
-    if (!parcel.ReadUint32(size)) {
-        return false;
-    }
-
-    if (size > MAX_SIZE) {
-        TELEPHONY_LOGE("over max size");
+    if (!parcel.ReadUint32(size) || size > MAX_SIZE) {
         return false;
     }
     profiles_.resize(size);
@@ -55,12 +50,7 @@ bool GetEuiccProfileInfoListResult::ReadFromParcel(Parcel &parcel)
         profile.policyRules_ = static_cast<PolicyRules>(policyRulesValue);
 
         uint32_t count;
-        if (!parcel.ReadUint32(count)) {
-            return false;
-        }
-
-        if (count > MAX_SIZE) {
-            TELEPHONY_LOGE("over max size");
+        if (!parcel.ReadUint32(count) || count > MAX_SIZE) {
             return false;
         }
         profile.accessRules_.resize(count);
