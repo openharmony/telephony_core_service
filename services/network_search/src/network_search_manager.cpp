@@ -1017,6 +1017,10 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     imei = inner->imei_;
+    if (imei.empty()) {
+        TELEPHONY_LOGI("imei is empty");
+        return TELEPHONY_ERR_SUCCESS;
+    }
     int32_t otherSlotId = slotId == SLOT_0 ? SLOT_1 : SLOT_0;
     if (otherSlotId < static_cast<int32_t>(mapManagerInner_.size())) {
         auto otherInner = FindManagerInner(otherSlotId);
@@ -1026,6 +1030,8 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
                 TELEPHONY_LOGI("otherImei is empty");
             } else if (otherImei == imei) {
                 TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is same", slotId, otherSlotId);
+            } else if (otherImei != imei) {
+                TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is different", slotId, otherSlotId);
             }
         }
     }
