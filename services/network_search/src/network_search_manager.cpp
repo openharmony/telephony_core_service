@@ -1030,7 +1030,7 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
                 TELEPHONY_LOGI("otherImei is empty");
             } else if (otherImei == imei) {
                 TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is same", slotId, otherSlotId);
-            } else if (otherImei != imei) {
+            } else {
                 TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is different", slotId, otherSlotId);
             }
         }
