@@ -43,9 +43,10 @@ inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline const int32_t DUAL_SLOT_COUNT = 2;
 inline const int32_t MAX_SLOT_COUNT = 3;
 inline const int32_t VSIM_DEFAULT_VALUE = -1;
+inline const int32_t ESIM_DEFAULT_SLOTID = -1;
 inline std::atomic<int32_t> maxRealSlotCount_ = 0;
 inline int32_t maxSlotCount_ = 0;
-inline int32_t esimDefaultSlotId_ = -1;
+inline int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
 inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
@@ -104,7 +105,7 @@ inline T GetRealMaxSlotCount()
 template<typename T>
 inline T GetDefaultEsimSlotId()
 {
-    if (esimDefaultSlotId_ == 0) {
+    if (esimDefaultSlotId_ == ESIM_DEFAULT_SLOTID) {
         char esimDefaultSlotId[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_DEFAULT_ESIM_SLOT_ID, DEFAULT_ESIM_SLOT_ID, esimDefaultSlotId, SYSPARA_SIZE);
         esimDefaultSlotId_ = std::stoi(esimDefaultSlotId);
