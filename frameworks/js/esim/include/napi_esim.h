@@ -20,7 +20,14 @@
 #include <string>
 #include <vector>
 #include "base_context.h"
+#include "download_profile_result_parcel.h"
+#include "downloadable_profile_parcel.h"
 #include "esim_state_type.h"
+#include "euicc_info_parcel.h"
+#include "get_downloadable_profiles_result_parcel.h"
+#include "profile_info_list_parcel.h"
+#include "profile_metadata_result_parcel.h"
+#include "response_esim_result.h"
 #include "telephony_napi_common_error.h"
 #include "telephony_types.h"
 

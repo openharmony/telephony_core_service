@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t MAX_SIZE = 1000;
 bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
 {
     if (!parcel.ReadString16(downloadableProfiles_.encodedActivationCode_) ||
@@ -31,6 +32,10 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
+    if (size > MAX_SIZE) {
+        TELEPHONY_LOGE("over max size");
+        return false;
+    }
     downloadableProfiles_.accessRules_.resize(size);
     for (auto &rule : downloadableProfiles_.accessRules_) {
         if (!parcel.ReadString16(rule.certificateHashHexStr_) ||
@@ -40,12 +45,14 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
         }
     }
 
-    int32_t resolvableErrorsValue = static_cast<int32_t>(resolvableErrors_);
-    int32_t resultValue = static_cast<int32_t>(result_);
+    int32_t resolvableErrorsValue;
+    int32_t resultValue;
     if (!parcel.ReadInt32(pprType_) || !parcel.ReadBool(pprFlag_) ||
         !parcel.ReadInt32(resolvableErrorsValue) || !parcel.ReadInt32(resultValue)) {
         return false;
     }
+    resolvableErrors_ = static_cast<ResolvableErrors>(resolvableErrorsValue);
+    result_ = static_cast<ResultState>(resultValue);
 
     return true;
 }

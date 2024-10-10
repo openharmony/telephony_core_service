@@ -21,10 +21,11 @@ namespace OHOS {
 namespace Telephony {
 bool ResponseEsimResult::ReadFromParcel(Parcel &parcel)
 {
-    int32_t resultValue = static_cast<int32_t>(resultCode_);
+    int32_t resultValue;
     if (!parcel.ReadInt32(resultValue) || !parcel.ReadString16(response_)) {
         return false;
     }
+    resultCode_ = static_cast<ResultState>(resultValue);
     return true;
 }
 

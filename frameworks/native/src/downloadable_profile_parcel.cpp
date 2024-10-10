@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t MAX_SIZE = 1000;
 bool DownloadableProfile::ReadFromParcel(Parcel &parcel)
 {
     if (!parcel.ReadString16(encodedActivationCode_) || !parcel.ReadString16(confirmationCode_) ||
@@ -31,6 +32,10 @@ bool DownloadableProfile::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
+    if (size > MAX_SIZE) {
+        TELEPHONY_LOGE("over max size");
+        return false;
+    }
     accessRules_.resize(size);
     for (auto &rule : accessRules_) {
         if (!parcel.ReadString16(rule.certificateHashHexStr_) || !parcel.ReadString16(rule.packageName_) ||

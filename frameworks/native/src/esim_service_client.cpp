@@ -41,13 +41,13 @@ void EsimServiceClientCallback::OnLoadSystemAbilitySuccess(
 
 void EsimServiceClientCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    TELEPHONY_LOGI("Loading system ability failed");
-    loadSAFailed_ = true;
+    TELEPHONY_LOGE("Loading system ability failed");
+    isLoadSAFailed_ = true;
 }
 
 bool EsimServiceClientCallback::IsFailed()
 {
-    return loadSAFailed_;
+    return isLoadSAFailed_;
 }
 
 const sptr<IRemoteObject> &EsimServiceClientCallback::GetRemoteObject() const
