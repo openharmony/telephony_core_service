@@ -780,7 +780,12 @@ int32_t NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &ca
         TELEPHONY_LOGE("slotId:%{public}d eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback)) {
+    bool isChipsetNetworkExtSupported = true;
+    if (TELEPHONY_EXT_WRAPPER.isChipsetNetworkExtSupported_ != nullptr) {
+        isChipsetNetworkExtSupported = TELEPHONY_EXT_WRAPPER.isChipsetNetworkExtSupported_();
+    }
+    if (!eventSender_->SendCallbackNetworkExt(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback,
+        isChipsetNetworkExtSupported)) {
         TELEPHONY_LOGE("slotId:%{public}d GetPreferredNetwork SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
     }
