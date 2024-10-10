@@ -29,7 +29,7 @@ namespace Telephony {
 constexpr int32_t EUICC_MEMORY_RESET_BIT_STR_FILL_LEN = 0x05;
 constexpr int32_t EUICC_MEMORY_RESET_BIT_STR_VALUE = 0xA0;
 constexpr int32_t VERSION_BYTES_LEN = 3;
-constexpr int32_t BASE64_TO_HEX_RATIO 2;
+constexpr int32_t BASE64_TO_HEX_RATIO = 2;
 constexpr int32_t APDU_MSG_STATUS_WAIT_RSP = 1;
 constexpr int32_t APDU_MSG_STATUS_RCV_RSP = 2;
 constexpr int32_t APDU_MSG_STATUS_DECODE_OK = 0;
@@ -171,7 +171,7 @@ typedef struct TagEuiccProfileInfo {
     int32_t profileState = 0;
     EsimOperatorId operatorId;
     int32_t policyRules = 0;
-    std::list<std::shared_ptr<Asn1Node>> accessRules = nullptr;
+    std::list<std::shared_ptr<Asn1Node>> accessRules;
 } EuiccProfileInfo;
 
 typedef struct TagPrepareDownloadResp {
