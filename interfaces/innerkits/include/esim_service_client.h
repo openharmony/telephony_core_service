@@ -34,7 +34,7 @@ public:
     const sptr<IRemoteObject> &GetRemoteObject() const;
 
 private:
-    bool loadSAFailed_ = false;
+    bool isLoadSAFailed_ = false;
     sptr<IRemoteObject> remoteObject_ = nullptr;
 };
 
@@ -169,7 +169,7 @@ public:
      * @brief Erase all specific profiles and reset the eUICC.
      *
      * @param slotId[in], indicates the card slot index number.
-     * @param option[in], options for resetting eUICC memory.
+     * @param resetOption[in], options for resetting eUICC memory.
      * @param resetMemoryResult[out], the result of the reset operation.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
