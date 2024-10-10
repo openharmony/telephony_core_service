@@ -115,6 +115,8 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        delete asyncContext;
+        asyncContext = nullptr;
         return nullptr;
     }
 
