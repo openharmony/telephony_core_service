@@ -35,7 +35,7 @@ int32_t WrapNetworkSelectionMode(int32_t mode)
 
 void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("OnGetNetworkModeCallback searchModel = %{public}d", searchModel);
+    TELEPHONY_LOGD("OnGetNetworkModeCallback searchModel = %{public}d", searchModel);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("OnGetNetworkModeCallback asyncContext null");
         return;
@@ -57,7 +57,7 @@ GetRadioStateCallback::GetRadioStateCallback(IsRadioOnContext *context)
 
 void GetRadioStateCallback::OnGetRadioStateCallback(const bool isOn, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("OnGetRadioStateCallback isOn = %{public}d", isOn);
+    TELEPHONY_LOGD("OnGetRadioStateCallback isOn = %{public}d", isOn);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("OnGetRadioStateCallback asyncContext null");
         return;
@@ -71,7 +71,7 @@ void GetRadioStateCallback::OnGetRadioStateCallback(const bool isOn, const int32
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGI("OnGetRadioStateCallback end");
+    TELEPHONY_LOGD("OnGetRadioStateCallback end");
 }
 } // namespace Telephony
 } // namespace OHOS
