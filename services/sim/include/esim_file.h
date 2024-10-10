@@ -41,6 +41,7 @@ constexpr static const int32_t PARAMETER_TWO = -1;
 constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
 static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
+constexpr static const int32_t ATR_LENGTH = 47;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -59,6 +60,19 @@ public:
     std::string ObtainEid();
     GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
     EuiccInfo GetEuiccInfo();
+    ResultState DisableProfile(int32_t portIndex, std::u16string &iccId);
+    std::string ObtainSmdsAddress(int32_t portIndex);
+    EuiccRulesAuthTable ObtainRulesAuthTable(int32_t portIndex);
+    ResponseEsimResult ObtainEuiccChallenge(int32_t portIndex);
+    bool ProcessObtainEuiccChallenge(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessRequestRulesAuthTable(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -89,6 +103,7 @@ private:
     std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
     std::string MakeVersionString(std::vector<uint8_t> &versionRaw);
     std::shared_ptr<Asn1Node> Asn1ParseResponse(const std::vector<uint8_t> &response, uint32_t respLength);
+
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     int32_t currentChannelId_ = -1;
@@ -120,6 +135,10 @@ private:
     EuiccNotificationList retrieveNotificationList_;
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
+    std::string smdsAddress_ = "";
+    EuiccRulesAuthTable eUiccRulesAuthTable_;
+    ResultState disableProfileResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResponseEsimResult responseChallengeResult_;
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
@@ -138,6 +157,22 @@ private:
     std::mutex euiccInfo1Mutex_;
     std::condition_variable euiccInfo1Cv_;
     bool isEuiccInfo1Ready_ = false;
+
+    std::mutex disableProfileMutex_;
+    std::condition_variable disableProfileCv_;
+    bool isDisableProfileReady_ = false;
+
+    std::mutex smdsAddressMutex_;
+    std::condition_variable smdsAddressCv_;
+    bool isSmdsAddressReady_ = false;
+
+    std::mutex rulesAuthTableMutex_;
+    std::condition_variable rulesAuthTableCv_;
+    bool isRulesAuthTableReady_ = false;
+
+    std::mutex euiccChallengeMutex_;
+    std::condition_variable euiccChallengeCv_;
+    bool isEuiccChallengeReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

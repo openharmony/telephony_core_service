@@ -21,7 +21,6 @@
 
 #include "core_service_client.h"
 #include "esim_state_type.h"
-#include "gtest/gtest.h"
 #include "if_system_ability_manager_mock.h"
 #include "iservice_registry.h"
 #include "securec.h"
@@ -29,6 +28,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -83,6 +83,49 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo_0001, Function | MediumTe
     euiccInfo.osVersion = Str8ToStr16("BF2003010203");
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, DisableProfile_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool refresh = true;
+    ResultState disableProfileResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result =
+        CoreServiceClient::GetInstance().DisableProfile(slotId, portIndex, iccId, refresh, disableProfileResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, GetSmdsAddress_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string smdsAddress;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetSmdsAddress(slotId, portIndex, smdsAddress);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, GetRulesAuthTable_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccChallenge_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccChallenge(slotId, portIndex, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 } // namespace Telephony

@@ -19,13 +19,13 @@
 #include "core_service.h"
 #include "esim_state_type.h"
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "string_ex.h"
 #include "str_convert.h"
 #include "sim_manager.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -81,6 +81,68 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
     EXPECT_NE(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, DisableProfile_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool refresh = true;
+    ResultState disableProfileResult;
+    EXPECT_NE(mCoreService->DisableProfile(
+        slotId, portIndex, iccId, refresh, disableProfileResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->DisableProfile(
+        slotId, portIndex, iccId, refresh, disableProfileResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, GetSmdsAddress_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string smdsAddress;
+    EXPECT_NE(mCoreService->GetSmdsAddress(
+        slotId, portIndex, smdsAddress), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetSmdsAddress(
+        slotId, portIndex, smdsAddress), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, GetRulesAuthTable_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    EXPECT_NE(mCoreService->GetRulesAuthTable(
+        slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetRulesAuthTable(
+        slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, GetEuiccChallenge_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    EXPECT_NE(mCoreService->GetEuiccChallenge(
+        slotId, portIndex, responseResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetEuiccChallenge(
+        slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 } // namespace Telephony
 } // namespace OHOS

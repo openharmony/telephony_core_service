@@ -1023,6 +1023,46 @@ EuiccInfo SimFileManager::GetEuiccInfo()
     }
     return eSimFile_->GetEuiccInfo();
 }
+
+ResultState SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &iccId)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState enumResult = eSimFile_->DisableProfile(portIndex, iccId);
+    return enumResult;
+}
+
+std::u16string SimFileManager::GetSmdsAddress(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainSmdsAddress(portIndex);
+    return Str8ToStr16(result);
+}
+
+EuiccRulesAuthTable SimFileManager::GetRulesAuthTable(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return EuiccRulesAuthTable();
+    }
+    EuiccRulesAuthTable result = eSimFile_->ObtainRulesAuthTable(portIndex);
+    return result;
+}
+
+ResponseEsimResult SimFileManager::GetEuiccChallenge(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->ObtainEuiccChallenge(portIndex);
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

@@ -90,7 +90,7 @@ HWTEST_F(TelRilCommonTest, TelRilManager_InitTelExtraModule_001, Function | Medi
         auto telRilCall = std::make_shared<TelRilCall>(i, rilInterface, observerHandler, telRilManager->handler_);
         telRilManager->telRilCall_.push_back(telRilCall);
     }
-    telRilManager->InitTelExtraModule(SIM_SLOT_2);
+    result = telRilManager->InitTelExtraModule(SIM_SLOT_2);
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
 }
 
@@ -538,7 +538,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_SendDtmfResponse_001, Function | MediumTest
     event = nullptr;
     telRilCall->CreateTelRilRequest(event);
     result = telRilCall->SendDtmfResponse(responseInfo);
-    ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**

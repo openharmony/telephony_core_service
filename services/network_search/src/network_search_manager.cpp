@@ -21,6 +21,7 @@
 #include <string_ex.h>
 
 #include "core_service_errors.h"
+#include "core_service_hisysevent.h"
 #include "enum_convert.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
@@ -560,7 +561,11 @@ void NetworkSearchManager::SetRadioStateValue(int32_t slotId, ModemPowerState ra
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
+        ModemPowerState radioStateOld = inner->radioState_;
         inner->radioState_ = radioState;
+        if (radioStateOld != radioState) {
+            CoreServiceHiSysEvent::WriteRadioStateBehaviorEvent(slotId, static_cast<int32_t>(radioState));
+        }
     }
 }
 

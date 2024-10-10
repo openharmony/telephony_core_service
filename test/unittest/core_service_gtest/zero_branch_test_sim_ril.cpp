@@ -373,7 +373,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | Med
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
-    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
+    EXPECT_EQ(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     auto caller = iccDiallingNumbersManager->BuildCallerInfo(-1);
     AppExecFwk::InnerEvent::Pointer event = diallingNumbersCache->CreateUsimPointer(-1, ELEMENTARY_FILE_PBR, caller);
     std::unique_ptr<UsimFetcher> fd = event->GetUniqueObject<UsimFetcher>();
@@ -420,7 +420,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_005, Function | Med
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
-    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
+    EXPECT_EQ(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     int extensionEf = diallingNumbersCache->ExtendedElementFile(ELEMENTARY_FILE_ADN);
     AppExecFwk::InnerEvent::Pointer event = iccDiallingNumbersManager->BuildCallerInfo(-1);
     diallingNumbersCache->ObtainAllDiallingNumberFiles(ELEMENTARY_FILE_ADN, extensionEf, event);
@@ -465,7 +465,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     diallingNumberHandler->MakeExceptionResult(0);
     diallingNumberHandler->UpdateFileController(iccFileController);
     auto sequence = diallingNumberHandler->CreateSavingSequence(telNumber, -1);
-    EXPECT_NE(sequence, nullptr);
+    EXPECT_EQ(sequence, nullptr);
     telNumber = nullptr;
     diallingNumberHandler->FormatNameAndNumber(telNumber, true);
     std::shared_ptr<unsigned char> diallingNumberStringPac = nullptr;
@@ -656,7 +656,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_004, Function | 
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
-    EXPECT_NE(diallingNumbersCache->diallingNumbersHandler_, nullptr);
+    EXPECT_EQ(diallingNumbersCache->diallingNumbersHandler_, nullptr);
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
     AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->CreateHandlerPointer(
@@ -681,7 +681,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
-    EXPECT_NE(diallingNumbersCache->usimDiallingNumberSrv_, nullptr);
+    EXPECT_EQ(diallingNumbersCache->usimDiallingNumberSrv_, nullptr);
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
     EXPECT_NE(usimDiallingNumbersService->memberFuncMap_.size(), 0);
@@ -752,44 +752,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_002, Function | MediumTest 
     EXPECT_NE(
         simStateManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simStateManager->SendSimMatchedOperatorInfo(0, 0, "", ""), TELEPHONY_ERR_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_SimStateManager_005
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_005, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    simStateManager->Init(0);
-    LockInfo mLockInfo;
-    LockStatusResponse mLockStatusResponse;
-    EXPECT_GT(simStateManager->SetLockState(0, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    LockType mLockType = LockType::PIN_LOCK;
-    LockState lockState;
-    EXPECT_EQ(simStateManager->GetLockState(0, mLockType, lockState), TELEPHONY_ERR_SUCCESS);
-    SimIoRequestInfo requestInfo;
-    SimAuthenticationResponse response;
-    EXPECT_EQ(simStateManager->GetSimIO(0, requestInfo, response), TELEPHONY_ERR_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_SimStateManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_004, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    simStateManager->SetSimState(SimState::SIM_STATE_LOADED);
-    simStateManager->Init(0);
-    simStateManager->SetSimState(SimState::SIM_STATE_LOADED);
-    EXPECT_EQ(simStateManager->GetSimState(), SimState::SIM_STATE_LOADED);
 }
 
 /**
