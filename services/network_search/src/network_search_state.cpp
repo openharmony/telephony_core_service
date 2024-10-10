@@ -108,6 +108,7 @@ int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &
 {
     std::lock_guard<std::mutex> lock(imsMutex_);
     if (imsServiceStatus_ == nullptr) {
+        TELEPHONY_LOGE("imsServiceStatus_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool isRegister = false;
