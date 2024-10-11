@@ -76,7 +76,6 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
     esimProfile_.imei = imei;
     SyncOpenChannel();
-    recvCombineStr_ = "";
     if (!ProcessAuthenticateServer(slotId_)) {
         TELEPHONY_LOGE("ProcessAuthenticateServer encode failed");
         return ResponseEsimResult();
@@ -156,10 +155,27 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     return true;
 }
 
+void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr)
+{
+    RequestApduBuild codec(currentChannelId_);
+    codec.BuildStoreData(hexStr);
+    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
+    for (const auto &cmd : apduCommandList) {
+        ApduSimIORequestInfo reqInfo;
+        CopyApdCmdToReqInfo(&reqInfo, cmd.get());
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
+        if (telRilManager_ == nullptr) {
+            return;
+        }
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
+    }
+}
+
 void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const std::string &base64Src)
 {
     std::string destString = VCardUtils::DecodeBase64(base64Src);
-    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(destString, 0, destString.length());
+    std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
+    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
     if (decoder == nullptr) {
         TELEPHONY_LOGE("create decoder failed");
         return;
@@ -178,14 +194,14 @@ void EsimFile::AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder)
         TELEPHONY_LOGE("dev caps build failed");
         return;
     }
-    std::string versionBytes;
+    std::vector<uint8_t> versionBytes;
     Asn1Utils::UintToBytes(VERSION_NUMBER, versionBytes);
-    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, versionBytes, versionBytes.length());
-    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_1, versionBytes, versionBytes.length());
-    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_5, versionBytes, versionBytes.length());
+    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, versionBytes, versionBytes.size());
+    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_1, versionBytes, versionBytes.size());
+    devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_5, versionBytes, versionBytes.size());
 }
 
-void EsimFile::GetImeiBytes(std::string &imeiBytes, const std::string &imei)
+void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei)
 {
     size_t imeiLen = imei.length();
     if (imeiLen < AUTH_SERVER_IMEI_LEN * BYTE_TO_HEX_LEN - 1) {
@@ -209,10 +225,12 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
         TELEPHONY_LOGE("AddCtxParams1 pbytes is nullptr");
         return;
     }
-    ctxParams1Builder->Asn1AddChildAsString(TAG_ESIM_CTX_0, pbytes->matchingId);
+    std::string matchingId;
+    ctxParams1Builder->Asn1AddChildAsString(TAG_ESIM_CTX_0, matchingId);
+    pbytes->matchingId = matchingId;
     std::shared_ptr<Asn1Node> subNode = nullptr;
-    std::string tacBytes;
-    std::string imeiBytes;
+    std::vector<uint8_t> tacBytes;
+    std::vector<uint8_t> imeiBytes;
     Asn1Utils::BcdToBytes(pbytes->imei, tacBytes);
     GetImeiBytes(imeiBytes, pbytes->imei);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
@@ -220,7 +238,7 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
         TELEPHONY_LOGE("AddCtxParams1 subBuilder is nullptr");
         return;
     }
-    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, tacBytes, tacBytes.length());
+    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, tacBytes, tacBytes.size());
     // add devCap
     std::shared_ptr<Asn1Builder> devCapsBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
     if (devCapsBuilder == nullptr) {
@@ -230,7 +248,7 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     AddDeviceCapability(devCapsBuilder);
     std::shared_ptr<Asn1Node> devCapNode = devCapsBuilder->Asn1Build();
     subBuilder->Asn1AddChild(devCapNode);
-    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, imeiBytes, imeiBytes.length());
+    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, imeiBytes, imeiBytes.size());
     subNode = subBuilder->Asn1Build();
     ctxParams1Builder->Asn1AddChild(subNode);
 }
@@ -250,8 +268,8 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     if (result == nullptr) {
         return false;
     }
-    std::string responseByte = Asn1Utils::HexStrToBytes(result->resultData);
-    uint32_t byteLen = responseByte.length();
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(result->resultData);
+    uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
@@ -499,24 +517,6 @@ void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<
     euiccInfo2->ppVersion = MakeVersionString(ppVersionNodeRaw);
 }
 
-void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *reqInfo, ApduCommand *apdCmd)
-{
-    if (apdCmd == nullptr || reqInfo == nullptr) {
-        TELEPHONY_LOGE("CopyApdCmdToReqInfo failed");
-        return;
-    }
-    static uint32_t cnt = 0;
-    reqInfo->serial = cnt;
-    cnt++;
-    reqInfo->channelId = apdCmd->channel;
-    reqInfo->type = apdCmd->data.cla;
-    reqInfo->instruction = apdCmd->data.ins;
-    reqInfo->p1 = apdCmd->data.p1;
-    reqInfo->p2 = apdCmd->data.p2;
-    reqInfo->p3 = apdCmd->data.p3;
-    reqInfo->data = apdCmd->data.cmdHex;
-}
-
 bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId)
 {
     if (fileData.sw1 != SW1_MORE_RESPONSE) {
@@ -525,7 +525,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId
     ApduSimIORequestInfo reqInfo;
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData("");
-    std::list<std::unique_ptr<ApduCommand>> lst = codec.getCommands();
+    std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
     std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
     if (apdCmd == nullptr) {
         return false;
@@ -555,8 +555,8 @@ bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
 
 bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
 {
-    std::string responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
-    std::shared_ptr<Asn1Node> responseNode = Asn1ParseResponse(responseByte, responseByte.length());
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
+    std::shared_ptr<Asn1Node> responseNode = Asn1ParseResponse(responseByte, responseByte.size());
     if (responseNode == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
@@ -576,7 +576,7 @@ bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
                 TELEPHONY_LOGE("authServerRespNode failed");
                 return false;
             }
-            uint32_t tidByteLen = transactionIdNode->Asn1AsBytes(authServerResp.transactionId);
+            uint32_t tidByteLen = transactionIdNode->Asn1AsString(authServerResp.transactionId);
             if (tidByteLen == 0) {
                 TELEPHONY_LOGE("tidByteLen is zero.");
                 return false;
@@ -588,7 +588,7 @@ bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
         }
     } else {
         authServerResp.respStr = responseByte;
-        authServerResp.respLength = responseByte.length();
+        authServerResp.respLength = responseByte.size();
     }
     CovertAuthToApiStruct(responseAuthenticateResult_, authServerResp);
 

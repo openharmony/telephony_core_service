@@ -98,7 +98,7 @@ struct AsyncProfileNickname {
 
 struct AsyncCancelSession {
     AsyncContext<napi_value> asyncContext;
-    vector<uint8_t> transactionId = {};
+    std::string transactionId = "";
     int32_t cancelReason = static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED);
     ResponseEsimResult responseResult;
 };

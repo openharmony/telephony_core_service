@@ -49,20 +49,20 @@ private:
     void EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
     void EuiccInfo2ParseEuiccCategory(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
     void EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root);
-    void CopyApdCmdToReqInfo(ApduSimIORequestInfo *reqInfo, ApduCommand *apdCmd);
     bool ProcessAuthenticateServer(int32_t slotId);
     bool ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RealProcsessAuthenticateServerDone(std::string combineHexStr);
-    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
+    bool ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId);
     bool CombineResponseDataFinish(IccFileData &fileData);
     void Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const std::string &base64Src);
     void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
     void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp *pbytes);
-    void GetImeiBytes(std::string &imeiBytes, const std::string &imei);
+    void GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei);
     void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool MergeRecvLongDataComplete(IccFileData &fileData);
     std::string MakeVersionString(std::vector<uint8_t> &versionRaw);
+    void SplitSendLongData(int32_t slotId, std::string hexStr);
 
     ResponseEsimResult responseInfo2Result_;
     ResponseEsimResult responseAuthenticateResult_;
