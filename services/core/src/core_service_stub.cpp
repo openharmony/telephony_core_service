@@ -2010,7 +2010,7 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteString16(responseResult.response));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

@@ -120,7 +120,7 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEve
 bool EsimFile::IsEsimSupported()
 {
     char buf[ATR_LENGTH + 1] = {0};
-    GetParameter(TEl_HW_ATR, "", buf, ATR_LENGTH);
+    GetParameter(TEL_ESIM_SUPPORT, "", buf, ATR_LENGTH);
     ResetResponse resetResponse;
     std::string atr(buf);
     resetResponse.AnalysisAtrData(atr);
