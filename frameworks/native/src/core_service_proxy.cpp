@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+constexpr uint32_t ESIM_MAX_SIZE = 1000;
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -3238,7 +3239,7 @@ void CoreServiceProxy::ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProf
     euiccProfile.policyRules = static_cast<PolicyRules>(reply.ReadInt32());
 
     uint32_t accessRulesSize = reply.ReadUint32();
-    if (accessRulesSize >= MAX_SIZE) {
+    if (accessRulesSize >= ESIM_MAX_SIZE) {
         TELEPHONY_LOGE("over max size");
         return;
     }
@@ -3277,7 +3278,7 @@ int32_t CoreServiceProxy::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfil
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         uint32_t profileCount = reply.ReadUint32();
-        if (profileCount >= MAX_SIZE) {
+        if (profileCount >= ESIM_MAX_SIZE) {
             TELEPHONY_LOGE("over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
@@ -3407,7 +3408,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         uint32_t policyRulesSize = reply.ReadUint32();
-        if (policyRulesSize > MAX_SIZE) {
+        if (policyRulesSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
@@ -3415,7 +3416,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
         }
         uint32_t carrierIdsSize = reply.ReadUint32();
-        if (carrierIdsSize > MAX_SIZE) {
+        if (carrierIdsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
@@ -3431,7 +3432,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             ci.specificCarrierId = reply.ReadInt32();
         }
         uint32_t policyRuleFlagsSize = reply.ReadUint32();
-        if (policyRuleFlagsSize > MAX_SIZE) {
+        if (policyRuleFlagsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);
