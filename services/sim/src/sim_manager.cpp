@@ -1292,7 +1292,7 @@ int32_t SimManager::GetProfile(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccProfile = simFileManager_[slotId]->GetProfile(portIndex, iccId);
-    if (eUiccProfile.state != 0) {
+    if (eUiccProfile.state != ProfileState::PROFILE_STATE_DISABLED) {
         return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
