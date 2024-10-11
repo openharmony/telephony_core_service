@@ -78,22 +78,23 @@ ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAdd
 
 bool EsimFile::ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    return true;
 }
 
 bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -141,8 +142,8 @@ ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const std::
         TELEPHONY_LOGE("ProcessSendApduData encode failed");
         return ResponseEsimResult();
     }
-    std::unique_lock<std::mutex> lock(SendApduDataMutex_);
-    if (!SendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+    std::unique_lock<std::mutex> lock(sendApduDataMutex_);
+    if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel();
         return ResponseEsimResult();
@@ -286,10 +287,10 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
     transApduDataResponse_.response = OHOS::Telephony::ToUtf16(result->resultData);
 
     {
-        std::lock_guard<std::mutex> lock(SendApduDataMutex_);
+        std::lock_guard<std::mutex> lock(sendApduDataMutex_);
         isSendApduDataReady_ = true;
     }
-    SendApduDataCv_.notify_one();
+    sendApduDataCv_.notify_one();
     return true;
 }
 
