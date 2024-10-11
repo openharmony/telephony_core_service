@@ -1961,7 +1961,7 @@ int32_t CoreServiceStub::OnRetrieveNotificationList(MessageParcel &data, Message
     int32_t result = RetrieveNotificationList(slotId, portIndex, events, notificationList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(notificationList.euiccNotification.size());
+        reply.WriteUint32(notificationList.euiccNotification.size());
         for (const auto &notification : notificationList.euiccNotification) {
             ret = (ret && reply.WriteInt32(notification.seq));
             ret = (ret && reply.WriteString16(notification.targetAddr));

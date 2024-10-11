@@ -1657,6 +1657,10 @@ int32_t CoreService::RetrieveNotificationList(
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("RetrieveNotificationList simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1671,6 +1675,10 @@ int32_t CoreService::RetrieveNotification(
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("RetrieveNotification simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1684,6 +1692,10 @@ int32_t CoreService::RemoveNotificationFromList(
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("RemoveNotificationFromList simManager_ is null");
