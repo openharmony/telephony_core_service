@@ -177,7 +177,7 @@ napi_value EuiccInfoConversion(napi_env env, const EuiccInfo &resultInfo)
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "osVersion", NapiUtil::ToUtf8(resultInfo.osVersion));
+    SetPropertyToNapiObject(env, val, "osVersion", NapiUtil::ToUtf8(resultInfo.osVersion_));
 
     return val;
 }
@@ -186,9 +186,9 @@ napi_value DownloadProfileResultConversion(napi_env env, const DownloadProfileRe
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.result));
-    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(resultInfo.resolvableErrors));
-    SetPropertyToNapiObject(env, val, "cardId", resultInfo.cardId);
+    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.result_));
+    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(resultInfo.resolvableErrors_));
+    SetPropertyToNapiObject(env, val, "cardId", resultInfo.cardId_);
 
     return val;
 }
@@ -197,9 +197,9 @@ napi_value AccessRuleInfoConversion(napi_env env, const AccessRule &accessInfo)
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "certificateHashHexStr", NapiUtil::ToUtf8(accessInfo.certificateHashHexStr));
-    SetPropertyToNapiObject(env, val, "packageName", NapiUtil::ToUtf8(accessInfo.packageName));
-    SetPropertyToNapiObject(env, val, "accessType", accessInfo.accessType);
+    SetPropertyToNapiObject(env, val, "certificateHashHexStr", NapiUtil::ToUtf8(accessInfo.certificateHashHexStr_));
+    SetPropertyToNapiObject(env, val, "packageName", NapiUtil::ToUtf8(accessInfo.packageName_));
+    SetPropertyToNapiObject(env, val, "accessType", accessInfo.accessType_);
 
     return val;
 }
@@ -208,13 +208,13 @@ napi_value ProfileInfoConversion(napi_env env, const DownloadableProfile &profil
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "encodedActivationCode", NapiUtil::ToUtf8(profileInfo.encodedActivationCode));
-    SetPropertyToNapiObject(env, val, "confirmationCode", NapiUtil::ToUtf8(profileInfo.confirmationCode));
-    SetPropertyToNapiObject(env, val, "carrierName", NapiUtil::ToUtf8(profileInfo.carrierName));
+    SetPropertyToNapiObject(env, val, "encodedActivationCode", NapiUtil::ToUtf8(profileInfo.encodedActivationCode_));
+    SetPropertyToNapiObject(env, val, "confirmationCode", NapiUtil::ToUtf8(profileInfo.confirmationCode_));
+    SetPropertyToNapiObject(env, val, "carrierName", NapiUtil::ToUtf8(profileInfo.carrierName_));
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
-    for (size_t i = 0; i < profileInfo.accessRules.size(); i++) {
-        napi_value res = AccessRuleInfoConversion(env, profileInfo.accessRules.at(i));
+    for (size_t i = 0; i < profileInfo.accessRules_.size(); i++) {
+        napi_value res = AccessRuleInfoConversion(env, profileInfo.accessRules_.at(i));
         napi_set_element(env, resultArray, i, res);
     }
     napi_set_named_property(env, val, "accessRules", resultArray);
@@ -226,11 +226,11 @@ napi_value ProfileResultListConversion(napi_env env, const GetDownloadableProfil
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultListInfo.result));
+    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultListInfo.result_));
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
-    for (size_t i = 0; i < resultListInfo.downloadableProfiles.size(); i++) {
-        napi_value res = ProfileInfoConversion(env, resultListInfo.downloadableProfiles.at(i));
+    for (size_t i = 0; i < resultListInfo.downloadableProfiles_.size(); i++) {
+        napi_value res = ProfileInfoConversion(env, resultListInfo.downloadableProfiles_.at(i));
         napi_set_element(env, resultArray, i, res);
     }
     napi_set_named_property(env, val, "downloadableProfiles", resultArray);
@@ -242,11 +242,11 @@ napi_value MetadataResultConversion(napi_env env, const GetDownloadableProfileMe
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "pprType", metadataInfo.pprType);
-    SetPropertyToNapiObject(env, val, "pprFlag", metadataInfo.pprFlag);
-    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(metadataInfo.resolvableErrors));
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(metadataInfo.result));
-    napi_value res = ProfileInfoConversion(env, metadataInfo.downloadableProfiles);
+    SetPropertyToNapiObject(env, val, "pprType", metadataInfo.pprType_);
+    SetPropertyToNapiObject(env, val, "pprFlag", metadataInfo.pprFlag_);
+    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(metadataInfo.resolvableErrors_));
+    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(metadataInfo.result_));
+    napi_value res = ProfileInfoConversion(env, metadataInfo.downloadableProfiles_);
     napi_set_named_property(env, val, "downloadableProfile", res);
 
     return val;
@@ -256,10 +256,10 @@ napi_value OperatorIdConversion(napi_env env, const OperatorId &operatorId)
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "mcc", NapiUtil::ToUtf8(operatorId.mcc));
-    SetPropertyToNapiObject(env, val, "mnc", NapiUtil::ToUtf8(operatorId.mnc));
-    SetPropertyToNapiObject(env, val, "gid1", NapiUtil::ToUtf8(operatorId.gid1));
-    SetPropertyToNapiObject(env, val, "gid2", NapiUtil::ToUtf8(operatorId.gid2));
+    SetPropertyToNapiObject(env, val, "mcc", NapiUtil::ToUtf8(operatorId.mcc_));
+    SetPropertyToNapiObject(env, val, "mnc", NapiUtil::ToUtf8(operatorId.mnc_));
+    SetPropertyToNapiObject(env, val, "gid1", NapiUtil::ToUtf8(operatorId.gid1_));
+    SetPropertyToNapiObject(env, val, "gid2", NapiUtil::ToUtf8(operatorId.gid2_));
 
     return val;
 }
@@ -268,19 +268,19 @@ napi_value EuiccProfileInfoConversion(napi_env env, const EuiccProfile &euiccPro
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "iccid", NapiUtil::ToUtf8(euiccProfileInfo.iccId));
-    SetPropertyToNapiObject(env, val, "nickName", NapiUtil::ToUtf8(euiccProfileInfo.nickName));
-    SetPropertyToNapiObject(env, val, "serviceProviderName", NapiUtil::ToUtf8(euiccProfileInfo.serviceProviderName));
-    SetPropertyToNapiObject(env, val, "profileName", NapiUtil::ToUtf8(euiccProfileInfo.profileName));
-    SetPropertyToNapiObject(env, val, "state", static_cast<int32_t>(euiccProfileInfo.state));
-    SetPropertyToNapiObject(env, val, "profileClass", static_cast<int32_t>(euiccProfileInfo.profileClass));
-    napi_value res = OperatorIdConversion(env, euiccProfileInfo.carrierId);
+    SetPropertyToNapiObject(env, val, "iccid", NapiUtil::ToUtf8(euiccProfileInfo.iccId_));
+    SetPropertyToNapiObject(env, val, "nickName", NapiUtil::ToUtf8(euiccProfileInfo.nickName_));
+    SetPropertyToNapiObject(env, val, "serviceProviderName", NapiUtil::ToUtf8(euiccProfileInfo.serviceProviderName_));
+    SetPropertyToNapiObject(env, val, "profileName", NapiUtil::ToUtf8(euiccProfileInfo.profileName_));
+    SetPropertyToNapiObject(env, val, "state", static_cast<int32_t>(euiccProfileInfo.state_));
+    SetPropertyToNapiObject(env, val, "profileClass", static_cast<int32_t>(euiccProfileInfo.profileClass_));
+    napi_value res = OperatorIdConversion(env, euiccProfileInfo.carrierId_);
     napi_set_named_property(env, val, "operatorId", res);
-    SetPropertyToNapiObject(env, val, "policyRules", static_cast<int32_t>(euiccProfileInfo.policyRules));
+    SetPropertyToNapiObject(env, val, "policyRules", static_cast<int32_t>(euiccProfileInfo.policyRules_));
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
-    for (size_t i = 0; i < euiccProfileInfo.accessRules.size(); i++) {
-        napi_value res = AccessRuleInfoConversion(env, euiccProfileInfo.accessRules.at(i));
+    for (size_t i = 0; i < euiccProfileInfo.accessRules_.size(); i++) {
+        napi_value res = AccessRuleInfoConversion(env, euiccProfileInfo.accessRules_.at(i));
         napi_set_element(env, resultArray, i, res);
     }
     napi_set_named_property(env, val, "accessRules", resultArray);
@@ -292,12 +292,12 @@ napi_value EuiccProfileListConversion(napi_env env, const GetEuiccProfileInfoLis
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(euiccListInfo.result));
-    SetPropertyToNapiObject(env, val, "isRemovable", euiccListInfo.isRemovable);
+    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(euiccListInfo.result_));
+    SetPropertyToNapiObject(env, val, "isRemovable", euiccListInfo.isRemovable_);
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
-    for (size_t i = 0; i < euiccListInfo.profiles.size(); i++) {
-        napi_value res = EuiccProfileInfoConversion(env, euiccListInfo.profiles.at(i));
+    for (size_t i = 0; i < euiccListInfo.profiles_.size(); i++) {
+        napi_value res = EuiccProfileInfoConversion(env, euiccListInfo.profiles_.at(i));
         napi_set_element(env, resultArray, i, res);
     }
     napi_set_named_property(env, val, "profiles", resultArray);
@@ -309,8 +309,8 @@ napi_value ResponseEsimResultConversion(napi_env env, const ResponseEsimResult &
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.resultCode));
-    SetPropertyToNapiObject(env, val, "response", NapiUtil::ToUtf8(resultInfo.response));
+    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.resultCode_));
+    SetPropertyToNapiObject(env, val, "response", NapiUtil::ToUtf8(resultInfo.response_));
 
     return val;
 }
@@ -318,9 +318,9 @@ napi_value ResponseEsimResultConversion(napi_env env, const ResponseEsimResult &
 AccessRule GetAccessRuleInfo(AsyncAccessRule &accessType)
 {
     AccessRule access;
-    access.certificateHashHexStr = NapiUtil::ToUtf16(accessType.certificateHashHexStr.data());
-    access.packageName = NapiUtil::ToUtf16(accessType.packageName.data());
-    access.accessType = accessType.accessType;
+    access.certificateHashHexStr_ = NapiUtil::ToUtf16(accessType.certificateHashHexStr.data());
+    access.packageName_ = NapiUtil::ToUtf16(accessType.packageName.data());
+    access.accessType_ = accessType.accessType;
 
     return access;
 }
@@ -328,13 +328,13 @@ AccessRule GetAccessRuleInfo(AsyncAccessRule &accessType)
 DownloadableProfile GetProfileInfo(AsyncDownloadableProfile &profileInfo)
 {
     DownloadableProfile profile;
-    profile.encodedActivationCode = NapiUtil::ToUtf16(profileInfo.encodedActivationCode.data());
-    profile.confirmationCode = NapiUtil::ToUtf16(profileInfo.confirmationCode.data());
-    profile.carrierName = NapiUtil::ToUtf16(profileInfo.carrierName.data());
+    profile.encodedActivationCode_ = NapiUtil::ToUtf16(profileInfo.encodedActivationCode.data());
+    profile.confirmationCode_ = NapiUtil::ToUtf16(profileInfo.confirmationCode.data());
+    profile.carrierName_ = NapiUtil::ToUtf16(profileInfo.carrierName.data());
 
     for (size_t i = 0; i < profileInfo.accessRules.size(); i++) {
         AccessRule access = GetAccessRuleInfo(profileInfo.accessRules.at(i));
-        profile.accessRules.push_back(std::move(access));
+        profile.accessRules_.push_back(std::move(access));
     }
 
     return profile;
@@ -576,7 +576,7 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
 
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetDefaultSmdpAddress(
-        context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
+        context->asyncContext.slotId, context->inputStr, result);
     TELEPHONY_LOGI("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
@@ -639,7 +639,7 @@ void NativeSwitchToProfile(napi_env env, void *data)
 
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SwitchToProfile(
-        asyncContext.slotId, profileContext->portIndex, NapiUtil::ToUtf16(profileContext->iccid.data()),
+        asyncContext.slotId, profileContext->portIndex, profileContext->iccid,
         profileContext->forceDeactivateSim, result);
     TELEPHONY_LOGI("NAPI NativeSwitchToProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
@@ -704,7 +704,7 @@ void NativeDeleteProfile(napi_env env, void *data)
 
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DeleteProfile(
-        context->asyncContext.slotId, NapiUtil::ToUtf16(context->inputStr.data()), result);
+        context->asyncContext.slotId, context->inputStr, result);
     TELEPHONY_LOGI("NAPI NativeDeleteProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         context->asyncContext.callbackVal = result;
@@ -770,7 +770,7 @@ void NativeResetMemory(napi_env env, void *data)
         profileContext->option = static_cast<int32_t>(GetDefaultResetOption());
     }
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
-        asyncContext.slotId, static_cast<ResetOption>(profileContext->option), result);
+        asyncContext.slotId, profileContext->option, result);
     TELEPHONY_LOGI("NAPI NativeResetMemory %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
@@ -839,10 +839,13 @@ void NativeDownloadProfile(napi_env env, void *data)
     }
 
     DownloadProfileResult result;
+    DownloadProfileConfigInfo configInfo;
+    configInfo.portIndex_ = profileContext->portIndex;
+    configInfo.isSwitchAfterDownload_ = profileContext->switchAfterDownload;
+    configInfo.isForceDeactivateSim_ = profileContext->forceDeactivateSim;
     DownloadableProfile profile = GetProfileInfo(profileContext->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
-        profileContext->asyncContext.slotId, profileContext->portIndex, profile,
-        profileContext->switchAfterDownload, profileContext->forceDeactivateSim, result);
+        profileContext->asyncContext.slotId, configInfo, profile, result);
     TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
@@ -1059,8 +1062,7 @@ void NativeSetProfileNickname(napi_env env, void *data)
 
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetProfileNickname(
-        asyncContext.slotId, NapiUtil::ToUtf16(profileContext->iccid.data()),
-        NapiUtil::ToUtf16(profileContext->nickname.data()), result);
+        asyncContext.slotId, profileContext->iccid, profileContext->nickname, result);
     TELEPHONY_LOGI("NAPI NativeSetProfileNickname %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
@@ -1126,8 +1128,7 @@ void NativeCancelSession(napi_env env, void *data)
 
     ResponseEsimResult responseResult;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().CancelSession(
-        asyncContext.slotId, NapiUtil::ToUtf16(sessionContext->transactionId.data()),
-        static_cast<CancelReason>(sessionContext->cancelReason), responseResult);
+        asyncContext.slotId, sessionContext->transactionId, sessionContext->cancelReason, responseResult);
     TELEPHONY_LOGI("NAPI NativeCancelSession %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         sessionContext->responseResult = responseResult;
