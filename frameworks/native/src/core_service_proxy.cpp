@@ -29,7 +29,9 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 constexpr uint32_t ESIM_MAX_SIZE = 1000;
+#endif
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
