@@ -99,6 +99,31 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
     return eUiccNotificationList_;
 }
 
+void EsimFile::ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src)
+{
+    dst.smdpSigned2 = OHOS::Telephony::ToUtf8(src.smdpSigned2);
+    dst.smdpSignature2 = OHOS::Telephony::ToUtf8(src.smdpSignature2);
+    dst.smdpCertificate = OHOS::Telephony::ToUtf8(src.smdpCertificate);
+    dst.hashCc = OHOS::Telephony::ToUtf8(src.hashCc);
+}
+
+void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::string &base64Src)
+{
+    std::string destString = VCardUtils::DecodeBase64(base64Src);
+    std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
+    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, destString.length());
+    if (decoder == nullptr) {
+        TELEPHONY_LOGE("create decoder failed");
+        return;
+    }
+    std::shared_ptr<Asn1Node> node = decoder->Asn1NextNode();
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("build is nullptr");
+        return;
+    }
+    builder->Asn1AddChild(node);
+}
+
 bool EsimFile::ProcessPrepareDownload(int32_t slotId)
 {
     if (!IsLogicChannelOpen()) {
@@ -117,9 +142,8 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     Asn1AddChildAsBase64(builder, dst.smdpSigned2);
     Asn1AddChildAsBase64(builder, dst.smdpSignature2);
     if (dst.hashCc.size() != 0) {
-        std::string bytes = VCardUtils::DecodeBase64(dst.hashCc);
-        uint32_t byteLen = bytes.length();
-        builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, byteLen);
+        std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
+        builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     }
     Asn1AddChildAsBase64(builder, dst.smdpCertificate);
     std::string hexStr;
@@ -128,6 +152,71 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
         return false;
     }
     SplitSendLongData(slotId, hexStr);
+    return true;
+}
+
+void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr)
+{
+    RequestApduBuild codec(currentChannelId_);
+    codec.BuildStoreData(hexStr);
+    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
+    for (const auto &cmd : apduCommandList) {
+        ApduSimIORequestInfo reqInfo;
+        CopyApdCmdToReqInfo(&reqInfo, cmd.get());
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
+        if (telRilManager_ == nullptr) {
+            return;
+        }
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
+    }
+}
+
+bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
+{
+    if(fileData.resultData.length() == 0) {
+        return false;
+    }
+    recvCombineStr_ = recvCombineStr_ + fileData.resultData;
+    return (fileData.sw1 == SW1_VALUE_90 && fileData.sw2 == SW2_VALUE_00);
+}
+
+bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId)
+{
+    if (fileData.sw1 == SW1_MORE_RESPONSE) {
+        ApduSimIORequestInfo reqInfo;
+        RequestApduBuild codec(currentChannelId_);
+        codec.BuildStoreData("");
+        std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
+        std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
+        if (apdCmd == nullptr) {
+            return false;
+        }
+        apdCmd->data.cla = 0;
+        apdCmd->data.ins = INS_GET_MORE_RESPONSE;
+        apdCmd->data.p1 = 0;
+        apdCmd->data.p2 = 0;
+        apdCmd->data.p3 = (int)fileData.sw2;
+        CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
+        AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
+        if (telRilManager_ == nullptr) {
+            return false;
+        }
+        telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
+        return true;
+    }
+    return false;
+}
+
+bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData)
+{
+    if(!CombineResponseDataFinish(fileData))
+    {
+        if(!ProcessIfNeedMoreResponse(fileData, MSG_ESIM_AUTHENTICATE_SERVER))
+        {
+            TELEPHONY_LOGE("try to ProcessIfNeedMoreResponse NOT done. sw1=%{public}02X", fileData.sw1);
+            return false;
+        }
+    }
     return true;
 }
 
@@ -146,8 +235,8 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     if (!MergeRecvLongDataComplete(iccFileData)) {
         return true;
     }
-    std::string responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
-    uint32_t byteLen = responseByte.length();
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
+    uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
@@ -165,7 +254,8 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         }
     }
     preDownloadResult_.resultCode = ResultState::RESULT_OK;
-    std::string destString = VCardUtils::EncodeBase64(responseByte);
+    std::string responseByteStr = Asn1Utils::BytesToString(responseByte);
+    std::string destString = VCardUtils::EncodeBase64(responseByteStr);
     preDownloadResult_.response = OHOS::Telephony::ToUtf16(destString);
     {
         std::lock_guard<std::mutex> lock(prepareDownloadMutex_);
@@ -179,7 +269,8 @@ bool EsimFile::DecodeBoundProfilePackage(const std::string &boundProfilePackageS
 {
     std::string destString = VCardUtils::DecodeBase64(boundProfilePackageStr);
     uint32_t byteLen = destString.length();
-    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(destString, 0, byteLen);
+    std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
+    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, byteLen);
     if (decoder == nullptr) {
         TELEPHONY_LOGE("decoder is nullptr");
         return false;
@@ -292,7 +383,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     if (sequenceOf86 != nullptr) {
         BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
     }
-    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.getCommands();
+    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
         CopyApdCmdToReqInfo(&reqInfo, cmd.get());
@@ -328,8 +419,8 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
 
 bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
 {
-    std::string responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
-    uint32_t byteLen = responseByte.length();
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
+    uint32_t byteLen = responseByte.size();
     loadBPPResult_.response = OHOS::Telephony::ToUtf16(combineHexStr);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
@@ -397,7 +488,7 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
         TELEPHONY_LOGE("iccidAsn is nullptr");
         return false;
     }
-    std::string iccid;
+    std::vector<uint8_t> iccid;
     std::string iccString;
     uint32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
     Asn1Utils::BchToString(iccid, iccString);
@@ -489,9 +580,9 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
         TELEPHONY_LOGE("nodeTargetAddr is nullptr");
         return;
     }
-    std::string resultStr;
+    std::vector<uint8_t> resultStr;
     nodeTargetAddr->Asn1AsBytes(resultStr);
-    euicc.targetAddr = OHOS::Telephony::ToUtf16(resultStr);
+    euicc.targetAddr = OHOS::Telephony::ToUtf16(Asn1Utils::BytesToString(resultStr));
 
     std::shared_ptr<Asn1Node> nodeEvent = metadataNode->Asn1GetChild(TAG_ESIM_EVENT);
     if (nodeEvent == nullptr) {
