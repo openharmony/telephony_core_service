@@ -110,10 +110,10 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("builder is nullptr");
         return false;
     }
-    std::string iccidBytes;
+    std::vector<uint8_t> iccidBytes;
     std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
     Asn1Utils::BcdToBytes(strIccId, iccidBytes);
-    builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.length());
+    builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -135,12 +135,12 @@ bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::
             TELEPHONY_LOGE("builder is nullptr");
             return false;
         }
-        std::string iccidBytes;
+        std::vector<uint8_t> iccidBytes;
         std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
         std::string childStr = OHOS::Telephony::ToUtf8(profile->nickname);
         Asn1Utils::BcdToBytes(strIccId, iccidBytes);
 
-        builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.length());
+        builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
         builder->Asn1AddChildAsString(TAG_ESIM_NICKNAME, childStr);
         ApduSimIORequestInfo reqInfo;
         CommBuildOneApduReqInfo(reqInfo, builder);
@@ -168,7 +168,7 @@ bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("pAsn1Node is nullptr");
         return false;
     }
-    delProfile_ = (static_cast<ResultState>Asn1NodeData->Asn1AsInteger());
+    delProfile_ = (static_cast<ResultState>(Asn1NodeData->Asn1AsInteger()));
     {
         std::lock_guard<std::mutex> lock(deleteProfileMutex_);
         isDeleteProfileReady_ = true;
@@ -187,10 +187,10 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
             TELEPHONY_LOGE("get builder failed");
             return false;
         }
-        std::string iccidBytes;
+        std::vector<uint8_t> iccidBytes;
         std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
         Asn1Utils::BcdToBytes(strIccId, iccidBytes);
-        subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.length());
+        subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
         std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
         builder->Asn1AddChild(subNode);
         builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
@@ -220,7 +220,7 @@ bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    switchResult_ = (static_cast<ResultState>asn1NodeData->Asn1AsInteger());
+    switchResult_ = (static_cast<ResultState>(asn1NodeData->Asn1AsInteger()));
 
     {
         std::lock_guard<std::mutex> lock(switchToProfileMutex_);
@@ -242,7 +242,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    updateNicknameResult_ = (static_cast<ResultState>asn1NodeData->Asn1AsInteger());
+    updateNicknameResult_ = (static_cast<ResultState>(asn1NodeData->Asn1AsInteger()));
     {
         std::lock_guard<std::mutex> lock(setNicknameMutex_);
         isSetNicknameReady_ = true;
