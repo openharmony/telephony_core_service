@@ -111,7 +111,7 @@ void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::
 {
     std::string destString = VCardUtils::DecodeBase64(base64Src);
     std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
-    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, destString.length());
+    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
     if (decoder == nullptr) {
         TELEPHONY_LOGE("create decoder failed");
         return;
@@ -173,14 +173,14 @@ void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr)
 
 bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
 {
-    if(fileData.resultData.length() == 0) {
+    if (fileData.resultData.length() == 0) {
         return false;
     }
     recvCombineStr_ = recvCombineStr_ + fileData.resultData;
     return (fileData.sw1 == SW1_VALUE_90 && fileData.sw2 == SW2_VALUE_00);
 }
 
-bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId)
+bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
 {
     if (fileData.sw1 == SW1_MORE_RESPONSE) {
         ApduSimIORequestInfo reqInfo;
@@ -195,7 +195,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId)
         apdCmd->data.ins = INS_GET_MORE_RESPONSE;
         apdCmd->data.p1 = 0;
         apdCmd->data.p2 = 0;
-        apdCmd->data.p3 = (int)fileData.sw2;
+        apdCmd->data.p3 = static_cast<int32_t>(fileData.sw2);
         CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
         AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
         if (telRilManager_ == nullptr) {
@@ -209,10 +209,8 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId)
 
 bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData)
 {
-    if(!CombineResponseDataFinish(fileData))
-    {
-        if(!ProcessIfNeedMoreResponse(fileData, MSG_ESIM_AUTHENTICATE_SERVER))
-        {
+    if (!CombineResponseDataFinish(fileData)) {
+        if (!ProcessIfNeedMoreResponse(fileData, MSG_ESIM_AUTHENTICATE_SERVER)) {
             TELEPHONY_LOGE("try to ProcessIfNeedMoreResponse NOT done. sw1=%{public}02X", fileData.sw1);
             return false;
         }
@@ -268,9 +266,8 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
 bool EsimFile::DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode)
 {
     std::string destString = VCardUtils::DecodeBase64(boundProfilePackageStr);
-    uint32_t byteLen = destString.length();
     std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
-    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, byteLen);
+    std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
     if (decoder == nullptr) {
         TELEPHONY_LOGE("decoder is nullptr");
         return false;
