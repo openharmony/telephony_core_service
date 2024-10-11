@@ -1986,7 +1986,7 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteInt32(euiccProfileInfoList.profiles.size());
+        reply.WriteUint32(euiccProfileInfoList.profiles.size());
         for (const auto &profile : euiccProfileInfoList.profiles) {
             ret = (ret && reply.WriteString16(profile.iccId));
             ret = (ret && reply.WriteString16(profile.nickName));
@@ -1999,7 +1999,7 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
             ret = (ret && reply.WriteString16(profile.carrierId.gid1));
             ret = (ret && reply.WriteString16(profile.carrierId.gid2));
             ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.policyRules)));
-            ret = (ret && reply.WriteInt32(profile.accessRules.size()));
+            ret = (ret && reply.WriteUint32(profile.accessRules.size()));
             for (const auto &rule : profile.accessRules) {
                 ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
                 ret = (ret && reply.WriteString16(rule.packageName));
@@ -2076,11 +2076,11 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
     int32_t result = GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.policyRules.size()));
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRules.size()));
         for (const auto &rules : eUiccRulesAuthTable.policyRules) {
             ret = (ret && reply.WriteInt32(rules));
         }
-        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.carrierIds.size()));
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.carrierIds.size()));
         for (const auto &carrier : eUiccRulesAuthTable.carrierIds) {
             ret = (ret && reply.WriteString16(carrier.mcc));
             ret = (ret && reply.WriteString16(carrier.mnc));
@@ -2091,7 +2091,7 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
             ret = (ret && reply.WriteInt32(carrier.carrierId));
             ret = (ret && reply.WriteInt32(carrier.specificCarrierId));
         }
-        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.policyRuleFlags.size()));
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRuleFlags.size()));
         for (const auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
             ret = (ret && reply.WriteInt32(ruleFlags));
         }
