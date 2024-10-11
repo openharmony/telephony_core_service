@@ -42,12 +42,13 @@ private:
     bool ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-    std::string GetProfileTagList();
+    std::vector<uint8_t> GetProfileTagList();
     bool ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
-
+    bool GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root);
+private:
     EsimProfile esimProfile_;
     std::string defaultDpAddress_ = "";
-    EuiccProfile euiccProfile_;
+    EuiccProfile eUiccProfile_;
     ResponseEsimResult cancelSessionResult_;
 
     std::mutex obtainDefaultSmdpAddressMutex_;
