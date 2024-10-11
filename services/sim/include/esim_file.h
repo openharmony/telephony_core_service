@@ -61,8 +61,8 @@ private:
     std::condition_variable setDefaultSmdpAddressCv_;
     bool isSetDefaultSmdpAddressReady_ = false;
 
-    std::mutex SendApduDataMutex_;
-    std::condition_variable SendApduDataCv_;
+    std::mutex sendApduDataMutex_;
+    std::condition_variable sendApduDataCv_;
     bool isSendApduDataReady_ = false;
 };
 } // namespace Telephony
