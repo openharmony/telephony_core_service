@@ -31,6 +31,7 @@ ohos_shared_library("esim") {
 
     sources = [
       "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_config_info_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_result_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/downloadable_profile_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/euicc_info_parcel.cpp",

@@ -91,6 +91,7 @@ ohos_shared_library("tel_core_service_api") {
 
   if (core_service_support_esim) {
     sources += [
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_config_info_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_result_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/downloadable_profile_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/esim_service_client.cpp",

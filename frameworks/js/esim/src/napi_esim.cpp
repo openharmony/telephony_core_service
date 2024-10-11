@@ -839,10 +839,13 @@ void NativeDownloadProfile(napi_env env, void *data)
     }
 
     DownloadProfileResult result;
+    DownloadProfileConfigInfo configInfo;
+    configInfo.portIndex_ = profileContext->portIndex;
+    configInfo.isSwitchAfterDownload_ = profileContext->switchAfterDownload;
+    configInfo.isForceDeactivateSim_ = profileContext->forceDeactivateSim;
     DownloadableProfile profile = GetProfileInfo(profileContext->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
-        profileContext->asyncContext.slotId, profileContext->portIndex, profile,
-        profileContext->switchAfterDownload, profileContext->forceDeactivateSim, result);
+        profileContext->asyncContext.slotId, configInfo, profile, result);
     TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
@@ -1468,7 +1471,7 @@ napi_status InitEnumPolicyRules(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DO_NOT_DISABLE",
             GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DO_NOT_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DO_NOT_DELETE",
-            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_NO_DELETE))),
+            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DO_NOT_DELETE))),
         DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DELETE_AFTER_DISABLING",
             GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DELETE_AFTER_DISABLING))),
     };

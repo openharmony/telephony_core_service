@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t MAX_SIZE = 1000;
+constexpr uint32_t MAX_SIZE = 1000;
 bool DownloadableProfile::ReadFromParcel(Parcel &parcel)
 {
     if (!parcel.ReadString16(encodedActivationCode_) || !parcel.ReadString16(confirmationCode_) ||

@@ -88,7 +88,7 @@ enum class ProfileClass {
  */
 enum class PolicyRules {
     POLICY_RULE_DO_NOT_DISABLE = 1,
-    POLICY_RULE_NO_DELETE = 1 << 1,
+    POLICY_RULE_DO_NOT_DELETE = 1 << 1,
     POLICY_RULE_DELETE_AFTER_DISABLING = 1 << 2,
 };
 
