@@ -3306,13 +3306,13 @@ int32_t CoreServiceProxy::ListNotifications(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        int32_t euiccNotificationCount = reply.ReadInt32();
+        uint32_t euiccNotificationCount = reply.ReadInt32();
         if (euiccNotificationCount >= MAX_SIZE) {
             TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
         notificationList.euiccNotification.resize(euiccNotificationCount);
-        for (int32_t i = 0; i < euiccNotificationCount; ++i) {
+        for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
             EuiccNotification &nf = notificationList.euiccNotification[i];
             nf.seq = reply.ReadInt32();
             nf.targetAddr = reply.ReadString16();
