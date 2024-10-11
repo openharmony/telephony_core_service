@@ -45,7 +45,8 @@ private:
     bool setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool ProcessObtainEUICCSupportDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
 
     ResultState resetResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState setDpAddressResult_ = ResultState::RESULT_UNDEFINED_ERROR;
