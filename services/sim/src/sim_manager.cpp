@@ -1260,7 +1260,7 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
 int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = simFileManager_[slotId]->ResetMemory(resetOption);
@@ -1271,7 +1271,7 @@ int32_t SimManager::SetDefaultSmdpAddress(
     int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = simFileManager_[slotId]->SetDefaultSmdpAddress(defaultSmdpAddress);
@@ -1281,7 +1281,7 @@ int32_t SimManager::SetDefaultSmdpAddress(
 bool SimManager::IsEsimSupported(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
         return false;
     }
     return simFileManager_[slotId]->IsEsimSupported();
@@ -1291,7 +1291,7 @@ int32_t SimManager::SendApduData(
     int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = simFileManager_[slotId]->SendApduData(aid, apduData);
