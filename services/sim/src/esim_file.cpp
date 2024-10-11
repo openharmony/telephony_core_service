@@ -534,7 +534,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId
     apdCmd->data.ins = INS_GET_MORE_RESPONSE;
     apdCmd->data.p1 = 0;
     apdCmd->data.p2 = 0;
-    apdCmd->data.p3 = static_cast<int32_t>(fileData.sw2);
+    apdCmd->data.p3 = static_cast<uint32_t>(fileData.sw2);
     CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
     AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
     if (telRilManager_ == nullptr) {
