@@ -101,7 +101,7 @@ ResultState EsimFile::SetProfileNickname(const std::u16string &iccId, const std:
 
 bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
+    if (!IsLogicChannelOpen()) {
         return false;
     }
     EsimProfile *profile = &esimProfile_;
@@ -128,32 +128,32 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
 
 bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_NICKNAME);
-        if (builder == nullptr) {
-            TELEPHONY_LOGE("builder is nullptr");
-            return false;
-        }
-        std::vector<uint8_t> iccidBytes;
-        std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
-        std::string childStr = OHOS::Telephony::ToUtf8(profile->nickname);
-        Asn1Utils::BcdToBytes(strIccId, iccidBytes);
-
-        builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
-        builder->Asn1AddChildAsString(TAG_ESIM_NICKNAME, childStr);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    EsimProfile *profile = &esimProfile_;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_NICKNAME);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    std::vector<uint8_t> iccidBytes;
+    std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
+    std::string childStr = OHOS::Telephony::ToUtf8(profile->nickname);
+    Asn1Utils::BcdToBytes(strIccId, iccidBytes);
+
+    builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
+    builder->Asn1AddChildAsString(TAG_ESIM_NICKNAME, childStr);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -179,33 +179,33 @@ bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &e
 
 bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
-        EsimProfile *profile = &esimProfile_;
-        std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
-        std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-        if (builder == nullptr || subBuilder == nullptr) {
-            TELEPHONY_LOGE("get builder failed");
-            return false;
-        }
-        std::vector<uint8_t> iccidBytes;
-        std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
-        Asn1Utils::BcdToBytes(strIccId, iccidBytes);
-        subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
-        std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
-        builder->Asn1AddChild(subNode);
-        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
-        ApduSimIORequestInfo reqInfo;
-        CommBuildOneApduReqInfo(reqInfo, builder);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
-            return false;
-        }
-        return true;
+    if (!IsLogicChannelOpen()) {
+        return false;
     }
-    return false;
+    EsimProfile *profile = &esimProfile_;
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
+    std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    if (builder == nullptr || subBuilder == nullptr) {
+        TELEPHONY_LOGE("get builder failed");
+        return false;
+    }
+    std::vector<uint8_t> iccidBytes;
+    std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
+    Asn1Utils::BcdToBytes(strIccId, iccidBytes);
+    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
+    std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    builder->Asn1AddChild(subNode);
+    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
 }
 
 bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
