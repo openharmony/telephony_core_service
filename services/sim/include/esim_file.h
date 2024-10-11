@@ -38,6 +38,7 @@ public:
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
 
 private:
+    void Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::string &base64Src);
     bool ProcessPrepareDownload(int32_t slotId);
     bool ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode);
@@ -57,7 +58,11 @@ private:
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
-    std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void SplitSendLongData(int32_t slotId, std::string hexStr);
+    bool MergeRecvLongDataComplete(IccFileData &fileData);
+    void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
+    bool CombineResponseDataFinish(IccFileData &fileData);
+    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId);
 
 protected:
     ResponseEsimResult preDownloadResult_;
