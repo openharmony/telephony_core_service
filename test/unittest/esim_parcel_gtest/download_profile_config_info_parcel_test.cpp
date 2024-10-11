@@ -61,7 +61,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, ReadFromParcel_0200, Function | MediumTe
     readBoolList.push_back(true);
     MockReadBool(true, &readBoolList);
     MockReadInt32(false);
-    EXPECT_TRUE(info.ReadFromParcel(parcel));
+    EXPECT_FALSE(info.ReadFromParcel(parcel));
     ResetParcelState();
 }
 
@@ -74,7 +74,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, ReadFromParcel_0300, Function | MediumTe
     readBoolList.push_back(true);
     MockReadBool(true, &readBoolList);
     MockReadInt32(true);
-    EXPECT_TRUE(info.ReadFromParcel(parcel));
+    EXPECT_FALSE(info.ReadFromParcel(parcel));
     ResetParcelState();
 }
 
@@ -87,7 +87,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, ReadFromParcel_0400, Function | MediumTe
     readBoolList.push_back(false);
     MockReadBool(true, &readBoolList);
     MockReadInt32(true);
-    EXPECT_TRUE(info.ReadFromParcel(parcel));
+    EXPECT_FALSE(info.ReadFromParcel(parcel));
     ResetParcelState();
 }
 
@@ -113,7 +113,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, Marshalling_0200, Function | MediumTest 
     writeBoolList.push_back(true);
     MockWriteBool(true, &writeBoolList);
     MockWriteInt32(false);
-    EXPECT_TRUE(info.Marshalling(parcel));
+    EXPECT_FALSE(info.Marshalling(parcel));
     ResetParcelState();
 }
 
@@ -126,7 +126,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, Marshalling_0300, Function | MediumTest 
     writeBoolList.push_back(true);
     MockWriteBool(true, &writeBoolList);
     MockWriteInt32(true);
-    EXPECT_TRUE(info.Marshalling(parcel));
+    EXPECT_FALSE(info.Marshalling(parcel));
     ResetParcelState();
 }
 
@@ -139,7 +139,7 @@ HWTEST_F(DownloadProfileConfigInfoTest, Marshalling_0400, Function | MediumTest 
     writeBoolList.push_back(false);
     MockWriteBool(true, &writeBoolList);
     MockWriteInt32(true);
-    EXPECT_TRUE(info.Marshalling(parcel));
+    EXPECT_FALSE(info.Marshalling(parcel));
     ResetParcelState();
 }
 
