@@ -62,7 +62,7 @@ private:
     bool MergeRecvLongDataComplete(IccFileData &fileData);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
-    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int eventId);
+    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
 
 protected:
     ResponseEsimResult preDownloadResult_;
