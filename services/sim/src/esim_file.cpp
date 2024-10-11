@@ -335,9 +335,9 @@ std::string EsimFile::MakeVersionString(std::vector<uint8_t> &versionRaw)
         return "";
     }
     std::ostringstream oss;
-    oss << std::hex << static_cast<unsigned char>(versionRaw[VERSION_HIGH])
-        << "." << static_cast<unsigned char>(versionRaw[VERSION_MIDDLE])
-        << "." << static_cast<unsigned char>(versionRaw[VERSION_LOW]);
+    oss << std::hex << static_cast<unsigned char>(versionRaw[VERSION_HIGH]) << "." <<
+        static_cast<unsigned char>(versionRaw[VERSION_MIDDLE]) << "." <<
+        static_cast<unsigned char>(versionRaw[VERSION_LOW]);
     return oss.str();
 }
 
@@ -349,6 +349,9 @@ bool EsimFile::ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event
         return false;
     }
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_EID);
+    if (profileRoot == nullptr) {
+        return false;
+    }
     std::vector<uint8_t> outPutBytes;
     uint32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
     if (byteLen == 0) {
@@ -462,7 +465,7 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
             TELEPHONY_LOGE("Profile must have an ICCID.");
             continue;
         }
-        BuildProfile(&euiccProfileInfo, curNode);
+        BuildBasicProfileInfo(&euiccProfileInfo, curNode);
         EuiccProfile euiccProfile;
         ConvertProfileInfoToApiStruct(euiccProfile, euiccProfileInfo);
         euiccProfileInfoList_.profiles.push_back(euiccProfile);
@@ -513,7 +516,7 @@ void EsimFile::ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo
     dst.accessRules.clear();
 }
 
-void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
+void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
 {
     if (eProfileInfo == nullptr || profileNode == nullptr) {
         TELEPHONY_LOGE("BuildProfile failed");
@@ -527,7 +530,6 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
     std::vector<uint8_t> iccidBytes;
     uint32_t iccidBytesLen = iccIdNode->Asn1AsBytes(iccidBytes);
     Asn1Utils::BchToString(iccidBytes, eProfileInfo->iccid);
-
     if (profileNode->Asn1HasChild(TAG_ESIM_NICKNAME)) {
         std::shared_ptr<Asn1Node> nickNameNode = profileNode->Asn1GetChild(TAG_ESIM_NICKNAME);
         if (nickNameNode == nullptr) {
@@ -536,7 +538,6 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
         }
         nickNameNode->Asn1AsString(eProfileInfo->nickname);
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_OBTAIN_OPERATOR_NAME)) {
         std::shared_ptr<Asn1Node> serviceProviderNameNode = profileNode->Asn1GetChild(TAG_ESIM_OBTAIN_OPERATOR_NAME);
         if (serviceProviderNameNode == nullptr) {
@@ -545,7 +546,6 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
         }
         serviceProviderNameNode->Asn1AsString(eProfileInfo->serviceProviderName);
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_NAME)) {
         std::shared_ptr<Asn1Node> profileNameNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_NAME);
         if (profileNameNode == nullptr) {
@@ -554,12 +554,20 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
         }
         profileNameNode->Asn1AsString(eProfileInfo->profileName);
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_OPERATOR_ID)) {
         std::shared_ptr<Asn1Node> pOperatorId = profileNode->Asn1GetChild(TAG_ESIM_OPERATOR_ID);
         BuildOperatorId(eProfileInfo, pOperatorId);
     }
 
+    BuildAdvancedProfileInfo(eProfileInfo, profileNode);
+}
+
+void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
+{
+    if (eProfileInfo == nullptr || profileNode == nullptr) {
+        TELEPHONY_LOGE("BuildProfile failed");
+        return;
+    }
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_STATE)) {
         std::shared_ptr<Asn1Node> profileStateNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_STATE);
         if (profileStateNode == nullptr) {
@@ -571,7 +579,6 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
     } else {
         eProfileInfo->profileState = ESIM_PROFILE_STATE_DISABLED;
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_CLASS)) {
         std::shared_ptr<Asn1Node> profileClassNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_CLASS);
         if (profileClassNode == nullptr) {
@@ -582,7 +589,6 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
     } else {
         eProfileInfo->profileClass = PROFILE_CLASS_OPERATIONAL;
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_POLICY_RULE)) {
         std::shared_ptr<Asn1Node> profilePolicyRuleNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_POLICY_RULE);
         if (profilePolicyRuleNode == nullptr) {
@@ -591,9 +597,8 @@ void EsimFile::BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1
         }
         eProfileInfo->policyRules = profilePolicyRuleNode->Asn1AsBits();
     }
-
     if (profileNode->Asn1HasChild(TAG_ESIM_CARRIER_PRIVILEGE_RULES)) {
-		std::list<std::shared_ptr<Asn1Node>> refArDoNodes;
+        std::list<std::shared_ptr<Asn1Node>> refArDoNodes;
         std::shared_ptr<Asn1Node> carrierPrivilegeRulesNode =
             profileNode->Asn1GetChild(TAG_ESIM_CARRIER_PRIVILEGE_RULES);
         if (carrierPrivilegeRulesNode == nullptr) {
@@ -634,6 +639,7 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
         }
         nodeCtx2->Asn1AsString(eProfileInfo->operatorId.gid2);
     }
+    return;
 }
 
 ResultState EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
@@ -734,6 +740,9 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
     Asn1Utils::BcdToBytes(str, iccidBytes);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    if (subNode == nullptr) {
+        return false;
+    }
     builder->Asn1AddChild(subNode);
     builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
     ApduSimIORequestInfo reqInfo;
@@ -1039,7 +1048,7 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             bool isFileProcessResponse = memberFunc(event);
-            ProcessFileLoaded(isFileProcessResponse);
+            return;
         }
     } else {
         IccFile::ProcessEvent(event);
@@ -1059,7 +1068,7 @@ std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Poi
     }
     IccFileData *resultDataPtr = &(rcvMsg->fileData);
     if (resultDataPtr == nullptr) {
-        TELEPHONY_LOGE("resultData is nullptr within rcvMsg");
+        TELEPHONY_LOGE("resultDataPtr is nullptr within rcvMsg");
         return nullptr;
     }
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(resultDataPtr->resultData);
