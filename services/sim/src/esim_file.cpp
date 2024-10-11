@@ -82,7 +82,7 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
-    AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_REMOVE_NOTIFICATION);
+    AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
     SyncOpenChannel();
     if (!ProcessListNotifications(slotId_, Event::EVENT_ENABLE, eventListNotif)) {
         TELEPHONY_LOGE("ProcessListNotifications encode failed");
