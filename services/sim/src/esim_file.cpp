@@ -153,6 +153,55 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
     return true;
 }
 
+void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc)
+{
+    if (node == nullptr) {
+        TELEPHONY_LOGE("createNotification node is nullptr");
+        return;
+    }
+    std::shared_ptr<Asn1Node> metadataNode;
+    if (node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA) {
+        metadataNode = node;
+    } else if (node->GetNodeTag() == TAG_ESIM_PROFILE_INSTALLATION_RESULT) {
+        std::shared_ptr<Asn1Node> findNode = node->Asn1GetGrandson(TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA, TAG_ESIM_NOTIFICATION_METADATA);
+        metadataNode = findNode;
+    } else {
+        // Other signed notification
+        std::shared_ptr<Asn1Node> findNode = node->Asn1GetChild(TAG_ESIM_NOTIFICATION_METADATA);
+        metadataNode = findNode;
+    }
+    if (metadataNode == nullptr) {
+        TELEPHONY_LOGE("metadataNode is nullptr");
+        return;
+    }
+    std::shared_ptr<Asn1Node> nodeSeq = metadataNode->Asn1GetChild(TAG_ESIM_SEQ);
+    if (nodeSeq == nullptr) {
+        TELEPHONY_LOGE("nodeSeq is nullptr");
+        return;
+    }
+    euicc.seq = nodeSeq->Asn1AsInteger();
+
+    std::shared_ptr<Asn1Node> nodeTargetAddr = metadataNode->Asn1GetChild(TAG_ESIM_TARGET_ADDR);
+    if (nodeTargetAddr == nullptr) {
+        TELEPHONY_LOGE("nodeTargetAddr is nullptr");
+        return;
+    }
+    std::string strResult;
+    nodeTargetAddr->Asn1AsString(strResult);
+    euicc.targetAddr = OHOS::Telephony::ToUtf16(strResult);
+
+    std::shared_ptr<Asn1Node> nodeEvent = metadataNode->Asn1GetChild(TAG_ESIM_EVENT);
+    if (nodeEvent == nullptr) {
+        TELEPHONY_LOGE("nodeEvent is nullptr");
+        return;
+    }
+    euicc.event = nodeEvent->Asn1AsBits();
+
+    std::string strmData;
+    node->Asn1NodeToHexStr(strmData);
+    euicc.data = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
+}
+
 bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
 {
     std::list<std::shared_ptr<Asn1Node>> ls;
