@@ -97,7 +97,8 @@ private:
     bool ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
     bool SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::string &mnc);
-    void BuildProfile(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
+    void BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
+    void BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
     void BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &operatorIdNode);
     void ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo &src);
     std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
