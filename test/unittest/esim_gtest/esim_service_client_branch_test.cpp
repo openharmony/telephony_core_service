@@ -114,16 +114,14 @@ HWTEST_F(EsimServiceClientBranchTest, GetDownloadableProfiles_0001, Function | M
 
 HWTEST_F(EsimServiceClientBranchTest, DownloadProfile_0001, Function | MediumTest | Level1)
 {
-    int32_t portIndex = 0;
+    DownloadProfileConfigInfo configInfo;
     DownloadableProfile profile;
-    bool switchAfterDownload = false;
-    bool forceDeactivateSim = false;
     DownloadProfileResult downloadProfileResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     int32_t result = EsimServiceClient::GetInstance().DownloadProfile(
-        SLOT_ID, portIndex, profile, switchAfterDownload, forceDeactivateSim, downloadProfileResult);
+        SLOT_ID, configInfo, profile, downloadProfileResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 

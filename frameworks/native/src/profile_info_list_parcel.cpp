@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t MAX_SIZE = 1000;
+constexpr uint32_t MAX_SIZE = 1000;
 bool GetEuiccProfileInfoListResult::ReadProfileFromParcel(Parcel &parcel, EuiccProfile &profile)
 {
     int32_t stateValue;
@@ -38,7 +38,7 @@ bool GetEuiccProfileInfoListResult::ReadProfileFromParcel(Parcel &parcel, EuiccP
     profile.policyRules_ = static_cast<PolicyRules>(policyRulesValue);
 
     uint32_t count;
-    if (!parcel.ReadUint32(count) || count > MAX_SIZE) {
+    if (!parcel.ReadUint32(count)) {
         return false;
     }
     if (count > MAX_SIZE) {

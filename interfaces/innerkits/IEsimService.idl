@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-sequenceable download_profile_result_parcel..OHOS.Telephony.EuiccInfo;
+sequenceable download_profile_config_info_parcel..OHOS.Telephony.DownloadProfileConfigInfo;
+sequenceable download_profile_result_parcel..OHOS.Telephony.DownloadableProfile;
 sequenceable downloadable_profile_parcel..OHOS.Telephony.DownloadProfileResult;
-sequenceable euicc_info_parcel..OHOS.Telephony.DownloadableProfile;
+sequenceable euicc_info_parcel..OHOS.Telephony.EuiccInfo;
 sequenceable get_downloadable_profiles_result_parcel..OHOS.Telephony.GetDownloadableProfileMetadataResult;
 sequenceable profile_info_list_parcel..OHOS.Telephony.GetDownloadableProfilesResult;
 sequenceable profile_metadata_result_parcel..OHOS.Telephony.GetEuiccProfileInfoListResult;
@@ -37,10 +38,8 @@ interface OHOS.Telephony.IEsimService {
         [out] GetDownloadableProfilesResult profileListResult);
     void DownloadProfile(
         [in] int slotId,
-        [in] int portIndex,
+        [in] DownloadProfileConfigInfo configInfo,
         [in] DownloadableProfile profile,
-        [in] boolean switchAfterDownload,
-        [in] boolean forceDeactivateSim,
         [out] DownloadProfileResult downloadProfileResult);
     void GetEuiccProfileInfoList([in] int slotId, [out] GetEuiccProfileInfoListResult euiccProfileInfoList);
     void GetEuiccInfo([in] int slotId, [out] EuiccInfo eUiccInfo);

@@ -21,7 +21,7 @@ ohos_unittest("parcel_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "$SOURCE_DIR/frameworks/native/src/download_profile_result_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/download_profile_config_info_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/downloadable_profile_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/euicc_info_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/get_downloadable_profiles_result_parcel.cpp",
@@ -29,6 +29,7 @@ ohos_unittest("parcel_gtest") {
     "$SOURCE_DIR/frameworks/native/src/profile_metadata_result_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/response_esim_result.cpp",
     "$SOURCE_DIR/test/unittest/esim_parcel_gtest/mock/src/parcel.cpp",
+    "download_profile_config_info_parcel_test.cpp",
     "download_profile_result_parcel_test.cpp",
     "downloadable_profile_parcel_test.cpp",
     "euicc_info_parcel_test.cpp",

@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t MAX_SIZE = 1000;
+constexpr uint32_t MAX_SIZE = 1000;
 bool GetDownloadableProfilesResult::ReadFromParcel(Parcel &parcel)
 {
     int32_t resultValue;

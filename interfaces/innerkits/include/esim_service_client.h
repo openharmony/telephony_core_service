@@ -100,16 +100,13 @@ public:
      * @brief Attempt to download the given downloadable Profile.
      *
      * @param slotId[in], indicates the card slot index number.
-     * @param portIndex[in], index of the port from the slot.
+     * @param configInfo[in], downloadprofile config info.
      * @param profile[in], the Bound Profile Package data returned by SM-DP+ server.
-     * @param switchAfterDownload[in], indicates whether to enable profile after successful download.
-     * @param forceDeactivateSim[in], If true, and if an active SIM must be deactivated to access the eUICC,
-     * perform this action automatically.
      * @param downloadProfileResult[out], the given downloadableProfile.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t DownloadProfile(int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-        bool switchAfterDownload, bool forceDeactivateSim, DownloadProfileResult &downloadProfileResult);
+    int32_t DownloadProfile(int32_t slotId, DownloadProfileConfigInfo configInfo, const DownloadableProfile &profile,
+        DownloadProfileResult &downloadProfileResult);
 
     /**
      * @brief Get a list of all euiccProfile informations.

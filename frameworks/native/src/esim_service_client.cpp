@@ -199,16 +199,15 @@ int32_t EsimServiceClient::GetDownloadableProfiles(
     return proxy->GetDownloadableProfiles(slotId, portIndex, forceDeactivateSim, profileListResult);
 }
 
-int32_t EsimServiceClient::DownloadProfile(int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-    bool switchAfterDownload, bool forceDeactivateSim, DownloadProfileResult &downloadProfileResult)
+int32_t EsimServiceClient::DownloadProfile(int32_t slotId, DownloadProfileConfigInfo configInfo,
+    const DownloadableProfile &profile, DownloadProfileResult &downloadProfileResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->DownloadProfile(slotId, portIndex, profile, switchAfterDownload, forceDeactivateSim,
-        downloadProfileResult);
+    return proxy->DownloadProfile(slotId, configInfo, profile, downloadProfileResult);
 }
 
 int32_t EsimServiceClient::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
