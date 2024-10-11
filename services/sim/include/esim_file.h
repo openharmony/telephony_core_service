@@ -40,8 +40,11 @@ constexpr static const int32_t NUMBER_ELEVEN = 11;
 constexpr static const int32_t PARAMETER_TWO = -1;
 constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
+constexpr static const int32_t SW1_MORE_RESPONSE = 0x61;
+constexpr static const int32_t INS_GET_MORE_RESPONSE = 0xC0;
+constexpr static const int32_t SW1_VALUE_90 = 0x90;
+constexpr static const int32_t SW2_VALUE_00 = 0x00;
 static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
-constexpr static const int32_t ATR_LENGTH = 47;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
