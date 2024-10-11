@@ -10,7 +10,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
+import("../../../core_service/telephony_core_service.gni")
 
 SUBSYSTEM_DIR = "../../../"
 TELEPHONY_CORE_SERVICE_ROOT = "$SUBSYSTEM_DIR/core_service"
@@ -28,6 +30,9 @@ config("tel_core_service_api_config") {
     "$TELEPHONY_INTERFACES_INNERKITS/ims/include",
     "$TELEPHONY_INTERFACES_INNERKITS/satellite",
   ]
+  if (core_service_support_esim) {
+    include_dirs += [ "${target_gen_dir}" ]
+  }
 
   cflags = []
   if (is_double_framework) {
@@ -41,6 +46,18 @@ config("tel_core_service_api_config") {
   }
   if (defined(build_public_version) && build_public_version) {
     cflags += [ "-DBUILD_PUBLIC_VERSION" ]
+  }
+}
+
+if (core_service_support_esim) {
+  idl_interface_sources = [ "${target_gen_dir}/esim_service_proxy.cpp" ]
+
+  idl_gen_interface("esim_service_api") {
+    src_idl = rebase_path("IEsimService.idl")
+    dst_file = string_join(",", idl_interface_sources)
+    hitrace = "HITRACE_TAG_ABILITY_MANAGER"
+    log_domainid = "0xD001F04"
+    log_tag = "CoreServiceApi"
   }
 }
 
@@ -72,6 +89,21 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_callback_proxy.cpp",
   ]
 
+  if (core_service_support_esim) {
+    sources += [
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_config_info_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_result_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/downloadable_profile_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/esim_service_client.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/euicc_info_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/get_downloadable_profiles_result_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/profile_info_list_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/profile_metadata_result_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/response_esim_result.cpp",
+      "${target_gen_dir}/esim_service_proxy.cpp",
+    ]
+  }
+
   version_script =
       "$TELEPHONY_INTERFACES_INNERKITS/libtel_core_service_api.versionscript"
 
@@ -83,6 +115,10 @@ ohos_shared_library("tel_core_service_api") {
   public_configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
   public_configs += [ ":tel_core_service_api_config" ]
+
+  if (core_service_support_esim) {
+    deps = [ ":esim_service_api" ]
+  }
 
   external_deps = [
     "ability_base:want",
@@ -96,6 +132,13 @@ ohos_shared_library("tel_core_service_api") {
     "resource_management:global_resmgr",
     "samgr:samgr_proxy",
   ]
+
+  if (core_service_support_esim) {
+    external_deps += [
+      "hitrace:hitrace_meter",
+      "ipc:ipc_core",
+    ]
+  }
 
   cflags_cc = [
     "-O2",
