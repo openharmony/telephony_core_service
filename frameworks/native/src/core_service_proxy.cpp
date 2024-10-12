@@ -3208,11 +3208,11 @@ int32_t CoreServiceProxy::GetDefaultSmdpAddress(int32_t slotId, std::u16string &
         TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t responseResult =
+    int32_t sendResult =
         remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS), data,
         reply, option);
-    if (responseResult != ERR_NONE) {
-        TELEPHONY_LOGE("GetDefaultSmdpAddress failed, error code is %{public}d", responseResult);
+    if (sendResult != ERR_NONE) {
+        TELEPHONY_LOGE("GetDefaultSmdpAddress failed, error code is %{public}d", sendResult);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -3257,8 +3257,8 @@ int32_t CoreServiceProxy::CancelSession(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        sendResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        sendResult.response = reply.ReadString16();
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
     }
     return result;
 }

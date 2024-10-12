@@ -123,7 +123,6 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_PROFILES);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     if (builder == nullptr || subBuilder == nullptr) {
@@ -131,7 +130,7 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string iccid= OHOS::Telephony::ToUtf8(profile->iccId);
+    std::string iccid= OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(iccid, iccidBytes);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
@@ -177,13 +176,12 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_CANCEL_SESSION);
     if (builder == nullptr) {
         TELEPHONY_LOGE("builder is nullptr");
         return false;
     }
-    std::string transactionIdStr = Str16ToStr8(profile->transactionId);
+    std::string transactionIdStr = Str16ToStr8(esimProfile_.transactionId);
     std::vector<uint8_t> transactionIdByte = Asn1Utils::HexStrToBytes(transactionIdStr);
     builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, transactionIdByte, transactionIdByte.size());
     builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, static_cast<uint32_t>(profile->cancelReason));
