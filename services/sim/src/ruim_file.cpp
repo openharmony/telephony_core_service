@@ -246,6 +246,10 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
             if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC) && isSizeEnough) {
                 mnc = imsi_.substr(MCC_LEN, lengthOfMnc_);
             }
+            if (!IsValidDecValue(mcc)) {
+                TELEPHONY_LOGE("mcc is invalid decimal value");
+                return false;
+            }
             int mncLength = MccPool::ShortestMncLengthFromMcc(std::stoi(mcc));
             isSizeEnough = imsiSize >= MCC_LEN + mncLength;
             if (mnc.empty() && IsValidDecValue(mcc) && isSizeEnough) {

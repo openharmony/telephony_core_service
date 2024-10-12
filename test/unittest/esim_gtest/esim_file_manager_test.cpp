@@ -20,9 +20,9 @@
 
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "gtest/gtest.h"
 #include "sim_file_manager.h"
 #include "tel_ril_manager.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -43,6 +43,135 @@ void EsimFileManagerTest::SetUp() {}
 void EsimFileManagerTest::TearDown() {}
 
 void EsimFileManagerTest::SetUpTestCase() {}
+
+HWTEST_F(EsimFileManagerTest, GetEid_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    EXPECT_EQ(simFileManager.GetEid(), Str8ToStr16(expectedEid));
+    simFileManager.eSimFile_ = nullptr;
+    EXPECT_EQ(simFileManager.GetEid(), u"");
+}
+
+HWTEST_F(EsimFileManagerTest, GetEuiccProfileInfoList_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    GetEuiccProfileInfoListResult eUiccRes = simFileManager.GetEuiccProfileInfoList();
+    EXPECT_EQ(eUiccRes.result, ResultState::RESULT_OK);
+    simFileManager.eSimFile_ = nullptr;
+    eUiccRes = simFileManager.GetEuiccProfileInfoList();
+    EXPECT_EQ(eUiccRes.result, ResultState::RESULT_OK);
+}
+
+HWTEST_F(EsimFileManagerTest, GetEuiccInfo_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    EuiccInfo eUiccInfo = simFileManager.GetEuiccInfo();
+    EXPECT_EQ(eUiccInfo.osVersion, u"");
+    simFileManager.eSimFile_ = nullptr;
+    eUiccInfo = simFileManager.GetEuiccInfo();
+    EXPECT_EQ(eUiccInfo.osVersion, u"");
+}
+
+HWTEST_F(EsimFileManagerTest, DisableProfile_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    std::u16string iccId = u"";
+    ResultState res = simFileManager.DisableProfile(portIndex, iccId);
+    EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
+    simFileManager.eSimFile_ = nullptr;
+    res = simFileManager.DisableProfile(portIndex, iccId);
+    EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
+}
+
+HWTEST_F(EsimFileManagerTest, GetSmdsAddress_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    std::u16string resStr = simFileManager.GetSmdsAddress(portIndex);
+    EXPECT_EQ(resStr, u"");
+    simFileManager.eSimFile_ = nullptr;
+    resStr = simFileManager.GetSmdsAddress(portIndex);
+    EXPECT_EQ(resStr, u"");
+}
+
+HWTEST_F(EsimFileManagerTest, GetRulesAuthTable_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    EuiccRulesAuthTable res = simFileManager.GetRulesAuthTable(portIndex);
+    EXPECT_EQ(res.position, 0);
+    simFileManager.eSimFile_ = nullptr;
+    res = simFileManager.GetRulesAuthTable(portIndex);
+    EXPECT_EQ(res.position, 0);
+}
+
+HWTEST_F(EsimFileManagerTest, GetEuiccChallenge_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    ResponseEsimResult res = simFileManager.GetEuiccChallenge(portIndex);
+    EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
+    simFileManager.eSimFile_ = nullptr;
+    res = simFileManager.GetEuiccChallenge(portIndex);
+    EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
+}
 
 HWTEST_F(EsimFileManagerTest, RequestDefaultSmdpAddress_001, Function | MediumTest | Level2)
 {

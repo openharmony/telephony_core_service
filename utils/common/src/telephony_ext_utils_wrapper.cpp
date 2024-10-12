@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-const std::string TELEPHONY_EXT_UTILS_WRAPPER_PATH = "libtelephony_ext_service.z.so";
+const std::string TELEPHONY_EXT_UTILS_WRAPPER_PATH = "libtelephony_ext_innerkits.z.so";
 } // namespace
 
 TelephonyExtUtilsWrapper::TelephonyExtUtilsWrapper() {}
@@ -34,11 +34,11 @@ void TelephonyExtUtilsWrapper::InitTelephonyExtUtilsWrapper()
     TELEPHONY_LOGD("TelephonyExtUtilsWrapper::InitTelephonyExtUtilsWrapper() start");
     telephonyExtUtilsWrapperHandle_ = dlopen(TELEPHONY_EXT_UTILS_WRAPPER_PATH.c_str(), RTLD_NOW);
     if (telephonyExtUtilsWrapperHandle_ == nullptr) {
-        TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
+        TELEPHONY_LOGE("libtelephony_ext_innerkits.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
-    isNrSupported_ = (IS_NR_SUPPORTED)dlsym(telephonyExtUtilsWrapperHandle_, "IsNrSupportedExt");
-    if (isNrSupported_ == nullptr) {
+    isChipsetNrSupported_ = (IsChipsetNrSupported)dlsym(telephonyExtUtilsWrapperHandle_, "IsChipsetNrSupported");
+    if (isChipsetNrSupported_ == nullptr) {
         TELEPHONY_LOGE("telephony ext utils wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
