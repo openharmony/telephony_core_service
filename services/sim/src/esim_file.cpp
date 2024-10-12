@@ -1237,7 +1237,7 @@ bool EsimFile::GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root)
     }
     std::shared_ptr<Asn1Node> iccNode = profileInfo->Asn1GetChild(TAG_ESIM_ICCID);
     if (iccNode == nullptr) {
-        TELEPHONY_LOGE("nodeIcc is null");
+        TELEPHONY_LOGE("nodeIcc is nullptr");
         return false;
     }
     EuiccProfileInfo euiccProfileInfo = {{0}};
