@@ -150,7 +150,6 @@ public:
     int32_t GetEid(int32_t slotId, std::u16string &eId) override;
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
     int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
-    void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
     int32_t DisableProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh,
         ResultState &enumResult) override;
     int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
@@ -174,6 +173,7 @@ private:
     void ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result);
     void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
+    void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
 
 private:
     static inline BrokerDelegator<CoreServiceProxy> delegator_;
