@@ -162,10 +162,11 @@ void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo *requestInfo, ApduComman
         TELEPHONY_LOGE("CopyApdCmdToReqInfo failed");
         return;
     }
-    
-    static uint32_t cnt = 0;
-    requestInfo->serial = cnt;
-    cnt++;
+    requestInfo->serial = nextSerialId_;
+    nextSerialId_++;
+    if (nextSerialId_ >= INT32_MAX) {
+        nextSerialId_ = 0;
+    }
     requestInfo->channelId = apduCommand->channel;
     requestInfo->type = apduCommand->data.cla;
     requestInfo->instruction = apduCommand->data.ins;
