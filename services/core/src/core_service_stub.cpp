@@ -1986,7 +1986,10 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        reply.WriteUint32(euiccProfileInfoList.profiles.size());
+        if (!reply.WriteUint32(euiccProfileInfoList.profiles.size())) {
+            TELEPHONY_LOGE("write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
         for (const auto &profile : euiccProfileInfoList.profiles) {
             ret = (ret && reply.WriteString16(profile.iccId));
             ret = (ret && reply.WriteString16(profile.nickName));
