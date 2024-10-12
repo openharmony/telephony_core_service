@@ -173,7 +173,9 @@ private:
     void ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result);
     void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
     void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
+#endif
 
 private:
     static inline BrokerDelegator<CoreServiceProxy> delegator_;
