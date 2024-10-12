@@ -239,6 +239,19 @@ public:
     bool SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
         int32_t firstParam, std::string secondParam);
 
+    /**
+     * @brief send event to RilBaseManager with callback
+     *
+     * @param slotId sim card id
+     * @param radioEvent see RadioEvent
+     * @param callback pointer to callback interface
+     * @param isChipsetNetworkExtSupported indicates whether the chipset supports networkExt
+     * @return true success
+     * @return false fail
+     */
+    bool SendCallbackNetworkExt(int32_t slotId, RadioEvent radioEvent, const sptr<INetworkSearchCallback> *callback,
+        bool isChipsetNetworkExtSupported);
+
 private:
     /**
      * @brief Get the Ril Function Pointer From Map
