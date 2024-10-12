@@ -93,7 +93,7 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
 
 bool EsimFile::ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
-    if (IsLogicChannelOpen()) {
+    if (!IsLogicChannelOpen()) {
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EUICC_INFO_2);
@@ -127,7 +127,7 @@ void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimPro
 
 bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
 {
-    if (IsLogicChannelOpen()) {
+    if (!IsLogicChannelOpen()) {
         return false;
     }
     Es9PlusInitAuthResp bytes;
@@ -148,6 +148,10 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
         return false;
     }
     std::shared_ptr<Asn1Node> ctxNode = ctxParams1Builder->Asn1Build();
+    if (ctxNode == nullptr) {
+        TELEPHONY_LOGE("ctxNode is nullptr");
+        return false;
+    }
     builder->Asn1AddChild(ctxNode);
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
@@ -181,8 +185,8 @@ void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const
         return;
     }
     std::shared_ptr<Asn1Node> node = decoder->Asn1NextNode();
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("build is nullptr");
+    if (node == nullptr) {
+        TELEPHONY_LOGE("node is nullptr");
         return;
     }
     builder->Asn1AddChild(node);
@@ -190,10 +194,6 @@ void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, const
 
 void EsimFile::AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder)
 {
-    if (devCapsBuilder == nullptr) {
-        TELEPHONY_LOGE("dev caps build failed");
-        return;
-    }
     std::vector<uint8_t> versionBytes;
     Asn1Utils::UintToBytes(VERSION_NUMBER, versionBytes);
     devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, versionBytes, versionBytes.size());
@@ -219,20 +219,16 @@ void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &
     }
 }
 
-void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp *pbytes)
+void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes)
 {
-    if (pbytes == nullptr || ctxParams1Builder == nullptr) {
-        TELEPHONY_LOGE("AddCtxParams1 pbytes is nullptr");
-        return;
-    }
     std::string matchingId;
     ctxParams1Builder->Asn1AddChildAsString(TAG_ESIM_CTX_0, matchingId);
-    pbytes->matchingId = matchingId;
+    pbytes.matchingId = matchingId;
     std::shared_ptr<Asn1Node> subNode = nullptr;
     std::vector<uint8_t> tacBytes;
     std::vector<uint8_t> imeiBytes;
-    Asn1Utils::BcdToBytes(pbytes->imei, tacBytes);
-    GetImeiBytes(imeiBytes, pbytes->imei);
+    Asn1Utils::BcdToBytes(pbytes.imei, tacBytes);
+    GetImeiBytes(imeiBytes, pbytes.imei);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
     if (subBuilder == nullptr) {
         TELEPHONY_LOGE("AddCtxParams1 subBuilder is nullptr");
@@ -247,6 +243,10 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     }
     AddDeviceCapability(devCapsBuilder);
     std::shared_ptr<Asn1Node> devCapNode = devCapsBuilder->Asn1Build();
+    if (devCapNode == nullptr) {
+        TELEPHONY_LOGE("devCapNode is nullptr");
+        return;
+    }
     subBuilder->Asn1AddChild(devCapNode);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_2, imeiBytes, imeiBytes.size());
     subNode = subBuilder->Asn1Build();
@@ -277,7 +277,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     }
     EuiccInfo2 euiccInfo2 = {};
     this->EuiccInfo2ParseProfileVersion(&euiccInfo2, root);
-    this->EuiccInfo2ParseSvn(&euiccInfo2, root, byteLen);
+    this->EuiccInfo2ParseSvn(&euiccInfo2, root);
     this->EuiccInfo2ParseEuiccFirmwareVer(&euiccInfo2, root);
     this->EuiccInfo2ParseExtCardResource(&euiccInfo2, root);
     this->EuiccInfo2ParseUiccCapability(&euiccInfo2, root);
@@ -312,12 +312,8 @@ std::string EsimFile::MakeVersionString(std::vector<uint8_t> &versionRaw)
     return result;
 }
 
-void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> profileVerNode = root->Asn1GetChild(TAG_ESIM_CTX_1);
     if (profileVerNode == nullptr) {
         TELEPHONY_LOGE("profileVerNode is nullptr");
@@ -329,16 +325,11 @@ void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 *euiccInfo2, std::shared
         TELEPHONY_LOGE("invalid profileVersion data");
         return;
     }
-    euiccInfo2->profileVersion = MakeVersionString(profileVersionRaw);
+    euiccInfo2.profileVersion = MakeVersionString(profileVersionRaw);
 }
 
-void EsimFile::EuiccInfo2ParseSvn(
-    EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root, uint32_t byteLen)
+void EsimFile::EuiccInfo2ParseSvn(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> svnNode = root->Asn1GetChild(TAG_ESIM_CTX_2);
     if (svnNode == nullptr) {
         TELEPHONY_LOGE("svnNode is nullptr");
@@ -350,15 +341,11 @@ void EsimFile::EuiccInfo2ParseSvn(
         TELEPHONY_LOGE("invalid SVN data");
         return;
     }
-    euiccInfo2->svn = MakeVersionString(svnRaw);
+    euiccInfo2.svn = MakeVersionString(svnRaw);
 }
 
-void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> euiccFirmwareVerNode = root->Asn1GetChild(TAG_ESIM_CTX_3);
     if (euiccFirmwareVerNode == nullptr) {
         TELEPHONY_LOGE("euiccFirmwareVerNode is nullptr");
@@ -370,43 +357,31 @@ void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 *euiccInfo2, std::shar
         TELEPHONY_LOGE("invalid firmwareVer data");
         return;
     }
-    euiccInfo2->svn = MakeVersionString(euiccFirmwareVerRaw);
+    euiccInfo2.svn = MakeVersionString(euiccFirmwareVerRaw);
 }
 
-void EsimFile::EuiccInfo2ParseExtCardResource(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseExtCardResource(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> extCardResourceNode = root->Asn1GetChild(TAG_ESIM_CTX_4);
     if (extCardResourceNode == nullptr) {
         TELEPHONY_LOGE("extCardResourceNode is nullptr");
         return;
     }
-    extCardResourceNode->Asn1AsString(euiccInfo2->extCardResource);
+    extCardResourceNode->Asn1AsString(euiccInfo2.extCardResource);
 }
 
-void EsimFile::EuiccInfo2ParseUiccCapability(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseUiccCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> uiccCapabilityNode = root->Asn1GetChild(TAG_ESIM_CTX_5);
     if (uiccCapabilityNode == nullptr) {
         TELEPHONY_LOGE("uiccCapabilityNode is nullptr");
         return;
     }
-    uiccCapabilityNode->Asn1AsString(euiccInfo2->uiccCapability);
+    uiccCapabilityNode->Asn1AsString(euiccInfo2.uiccCapability);
 }
 
-void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> ts102241VersionNode = root->Asn1GetChild(TAG_ESIM_CTX_6);
     if (ts102241VersionNode == nullptr) {
         TELEPHONY_LOGE("ts102241VersionNode is nullptr");
@@ -418,15 +393,11 @@ void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 *euiccInfo2, std::share
         TELEPHONY_LOGE("invalid ts102241VersionNode data");
         return;
     }
-    euiccInfo2->ts102241Version = MakeVersionString(ts102241VersionRaw);
+    euiccInfo2.ts102241Version = MakeVersionString(ts102241VersionRaw);
 }
 
-void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> globalPlatformVersionNode = root->Asn1GetChild(TAG_ESIM_CTX_7);
     if (globalPlatformVersionNode == nullptr) {
         TELEPHONY_LOGE("globalPlatformVersionNode is nullptr");
@@ -438,71 +409,51 @@ void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 *euiccInfo2, std:
         TELEPHONY_LOGE("invalid globalplatformVersionRaw data");
         return;
     }
-    euiccInfo2->globalPlatformVersion = MakeVersionString(globalPlatformVersionRaw);
+    euiccInfo2.globalPlatformVersion = MakeVersionString(globalPlatformVersionRaw);
 }
 
-void EsimFile::EuiccInfo2ParseRspCapability(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseRspCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> rspCapabilityNode = root->Asn1GetChild(TAG_ESIM_CTX_8);
     if (rspCapabilityNode == nullptr) {
         TELEPHONY_LOGE("rspCapabilityNode is nullptr");
         return;
     }
-    rspCapabilityNode->Asn1AsString(euiccInfo2->rspCapability);
+    rspCapabilityNode->Asn1AsString(euiccInfo2.rspCapability);
 }
 
-void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForVerification(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForVerification(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> ciPKIdListForVerificationNode = root->Asn1GetChild(TAG_ESIM_CTX_COMP_9);
     if (ciPKIdListForVerificationNode == nullptr) {
         TELEPHONY_LOGE("ciPKIdListForVerificationNode is nullptr");
         return;
     }
-    ciPKIdListForVerificationNode->Asn1NodeToHexStr(euiccInfo2->euiccCiPKIdListForVerification);
+    ciPKIdListForVerificationNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForVerification);
 }
 
-void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> euiccCiPKIdListForSigningNode = root->Asn1GetChild(TAG_ESIM_CTX_COMP_A);
     if (euiccCiPKIdListForSigningNode == nullptr) {
         TELEPHONY_LOGE("euiccCiPKIdListForSigningNode is nullptr");
         return;
     }
-    euiccCiPKIdListForSigningNode->Asn1NodeToHexStr(euiccInfo2->euiccCiPKIdListForSigning);
+    euiccCiPKIdListForSigningNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForSigning);
 }
 
-void EsimFile::EuiccInfo2ParseEuiccCategory(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParseEuiccCategory(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> euiccCategoryNode = root->Asn1GetChild(TAG_ESIM_CTX_B);
     if (euiccCategoryNode == nullptr) {
         TELEPHONY_LOGE("euiccCategoryNode is nullptr");
         return;
     }
-    euiccInfo2->euiccCategory = euiccCategoryNode->Asn1AsInteger();
+    euiccInfo2.euiccCategory = euiccCategoryNode->Asn1AsInteger();
 }
 
-void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<Asn1Node> &root)
+void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
 {
-    if (euiccInfo2 == nullptr) {
-        TELEPHONY_LOGE("euiccInfo2 is nullptr");
-        return;
-    }
     std::shared_ptr<Asn1Node> ppVersionNode = root->Asn1GetChild(TAG_ESIM_OCTET_STRING_TYPE);
     if (ppVersionNode == nullptr) {
         TELEPHONY_LOGE("ppVersionNode is nullptr");
@@ -514,7 +465,7 @@ void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 *euiccInfo2, std::shared_ptr<
         TELEPHONY_LOGE("invalid ppVersion data");
         return;
     }
-    euiccInfo2->ppVersion = MakeVersionString(ppVersionNodeRaw);
+    euiccInfo2.ppVersion = MakeVersionString(ppVersionNodeRaw);
 }
 
 bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, uint32_t eventId)
@@ -611,8 +562,7 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    if (!MergeRecvLongDataComplete(iccFileData)) {
+    if (!MergeRecvLongDataComplete(rcvMsg->fileData)) {
         return true;
     }
     return RealProcsessAuthenticateServerDone(recvCombineStr_);
