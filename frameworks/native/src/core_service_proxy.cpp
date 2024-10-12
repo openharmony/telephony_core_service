@@ -3306,8 +3306,8 @@ int32_t CoreServiceProxy::ListNotifications(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        uint32_t euiccNotificationCount = reply.ReadInt32();
-        if (euiccNotificationCount >= MAX_SIZE) {
+        uint32_t euiccNotificationCount = reply.ReadUint32();
+        if (euiccNotificationCount >= ESIM_MAX_SIZE) {
             TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }

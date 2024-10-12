@@ -52,9 +52,9 @@ void EsimTest::SetUpTestCase() {}
 static const std::string bppCombineHexStr = "BF3781ADBF27678008D14FE1DE62C340D7BF2F3480024C66810207800C1E31302E313" +
     "02E31322E3136342F64702D706C75732D696E746572666163655A0A98680010203040506080060388370AA21FA01D4F10A000000559101" +
     "0FFFFFFFF890000120004093007A00530038001005F3740B354AE39D08ACD7EDD7D2D01C73378621F623B832DFA3243489C5B42C90F220" +
-    "14E6C928130D78EE561982EF412AC3D94C04B56F37657DA84FD7BB24DD4153E88";
+    "14E6C928130D78EE561982EF412AC3D94C04B56F37657DA84FD7BB24DD5634E89";
 
-static const std::string boundProfilePackage = static const std::string boundProfilePackage = "vzaCFPW/I4GjggEBgAiX" +
+static const std::string boundProfilePackage = "vzaCFPW/I4GjggEBgAiX" +
     "eXu/pVhILaYNgAGIgQEQhAURIjNEVV9JQQR+7Z54dnOSpmXRSRnS/dgZEoPkCNaLCyTpgJ8wSrEsBUj2+BzS0YB0bucZUYQRGEcd5cbYvJGiV8" +
     "e5SKNcRHwlXzdAsXrBYvUtRoF94nq56/+wm60AXC0w5/1rUwpZqEhgu+G5Yof1Bb1e/uKWQNicUmNMDJNKi/7keRhJBItkYTjBnaAahxjfW3PZ" +
     "gTC0L4zP/odnrg0orSDX3nb1etmhVIhSvyVHWgqYaAAQIDBAUGCAkQVzbWFydJIAlQECtiYwJIACBPCBHjEwLjEwLjEyLjE2NC9kcC1wbHVzLW" +
@@ -119,7 +119,7 @@ static const std::string boundProfilePackage = static const std::string boundPro
     "JTWlhZNe4gLGrVmrbxPG/2lXdtb3JnH9iAfzPxbsJLDiDiVzb6JM2U8I0cplmFX5IxYFcVUUCg4ZNQuXXZdMklwSHN+QQdBqh2F6Z+ot1KJmGL" +
     "4zkrn60C0IqQ/Io55/nDNLyJIc8ogkvAVIy1O8GFZVvUcahyFmWxkSRVsj/6j1n+RmMpbbJsvfsCa93+09gNszKKYaIR30r51SzrPEckjcRdc/" +
     "aZNW6UFYPg/BK6SuCJTMxL9OkDmh7II/n7vOnOum3xMwLGO5Ls/JXje5stKLdBBrdGf1AZx2OFo04O96AuXtM+wwUgPIHmLsg8ftOz/oBPhfgc" +
-    "F6N9SucIgpUkjlxdM61S5KyvxEVgFKyb1tWfc8QaMq5hSwjtD/Rdg1KHei5aWNxLFovBcwk3JDLH5I3TZrlBGcJYxE16vXAkG3z4";
+    "F6N9SucIgpUkjlxdM61S5KyvxEVgFKyb1tWfc8QaMq5hSwjtD/Rdg1KHei5aWNxLFovBcwk3JDLH5I3TZrlBGcJYxE16AkvXz4G3";
 
 HWTEST_F(EsimTest, ObtainPrepareDownload_001, Function | MediumTest | Level2)
 {
@@ -216,7 +216,7 @@ HWTEST_F(EsimTest, ProcessPrepareDownloadDone_001, Function | MediumTest | Level
     rcvMsg->fileData.resultData =
         "BF218196A08193304E8008D14FE1DE62C340D75F494104B067E0DF2D080C747D76DF98198DB8766625CB216E62A2796003287E41"
         "E8DAD1D28229C14B9F5D7901D03D224D6AEC6EF031BA9176D50298ECB42F56739014365F37400A3F852229A3A0606F5E90FF9D2F"
-        "2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E629CD27CF9DC6A5768A93B0165E0F54D";
+        "2DEDE548C5FF87473D6A49A7EED53672D2DF5A4555E9F314F65668AEE8F1C5B3229E629CD27CF9DC6A5768A93B01E06540F1";
     rcvMsg->fileData.sw1 = 0x90;
     rcvMsg->fileData.sw2 = 0x00;
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
@@ -258,6 +258,8 @@ HWTEST_F(EsimTest, BuildApduForInitSecureChannel_001, Function | MediumTest | Le
     RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> initSecureChannelReq = bppNode->Asn1GetChild(TAG_ESIM_INITIALISE_SECURE_CHANNEL);
     esimFile->BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
+    bool bRet = codec.GetCommands().size() != 0 ? true : false;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, BuildApduForFirstSequenceOf87_001, Function | MediumTest | Level2)
@@ -271,6 +273,8 @@ HWTEST_F(EsimTest, BuildApduForFirstSequenceOf87_001, Function | MediumTest | Le
     RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> firstSequenceOf87 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     esimFile->BuildApduForFirstSequenceOf87(codec, firstSequenceOf87);
+    bool bRet = codec.GetCommands().size() != 0 ? true : false;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, BuildApduForSequenceOf88_001, Function | MediumTest | Level2)
@@ -284,6 +288,8 @@ HWTEST_F(EsimTest, BuildApduForSequenceOf88_001, Function | MediumTest | Level2)
     RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> sequenceOf88 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_1);
     esimFile->BuildApduForSequenceOf88(codec, sequenceOf88);
+    bool bRet = codec.GetCommands().size() != 0 ? true : false;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, BuildApduForSequenceOf86_001, Function | MediumTest | Level2)
@@ -297,6 +303,8 @@ HWTEST_F(EsimTest, BuildApduForSequenceOf86_001, Function | MediumTest | Level2)
     RequestApduBuild codec(currentChannelId_);
     std::shared_ptr<Asn1Node> sequenceOf86 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_3);
     esimFile->BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
+    bool bRet = codec.GetCommands().size() != 0 ? true : false;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_001, Function | MediumTest | Level2)
@@ -329,7 +337,7 @@ HWTEST_F(EsimTest, ProcessLoadBoundProfilePackageDone_001, Function | MediumTest
     rcvMsg->fileData.resultData = "BF3781ADBF27678008D14FE1DE62C340D7BF2F3480024C66810207800C1E31302E31302E31322E" +
         "3136342F64702D706C75732D696E746572666163655A0A98680010203040506080060388370AA21FA01D4F10A0000005591010FFF" +
         "FFFFF890000120004093007A00530038001005F3740B354AE39D08ACD7EDD7D2D01C73378621F623B832DFA3243489C5B42C90F22" +
-        "014E6C928130D78EE561982EF412AC3D94C04B56F37657DA84FD7BB24DD4153E88";
+        "014E6C928130D78EE561982EF412AC3D94C04B56F37657DA84FD7BB24D15C4783F";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessLoadBoundProfilePackageDone(event));
     auto event1 = AppExecFwk::InnerEvent::Get(0);
@@ -406,12 +414,14 @@ HWTEST_F(EsimTest, createNotification_001, Function | MediumTest | Level2)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    std::string resultData = "BF2F118001010C08736D64702E636F6D81020410";
+    std::string resultData = "BF2F118001010C08736D64702E636F6D81020508";
     std::string responseByte = Asn1Utils::HexStrToBytes(resultData.c_str());
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> node = esimFile->Asn1ParseResponse(responseByte, byteLen);
     EuiccNotification euicc;
     esimFile->createNotification(node, euicc);
+    bool bRet = euicc.targetAddr.empty() ? false : true;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, createNotification_002, Function | MediumTest | Level2)
@@ -420,12 +430,14 @@ HWTEST_F(EsimTest, createNotification_002, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
-    std::string resultData = "BF282BA029BF2F118001010C00736D64702E636F6D8100";
+    std::string resultData = "BF282BA029BF2F118001010C00736D64702E636F6C820";
     std::string responseByte = Asn1Utils::HexStrToBytes(resultData.c_str());
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> node = esimFile->Asn1ParseResponse(responseByte, byteLen);
     EuiccNotification euicc;
     esimFile->createNotification(node, euicc);
+    bool bRet = euicc.targetAddr.empty() ? false : true;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, createNotification_003, Function | MediumTest | Level2)
@@ -433,12 +445,14 @@ HWTEST_F(EsimTest, createNotification_003, Function | MediumTest | Level2)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    std::string resultData = "BF2F118001010C08736D64702E636F6D81020410";
+    std::string resultData = "BF2F118001010C08736D64702E636F6D81020603";
     std::string responseByte = Asn1Utils::HexStrToBytes(resultData.c_str());
     int32_t byteLen = responseByte.length();
     std::shared_ptr<Asn1Node> node = esimFile->Asn1ParseResponse(responseByte, byteLen);
     EuiccNotification euicc;
     esimFile->createNotification(node, euicc);
+    bool bRet = euicc.targetAddr.empty() ? false : true;
+    EXPECT_TRUE(bRet);
 }
 
 HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_001, Function | MediumTest | Level2)
@@ -448,7 +462,7 @@ HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_001, Function | MediumTe
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
     std::string resultData =
-        "BF282BA029BF2F118001010C08736D64702E636F6D81020410BF2F128001020C09736D6470322E636F6D810204209000";
+        "BF282BA029BF2F118001010C08736D64702E636F6D81020410BF2F128001020C09736D6470322E636F6D810205309000";
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
     int32_t byteLen = responseByte.length();
@@ -464,8 +478,7 @@ HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_002, Function | MediumTe
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
-    std::string resultData =
-        "BF2803810101";
+    std::string resultData = "BF2803810106";
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
     int32_t byteLen = responseByte.length();
@@ -481,8 +494,7 @@ HWTEST_F(EsimTest, ProcessListNotificationsAsn1Response_003, Function | MediumTe
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
-    std::string resultData =
-        "BF2803A00101";
+    std::string resultData = "BF2803A00106";
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
     int32_t byteLen = responseByte.length();
