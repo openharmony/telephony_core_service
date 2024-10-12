@@ -146,5 +146,35 @@ HWTEST_F(EsimCoreServiceStubTest, OnGetProfile_001, Function | MediumTest | Leve
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_PROFILE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceStubTest, OnResetMemory_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::RESET_MEMORY);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnSetDefaultSmdpAddress_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnSendApduData_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SEND_APDU_DATA);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS
