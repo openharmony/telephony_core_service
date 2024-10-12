@@ -283,7 +283,7 @@ group("unittest") {
   testonly = true
   deps = [
     ":esim_core_service_client_branch_test",
-    ":esim_service_client_branch_gtest"，
+    ":esim_service_client_branch_gtest",
     ":tel_esim_gtest",
   ]
 }
