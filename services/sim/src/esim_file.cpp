@@ -1110,7 +1110,7 @@ bool EsimFile::ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::P
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string iccid= OHOS::Telephony::ToUtf8(esimProfile_.iccId);
+    std::string iccid = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(iccid, iccidBytes);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
@@ -1236,7 +1236,7 @@ bool EsimFile::GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root)
         return false;
     }
     std::shared_ptr<Asn1Node> iccNode = profileInfo->Asn1GetChild(TAG_ESIM_ICCID);
-    if(iccNode == nullptr) {
+    if (iccNode == nullptr) {
         TELEPHONY_LOGE("nodeIcc is null");
         return false;
     }
