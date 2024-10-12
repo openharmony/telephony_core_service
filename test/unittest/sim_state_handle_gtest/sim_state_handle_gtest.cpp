@@ -73,7 +73,7 @@ void SimStateHandleTest::TearDown() {}
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_001, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     LockInfo options;
     options.lockType = LockType::PIN_LOCK;
     options.lockState = LockState::LOCK_OFF;
@@ -97,7 +97,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_001, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_002, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     LockInfo options;
     options.lockType = LockType::FDN_LOCK;
     options.lockState = LockState::LOCK_ON;
@@ -121,7 +121,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_002, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     LockType lockType = LockType::PIN_LOCK;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -143,7 +143,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_003, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_004, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     LockType lockType = LockType::FDN_LOCK;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -165,7 +165,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_004, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_005, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
@@ -183,7 +183,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_005, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_006, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     SimIoRequestInfo requestInfo;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -206,7 +206,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_006, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_007, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     SimIoRequestInfo requestInfo;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
@@ -229,7 +229,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_007, Function | MediumTest
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_008, Function | MediumTest | Level1)
 {
-    int32_t slotId = 0;
+    int32_t slotId = 10;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);

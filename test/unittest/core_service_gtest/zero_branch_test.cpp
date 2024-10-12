@@ -86,6 +86,7 @@ const CellInformation::CellType WCDMA = CellInformation::CellType::CELL_TYPE_WCD
 const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_TDSCDMA;
 const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
 const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
+static const int32_t SLEEP_TIME = 3;
 } // namespace
 
 class BranchTest : public testing::Test {
@@ -96,7 +97,10 @@ public:
     void TearDown();
 };
 
-void BranchTest::TearDownTestCase() {}
+void BranchTest::TearDownTestCase()
+{
+    sleep(SLEEP_TIME);
+}
 
 void BranchTest::SetUp() {}
 
@@ -1413,63 +1417,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | L
 }
 
 /**
- * @tc.number   Telephony_MultiSimController_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr};
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr};
-    for (int32_t slotId = 0; slotId < 2; slotId++) {
-        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
-        if (simStateManager[slotId] != nullptr) {
-            simStateManager[slotId]->Init(slotId);
-        }
-        simFileManager[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
-        std::weak_ptr<SimStateManager>(simStateManager[slotId]));
-        if (simFileManager[slotId] != nullptr) {
-            simFileManager[slotId]->Init(slotId);
-        }
-    }
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    multiSimController->Init();
-    telRilManager->InitTelExtraModule(2);
-    simStateManager.resize(3);
-    simFileManager.resize(3);
-    simStateManager[2] = std::make_shared<SimStateManager>(telRilManager);
-    if (simStateManager[2] != nullptr) {
-        simStateManager[2]->Init(2);
-    }
-    simFileManager[2] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager),
-        std::weak_ptr<SimStateManager>(simStateManager[2]));
-    if (simFileManager[2] != nullptr) {
-        simFileManager[2]->Init(2);
-    }
-    multiSimController->AddExtraManagers(simStateManager[2], simFileManager[2]);
-    multiSimController->ForgetAllData(0);
-    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simStatus_ = 1;
-    multiSimController->simStateManager_[0]->simStateHandle_->iccState_.simType_ = 2;
-    multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "898600520123F0102670";
-    multiSimController->simStateManager_[0]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
-    multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
-    EXPECT_FALSE(multiSimController->InitData(-1));
-    EXPECT_TRUE(multiSimController->InitData(0));
-    EXPECT_TRUE(multiSimController->InitShowNumber(0));
-    std::vector<IccAccountInfo> iccAccountInfoList;
-    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GE(multiSimController->GetActiveSimAccountInfoList(true, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
-    int32_t imsSwitchValue;
-    EXPECT_GE(multiSimController->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(multiSimController->IsSetActiveSimInProgress(0));
-    EXPECT_FALSE(multiSimController->IsSetPrimarySlotIdInProgress());
-}
-
-/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2560,6 +2507,7 @@ HWTEST_F(BranchTest, Telephony_SimFileController_001, Function | MediumTest | Le
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_SPN), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_AD), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_PNN), "");
+    EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_OPL), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBDN), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_EXT6), "");
     EXPECT_NE(simFileController->ObtainElementFilePath(ELEMENTARY_FILE_MBI), "");

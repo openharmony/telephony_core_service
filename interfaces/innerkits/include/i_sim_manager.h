@@ -17,6 +17,9 @@
 #define OHOS_I_SIM_MANAGER_H
 
 #include "dialling_numbers_info.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_state_type.h"
+#endif
 #include "event_handler.h"
 #include "operator_config_types.h"
 #include "sim_account_callback.h"
@@ -142,6 +145,16 @@ public:
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+    virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
+    virtual int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) = 0;
+    virtual int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) = 0;
+    virtual int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) = 0;
+    virtual int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) = 0;
+    virtual int32_t GetRulesAuthTable(
+        int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) = 0;
+    virtual int32_t GetEuiccChallenge(
+        int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;
     virtual int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress) = 0;
     virtual int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
         ResponseEsimResult &responseResult) = 0;

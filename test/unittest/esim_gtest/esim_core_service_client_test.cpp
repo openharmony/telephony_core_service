@@ -21,12 +21,12 @@
 
 #include "core_service_client.h"
 #include "esim_state_type.h"
-#include "gtest/gtest.h"
 #include "securec.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,6 +46,70 @@ void EsimCoreServiceClientTest::TearDownTestCase() {}
 void EsimCoreServiceClientTest::SetUp() {}
 
 void EsimCoreServiceClientTest::TearDown() {}
+
+HWTEST_F(EsimCoreServiceClientTest, GetEid_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string eId = Str8ToStr16("1A2B3C4D");
+    int32_t result = CoreServiceClient::GetInstance().GetEid(slotId, eId);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, GetEuiccProfileInfoList_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    GetEuiccProfileInfoListResult euiccProfileInfoList;
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EuiccInfo euiccInfo;
+    euiccInfo.osVersion = Str8ToStr16("BF2003010203");
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, DisableProfile_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool refresh = true;
+    ResultState disableProfileResult;
+    int32_t result = CoreServiceClient::GetInstance().DisableProfile(
+        slotId, portIndex, iccId, refresh, disableProfileResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, GetSmdsAddress_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string smdsAddress;
+    int32_t result = CoreServiceClient::GetInstance().GetSmdsAddress(slotId, portIndex, smdsAddress);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, GetRulesAuthTable_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    int32_t result = CoreServiceClient::GetInstance().GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, GetEuiccChallenge_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccChallenge(slotId, portIndex, responseResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
 
 HWTEST_F(EsimCoreServiceClientTest, RequestDefaultSmdpAddress_0001, Function | MediumTest | Level1)
 {
