@@ -1657,7 +1657,7 @@ int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, 
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
-        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {
@@ -1675,7 +1675,7 @@ int32_t CoreService::SwitchToProfile(
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE_OPEN)) {
-        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE_OPEN");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {
@@ -1692,8 +1692,8 @@ int32_t CoreService::SetProfileNickname(
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
-        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE_OPEN)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE_OPEN");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {
