@@ -33,14 +33,13 @@ namespace Telephony {
 constexpr static const int32_t ATR_LEN = 47;
 class EsimFile : public IccFile {
 public:
-void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
-EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
-ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
+    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
+    EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
+    ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
 
 private:
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc);
-private:
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);

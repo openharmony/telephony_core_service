@@ -170,7 +170,7 @@ HWTEST_F(EsimTest, ProcessRetrieveNotificationListDone_001, Function | MediumTes
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData =
-        "BF2B2FA02D3014BF2F118001010C08736D64702E636F6D810204103015BF2F128001020C09736D6470322E636F6D810204209000";
+        "BF2B2FA02D3014BF2F118001010C08736D64702E636F6D810204103015BF2F128001020C09736D6470322E636F6D810205109000";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessRetrieveNotificationListDone(event));
     auto event1 = AppExecFwk::InnerEvent::Get(0);
@@ -188,7 +188,7 @@ HWTEST_F(EsimTest, RetrieveNotificationParseCompTag_001, Function | MediumTest |
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData =
-        "BF2B2FA02D3014BF2F118001010C08736D64702E636F6D810204103015BF2F128001020C09736D6470322E636F6D810204209000";
+        "BF2B2FA02D3014BF2F118001010C08736D64702E636F6D810204103015BF2F128001020C09736D6470322E636F6D810205109000";
     std::string responseByte;
     responseByte = Asn1Utils::HexStrToBytes(rcvMsg->fileData.resultData);
     int32_t byteLen = responseByte.length();
