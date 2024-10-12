@@ -104,14 +104,13 @@ bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DELETE_PROFILE);
     if (builder == nullptr) {
         TELEPHONY_LOGE("builder is nullptr");
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(strIccId, iccidBytes);
     builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     ApduSimIORequestInfo reqInfo;
@@ -131,15 +130,14 @@ bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_NICKNAME);
     if (builder == nullptr) {
         TELEPHONY_LOGE("builder is nullptr");
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
-    std::string childStr = OHOS::Telephony::ToUtf8(profile->nickname);
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
+    std::string childStr = OHOS::Telephony::ToUtf8(esimProfile_.nickname);
     Asn1Utils::BcdToBytes(strIccId, iccidBytes);
 
     builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
@@ -168,7 +166,7 @@ bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("pAsn1Node is nullptr");
         return false;
     }
-    delProfile_ = (static_cast<ResultState>(Asn1NodeData->Asn1AsInteger()));
+    delProfile_ = static_cast<ResultState>(Asn1NodeData->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(deleteProfileMutex_);
         isDeleteProfileReady_ = true;
@@ -182,7 +180,6 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     if (builder == nullptr || subBuilder == nullptr) {
@@ -190,10 +187,14 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string strIccId = OHOS::Telephony::ToUtf8(profile->iccId);
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(strIccId, iccidBytes);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    if (subNode == nullptr) {
+        TELEPHONY_LOGE("subNode is nullptr");
+        return false;
+    }
     builder->Asn1AddChild(subNode);
     builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
     ApduSimIORequestInfo reqInfo;
@@ -220,7 +221,7 @@ bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    switchResult_ = (static_cast<ResultState>(asn1NodeData->Asn1AsInteger()));
+    switchResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
 
     {
         std::lock_guard<std::mutex> lock(switchToProfileMutex_);
@@ -242,7 +243,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    updateNicknameResult_ = (static_cast<ResultState>(asn1NodeData->Asn1AsInteger()));
+    updateNicknameResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(setNicknameMutex_);
         isSetNicknameReady_ = true;

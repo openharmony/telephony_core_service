@@ -45,7 +45,7 @@ private:
     bool ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event);
 
-protected:
+private:
     ResultState delProfile_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState switchResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState setNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
