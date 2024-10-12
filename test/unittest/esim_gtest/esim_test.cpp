@@ -89,7 +89,7 @@ HWTEST_F(EsimTest, ObtainProfile_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
-    std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
+    std::u16string iccId = Str8ToStr16("5A0A89670000000000216954");
     EuiccProfile eUiccProfile;
     esimFile->currentChannelId_ = 0;
     EXPECT_EQ(eUiccProfile.state, (esimFile->ObtainProfile(portIndex, iccId)).state);
@@ -127,7 +127,7 @@ HWTEST_F(EsimTest, ProcessObtainDefaultSmdpAddressDone_001, Function | MediumTes
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
-    rcvMsg->fileData.resultData = "BF3C148008534D44502E434F4D8108736D64732E636F6D9000";
+    rcvMsg->fileData.resultData = "BF3C148008534D44502E434F4D8108736D64732E58225F9000";
     auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_TRUE(esimFile->ProcessObtainDefaultSmdpAddressDone(event));
     auto event1 = AppExecFwk::InnerEvent::Get(0);
@@ -166,7 +166,7 @@ HWTEST_F(EsimTest, ProcessCancelSessionDone_001, Function | MediumTest | Level2)
     EXPECT_TRUE(esimFile->ProcessCancelSessionDone(event));
     std::shared_ptr<IccControllerHolder> holder1 = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg1 = std::make_unique<Telephony::IccFromRilMsg>(holder1);
-    rcvMsg1->fileData.resultData = "BF4106810400000001";
+    rcvMsg1->fileData.resultData = "BF4106810456362523";
     event = AppExecFwk::InnerEvent::Get(0, rcvMsg1);
     EXPECT_FALSE(esimFile->ProcessCancelSessionDone(event));
     auto event1 = AppExecFwk::InnerEvent::Get(0);
@@ -208,12 +208,12 @@ HWTEST_F(EsimTest, ProcessGetProfileDone_001, Function | MediumTest | Level2)
     std::shared_ptr<IccControllerHolder> holder = nullptr;
     std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
     rcvMsg->fileData.resultData = "BF2D8184A08181E37F"
-        "5A0A89670000000000452301"
-        "90046E69636B"
+        "5A0A89670000000000216954"
+        "90046E584754"
         "9103746D6F"
         "92027031"
-        "B70F800312F34581030102038203040506"
-        "9F700101"
+        "B70F800312F34581030102036945226554"
+        "9F700387"
         "950101"
         "990206C0"
         "BF7645E243E135C114ABCD92CBB156B280FA4E1429A6ECEEB6E5C1BFE4"

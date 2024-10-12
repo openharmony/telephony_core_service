@@ -52,7 +52,7 @@ HWTEST_F(EsimCoreServiceTest, RequestDefaultSmdpAddress_0001, Function | MediumT
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
-    std::u16string address = Str8ToStr16("SMDP.COM");
+    std::u16string address = Str8ToStr16("test.com");
     EXPECT_NE(mCoreService->GetDefaultSmdpAddress(slotId, address), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetDefaultSmdpAddress(slotId, address), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -81,7 +81,7 @@ HWTEST_F(EsimCoreServiceTest, GetProfile_0001, Function | MediumTest | Level1)
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
+    std::u16string iccId = Str8ToStr16("5A0A89670000000000216954");
     EuiccProfile eUiccProfile;
     EXPECT_NE(mCoreService->GetProfile(
         slotId, portIndex, iccId, eUiccProfile), TELEPHONY_ERR_SUCCESS);

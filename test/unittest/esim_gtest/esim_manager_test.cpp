@@ -109,7 +109,7 @@ HWTEST_F(EsimManagerTest, GetProfile, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
+    std::u16string iccId = Str8ToStr16("5A0A89670000000000216954");
     EuiccProfile eUiccProfile;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);

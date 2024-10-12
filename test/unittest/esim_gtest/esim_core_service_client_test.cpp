@@ -50,7 +50,7 @@ void EsimCoreServiceClientTest::TearDown() {}
 HWTEST_F(EsimCoreServiceClientTest, RequestDefaultSmdpAddress_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    std::u16string address = Str8ToStr16("SMDP.COM");
+    std::u16string address = Str8ToStr16("test.com");
     int32_t result = CoreServiceClient::GetInstance().GetDefaultSmdpAddress(slotId, address);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
@@ -70,7 +70,7 @@ HWTEST_F(EsimCoreServiceClientTest, GetProfile_0001, Function | MediumTest | Lev
 {
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
+    std::u16string iccId = Str8ToStr16("5A0A89670000000000216954");
     EuiccProfile eUiccProfile;
     int32_t result = CoreServiceClient::GetInstance().GetProfile(slotId, portIndex, iccId, eUiccProfile);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
