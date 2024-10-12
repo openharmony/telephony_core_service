@@ -120,6 +120,9 @@ ohos_shared_library("tel_core_service") {
     "services/core/src/core_service_hisysevent.cpp",
     "services/core/src/core_service_stub.cpp",
   ]
+  if (core_service_support_esim) {
+    sources += [ "$TELEPHONY_SIM_ROOT/src/esim_file.cpp" ]
+  }
 
   include_dirs = [
     "$TELEPHONY_SIM_ROOT/include",
@@ -131,6 +134,13 @@ ohos_shared_library("tel_core_service") {
     "utils/log/include",
     "utils/codec/include",
   ]
+
+  if (core_service_support_esim) {
+    include_dirs += [
+      "utils/codec/include",
+      "utils/vcard/include",
+    ]
+  }
 
   configs = [ "utils:telephony_log_config" ]
 
@@ -150,6 +160,10 @@ ohos_shared_library("tel_core_service") {
     "//third_party/libxml2:libxml2",
     "//third_party/openssl:libcrypto_shared",
   ]
+
+  if (core_service_support_esim) {
+    deps += [ "utils:libtel_vcard" ]
+  }
 
   external_deps = [
     "ability_base:want",

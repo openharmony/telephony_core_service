@@ -41,7 +41,9 @@ group("unittest") {
 
   if (core_service_support_esim) {
     deps += [
+      "unittest/esim_gtest:esim_core_service_client_branch_test",
       "unittest/esim_gtest:esim_service_client_branch_gtest",
+      "unittest/esim_gtest:tel_esim_gtest",
       "unittest/esim_parcel_gtest:parcel_gtest",
       "unittest/utils_codec_gtest:utils_codec_gtest",
     ]

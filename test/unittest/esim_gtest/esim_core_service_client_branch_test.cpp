@@ -58,6 +58,34 @@ void EsimCoreServiceClientBranchTest::SetUp() {}
 
 void EsimCoreServiceClientBranchTest::TearDown() {}
 
+HWTEST_F(EsimCoreServiceClientBranchTest, GetEid_0002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string eId = Str8ToStr16("1A2B3C4D");
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetEid(slotId, eId);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccProfileInfoList_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    GetEuiccProfileInfoListResult euiccProfileInfoList;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    EuiccInfo euiccInfo;
+    euiccInfo.osVersion = Str8ToStr16("BF2003010203");
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
 HWTEST_F(EsimCoreServiceClientBranchTest, DisableProfile_0100, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;

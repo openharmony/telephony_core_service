@@ -46,6 +46,43 @@ void EsimCoreServiceTest::SetUp() {}
 
 void EsimCoreServiceTest::TearDown() {}
 
+HWTEST_F(EsimCoreServiceTest, GetEid_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    std::u16string eId;
+    EXPECT_NE(mCoreService->GetEid(slotId, eId), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetEid(slotId, eId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, GetEuiccProfileInfoList_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    GetEuiccProfileInfoListResult euiccProfileInfoList;
+    EXPECT_NE(mCoreService->GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    EuiccInfo euiccInfo;
+    euiccInfo.osVersion = Str8ToStr16("BF2003010203");
+    EXPECT_NE(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
 HWTEST_F(EsimCoreServiceTest, DisableProfile_0001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
