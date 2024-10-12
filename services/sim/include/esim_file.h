@@ -45,6 +45,7 @@ constexpr static const int32_t INS_GET_MORE_RESPONSE = 0xC0;
 constexpr static const int32_t SW1_VALUE_90 = 0x90;
 constexpr static const int32_t SW2_VALUE_00 = 0x00;
 static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
+constexpr static const int32_t ATR_LENGTH = 47;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -79,6 +80,10 @@ public:
     std::string ObtainDefaultSmdpAddress();
     ResponseEsimResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
     EuiccProfile ObtainProfile(int32_t portIndex, const std::u16string &iccId);
+    ResultState ResetMemory(ResetOption resetOption);
+    ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
+    bool IsEsimSupported();
+    ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -118,6 +123,14 @@ private:
     std::vector<uint8_t> GetProfileTagList();
     bool ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root);
+    bool ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -197,6 +210,18 @@ private:
     std::mutex obtainProfileMutex_;
     std::condition_variable obtainProfileCv_;
     bool isObtainProfileReady_ = false;
+
+    std::mutex resetMemoryMutex_;
+    std::condition_variable resetMemoryCv_;
+    bool isResetMemoryReady_ = false;
+
+    std::mutex setDefaultSmdpAddressMutex_;
+    std::condition_variable setDefaultSmdpAddressCv_;
+    bool isSetDefaultSmdpAddressReady_ = false;
+
+    std::mutex sendApduDataMutex_;
+    std::condition_variable sendApduDataCv_;
+    bool isSendApduDataReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

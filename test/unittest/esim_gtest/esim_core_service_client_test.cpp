@@ -139,5 +139,41 @@ HWTEST_F(EsimCoreServiceClientTest, GetProfile_0001, Function | MediumTest | Lev
     int32_t result = CoreServiceClient::GetInstance().GetProfile(slotId, portIndex, iccId, eUiccProfile);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceClientTest, ResetMemory_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    ResultState ResetMemoryResult;
+    const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    int32_t result = CoreServiceClient::GetInstance().ResetMemory(slotId, resetOption, ResetMemoryResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, SetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
+    ResultState SetAddressResult;
+    int32_t result = CoreServiceClient::GetInstance().SetDefaultSmdpAddress(
+        slotId, defaultSmdpAddress, SetAddressResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    bool result = CoreServiceClient::GetInstance().IsEsimSupported(slotId);
+    EXPECT_NE(result, true);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, SendApduData_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string aid = Str8ToStr16("aid test");
+    std::u16string apduData = Str8ToStr16("apduData test");
+    ResponseEsimResult responseResult;
+    int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

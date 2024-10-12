@@ -1370,6 +1370,47 @@ int32_t SimManager::GetProfile(
     }
     return TELEPHONY_ERR_SUCCESS;
 }
+
+int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->ResetMemory(resetOption);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::SetDefaultSmdpAddress(
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    enumResult = simFileManager_[slotId]->SetDefaultSmdpAddress(defaultSmdpAddress);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+bool SimManager::IsEsimSupported(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
+        return false;
+    }
+    return simFileManager_[slotId]->IsEsimSupported();
+}
+
+int32_t SimManager::SendApduData(
+    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->SendApduData(aid, apduData);
+    return TELEPHONY_ERR_SUCCESS;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

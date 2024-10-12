@@ -160,6 +160,12 @@ public:
         ResponseEsimResult &responseResult) = 0;
     virtual int32_t GetProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) = 0;
+    virtual int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) = 0;
+    virtual int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) = 0;
+    virtual bool IsEsimSupported(int32_t slotId) = 0;
+    virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
+        const std::u16string &apduData, ResponseEsimResult &responseResult) = 0;
 #endif
 };
 } // namespace Telephony

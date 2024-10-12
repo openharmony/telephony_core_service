@@ -155,6 +155,10 @@ private:
     int32_t OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
     int32_t OnCancelSession(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnResetMemory(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsEsimSupported(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:

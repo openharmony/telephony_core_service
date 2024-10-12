@@ -298,6 +298,14 @@ void CoreServiceStub::AddHandlerEsimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnCancelSession(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PROFILE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetProfile(data, reply); };
+        memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RESET_MEMORY)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnResetMemory(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultSmdpAddress(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsEsimSupported(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
 }
 #endif
 
@@ -2195,6 +2203,71 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRequestDefaultSmdpAddress OnRemoteRequest::REQUEST_DEFAULT_SMDP_ADDRESS write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnResetMemory(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    ResetOption resetOption = static_cast<ResetOption>(data.ReadInt32());
+    ResultState enumResult;
+    int32_t result = ResetMemory(slotId, resetOption, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string defaultSmdpAddress = data.ReadString16();
+    ResultState enumResult;
+    int32_t result = SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnIsEsimSupported(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    bool result = IsEsimSupported(slotId);
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string aid = data.ReadString16();
+    std::u16string apduData = data.ReadString16();
+    ResponseEsimResult responseResult;
+    int32_t result = SendApduData(slotId, aid, apduData, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;

@@ -188,5 +188,62 @@ HWTEST_F(EsimCoreServiceTest, GetProfile_0001, Function | MediumTest | Level1)
     EXPECT_EQ(mCoreService->GetProfile(
         slotId, portIndex, iccId, eUiccProfile), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(EsimCoreServiceTest, ResetMemory_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    ResultState ResetMemoryResult;
+    const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    EXPECT_NE(mCoreService->ResetMemory(
+        slotId, resetOption, ResetMemoryResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->ResetMemory(
+        slotId, resetOption, ResetMemoryResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, SetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
+    ResultState SetAddressResult;
+    EXPECT_NE(mCoreService->SetDefaultSmdpAddress(
+        slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->SetDefaultSmdpAddress(
+        slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
+    mCoreService->simManager_ = nullptr;
+    EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
+}
+
+HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    std::u16string aid = Str8ToStr16("aid test");
+    std::u16string apduData = Str8ToStr16("apduData test");
+    ResponseEsimResult responseResult;
+    EXPECT_NE(mCoreService->SendApduData(
+        slotId, aid, apduData, responseResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->SendApduData(
+        slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS

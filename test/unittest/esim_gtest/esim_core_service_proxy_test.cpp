@@ -439,5 +439,128 @@ HWTEST_F(EsimCoreServiceProxyTest, GetProfile_003, Function | MediumTest | Level
     int32_t ret = proxy.GetProfile(SLOT_ID, portIndex, iccId, eUiccProfile);
     EXPECT_EQ(ret, 0);
 }
+
+HWTEST_F(EsimCoreServiceProxyTest, ResetMemory_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+
+    ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    ResultState resetMemoryResult;
+    int32_t ret = proxy.ResetMemory(SLOT_ID, resetOption, resetMemoryResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, ResetMemory_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    ResultState resetMemoryResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.ResetMemory(SLOT_ID, resetOption, resetMemoryResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, ResetMemory_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    ResultState resetMemoryResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.ResetMemory(SLOT_ID, resetOption, resetMemoryResult);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
+    ResultState setAddressResult;
+    int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
+    ResultState setAddressResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
+    ResultState setAddressResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    EXPECT_FALSE(proxy.IsEsimSupported(SLOT_ID));
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    EXPECT_FALSE(proxy.IsEsimSupported(SLOT_ID));
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    EXPECT_FALSE(proxy.IsEsimSupported(SLOT_ID));
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SendApduData_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    std::u16string aid = Str8ToStr16("aid test");
+    std::u16string apduData = Str8ToStr16("apduData test");
+    ResponseEsimResult responseResult;
+    std::u16string eId;
+    EXPECT_EQ(proxy.SendApduData(SLOT_ID, aid, apduData, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SendApduData_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string aid = Str8ToStr16("aid test");
+    std::u16string apduData = Str8ToStr16("apduData test");
+    ResponseEsimResult responseResult;
+    std::u16string eId;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    EXPECT_EQ(proxy.SendApduData(SLOT_ID, aid, apduData, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, SendApduData_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string aid = Str8ToStr16("aid test");
+    std::u16string apduData = Str8ToStr16("apduData test");
+    ResponseEsimResult responseResult;
+    std::u16string eId;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    EXPECT_EQ(proxy.SendApduData(SLOT_ID, aid, apduData, responseResult), 0);
+}
 } // namespace Telephony
 } // namespace OHOS

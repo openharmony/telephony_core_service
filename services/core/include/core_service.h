@@ -282,6 +282,16 @@ public:
 
     int32_t GetProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) override;
+
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) override;
+
+    int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) override;
+
+    bool IsEsimSupported(int32_t slotId) override;
+
+    int32_t SendApduData(int32_t slotId, const std::u16string &aid, const std::u16string &apduData,
+        ResponseEsimResult &responseResult) override;
 #endif
 
 private:

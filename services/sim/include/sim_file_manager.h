@@ -103,6 +103,10 @@ public:
     std::u16string GetDefaultSmdpAddress();
     ResponseEsimResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
     EuiccProfile GetProfile(int32_t portIndex, const std::u16string &iccId);
+    ResultState ResetMemory(ResetOption resetOption);
+    ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
+    bool IsEsimSupported();
+    ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
 #endif
 
 protected:
