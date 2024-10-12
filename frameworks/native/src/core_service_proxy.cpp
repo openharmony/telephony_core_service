@@ -3514,6 +3514,119 @@ int32_t CoreServiceProxy::GetEuiccChallenge(
     }
     return result;
 }
+
+int32_t CoreServiceProxy::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t sendResult =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS), data,
+        reply, option);
+    if (sendResult != ERR_NONE) {
+        TELEPHONY_LOGE("GetDefaultSmdpAddress failed, error code is %{public}d", sendResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        defaultSmdpAddress = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::CancelSession(
+    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(transactionId)) {
+        TELEPHONY_LOGE("WriteString16 transactionId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(static_cast<int32_t>(cancelReason))) {
+        TELEPHONY_LOGE("WriteInt32 cancelReason is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t sendResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::CANCEL_SESSION),
+        data, reply, option);
+    if (sendResult != ERR_NONE) {
+        TELEPHONY_LOGE("CancelSession failed, error code is %{public}d", sendResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::GetProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteString16(iccId)) {
+        TELEPHONY_LOGE("WriteString16 iccId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t resultSend =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_PROFILE), data, reply, option);
+    if (resultSend != ERR_NONE) {
+        TELEPHONY_LOGE("GetProfile sendRequest failed, error code is %{public}d", resultSend);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ReadEuiccProfileFromReply(reply, eUiccProfile);
+    }
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

@@ -100,6 +100,9 @@ public:
     std::u16string GetSmdsAddress(int32_t portIndex);
     EuiccRulesAuthTable GetRulesAuthTable(int32_t portIndex);
     ResponseEsimResult GetEuiccChallenge(int32_t portIndex);
+    std::u16string GetDefaultSmdpAddress();
+    ResponseEsimResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
+    EuiccProfile GetProfile(int32_t portIndex, const std::u16string &iccId);
 #endif
 
 protected:

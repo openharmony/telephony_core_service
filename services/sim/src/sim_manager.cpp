@@ -1329,6 +1329,47 @@ int32_t SimManager::GetEuiccChallenge(int32_t slotId, int32_t portIndex, Respons
     responseResult = simFileManager_[slotId]->GetEuiccChallenge(portIndex);
     return TELEPHONY_ERR_SUCCESS;
 }
+
+int32_t SimManager::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    defaultSmdpAddress = simFileManager_[slotId]->GetDefaultSmdpAddress();
+    if (defaultSmdpAddress == Str8ToStr16("")) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::CancelSession(
+    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->CancelSession(transactionId, cancelReason);
+    if (responseResult.resultCode != ResultState::RESULT_OK) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    eUiccProfile = simFileManager_[slotId]->GetProfile(portIndex, iccId);
+    if (eUiccProfile.state != ProfileState::PROFILE_STATE_DISABLED) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

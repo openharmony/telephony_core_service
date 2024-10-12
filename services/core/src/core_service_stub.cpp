@@ -292,6 +292,12 @@ void CoreServiceStub::AddHandlerEsimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetRulesAuthTable(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccChallenge(data, reply); };
+        memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRequestDefaultSmdpAddress(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::CANCEL_SESSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCancelSession(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetProfile(data, reply); };
 }
 #endif
 
@@ -2120,6 +2126,75 @@ int32_t CoreServiceStub::OnGetEuiccChallenge(MessageParcel &data, MessageParcel 
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string defaultSmdpAddress;
+    int32_t result = GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(defaultSmdpAddress));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string transactionId = data.ReadString16();
+    CancelReason cancelReason = static_cast<CancelReason>(data.ReadInt32());
+    ResponseEsimResult responseResult;
+    int32_t result = CancelSession(slotId, transactionId, cancelReason, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    EuiccProfile eUiccProfile;
+    int32_t result = GetProfile(slotId, portIndex, iccId, eUiccProfile);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eUiccProfile.iccId));
+        ret = (ret && reply.WriteString16(eUiccProfile.nickName));
+        ret = (ret && reply.WriteString16(eUiccProfile.serviceProviderName));
+        ret = (ret && reply.WriteString16(eUiccProfile.profileName));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state)));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass)));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mcc));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mnc));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid1));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid2));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules)));
+        ret = (ret && reply.WriteInt32(eUiccProfile.accessRules.size()));
+        for (const auto &rule : eUiccProfile.accessRules) {
+            ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
+            ret = (ret && reply.WriteString16(rule.packageName));
+            ret = (ret && reply.WriteInt32(rule.accessType));
+        }
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRequestDefaultSmdpAddress OnRemoteRequest::REQUEST_DEFAULT_SMDP_ADDRESS write reply failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
