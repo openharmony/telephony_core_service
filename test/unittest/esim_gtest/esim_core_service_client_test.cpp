@@ -59,7 +59,7 @@ HWTEST_F(EsimCoreServiceClientTest, ResetMemory_0001, Function | MediumTest | Le
 HWTEST_F(EsimCoreServiceClientTest, SetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState SetAddressResult;
     int32_t result = CoreServiceClient::GetInstance().SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult);

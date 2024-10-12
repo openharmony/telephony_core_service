@@ -60,7 +60,7 @@ inline constexpr const char *COUNTRY_CODE_KEY = "telephony.sim.countryCode";
 inline constexpr const char *TEL_SATELLITE_SUPPORTED = "const.telephony.satellite.supported";
 inline constexpr const char *DEFAULT_VSIM_MODEM_COUNT = "0";
 inline constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
-inline constexpr const char *TEL_ESIM_SUPPORT = "const.telephony.esim.supported";
+inline constexpr const char *TEL_ESIM_SUPPORT = "persist.telephony.esim.supported";
 
 template<typename T>
 inline T GetVirtualModemSwitch()

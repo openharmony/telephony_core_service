@@ -67,7 +67,7 @@ HWTEST_F(EsimCoreServiceTest, SetDefaultSmdpAddress_0001, Function | MediumTest 
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState SetAddressResult;
     EXPECT_NE(mCoreService->SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_SUCCESS);

@@ -109,7 +109,7 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("pAsn1Node is nullptr");
         return false;
     }
-    setDpAddressResult_ = (ResultState)pAsn1Node->Asn1AsInteger();
+    setDpAddressResult_ = static_cast<ResultState>(pAsn1Node->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(setDefaultSmdpAddressMutex_);
         isSetDefaultSmdpAddressReady_ = true;
@@ -250,12 +250,14 @@ bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent:
         return false;
     }
 
-    EsimProfile *profile = &esimProfile_;
-    std::string hexStr = OHOS::Telephony::ToUtf8(profile->toBeSendApduDataHexStr);
+    std::string hexStr = OHOS::Telephony::ToUtf8(esimProfile_.toBeSendApduDataHexStr);
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> list = codec.GetCommands();
     std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());
+    if (apdCmd == nullptr) {
+        return false;
+    }
     ApduSimIORequestInfo reqInfo;
     CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
     if (telRilManager_ == nullptr) {
