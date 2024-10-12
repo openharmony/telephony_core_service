@@ -30,6 +30,7 @@ namespace Telephony {
 #define PREFERRED_NETWORK_TYPE GetPreferredNetworkType<int32_t>()
 #define VSIM_MODEM_COUNT GetVSimModemCount<int32_t>()
 #define IS_SUPPORT_VSIM (VSIM_MODEM_COUNT > 0)
+#define DEFAULT_ESIM_ID GetDefaultEsimSlotId<int32_t>()
 inline const int32_t SYSPARA_SIZE = 128;
 inline constexpr size_t ARRAY_SIZE = 1024;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
@@ -42,11 +43,14 @@ inline const size_t MAX_PARAMETER_LENGTH = 100;
 inline const int32_t DUAL_SLOT_COUNT = 2;
 inline const int32_t MAX_SLOT_COUNT = 3;
 inline const int32_t VSIM_DEFAULT_VALUE = -1;
+inline const int32_t ESIM_DEFAULT_SLOTID = -1;
 inline std::atomic<int32_t> maxRealSlotCount_ = 0;
 inline int32_t maxSlotCount_ = 0;
+inline int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
 inline int32_t vSimModemCount_ = VSIM_DEFAULT_VALUE;
 inline constexpr const char *SATELLITE_DEFAULT_VALUE = "0";
 inline constexpr const char *DEFAULT_SLOT_COUNT = "1";
+inline constexpr const char *DEFAULT_ESIM_SLOT_ID = "0";
 inline constexpr const char *TEL_SIM_SLOT_COUNT = "const.telephony.slotCount";
 inline constexpr const char *VIRTUAL_MODEM_SWITCH = "const.booster.virtual_modem_switch";
 inline constexpr const char *VIRTUAL_MODEM_DEFAULT_SWITCH = "false";
@@ -61,6 +65,7 @@ inline constexpr const char *TEL_SATELLITE_SUPPORTED = "const.telephony.satellit
 inline constexpr const char *DEFAULT_VSIM_MODEM_COUNT = "0";
 inline constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 inline constexpr const char *TEL_ESIM_SUPPORT = "persist.telephony.esim.supported";
+inline constexpr const char *TEL_DEFAULT_ESIM_SLOT_ID = "const.telephony.esim.slotID";
 
 template<typename T>
 inline T GetVirtualModemSwitch()
@@ -96,6 +101,17 @@ inline T GetRealMaxSlotCount()
         maxRealSlotCount_ = std::atoi(realSimSlotCount);
     }
     return maxRealSlotCount_;
+}
+
+template<typename T>
+inline T GetDefaultEsimSlotId()
+{
+    if (esimDefaultSlotId_ == ESIM_DEFAULT_SLOTID) {
+        char esimDefaultSlotId[SYSPARA_SIZE] = { 0 };
+        GetParameter(TEL_DEFAULT_ESIM_SLOT_ID, DEFAULT_ESIM_SLOT_ID, esimDefaultSlotId, SYSPARA_SIZE);
+        esimDefaultSlotId_ = std::stoi(esimDefaultSlotId);
+    }
+    return esimDefaultSlotId_;
 }
 
 template<typename T>

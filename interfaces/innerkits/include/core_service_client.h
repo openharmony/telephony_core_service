@@ -920,6 +920,108 @@ public:
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
+     * @brief Get the EID identifying the eUICC hardware.
+     *
+     * @param slotId[in], ndicates the card slot index number
+     * @param eId[out], the EID identifying the eUICC hardware
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEid(int32_t slotId, std::u16string &eId);
+
+    /**
+     * @brief Obtain the list of all EuiccProfileInfos
+     *
+     * @param slotId[in], sim slot id
+     * @param euiccProfileInfoList[out], the list of all EuiccProfileInfos
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList);
+
+    /**
+     * @brief Obtain the info about the eUICC chip/device
+     *
+     * @param slotId[in], sim slot id
+     * @param eUiccInfo[out], the info about the eUICC chip/device
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
+
+    /**
+     * @brief Disables the profile of the given iccid.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param iccId[in], the iccId of the profile
+     * @param refresh[in], whether sending the REFRESH command to modem
+     * @param enumResult[out], the response to obtain
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult);
+
+    /**
+     * @brief Requests the SM-DS address from eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param smdsAddress[out], the result code and the SM-DS address
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress);
+
+    /**
+     * @brief Requests Rules Authorisation Table.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param eUiccRulesAuthTable[out], get the rule authorisation table
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable);
+
+    /**
+     * @brief Requests the eUICC challenge for new profile downloading.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param responseResult[out], get the result code and the challenge
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
+
+    /**
+     * @brief Obtain the international mobile subscriber identity
+     *
+     * @param slotId[in], sim slot id
+     * @param defaultSmdpAddress[out], the international mobile subscriber identity of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress);
+
+    /**
+     * @brief cancel session.
+     *
+     * @param slotId[in], sim slot id
+     * @param transactionId[in], the Id of the transaction
+     * @param cancelReason[in], reason for canceling a profile download session
+     * @param responseResult[out], the result of the session
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
+        ResponseEsimResult &responseResult);
+
+    /**
+     * @brief Requests the profile of the given iccid.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param iccId[in], the iccId of the profile
+     * @param eUiccProfile[out], the profile of the given iccid
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile);
+
+    /**
      * @brief Reset memory
      *
      * @param slotId[in], sim slot id
@@ -966,7 +1068,7 @@ private:
     public:
         explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
         ~CoreServiceDeathRecipient() override = default;
-        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        __attribute__((no_sanitize("cfi"))) void OnRemoteDied(const wptr<IRemoteObject> &remote) override
         {
             client_.OnRemoteDied(remote);
         }

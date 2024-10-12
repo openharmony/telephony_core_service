@@ -40,6 +40,9 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerVoiceMailToMap();
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    AddHandlerEsimToMap();
+#endif
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -275,7 +278,27 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 void CoreServiceStub::AddHandlerEsimToMap()
 {
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RESET_MEMORY)] =
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EID)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEid(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_PROFILE_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccProfileInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccInfo(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::DISABLE_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDisableProfile(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SMDSADDRESS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSmdsAddress(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_RULES_AUTH_TABLE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetRulesAuthTable(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_CHALLENGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccChallenge(data, reply); };
+        memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRequestDefaultSmdpAddress(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::CANCEL_SESSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCancelSession(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetProfile(data, reply); };
+        memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RESET_MEMORY)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetMemory(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultSmdpAddress(data, reply); };
@@ -1954,6 +1977,237 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceStub::OnGetEid(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string eId;
+    int32_t result = GetEid(slotId, eId);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eId));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    GetEuiccProfileInfoListResult euiccProfileInfoList;
+    int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        if (!reply.WriteUint32(euiccProfileInfoList.profiles.size())) {
+            TELEPHONY_LOGE("write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
+        for (const auto &profile : euiccProfileInfoList.profiles) {
+            ret = (ret && reply.WriteString16(profile.iccId));
+            ret = (ret && reply.WriteString16(profile.nickName));
+            ret = (ret && reply.WriteString16(profile.serviceProviderName));
+            ret = (ret && reply.WriteString16(profile.profileName));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.state)));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.profileClass)));
+            ret = (ret && reply.WriteString16(profile.carrierId.mcc));
+            ret = (ret && reply.WriteString16(profile.carrierId.mnc));
+            ret = (ret && reply.WriteString16(profile.carrierId.gid1));
+            ret = (ret && reply.WriteString16(profile.carrierId.gid2));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.policyRules)));
+            ret = (ret && reply.WriteUint32(profile.accessRules.size()));
+            for (const auto &rule : profile.accessRules) {
+                ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
+                ret = (ret && reply.WriteString16(rule.packageName));
+                ret = (ret && reply.WriteInt32(rule.accessType));
+            }
+        }
+        ret = (ret && reply.WriteBool(euiccProfileInfoList.isRemovable));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result)));
+        if (!ret) {
+            TELEPHONY_LOGE("write reply failed.");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
+    }
+    return result;
+}
+
+int32_t CoreServiceStub::OnGetEuiccInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    EuiccInfo eUiccInfo;
+    int32_t result = GetEuiccInfo(slotId, eUiccInfo);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eUiccInfo.osVersion) && reply.WriteString16(eUiccInfo.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnDisableProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    bool refresh = data.ReadBool();
+    ResultState enumResult;
+    int32_t result = DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string smdsAddress;
+    int32_t result = GetSmdsAddress(slotId, portIndex, smdsAddress);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(smdsAddress));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    int32_t result = GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRules.size()));
+        for (const auto &rules : eUiccRulesAuthTable.policyRules) {
+            ret = (ret && reply.WriteInt32(rules));
+        }
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.carrierIds.size()));
+        for (const auto &carrier : eUiccRulesAuthTable.carrierIds) {
+            ret = (ret && reply.WriteString16(carrier.mcc));
+            ret = (ret && reply.WriteString16(carrier.mnc));
+            ret = (ret && reply.WriteString16(carrier.spn));
+            ret = (ret && reply.WriteString16(carrier.imsi));
+            ret = (ret && reply.WriteString16(carrier.gid1));
+            ret = (ret && reply.WriteString16(carrier.gid2));
+            ret = (ret && reply.WriteInt32(carrier.carrierId));
+            ret = (ret && reply.WriteInt32(carrier.specificCarrierId));
+        }
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRuleFlags.size()));
+        for (const auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
+            ret = (ret && reply.WriteInt32(ruleFlags));
+        }
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.position));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    ResponseEsimResult responseResult;
+    int32_t result = GetEuiccChallenge(slotId, portIndex, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string defaultSmdpAddress;
+    int32_t result = GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(defaultSmdpAddress));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string transactionId = data.ReadString16();
+    CancelReason cancelReason = static_cast<CancelReason>(data.ReadInt32());
+    ResponseEsimResult responseResult;
+    int32_t result = CancelSession(slotId, transactionId, cancelReason, responseResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
+        ret = (ret && reply.WriteString16(responseResult.response));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    EuiccProfile eUiccProfile;
+    int32_t result = GetProfile(slotId, portIndex, iccId, eUiccProfile);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteString16(eUiccProfile.iccId));
+        ret = (ret && reply.WriteString16(eUiccProfile.nickName));
+        ret = (ret && reply.WriteString16(eUiccProfile.serviceProviderName));
+        ret = (ret && reply.WriteString16(eUiccProfile.profileName));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state)));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass)));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mcc));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mnc));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid1));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid2));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules)));
+        ret = (ret && reply.WriteInt32(eUiccProfile.accessRules.size()));
+        for (const auto &rule : eUiccProfile.accessRules) {
+            ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
+            ret = (ret && reply.WriteString16(rule.packageName));
+            ret = (ret && reply.WriteInt32(rule.accessType));
+        }
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRequestDefaultSmdpAddress OnRemoteRequest::REQUEST_DEFAULT_SMDP_ADDRESS write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
 int32_t CoreServiceStub::OnResetMemory(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
