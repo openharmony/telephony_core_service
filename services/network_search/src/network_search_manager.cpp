@@ -45,6 +45,9 @@ const int32_t SERVICE_ABILITY_OFF = 0;
 const int32_t SERVICE_ABILITY_ON = 1;
 const int32_t SYS_PARAMETER_SIZE = 256;
 const int32_t INVALID_DELAY_TIME = 0;
+const int32_t SLOT_0 = 0;
+const int32_t SLOT_1 = 1;
+
 constexpr const char *NO_DELAY_TIME__CONFIG = "0";
 constexpr const char *CFG_TECH_UPDATE_TIME = "persist.radio.cfg.update.time";
 constexpr static const int32_t GET_SSB_WAIT_TIME_SECOND = 5;
@@ -780,7 +783,12 @@ int32_t NetworkSearchManager::GetPreferredNetwork(int32_t slotId, NSCALLBACK &ca
         TELEPHONY_LOGE("slotId:%{public}d eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!eventSender_->SendCallback(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback)) {
+    bool isChipsetNetworkExtSupported = true;
+    if (TELEPHONY_EXT_WRAPPER.isChipsetNetworkExtSupported_ != nullptr) {
+        isChipsetNetworkExtSupported = TELEPHONY_EXT_WRAPPER.isChipsetNetworkExtSupported_();
+    }
+    if (!eventSender_->SendCallbackNetworkExt(slotId, RadioEvent::RADIO_GET_PREFERRED_NETWORK_MODE, &callback,
+        isChipsetNetworkExtSupported)) {
         TELEPHONY_LOGE("slotId:%{public}d GetPreferredNetwork SendCallback failed.", slotId);
         return CORE_SERVICE_SEND_CALLBACK_FAILED;
     }
@@ -1014,6 +1022,24 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     imei = inner->imei_;
+    if (imei.empty()) {
+        TELEPHONY_LOGI("imei is empty");
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    int32_t otherSlotId = slotId == SLOT_0 ? SLOT_1 : SLOT_0;
+    if (otherSlotId < static_cast<int32_t>(mapManagerInner_.size())) {
+        auto otherInner = FindManagerInner(otherSlotId);
+        if (otherInner != nullptr) {
+            std::u16string otherImei = otherInner->imei_;
+            if (otherImei.empty()) {
+                TELEPHONY_LOGI("otherImei is empty");
+            } else if (otherImei == imei) {
+                TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is same", slotId, otherSlotId);
+            } else {
+                TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is different", slotId, otherSlotId);
+            }
+        }
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 

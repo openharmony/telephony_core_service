@@ -66,11 +66,12 @@ sptr<ICoreService> CoreServiceClient::GetProxy()
     return proxy_;
 }
 
-void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+__attribute__((no_sanitize("cfi"))) void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     RemoveDeathRecipient(remote, true);
 }
 
+__attribute__((no_sanitize("cfi")))
 void CoreServiceClient::RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied)
 {
     if (isRemoteDied && remote == nullptr) {

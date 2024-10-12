@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+SOURCE_DIR = "../../../"
+ohos_unittest("parcel_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "tel_esim_gtest"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "$SOURCE_DIR/frameworks/native/src/download_profile_config_info_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/downloadable_profile_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/euicc_info_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/get_downloadable_profiles_result_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/profile_info_list_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/profile_metadata_result_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/response_esim_result.cpp",
+    "$SOURCE_DIR/test/unittest/esim_parcel_gtest/mock/src/parcel.cpp",
+    "download_profile_config_info_parcel_test.cpp",
+    "download_profile_result_parcel_test.cpp",
+    "downloadable_profile_parcel_test.cpp",
+    "euicc_info_parcel_test.cpp",
+    "get_downloadable_profiles_result_parcel_test.cpp",
+    "profile_info_list_parcel_test.cpp",
+    "profile_metadata_result_parcel_test.cpp",
+    "response_esim_result_test.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/interfaces/innerkits/include",
+    "$SOURCE_DIR/test/unittest/esim_parcel_gtest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  cflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = [ ":parcel_gtest" ]
+}

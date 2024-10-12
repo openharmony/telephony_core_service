@@ -18,6 +18,7 @@
 
 #include "if_system_ability_manager.h"
 #include "gmock/gmock.h"
+
 namespace OHOS {
 class ISystemAbilityManagerMock : public ISystemAbilityManager {
 public:
