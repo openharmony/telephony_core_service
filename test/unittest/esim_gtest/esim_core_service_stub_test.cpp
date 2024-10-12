@@ -40,6 +40,43 @@ void EsimCoreServiceStubTest::SetUp() {}
 
 void EsimCoreServiceStubTest::TearDown() {}
 
+int32_t EsimCoreServiceStubTest::SendRemoteRequest(MessageParcel &data, CoreServiceInterfaceCode code)
+{
+    MessageParcel reply;
+    MessageOption option;
+    return instance_->OnRemoteRequest(static_cast<uint32_t>(code), data, reply, option);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetEid_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EID);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccProfileInfoList_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_PROFILE_INFO_LIST);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccInfo_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_INFO);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
 HWTEST_F(EsimCoreServiceStubTest, OnDisableProfile_001, Function | MediumTest | Level2)
 {
     MessageParcel data;

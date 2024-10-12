@@ -67,5 +67,4 @@ public:
         std::vector<int64_t>& extraDataIdList, const std::string& eventName));
 };
 } // namespace OHOS
-
 #endif // CORE_SERVICE_CLIENT_IF_SYSTEM_ABILITY_MANAGER_MOCK_H

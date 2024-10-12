@@ -15,6 +15,9 @@
 
 #include "core_service_proxy.h"
 
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_state_type.h"
+#endif
 #include "network_search_types.h"
 #include "parameter.h"
 #include "sim_state_type.h"
@@ -26,6 +29,9 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+constexpr uint32_t ESIM_MAX_SIZE = 1000;
+#endif
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -3190,6 +3196,136 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceProxy::GetEid(int32_t slotId, std::u16string &eId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t sendRequestRet =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EID), data, reply, option);
+    if (sendRequestRet != ERR_NONE) {
+        TELEPHONY_LOGE("GetEid failed, error code is %{public}d", sendRequestRet);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        eId = reply.ReadString16();
+    }
+    return result;
+}
+
+void CoreServiceProxy::ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile)
+{
+    euiccProfile.iccId = reply.ReadString16();
+    euiccProfile.nickName = reply.ReadString16();
+    euiccProfile.serviceProviderName = reply.ReadString16();
+    euiccProfile.profileName = reply.ReadString16();
+    euiccProfile.state = static_cast<ProfileState>(reply.ReadInt32());
+    euiccProfile.profileClass = static_cast<ProfileClass>(reply.ReadInt32());
+    euiccProfile.carrierId.mcc = reply.ReadString16();
+    euiccProfile.carrierId.mnc = reply.ReadString16();
+    euiccProfile.carrierId.gid1 = reply.ReadString16();
+    euiccProfile.carrierId.gid2 = reply.ReadString16();
+    euiccProfile.policyRules = static_cast<PolicyRules>(reply.ReadInt32());
+
+    uint32_t accessRulesSize = reply.ReadUint32();
+    if (accessRulesSize >= ESIM_MAX_SIZE) {
+        TELEPHONY_LOGE("over max size");
+        return;
+    }
+    euiccProfile.accessRules.resize(accessRulesSize);
+    for (uint32_t j = 0; j < accessRulesSize; ++j) {
+        AccessRule &rule = euiccProfile.accessRules[j];
+        rule.certificateHashHexStr = reply.ReadString16();
+        rule.packageName = reply.ReadString16();
+        rule.accessType = reply.ReadInt32();
+    }
+}
+
+int32_t CoreServiceProxy::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t sendRequestRet = remote->SendRequest(
+        static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EUICC_PROFILE_INFO_LIST), data, reply, option);
+    if (sendRequestRet != ERR_NONE) {
+        TELEPHONY_LOGE("GetEuiccProfileInfoList failed, error code is %{public}d", sendRequestRet);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        uint32_t profileCount = reply.ReadUint32();
+        if (profileCount >= ESIM_MAX_SIZE) {
+            TELEPHONY_LOGE("over max size");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
+        euiccProfileInfoList.profiles.resize(profileCount);
+        for (uint32_t i = 0; i < profileCount; ++i) {
+            EuiccProfile &euiccProfile = euiccProfileInfoList.profiles[i];
+            ReadEuiccProfileFromReply(reply, euiccProfile);
+        }
+        euiccProfileInfoList.isRemovable = reply.ReadBool();
+        euiccProfileInfoList.result = static_cast<ResultState>(reply.ReadInt32());
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (data.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t sendRequestRet = remote->SendRequest(
+        static_cast<uint32_t>(CoreServiceInterfaceCode::GET_EUICC_INFO), data, reply, option);
+    if (sendRequestRet != ERR_NONE) {
+        TELEPHONY_LOGE("GetEuiccInfo failed, error code is %{public}d", sendRequestRet);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        eUiccInfo.osVersion = reply.ReadString16();
+        eUiccInfo.response = reply.ReadString16();
+    }
+    return result;
+}
+
 int32_t CoreServiceProxy::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
 {
@@ -3274,7 +3410,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         uint32_t policyRulesSize = reply.ReadUint32();
-        if (policyRulesSize > MAX_SIZE) {
+        if (policyRulesSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
@@ -3282,7 +3418,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
         }
         uint32_t carrierIdsSize = reply.ReadUint32();
-        if (carrierIdsSize > MAX_SIZE) {
+        if (carrierIdsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
@@ -3298,7 +3434,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             ci.specificCarrierId = reply.ReadInt32();
         }
         uint32_t policyRuleFlagsSize = reply.ReadUint32();
-        if (policyRuleFlagsSize > MAX_SIZE) {
+        if (policyRuleFlagsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);

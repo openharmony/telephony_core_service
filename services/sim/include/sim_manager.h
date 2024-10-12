@@ -156,6 +156,9 @@ public:
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t SavePrimarySlotId(int32_t slotId) override;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t GetEid(int32_t slotId, std::u16string &eId) override;
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
     int32_t DisableProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) override;
     int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
