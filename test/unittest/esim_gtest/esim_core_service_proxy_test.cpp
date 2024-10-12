@@ -141,7 +141,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_001, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState setAddressResult;
     int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -151,7 +151,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_002, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState setAddressResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
     int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);
@@ -162,7 +162,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_003, Function | MediumT
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState setAddressResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     int32_t ret = proxy.SetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress, setAddressResult);

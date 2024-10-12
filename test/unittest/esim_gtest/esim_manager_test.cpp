@@ -81,7 +81,7 @@ HWTEST_F(EsimManagerTest, ResetMemory, Function | MediumTest | Level1)
 HWTEST_F(EsimManagerTest, SetDefaultSmdpAddress, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    std::u16string defaultSmdpAddress = Str8ToStr16("smdp.gsma.com");
+    std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
     ResultState SetAddressResult;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
