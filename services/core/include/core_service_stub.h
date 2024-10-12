@@ -152,6 +152,9 @@ private:
     int32_t OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCancelSession(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetProfile(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:

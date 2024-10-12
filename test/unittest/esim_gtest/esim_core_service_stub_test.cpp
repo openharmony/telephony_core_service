@@ -116,5 +116,35 @@ HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccChallenge_001, Function | MediumTest
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_CHALLENGE);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceStubTest, OnRequestDefaultSmdpAddress_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::REQUEST_DEFAULT_SMDP_ADDRESS);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnCancelSession_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::CANCEL_SESSION);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetProfile_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_PROFILE);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

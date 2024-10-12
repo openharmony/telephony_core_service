@@ -164,6 +164,11 @@ public:
     int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
     int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) override;
     int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
+    int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress) override;
+    int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
+        ResponseEsimResult &responseResult) override;
+    int32_t GetProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) override;
 #endif
 
 private:

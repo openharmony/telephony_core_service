@@ -340,5 +340,104 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccChallenge_003, Function | MediumTest 
     int32_t ret = proxy.GetEuiccChallenge(SLOT_ID, portIndex, responseResult);
     EXPECT_EQ(ret, 0);
 }
+
+HWTEST_F(EsimCoreServiceProxyTest, RequestDefaultSmdpAddress_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress;
+    int32_t ret = proxy.GetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RequestDefaultSmdpAddress_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.GetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RequestDefaultSmdpAddress_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string defaultSmdpAddress;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.GetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, CancelSession_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    std::u16string transactionId = Str8ToStr16("A1B2C3");
+    const CancelReason cancelReason = CancelReason::CANCEL_REASON_POSTPONED;
+    ResponseEsimResult responseResult;
+    int32_t ret = proxy.CancelSession(SLOT_ID, transactionId, cancelReason, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, CancelSession_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string transactionId = Str8ToStr16("A1B2C3");
+    const CancelReason cancelReason = CancelReason::CANCEL_REASON_POSTPONED;
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.CancelSession(SLOT_ID, transactionId, cancelReason, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, CancelSession_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    std::u16string transactionId = Str8ToStr16("A1B2C3");
+    const CancelReason cancelReason = CancelReason::CANCEL_REASON_POSTPONED;
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.CancelSession(SLOT_ID, transactionId, cancelReason, responseResult);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetProfile_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    std::u16string iccId;
+    EuiccProfile eUiccProfile;
+    int32_t ret = proxy.GetProfile(SLOT_ID, portIndex, iccId, eUiccProfile);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetProfile_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    std::u16string iccId;
+    EuiccProfile eUiccProfile;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.GetProfile(SLOT_ID, portIndex, iccId, eUiccProfile);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetProfile_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    std::u16string iccId;
+    EuiccProfile eUiccProfile;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.GetProfile(SLOT_ID, portIndex, iccId, eUiccProfile);
+    EXPECT_EQ(ret, 0);
+}
 } // namespace Telephony
 } // namespace OHOS

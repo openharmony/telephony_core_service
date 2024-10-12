@@ -1769,6 +1769,59 @@ int32_t CoreService::GetEuiccChallenge(int32_t slotId, int32_t portIndex, Respon
     }
     return simManager_->GetEuiccChallenge(slotId, portIndex, responseResult);
 }
+
+int32_t CoreService::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+}
+
+int32_t CoreService::CancelSession(
+    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->CancelSession(slotId, transactionId, cancelReason, responseResult);
+}
+
+int32_t CoreService::GetProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetProfile(slotId, portIndex, iccId, eUiccProfile);
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

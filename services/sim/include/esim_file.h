@@ -76,6 +76,9 @@ public:
     bool ProcessRequestRulesAuthTable(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRequestRulesAuthTableDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
+    std::string ObtainDefaultSmdpAddress();
+    ResponseEsimResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
+    EuiccProfile ObtainProfile(int32_t portIndex, const std::u16string &iccId);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -107,6 +110,14 @@ private:
     std::shared_ptr<Asn1Node> ParseEvent(const AppExecFwk::InnerEvent::Pointer &event);
     std::string MakeVersionString(std::vector<uint8_t> &versionRaw);
     std::shared_ptr<Asn1Node> Asn1ParseResponse(const std::vector<uint8_t> &response, uint32_t respLength);
+    bool ProcessObtainDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    std::vector<uint8_t> GetProfileTagList();
+    bool ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -174,6 +185,18 @@ private:
     std::mutex euiccChallengeMutex_;
     std::condition_variable euiccChallengeCv_;
     bool isEuiccChallengeReady_ = false;
+
+    std::mutex obtainDefaultSmdpAddressMutex_;
+    std::condition_variable obtainDefaultSmdpAddressCv_;
+    bool isObtainDefaultSmdpAddressReady_ = false;
+
+    std::mutex cancelSessionMutex_;
+    std::condition_variable cancelSessionCv_;
+    bool isCancelSessionReady_ = false;
+
+    std::mutex obtainProfileMutex_;
+    std::condition_variable obtainProfileCv_;
+    bool isObtainProfileReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
