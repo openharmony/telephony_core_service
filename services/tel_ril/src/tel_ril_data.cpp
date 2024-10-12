@@ -88,7 +88,8 @@ int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioRes
         setupDataCallResultInfo->flag = telRilRequest->pointer_->GetParam();
         return setupDataCallResultInfo;
     };
-    return Response<SetupDataCallResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);
+    return Response<SetupDataCallResultInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, iSetupDataCallResultInfo,
+        getDataFunc);
 }
 
 int32_t TelRilData::GetPdpContextList(const AppExecFwk::InnerEvent::Pointer &response)

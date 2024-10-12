@@ -131,7 +131,6 @@ void RadioInfo::RadioFirstPowerOn(std::shared_ptr<NetworkSearchManager> &nsm, Mo
 void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetImei slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetImei event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -147,14 +146,13 @@ void RadioInfo::ProcessGetImei(const AppExecFwk::InnerEvent::Pointer &event) con
         nsm->SetImei(slotId_, u"");
         return;
     }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetImei get imei success");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetImei get imei success slotId:%{public}d", slotId_);
     nsm->SetImei(slotId_, Str8ToStr16(imeiID->data));
 }
 
 void RadioInfo::ProcessGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetImeiSv slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetImeiSv event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -170,14 +168,13 @@ void RadioInfo::ProcessGetImeiSv(const AppExecFwk::InnerEvent::Pointer &event) c
         nsm->SetImeiSv(slotId_, u"");
         return;
     }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetImeiSv get imeiSv success");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetImeiSv get imeiSv success slotId:%{public}d", slotId_);
     nsm->SetImeiSv(slotId_, Str8ToStr16(imeiSvID->data));
 }
 
 void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    TELEPHONY_LOGI("RadioInfo::ProcessGetMeid slotId:%{public}d", slotId_);
     if (event == nullptr) {
         TELEPHONY_LOGE("RadioInfo::ProcessGetMeid event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -193,7 +190,7 @@ void RadioInfo::ProcessGetMeid(const AppExecFwk::InnerEvent::Pointer &event) con
         nsm->SetMeid(slotId_, u"");
         return;
     }
-    TELEPHONY_LOGI("RadioInfo::ProcessGetMeid success");
+    TELEPHONY_LOGI("RadioInfo::ProcessGetMeid success slotId:%{public}d", slotId_);
     nsm->SetMeid(slotId_, Str8ToStr16(meid->data));
 }
 

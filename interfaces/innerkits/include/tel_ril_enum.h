@@ -145,6 +145,7 @@ enum PdpErrorReason {
     PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE = 112, /* APN restriction value incompatible
                                                             * with active PDP context */
     PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED = 113, /* Multiple accesses to a PDN connection not allowed */
+    PDP_ERR_UNKNOWN_TO_CLEAR_CONNECTION = 0xFFFE, /* unspecific errors, do not retry, just clear connection */
 };
 
 enum NotificationFilter {

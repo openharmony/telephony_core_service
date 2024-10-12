@@ -32,3 +32,7 @@ if (defined(global_parts_info) &&
   telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_EXT" ]
   telephony_extra_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_VSIM" ]
 }
+
+if (core_service_support_esim) {
+  telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_ESIM" ]
+}

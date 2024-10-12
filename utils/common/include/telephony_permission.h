@@ -101,6 +101,19 @@ static constexpr const char *CONNECT_IMS_SERVICE = "ohos.permission.CONNECT_IMS_
  * This permission indicates being allowed to receive mms.
  */
 static constexpr const char *RECEIVE_MMS = "ohos.permission.RECEIVE_MMS";
+/**
+ * This permission allows a system application to modify the eSIM profile and upgrade the eSIM.
+ */
+static constexpr const char *SET_TELEPHONY_ESIM_STATE = "ohos.permission.SET_TELEPHONY_ESIM_STATE";
+/**
+ * This permission allows a system application or carrier application to set the eSIM nickname and activate the eSIM.
+ */
+static constexpr const char *SET_TELEPHONY_ESIM_STATE_OPEN = "ohos.permission.SET_TELEPHONY_ESIM_STATE_OPEN";
+/**
+ * This permission allows a system application to obtain eSIM profile information and information written
+ * on the device chip when the eSIM is activated.
+ */
+static constexpr const char *GET_TELEPHONY_ESIM_STATE = "ohos.permission.GET_TELEPHONY_ESIM_STATE";
 } // namespace Permission
 
 class TelephonyPermission {

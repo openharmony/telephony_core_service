@@ -419,6 +419,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function |
     std::string argStr = "";
     coreServiceHiSysEvent->WriteSignalLevelBehaviorEvent(slotId, argInt);
     coreServiceHiSysEvent->WriteNetworkStateBehaviorEvent(slotId, argInt, argInt, argInt);
+    coreServiceHiSysEvent->WriteRadioStateBehaviorEvent(slotId, argInt);
     coreServiceHiSysEvent->WriteDefaultDataSlotIdBehaviorEvent(slotId);
     coreServiceHiSysEvent->WriteSimStateBehaviorEvent(slotId, argInt);
     coreServiceHiSysEvent->WriteDialCallFaultEvent(slotId, argInt, argStr);
