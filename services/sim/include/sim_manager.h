@@ -156,6 +156,25 @@ public:
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t SavePrimarySlotId(int32_t slotId) override;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t GetEid(int32_t slotId, std::u16string &eId) override;
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
+    int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) override;
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
+    int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) override;
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
+    int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress) override;
+    int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
+        ResponseEsimResult &responseResult) override;
+    int32_t GetProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) override;
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) override;
+    int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) override;
+    bool IsEsimSupported(int32_t slotId) override;
+    int32_t SendApduData(int32_t slotId, const std::u16string &aid, const std::u16string &apduData,
+        ResponseEsimResult &responseResult) override;
     int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
         ResponseEsimResult &responseResult) override;
     int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
@@ -163,6 +182,7 @@ public:
     int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
         EuiccNotificationList &notificationList) override;
 #endif
+
 private:
     bool IsValidSlotId(int32_t slotId);
     template<class N>
