@@ -40,9 +40,6 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         return;
     }
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager != nullptr && preferredNetworkInfo != nullptr) {
-        networkSearchManager->SetCachePreferredNetworkValue(slotId_, preferredNetworkInfo->preferredNetworkType);
-    }
     if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr && preferredNetworkInfo != nullptr) {
         TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
     }
@@ -134,6 +131,13 @@ bool NetworkType::WriteGetPreferredNetworkInfo(std::shared_ptr<PreferredNetworkT
         networkMode = preferredNetworkInfo->preferredNetworkType;
         index = preferredNetworkInfo->flag;
         networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
+        std::shared_ptr<NetworkSearchCallbackInfo> callbackInfo = NetworkUtils::FindNetworkSearchCallback(index);
+        if (callbackInfo != nullptr) {
+            bool isChipsetNetworkExtSupported = static_cast<bool>(callbackInfo->param_);
+            if (!isChipsetNetworkExtSupported && TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(networkMode);
+            }
+        }
         if (!data.WriteInt32(networkMode) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
             TELEPHONY_LOGE("NetworkType::ProcessGetPreferredNetwork WriteInt32 networkMode is false");
             return false;

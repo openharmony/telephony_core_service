@@ -31,7 +31,14 @@ ohos_shared_library("esim") {
 
     sources = [
       "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
-      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/esim_state_type.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_config_info_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_result_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/downloadable_profile_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/euicc_info_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/get_downloadable_profiles_result_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/profile_info_list_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/profile_metadata_result_parcel.cpp",
+      "$SUBSYSTEM_DIR/core_service/frameworks/native/src/response_esim_result.cpp",
       "src/napi_esim.cpp",
     ]
   }
