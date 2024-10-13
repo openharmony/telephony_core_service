@@ -243,5 +243,35 @@ HWTEST_F(EsimCoreServiceStubTest, OnRemoveNotificationFromList_001, Function | M
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::REMOVE_NOTIFICATION);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceStubTest, OnDeleteProfile_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::DELETE_PROFILE);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnSwitchToProfile_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SWITCH_TO_PROFILE);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnSetProfileNickname_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

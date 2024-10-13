@@ -2442,6 +2442,222 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
     return true;
 }
 
+ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
+{
+    esimProfile_.iccId = iccId;
+    SyncOpenChannel();
+    AppExecFwk::InnerEvent::Pointer eventDeleteProfile = BuildCallerInfo(MSG_ESIM_DELETE_PROFILE);
+    if (!ProcessDeleteProfile(slotId_, eventDeleteProfile)) {
+        TELEPHONY_LOGE("ProcessDeleteProfile encode failed");
+        return ResultState();
+    }
+    isDeleteProfileReady_ = false;
+    std::unique_lock<std::mutex> lock(deleteProfileMutex_);
+    if (!deleteProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        [this]() { return isDeleteProfileReady_; })) {
+        SyncCloseChannel();
+        return ResultState();
+    }
+    SyncCloseChannel();
+    return delProfile_;
+}
+
+ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim)
+{
+    esimProfile_.portIndex = portIndex;
+    esimProfile_.iccId = iccId;
+    esimProfile_.forceDeactivateSim = forceDeactivateSim;
+    SyncOpenChannel();
+    AppExecFwk::InnerEvent::Pointer eventSwitchToProfile = BuildCallerInfo(MSG_ESIM_SWITCH_PROFILE);
+    if (!ProcessSwitchToProfile(slotId_, eventSwitchToProfile)) {
+        TELEPHONY_LOGE("ProcessSwitchToProfile encode failed");
+        return ResultState();
+    }
+    isSwitchToProfileReady_ = false;
+    std::unique_lock<std::mutex> lock(switchToProfileMutex_);
+    if (!switchToProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        [this]() { return isSwitchToProfileReady_; })) {
+        SyncCloseChannel();
+        return ResultState();
+    }
+    SyncCloseChannel();
+    return switchResult_;
+}
+
+ResultState EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
+{
+    esimProfile_.iccId = iccId;
+    esimProfile_.nickname = nickname;
+    SyncOpenChannel();
+    AppExecFwk::InnerEvent::Pointer eventSetNickName = BuildCallerInfo(MSG_ESIM_SET_NICK_NAME);
+    if (!ProcessSetNickname(slotId_, eventSetNickName)) {
+        TELEPHONY_LOGE("ProcessSetNickname encode failed");
+        return ResultState();
+    }
+    isSetNicknameReady_ = false;
+    std::unique_lock<std::mutex> lock(setNicknameMutex_);
+    if (!setNicknameCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        [this]() { return isSetNicknameReady_; })) {
+        SyncCloseChannel();
+        return ResultState();
+    }
+    SyncCloseChannel();
+    return setNicknameResult_;
+}
+
+bool EsimFile::ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+{
+    if (!IsLogicChannelOpen()) {
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DELETE_PROFILE);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    std::vector<uint8_t> iccidBytes;
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
+    Asn1Utils::BcdToBytes(strIccId, iccidBytes);
+    builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
+}
+
+bool EsimFile::ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+{
+    if (!IsLogicChannelOpen()) {
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_NICKNAME);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    std::vector<uint8_t> iccidBytes;
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
+    std::string childStr = OHOS::Telephony::ToUtf8(esimProfile_.nickname);
+    Asn1Utils::BcdToBytes(strIccId, iccidBytes);
+
+    builder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
+    builder->Asn1AddChildAsString(TAG_ESIM_NICKNAME, childStr);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
+}
+
+bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    if (root == nullptr) {
+        TELEPHONY_LOGE("Asn1ParseResponse failed");
+        return false;
+    }
+    std::shared_ptr<Asn1Node> Asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (Asn1NodeData == nullptr) {
+        TELEPHONY_LOGE("pAsn1Node is nullptr");
+        return false;
+    }
+    delProfile_ = static_cast<ResultState>(Asn1NodeData->Asn1AsInteger());
+    {
+        std::lock_guard<std::mutex> lock(deleteProfileMutex_);
+        isDeleteProfileReady_ = true;
+    }
+    deleteProfileCv_.notify_one();
+    return true;
+}
+
+bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+{
+    if (!IsLogicChannelOpen()) {
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_ENABLE_PROFILE);
+    std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
+    if (builder == nullptr || subBuilder == nullptr) {
+        TELEPHONY_LOGE("get builder failed");
+        return false;
+    }
+    std::vector<uint8_t> iccidBytes;
+    std::string strIccId = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
+    Asn1Utils::BcdToBytes(strIccId, iccidBytes);
+    subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
+    std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
+    if (subNode == nullptr) {
+        TELEPHONY_LOGE("subNode is nullptr");
+        return false;
+    }
+    builder->Asn1AddChild(subNode);
+    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
+    ApduSimIORequestInfo reqInfo;
+    CommBuildOneApduReqInfo(reqInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
+}
+
+bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    if (root == nullptr) {
+        TELEPHONY_LOGE("Asn1ParseResponse failed");
+        return false;
+    }
+    std::shared_ptr<Asn1Node> asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (asn1NodeData == nullptr) {
+        TELEPHONY_LOGE("asn1NodeData is nullptr");
+        return false;
+    }
+    switchResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+
+    {
+        std::lock_guard<std::mutex> lock(switchToProfileMutex_);
+        isSwitchToProfileReady_ = true;
+    }
+    switchToProfileCv_.notify_one();
+    return true;
+}
+
+bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    if (root == nullptr) {
+        TELEPHONY_LOGE("Asn1ParseResponse failed");
+        return false;
+    }
+    std::shared_ptr<Asn1Node> asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    if (asn1NodeData == nullptr) {
+        TELEPHONY_LOGE("asn1NodeData is nullptr");
+        return false;
+    }
+    updateNicknameResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+    {
+        std::lock_guard<std::mutex> lock(setNicknameMutex_);
+        isSetNicknameReady_ = true;
+    }
+    setNicknameCv_.notify_one();
+    return true;
+}
+
 void EsimFile::InitMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_OPEN_CHANNEL_DONE] =
@@ -2486,6 +2702,12 @@ void EsimFile::InitMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessRetrieveNotificationDone(event); };
     memberFuncMap_[MSG_ESIM_RETRIEVE_NOTIFICATION_LIST] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessRetrieveNotificationListDone(event); };
+    memberFuncMap_[MSG_ESIM_DELETE_PROFILE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessDeleteProfileDone(event); };
+    memberFuncMap_[MSG_ESIM_SWITCH_PROFILE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSwitchToProfileDone(event); };
+    memberFuncMap_[MSG_ESIM_SET_NICK_NAME] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetNicknameDone(event); };
 }
 
 void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

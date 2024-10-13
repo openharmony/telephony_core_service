@@ -578,5 +578,92 @@ HWTEST_F(EsimManagerTest, RemoveNotificationFromList, Function | MediumTest | Le
     ret = simManager->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimManagerTest, DeleteProfile, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    ResultState DeleteProfileResult;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t ret = simManager->DeleteProfile(slotId, iccId, DeleteProfileResult);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simManager->simStateManager_.push_back(simStateManager);
+    simManager->simStateManager_[slotId]->Init(slotId);
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
+    ret = simManager->DeleteProfile(slotId, iccId, DeleteProfileResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    EventFwk::CommonEventSubscribeInfo sp;
+    std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
+    std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    simManager->simFileManager_.push_back(simFileManager);
+    simManager->simFileManager_[slotId]->Init(slotId);
+    ret = simManager->DeleteProfile(slotId, iccId, DeleteProfileResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimManagerTest, SwitchToProfile, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 1;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool forceDeactivateSim = true;
+    ResultState SwitchProfileResult;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t ret = simManager->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simManager->simStateManager_.push_back(simStateManager);
+    simManager->simStateManager_[slotId]->Init(slotId);
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
+    ret = simManager->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    EventFwk::CommonEventSubscribeInfo sp;
+    std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
+    std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    simManager->simFileManager_.push_back(simFileManager);
+    simManager->simFileManager_[slotId]->Init(slotId);
+    ret = simManager->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimManagerTest, SetProfileNickname, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    std::u16string nickname = Str8ToStr16("nick");
+    ResultState UpdateResult;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t ret = simManager->SetProfileNickname(slotId, iccId, nickname, UpdateResult);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simManager->simStateManager_.push_back(simStateManager);
+    simManager->simStateManager_[slotId]->Init(slotId);
+    simManager->simStateManager_[slotId]->simStateHandle_->iccState_.simStatus_ = -1;
+    ret = simManager->SetProfileNickname(slotId, iccId, nickname, UpdateResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    EventFwk::CommonEventSubscribeInfo sp;
+    std::weak_ptr<Telephony::ITelRilManager> iTelRilManager = telRilManager;
+    std::weak_ptr<Telephony::SimStateManager> state = simStateManager;
+    std::shared_ptr<Telephony::SimFileManager> simFileManager =
+        std::make_shared<SimFileManager>(sp, iTelRilManager, state);
+    simManager->simFileManager_.push_back(simFileManager);
+    simManager->simFileManager_[slotId]->Init(slotId);
+    ret = simManager->SetProfileNickname(slotId, iccId, nickname, UpdateResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

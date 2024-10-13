@@ -90,6 +90,9 @@ public:
     EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
     EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
     ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
+    ResultState DeleteProfile(const std::u16string &iccId);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -172,6 +175,12 @@ private:
     bool RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
     bool ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessDeleteProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -184,7 +193,7 @@ private:
     ResultState delProfile_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState setDpAddressResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState switchResult_ = ResultState::RESULT_UNDEFINED_ERROR;
-    ResultState updateNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultState setNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState resetResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState disableProfileResult_ = ResultState::RESULT_UNDEFINED_ERROR;
     ResultState factoryResetResult_ = ResultState::RESULT_UNDEFINED_ERROR;
@@ -287,6 +296,18 @@ private:
     std::mutex removeNotificationMutex_;
     std::condition_variable removeNotificationCv_;
     bool isRemoveNotificationReady_ = false;
+
+    std::mutex deleteProfileMutex_;
+    std::condition_variable deleteProfileCv_;
+    bool isDeleteProfileReady_ = false;
+
+    std::mutex switchToProfileMutex_;
+    std::condition_variable switchToProfileCv_;
+    bool isSwitchToProfileReady_ = false;
+
+    std::mutex setNicknameMutex_;
+    std::condition_variable setNicknameCv_;
+    bool isSetNicknameReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

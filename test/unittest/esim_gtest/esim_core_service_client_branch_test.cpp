@@ -273,5 +273,39 @@ HWTEST_F(EsimCoreServiceClientBranchTest, RemoveNotificationFromList_0100, Funct
         seqNumber, enumResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
+
+HWTEST_F(EsimCoreServiceClientBranchTest, DeleteProfile_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    ResultState DeleteProfileResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().DeleteProfile(slotId, iccId, DeleteProfileResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, SwitchToProfile_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 1;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool forceDeactivateSim = true;
+    ResultState SwitchProfileResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
+        slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, SetProfileNickname_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    std::u16string nickname = Str8ToStr16("nick");
+    ResultState UpdateResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().SetProfileNickname(slotId, iccId, nickname, UpdateResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS
