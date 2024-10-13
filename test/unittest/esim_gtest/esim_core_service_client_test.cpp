@@ -240,5 +240,36 @@ HWTEST_F(EsimCoreServiceClientTest, RemoveNotificationFromList_0001, Function | 
         slotId, portIndex, seqNumber, enumResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceClientTest, DeleteProfile_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    ResultState DeleteProfileResult;
+    int32_t result = CoreServiceClient::GetInstance().DeleteProfile(slotId, iccId, DeleteProfileResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, SwitchToProfile_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 1;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    bool forceDeactivateSim = true;
+    ResultState SwitchProfileResult;
+    int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
+        slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, SetProfileNickname_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::u16string iccId = Str8ToStr16("98760000000000543210");
+    std::u16string nickname = Str8ToStr16("nick");
+    ResultState UpdateResult;
+    int32_t result = CoreServiceClient::GetInstance().SetProfileNickname(slotId, iccId, nickname, UpdateResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

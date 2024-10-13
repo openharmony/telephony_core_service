@@ -178,6 +178,11 @@ public:
         int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) = 0;
     virtual int32_t RemoveNotificationFromList(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) = 0;
+    virtual int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) = 0;
+    virtual int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
+        const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult) = 0;
+    virtual int32_t SetProfileNickname(
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) = 0;
 #endif
 };
 } // namespace Telephony

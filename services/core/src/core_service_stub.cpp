@@ -318,6 +318,12 @@ void CoreServiceStub::AddHandlerEsimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRetrieveNotification(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REMOVE_NOTIFICATION)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveNotificationFromList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::DELETE_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDeleteProfile(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SWITCH_TO_PROFILE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSwitchToProfile(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetProfileNickname(data, reply); };
 }
 #endif
 
@@ -2417,6 +2423,60 @@ int32_t CoreServiceStub::OnRemoveNotificationFromList(MessageParcel &data, Messa
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRemoveNotificationFromList write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnDeleteProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    ResultState enumResult;
+    int32_t result = DeleteProfile(slotId, iccId, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSwitchToProfile(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    bool forceDeactivateSim = data.ReadBool();
+    ResultState enumResult;
+    int32_t result = SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSetProfileNickname(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    std::u16string iccId = data.ReadString16();
+    std::u16string nickname = data.ReadString16();
+    ResultState enumResult;
+    int32_t result = SetProfileNickname(slotId, iccId, nickname, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;

@@ -1191,6 +1191,36 @@ ResultState SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_
     }
     return eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
 }
+
+ResultState SimFileManager::DeleteProfile(const std::u16string &iccId)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState result = eSimFile_->DeleteProfile(iccId);
+    return result;
+}
+
+ResultState SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    return result;
+}
+
+ResultState SimFileManager::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState result = eSimFile_->SetProfileNickname(iccId, nickname);
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

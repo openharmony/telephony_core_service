@@ -165,6 +165,9 @@ private:
     int32_t OnRetrieveNotificationList(MessageParcel &data, MessageParcel &reply);
     int32_t OnRetrieveNotification(MessageParcel &data, MessageParcel &reply);
     int32_t OnRemoveNotificationFromList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDeleteProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSwitchToProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetProfileNickname(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:
