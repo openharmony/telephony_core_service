@@ -448,5 +448,14 @@ bool EventSender::SendCallback(int32_t slotId, RadioEvent radioEvent, const sptr
     return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Int_String_Event, int32_t, std::string>(
         parameters, firstParam, secondParam);
 }
+
+bool EventSender::SendCallbackNetworkExt(int32_t slotId, RadioEvent radioEvent,
+    const sptr<INetworkSearchCallback> *callback, bool isChipsetNetworkExtSupported)
+{
+    auto fun = GetFunctionOfEvent<RilFunc_Event>(mapFunctions_, radioEvent);
+    std::tuple<int32_t, RadioEvent, int32_t, const sptr<INetworkSearchCallback> *, RilFunc_Event> parameters(
+        slotId, radioEvent, static_cast<int32_t>(isChipsetNetworkExtSupported), callback, fun);
+    return Send<EventGetMode::GET_EVENT_BY_INDEX, RilFunc_Event>(parameters);
+}
 } // namespace Telephony
 } // namespace OHOS
