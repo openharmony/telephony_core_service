@@ -1195,7 +1195,7 @@ bool EsimFile::ProcessObtainDefaultSmdpAddressDone(const AppExecFwk::InnerEvent:
     std::vector<uint8_t> outPutBytes;
     uint32_t byteLen = profileRoot->Asn1AsBytes(outPutBytes);
     if (byteLen == 0) {
-        TELEPHONY_LOGE("byteLen is zero!");
+        TELEPHONY_LOGE("byteLen is zero");
         return false;
     }
     defaultDpAddress_ = Asn1Utils::BytesToHexStr(outPutBytes);
