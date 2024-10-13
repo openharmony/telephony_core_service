@@ -119,6 +119,11 @@ struct SetupDataCallResultInfo {
      * integer type; identifies the PDU session, see 3GPP TS 24.501 [161].
      */
     int32_t pduSessionId = 0;
+
+    /** retry scene,
+     * 0 - setup datacall fail, 1 - modem deactivate, 2 - others
+     */
+    int32_t retryScene = 2;
 };
 
 /**

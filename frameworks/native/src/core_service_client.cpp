@@ -66,11 +66,12 @@ sptr<ICoreService> CoreServiceClient::GetProxy()
     return proxy_;
 }
 
-void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+__attribute__((no_sanitize("cfi"))) void CoreServiceClient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     RemoveDeathRecipient(remote, true);
 }
 
+__attribute__((no_sanitize("cfi")))
 void CoreServiceClient::RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied)
 {
     if (isRemoteDied && remote == nullptr) {
@@ -1083,6 +1084,186 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+int32_t CoreServiceClient::GetEid(int32_t slotId, std::u16string &eId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEid(slotId, eId);
+}
+
+int32_t CoreServiceClient::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+}
+
+int32_t CoreServiceClient::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccInfo(slotId, eUiccInfo);
+}
+
+int32_t CoreServiceClient::DisableProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
+}
+
+int32_t CoreServiceClient::GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetSmdsAddress(slotId, portIndex, smdsAddress);
+}
+
+int32_t CoreServiceClient::GetRulesAuthTable(
+    int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
+}
+
+int32_t CoreServiceClient::GetEuiccChallenge(
+    int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccChallenge(slotId, portIndex, responseResult);
+}
+
+int32_t CoreServiceClient::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+}
+
+int32_t CoreServiceClient::CancelSession(
+    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->CancelSession(slotId, transactionId, cancelReason, responseResult);
+}
+
+int32_t CoreServiceClient::GetProfile(
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetProfile(slotId, portIndex, iccId, eUiccProfile);
+}
+
+int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ResetMemory(slotId, resetOption, enumResult);
+}
+
+int32_t CoreServiceClient::SetDefaultSmdpAddress(
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
+}
+
+bool CoreServiceClient::IsEsimSupported(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->IsEsimSupported(slotId);
+}
+
+int32_t CoreServiceClient::SendApduData(
+    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SendApduData(slotId, aid, apduData, responseResult);
+}
+
+int32_t CoreServiceClient::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
+}
+
+int32_t CoreServiceClient::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
+}
+
+int32_t CoreServiceClient::ListNotifications(int32_t slotId, int32_t portIndex,
+    Event events, EuiccNotificationList &notificationList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ListNotifications(slotId, portIndex, events, notificationList);
+}
+
 int32_t CoreServiceClient::RetrieveNotificationList(
     int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
 {
