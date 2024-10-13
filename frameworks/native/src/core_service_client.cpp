@@ -1230,6 +1230,39 @@ int32_t CoreServiceClient::SendApduData(
     }
     return proxy->SendApduData(slotId, aid, apduData, responseResult);
 }
+
+int32_t CoreServiceClient::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
+}
+
+int32_t CoreServiceClient::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
+}
+
+int32_t CoreServiceClient::ListNotifications(int32_t slotId, int32_t portIndex,
+    Event events, EuiccNotificationList &notificationList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->ListNotifications(slotId, portIndex, events, notificationList);
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

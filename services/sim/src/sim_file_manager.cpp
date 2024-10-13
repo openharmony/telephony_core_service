@@ -1133,6 +1133,37 @@ ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const
     ResponseEsimResult result = eSimFile_->SendApduData(aid, apduData);
     return result;
 }
+
+ResponseEsimResult SimFileManager::PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(downLoadConfigInfo);
+    return result;
+}
+
+ResponseEsimBppResult SimFileManager::LoadBoundProfilePackage(
+    int32_t portIndex, const std::u16string &boundProfilePackage)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return ResponseEsimBppResult();
+    }
+    ResponseEsimBppResult result = eSimFile_->ObtainLoadBoundProfilePackage(portIndex, boundProfilePackage);
+    return result;
+}
+
+EuiccNotificationList SimFileManager::ListNotifications(int32_t portIndex, Event events)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return EuiccNotificationList();
+    }
+    EuiccNotificationList result = eSimFile_->ListNotifications(portIndex, events);
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

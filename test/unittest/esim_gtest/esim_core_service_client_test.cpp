@@ -175,5 +175,38 @@ HWTEST_F(EsimCoreServiceClientTest, SendApduData_0001, Function | MediumTest | L
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceClientTest, PrepareDownload_0001, Function | MediumTest | Level1)
+{
+    DownLoadConfigInfo downLoadConfigInfo;
+    int32_t slotId = 0;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, downLoadConfigInfo, responseResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, LoadBoundProfilePackage_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string boundProfilePackage = Str8ToStr16("0");
+    ResponseEsimBppResult responseResult;
+    int32_t result = CoreServiceClient::GetInstance().LoadBoundProfilePackage(
+        slotId, portIndex, boundProfilePackage, responseResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, ListNotifications_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList1;
+    int32_t result = CoreServiceClient::GetInstance().ListNotifications(
+        slotId, portIndex, events, notificationList1);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

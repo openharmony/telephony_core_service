@@ -258,7 +258,6 @@ public:
 
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
-
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetEid(int32_t slotId, std::u16string &eId) override;
 
@@ -292,6 +291,15 @@ public:
 
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const std::u16string &apduData,
         ResponseEsimResult &responseResult) override;
+
+    int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+        ResponseEsimResult &responseResult) override;
+
+    int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
+        ResponseEsimBppResult &responseResult) override;
+
+    int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
+        EuiccNotificationList &notificationList) override;
 #endif
 
 private:

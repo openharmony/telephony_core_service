@@ -84,6 +84,9 @@ public:
     ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
     bool IsEsimSupported();
     ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
+    ResponseEsimResult ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
+    ResponseEsimBppResult ObtainLoadBoundProfilePackage(int32_t portIndex, const std::u16string boundProfilePackage);
+    EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -131,6 +134,31 @@ private:
     bool ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::string &base64Src);
+    bool ProcessPrepareDownload(int32_t slotId);
+    bool ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode);
+    void BuildApduForInitSecureChannel(
+        RequestApduBuild& codec, std::shared_ptr<Asn1Node> &bppNode, std::shared_ptr<Asn1Node> &initSecureChannelReq);
+    void BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87);
+    void BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &sequenceOf88);
+    void BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &bppNode,
+        std::shared_ptr<Asn1Node> &sequenceOf86);
+    bool ProcessLoadBoundProfilePackage(int32_t slotId);
+    bool ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::Pointer &event);
+    std::shared_ptr<Asn1Node> LoadBoundProfilePackageParseProfileInstallResult(std::shared_ptr<Asn1Node> &root);
+    bool LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<Asn1Node> &notificationMetadata);
+    bool RealProcessLoadBoundProfilePackageDone(std::string combineHexStr);
+    bool ProcessListNotifications(
+        int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
+    bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
+    void SplitSendLongData(int32_t slotId, std::string hexStr);
+    bool MergeRecvLongDataComplete(IccFileData &fileData);
+    void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
+    bool CombineResponseDataFinish(IccFileData &fileData);
+    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -222,6 +250,18 @@ private:
     std::mutex sendApduDataMutex_;
     std::condition_variable sendApduDataCv_;
     bool isSendApduDataReady_ = false;
+
+    std::mutex prepareDownloadMutex_;
+    std::condition_variable prepareDownloadCv_;
+    bool isPrepareDownloadReady_ = false;
+
+    std::mutex loadBppMutex_;
+    std::condition_variable loadBppCv_;
+    bool isLoadBppReady_ = false;
+
+    std::mutex listNotificationsMutex_;
+    std::condition_variable listNotificationsCv_;
+    bool isListNotificationsReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

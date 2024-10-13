@@ -175,6 +175,12 @@ public:
     bool IsEsimSupported(int32_t slotId) override;
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const std::u16string &apduData,
         ResponseEsimResult &responseResult) override;
+    int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+        ResponseEsimResult &responseResult) override;
+    int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
+        ResponseEsimBppResult &responseResult) override;
+    int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
+        EuiccNotificationList &notificationList) override;
 #endif
 
 private:

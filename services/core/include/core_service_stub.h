@@ -159,6 +159,9 @@ private:
     int32_t OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsEsimSupported(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPrepareDownload(MessageParcel &data, MessageParcel &reply);
+    int32_t OnLoadBoundProfilePackage(MessageParcel &data, MessageParcel &reply);
+    int32_t OnListNotifications(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:
