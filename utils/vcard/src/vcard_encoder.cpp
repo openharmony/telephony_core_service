@@ -75,7 +75,7 @@ void VCardEncoder::ContructContact(std::shared_ptr<VCardContact> contact,
     while (rawResultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
         int32_t index = 0;
         int32_t rawContactId;
-        rawResultSet->GetColumnIndex(RawContact::CONTACT_ID, index);
+        rawResultSet->GetColumnIndex(RawContact::ID, index);
         rawResultSet->GetInt(index, rawContactId);
         std::vector<std::string> columns;
         DataShare::DataSharePredicates predicates;

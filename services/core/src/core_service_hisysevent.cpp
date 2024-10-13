@@ -22,6 +22,7 @@ namespace Telephony {
 // EVENT
 static constexpr const char *SIGNAL_LEVEL_EVENT = "SIGNAL_LEVEL";
 static constexpr const char *NETWORK_REGISTER_EVENT = "NETWORK_REGISTER";
+static constexpr const char *RADIO_STATE_CHANGE_EVENT = "RADIO_STATE_CHANGE";
 static constexpr const char *SET_DEFAULT_CELLULAR_DATA_EVENT = "SET_DEFAULT_CELLULAR_DATA";
 static constexpr const char *SIM_STATE_CHANGE_EVENT = "SIM_STATE_CHANGE";
 static constexpr const char *CALL_DIAL_FAILED_EVENT = "CALL_DIAL_FAILED";
@@ -65,6 +66,11 @@ void CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(int32_t slotId, int32
 {
     HiWriteBehaviorEvent(NETWORK_REGISTER_EVENT, SLOT_ID_KEY, slotId, NETWORK_DOMAIN_KEY, domain, NETWORK_TECH_KEY,
         tech, NETWORK_STATE_KEY, state);
+}
+
+void CoreServiceHiSysEvent::WriteRadioStateBehaviorEvent(int32_t slotId, int32_t state)
+{
+    HiWriteBehaviorEvent(RADIO_STATE_CHANGE_EVENT, SLOT_ID_KEY, slotId, STATE_KEY, state);
 }
 
 void CoreServiceHiSysEvent::WriteDefaultDataSlotIdBehaviorEvent(int32_t slotId)

@@ -36,6 +36,7 @@ class CoreServiceHiSysEvent : public TelephonyHiSysEvent {
 public:
     static void WriteSignalLevelBehaviorEvent(int32_t slotId, int32_t level);
     static void WriteNetworkStateBehaviorEvent(int32_t slotId, int32_t domain, int32_t tech, int32_t state);
+    static void WriteRadioStateBehaviorEvent(int32_t slotId, int32_t state);
     static void WriteDefaultDataSlotIdBehaviorEvent(int32_t slotId);
     static void WriteSimStateBehaviorEvent(int32_t slotId, int32_t state);
     static void WriteDialCallFaultEvent(int32_t slotId, int32_t errCode, const std::string &desc);

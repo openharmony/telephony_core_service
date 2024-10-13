@@ -103,6 +103,14 @@ napi_value GetNapiValue(napi_env env, T val)
     return result;
 }
 
+template<typename T, std::enable_if_t<std::is_same_v<T, uint32_t>, int32_t> = 0>
+napi_value GetNapiValue(napi_env env, T val)
+{
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_uint32(env, val, &result));
+    return result;
+}
+
 template<typename T, std::enable_if_t<std::is_same_v<T, int64_t>, int64_t> = 0>
 napi_value GetNapiValue(napi_env env, T val)
 {
@@ -149,6 +157,12 @@ napi_status NapiValueToCppValue(napi_env env, napi_value arg, napi_valuetype arg
         return NapiValueConverted(env, arg, val);
     }
     return napi_invalid_arg;
+}
+
+template<typename T, std::enable_if_t<std::is_same_v<T, bool>, int32_t> = 0>
+napi_valuetype GetInputArgvType(T *)
+{
+    return napi_boolean;
 }
 
 template<typename... Ts, size_t N>
