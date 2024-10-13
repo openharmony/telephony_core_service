@@ -1648,42 +1648,6 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     }
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-int32_t CoreService::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
-    ResponseEsimResult &responseResult)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
-        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return simManager_->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
-}
-
-int32_t CoreService::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
-    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
-        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return simManager_->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
-}
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::GetEid(int32_t slotId, std::u16string &eId)
