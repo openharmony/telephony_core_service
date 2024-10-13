@@ -1938,6 +1938,60 @@ int32_t CoreService::ListNotifications(
     }
     return simManager_->ListNotifications(slotId, portIndex, events, notificationList);
 }
+
+int32_t CoreService::RetrieveNotificationList(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotificationList simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->RetrieveNotificationList(slotId, portIndex, events, notificationList);
+}
+
+int32_t CoreService::RetrieveNotification(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotification simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->RetrieveNotification(slotId, portIndex, seqNumber, notification);
+}
+
+int32_t CoreService::RemoveNotificationFromList(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("RemoveNotificationFromList simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

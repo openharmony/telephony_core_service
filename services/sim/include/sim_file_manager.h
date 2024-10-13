@@ -110,6 +110,9 @@ public:
     ResponseEsimResult PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult LoadBoundProfilePackage(int32_t portIndex, const std::u16string &boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
+    EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
+    EuiccNotification RetrieveNotification(int32_t portIndex, int32_t seqNumber);
+    ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
 #endif
 
 protected:

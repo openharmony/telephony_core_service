@@ -180,6 +180,12 @@ public:
         const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult) = 0;
     virtual int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
         EuiccNotificationList &notificationList) = 0;
+    virtual int32_t RetrieveNotificationList(
+        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList) = 0;
+    virtual int32_t RetrieveNotification(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) = 0;
+    virtual int32_t RemoveNotificationFromList(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) = 0;
 #endif
 
 protected:

@@ -3900,6 +3900,145 @@ int32_t CoreServiceProxy::ListNotifications(
     }
     return result;
 }
+
+int32_t CoreServiceProxy::RetrieveNotificationList(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RetrieveNotificationList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("RetrieveNotificationList WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("RetrieveNotificationList WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(static_cast<int32_t>(events))) {
+        TELEPHONY_LOGE("RetrieveNotificationList WriteInt32 events is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotificationList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    int32_t requestResult =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION_LIST), data,
+        reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("RetrieveNotificationList sendRequest failed, errcode is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        uint32_t euiccNotificationCount = reply.ReadUint32();
+        if (euiccNotificationCount >= ESIM_MAX_SIZE) {
+            TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
+        notificationList.euiccNotification.resize(euiccNotificationCount);
+        for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
+            EuiccNotification &nf = notificationList.euiccNotification[i];
+            nf.seq = reply.ReadInt32();
+            nf.targetAddr = reply.ReadString16();
+            nf.event = reply.ReadInt32();
+            nf.data = reply.ReadString16();
+        }
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::RetrieveNotification(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RetrieveNotification WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("RetrieveNotification WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("RetrieveNotification WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(seqNumber)) {
+        TELEPHONY_LOGE("RetrieveNotification WriteInt32 seqNumber is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotification Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION),
+        data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("RetrieveNotification sendRequest failed, errcode is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t res = reply.ReadInt32();
+    if (res == TELEPHONY_ERR_SUCCESS) {
+        notification.seq = reply.ReadInt32();
+        notification.targetAddr = reply.ReadString16();
+        notification.event = reply.ReadInt32();
+        notification.data = reply.ReadString16();
+    }
+    return res;
+}
+
+int32_t CoreServiceProxy::RemoveNotificationFromList(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("RemoveNotificationFromList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("RemoveNotificationFromList WriteInt32 slotId is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(portIndex)) {
+        TELEPHONY_LOGE("RemoveNotificationFromList WriteInt32 portIndex is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(seqNumber)) {
+        TELEPHONY_LOGE("RemoveNotificationFromList WriteInt32 seqNumber is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("RemoveNotificationFromList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::REMOVE_NOTIFICATION),
+        data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("RemoveNotificationFromList sendRequest failed, errcode is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        enumResult = static_cast<ResultState>(reply.ReadInt32());
+    }
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

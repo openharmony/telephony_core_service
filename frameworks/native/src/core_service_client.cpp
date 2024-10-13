@@ -1263,6 +1263,39 @@ int32_t CoreServiceClient::ListNotifications(int32_t slotId, int32_t portIndex,
     }
     return proxy->ListNotifications(slotId, portIndex, events, notificationList);
 }
+
+int32_t CoreServiceClient::RetrieveNotificationList(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotificationList proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->RetrieveNotificationList(slotId, portIndex, events, notificationList);
+}
+
+int32_t CoreServiceClient::RetrieveNotification(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("RetrieveNotification proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->RetrieveNotification(slotId, portIndex, seqNumber, notification);
+}
+
+int32_t CoreServiceClient::RemoveNotificationFromList(
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("RemoveNotificationFromList proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

@@ -312,6 +312,12 @@ void CoreServiceStub::AddHandlerEsimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnLoadBoundProfilePackage(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LIST_NOTIFICATIONS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnListNotifications(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRetrieveNotificationList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::RETRIEVE_NOTIFICATION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRetrieveNotification(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::REMOVE_NOTIFICATION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveNotificationFromList(data, reply); };
 }
 #endif
 
@@ -2346,6 +2352,71 @@ int32_t CoreServiceStub::OnListNotifications(MessageParcel &data, MessageParcel 
     }
     if (!ret) {
         TELEPHONY_LOGE("OnListNotifications write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnRetrieveNotificationList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    Event events = static_cast<Event>(data.ReadInt32());
+    EuiccNotificationList notificationList;
+    int32_t result = RetrieveNotificationList(slotId, portIndex, events, notificationList);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteUint32(notificationList.euiccNotification.size()));
+        for (const auto &notification : notificationList.euiccNotification) {
+            ret = (ret && reply.WriteInt32(notification.seq));
+            ret = (ret && reply.WriteString16(notification.targetAddr));
+            ret = (ret && reply.WriteInt32(notification.event));
+            ret = (ret && reply.WriteString16(notification.data));
+        }
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRetrieveNotificationList write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnRetrieveNotification(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    int32_t seqNumber = data.ReadInt32();
+
+    EuiccNotification notification;
+    int32_t result = RetrieveNotification(slotId, portIndex, seqNumber, notification);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(notification.seq));
+        ret = (ret && reply.WriteString16(notification.targetAddr));
+        ret = (ret && reply.WriteInt32(notification.event));
+        ret = (ret && reply.WriteString16(notification.data));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRetrieveNotification write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnRemoveNotificationFromList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t portIndex = data.ReadInt32();
+    int32_t seqNumber = data.ReadInt32();
+
+    ResultState enumResult;
+    int32_t result = RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoveNotificationFromList write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;

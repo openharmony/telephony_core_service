@@ -181,6 +181,12 @@ public:
         ResponseEsimBppResult &responseResult) override;
     int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
         EuiccNotificationList &notificationList) override;
+    int32_t RetrieveNotificationList(
+        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList) override;
+    int32_t RetrieveNotification(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) override;
+    int32_t RemoveNotificationFromList(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) override;
 #endif
 
 private:
