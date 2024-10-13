@@ -2407,7 +2407,7 @@ bool EsimFile::ProcessRemoveNotification(int32_t slotId, const AppExecFwk::Inner
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("telRilManager_ is nullptr");
+        TELEPHONY_LOGE("telRilManager is nullptr");
         return false;
     }
     int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
