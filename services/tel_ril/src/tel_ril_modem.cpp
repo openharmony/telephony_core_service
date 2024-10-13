@@ -140,15 +140,17 @@ int32_t TelRilModem::OnRilAdapterHostDied()
 int32_t TelRilModem::RadioStateUpdated(int32_t state)
 {
     radioState_ = static_cast<ModemPowerState>(state);
-    AAFwk::Want want;
-    want.SetParam("slotId", slotId_);
-    want.SetParam("radioState", state);
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
-    EventFwk::CommonEventData commonEventData;
-    commonEventData.SetWant(want);
-    EventFwk::CommonEventPublishInfo publishInfo;
-    bool result = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
-    TELEPHONY_LOGD("publish modem subscribed event result : %{public}d", result);
+    TelFFRTUtils::Submit([=]() {
+        AAFwk::Want want;
+        want.SetParam("slotId", slotId_);
+        want.SetParam("radioState", state);
+        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
+        EventFwk::CommonEventData commonEventData;
+        commonEventData.SetWant(want);
+        EventFwk::CommonEventPublishInfo publishInfo;
+        bool result = EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
+        TELEPHONY_LOGD("publish modem subscribed event result : %{public}d", result);
+    });
     return Notify<Int32Parcel>(
         TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_STATE_CHANGED);
 }

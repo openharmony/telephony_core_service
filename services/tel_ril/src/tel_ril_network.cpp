@@ -226,6 +226,7 @@ int32_t TelRilNetwork::GetCsRegStatusResponse(
         std::shared_ptr<CsRegStatusInfo> regStatusInfo = std::make_shared<CsRegStatusInfo>();
         this->BuildCsRegStatusInfo(regStatusInfo, csRegStatusInfo);
         regStatusInfo->flag = telRilRequest->pointer_->GetParam();
+        Notify<CsRegStatusInfo>(TELEPHONY_LOG_FUNC_NAME, regStatusInfo, RadioEvent::RADIO_VOICE_REG_STATE);
         return regStatusInfo;
     };
     return Response<CsRegStatusInfo>(TELEPHONY_LOG_FUNC_NAME, responseInfo, getDataFunc);

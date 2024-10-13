@@ -38,6 +38,9 @@ std::string SimFileController::ObtainElementFilePath(int efId)
         case ELEMENTARY_FILE_SPN:
         case ELEMENTARY_FILE_AD:
         case ELEMENTARY_FILE_PNN:
+        case ELEMENTARY_FILE_OPL:
+            mf.append(DEDICATED_FILE_GSM);
+            return mf;
         case ELEMENTARY_FILE_MBDN:
         case ELEMENTARY_FILE_EXT6:
         case ELEMENTARY_FILE_MBI:

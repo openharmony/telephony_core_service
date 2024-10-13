@@ -62,6 +62,7 @@ public:
     typedef void (*GET_NR_OPTION_MODE_EXT)(int32_t slotId, int32_t &mode);
     typedef void (*GET_NR_OPTION_MODE_EXTEND)(int32_t slotId, OHOS::Telephony::NrMode &mode);
     typedef void (*GET_PREFERRED_NETWORK_EXT)(int32_t &preferredNetworkType);
+    typedef bool (*IS_CHIPSET_NETWORK_EXT_SUPPORTED)();
     typedef bool (*IS_NR_SUPPORTED_NATIVE)(int32_t modemRaf);
     typedef void (*GET_SIGNAL_INFO_LIST_EXT)(int32_t slotId,
 	    std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
@@ -123,6 +124,7 @@ public:
     GET_NR_OPTION_MODE_EXT getNrOptionModeExt_ = nullptr;
     GET_NR_OPTION_MODE_EXTEND getNrOptionModeExtend_ = nullptr;
     GET_PREFERRED_NETWORK_EXT getPreferredNetworkExt_ = nullptr;
+    IS_CHIPSET_NETWORK_EXT_SUPPORTED isChipsetNetworkExtSupported_ = nullptr;
     IS_NR_SUPPORTED_NATIVE isNrSupportedNative_ = nullptr;
     GET_SIGNAL_INFO_LIST_EXT getSignalInfoListExt_ = nullptr;
     GET_NETWORK_CAPABILITY_EXT getNetworkCapabilityExt_ = nullptr;

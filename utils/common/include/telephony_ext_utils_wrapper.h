@@ -28,8 +28,8 @@ DECLARE_DELAYED_REF_SINGLETON(TelephonyExtUtilsWrapper);
 public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtUtilsWrapper);
     void InitTelephonyExtUtilsWrapper();
-    typedef void (*IS_NR_SUPPORTED)(bool &isNrSupported);
-    IS_NR_SUPPORTED isNrSupported_ = nullptr;
+    typedef bool (*IsChipsetNrSupported)();
+    IsChipsetNrSupported isChipsetNrSupported_ = nullptr;
 
 private:
     void* telephonyExtUtilsWrapperHandle_ = nullptr;
