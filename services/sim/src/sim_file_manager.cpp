@@ -143,6 +143,9 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
             iccFileCache_.insert(std::make_pair(SimFileManager::IccType::ICC_TYPE_GSM, simFile_));
         }
         if (simFile_ != nullptr) {
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+            eSimFile_ = std::make_shared<EsimFile>(simStateManager_.lock());
+#endif
             simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
     } else {
@@ -153,6 +156,10 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
         TELEPHONY_LOGE("SimFileManager::Init simFile create nullptr.");
         return false;
     }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    eSimFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
+#endif
     simFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
     simFile_->SetId(slotId_);
     simFile_->Init();
@@ -984,6 +991,180 @@ void SimFileManager::ClearData()
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+std::shared_ptr<EsimFile> SimFileManager::GetEsimfile()
+{
+    return eSimFile_;
+}
+
+std::u16string SimFileManager::GetEid()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainEid();
+    return Str8ToStr16(result);
+}
+
+GetEuiccProfileInfoListResult SimFileManager::GetEuiccProfileInfoList()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return GetEuiccProfileInfoListResult();
+    }
+    return eSimFile_->GetEuiccProfileInfoList();
+}
+
+EuiccInfo SimFileManager::GetEuiccInfo()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile is nullptr");
+        return EuiccInfo();
+    }
+    return eSimFile_->GetEuiccInfo();
+}
+
+ResultState SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &iccId)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState enumResult = eSimFile_->DisableProfile(portIndex, iccId);
+    return enumResult;
+}
+
+std::u16string SimFileManager::GetSmdsAddress(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainSmdsAddress(portIndex);
+    return Str8ToStr16(result);
+}
+
+EuiccRulesAuthTable SimFileManager::GetRulesAuthTable(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return EuiccRulesAuthTable();
+    }
+    EuiccRulesAuthTable result = eSimFile_->ObtainRulesAuthTable(portIndex);
+    return result;
+}
+
+ResponseEsimResult SimFileManager::GetEuiccChallenge(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->ObtainEuiccChallenge(portIndex);
+    return result;
+}
+
+std::u16string SimFileManager::GetDefaultSmdpAddress()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return Str8ToStr16("");
+    }
+    std::string result = eSimFile_->ObtainDefaultSmdpAddress();
+    return Str8ToStr16(result);
+}
+
+ResponseEsimResult SimFileManager::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->CancelSession(transactionId, cancelReason);
+    return result;
+}
+
+EuiccProfile SimFileManager::GetProfile(int32_t portIndex, const std::u16string &iccId)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return EuiccProfile();
+    }
+    EuiccProfile result = eSimFile_->ObtainProfile(portIndex, iccId);
+    return result;
+}
+
+ResultState SimFileManager::ResetMemory(ResetOption resetOption)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState result = eSimFile_->ResetMemory(resetOption);
+    return result;
+}
+
+ResultState SimFileManager::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResultState::RESULT_UNDEFINED_ERROR;
+    }
+    ResultState result = eSimFile_->SetDefaultSmdpAddress(defaultSmdpAddress);
+    return result;
+}
+
+bool SimFileManager::IsEsimSupported()
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return false;
+    }
+    bool result = eSimFile_->IsEsimSupported();
+    return result;
+}
+
+ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const std::u16string &apduData)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->SendApduData(aid, apduData);
+    return result;
+}
+
+ResponseEsimResult SimFileManager::PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(downLoadConfigInfo);
+    return result;
+}
+
+ResponseEsimBppResult SimFileManager::LoadBoundProfilePackage(
+    int32_t portIndex, const std::u16string &boundProfilePackage)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return ResponseEsimBppResult();
+    }
+    ResponseEsimBppResult result = eSimFile_->ObtainLoadBoundProfilePackage(portIndex, boundProfilePackage);
+    return result;
+}
+
+EuiccNotificationList SimFileManager::ListNotifications(int32_t portIndex, Event events)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("eSimFile is nullptr");
+        return EuiccNotificationList();
+    }
+    EuiccNotificationList result = eSimFile_->ListNotifications(portIndex, events);
+    return result;
+}
+
 EuiccNotificationList SimFileManager::RetrieveNotificationList(int32_t portIndex, Event events)
 {
     if (eSimFile_ == nullptr) {
