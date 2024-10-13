@@ -1180,7 +1180,7 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
 bool EsimFile::ProcessObtainDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
+        TELEPHONY_LOGE("event is nullptr");
         return false;
     }
     std::shared_ptr<Asn1Node> root = ParseEvent(event);
