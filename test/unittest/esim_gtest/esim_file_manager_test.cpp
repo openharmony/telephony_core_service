@@ -306,5 +306,67 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
     res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
 }
+
+HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = u"";
+    ResponseEsimResult res = simFileManager.PrepareDownload(downLoadConfigInfo);
+    EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
+    
+    simFileManager.eSimFile_ = nullptr;
+    res = simFileManager.PrepareDownload(downLoadConfigInfo);
+    EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
+}
+
+HWTEST_F(EsimFileManagerTest, LoadBoundProfilePackage_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    std::u16string boundProfilePackage = u"";
+    ResponseEsimBppResult res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
+    EXPECT_EQ(res.resultCode, 0);
+    simFileManager.eSimFile_ = nullptr;
+    res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
+    EXPECT_EQ(res.resultCode, 0);
+}
+
+HWTEST_F(EsimFileManagerTest, ListNotifications_001, Function | MediumTest | Level2)
+{
+    std::string expectedEid = "12345";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+    simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
+    int32_t portIndex = 0;
+    Event events = Event::EVENT_DONOTHING;
+    EuiccNotificationList lst = simFileManager.ListNotifications(portIndex, events);
+    EXPECT_EQ(lst.euiccNotification.empty(), true);
+    simFileManager.eSimFile_ = nullptr;
+    lst = simFileManager.ListNotifications(portIndex, events);
+    EXPECT_EQ(lst.euiccNotification.empty(), true);
+}
 } // namespace Telephony
 } // namespace OHOS

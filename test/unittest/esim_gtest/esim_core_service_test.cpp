@@ -245,5 +245,52 @@ HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
     EXPECT_EQ(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(EsimCoreServiceTest, PrepareDownload_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    DownLoadConfigInfo downLoadConfigInfo;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    EXPECT_NE(mCoreService->PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, LoadBoundProfilePackage_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string boundProfilePackage = Str8ToStr16("0");
+    ResponseEsimBppResult responseResult;
+    EXPECT_NE(mCoreService->LoadBoundProfilePackage(
+        slotId, portIndex, boundProfilePackage, responseResult), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->LoadBoundProfilePackage(
+        slotId, portIndex, boundProfilePackage, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, ListNotifications_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList1;
+    EXPECT_NE(mCoreService->ListNotifications(
+        slotId, portIndex, events, notificationList1), TELEPHONY_ERR_SUCCESS);
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->ListNotifications(
+        slotId, portIndex, events, notificationList1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS

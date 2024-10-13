@@ -200,5 +200,40 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SendApduData_0100, Function | MediumTe
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
+
+HWTEST_F(EsimCoreServiceClientBranchTest, PrepareDownload_0100, Function | MediumTest | Level1)
+{
+    DownLoadConfigInfo downLoadConfigInfo;
+    int32_t slotId = 0;
+    downLoadConfigInfo.portIndex = 0;
+    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, downLoadConfigInfo, responseResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, LoadBoundProfilePackage_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    std::u16string boundProfilePackage = Str8ToStr16("0");
+    ResponseEsimBppResult responseResult;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().LoadBoundProfilePackage(
+        slotId, portIndex, boundProfilePackage, responseResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, ListNotifications_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList1;
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().ListNotifications(slotId, portIndex, events, notificationList1);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS

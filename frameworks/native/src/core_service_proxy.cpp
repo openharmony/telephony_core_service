@@ -3767,6 +3767,139 @@ int32_t CoreServiceProxy::SendApduData(
     }
     return result;
 }
+
+int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+    ResponseEsimResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    bool ret = data.WriteInt32(slotId);
+    ret = (ret && data.WriteInt32(downLoadConfigInfo.portIndex));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.hashCc));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSigned2));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSignature2));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpCertificate));
+    if (!ret) {
+        TELEPHONY_LOGE("Write data false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::PREPARE_DOWNLOAD),
+        data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("PrepareDownload sendRequest failed, error code is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
+    const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    bool ret = data.WriteInt32(slotId);
+    ret = (ret && data.WriteInt32(portIndex));
+    ret = (ret && data.WriteString16(boundProfilePackage));
+    if (!ret) {
+        TELEPHONY_LOGE("Write data is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult =
+        remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE), data,
+        reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("LoadBoundProfilePackage sendRequest failed, errcode is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        responseResult.resultCode = reply.ReadInt32();
+        responseResult.response = reply.ReadString16();
+        responseResult.seqNumber = reply.ReadInt32();
+        responseResult.profileManagementOperation = reply.ReadInt32();
+        responseResult.notificationAddress = reply.ReadString16();
+        responseResult.iccId = reply.ReadString16();
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::ListNotifications(
+    int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    bool ret = data.WriteInt32(slotId);
+    ret = (ret && data.WriteInt32(portIndex));
+    ret = (ret && data.WriteInt32(static_cast<int32_t>(events)));
+    if (!ret) {
+        TELEPHONY_LOGE("Write data is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::LIST_NOTIFICATIONS),
+        data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("ListNotifications sendRequest failed, error code is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        uint32_t euiccNotificationCount = reply.ReadUint32();
+        if (euiccNotificationCount >= ESIM_MAX_SIZE) {
+            TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
+            return TELEPHONY_ERR_READ_DATA_FAIL;
+        }
+        notificationList.euiccNotification.resize(euiccNotificationCount);
+        for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
+            EuiccNotification &nf = notificationList.euiccNotification[i];
+            nf.seq = reply.ReadInt32();
+            nf.targetAddr = reply.ReadString16();
+            nf.event = reply.ReadInt32();
+            nf.data = reply.ReadString16();
+        }
+    }
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

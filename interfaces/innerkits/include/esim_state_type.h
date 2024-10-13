@@ -159,6 +159,18 @@ struct EuiccRulesAuthTable {
 };
 
 /**
+ * @brief ConfigInfo about prepareDownload.
+ */
+struct DownLoadConfigInfo {
+    int32_t portIndex = 0;
+    std::u16string hashCc = u"";
+    std::u16string smdpSigned2 = u"";
+    std::u16string smdpSignature2 = u"";
+    std::u16string smdpCertificate = u"";
+};
+
+/**
+ * @brief Result of a operation.
  * @brief Result of a bpp operation.
  */
 struct ResponseEsimBppResult {
