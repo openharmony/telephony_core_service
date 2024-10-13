@@ -1103,6 +1103,41 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList);
+
+    /**
+     * @brief  Retrieves contents of all notification of the given.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param events[in], events bits of the event types
+     * @param notificationList[out], get the result code and the list of notifications
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t RetrieveNotificationList(
+        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList);
+
+    /**
+     * @brief Retrieves the content of a notification of the given.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param seqNumber[in], the sequence number of the notification
+     * @param notification[out], get the result code and the notification
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t RetrieveNotification(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification);
+
+    /**
+     * @brief Removes a notification from eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param seqNumber[in], the sequence number of the notification
+     * @param enumResult[out], get the result code
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t RemoveNotificationFromList(int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult);
 #endif
 
 private:

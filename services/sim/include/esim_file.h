@@ -87,6 +87,9 @@ public:
     ResponseEsimResult ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult ObtainLoadBoundProfilePackage(int32_t portIndex, const std::u16string boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
+    EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
+    EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
+    ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
@@ -159,6 +162,16 @@ private:
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
     bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
+    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc);
+    bool ProcessRetrieveNotificationList(
+        int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root);
+    bool ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &root);
+    bool ProcessRemoveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -262,6 +275,18 @@ private:
     std::mutex listNotificationsMutex_;
     std::condition_variable listNotificationsCv_;
     bool isListNotificationsReady_ = false;
+
+    std::mutex retrieveNotificationListMutex_;
+    std::condition_variable retrieveNotificationListCv_;
+    bool isRetrieveNotificationListReady_ = false;
+
+    std::mutex retrieveNotificationMutex_;
+    std::condition_variable retrieveNotificationCv_;
+    bool isRetrieveNotificationReady_ = false;
+
+    std::mutex removeNotificationMutex_;
+    std::condition_variable removeNotificationCv_;
+    bool isRemoveNotificationReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

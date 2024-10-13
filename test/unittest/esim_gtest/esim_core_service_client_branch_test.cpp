@@ -235,5 +235,43 @@ HWTEST_F(EsimCoreServiceClientBranchTest, ListNotifications_0100, Function | Med
     int32_t result = CoreServiceClient::GetInstance().ListNotifications(slotId, portIndex, events, notificationList1);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
+
+HWTEST_F(EsimCoreServiceClientBranchTest, RetrieveNotificationList_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList;
+
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().RetrieveNotificationList(slotId, portIndex,
+        events, notificationList);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, RetrieveNotification_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().RetrieveNotification(slotId, portIndex, seqNumber, notification);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceClientBranchTest, RemoveNotificationFromList_0100, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState enumResult;
+
+    EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t result = CoreServiceClient::GetInstance().RemoveNotificationFromList(slotId, portIndex,
+        seqNumber, enumResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS

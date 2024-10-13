@@ -292,5 +292,56 @@ HWTEST_F(EsimCoreServiceTest, ListNotifications_0001, Function | MediumTest | Le
     EXPECT_EQ(mCoreService->ListNotifications(
         slotId, portIndex, events, notificationList1), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(EsimCoreServiceTest, RetrieveNotificationList_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList;
+    EXPECT_NE(mCoreService->RetrieveNotificationList(
+        slotId, portIndex, events, notificationList), TELEPHONY_ERR_SUCCESS);
+
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->RetrieveNotificationList(
+        slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, RetrieveNotification_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+    EXPECT_NE(mCoreService->RetrieveNotification(
+        slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_SUCCESS);
+
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->RetrieveNotification(
+        slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(EsimCoreServiceTest, RemoveNotificationFromList_0001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState removeNotifFromListResult;
+    EXPECT_NE(mCoreService->RemoveNotificationFromList(
+        slotId, portIndex, seqNumber, removeNotifFromListResult), TELEPHONY_ERR_SUCCESS);
+
+    mCoreService->simManager_ = nullptr;
+    EXPECT_EQ(mCoreService->RemoveNotificationFromList(
+        slotId, portIndex, seqNumber, removeNotifFromListResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS

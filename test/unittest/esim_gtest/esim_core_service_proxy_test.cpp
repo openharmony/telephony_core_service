@@ -671,5 +671,107 @@ HWTEST_F(EsimCoreServiceProxyTest, ListNotifications_003, Function | MediumTest 
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     EXPECT_EQ(proxy.ListNotifications(SLOT_ID, portIndex, events, notificationList), 0);
 }
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotificationList_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DISABLE;
+    EuiccNotificationList notificationList;
+    EXPECT_EQ(proxy.RetrieveNotificationList(SLOT_ID, portIndex, events, notificationList),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotificationList_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DISABLE;
+    EuiccNotificationList notificationList;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    EXPECT_EQ(proxy.RetrieveNotificationList(SLOT_ID, portIndex, events, notificationList),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotificationList_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DISABLE;
+    EuiccNotificationList notificationList;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    EXPECT_EQ(proxy.RetrieveNotificationList(SLOT_ID, portIndex, events, notificationList), 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotification_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+    EXPECT_EQ(proxy.RetrieveNotification(SLOT_ID, portIndex, seqNumber, notification),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotification_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    EXPECT_EQ(proxy.RetrieveNotification(SLOT_ID, portIndex, seqNumber, notification),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RetrieveNotification_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    EXPECT_EQ(proxy.RetrieveNotification(SLOT_ID, portIndex, seqNumber, notification), 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RemoveNotificationFromList_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState enumResult;
+    EXPECT_EQ(proxy.RemoveNotificationFromList(SLOT_ID, portIndex, seqNumber, enumResult),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RemoveNotificationFromList_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState enumResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    EXPECT_EQ(proxy.RemoveNotificationFromList(SLOT_ID, portIndex, seqNumber, enumResult),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, RemoveNotificationFromList_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState enumResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    EXPECT_EQ(proxy.RemoveNotificationFromList(SLOT_ID, portIndex, seqNumber, enumResult), 0);
+}
 } // namespace Telephony
 } // namespace OHOS

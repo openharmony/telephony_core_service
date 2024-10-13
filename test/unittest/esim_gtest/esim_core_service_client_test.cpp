@@ -208,5 +208,37 @@ HWTEST_F(EsimCoreServiceClientTest, ListNotifications_0001, Function | MediumTes
         slotId, portIndex, events, notificationList1);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
+
+HWTEST_F(EsimCoreServiceClientTest, RetrieveNotificationList_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    const Event events = Event::EVENT_DELETE;
+    EuiccNotificationList notificationList;
+    int32_t result = CoreServiceClient::GetInstance().RetrieveNotificationList(
+        slotId, portIndex, events, notificationList);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, RetrieveNotification_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    EuiccNotification notification;
+    int32_t result = CoreServiceClient::GetInstance().RetrieveNotification(slotId, portIndex, seqNumber, notification);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceClientTest, RemoveNotificationFromList_0001, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t portIndex = 0;
+    int32_t seqNumber = 5;
+    ResultState enumResult;
+    int32_t result = CoreServiceClient::GetInstance().RemoveNotificationFromList(
+        slotId, portIndex, seqNumber, enumResult);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS
