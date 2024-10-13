@@ -65,6 +65,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     getNrOptionModeExt_ = (GET_NR_OPTION_MODE_EXT)dlsym(telephonyExtWrapperHandle_, "GetNrOptionModeExt");
     getNrOptionModeExtend_ = (GET_NR_OPTION_MODE_EXTEND)dlsym(telephonyExtWrapperHandle_, "GetNrOptionModeExtend");
     getPreferredNetworkExt_ = (GET_PREFERRED_NETWORK_EXT)dlsym(telephonyExtWrapperHandle_, "GetPreferredNetworkExt");
+    isChipsetNetworkExtSupported_ = (IS_CHIPSET_NETWORK_EXT_SUPPORTED)dlsym(telephonyExtWrapperHandle_,
+        "IsChipsetNetworkExtSupported");
     isNrSupportedNative_ = (IS_NR_SUPPORTED_NATIVE)dlsym(telephonyExtWrapperHandle_, "IsNrSupportedNativeExt");
     getSignalInfoListExt_ = (GET_SIGNAL_INFO_LIST_EXT)dlsym(telephonyExtWrapperHandle_, "GetSignalInfoListExt");
     getNetworkCapabilityExt_ = (GET_NETWORK_CAPABILITY_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkCapabilityExt");
@@ -75,7 +77,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
         getRadioTechExt_ == nullptr || getNrOptionModeExt_ == nullptr || getSignalInfoListExt_ == nullptr ||
         getNetworkCapabilityExt_ == nullptr || onGetNetworkSearchInformationExt_ == nullptr ||
         getNetworkStatusExt_ == nullptr || isNrSupportedNative_ == nullptr ||
-        getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr) {
+        getNrOptionModeExtend_ == nullptr || getPreferredNetworkExt_ == nullptr ||
+        isChipsetNetworkExtSupported_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
     updateCountryCodeExt_ = (UPDATE_COUNTRY_CODE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateCountryCodeExt");
@@ -99,11 +102,6 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     }
     processStateChangeExt_ = (PROCESS_STATE_CHANGE_EXT)dlsym(telephonyExtWrapperHandle_, "ProcessStateChangeExt");
     if (processStateChangeExt_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
-    }
-    publishSpnInfoChangedExt_ = (PUBLISH_SPN_INFO_CHANGED_EXT)dlsym(telephonyExtWrapperHandle_,
-        "PublishSpnInfoChangedExt");
-    if (publishSpnInfoChangedExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 }
@@ -146,6 +144,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
 {
     updateNetworkStateExt_ = (UPDATE_NETWORK_STATE_EXT)dlsym(telephonyExtWrapperHandle_, "UpdateNetworkStateExt");
     if (updateNetworkStateExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    publishSpnInfoChangedExt_ = (PUBLISH_SPN_INFO_CHANGED_EXT)dlsym(telephonyExtWrapperHandle_,
+        "PublishSpnInfoChangedExt");
+    if (publishSpnInfoChangedExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
     InitTelephonyExtWrapperForApnCust();

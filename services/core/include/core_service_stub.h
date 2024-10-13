@@ -38,6 +38,9 @@ private:
     void AddHandlerVoiceMailToMap();
     void AddHandlerPdpProfileToMap();
     void AddHandlerOpkeyVersionToMap();
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    void AddHandlerEsimToMap();
+#endif
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -142,6 +145,29 @@ private:
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t OnGetEid(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccProfileInfoList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDisableProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSmdsAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetRulesAuthTable(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccChallenge(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRequestDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCancelSession(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnResetMemory(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsEsimSupported(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPrepareDownload(MessageParcel &data, MessageParcel &reply);
+    int32_t OnLoadBoundProfilePackage(MessageParcel &data, MessageParcel &reply);
+    int32_t OnListNotifications(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRetrieveNotificationList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRetrieveNotification(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRemoveNotificationFromList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDeleteProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSwitchToProfile(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetProfileNickname(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetEuiccInfo2(MessageParcel &data, MessageParcel &reply);
     int32_t OnAuthenticateServer(MessageParcel &data, MessageParcel &reply);
 #endif
