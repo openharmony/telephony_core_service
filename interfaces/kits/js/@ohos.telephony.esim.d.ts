@@ -34,12 +34,6 @@ declare namespace esim {
    *
    * @param { number } slotId - Indicates the card slot index number.
    * @returns { boolean } Returns {@code true} if the eSIM capability is supported; returns {@code false} otherwise.
-   * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
-   * 2. Incorrect parameter types.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Service connection failed.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300999 - Unknown error.
    * @syscap SystemCapability.Telephony.CoreService
    * @since 14
    */
@@ -50,7 +44,7 @@ declare namespace esim {
    *
    * @permission ohos.permission.GET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { string } Returns the EID identifying the eUICC hardware.
+   * @returns { string } Returns the EID. When eUICC is not ready, the return value may be null.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
@@ -70,7 +64,7 @@ declare namespace esim {
    * 
    * @permission ohos.permission.GET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { Promise<OsuStatus> } Return the status of eUICC OSU update.
+   * @returns { Promise<OsuStatus> } Return the status of eUICC OS upgrade.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
@@ -90,7 +84,7 @@ declare namespace esim {
    * 
    * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { Promise<ResultState> } Return the status of OSU update when OSU status changed.
+   * @returns { Promise<ResultState> } Return the status of OS upgrade when OSU status changed.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
@@ -209,7 +203,8 @@ declare namespace esim {
    *
    * @permission ohos.permission.GET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { Promise<EuiccInfo> } Returns the eUICC information to obtain.
+   * @returns { Promise<EuiccInfo> } Returns the eUICC information to obtain. When eUICC is not ready,
+   * the return value may be null.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
