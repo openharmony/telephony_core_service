@@ -128,6 +128,8 @@ constexpr const char *KEY_VOICE_MAIL_TAG_STRING = "voice_mail_tag_string";
  */
 constexpr const char *KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL = "voice_mail_edit_not_to_sim_bool";
 
+constexpr const char *KEY_NR_MODE_SUPPORTED_INT = "nr_mode_supported_int";
+
 struct OperatorConfig : public Parcelable {
     std::map<std::u16string, std::u16string> configValue {};
     std::map<std::string, std::string> stringValue {};
