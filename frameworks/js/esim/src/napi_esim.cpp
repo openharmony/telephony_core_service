@@ -187,7 +187,7 @@ napi_value DownloadProfileResultConversion(napi_env env, const DownloadProfileRe
     napi_value val = nullptr;
     napi_create_object(env, &val);
     SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.result_));
-    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(resultInfo.resolvableErrors_));
+    SetPropertyToNapiObject(env, val, "solvableErrors", static_cast<int32_t>(resultInfo.resolvableErrors_));
     SetPropertyToNapiObject(env, val, "cardId", resultInfo.cardId_);
 
     return val;
@@ -208,7 +208,7 @@ napi_value ProfileInfoConversion(napi_env env, const DownloadableProfile &profil
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "encodedActivationCode", NapiUtil::ToUtf8(profileInfo.encodedActivationCode_));
+    SetPropertyToNapiObject(env, val, "activationCode", NapiUtil::ToUtf8(profileInfo.encodedActivationCode_));
     SetPropertyToNapiObject(env, val, "confirmationCode", NapiUtil::ToUtf8(profileInfo.confirmationCode_));
     SetPropertyToNapiObject(env, val, "carrierName", NapiUtil::ToUtf8(profileInfo.carrierName_));
     napi_value resultArray = nullptr;
@@ -244,7 +244,7 @@ napi_value MetadataResultConversion(napi_env env, const GetDownloadableProfileMe
     napi_create_object(env, &val);
     SetPropertyToNapiObject(env, val, "pprType", metadataInfo.pprType_);
     SetPropertyToNapiObject(env, val, "pprFlag", metadataInfo.pprFlag_);
-    SetPropertyToNapiObject(env, val, "resolvableErrors", static_cast<int32_t>(metadataInfo.resolvableErrors_));
+    SetPropertyToNapiObject(env, val, "solvableErrors", static_cast<int32_t>(metadataInfo.resolvableErrors_));
     SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(metadataInfo.result_));
     napi_value res = ProfileInfoConversion(env, metadataInfo.downloadableProfiles_);
     napi_set_named_property(env, val, "downloadableProfile", res);
@@ -328,7 +328,7 @@ AccessRule GetAccessRuleInfo(AsyncAccessRule &accessType)
 DownloadableProfile GetProfileInfo(AsyncDownloadableProfile &profileInfo)
 {
     DownloadableProfile profile;
-    profile.encodedActivationCode_ = NapiUtil::ToUtf16(profileInfo.encodedActivationCode.data());
+    profile.encodedActivationCode_ = NapiUtil::ToUtf16(profileInfo.activationCode.data());
     profile.confirmationCode_ = NapiUtil::ToUtf16(profileInfo.confirmationCode.data());
     profile.carrierName_ = NapiUtil::ToUtf16(profileInfo.carrierName.data());
 
@@ -364,11 +364,11 @@ void AccessRuleInfoAnalyze(napi_env env, napi_value arg, AsyncAccessRule &access
 
 void ProfileInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadableProfile &profileInfo)
 {
-    napi_value activateState = NapiUtil::GetNamedProperty(env, arg, "encodedActivationCode");
+    napi_value activateState = NapiUtil::GetNamedProperty(env, arg, "activationCode");
     if (activateState) {
         char activationStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, activateState, napi_string, activationStr);
-        profileInfo.encodedActivationCode = std::string(activationStr);
+        profileInfo.activationCode = std::string(activationStr);
     }
 
     napi_value confirmState = NapiUtil::GetNamedProperty(env, arg, "confirmationCode");
@@ -640,7 +640,7 @@ void NativeSwitchToProfile(napi_env env, void *data)
     int32_t result = UNDEFINED_VALUE;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SwitchToProfile(
         asyncContext.slotId, profileContext->portIndex, profileContext->iccid,
-        profileContext->forceDeactivateSim, result);
+        profileContext->forceDisableProfile, result);
     TELEPHONY_LOGI("NAPI NativeSwitchToProfile %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         asyncContext.callbackVal = result;
@@ -673,7 +673,7 @@ napi_value SwitchToProfile(napi_env env, napi_callback_info info)
 
     char iccIdStr[ARRAY_SIZE] = {0};
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        iccIdStr, &profileContext->forceDeactivateSim, &context.callbackRef);
+        iccIdStr, &profileContext->forceDisableProfile, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "SwitchToProfile",
@@ -842,7 +842,7 @@ void NativeDownloadProfile(napi_env env, void *data)
     DownloadProfileConfigInfo configInfo;
     configInfo.portIndex_ = profileContext->portIndex;
     configInfo.isSwitchAfterDownload_ = profileContext->switchAfterDownload;
-    configInfo.isForceDeactivateSim_ = profileContext->forceDeactivateSim;
+    configInfo.isForceDeactivateSim_ = profileContext->forceDisableProfile;
     DownloadableProfile profile = GetProfileInfo(profileContext->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
         profileContext->asyncContext.slotId, configInfo, profile, result);
@@ -881,7 +881,7 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
     BaseContext &context = profileContext->asyncContext.context;
     napi_value object = NapiUtil::CreateUndefined(env);
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        &object, &profileContext->switchAfterDownload, &profileContext->forceDeactivateSim,
+        &object, &profileContext->switchAfterDownload, &profileContext->forceDisableProfile,
         &context.callbackRef);
 
     AsyncPara para {
@@ -913,7 +913,7 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
 
     GetDownloadableProfilesResult result;
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfiles(
-        profileContext->asyncContext.slotId, profileContext->portIndex, profileContext->forceDeactivateSim, result);
+        profileContext->asyncContext.slotId, profileContext->portIndex, profileContext->forceDisableProfile, result);
     TELEPHONY_LOGI("NAPI NativeGetDownloadableProfiles %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         profileContext->result = result;
@@ -949,7 +949,7 @@ napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
     BaseContext &context = profileContext->asyncContext.context;
 
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        &profileContext->forceDeactivateSim, &context.callbackRef);
+        &profileContext->forceDisableProfile, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "GetDownloadableProfiles",
@@ -1197,7 +1197,7 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     GetDownloadableProfileMetadataResult result;
     DownloadableProfile profile = GetProfileInfo(metadata->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfileMetadata(
-        metadata->asyncContext.slotId, metadata->portIndex, profile, metadata->forceDeactivateSim, result);
+        metadata->asyncContext.slotId, metadata->portIndex, profile, metadata->forceDisableProfile, result);
     TELEPHONY_LOGI("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
         metadata->result = result;
@@ -1233,7 +1233,7 @@ napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
     BaseContext &context = metadata->asyncContext.context;
     napi_value object = NapiUtil::CreateUndefined(env);
     auto initPara = std::make_tuple(&metadata->asyncContext.slotId, &metadata->portIndex,
-        &object, &metadata->forceDeactivateSim, &context.callbackRef);
+        &object, &metadata->forceDisableProfile, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "GetDownloadableProfileMetadata",
@@ -1396,8 +1396,8 @@ napi_status InitEnumResetOption(napi_env env, napi_value exports)
 napi_status InitEnumCancelReason(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("CANCEL_REASON_END_USER_REJECTED",
-            GetNapiValue(env, static_cast<int32_t>(CancelReason::CANCEL_REASON_END_USER_REJECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("CANCEL_REASON_END_USER_REJECTION",
+            GetNapiValue(env, static_cast<int32_t>(CancelReason::CANCEL_REASON_END_USER_REJECTION))),
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL_REASON_POSTPONED",
             GetNapiValue(env, static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED))),
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL_REASON_TIMEOUT",
@@ -1414,16 +1414,16 @@ napi_status InitEnumCancelReason(napi_env env, napi_value exports)
 napi_status InitEnumOsuStatus(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_OSU_IN_PROGRESS",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_OSU_IN_PROGRESS))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_OSU_FAILED",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_OSU_FAILED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_OSU_SUCCEEDED",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_OSU_SUCCEEDED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_OSU_NOT_NEEDED",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_OSU_NOT_NEEDED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_OSU_UNAVAILABLE",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_OSU_UNAVAILABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_IN_PROGRESS",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_IN_PROGRESS))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_SUCCESSFUL",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_SUCCESSFUL))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_ALREADY_LATEST",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_ALREADY_LATEST))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_SERVICE_UNAVAILABLE",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_SERVICE_UNAVAILABLE))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
@@ -1452,8 +1452,8 @@ napi_status InitEnumProfileClass(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("PROFILE_CLASS_UNSPECIFIED",
             GetNapiValue(env, static_cast<int32_t>(ProfileClass::PROFILE_CLASS_UNSPECIFIED))),
-        DECLARE_NAPI_STATIC_PROPERTY("PROFILE_CLASS_TESTING",
-            GetNapiValue(env, static_cast<int32_t>(ProfileClass::PROFILE_CLASS_TESTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("PROFILE_CLASS_TEST",
+            GetNapiValue(env, static_cast<int32_t>(ProfileClass::PROFILE_CLASS_TEST))),
         DECLARE_NAPI_STATIC_PROPERTY("PROFILE_CLASS_PROVISIONING",
             GetNapiValue(env, static_cast<int32_t>(ProfileClass::PROFILE_CLASS_PROVISIONING))),
         DECLARE_NAPI_STATIC_PROPERTY("PROFILE_CLASS_OPERATIONAL",
@@ -1468,12 +1468,12 @@ napi_status InitEnumProfileClass(napi_env env, napi_value exports)
 napi_status InitEnumPolicyRules(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DO_NOT_DISABLE",
-            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DO_NOT_DISABLE))),
-        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DO_NOT_DELETE",
-            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DO_NOT_DELETE))),
-        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DELETE_AFTER_DISABLING",
-            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DELETE_AFTER_DISABLING))),
+        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DISABLE_NOT_ALLOWED",
+            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DISABLE_NOT_ALLOWED))),
+        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DELETE_NOT_ALLOWED",
+            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DELETE_NOT_ALLOWED))),
+        DECLARE_NAPI_STATIC_PROPERTY("POLICY_RULE_DISABLE_AND_DELETE",
+            GetNapiValue(env, static_cast<int32_t>(PolicyRules::POLICY_RULE_DISABLE_AND_DELETE))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
@@ -1484,14 +1484,12 @@ napi_status InitEnumPolicyRules(napi_env env, napi_value exports)
 napi_status InitEnumResult(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_RESOLVABLE_ERRORS",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_RESOLVABLE_ERRORS))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_MUST_DEACTIVATE_SIM",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_MUST_DEACTIVATE_SIM))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESULT_SOLVABLE_ERRORS",
+            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_SOLVABLE_ERRORS))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESULT_MUST_DISABLE_PROFILE",
+            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_MUST_DISABLE_PROFILE))),
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_OK",
             GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_OK))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_FIRST_USER",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_FIRST_USER))),
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_UNDEFINED_ERROR",
             GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_UNDEFINED_ERROR))),
     };
@@ -1504,14 +1502,14 @@ napi_status InitEnumResult(napi_env env, napi_value exports)
 napi_status InitEnumResolvableErrors(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("RESOLVABLE_ERROR_CONFIRMATION_CODE",
-            GetNapiValue(env, static_cast<int32_t>(ResolvableErrors::RESOLVABLE_ERROR_CONFIRMATION_CODE))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESOLVABLE_ERROR_POLICY_RULES",
-            GetNapiValue(env, static_cast<int32_t>(ResolvableErrors::RESOLVABLE_ERROR_POLICY_RULES))),
+        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE",
+            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE))),
+        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEEED_POLICY_RULE",
+            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEEED_POLICY_RULE))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
-    NapiUtil::DefineEnumClassByName(env, exports, "ResolvableErrors", arrSize, desc);
+    NapiUtil::DefineEnumClassByName(env, exports, "SolvableErrors", arrSize, desc);
     return napi_define_properties(env, exports, arrSize, desc);
 }
 

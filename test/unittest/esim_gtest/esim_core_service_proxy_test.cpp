@@ -816,9 +816,9 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_001, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -829,10 +829,10 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_002, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -843,10 +843,10 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_003, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, 0);
 }
 
@@ -885,6 +885,78 @@ HWTEST_F(EsimCoreServiceProxyTest, SetProfileNickname_003, Function | MediumTest
     ResultState setProfileNicknameResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     int32_t ret = proxy.SetProfileNickname(SLOT_ID, iccId, nickname, setProfileNicknameResult);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+
+    int32_t portIndex = 0;
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_001, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = nullptr;
+    CoreServiceProxy proxy(remote);
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_002, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_003, Function | MediumTest | Level2)
+{
+    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
+    CoreServiceProxy proxy(remote);
+    AuthenticateConfigInfo authenticateConfigInfo;
+    authenticateConfigInfo.portIndex = 0;
+    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    ResponseEsimResult responseResult;
+    EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
+    int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, 0);
 }
 } // namespace Telephony

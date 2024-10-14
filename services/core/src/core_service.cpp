@@ -2011,7 +2011,7 @@ int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, 
 }
 
 int32_t CoreService::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -2025,7 +2025,7 @@ int32_t CoreService::SwitchToProfile(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    return simManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
 }
 
 int32_t CoreService::SetProfileNickname(
@@ -2044,6 +2044,41 @@ int32_t CoreService::SetProfileNickname(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SetProfileNickname(slotId, iccId, nickname, enumResult);
+}
+
+int32_t CoreService::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetEuiccInfo2(slotId, portIndex, responseResult);
+}
+
+int32_t CoreService::AuthenticateServer(
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
 }
 #endif
 } // namespace Telephony

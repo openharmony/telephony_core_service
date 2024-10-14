@@ -51,7 +51,7 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
         !parcel.ReadInt32(resolvableErrorsValue) || !parcel.ReadInt32(resultValue)) {
         return false;
     }
-    resolvableErrors_ = static_cast<ResolvableErrors>(resolvableErrorsValue);
+    resolvableErrors_ = static_cast<SolvableErrors>(resolvableErrorsValue);
     result_ = static_cast<ResultState>(resultValue);
 
     return true;

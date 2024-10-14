@@ -113,12 +113,11 @@ public:
     EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
     EuiccNotification RetrieveNotification(int32_t portIndex, int32_t seqNumber);
     ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
-#endif
-
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     ResultState DeleteProfile(const std::u16string &iccId);
-    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
     ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
+    ResponseEsimResult GetEuiccInfo2(int32_t portIndex);
+    ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 #endif
 
 protected:

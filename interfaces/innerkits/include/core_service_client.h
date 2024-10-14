@@ -1155,12 +1155,12 @@ public:
      * @param slotId[in], sim slot id
      * @param portIndex[in], index of the port from the slot
      * @param iccId[in], the iccId of the profile
-     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * @param forceDisableProfile[in], if true, and if an active SIM must be deactivated to access the eUICC,
      * perform this action automatically
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim,
+    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile,
         ResultState &enumResult);
 
     /**
@@ -1174,6 +1174,38 @@ public:
      */
     int32_t SetProfileNickname(
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult);
+
+    /**
+     * @brief Gets the eUICC info2 defined in GSMA RSP v2.0+ for new profile downloading.
+     *
+     * @param slotId[in], sim slot id
+     * @param portIndex[in], the Id of the eUICC
+     * @param responseResult[out], get the result code and the info2
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
+
+    /**
+     * @brief  Authenticates the SM-DP+ server by the eUICC.
+     *
+     * @param slotId[in], sim slot id
+     * @param authenticateConfigInfo.portIndex[in], the Id of the eUICC
+     * @param authenticateConfigInfo.matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0+
+     * or empty when it is not required
+     * @param authenticateConfigInfo.serverSigned1[in], ASN.1 data in byte array signed and returned
+     * by the SM-DP+ server
+     * @param authenticateConfigInfo.serverSignature1[in], ASN.1 data in byte array indicating a SM-DP+ signature
+     * which is returned by SM-DP+ server
+     * @param authenticateConfigInfo.euiccCiPkIdToBeUsed[in], ASN.1 data in byte array indicating CI Public Key
+     * Identifier to be used by the eUICC for signature which is returned by SM-DP+ server.
+     * This is defined in GSMA RSP v2.0+
+     * @param authenticateConfigInfo.serverCertificate[in], ASN.1 data in byte array indicating SM-DP+ Certificate
+     * returned by SM-DP+ server
+     * @param responseResult[out], get the result code and the challenge
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
+        ResponseEsimResult &responseResult);
 #endif
 
 private:

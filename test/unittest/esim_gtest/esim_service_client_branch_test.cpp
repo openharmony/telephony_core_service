@@ -89,26 +89,26 @@ HWTEST_F(EsimServiceClientBranchTest, GetDownloadableProfileMetadata_0001, Funct
 {
     int32_t portIndex = 0;
     DownloadableProfile profile;
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     GetDownloadableProfileMetadataResult profileMetadataResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     int32_t result = EsimServiceClient::GetInstance().GetDownloadableProfileMetadata(
-        SLOT_ID, portIndex, profile, forceDeactivateSim, profileMetadataResult);
+        SLOT_ID, portIndex, profile, forceDisableProfile, profileMetadataResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, GetDownloadableProfiles_0001, Function | MediumTest | Level1)
 {
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     int32_t portIndex = 0;
     GetDownloadableProfilesResult profileListResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     int32_t result = EsimServiceClient::GetInstance().GetDownloadableProfiles(
-        SLOT_ID, portIndex, forceDeactivateSim, profileListResult);
+        SLOT_ID, portIndex, forceDisableProfile, profileListResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -160,13 +160,13 @@ HWTEST_F(EsimServiceClientBranchTest, SwitchToProfile_0001, Function | MediumTes
 {
     int32_t portIndex = 0;
     std::string iccId = "98760000000000543210";
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     int32_t switchToProfileResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     int32_t result = EsimServiceClient::GetInstance().SwitchToProfile(
-        SLOT_ID, portIndex, iccId, forceDeactivateSim, switchToProfileResult);
+        SLOT_ID, portIndex, iccId, forceDisableProfile, switchToProfileResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 

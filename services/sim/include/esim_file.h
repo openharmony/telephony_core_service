@@ -21,11 +21,20 @@
 #include "asn1_decoder.h"
 #include "asn1_node.h"
 #include "asn1_utils.h"
-#include "esim_service.h"
+#include "asn1_constants.h"
+#include "download_profile_config_info_parcel.h"
+#include "download_profile_result_parcel.h"
+#include "downloadable_profile_parcel.h"
 #include "esim_state_type.h"
+#include "euicc_info_parcel.h"
+#include "esim_service.h"
+#include "get_downloadable_profiles_result_parcel.h"
+#include "profile_info_list_parcel.h"
+#include "profile_metadata_result_parcel.h"
 #include "icc_file.h"
 #include "request_apdu_build.h"
 #include "reset_response.h"
+#include "response_esim_result.h"
 #include "tel_ril_sim_parcel.h"
 
 namespace OHOS {
@@ -46,6 +55,8 @@ constexpr static const int32_t SW1_VALUE_90 = 0x90;
 constexpr static const int32_t SW2_VALUE_00 = 0x00;
 static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
 constexpr static const int32_t ATR_LENGTH = 47;
+constexpr static const uint32_t OFFSET_FOUR_BIT = 4;
+constexpr static const uint32_t VERSION_NUMBER = 11;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -91,12 +102,15 @@ public:
     EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
     ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
     ResultState DeleteProfile(const std::u16string &iccId);
-    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
     ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
+    ResponseEsimResult ObtainEuiccInfo2(int32_t portIndex);
+    ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     void InitMemberFunc();
+    void InitChanneMemberFunc();
     void SyncCloseChannel();
     bool IsLogicChannelOpen();
     void ProcessEsimOpenChannel(const std::u16string &aid);
@@ -165,7 +179,6 @@ private:
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
     bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
-    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc);
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -181,10 +194,32 @@ private:
     bool ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessSetNickname(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer &event);
+    void EuiccInfo2ParseProfileVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseSvn(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseExtCardResource(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseUiccCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseTs102241Version(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseRspCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseEuiccCiPKIdListForVerification(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParseEuiccCategory(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    void EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
+    bool ProcessAuthenticateServer(int32_t slotId);
+    bool ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool RealProcsessAuthenticateServerDone(std::string combineHexStr);
+    void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
+    void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes);
+    void GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei);
+    void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
+    void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
-    int32_t nextSerialId_ = 0;
+    std::atomic_int nextSerialId_ = 0;
     int32_t currentChannelId_ = -1;
     int32_t slotId_ = 0;
     EsimProfile esimProfile_;
@@ -214,6 +249,7 @@ private:
     EuiccNotificationList retrieveNotificationList_;
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
+    std::string recvCombineStr_ = "";
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
@@ -308,6 +344,14 @@ private:
     std::mutex setNicknameMutex_;
     std::condition_variable setNicknameCv_;
     bool isSetNicknameReady_ = false;
+
+    std::mutex euiccInfo2Mutex_;
+    std::condition_variable euiccInfo2Cv_;
+    bool isEuiccInfo2Ready_ = false;
+
+    std::mutex authenticateServerMutex_;
+    std::condition_variable authenticateServerCv_;
+    bool isAuthenticateServerReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

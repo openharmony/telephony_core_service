@@ -29,7 +29,7 @@ bool DownloadProfileResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
     result_ = static_cast<ResultState>(resultValue);
-    resolvableErrors_ = static_cast<ResolvableErrors>(resolvableErrorsValue);
+    resolvableErrors_ = static_cast<SolvableErrors>(resolvableErrorsValue);
     return true;
 }
 

@@ -177,7 +177,7 @@ int32_t EsimServiceClient::StartOsu(int32_t slotId, int32_t &startOsuResult)
 
 int32_t EsimServiceClient::GetDownloadableProfileMetadata(
     int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-    bool forceDeactivateSim, GetDownloadableProfileMetadataResult &profileMetadataResult)
+    bool forceDisableProfile, GetDownloadableProfileMetadataResult &profileMetadataResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -185,18 +185,18 @@ int32_t EsimServiceClient::GetDownloadableProfileMetadata(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetDownloadableProfileMetadata(
-        slotId, portIndex, profile, forceDeactivateSim, profileMetadataResult);
+        slotId, portIndex, profile, forceDisableProfile, profileMetadataResult);
 }
 
 int32_t EsimServiceClient::GetDownloadableProfiles(
-    int32_t slotId, int32_t portIndex, bool forceDeactivateSim, GetDownloadableProfilesResult &profileListResult)
+    int32_t slotId, int32_t portIndex, bool forceDisableProfile, GetDownloadableProfilesResult &profileListResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDownloadableProfiles(slotId, portIndex, forceDeactivateSim, profileListResult);
+    return proxy->GetDownloadableProfiles(slotId, portIndex, forceDisableProfile, profileListResult);
 }
 
 int32_t EsimServiceClient::DownloadProfile(int32_t slotId, DownloadProfileConfigInfo configInfo,
@@ -241,14 +241,14 @@ int32_t EsimServiceClient::DeleteProfile(int32_t slotId, const std::string &iccI
 }
 
 int32_t EsimServiceClient::SwitchToProfile(int32_t slotId, int32_t portIndex,
-    const std::string &iccId, bool forceDeactivateSim, int32_t &switchToProfileResult)
+    const std::string &iccId, bool forceDisableProfile, int32_t &switchToProfileResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, switchToProfileResult);
+    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, switchToProfileResult);
 }
 
 int32_t EsimServiceClient::SetProfileNickname(int32_t slotId, const std::string &iccId,
