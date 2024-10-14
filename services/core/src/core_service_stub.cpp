@@ -2022,31 +2022,31 @@ int32_t CoreServiceStub::OnGetEuiccProfileInfoList(MessageParcel &data, MessageP
     int32_t result = GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        if (!reply.WriteUint32(euiccProfileInfoList.profiles.size())) {
+        if (!reply.WriteUint32(euiccProfileInfoList.profiles_.size())) {
             TELEPHONY_LOGE("write reply failed.");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
         }
-        for (const auto &profile : euiccProfileInfoList.profiles) {
-            ret = (ret && reply.WriteString16(profile.iccId));
-            ret = (ret && reply.WriteString16(profile.nickName));
-            ret = (ret && reply.WriteString16(profile.serviceProviderName));
-            ret = (ret && reply.WriteString16(profile.profileName));
-            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.state)));
-            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.profileClass)));
-            ret = (ret && reply.WriteString16(profile.carrierId.mcc));
-            ret = (ret && reply.WriteString16(profile.carrierId.mnc));
-            ret = (ret && reply.WriteString16(profile.carrierId.gid1));
-            ret = (ret && reply.WriteString16(profile.carrierId.gid2));
-            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.policyRules)));
-            ret = (ret && reply.WriteUint32(profile.accessRules.size()));
-            for (const auto &rule : profile.accessRules) {
-                ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
-                ret = (ret && reply.WriteString16(rule.packageName));
-                ret = (ret && reply.WriteInt32(rule.accessType));
+        for (const auto &profile : euiccProfileInfoList.profiles_) {
+            ret = (ret && reply.WriteString16(profile.iccId_));
+            ret = (ret && reply.WriteString16(profile.nickName_));
+            ret = (ret && reply.WriteString16(profile.serviceProviderName_));
+            ret = (ret && reply.WriteString16(profile.profileName_));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.state_)));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.profileClass_)));
+            ret = (ret && reply.WriteString16(profile.carrierId_.mcc_));
+            ret = (ret && reply.WriteString16(profile.carrierId_.mnc_));
+            ret = (ret && reply.WriteString16(profile.carrierId_.gid1_));
+            ret = (ret && reply.WriteString16(profile.carrierId_.gid2_));
+            ret = (ret && reply.WriteInt32(static_cast<int32_t>(profile.policyRules_)));
+            ret = (ret && reply.WriteUint32(profile.accessRules_.size()));
+            for (const auto &rule : profile.accessRules_) {
+                ret = (ret && reply.WriteString16(rule.certificateHashHexStr_));
+                ret = (ret && reply.WriteString16(rule.packageName_));
+                ret = (ret && reply.WriteInt32(rule.accessType_));
             }
         }
-        ret = (ret && reply.WriteBool(euiccProfileInfoList.isRemovable));
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result)));
+        ret = (ret && reply.WriteBool(euiccProfileInfoList.isRemovable_));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(euiccProfileInfoList.result_)));
         if (!ret) {
             TELEPHONY_LOGE("write reply failed.");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -2062,7 +2062,7 @@ int32_t CoreServiceStub::OnGetEuiccInfo(MessageParcel &data, MessageParcel &repl
     int32_t result = GetEuiccInfo(slotId, eUiccInfo);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteString16(eUiccInfo.osVersion) && reply.WriteString16(eUiccInfo.response));
+        ret = (ret && reply.WriteString16(eUiccInfo.osVersion_) && reply.WriteString16(eUiccInfo.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2115,26 +2115,26 @@ int32_t CoreServiceStub::OnGetRulesAuthTable(MessageParcel &data, MessageParcel 
     int32_t result = GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRules.size()));
-        for (const auto &rules : eUiccRulesAuthTable.policyRules) {
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRules_.size()));
+        for (const auto &rules : eUiccRulesAuthTable.policyRules_) {
             ret = (ret && reply.WriteInt32(rules));
         }
-        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.carrierIds.size()));
-        for (const auto &carrier : eUiccRulesAuthTable.carrierIds) {
-            ret = (ret && reply.WriteString16(carrier.mcc));
-            ret = (ret && reply.WriteString16(carrier.mnc));
-            ret = (ret && reply.WriteString16(carrier.spn));
-            ret = (ret && reply.WriteString16(carrier.imsi));
-            ret = (ret && reply.WriteString16(carrier.gid1));
-            ret = (ret && reply.WriteString16(carrier.gid2));
-            ret = (ret && reply.WriteInt32(carrier.carrierId));
-            ret = (ret && reply.WriteInt32(carrier.specificCarrierId));
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.carrierIds_.size()));
+        for (const auto &carrier : eUiccRulesAuthTable.carrierIds_) {
+            ret = (ret && reply.WriteString16(carrier.mcc_));
+            ret = (ret && reply.WriteString16(carrier.mnc_));
+            ret = (ret && reply.WriteString16(carrier.spn_));
+            ret = (ret && reply.WriteString16(carrier.imsi_));
+            ret = (ret && reply.WriteString16(carrier.gid1_));
+            ret = (ret && reply.WriteString16(carrier.gid2_));
+            ret = (ret && reply.WriteInt32(carrier.carrierId_));
+            ret = (ret && reply.WriteInt32(carrier.specificCarrierId_));
         }
-        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRuleFlags.size()));
-        for (const auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags) {
+        ret = (ret && reply.WriteUint32(eUiccRulesAuthTable.policyRuleFlags_.size()));
+        for (const auto &ruleFlags : eUiccRulesAuthTable.policyRuleFlags_) {
             ret = (ret && reply.WriteInt32(ruleFlags));
         }
-        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.position));
+        ret = (ret && reply.WriteInt32(eUiccRulesAuthTable.position_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2151,8 +2151,8 @@ int32_t CoreServiceStub::OnGetEuiccChallenge(MessageParcel &data, MessageParcel 
     int32_t result = GetEuiccChallenge(slotId, portIndex, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2186,8 +2186,8 @@ int32_t CoreServiceStub::OnCancelSession(MessageParcel &data, MessageParcel &rep
     int32_t result = CancelSession(slotId, transactionId, cancelReason, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed");
@@ -2205,22 +2205,22 @@ int32_t CoreServiceStub::OnGetProfile(MessageParcel &data, MessageParcel &reply)
     int32_t result = GetProfile(slotId, portIndex, iccId, eUiccProfile);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteString16(eUiccProfile.iccId));
-        ret = (ret && reply.WriteString16(eUiccProfile.nickName));
-        ret = (ret && reply.WriteString16(eUiccProfile.serviceProviderName));
-        ret = (ret && reply.WriteString16(eUiccProfile.profileName));
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state)));
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass)));
-        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mcc));
-        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.mnc));
-        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid1));
-        ret = (ret && reply.WriteString16(eUiccProfile.carrierId.gid2));
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules)));
-        ret = (ret && reply.WriteInt32(eUiccProfile.accessRules.size()));
-        for (const auto &rule : eUiccProfile.accessRules) {
-            ret = (ret && reply.WriteString16(rule.certificateHashHexStr));
-            ret = (ret && reply.WriteString16(rule.packageName));
-            ret = (ret && reply.WriteInt32(rule.accessType));
+        ret = (ret && reply.WriteString16(eUiccProfile.iccId_));
+        ret = (ret && reply.WriteString16(eUiccProfile.nickName_));
+        ret = (ret && reply.WriteString16(eUiccProfile.serviceProviderName_));
+        ret = (ret && reply.WriteString16(eUiccProfile.profileName_));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.state_)));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.profileClass_)));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId_.mcc_));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId_.mnc_));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId_.gid1_));
+        ret = (ret && reply.WriteString16(eUiccProfile.carrierId_.gid2_));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(eUiccProfile.policyRules_)));
+        ret = (ret && reply.WriteInt32(eUiccProfile.accessRules_.size()));
+        for (const auto &rule : eUiccProfile.accessRules_) {
+            ret = (ret && reply.WriteString16(rule.certificateHashHexStr_));
+            ret = (ret && reply.WriteString16(rule.packageName_));
+            ret = (ret && reply.WriteInt32(rule.accessType_));
         }
     }
     if (!ret) {
@@ -2285,8 +2285,8 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
     int32_t result = SendApduData(slotId, aid, apduData, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2299,18 +2299,18 @@ int32_t CoreServiceStub::OnPrepareDownload(MessageParcel &data, MessageParcel &r
 {
     DownLoadConfigInfo downLoadConfigInfo;
     int32_t slotId = data.ReadInt32();
-    downLoadConfigInfo.portIndex = data.ReadInt32();
-    downLoadConfigInfo.hashCc = data.ReadString16();
-    downLoadConfigInfo.smdpSigned2 = data.ReadString16();
-    downLoadConfigInfo.smdpSignature2 = data.ReadString16();
-    downLoadConfigInfo.smdpCertificate = data.ReadString16();
+    downLoadConfigInfo.portIndex_ = data.ReadInt32();
+    downLoadConfigInfo.hashCc_ = data.ReadString16();
+    downLoadConfigInfo.smdpSigned2_ = data.ReadString16();
+    downLoadConfigInfo.smdpSignature2_ = data.ReadString16();
+    downLoadConfigInfo.smdpCertificate_ = data.ReadString16();
 
     ResponseEsimResult responseResult;
     int32_t result = PrepareDownload(slotId, downLoadConfigInfo, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("OnPrepareDownload write reply failed.");
@@ -2329,12 +2329,12 @@ int32_t CoreServiceStub::OnLoadBoundProfilePackage(MessageParcel &data, MessageP
     int32_t result = LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(responseResult.resultCode));
-        ret = (ret && reply.WriteString16(responseResult.response));
-        ret = (ret && reply.WriteInt32(responseResult.seqNumber));
-        ret = (ret && reply.WriteInt32(responseResult.profileManagementOperation));
-        ret = (ret && reply.WriteString16(responseResult.notificationAddress));
-        ret = (ret && reply.WriteString16(responseResult.iccId));
+        ret = (ret && reply.WriteInt32(responseResult.resultCode_));
+        ret = (ret && reply.WriteString16(responseResult.response_));
+        ret = (ret && reply.WriteInt32(responseResult.seqNumber_));
+        ret = (ret && reply.WriteInt32(responseResult.profileManagementOperation_));
+        ret = (ret && reply.WriteString16(responseResult.notificationAddress_));
+        ret = (ret && reply.WriteString16(responseResult.iccId_));
     }
     if (!ret) {
         TELEPHONY_LOGE("OnLoadBoundProfilePackage write reply failed.");
@@ -2352,12 +2352,12 @@ int32_t CoreServiceStub::OnListNotifications(MessageParcel &data, MessageParcel 
     int32_t result = ListNotifications(slotId, portIndex, events, notificationList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteUint32(notificationList.euiccNotification.size()));
-        for (const auto &notification : notificationList.euiccNotification) {
-            ret = (ret && reply.WriteInt32(notification.seq));
-            ret = (ret && reply.WriteString16(notification.targetAddr));
-            ret = (ret && reply.WriteInt32(notification.event));
-            ret = (ret && reply.WriteString16(notification.data));
+        ret = (ret && reply.WriteUint32(notificationList.euiccNotification_.size()));
+        for (const auto &notification : notificationList.euiccNotification_) {
+            ret = (ret && reply.WriteInt32(notification.seq_));
+            ret = (ret && reply.WriteString16(notification.targetAddr_));
+            ret = (ret && reply.WriteInt32(notification.event_));
+            ret = (ret && reply.WriteString16(notification.data_));
         }
     }
     if (!ret) {
@@ -2376,12 +2376,12 @@ int32_t CoreServiceStub::OnRetrieveNotificationList(MessageParcel &data, Message
     int32_t result = RetrieveNotificationList(slotId, portIndex, events, notificationList);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteUint32(notificationList.euiccNotification.size()));
-        for (const auto &notification : notificationList.euiccNotification) {
-            ret = (ret && reply.WriteInt32(notification.seq));
-            ret = (ret && reply.WriteString16(notification.targetAddr));
-            ret = (ret && reply.WriteInt32(notification.event));
-            ret = (ret && reply.WriteString16(notification.data));
+        ret = (ret && reply.WriteUint32(notificationList.euiccNotification_.size()));
+        for (const auto &notification : notificationList.euiccNotification_) {
+            ret = (ret && reply.WriteInt32(notification.seq_));
+            ret = (ret && reply.WriteString16(notification.targetAddr_));
+            ret = (ret && reply.WriteInt32(notification.event_));
+            ret = (ret && reply.WriteString16(notification.data_));
         }
     }
     if (!ret) {
@@ -2401,10 +2401,10 @@ int32_t CoreServiceStub::OnRetrieveNotification(MessageParcel &data, MessageParc
     int32_t result = RetrieveNotification(slotId, portIndex, seqNumber, notification);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(notification.seq));
-        ret = (ret && reply.WriteString16(notification.targetAddr));
-        ret = (ret && reply.WriteInt32(notification.event));
-        ret = (ret && reply.WriteString16(notification.data));
+        ret = (ret && reply.WriteInt32(notification.seq_));
+        ret = (ret && reply.WriteString16(notification.targetAddr_));
+        ret = (ret && reply.WriteInt32(notification.event_));
+        ret = (ret && reply.WriteString16(notification.data_));
     }
     if (!ret) {
         TELEPHONY_LOGE("OnRetrieveNotification write reply failed.");
@@ -2454,9 +2454,9 @@ int32_t CoreServiceStub::OnSwitchToProfile(MessageParcel &data, MessageParcel &r
     int32_t slotId = data.ReadInt32();
     int32_t portIndex = data.ReadInt32();
     std::u16string iccId = data.ReadString16();
-    bool forceDeactivateSim = data.ReadBool();
+    bool forceDisableProfile = data.ReadBool();
     ResultState enumResult;
-    int32_t result = SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    int32_t result = SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteInt32(static_cast<int32_t>(enumResult)));
@@ -2494,8 +2494,8 @@ int32_t CoreServiceStub::OnGetEuiccInfo2(MessageParcel &data, MessageParcel &rep
     int32_t result = GetEuiccInfo2(slotId, portIndex, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2508,18 +2508,18 @@ int32_t CoreServiceStub::OnAuthenticateServer(MessageParcel &data, MessageParcel
 {
     int32_t slotId = data.ReadInt32();
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = data.ReadInt32();
-    authenticateConfigInfo.matchingId = data.ReadString16();
-    authenticateConfigInfo.serverSigned1 = data.ReadString16();
-    authenticateConfigInfo.serverSignature1 = data.ReadString16();
-    authenticateConfigInfo.euiccCiPkIdToBeUsed = data.ReadString16();
-    authenticateConfigInfo.serverCertificate = data.ReadString16();
+    authenticateConfigInfo.portIndex_ = data.ReadInt32();
+    authenticateConfigInfo.matchingId_ = data.ReadString16();
+    authenticateConfigInfo.serverSigned1_ = data.ReadString16();
+    authenticateConfigInfo.serverSignature1_ = data.ReadString16();
+    authenticateConfigInfo.euiccCiPkIdToBeUsed_ = data.ReadString16();
+    authenticateConfigInfo.serverCertificate_ = data.ReadString16();
     ResponseEsimResult responseResult;
     int32_t result = AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode)));
-        ret = (ret && reply.WriteString16(responseResult.response));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
+        ret = (ret && reply.WriteString16(responseResult.response_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

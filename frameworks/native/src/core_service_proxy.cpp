@@ -15,9 +15,6 @@
 
 #include "core_service_proxy.h"
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-#include "esim_state_type.h"
-#endif
 #include "network_search_types.h"
 #include "parameter.h"
 #include "sim_state_type.h"
@@ -3228,29 +3225,29 @@ int32_t CoreServiceProxy::GetEid(int32_t slotId, std::u16string &eId)
 
 void CoreServiceProxy::ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile)
 {
-    euiccProfile.iccId = reply.ReadString16();
-    euiccProfile.nickName = reply.ReadString16();
-    euiccProfile.serviceProviderName = reply.ReadString16();
-    euiccProfile.profileName = reply.ReadString16();
-    euiccProfile.state = static_cast<ProfileState>(reply.ReadInt32());
-    euiccProfile.profileClass = static_cast<ProfileClass>(reply.ReadInt32());
-    euiccProfile.carrierId.mcc = reply.ReadString16();
-    euiccProfile.carrierId.mnc = reply.ReadString16();
-    euiccProfile.carrierId.gid1 = reply.ReadString16();
-    euiccProfile.carrierId.gid2 = reply.ReadString16();
-    euiccProfile.policyRules = static_cast<PolicyRules>(reply.ReadInt32());
+    euiccProfile.iccId_ = reply.ReadString16();
+    euiccProfile.nickName_ = reply.ReadString16();
+    euiccProfile.serviceProviderName_ = reply.ReadString16();
+    euiccProfile.profileName_ = reply.ReadString16();
+    euiccProfile.state_ = static_cast<ProfileState>(reply.ReadInt32());
+    euiccProfile.profileClass_ = static_cast<ProfileClass>(reply.ReadInt32());
+    euiccProfile.carrierId_.mcc_ = reply.ReadString16();
+    euiccProfile.carrierId_.mnc_ = reply.ReadString16();
+    euiccProfile.carrierId_.gid1_ = reply.ReadString16();
+    euiccProfile.carrierId_.gid2_ = reply.ReadString16();
+    euiccProfile.policyRules_ = static_cast<PolicyRules>(reply.ReadInt32());
 
     uint32_t accessRulesSize = reply.ReadUint32();
     if (accessRulesSize >= ESIM_MAX_SIZE) {
         TELEPHONY_LOGE("over max size");
         return;
     }
-    euiccProfile.accessRules.resize(accessRulesSize);
+    euiccProfile.accessRules_.resize(accessRulesSize);
     for (uint32_t j = 0; j < accessRulesSize; ++j) {
-        AccessRule &rule = euiccProfile.accessRules[j];
-        rule.certificateHashHexStr = reply.ReadString16();
-        rule.packageName = reply.ReadString16();
-        rule.accessType = reply.ReadInt32();
+        AccessRule &rule = euiccProfile.accessRules_[j];
+        rule.certificateHashHexStr_ = reply.ReadString16();
+        rule.packageName_ = reply.ReadString16();
+        rule.accessType_ = reply.ReadInt32();
     }
 }
 
@@ -3284,13 +3281,13 @@ int32_t CoreServiceProxy::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfil
             TELEPHONY_LOGE("over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
-        euiccProfileInfoList.profiles.resize(profileCount);
+        euiccProfileInfoList.profiles_.resize(profileCount);
         for (uint32_t i = 0; i < profileCount; ++i) {
-            EuiccProfile &euiccProfile = euiccProfileInfoList.profiles[i];
+            EuiccProfile &euiccProfile = euiccProfileInfoList.profiles_[i];
             ReadEuiccProfileFromReply(reply, euiccProfile);
         }
-        euiccProfileInfoList.isRemovable = reply.ReadBool();
-        euiccProfileInfoList.result = static_cast<ResultState>(reply.ReadInt32());
+        euiccProfileInfoList.isRemovable_ = reply.ReadBool();
+        euiccProfileInfoList.result_ = static_cast<ResultState>(reply.ReadInt32());
     }
     return result;
 }
@@ -3320,8 +3317,8 @@ int32_t CoreServiceProxy::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        eUiccInfo.osVersion = reply.ReadString16();
-        eUiccInfo.response = reply.ReadString16();
+        eUiccInfo.osVersion_ = reply.ReadString16();
+        eUiccInfo.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -3413,35 +3410,35 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
         if (policyRulesSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
-        eUiccRulesAuthTable.policyRules.resize(policyRulesSize);
+        eUiccRulesAuthTable.policyRules_.resize(policyRulesSize);
         for (uint32_t i = 0; i < policyRulesSize; ++i) {
-            eUiccRulesAuthTable.policyRules[i] = reply.ReadInt32();
+            eUiccRulesAuthTable.policyRules_[i] = reply.ReadInt32();
         }
         uint32_t carrierIdsSize = reply.ReadUint32();
         if (carrierIdsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
-        eUiccRulesAuthTable.carrierIds.resize(carrierIdsSize);
+        eUiccRulesAuthTable.carrierIds_.resize(carrierIdsSize);
         for (uint32_t j = 0; j < carrierIdsSize; ++j) {
-            CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds[j];
-            ci.mcc = reply.ReadString16();
-            ci.mnc = reply.ReadString16();
-            ci.spn = reply.ReadString16();
-            ci.imsi = reply.ReadString16();
-            ci.gid1 = reply.ReadString16();
-            ci.gid2 = reply.ReadString16();
-            ci.carrierId = reply.ReadInt32();
-            ci.specificCarrierId = reply.ReadInt32();
+            CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds_[j];
+            ci.mcc_ = reply.ReadString16();
+            ci.mnc_ = reply.ReadString16();
+            ci.spn_ = reply.ReadString16();
+            ci.imsi_ = reply.ReadString16();
+            ci.gid1_ = reply.ReadString16();
+            ci.gid2_ = reply.ReadString16();
+            ci.carrierId_ = reply.ReadInt32();
+            ci.specificCarrierId_ = reply.ReadInt32();
         }
         uint32_t policyRuleFlagsSize = reply.ReadUint32();
         if (policyRuleFlagsSize > ESIM_MAX_SIZE) {
             return TELEPHONY_ERR_FAIL;
         }
-        eUiccRulesAuthTable.policyRuleFlags.resize(policyRuleFlagsSize);
+        eUiccRulesAuthTable.policyRuleFlags_.resize(policyRuleFlagsSize);
         for (uint32_t k = 0; k < policyRuleFlagsSize; ++k) {
-            eUiccRulesAuthTable.policyRuleFlags[k] = reply.ReadInt32();
+            eUiccRulesAuthTable.policyRuleFlags_[k] = reply.ReadInt32();
         }
-        eUiccRulesAuthTable.position = reply.ReadInt32();
+        eUiccRulesAuthTable.position_ = reply.ReadInt32();
     }
     return result;
 }
@@ -3509,8 +3506,8 @@ int32_t CoreServiceProxy::GetEuiccChallenge(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -3582,8 +3579,8 @@ int32_t CoreServiceProxy::CancelSession(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -3762,8 +3759,8 @@ int32_t CoreServiceProxy::SendApduData(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -3780,11 +3777,11 @@ int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, const DownLoadConfigIn
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     bool ret = data.WriteInt32(slotId);
-    ret = (ret && data.WriteInt32(downLoadConfigInfo.portIndex));
-    ret = (ret && data.WriteString16(downLoadConfigInfo.hashCc));
-    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSigned2));
-    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSignature2));
-    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpCertificate));
+    ret = (ret && data.WriteInt32(downLoadConfigInfo.portIndex_));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.hashCc_));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSigned2_));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpSignature2_));
+    ret = (ret && data.WriteString16(downLoadConfigInfo.smdpCertificate_));
     if (!ret) {
         TELEPHONY_LOGE("Write data false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -3803,8 +3800,8 @@ int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, const DownLoadConfigIn
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -3842,12 +3839,12 @@ int32_t CoreServiceProxy::LoadBoundProfilePackage(int32_t slotId, int32_t portIn
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = reply.ReadInt32();
-        responseResult.response = reply.ReadString16();
-        responseResult.seqNumber = reply.ReadInt32();
-        responseResult.profileManagementOperation = reply.ReadInt32();
-        responseResult.notificationAddress = reply.ReadString16();
-        responseResult.iccId = reply.ReadString16();
+        responseResult.resultCode_ = reply.ReadInt32();
+        responseResult.response_ = reply.ReadString16();
+        responseResult.seqNumber_ = reply.ReadInt32();
+        responseResult.profileManagementOperation_ = reply.ReadInt32();
+        responseResult.notificationAddress_ = reply.ReadString16();
+        responseResult.iccId_ = reply.ReadString16();
     }
     return result;
 }
@@ -3889,13 +3886,13 @@ int32_t CoreServiceProxy::ListNotifications(
             TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
-        notificationList.euiccNotification.resize(euiccNotificationCount);
+        notificationList.euiccNotification_.resize(euiccNotificationCount);
         for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
-            EuiccNotification &nf = notificationList.euiccNotification[i];
-            nf.seq = reply.ReadInt32();
-            nf.targetAddr = reply.ReadString16();
-            nf.event = reply.ReadInt32();
-            nf.data = reply.ReadString16();
+            EuiccNotification &nf = notificationList.euiccNotification_[i];
+            nf.seq_ = reply.ReadInt32();
+            nf.targetAddr_ = reply.ReadString16();
+            nf.event_ = reply.ReadInt32();
+            nf.data_ = reply.ReadString16();
         }
     }
     return result;
@@ -3943,13 +3940,13 @@ int32_t CoreServiceProxy::RetrieveNotificationList(
             TELEPHONY_LOGE("CoreServiceProxy::RetrieveNotificationList over max size");
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
-        notificationList.euiccNotification.resize(euiccNotificationCount);
+        notificationList.euiccNotification_.resize(euiccNotificationCount);
         for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
-            EuiccNotification &nf = notificationList.euiccNotification[i];
-            nf.seq = reply.ReadInt32();
-            nf.targetAddr = reply.ReadString16();
-            nf.event = reply.ReadInt32();
-            nf.data = reply.ReadString16();
+            EuiccNotification &nf = notificationList.euiccNotification_[i];
+            nf.seq_ = reply.ReadInt32();
+            nf.targetAddr_ = reply.ReadString16();
+            nf.event_ = reply.ReadInt32();
+            nf.data_ = reply.ReadString16();
         }
     }
     return result;
@@ -3991,10 +3988,10 @@ int32_t CoreServiceProxy::RetrieveNotification(
     }
     int32_t res = reply.ReadInt32();
     if (res == TELEPHONY_ERR_SUCCESS) {
-        notification.seq = reply.ReadInt32();
-        notification.targetAddr = reply.ReadString16();
-        notification.event = reply.ReadInt32();
-        notification.data = reply.ReadString16();
+        notification.seq_ = reply.ReadInt32();
+        notification.targetAddr_ = reply.ReadString16();
+        notification.event_ = reply.ReadInt32();
+        notification.data_ = reply.ReadString16();
     }
     return res;
 }
@@ -4072,7 +4069,7 @@ int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &ic
 }
 
 int32_t CoreServiceProxy::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4082,7 +4079,7 @@ int32_t CoreServiceProxy::SwitchToProfile(
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!data.WriteInt32(slotId) || !data.WriteInt32(portIndex) ||
-        !data.WriteString16(iccId) || !data.WriteBool(forceDeactivateSim)) {
+        !data.WriteString16(iccId) || !data.WriteBool(forceDisableProfile)) {
         TELEPHONY_LOGE("Write is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
@@ -4166,8 +4163,8 @@ int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Respo
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -4188,8 +4185,8 @@ int32_t CoreServiceProxy::RealAuthenticateServer(const MessageParcel &data, cons
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response = reply.ReadString16();
+        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.response_ = reply.ReadString16();
     }
     return result;
 }
@@ -4208,27 +4205,27 @@ int32_t CoreServiceProxy::AuthenticateServer(
         TELEPHONY_LOGE("WriteInt32 slotId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteInt32(authenticateConfigInfo.portIndex)) {
+    if (!data.WriteInt32(authenticateConfigInfo.portIndex_)) {
         TELEPHONY_LOGE("WriteInt32 portIndex is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(authenticateConfigInfo.matchingId)) {
+    if (!data.WriteString16(authenticateConfigInfo.matchingId_)) {
         TELEPHONY_LOGE("WriteString16 matchingId is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(authenticateConfigInfo.serverSigned1)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverSigned1_)) {
         TELEPHONY_LOGE("WriteString16 serverSigned1 is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(authenticateConfigInfo.serverSignature1)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverSignature1_)) {
         TELEPHONY_LOGE("WriteString16 serverSignature1 is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(authenticateConfigInfo.euiccCiPkIdToBeUsed)) {
+    if (!data.WriteString16(authenticateConfigInfo.euiccCiPkIdToBeUsed_)) {
         TELEPHONY_LOGE("WriteString16 euiccCiPkIdToBeUsed is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(authenticateConfigInfo.serverCertificate)) {
+    if (!data.WriteString16(authenticateConfigInfo.serverCertificate_)) {
         TELEPHONY_LOGE("WriteString16 serverCertificate is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }

@@ -1308,14 +1308,14 @@ int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &i
 }
 
 int32_t CoreServiceClient::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
 }
 
 int32_t CoreServiceClient::SetProfileNickname(

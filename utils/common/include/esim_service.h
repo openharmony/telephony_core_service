@@ -122,7 +122,7 @@ typedef struct TagEsimProfile {
     std::u16string smdpCertificate = u"";
     int32_t seqNumber = 0;
     bool activeAfterDown = false;
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     OHOS::Telephony::ResetOption option = OHOS::Telephony::ResetOption::DELETE_OPERATIONAL_PROFILES;
     std::u16string transactionId = u"";
     OHOS::Telephony::CancelReason cancelReason = OHOS::Telephony::CancelReason::CANCEL_REASON_POSTPONED;
@@ -152,7 +152,7 @@ typedef struct TagEs9PlusInitAuthResp {
 typedef struct TagAuthServerResponse {
     int32_t errCode = 0;
     std::string transactionId;
-    std::string respStr;
+    std::vector<uint8_t> respStr;
     int32_t respLength = 0;
 } AuthServerResponse;
 

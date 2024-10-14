@@ -66,7 +66,7 @@ struct AsyncSwitchProfileInfo {
     AsyncContext<int32_t> asyncContext;
     int32_t portIndex = ERROR_DEFAULT;
     std::string iccid = "";
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
 };
 
 struct AsyncAccessRule {
@@ -76,7 +76,7 @@ struct AsyncAccessRule {
 };
 
 struct AsyncDownloadableProfile {
-    std::string encodedActivationCode = "";
+    std::string activationCode = "";
     std::string confirmationCode = "";
     std::string carrierName = "";
     std::vector<AsyncAccessRule> accessRules{};
@@ -87,14 +87,14 @@ struct AsyncDownloadProfileInfo {
     int32_t portIndex = ERROR_DEFAULT;
     AsyncDownloadableProfile profile;
     bool switchAfterDownload = false;
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     DownloadProfileResult result;
 };
 
 struct AsyncDefaultProfileList {
     AsyncContext<napi_value> asyncContext;
     int32_t portIndex = ERROR_DEFAULT;
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     GetDownloadableProfilesResult result;
 };
 
@@ -115,7 +115,7 @@ struct AsyncProfileMetadataInfo {
     AsyncContext<napi_value> asyncContext;
     int32_t portIndex = ERROR_DEFAULT;
     AsyncDownloadableProfile profile;
-    bool forceDeactivateSim = false;
+    bool forceDisableProfile = false;
     GetDownloadableProfileMetadataResult result;
 };
 

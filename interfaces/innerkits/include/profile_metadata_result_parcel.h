@@ -32,7 +32,7 @@ struct GetDownloadableProfileMetadataResult : public Parcelable {
     DownloadableProfile downloadableProfiles_;
     int32_t pprType_ = 0;
     bool pprFlag_ = false;
-    ResolvableErrors resolvableErrors_;
+    SolvableErrors resolvableErrors_;
     ResultState result_;
 
     bool ReadFromParcel(Parcel &parcel);

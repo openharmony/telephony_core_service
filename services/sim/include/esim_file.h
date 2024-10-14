@@ -21,11 +21,20 @@
 #include "asn1_decoder.h"
 #include "asn1_node.h"
 #include "asn1_utils.h"
-#include "esim_service.h"
+#include "asn1_constants.h"
+#include "download_profile_config_info_parcel.h"
+#include "download_profile_result_parcel.h"
+#include "downloadable_profile_parcel.h"
 #include "esim_state_type.h"
+#include "euicc_info_parcel.h"
+#include "esim_service.h"
+#include "get_downloadable_profiles_result_parcel.h"
+#include "profile_info_list_parcel.h"
+#include "profile_metadata_result_parcel.h"
 #include "icc_file.h"
 #include "request_apdu_build.h"
 #include "reset_response.h"
+#include "response_esim_result.h"
 #include "tel_ril_sim_parcel.h"
 
 namespace OHOS {
@@ -46,6 +55,8 @@ constexpr static const int32_t SW1_VALUE_90 = 0x90;
 constexpr static const int32_t SW2_VALUE_00 = 0x00;
 static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
 constexpr static const int32_t ATR_LENGTH = 47;
+constexpr static const uint32_t OFFSET_FOUR_BIT = 4;
+constexpr static const uint32_t VERSION_NUMBER = 11;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -91,7 +102,7 @@ public:
     EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
     ResultState RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
     ResultState DeleteProfile(const std::u16string &iccId);
-    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim);
+    ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
     ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
     ResponseEsimResult ObtainEuiccInfo2(int32_t portIndex);
     ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
@@ -167,7 +178,6 @@ private:
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
     bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
-    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc);
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -208,7 +218,7 @@ private:
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
-    int32_t nextSerialId_ = 0;
+    std::atomic_int nextSerialId_ = 0;
     int32_t currentChannelId_ = -1;
     int32_t slotId_ = 0;
     EsimProfile esimProfile_;
@@ -238,6 +248,7 @@ private:
     EuiccNotificationList retrieveNotificationList_;
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
+    std::string recvCombineStr_ = "";
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;

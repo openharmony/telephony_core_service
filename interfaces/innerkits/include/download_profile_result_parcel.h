@@ -27,7 +27,7 @@ namespace Telephony {
  */
 struct DownloadProfileResult : public Parcelable {
     ResultState result_;
-    ResolvableErrors resolvableErrors_;
+    SolvableErrors resolvableErrors_;
     uint32_t cardId_ = 0;
 
     bool ReadFromParcel(Parcel &parcel);

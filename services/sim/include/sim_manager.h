@@ -190,12 +190,9 @@ public:
     int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
     int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult) override;
-#endif
-
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) override;
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId,
-        bool forceDeactivateSim, ResultState &enumResult) override;
+        bool forceDisableProfile, ResultState &enumResult) override;
     int32_t SetProfileNickname(
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) override;
 #endif

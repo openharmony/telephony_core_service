@@ -401,7 +401,7 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
         return false;
     }
     IccFileData *result = &(rcvMsg->fileData);
-    eUiccInfo_.response = Str8ToStr16(result->resultData);
+    eUiccInfo_.response_ = Str8ToStr16(result->resultData);
     {
         std::lock_guard<std::mutex> lock(euiccInfo1Mutex_);
         isEuiccInfo1Ready_ = true;
@@ -424,7 +424,7 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
         TELEPHONY_LOGE("invalid SVN data");
         return false;
     }
-    eUiccInfo_.osVersion = OHOS::Telephony::ToUtf16(MakeVersionString(svnRaw));
+    eUiccInfo_.osVersion_ = OHOS::Telephony::ToUtf16(MakeVersionString(svnRaw));
     return true;
 }
 
@@ -469,9 +469,9 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
         BuildBasicProfileInfo(&euiccProfileInfo, curNode);
         EuiccProfile euiccProfile;
         ConvertProfileInfoToApiStruct(euiccProfile, euiccProfileInfo);
-        euiccProfileInfoList_.profiles.push_back(euiccProfile);
+        euiccProfileInfoList_.profiles_.push_back(euiccProfile);
     }
-    euiccProfileInfoList_.result = ResultState::RESULT_OK;
+    euiccProfileInfoList_.result_ = ResultState::RESULT_OK;
     return true;
 }
 
@@ -498,29 +498,29 @@ bool EsimFile::SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::s
 
 void EsimFile::ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo &src)
 {
-    dst.iccId = OHOS::Telephony::ToUtf16(src.iccid);
-    dst.nickName = OHOS::Telephony::ToUtf16(src.nickname);
-    dst.serviceProviderName = OHOS::Telephony::ToUtf16(src.serviceProviderName);
-    dst.profileName = OHOS::Telephony::ToUtf16(src.profileName);
-    dst.state = static_cast<ProfileState>(src.profileState);
-    dst.profileClass = static_cast<ProfileClass>(src.profileClass);
-    dst.policyRules = static_cast<PolicyRules>(src.policyRules);
+    dst.iccId_ = OHOS::Telephony::ToUtf16(src.iccid);
+    dst.nickName_ = OHOS::Telephony::ToUtf16(src.nickname);
+    dst.serviceProviderName_ = OHOS::Telephony::ToUtf16(src.serviceProviderName);
+    dst.profileName_ = OHOS::Telephony::ToUtf16(src.profileName);
+    dst.state_ = static_cast<ProfileState>(src.profileState);
+    dst.profileClass_ = static_cast<ProfileClass>(src.profileClass);
+    dst.policyRules_ = static_cast<PolicyRules>(src.policyRules);
 
     // split mccMnc to mcc and mnc
     std::string mcc = "";
     std::string mnc = "";
     SplitMccAndMnc(src.operatorId.mccMnc, mcc, mnc);
-    dst.carrierId.mcc = OHOS::Telephony::ToUtf16(mcc);
-    dst.carrierId.mnc = OHOS::Telephony::ToUtf16(mnc);
-    dst.carrierId.gid1 = OHOS::Telephony::ToUtf16(src.operatorId.gid1);
-    dst.carrierId.gid2 = OHOS::Telephony::ToUtf16(src.operatorId.gid2);
-    dst.accessRules.clear();
+    dst.carrierId_.mcc_ = OHOS::Telephony::ToUtf16(mcc);
+    dst.carrierId_.mnc_ = OHOS::Telephony::ToUtf16(mnc);
+    dst.carrierId_.gid1_ = OHOS::Telephony::ToUtf16(src.operatorId.gid1);
+    dst.carrierId_.gid2_ = OHOS::Telephony::ToUtf16(src.operatorId.gid2);
+    dst.accessRules_.clear();
 }
 
 void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
 {
     if (eProfileInfo == nullptr || profileNode == nullptr) {
-        TELEPHONY_LOGE("BuildProfile failed");
+        TELEPHONY_LOGE("BuildBasicProfileInfo failed");
         return;
     }
     std::shared_ptr<Asn1Node> iccIdNode = profileNode->Asn1GetChild(TAG_ESIM_ICCID);
@@ -566,7 +566,7 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
 void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
 {
     if (eProfileInfo == nullptr || profileNode == nullptr) {
-        TELEPHONY_LOGE("BuildProfile failed");
+        TELEPHONY_LOGE("BuildAdvancedProfileInfo failed");
         return;
     }
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_STATE)) {
@@ -880,11 +880,11 @@ struct CarrierIdentifier CarrierIdentifiers(const std::vector<uint8_t> &mccMncDa
     if (strResult[NUMBER_TWO] != 'F') {
         mMnc[NUMBER_TWO] = strResult[NUMBER_TWO];
     }
-    struct CarrierIdentifier carrierId;
-    carrierId.mcc = OHOS::Telephony::ToUtf16(mMcc);
-    carrierId.mnc = OHOS::Telephony::ToUtf16(mMnc);
-    carrierId.gid1 = gid1;
-    carrierId.gid2 = gid2;
+    CarrierIdentifier carrierId;
+    carrierId.mcc_ = OHOS::Telephony::ToUtf16(mMcc);
+    carrierId.mnc_ = OHOS::Telephony::ToUtf16(mMnc);
+    carrierId.gid1_ = gid1;
+    carrierId.gid2_ = gid2;
     return carrierId;
 }
 
@@ -949,7 +949,7 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             if (curNode == nullptr) {
                 return false;
             }
-            eUiccRulesAuthTable_.carrierIds.push_back(buildCarrierIdentifiers(curNode));
+            eUiccRulesAuthTable_.carrierIds_.push_back(buildCarrierIdentifiers(curNode));
         }
         grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_0);
         if (grandson == nullptr) {
@@ -961,8 +961,8 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             return false;
         }
         int32_t policyRuleFlags = grandson->Asn1AsInteger();
-        eUiccRulesAuthTable_.policyRules.push_back(policyRules);
-        eUiccRulesAuthTable_.policyRuleFlags.push_back(policyRuleFlags);
+        eUiccRulesAuthTable_.policyRules_.push_back(policyRules);
+        eUiccRulesAuthTable_.policyRuleFlags_.push_back(policyRuleFlags);
     }
     return true;
 }
@@ -1005,8 +1005,8 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     std::string resultStr = Asn1Utils::BytesToHexStr(profileResponseByte);
-    responseChallengeResult_.resultCode = ResultState::RESULT_OK;
-    responseChallengeResult_.response = OHOS::Telephony::ToUtf16(resultStr);
+    responseChallengeResult_.resultCode_ = ResultState::RESULT_OK;
+    responseChallengeResult_.response_ = OHOS::Telephony::ToUtf16(resultStr);
     {
         std::lock_guard<std::mutex> lock(euiccChallengeMutex_);
         isEuiccChallengeReady_ = true;
@@ -1164,7 +1164,7 @@ bool EsimFile::ProcessCancelSession(int32_t slotId, const AppExecFwk::InnerEvent
     std::string transactionIdStr = Str16ToStr8(esimProfile_.transactionId);
     std::vector<uint8_t> transactionIdByte = Asn1Utils::HexStrToBytes(transactionIdStr);
     builder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, transactionIdByte, transactionIdByte.size());
-    builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, static_cast<uint32_t>(profile->cancelReason));
+    builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_1, static_cast<uint32_t>(esimProfile_.cancelReason));
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -1218,8 +1218,8 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
     if (byteLen == 0) {
         return false;
     }
-    cancelSessionResult_.resultCode = ResultState::RESULT_OK;
-    cancelSessionResult_.response = OHOS::Telephony::ToUtf16(responseResult);
+    cancelSessionResult_.resultCode_ = ResultState::RESULT_OK;
+    cancelSessionResult_.response_ = OHOS::Telephony::ToUtf16(responseResult);
     {
         std::lock_guard<std::mutex> lock(cancelSessionMutex_);
         isCancelSessionReady_ = true;
@@ -1241,7 +1241,7 @@ bool EsimFile::GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root)
         return false;
     }
     EuiccProfileInfo euiccProfileInfo = {{0}};
-    BuildProfile(&euiccProfileInfo, profileInfo);
+    BuildBasicProfileInfo(&euiccProfileInfo, profileInfo);
     ConvertProfileInfoToApiStruct(eUiccProfile_, euiccProfileInfo);
     return true;
 }
@@ -1519,8 +1519,8 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
     if (result == nullptr) {
         return false;
     }
-    transApduDataResponse_.resultCode = ResultState::RESULT_OK;
-    transApduDataResponse_.response = OHOS::Telephony::ToUtf16(result->resultData);
+    transApduDataResponse_.resultCode_ = ResultState::RESULT_OK;
+    transApduDataResponse_.response_ = OHOS::Telephony::ToUtf16(result->resultData);
 
     {
         std::lock_guard<std::mutex> lock(sendApduDataMutex_);
@@ -1532,11 +1532,11 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
 
 ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
-    esimProfile_.portIndex = downLoadConfigInfo.portIndex;
-    esimProfile_.hashCc = downLoadConfigInfo.hashCc;
-    esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2;
-    esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2;
-    esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate;
+    esimProfile_.portIndex = downLoadConfigInfo.portIndex_;
+    esimProfile_.hashCc = downLoadConfigInfo.hashCc_;
+    esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2_;
+    esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2_;
+    esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate_;
     SyncOpenChannel();
     if (!ProcessPrepareDownload(slotId_)) {
         TELEPHONY_LOGE("ProcessPrepareDownload encode failed");
@@ -1744,10 +1744,10 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
             }
         }
     }
-    preDownloadResult_.resultCode = ResultState::RESULT_OK;
+    preDownloadResult_.resultCode_ = ResultState::RESULT_OK;
     std::string responseByteStr = Asn1Utils::BytesToString(responseByte);
     std::string destString = VCardUtils::EncodeBase64(responseByteStr);
-    preDownloadResult_.response = OHOS::Telephony::ToUtf16(destString);
+    preDownloadResult_.response_ = OHOS::Telephony::ToUtf16(destString);
     {
         std::lock_guard<std::mutex> lock(prepareDownloadMutex_);
         isPrepareDownloadReady_ = true;
@@ -1911,7 +1911,7 @@ bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
 {
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
     uint32_t byteLen = responseByte.size();
-    loadBPPResult_.response = OHOS::Telephony::ToUtf16(combineHexStr);
+    loadBPPResult_.response_ = OHOS::Telephony::ToUtf16(combineHexStr);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
@@ -1934,7 +1934,7 @@ bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
         loadBppCv_.notify_one();
         return false;
     }
-    loadBPPResult_.resultCode = 0;
+    loadBPPResult_.resultCode_ = 0;
     {
         std::lock_guard<std::mutex> lock(loadBppMutex_);
         isLoadBppReady_ = true;
@@ -1951,14 +1951,14 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
     }
     std::shared_ptr<Asn1Node> sequenceNumberAsn = notificationMetadata->Asn1GetChild(TAG_ESIM_CTX_0);
     if (sequenceNumberAsn != nullptr) {
-        loadBPPResult_.seqNumber = sequenceNumberAsn->Asn1AsInteger();
+        loadBPPResult_.seqNumber_ = sequenceNumberAsn->Asn1AsInteger();
     } else {
         TELEPHONY_LOGE("sequenceNumber tag missing");
         return false;
     }
     std::shared_ptr<Asn1Node> profileManagementOpAsn = notificationMetadata->Asn1GetChild(TAG_ESIM_CTX_1);
     if (profileManagementOpAsn != nullptr) {
-        loadBPPResult_.profileManagementOperation = EVENT_INSTALL;
+        loadBPPResult_.profileManagementOperation_ = EVENT_INSTALL;
     } else {
         TELEPHONY_LOGE("profileManagementOperation tag missing");
         return false;
@@ -1968,7 +1968,7 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
         std::string hexString;
         addressAsn->Asn1AsString(hexString);
         std::string address = Asn1Utils::HexStrToString(hexString);
-        loadBPPResult_.notificationAddress = OHOS::Telephony::ToUtf16(address);
+        loadBPPResult_.notificationAddress_ = OHOS::Telephony::ToUtf16(address);
     } else {
         TELEPHONY_LOGE("notificationAddress tag missing");
         return false;
@@ -1982,7 +1982,7 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
     std::string iccString;
     uint32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
     Asn1Utils::BchToString(iccid, iccString);
-    loadBPPResult_.iccId = OHOS::Telephony::ToUtf16(iccString);
+    loadBPPResult_.iccId_ = OHOS::Telephony::ToUtf16(iccString);
     return true;
 }
 
@@ -2000,7 +2000,7 @@ std::shared_ptr<Asn1Node> EsimFile::LoadBoundProfilePackageParseProfileInstallRe
     std::shared_ptr<Asn1Node> errNode = resultData->Asn1GetGreatGrandson(TAG_ESIM_CTX_COMP_2,
         TAG_ESIM_CTX_COMP_1, TAG_ESIM_CTX_1);
     if (errNode != nullptr) {
-        loadBPPResult_.resultCode = errNode->Asn1AsInteger();
+        loadBPPResult_.resultCode_ = errNode->Asn1AsInteger();
         return nullptr;
     }
     std::shared_ptr<Asn1Node> notificationMetadataAsn = resultData->Asn1GetChild(TAG_ESIM_NOTIFICATION_METADATA);
@@ -2063,7 +2063,7 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
         TELEPHONY_LOGE("nodeSeq is nullptr");
         return;
     }
-    euicc.seq = nodeSeq->Asn1AsInteger();
+    euicc.seq_ = nodeSeq->Asn1AsInteger();
 
     std::shared_ptr<Asn1Node> nodeTargetAddr = metadataNode->Asn1GetChild(TAG_ESIM_TARGET_ADDR);
     if (nodeTargetAddr == nullptr) {
@@ -2072,18 +2072,18 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
     }
     std::vector<uint8_t> resultStr;
     nodeTargetAddr->Asn1AsBytes(resultStr);
-    euicc.targetAddr = OHOS::Telephony::ToUtf16(Asn1Utils::BytesToString(resultStr));
+    euicc.targetAddr_ = OHOS::Telephony::ToUtf16(Asn1Utils::BytesToString(resultStr));
 
     std::shared_ptr<Asn1Node> nodeEvent = metadataNode->Asn1GetChild(TAG_ESIM_EVENT);
     if (nodeEvent == nullptr) {
         TELEPHONY_LOGE("nodeEvent is nullptr");
         return;
     }
-    euicc.event = nodeEvent->Asn1AsBits();
+    euicc.event_ = nodeEvent->Asn1AsBits();
 
     std::string strmData;
     node->Asn1NodeToHexStr(strmData);
-    euicc.data = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
+    euicc.data_ = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
 }
 
 bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root)
@@ -2109,7 +2109,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &r
         curNode = *it;
         EuiccNotification euicc;
         createNotification(curNode, euicc);
-        euiccList.euiccNotification.push_back(euicc);
+        euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
     {
@@ -2249,56 +2249,6 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
     return true;
 }
 
-void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification& euicc)
-{
-    if (node == nullptr) {
-        TELEPHONY_LOGE("createNotification node is nullptr");
-        return;
-    }
-    std::shared_ptr<Asn1Node> metadataNode;
-    if (node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA) {
-        metadataNode = node;
-    } else if (node->GetNodeTag() == TAG_ESIM_PROFILE_INSTALLATION_RESULT) {
-        std::shared_ptr<Asn1Node> findNode = node->Asn1GetGrandson(TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA,
-            TAG_ESIM_NOTIFICATION_METADATA);
-        metadataNode = findNode;
-    } else {
-        // Other signed notification
-        std::shared_ptr<Asn1Node> findNode = node->Asn1GetChild(TAG_ESIM_NOTIFICATION_METADATA);
-        metadataNode = findNode;
-    }
-    if (metadataNode == nullptr) {
-        TELEPHONY_LOGE("metadataNode is nullptr");
-        return;
-    }
-    std::shared_ptr<Asn1Node> nodeSeq = metadataNode->Asn1GetChild(TAG_ESIM_SEQ);
-    if (nodeSeq == nullptr) {
-        TELEPHONY_LOGE("nodeSeq is nullptr");
-        return;
-    }
-    euicc.seq = nodeSeq->Asn1AsInteger();
-
-    std::shared_ptr<Asn1Node> nodeTargetAddr = metadataNode->Asn1GetChild(TAG_ESIM_TARGET_ADDR);
-    if (nodeTargetAddr == nullptr) {
-        TELEPHONY_LOGE("nodeTargetAddr is nullptr");
-        return;
-    }
-    std::string strResult;
-    nodeTargetAddr->Asn1AsString(strResult);
-    euicc.targetAddr = OHOS::Telephony::ToUtf16(strResult);
-
-    std::shared_ptr<Asn1Node> nodeEvent = metadataNode->Asn1GetChild(TAG_ESIM_EVENT);
-    if (nodeEvent == nullptr) {
-        TELEPHONY_LOGE("nodeEvent is nullptr");
-        return;
-    }
-    euicc.event = nodeEvent->Asn1AsBits();
-
-    std::string strmData;
-    node->Asn1NodeToHexStr(strmData);
-    euicc.data = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
-}
-
 bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
 {
     std::list<std::shared_ptr<Asn1Node>> ls;
@@ -2318,7 +2268,7 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
         curNode = *it;
         EuiccNotification euicc;
         createNotification(curNode, euicc);
-        euiccList.euiccNotification.push_back(euicc);
+        euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
     return true;
@@ -2462,11 +2412,11 @@ ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
     return delProfile_;
 }
 
-ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim)
+ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
-    esimProfile_.forceDeactivateSim = forceDeactivateSim;
+    esimProfile_.forceDisableProfile = forceDisableProfile;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSwitchToProfile = BuildCallerInfo(MSG_ESIM_SWITCH_PROFILE);
     if (!ProcessSwitchToProfile(slotId_, eventSwitchToProfile)) {
@@ -2649,7 +2599,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("asn1NodeData is nullptr");
         return false;
     }
-    updateNicknameResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+    setNicknameResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
     {
         std::lock_guard<std::mutex> lock(setNicknameMutex_);
         isSetNicknameReady_ = true;
@@ -2680,12 +2630,12 @@ ResponseEsimResult EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 
 ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
-    esimProfile_.portIndex = authenticateConfigInfo.portIndex;
-    esimProfile_.matchingId = authenticateConfigInfo.matchingId;
-    esimProfile_.serverSigned1 = authenticateConfigInfo.serverSigned1;
-    esimProfile_.serverSignature1 = authenticateConfigInfo.serverSignature1;
-    esimProfile_.euiccCiPkIdToBeUsed = authenticateConfigInfo.euiccCiPkIdToBeUsed;
-    esimProfile_.serverCertificate = authenticateConfigInfo.serverCertificate;
+    esimProfile_.portIndex = authenticateConfigInfo.portIndex_;
+    esimProfile_.matchingId = authenticateConfigInfo.matchingId_;
+    esimProfile_.serverSigned1 = authenticateConfigInfo.serverSigned1_;
+    esimProfile_.serverSignature1 = authenticateConfigInfo.serverSignature1_;
+    esimProfile_.euiccCiPkIdToBeUsed = authenticateConfigInfo.euiccCiPkIdToBeUsed_;
+    esimProfile_.serverCertificate = authenticateConfigInfo.serverCertificate_;
 
     std::u16string imei = u"";
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
@@ -2757,7 +2707,7 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     Asn1AddChildAsBase64(builder, bytes.euiccCiPKIdToBeUsed);
     Asn1AddChildAsBase64(builder, bytes.serverCertificate);
     std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-    AddCtxParams1(ctxParams1Builder, &bytes);
+    AddCtxParams1(ctxParams1Builder, bytes);
     if (ctxParams1Builder == nullptr) {
         TELEPHONY_LOGE("AddCtxParams1 failed");
         return false;
@@ -2858,18 +2808,18 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
         return false;
     }
     EuiccInfo2 euiccInfo2 = {};
-    this->EuiccInfo2ParseProfileVersion(&euiccInfo2, root);
-    this->EuiccInfo2ParseSvn(&euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccFirmwareVer(&euiccInfo2, root);
-    this->EuiccInfo2ParseExtCardResource(&euiccInfo2, root);
-    this->EuiccInfo2ParseUiccCapability(&euiccInfo2, root);
-    this->EuiccInfo2ParseTs102241Version(&euiccInfo2, root);
-    this->EuiccInfo2ParseGlobalPlatformVersion(&euiccInfo2, root);
-    this->EuiccInfo2ParseRspCapability(&euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCiPKIdListForVerification(&euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCiPKIdListForSigning(&euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCategory(&euiccInfo2, root);
-    this->EuiccInfo2ParsePpVersion(&euiccInfo2, root);
+    this->EuiccInfo2ParseProfileVersion(euiccInfo2, root);
+    this->EuiccInfo2ParseSvn(euiccInfo2, root);
+    this->EuiccInfo2ParseEuiccFirmwareVer(euiccInfo2, root);
+    this->EuiccInfo2ParseExtCardResource(euiccInfo2, root);
+    this->EuiccInfo2ParseUiccCapability(euiccInfo2, root);
+    this->EuiccInfo2ParseTs102241Version(euiccInfo2, root);
+    this->EuiccInfo2ParseGlobalPlatformVersion(euiccInfo2, root);
+    this->EuiccInfo2ParseRspCapability(euiccInfo2, root);
+    this->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2, root);
+    this->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2, root);
+    this->EuiccInfo2ParseEuiccCategory(euiccInfo2, root);
+    this->EuiccInfo2ParsePpVersion(euiccInfo2, root);
     {
         std::lock_guard<std::mutex> lock(euiccInfo2Mutex_);
         isEuiccInfo2Ready_ = true;
@@ -3100,9 +3050,9 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
 
 void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src)
 {
-    dst.resultCode = static_cast<ResultState>(src.errCode);
+    dst.resultCode_ = static_cast<ResultState>(src.errCode);
     std::string hexStr = Asn1Utils::BytesToHexStr(src.respStr);
-    dst.response = OHOS::Telephony::ToUtf16(hexStr);
+    dst.response_ = OHOS::Telephony::ToUtf16(hexStr);
 }
 
 void EsimFile::InitMemberFunc()

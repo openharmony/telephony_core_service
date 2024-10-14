@@ -75,26 +75,26 @@ public:
      * @param slotId[in], indicates the card slot index number.
      * @param portIndex[in], index of the port from the slot.
      * @param profile[in], the Bound Profile Package data returned by SM-DP+ server.
-     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * @param forceDisableProfile[in], if true, and if an active SIM must be deactivated to access the eUICC,
      * perform this action automatically.
      * @param profileMetadataResult[out], the metadata for profile.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetDownloadableProfileMetadata(int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-        bool forceDeactivateSim, GetDownloadableProfileMetadataResult &profileMetadataResult);
+        bool forceDisableProfile, GetDownloadableProfileMetadataResult &profileMetadataResult);
 
     /**
      * @brief Gets downloadable profile List which are available for download on this device.
      *
      * @param slotId[in], indicates the card slot index number.
-     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * @param forceDisableProfile[in], if true, and if an active SIM must be deactivated to access the eUICC,
      * perform this action automatically.
      * @param profileListResult[out], the metadata for downloadableProfile which are
      * available for download on this device.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetDownloadableProfiles(
-        int32_t slotId, int32_t portIndex, bool forceDeactivateSim, GetDownloadableProfilesResult &profileListResult);
+        int32_t slotId, int32_t portIndex, bool forceDisableProfile, GetDownloadableProfilesResult &profileListResult);
 
     /**
      * @brief Attempt to download the given downloadable Profile.
@@ -142,13 +142,13 @@ public:
      * @param slotId[in], indicates the card slot index number.
      * @param portIndex[in], index of the port from the slot.
      * @param iccId[in], the iccId of the profile.
-     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * @param forceDisableProfile[in], if true, and if an active SIM must be deactivated to access the eUICC,
      * perform this action automatically.
      * @param switchToProfileResult[out], the response to switch profile.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
-        const std::string &iccId, bool forceDeactivateSim, int32_t &switchToProfileResult);
+        const std::string &iccId, bool forceDisableProfile, int32_t &switchToProfileResult);
 
     /**
      * @brief Set the nickname for the given profile.

@@ -366,14 +366,14 @@ HWTEST_F(EsimCoreServiceTest, SwitchToProfile_0001, Function | MediumTest | Leve
     int32_t slotId = 0;
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState switchProfileResult;
     EXPECT_NE(mCoreService->SwitchToProfile(
-        slotId, portIndex, iccId, forceDeactivateSim, switchProfileResult), TELEPHONY_ERR_SUCCESS);
+        slotId, portIndex, iccId, forceDisableProfile, switchProfileResult), TELEPHONY_ERR_SUCCESS);
 
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->SwitchToProfile(
-        slotId, portIndex, iccId, forceDeactivateSim, switchProfileResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+        slotId, portIndex, iccId, forceDisableProfile, switchProfileResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(EsimCoreServiceTest, SetProfileNickname_0001, Function | MediumTest | Level1)
