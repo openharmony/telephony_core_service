@@ -2011,7 +2011,7 @@ int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, 
 }
 
 int32_t CoreService::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -2025,7 +2025,7 @@ int32_t CoreService::SwitchToProfile(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    return simManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
 }
 
 int32_t CoreService::SetProfileNickname(

@@ -289,11 +289,11 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SwitchToProfile_0100, Function | Mediu
     int32_t slotId = 0;
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
-        slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+        slotId, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 

@@ -1155,12 +1155,12 @@ public:
      * @param slotId[in], sim slot id
      * @param portIndex[in], index of the port from the slot
      * @param iccId[in], the iccId of the profile
-     * @param forceDeactivateSim[in], if true, and if an active SIM must be deactivated to access the eUICC,
+     * @param forceDisableProfile[in], if true, and if an active SIM must be deactivated to access the eUICC,
      * perform this action automatically
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim,
+    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile,
         ResultState &enumResult);
 
     /**
@@ -1180,7 +1180,7 @@ public:
      *
      * @param slotId[in], sim slot id
      * @param portIndex[in], the Id of the eUICC
-     * @param result[out], get the result code and the info2
+     * @param responseResult[out], get the result code and the info2
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);

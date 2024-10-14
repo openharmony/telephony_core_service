@@ -559,7 +559,7 @@ public:
     }
 
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
-        const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult) override
+        const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult) override
     {
         return 0;
     }

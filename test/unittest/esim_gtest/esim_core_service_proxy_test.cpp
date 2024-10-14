@@ -816,9 +816,9 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_001, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -829,10 +829,10 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_002, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -843,10 +843,10 @@ HWTEST_F(EsimCoreServiceProxyTest, SwitchToProfile_003, Function | MediumTest | 
 
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
-    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+    int32_t ret = proxy.SwitchToProfile(SLOT_ID, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_EQ(ret, 0);
 }
 

@@ -1202,13 +1202,13 @@ ResultState SimFileManager::DeleteProfile(const std::u16string &iccId)
     return result;
 }
 
-ResultState SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim)
+ResultState SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
         return ResultState::RESULT_UNDEFINED_ERROR;
     }
-    ResultState result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    ResultState result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return result;
 }
 

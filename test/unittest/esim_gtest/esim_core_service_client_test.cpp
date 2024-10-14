@@ -255,10 +255,10 @@ HWTEST_F(EsimCoreServiceClientTest, SwitchToProfile_0001, Function | MediumTest 
     int32_t slotId = 0;
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    bool forceDeactivateSim = true;
+    bool forceDisableProfile = true;
     ResultState SwitchProfileResult;
     int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
-        slotId, portIndex, iccId, forceDeactivateSim, SwitchProfileResult);
+        slotId, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 

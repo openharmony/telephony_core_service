@@ -19,7 +19,15 @@
 #include "cell_information.h"
 #include "dialling_numbers_info.h"
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "download_profile_config_info_parcel.h"
+#include "download_profile_result_parcel.h"
+#include "downloadable_profile_parcel.h"
 #include "esim_state_type.h"
+#include "euicc_info_parcel.h"
+#include "get_downloadable_profiles_result_parcel.h"
+#include "profile_info_list_parcel.h"
+#include "profile_metadata_result_parcel.h"
+#include "response_esim_result.h"
 #endif
 #include "i_network_search_callback.h"
 #include "ims_reg_info_callback.h"
@@ -188,7 +196,7 @@ public:
         int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) = 0;
     virtual int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) = 0;
     virtual int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
-        const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult) = 0;
+        const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult) = 0;
     virtual int32_t SetProfileNickname(
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) = 0;
     virtual int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) = 0;

@@ -203,7 +203,7 @@ HWTEST_F(EsimFileManagerTest, CancelSession_001, Function | MediumTest | Level2)
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string transactionId = u"";
-    CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTED;
+    CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTION;
     ResponseEsimResult res = simFileManager.CancelSession(transactionId, cancelReason);
     EXPECT_EQ(res.resultCode, ResultState::RESULT_OK);
     simFileManager.eSimFile_ = nullptr;
@@ -461,11 +461,11 @@ HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     std::u16string iccId = u"";
-    bool forceDeactivateSim = false;
-    ResultState res = simFileManager.SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    bool forceDisableProfile = false;
+    ResultState res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
     EXPECT_NE(res, ResultState::RESULT_UNDEFINED_ERROR);
     simFileManager.eSimFile_ = nullptr;
-    res = simFileManager.SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
     EXPECT_EQ(res, ResultState::RESULT_UNDEFINED_ERROR);
 }
 
