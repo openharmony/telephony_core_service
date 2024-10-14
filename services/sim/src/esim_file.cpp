@@ -730,7 +730,6 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
     if (!IsLogicChannelOpen()) {
         return false;
     }
-    EsimProfile *profile = &esimProfile_;
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DISABLE_PROFILE);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     if (builder == nullptr || subBuilder == nullptr) {
@@ -738,7 +737,7 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
         return false;
     }
     std::vector<uint8_t> iccidBytes;
-    std::string str = OHOS::Telephony::ToUtf8(profile->iccId);
+    std::string str = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(str, iccidBytes);
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_ICCID, iccidBytes, iccidBytes.size());
     std::shared_ptr<Asn1Node> subNode = subBuilder->Asn1Build();
