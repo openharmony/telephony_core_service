@@ -137,6 +137,8 @@ HWTEST_F(EsimCoreServiceProxyTest, ReadEuiccProfileFromReply_001, Function | Med
     MessageParcel reply;
     EuiccProfile euiccProfile;
     proxy.ReadEuiccProfileFromReply(reply, euiccProfile);
+    bool ret = euiccProfile.nickName_.empty();
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(EsimCoreServiceProxyTest, GetEuiccProfileInfoList_001, Function | MediumTest | Level2)
