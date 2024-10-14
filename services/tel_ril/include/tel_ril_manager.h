@@ -307,6 +307,8 @@ public:
     void SendAckAndLock(void);
     void ReduceRunningLock();
     void ReleaseRunningLock();
+    int32_t GetTelRilSimSize();
+    int32_t GetTelRilModemSize();
 
 public:
     static const int32_t INVALID_WAKELOCK = -1;
@@ -355,6 +357,7 @@ private:
 
 private:
     std::mutex mutex_;
+    std::mutex telRilMutex_;
     std::vector<std::shared_ptr<TelRilSim>> telRilSim_;
     std::vector<std::shared_ptr<TelRilSms>> telRilSms_;
     std::vector<std::shared_ptr<TelRilCall>> telRilCall_;
