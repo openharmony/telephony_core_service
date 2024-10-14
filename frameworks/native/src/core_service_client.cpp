@@ -1308,14 +1308,14 @@ int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &i
 }
 
 int32_t CoreServiceClient::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDeactivateSim, enumResult);
+    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
 }
 
 int32_t CoreServiceClient::SetProfileNickname(
@@ -1327,6 +1327,28 @@ int32_t CoreServiceClient::SetProfileNickname(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->SetProfileNickname(slotId, iccId, nickname, enumResult);
+}
+
+int32_t CoreServiceClient::GetEuiccInfo2(
+    int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetEuiccInfo2(slotId, portIndex, responseResult);
+}
+
+int32_t CoreServiceClient::AuthenticateServer(
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
 }
 #endif
 } // namespace Telephony

@@ -40,6 +40,7 @@ private:
     void AddHandlerOpkeyVersionToMap();
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void AddHandlerEsimToMap();
+    void AddHandlerEsimEidToMap();
 #endif
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
@@ -168,6 +169,8 @@ private:
     int32_t OnDeleteProfile(MessageParcel &data, MessageParcel &reply);
     int32_t OnSwitchToProfile(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetProfileNickname(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetEuiccInfo2(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAuthenticateServer(MessageParcel &data, MessageParcel &reply);
 #endif
 
 private:

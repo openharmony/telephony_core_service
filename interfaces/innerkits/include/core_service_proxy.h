@@ -181,10 +181,13 @@ public:
     int32_t RemoveNotificationFromList(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) override;
     int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) override;
-    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim,
+    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile,
         ResultState &enumResult) override;
     int32_t SetProfileNickname(
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) override;
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
+    int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
+        ResponseEsimResult &responseResult) override;
 #endif
 
 private:
@@ -203,6 +206,7 @@ private:
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
+    int32_t RealAuthenticateServer(const MessageParcel &data, const MessageParcel &reply, const MessageParcel &option);
 #endif
 
 private:

@@ -29,12 +29,12 @@ interface OHOS.Telephony.IEsimService {
         [in] int slotId,
         [in] int portIndex,
         [in] DownloadableProfile profile,
-        [in] boolean forceDeactivateSim,
+        [in] boolean forceDisableProfile,
         [out] GetDownloadableProfileMetadataResult profileMetadataResult);
     void GetDownloadableProfiles(
         [in] int slotId,
         [in] int portIndex,
-        [in] boolean forceDeactivateSim,
+        [in] boolean forceDisableProfile,
         [out] GetDownloadableProfilesResult profileListResult);
     void DownloadProfile(
         [in] int slotId,
@@ -48,7 +48,7 @@ interface OHOS.Telephony.IEsimService {
         [in] int slotId,
         [in] int portIndex,
         [in] String iccId,
-        [in] boolean forceDeactivateSim,
+        [in] boolean forceDisableProfile,
         [out] int switchToProfileResult);
     void SetProfileNickname(
         [in] int slotId,

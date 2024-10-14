@@ -1351,7 +1351,7 @@ int32_t SimManager::CancelSession(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = simFileManager_[slotId]->CancelSession(transactionId, cancelReason);
-    if (responseResult.resultCode != ResultState::RESULT_OK) {
+    if (responseResult.resultCode_ != ResultState::RESULT_OK) {
         return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -1365,7 +1365,7 @@ int32_t SimManager::GetProfile(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccProfile = simFileManager_[slotId]->GetProfile(portIndex, iccId);
-    if (eUiccProfile.state != ProfileState::PROFILE_STATE_DISABLED) {
+    if (eUiccProfile.state_ != ProfileState::PROFILE_STATE_DISABLED) {
         return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -1489,13 +1489,13 @@ int32_t SimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, R
 }
 
 int32_t SimManager::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    enumResult = simFileManager_[slotId]->SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    enumResult = simFileManager_[slotId]->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1507,6 +1507,27 @@ int32_t SimManager::SetProfileNickname(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = simFileManager_[slotId]->SetProfileNickname(iccId, nickname);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->GetEuiccInfo2(portIndex);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::AuthenticateServer(
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    responseResult = simFileManager_[slotId]->AuthenticateServer(authenticateConfigInfo);
     return TELEPHONY_ERR_SUCCESS;
 }
 #endif

@@ -302,8 +302,8 @@ uint32_t Asn1Node::Asn1AsString(std::string &output)
         return hexStrLen;
     }
     std::string hexStr = Asn1Utils::BytesToHexStr(dataBytes_);
-    output = hexStr;
-    return static_cast<uint32_t>(hexStr.length());
+    output = Asn1Utils::HexStrToString(hexStr);
+    return static_cast<uint32_t>(Asn1Utils::HexStrToString(hexStr).length());
 }
 
 int32_t Asn1Node::Asn1AsBits()

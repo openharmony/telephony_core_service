@@ -1202,13 +1202,13 @@ ResultState SimFileManager::DeleteProfile(const std::u16string &iccId)
     return result;
 }
 
-ResultState SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDeactivateSim)
+ResultState SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
         return ResultState::RESULT_UNDEFINED_ERROR;
     }
-    ResultState result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDeactivateSim);
+    ResultState result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return result;
 }
 
@@ -1219,6 +1219,26 @@ ResultState SimFileManager::SetProfileNickname(const std::u16string &iccId, cons
         return ResultState::RESULT_UNDEFINED_ERROR;
     }
     ResultState result = eSimFile_->SetProfileNickname(iccId, nickname);
+    return result;
+}
+
+ResponseEsimResult SimFileManager::GetEuiccInfo2(int32_t portIndex)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->ObtainEuiccInfo2(portIndex);
+    return result;
+}
+
+ResponseEsimResult SimFileManager::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return ResponseEsimResult();
+    }
+    ResponseEsimResult result = eSimFile_->AuthenticateServer(authenticateConfigInfo);
     return result;
 }
 #endif

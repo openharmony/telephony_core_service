@@ -27,29 +27,28 @@ namespace Telephony {
  * @brief Result state.
  */
 enum class ResultState {
-    RESULT_RESOLVABLE_ERRORS = -2,
-    RESULT_MUST_DEACTIVATE_SIM = -1,
+    RESULT_SOLVABLE_ERRORS = -2,
+    RESULT_MUST_DISABLE_PROFILE = -1,
     RESULT_OK = 0,
-    RESULT_FIRST_USER = 1,
-    RESULT_UNDEFINED_ERROR = 2,
+    RESULT_UNDEFINED_ERROR = 1,
 };
 
 /**
  * @brief Euicc OTA update status.
  */
 enum class OsuStatus {
-    EUICC_OSU_IN_PROGRESS = 1,
-    EUICC_OSU_FAILED = 2,
-    EUICC_OSU_SUCCEEDED = 3,
-    EUICC_OSU_NOT_NEEDED = 4,
-    EUICC_OSU_UNAVAILABLE = 5,
+    EUICC_UPGRAD_IN_PROGRESS = 1,
+    EUICC_UPGRAD_FAILED = 2,
+    EUICC_UPGRAD_SUCCESSFUL = 3,
+    EUICC_UPGRAD_ALREADY_LATEST = 4,
+    EUICC_UPGRAD_SERVICE_UNAVAILABLE = 5,
 };
 
 /**
  * @brief Reason for canceling a profile download session.
  */
 enum class CancelReason {
-    CANCEL_REASON_END_USER_REJECTED = 0,
+    CANCEL_REASON_END_USER_REJECTION = 0,
     CANCEL_REASON_POSTPONED = 1,
     CANCEL_REASON_TIMEOUT = 2,
     CANCEL_REASON_PPR_NOT_ALLOWED = 3,
@@ -78,7 +77,7 @@ enum class ProfileState {
  */
 enum class ProfileClass {
     PROFILE_CLASS_UNSPECIFIED = -1,
-    PROFILE_CLASS_TESTING = 0,
+    PROFILE_CLASS_TEST = 0,
     PROFILE_CLASS_PROVISIONING = 1,
     PROFILE_CLASS_OPERATIONAL = 2,
 };
@@ -87,17 +86,17 @@ enum class ProfileClass {
  * @brief The policy rules of the profile.
  */
 enum class PolicyRules {
-    POLICY_RULE_DO_NOT_DISABLE = 1,
-    POLICY_RULE_DO_NOT_DELETE = 1 << 1,
-    POLICY_RULE_DELETE_AFTER_DISABLING = 1 << 2,
+    POLICY_RULE_DISABLE_NOT_ALLOWED = 1,
+    POLICY_RULE_DELETE_NOT_ALLOWED = 1 << 1,
+    POLICY_RULE_DISABLE_AND_DELETE = 1 << 2,
 };
 
 /**
  * @brief The bit map of resolvable errors.
  */
-enum class ResolvableErrors {
-    RESOLVABLE_ERROR_CONFIRMATION_CODE = 1 << 0,
-    RESOLVABLE_ERROR_POLICY_RULES = 1 << 1,
+enum class SolvableErrors {
+    SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE = 1 << 0,
+    SOLVABLE_ERROR_NEEED_POLICY_RULE = 1 << 1,
 };
 
 /**
@@ -162,11 +161,23 @@ struct EuiccRulesAuthTable {
  * @brief ConfigInfo about prepareDownload.
  */
 struct DownLoadConfigInfo {
-    int32_t portIndex = 0;
-    std::u16string hashCc = u"";
-    std::u16string smdpSigned2 = u"";
-    std::u16string smdpSignature2 = u"";
-    std::u16string smdpCertificate = u"";
+    int32_t portIndex_ = 0;
+    std::u16string hashCc_ = u"";
+    std::u16string smdpSigned2_ = u"";
+    std::u16string smdpSignature2_ = u"";
+    std::u16string smdpCertificate_ = u"";
+};
+
+/**
+ * @brief Config information about Authenticate.
+ */
+struct AuthenticateConfigInfo {
+    int32_t portIndex_ = 0;
+    std::u16string matchingId_ = u"";
+    std::u16string serverSigned1_ = u"";
+    std::u16string serverSignature1_ = u"";
+    std::u16string euiccCiPkIdToBeUsed_ = u"";
+    std::u16string serverCertificate_ = u"";
 };
 
 /**

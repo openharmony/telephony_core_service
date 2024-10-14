@@ -273,5 +273,32 @@ HWTEST_F(EsimCoreServiceStubTest, OnSetProfileNickname_001, Function | MediumTes
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+int32_t EsimCoreServiceStubTest::SendRemoteRequest(MessageParcel &data, CoreServiceInterfaceCode code)
+{
+    MessageParcel reply;
+    MessageOption option;
+    return instance_->OnRemoteRequest(static_cast<uint32_t>(code), data, reply, option);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnGetEuiccInfo2_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::GET_EUICC_INFO2);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(EsimCoreServiceStubTest, OnAuthenticateServer_001, Function | MediumTest | Level2)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::AUTHENTICATE_SERVER);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS
