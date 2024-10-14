@@ -39,6 +39,7 @@ EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("
 {
     currentChannelId_ = 0;
     InitMemberFunc();
+    InitChanneMemberFunc();
 }
 
 void EsimFile::StartLoad() {}
@@ -3055,12 +3056,18 @@ void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse
     dst.response_ = OHOS::Telephony::ToUtf16(hexStr);
 }
 
-void EsimFile::InitMemberFunc()
+void EsimFile::InitChanneMemberFunc()
 {
     memberFuncMap_[MSG_ESIM_OPEN_CHANNEL_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessEsimOpenChannelDone(event); };
     memberFuncMap_[MSG_ESIM_CLOSE_CHANNEL_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessEsimCloseChannelDone(event); };
+    memberFuncMap_[MSG_ESIM_SEND_APUD_DATA] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSendApduDataDone(event); };
+}
+
+void EsimFile::InitMemberFunc()
+{
     memberFuncMap_[MSG_ESIM_OBTAIN_EID_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEidDone(event); };
     memberFuncMap_[MSG_ESIM_OBTAIN_EUICC_INFO_1_DONE] =
@@ -3085,8 +3092,6 @@ void EsimFile::InitMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessEstablishDefaultSmdpAddressDone(event); };
     memberFuncMap_[MSG_ESIM_RESET_MEMORY] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessResetMemoryDone(event); };
-    memberFuncMap_[MSG_ESIM_SEND_APUD_DATA] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSendApduDataDone(event); };
     memberFuncMap_[MSG_ESIM_LIST_NOTIFICATION] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessListNotificationsDone(event); };
     memberFuncMap_[MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE] =

@@ -42,6 +42,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerOpkeyVersionToMap();
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     AddHandlerEsimToMap();
+    AddHandlerEsimEidToMap();
 #endif
 }
 
@@ -276,10 +277,16 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-void CoreServiceStub::AddHandlerEsimToMap()
+void CoreServiceStub::AddHandlerEsimEidToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EID)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetEid(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerEsimToMap()
+{
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_PROFILE_INFO_LIST)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetEuiccProfileInfoList(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_EUICC_INFO)] =
@@ -304,8 +311,6 @@ void CoreServiceStub::AddHandlerEsimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultSmdpAddress(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnIsEsimSupported(data, reply); };
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnPrepareDownload(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE)] =

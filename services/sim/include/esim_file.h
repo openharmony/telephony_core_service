@@ -110,6 +110,7 @@ public:
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     void InitMemberFunc();
+    void InitChanneMemberFunc()
     void SyncCloseChannel();
     bool IsLogicChannelOpen();
     void ProcessEsimOpenChannel(const std::u16string &aid);
