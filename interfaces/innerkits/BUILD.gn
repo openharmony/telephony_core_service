@@ -112,6 +112,8 @@ ohos_shared_library("tel_core_service_api") {
     "LOG_DOMAIN = 0xD001F04",
   ]
 
+  defines += telephony_extra_defines
+
   public_configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
   public_configs += [ ":tel_core_service_api_config" ]

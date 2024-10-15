@@ -13,6 +13,8 @@
 
 import("//build/test.gni")
 SOURCE_DIR = "../../../"
+import("$SOURCE_DIR/telephony_core_service.gni")
+
 ohos_unittest("esim_service_client_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
@@ -176,6 +178,8 @@ ohos_unittest("tel_esim_gtest") {
     defines += [ "ABILITY_LOCATION_SUPPORT" ]
   }
 
+  defines += telephony_extra_defines
+
   cflags = [
     "-flto",
     "-fsanitize=cfi",
@@ -254,6 +258,8 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&

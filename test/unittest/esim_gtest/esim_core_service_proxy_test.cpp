@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#define private public
+#define protected public
+
 #include <chrono>
 #include <thread>
 
@@ -570,8 +573,8 @@ HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_001, Function | MediumTest | 
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
     DownLoadConfigInfo downLoadConfigInfo;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
@@ -581,8 +584,8 @@ HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_002, Function | MediumTest | 
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     DownLoadConfigInfo downLoadConfigInfo;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
     EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -593,8 +596,8 @@ HWTEST_F(EsimCoreServiceProxyTest, PrepareDownload_003, Function | MediumTest | 
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     DownLoadConfigInfo downLoadConfigInfo;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     EXPECT_EQ(proxy.PrepareDownload(SLOT_ID, downLoadConfigInfo, responseResult), 0);
@@ -929,8 +932,8 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_001, Function | MediumTest
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = 0;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.portIndex_ = 0;
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -941,8 +944,8 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_002, Function | MediumTest
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = 0;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.portIndex_ = 0;
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
     int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
@@ -954,8 +957,8 @@ HWTEST_F(EsimCoreServiceProxyTest, AuthenticateServer_003, Function | MediumTest
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = 0;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.portIndex_ = 0;
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
     int32_t ret = proxy.AuthenticateServer(SLOT_ID, authenticateConfigInfo, responseResult);
