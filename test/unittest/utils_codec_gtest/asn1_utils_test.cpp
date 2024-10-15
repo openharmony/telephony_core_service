@@ -18,6 +18,7 @@
 #include <cstdbool>
 #include <gtest/gtest.h>
 #include <iostream>
+#include "asn1_constants.h"
 #include "asn1_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -86,10 +87,10 @@ HWTEST_F(Asn1UtilsTest, BchToString_001, Function | MediumTest | Level3)
 HWTEST_F(Asn1UtilsTest, BcdToBytes_001, Function | MediumTest | Level3)
 {
     bool ret = false;
-    std::string iccidBytes;
+    std::vector<uint8_t> iccidBytes;
     const std::string str = "ABCDEFG";
     Asn1Utils::BcdToBytes(str.c_str(), iccidBytes);
-    int32_t iccidBytesLen = iccidBytes.length();
+    uint32_t iccidBytesLen = iccidBytes.size();
     ret = iccidBytesLen == 4 ? true : false;
     EXPECT_EQ(ret, true);
 }
@@ -157,10 +158,9 @@ HWTEST_F(Asn1UtilsTest, HexStrToBytes_001, Function | MediumTest | Level3)
 {
     const std::string resultData = "BF3C148008534D44502E434F408108736D64732E636F6D9000";
     std::vector<uint8_t> responseByte;
-    int32_t byteLen = 0;
     bool ret = false;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
-    byteLen = responseByte.length();
+    uint32_t byteLen = responseByte.size();
     ret = byteLen == 0 ? true : false;
     EXPECT_EQ(ret, false);
 }
@@ -170,7 +170,7 @@ HWTEST_F(Asn1UtilsTest, UintToBytes_001, Function | MediumTest | Level3)
     bool ret = false;
     uint32_t res = 0;
     uint32_t value = 0xFF;
-    std::string versionBytes;
+    std::vector<uint8_t> versionBytes;
     res = Asn1Utils::UintToBytes(value, versionBytes);
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);
@@ -197,7 +197,7 @@ HWTEST_F(Asn1UtilsTest, BytesToInt_001, Function | MediumTest | Level3)
     std::vector<uint8_t> responseByte;
     int32_t offset = 0;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
-    int32_t byteLen = Asn1Utils::BytesToInt(responseByte, offset, responseByte.length());
+    int32_t byteLen = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size());
     ret = byteLen == 0 ? true : false;
     EXPECT_EQ(ret, false);
 }
@@ -206,8 +206,7 @@ HWTEST_F(Asn1UtilsTest, StrToHexStr_001, Function | MediumTest | Level3)
 {
     bool ret = false;
     int32_t res = 0;
-    std::string bufIn = Asn1Utils::HexStrToBytes(std::string("BF370ABF2707A205A103810103"));
-    std::string bufOut = Asn1Utils::StrToHexStr(bufIn);
+    std::string bufOut = Asn1Utils::StrToHexStr(std::string("BF370ABF2707A205A103810103"));
     res = bufOut.length();
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);
@@ -216,11 +215,11 @@ HWTEST_F(Asn1UtilsTest, StrToHexStr_001, Function | MediumTest | Level3)
 HWTEST_F(Asn1UtilsTest, StringToBytes_001, Function | MediumTest | Level3)
 {
     bool ret = false;
-    int32_t res = 0;
+    uint32_t res = 0;
     const std::string src = "BF2102A0009000";
     std::vector<uint8_t> dest;
     dest = Asn1Utils::StringToBytes(src);
-    res = dest.length();
+    res = dest.size();
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);
 }
@@ -287,7 +286,7 @@ HWTEST_F(Asn1UtilsTest, IntToBytes_001, Function | MediumTest | Level3)
     bool ret = false;
     uint32_t res = 0;
     int32_t value = 1;
-    std::string dest;
+    std::vector<uint8_t> dest;
     res = Asn1Utils::IntToBytes(value, dest);
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, false);

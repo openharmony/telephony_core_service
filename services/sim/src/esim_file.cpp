@@ -492,8 +492,8 @@ bool EsimFile::SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::s
         mMnc[NUMBER_ONE] = mccMnc[NUMBER_FOUR];
         mMnc[NUMBER_TWO] = mccMnc[NUMBER_TWO];
     }
-    mcc = mMcc;
-    mnc = mMnc;
+    mcc = mMcc.c_str();
+    mnc = mMnc.c_str();
     return true;
 }
 
@@ -1538,6 +1538,7 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
     esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2_;
     esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate_;
     SyncOpenChannel();
+    recvCombineStr_ = "";
     if (!ProcessPrepareDownload(slotId_)) {
         TELEPHONY_LOGE("ProcessPrepareDownload encode failed");
         return ResponseEsimResult();
@@ -1559,11 +1560,12 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     esimProfile_.portIndex = portIndex;
     esimProfile_.boundProfilePackage = boundProfilePackage;
     SyncOpenChannel();
-    isLoadBppReady_ = false;
+    recvCombineStr_ = "";
     if (!ProcessLoadBoundProfilePackage(slotId_)) {
         TELEPHONY_LOGE("ProcessLoadBoundProfilePackage encode failed");
         return ResponseEsimBppResult();
     }
+    isLoadBppReady_ = false;
     std::unique_lock<std::mutex> lock(loadBppMutex_);
     if (!loadBppCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isLoadBppReady_; })) {
@@ -1580,7 +1582,8 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
     esimProfile_.events = events;
     AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
     SyncOpenChannel();
-    if (!ProcessListNotifications(slotId_, Event::EVENT_ENABLE, eventListNotif)) {
+    recvCombineStr_ = "";
+    if (!ProcessListNotifications(slotId_, events, eventListNotif)) {
         TELEPHONY_LOGE("ProcessListNotifications encode failed");
         return EuiccNotificationList();
     }
@@ -1644,11 +1647,11 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     if (hexStrLen == 0) {
         return false;
     }
-    SplitSendLongData(slotId, hexStr);
+    SplitSendLongData(slotId, hexStr, MSG_ESIM_PREPARE_DOWNLOAD_DONE);
     return true;
 }
 
-void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr)
+void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr, int32_t esimMessageId)
 {
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
@@ -1656,7 +1659,7 @@ void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr)
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
         CopyApdCmdToReqInfo(&reqInfo, cmd.get());
-        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(esimMessageId);
         if (telRilManager_ == nullptr) {
             return;
         }
@@ -1673,7 +1676,7 @@ bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
     return (fileData.sw1 == SW1_VALUE_90 && fileData.sw2 == SW2_VALUE_00);
 }
 
-bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
+void EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
 {
     if (fileData.sw1 == SW1_MORE_RESPONSE) {
         ApduSimIORequestInfo reqInfo;
@@ -1682,7 +1685,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
         std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
         std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
         if (apdCmd == nullptr) {
-            return false;
+            return;
         }
         apdCmd->data.cla = 0;
         apdCmd->data.ins = INS_GET_MORE_RESPONSE;
@@ -1692,21 +1695,17 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
         CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
         AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
         if (telRilManager_ == nullptr) {
-            return false;
+            return;
         }
         telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
-        return true;
     }
-    return false;
 }
 
-bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData)
+bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId)
 {
     if (!CombineResponseDataFinish(fileData)) {
-        if (!ProcessIfNeedMoreResponse(fileData, MSG_ESIM_AUTHENTICATE_SERVER)) {
-            TELEPHONY_LOGE("try to ProcessIfNeedMoreResponse NOT done. sw1=%{public}02X", fileData.sw1);
-            return false;
-        }
+        ProcessIfNeedMoreResponse(fileData, eventId);
+        return false;
     }
     return true;
 }
@@ -1723,7 +1722,7 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         return false;
     }
     IccFileData &iccFileData = rcvMsg->fileData;
-    if (!MergeRecvLongDataComplete(iccFileData)) {
+    if (!MergeRecvLongDataComplete(iccFileData, MSG_ESIM_PREPARE_DOWNLOAD_DONE)) {
         return true;
     }
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
@@ -1901,7 +1900,7 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
         return false;
     }
     IccFileData &iccFileData = rcvMsg->fileData;
-    if (!MergeRecvLongDataComplete(iccFileData)) {
+    if (!MergeRecvLongDataComplete(iccFileData, MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE)) {
         return true;
     }
     return RealProcessLoadBoundProfilePackageDone(recvCombineStr_);
@@ -2083,7 +2082,7 @@ void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotifica
 
     std::string strmData;
     node->Asn1NodeToHexStr(strmData);
-    euicc.data_ = node->GetNodeTag() == TAG_ESIM_NOTIFICATION_METADATA ? u"" : OHOS::Telephony::ToUtf16(strmData);
+    euicc.data_ = Str8ToStr16(strmData);
 }
 
 bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root)
@@ -2122,7 +2121,21 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &r
 
 bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return false;
+    }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return false;
+    }
+    if (!MergeRecvLongDataComplete(rcvMsg->fileData, MSG_ESIM_LIST_NOTIFICATION)) {
+        return true;
+    }
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
+    uint32_t byteLen = responseByte.size();
+    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
@@ -2138,8 +2151,9 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
     SyncOpenChannel();
+    recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRetrieveListNotif = BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_LIST);
-    if (!ProcessRetrieveNotificationList(slotId_, Event::EVENT_ENABLE, eventRetrieveListNotif)) {
+    if (!ProcessRetrieveNotificationList(slotId_, events, eventRetrieveListNotif)) {
         TELEPHONY_LOGE("ProcessRetrieveNotificationList encode failed");
         return EuiccNotificationList();
     }
@@ -2307,7 +2321,17 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("event is nullptr");
         return false;
     }
-    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return false;
+    }
+    if (!MergeRecvLongDataComplete(rcvMsg->fileData, MSG_ESIM_RETRIEVE_NOTIFICATION_DONE)) {
+        return true;
+    }
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
+    uint32_t byteLen = responseByte.size();
+    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         return false;
@@ -2641,6 +2665,7 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
     esimProfile_.imei = imei;
     SyncOpenChannel();
+    recvCombineStr_ = "";
     if (!ProcessAuthenticateServer(slotId_)) {
         TELEPHONY_LOGE("ProcessAuthenticateServer encode failed");
         return ResponseEsimResult();
@@ -2720,7 +2745,7 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     builder->Asn1AddChild(ctxNode);
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
-    SplitSendLongData(slotId, hexStr);
+    SplitSendLongData(slotId, hexStr, MSG_ESIM_AUTHENTICATE_SERVER);
     return true;
 }
 
@@ -2820,6 +2845,8 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     this->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2, root);
     this->EuiccInfo2ParseEuiccCategory(euiccInfo2, root);
     this->EuiccInfo2ParsePpVersion(euiccInfo2, root);
+    responseInfo2Result_.resultCode_ = ResultState::RESULT_OK;
+    responseInfo2Result_.response_ = Str8ToStr16(euiccInfo2.firmwareVer);
     {
         std::lock_guard<std::mutex> lock(euiccInfo2Mutex_);
         isEuiccInfo2Ready_ = true;
@@ -3042,7 +3069,7 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return false;
     }
-    if (!MergeRecvLongDataComplete(rcvMsg->fileData)) {
+    if (!MergeRecvLongDataComplete(rcvMsg->fileData, MSG_ESIM_AUTHENTICATE_SERVER)) {
         return true;
     }
     return RealProcsessAuthenticateServerDone(recvCombineStr_);

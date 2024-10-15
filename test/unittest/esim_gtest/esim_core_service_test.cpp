@@ -77,7 +77,7 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     EuiccInfo euiccInfo;
-    euiccInfo.osVersion = Str8ToStr16("BF2003010203");
+    euiccInfo.osVersion_ = Str8ToStr16("BF2003010203");
     EXPECT_NE(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetEuiccInfo(slotId, euiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -253,8 +253,8 @@ HWTEST_F(EsimCoreServiceTest, PrepareDownload_0001, Function | MediumTest | Leve
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     DownLoadConfigInfo downLoadConfigInfo;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
@@ -414,8 +414,8 @@ HWTEST_F(EsimCoreServiceTest, AuthenticateServer_0001, Function | MediumTest | L
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = 0;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.portIndex_ = 0;
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;

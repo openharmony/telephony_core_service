@@ -512,11 +512,6 @@ public:
         return 0;
     }
 
-    int32_t InitExtraModule(int32_t slotId) override
-    {
-        return 0;
-    }
-
     bool IsAllowedInsertApn(std::string &value) override
     {
         return true;
@@ -631,25 +626,14 @@ public:
         return 0;
     }
 
-    int32_t AuthenticateServer(
-        int32_t slotId, int32_t portIndex,
-        const std::u16string &matchingId,
-        const std::u16string &serverSigned1,
-        const std::u16string &serverSignature1,
-        const std::u16string &euiccCiPkIdToBeUsed,
-        const std::u16string &serverCertificate,
+    int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult) override
     {
         return 0;
     }
 
     int32_t PrepareDownload(
-        int32_t slotId, int32_t portIndex,
-        const std::u16string &hashCc,
-        const std::u16string &smdpSigned2,
-        const std::u16string &smdpSignature2,
-        const std::u16string &smdpCertificate,
-        ResponseEsimResult &responseResult) override
+        int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo, ResponseEsimResult &responseResult) override
     {
         return 0;
     }
