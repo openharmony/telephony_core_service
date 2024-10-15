@@ -107,6 +107,7 @@ void TelRilManager::SendAckAndLock(void)
 
 void TelRilManager::InitTelModule(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
     telRilSms_.push_back(std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
@@ -135,6 +136,7 @@ int32_t TelRilManager::InitTelExtraModule(int32_t slotId)
 
 std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSms_.size()) {
         TELEPHONY_LOGE("telRilSms_ slotId is valid");
         return nullptr;
@@ -144,6 +146,7 @@ std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 
 std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSim_.size()) {
         TELEPHONY_LOGE("telRilSim_ slotId is valid");
         return nullptr;
@@ -151,8 +154,16 @@ std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
     return telRilSim_[slotId];
 }
 
+int32_t TelRilManager::GetTelRilSimSize()
+{
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
+    int32_t size = static_cast<int32_t>(telRilSim_.size());
+    return size;
+}
+
 std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilCall_.size()) {
         TELEPHONY_LOGE("telRilCall_ slotId is valid");
         return nullptr;
@@ -162,6 +173,7 @@ std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 
 std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilData_.size()) {
         TELEPHONY_LOGE("telRilData_ slotId is valid");
         return nullptr;
@@ -171,6 +183,7 @@ std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 
 std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilNetwork_.size()) {
         TELEPHONY_LOGE("telRilNetwork_ slotId is valid");
         return nullptr;
@@ -180,6 +193,7 @@ std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 
 std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilModem_.size()) {
         TELEPHONY_LOGE("telRilModem_ slotId is valid");
         return nullptr;
@@ -187,8 +201,16 @@ std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
     return telRilModem_[slotId];
 }
 
+int32_t TelRilManager::GetTelRilModemSize()
+{
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
+    int32_t size = static_cast<int32_t>(telRilModem_.size());
+    return size;
+}
+
 std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
 {
+    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= observerHandler_.size()) {
         TELEPHONY_LOGE("observerHandler_ slotId %{public}d is valid", slotId);
         return nullptr;
@@ -956,7 +978,7 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
             return;
         }
         TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, reconnect riladapter service success");
-        int32_t size = static_cast<int32_t>(telRilSim_.size());
+        int32_t size = GetTelRilSimSize();
         for (int32_t slotId = SIM_SLOT_0; slotId < size; slotId++) {
             if (GetTelRilSim(slotId) != nullptr) {
                 GetTelRilSim(slotId)->SimStateUpdated();
@@ -970,7 +992,7 @@ void TelRilManager::HandleRilInterfaceStatusCallback(const OHOS::HDI::ServiceMan
             TELEPHONY_LOGE("TelRilManager::HandleRilInterfaceCallback, DisConnectRilAdapterService fail");
             return;
         }
-        int32_t size = static_cast<int32_t>(telRilModem_.size());
+        int32_t size = GetTelRilModemSize();
         TELEPHONY_LOGI("TelRilManager::HandleRilInterfaceCallback, size:%{public}d", size);
         for (int32_t slotId = SIM_SLOT_0; slotId < size; slotId++) {
             if (GetTelRilModem(slotId) != nullptr) {
