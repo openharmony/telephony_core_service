@@ -1676,7 +1676,7 @@ bool EsimFile::CombineResponseDataFinish(IccFileData &fileData)
     return (fileData.sw1 == SW1_VALUE_90 && fileData.sw2 == SW2_VALUE_00);
 }
 
-bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
+void EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
 {
     if (fileData.sw1 == SW1_MORE_RESPONSE) {
         ApduSimIORequestInfo reqInfo;
@@ -1685,7 +1685,7 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
         std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
         std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
         if (apdCmd == nullptr) {
-            return false;
+            return;
         }
         apdCmd->data.cla = 0;
         apdCmd->data.ins = INS_GET_MORE_RESPONSE;
@@ -1695,20 +1695,16 @@ bool EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
         CopyApdCmdToReqInfo(&reqInfo, apdCmd.get());
         AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(eventId);
         if (telRilManager_ == nullptr) {
-            return false;
+            return;
         }
         telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, responseEvent);
-        return true;
     }
-    return false;
 }
 
 bool EsimFile::MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId)
 {
     if (!CombineResponseDataFinish(fileData)) {
-        if (!ProcessIfNeedMoreResponse(fileData, eventId)) {
-            return false;
-        }
+        ProcessIfNeedMoreResponse(fileData, eventId);
         return false;
     }
     return true;
