@@ -4170,7 +4170,7 @@ int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Respo
 }
 
 int32_t CoreServiceProxy::RealAuthenticateServer(
-    MessageParcel &data,MessageParcel &reply, MessageOption &option, ResponseEsimResult &responseResult)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option, ResponseEsimResult &responseResult)
 {
     auto remote = Remote();
     if (remote == nullptr) {
