@@ -178,7 +178,7 @@ private:
     bool MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
-    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
+    void ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
