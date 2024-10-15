@@ -174,11 +174,11 @@ private:
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
-    void SplitSendLongData(int32_t slotId, std::string hexStr);
-    bool MergeRecvLongDataComplete(IccFileData &fileData);
+    void SplitSendLongData(int32_t slotId, std::string hexStr, int32_t esimMessageId);
+    bool MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     bool CombineResponseDataFinish(IccFileData &fileData);
-    bool ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
+    void ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);

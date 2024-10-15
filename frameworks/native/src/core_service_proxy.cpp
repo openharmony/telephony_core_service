@@ -4123,7 +4123,7 @@ int32_t CoreServiceProxy::SetProfileNickname(
     int32_t sendRequestRet = remote->SendRequest(
         static_cast<uint32_t>(CoreServiceInterfaceCode::UPDATE_PROFILE_NICKNAME), data, reply, option);
     if (sendRequestRet != ERR_NONE) {
-        TELEPHONY_LOGE("SetProfileNickname failed, error code is %{public}d", st);
+        TELEPHONY_LOGE("SetProfileNickname failed, error code is %{public}d", sendRequestRet);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
@@ -4169,8 +4169,8 @@ int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Respo
     return result;
 }
 
-int32_t CoreServiceProxy::RealAuthenticateServer(const MessageParcel &data, const MessageParcel &reply,
-    const MessageParcel &option)
+int32_t CoreServiceProxy::RealAuthenticateServer(
+    MessageParcel &data, MessageParcel &reply, MessageOption &option, ResponseEsimResult &responseResult)
 {
     auto remote = Remote();
     if (remote == nullptr) {
@@ -4229,7 +4229,7 @@ int32_t CoreServiceProxy::AuthenticateServer(
         TELEPHONY_LOGE("WriteString16 serverCertificate is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    return RealAuthenticateServer(data, reply, option);
+    return RealAuthenticateServer(data, reply, option, responseResult);
 }
 #endif
 } // namespace Telephony

@@ -202,6 +202,7 @@ enum class Event {
     EVENT_ENABLE = 1 << 1,
     EVENT_DISABLE = 1 << 2,
     EVENT_DELETE = 1 << 3,
+    EVENT_ALL = 15,
 };
 
 /**
