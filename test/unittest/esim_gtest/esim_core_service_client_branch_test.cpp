@@ -80,7 +80,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo_0001, Function | MediumTe
 {
     int32_t slotId = 0;
     EuiccInfo euiccInfo;
-    euiccInfo.osVersion = Str8ToStr16("BF2003010203");
+    euiccInfo.osVersion_ = Str8ToStr16("BF2003010203");
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo(slotId, euiccInfo);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -205,8 +205,8 @@ HWTEST_F(EsimCoreServiceClientBranchTest, PrepareDownload_0100, Function | Mediu
 {
     DownLoadConfigInfo downLoadConfigInfo;
     int32_t slotId = 0;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().PrepareDownload(slotId, downLoadConfigInfo, responseResult);
@@ -322,8 +322,8 @@ HWTEST_F(EsimCoreServiceClientBranchTest, AuthenticateServer_0100, Function | Me
 {
     int32_t slotId = 0;
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.portIndex = 0;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.portIndex_ = 0;
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().AuthenticateServer(slotId, authenticateConfigInfo,

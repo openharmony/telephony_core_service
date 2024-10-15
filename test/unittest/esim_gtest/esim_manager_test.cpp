@@ -414,8 +414,8 @@ HWTEST_F(EsimManagerTest, PrepareDownload, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     DownLoadConfigInfo downLoadConfigInfo;
-    downLoadConfigInfo.portIndex = 0;
-    downLoadConfigInfo.hashCc = Str8ToStr16("4131423243332D583459355A36");
+    downLoadConfigInfo.portIndex_ = 0;
+    downLoadConfigInfo.hashCc_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
@@ -696,7 +696,7 @@ HWTEST_F(EsimManagerTest, AuthenticateServer, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     AuthenticateConfigInfo authenticateConfigInfo;
-    authenticateConfigInfo.matchingId = Str8ToStr16("4131423243332D583459355A36");
+    authenticateConfigInfo.matchingId_ = Str8ToStr16("4131423243332D583459355A36");
     ResponseEsimResult responseResult;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);

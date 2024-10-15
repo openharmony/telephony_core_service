@@ -43,7 +43,7 @@ HWTEST_F(RequestApduBuildTest, BuildStoreData_001, Function | MediumTest | Level
     RequestApduBuild build(1);
     std::string cmdHex = "test cmdHex";
     build.BuildStoreData(cmdHex);
-    std::list<std::unique_ptr<ApduCommand>> commands = build.getCommands();
+    std::list<std::unique_ptr<ApduCommand>> commands = build.GetCommands();
     EXPECT_EQ(1, commands.size());
 }
 #endif // TEL_TEST_UNSUPPORT

@@ -206,7 +206,8 @@ private:
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
-    int32_t RealAuthenticateServer(const MessageParcel &data, const MessageParcel &reply, const MessageParcel &option);
+    int32_t RealAuthenticateServer(
+        MessageParcel &data, MessageParcel &reply, MessageOption &option, ResponseEsimResult &responseResult);
 #endif
 
 private:
