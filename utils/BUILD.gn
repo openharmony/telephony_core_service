@@ -199,8 +199,8 @@ ohos_shared_library("libtel_vcard") {
   ]
 
   deps = [
-    "//third_party/glib:glib_packages",
     ":libtel_common",
+    "//third_party/glib:glib_packages",
   ]
 
   external_deps = [
