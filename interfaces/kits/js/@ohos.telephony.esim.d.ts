@@ -100,7 +100,7 @@ declare namespace esim {
   function startOsu(slotId: number): Promise<ResultState>;
 
   /**
-   * Fills in the metadata for a downloadable profile.
+   * Fills in and gets the metadata for a downloadable profile.
    *
    * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
