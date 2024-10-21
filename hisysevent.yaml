@@ -70,11 +70,15 @@ SMS_RECEIVE:
 
 DATA_CONNECTION_STATE:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: data connection status}
+  SLOT_ID: {type: INT32, desc: slot id}
+  APN_TYPE: {type: INT32, desc: apn type}
+  SUPPLIER_ID: {type: INT32, desc: net supplier id}
   STATE: {type: INT32, desc: 0_OFF 1_ON}
 
 DATA_DEACTIVED:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: data disconnection type}
   SLOT_ID: {type: INT32, desc: slot id}
+  APN_TYPE: {type: INT32, desc: apn type}
   TYPE: {type: INT32, desc: 0 NETWORK_DISCONNECTION 1 USER_INITIATED 2 HAS_HIGN_PRIORITY_NETWORK}
 
 ROAMING_DATA_CONNECTION_STATE:
