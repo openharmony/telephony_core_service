@@ -1221,7 +1221,7 @@ bool CoreServiceClient::IsEsimSupported(int32_t slotId)
 }
 
 int32_t CoreServiceClient::SendApduData(
-    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
