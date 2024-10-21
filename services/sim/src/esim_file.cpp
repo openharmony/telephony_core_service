@@ -400,7 +400,7 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(rawData.resultData);
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
-    if(root == nullptr) {
+    if (root == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse error!");
         return false;
     }
