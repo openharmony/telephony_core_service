@@ -64,10 +64,7 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
-    int ffrtRet = ffrt_set_cpu_worker_max_num(ffrt::qos_default, MAX_FFRT_THREAD_NUM);
-    if (ffrtRet == -1) {
-        TELEPHONY_LOGE("ffrt_set_cpu_worker_max_num fail");
-    }
+
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
