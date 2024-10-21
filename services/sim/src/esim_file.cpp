@@ -196,8 +196,12 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
     }
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
-    std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
-    std::unique_ptr<ApduCommand> apduCommand = std::move(lst.front());
+    std::list<std::unique_ptr<ApduCommand>> list = codec.GetCommands();
+    if (list.empty()) {
+        TELEPHONY_LOGE("node is empty");
+        return;
+    }
+    std::unique_ptr<ApduCommand> apduCommand = std::move(list.front());
     CopyApdCmdToReqInfo(&requestInfo, apduCommand.get());
 }
 
@@ -1511,6 +1515,10 @@ bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent:
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> list = codec.GetCommands();
+    if (list.empty()) {
+        TELEPHONY_LOGE("node is empty");
+        return;
+    }
     std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());
     if (apdCmd == nullptr) {
         return false;
@@ -1714,8 +1722,12 @@ void EsimFile::ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId)
         ApduSimIORequestInfo reqInfo;
         RequestApduBuild codec(currentChannelId_);
         codec.BuildStoreData("");
-        std::list<std::unique_ptr<ApduCommand>> lst = codec.GetCommands();
-        std::unique_ptr<ApduCommand> apdCmd = std::move(lst.front());
+        std::list<std::unique_ptr<ApduCommand>> list = codec.GetCommands();
+        if (list.empty()) {
+            TELEPHONY_LOGE("node is empty");
+            return;
+        }
+        std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());
         if (apdCmd == nullptr) {
             return;
         }
@@ -2815,6 +2827,9 @@ void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &
 
 void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes)
 {
+    if (ctxParams1Builder == nullptr) {
+        return;
+    }
     ctxParams1Builder->Asn1AddChildAsString(TAG_ESIM_CTX_0, pbytes.matchingId);
     std::shared_ptr<Asn1Node> subNode = nullptr;
     std::vector<uint8_t> tacBytes;
