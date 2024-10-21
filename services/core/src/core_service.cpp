@@ -15,6 +15,8 @@
 
 #include "core_service.h"
 
+#include <securec.h>
+
 #include "core_manager_inner.h"
 #include "core_service_dump_helper.h"
 #include "ffrt_inner.h"
@@ -64,10 +66,17 @@ void CoreService::OnStart()
         registerToService_ = true;
     }
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
-    int ffrtRet = ffrt_set_cpu_worker_max_num(ffrt::qos_default, MAX_FFRT_THREAD_NUM);
-    if (ffrtRet == -1) {
-        TELEPHONY_LOGE("ffrt_set_cpu_worker_max_num fail");
+    ffrt_worker_num_param qosConfig;
+    if (memset_s(&qosConfig, sizeof(qosConfig), -1, sizeof(qosConfig)) == EOK) {
+        qosConfig.effectLen = 1;
+        qosConfig.qosConfigArray[0].qos = ffrt_qos_default;
+        qosConfig.qosConfigArray[0].hardLimit = MAX_FFRT_THREAD_NUM;
+        int ffrtRet = ffrt_set_qos_worker_num(&qosConfig);
+        if (ffrtRet != 0) {
+            TELEPHONY_LOGE("ffrt_set_qos_worker_num fail");
+        }
     }
+
     if (!Init()) {
         TELEPHONY_LOGE("failed to init CoreService");
         return;
