@@ -118,7 +118,7 @@ void Asn1Utils::BcdToBytes(const std::string &bcd, std::vector<uint8_t> &bytes)
 std::string Asn1Utils::BytesToHexStr(const std::vector<uint8_t> &bytes)
 {
     if (bytes.size() > MAX_UINT16) {
-         return "";
+        return "";
     }
     std::ostringstream oss;
     for (size_t i = 0; i < bytes.size(); i++) {
