@@ -1400,7 +1400,7 @@ ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const EsimA
         TELEPHONY_LOGE("ProcessSendApduData encode failed");
         return ResponseEsimResult();
     }
-    isSendApduDataReady_ = false
+    isSendApduDataReady_ = false;
     std::unique_lock<std::mutex> lock(sendApduDataMutex_);
     if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
