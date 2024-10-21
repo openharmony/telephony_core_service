@@ -2204,6 +2204,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
     SyncOpenChannel();
+    recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRetrieveNotification = BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
     if (!ProcessRetrieveNotification(slotId_, eventRetrieveNotification)) {
         TELEPHONY_LOGE("ProcessRetrieveNotification encode failed");
