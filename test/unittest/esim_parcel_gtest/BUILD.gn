@@ -22,6 +22,7 @@ ohos_unittest("parcel_gtest") {
 
   sources = [
     "$SOURCE_DIR/frameworks/native/src/download_profile_config_info_parcel.cpp",
+    "$SOURCE_DIR/frameworks/native/src/download_profile_result_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/downloadable_profile_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/euicc_info_parcel.cpp",
     "$SOURCE_DIR/frameworks/native/src/get_downloadable_profiles_result_parcel.cpp",
