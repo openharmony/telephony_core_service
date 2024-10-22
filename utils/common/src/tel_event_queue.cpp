@@ -324,9 +324,12 @@ void TelEventQueue::EventStats::PrintEventStats(std::string &name)
     }
     lastPrintTime_ = now;
     TELEPHONY_LOGI(
-        "%{public}s, totalHandled %{public}d, currentQueue %{public}d, submitedToFFRT %{public}d, removed %{public}d,",
-         name_.c_str(), totalHandledEvents.load(), currentQueueEvents.load(),
-         submitedToFFRTEvents.load(), removedEvents.load());
+        "%{public}s, totalHandled %{public}d, currentQueue %{public}d, submitedToFFRT %{public}d, removed %{public}d",
+         name_.c_str(),
+         totalHandledEvents.load(),
+         currentQueueEvents.load(),
+         submitedToFFRTEvents.load(),
+         removedEvents.load());
 }
 
 } // namespace Telephony
