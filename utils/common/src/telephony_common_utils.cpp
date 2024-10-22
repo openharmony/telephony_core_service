@@ -62,7 +62,7 @@ bool IsValidHexValue(const std::string &inputValue)
         TELEPHONY_LOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
         return false;
     }
-    bool isValueNumber = regex_match(inputValue, std::regex("0[xX][0-9a-fA-F]+"));
+    bool isValueNumber = regex_match(inputValue, std::regex("(0[xX][0-9a-fA-F]+)|([0-9a-fA-F]+)"));
     if (isValueNumber) {
         int64_t numberValue = std::stoll(inputValue, nullptr, HEX_TYPE);
         if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
