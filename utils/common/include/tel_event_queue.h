@@ -41,13 +41,15 @@ private:
         ~EventStats() = default;
         void CalculationInsertQueueEvents();
         void CalculationSubmitToFFRTEvents();
+        void CalculationExecutedEvents();
         void CalculationRemovedEvents(int count);
         void PrintEventStats(std::string &name);
     private:
-        std::atomic_int totalHandledEvents { 0 };
-        std::atomic_int currentQueueEvents { 0 };
-        std::atomic_int submitedToFFRTEvents { 0 };
-        std::atomic_int removedEvents { 0 };
+        std::atomic_uint64_t totalHandledEvents { 0 }; 
+        std::atomic_uint64_t currentQueueEvents { 0 }; 
+        std::atomic_uint64_t submitedToFFRTEvents { 0 };
+        std::atomic_uint64_t executedEvents { 0 };
+        std::atomic_uint64_t removedEvents { 0 };
         AppExecFwk::InnerEvent::TimePoint lastPrintTime_ { AppExecFwk::InnerEvent::Clock::now() };
     };
 private:
