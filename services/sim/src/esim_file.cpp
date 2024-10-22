@@ -2413,6 +2413,10 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
     EuiccNotification notification;
     std::shared_ptr<Asn1Node> firstNode = nodes.front();
     createNotification(firstNode, notification);
+    notification_.seq_ = notification.seq_;
+    notification_.targetAddr_ = notification.targetAddr_;
+    notification_.event_ = notification.event_;
+    notification_.data_ = notification.data_;
     return true;
 }
 
