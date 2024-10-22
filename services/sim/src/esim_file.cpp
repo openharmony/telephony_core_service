@@ -1517,7 +1517,7 @@ bool EsimFile::ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent:
     std::list<std::unique_ptr<ApduCommand>> list = codec.GetCommands();
     if (list.empty()) {
         TELEPHONY_LOGE("node is empty");
-        return;
+        return false;
     }
     std::unique_ptr<ApduCommand> apdCmd = std::move(list.front());
     if (apdCmd == nullptr) {
