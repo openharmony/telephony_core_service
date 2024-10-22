@@ -168,6 +168,7 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
                 TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", name_.c_str(),
                     static_cast<uint32_t>(event->GetInnerEventId()));
                 handler->ProcessEvent(event);
+                eventStats_.CalculationExecutedEvents();
             }
             if (!isNeedSubmit) {
                 TELEPHONY_LOGD("%{public}s task no need to submit", name_.c_str());
@@ -176,6 +177,7 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
             SubmitInner(queueId);
         },
         ffrt::task_attr().delay(delayTime));
+        eventStats_.CalculationSubmitToFFRTEvents();
 }
 
 void TelEventQueue::RemoveEvent(uint32_t innerEventId)
@@ -246,7 +248,6 @@ AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent(int32_t queueId, bool &i
     uint32_t priorityIndex = GetPriorityIndex();
     AppExecFwk::InnerEvent::Pointer event = std::move(eventLists_[priorityIndex].events.front());
     eventLists_[priorityIndex].events.pop_front();
-    eventStats_.CalculationSubmitToFFRTEvents();
     if (IsEmpty()) {
         isNeedSubmit = false;
         SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
@@ -287,21 +288,12 @@ uint32_t TelEventQueue::GetPriorityIndex()
 
 void TelEventQueue::EventStats::CalculationInsertQueueEvents()
 {
-    if (totalHandledEvents >= INT32_MAX) {
-        totalHandledEvents = 0;
-    }
-    if (currentQueueEvents >= INT32_MAX) {
-        currentQueueEvents = 0;
-    }
     totalHandledEvents++;
     currentQueueEvents++;
 }
 
 void TelEventQueue::EventStats::CalculationSubmitToFFRTEvents()
 {
-    if (submitedToFFRTEvents >= INT32_MAX) {
-        submitedToFFRTEvents = 0;
-    }
     if (currentQueueEvents <= 0) {
         currentQueueEvents = 1;
     }
@@ -309,11 +301,13 @@ void TelEventQueue::EventStats::CalculationSubmitToFFRTEvents()
     currentQueueEvents--;
 }
 
+void TelEventQueue::EventStats::CalculationExecutedEvents()
+{
+    executedEvents++;
+}
+
 void TelEventQueue::EventStats::CalculationRemovedEvents(int count)
 {
-    if (removedEvents + count >= INT32_MAX) {
-        removedEvents = 0;
-    }
     removedEvents += count;
 }
 
@@ -326,11 +320,13 @@ void TelEventQueue::EventStats::PrintEventStats(std::string &name)
     }
     lastPrintTime_ = now;
     TELEPHONY_LOGI(
-        "%{public}s, totalHandled %{public}d, currentQueue %{public}d, submitedToFFRT %{public}d, removed %{public}d",
+        "%{public}s, totalHandledEvents %{public}lu, currentQueueEvents %{public}lu, " 
+        "submitedToFFRTEvents %{public}lu, executedEvents %{public}lu, removedEvents %{public}lu",
         name.c_str(),
         totalHandledEvents.load(),
         currentQueueEvents.load(),
         submitedToFFRTEvents.load(),
+        executedEvents.load(),
         removedEvents.load()
     );
 }
