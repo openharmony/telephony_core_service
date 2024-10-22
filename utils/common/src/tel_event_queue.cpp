@@ -97,6 +97,8 @@ void TelEventQueue::InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, Ap
     auto it = std::upper_bound(events.begin(), events.end(), event, f);
     auto innerEventId = event->GetInnerEventId();
     events.insert(it, std::move(event));
+    eventStats_.CalculationInsertQueueEvents();
+    eventStats_.PrintEventStats(name_);
     TELEPHONY_LOGD(
         "%{public}s InsertEventsInner eventId %{public}d finish", name_.c_str(), static_cast<int32_t>(innerEventId));
 }
@@ -189,6 +191,7 @@ void TelEventQueue::RemoveEvent(uint32_t innerEventId)
     if (IsEmpty()) {
         SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
     }
+    eventStats_.CalculationRemovedEvents(1);
     TELEPHONY_LOGD("%{public}s remove eventId %{public}d finish", name_.c_str(), innerEventId);
 }
 
@@ -210,10 +213,13 @@ bool TelEventQueue::HasInnerEvent(uint32_t innerEventId)
 void TelEventQueue::RemoveAllEvents()
 {
     std::lock_guard<std::mutex> lock(eventCtx_);
+    int removeCount = 0;
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
+        removeCount += eventLists_[i].events.size();
         eventLists_[i].events.clear();
     }
     SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
+    eventStats_.CalculationRemovedEvents(removeCount);
     TELEPHONY_LOGD("%{public}s RemoveAllEvents finish", name_.c_str());
 }
 
@@ -238,6 +244,7 @@ AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent(int32_t queueId, bool &i
     uint32_t priorityIndex = GetPriorityIndex();
     AppExecFwk::InnerEvent::Pointer event = std::move(eventLists_[priorityIndex].events.front());
     eventLists_[priorityIndex].events.pop_front();
+    eventStats_.CalculationSubmitToFFRTEvents();
     if (IsEmpty()) {
         isNeedSubmit = false;
         SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
@@ -274,6 +281,52 @@ uint32_t TelEventQueue::GetPriorityIndex()
         }
     }
     return priorityIndex;
+}
+
+void TelEventQueue::EventStats::CalculationInsertQueueEvents()
+{
+    if (totalHandledEvents >= INT32_MAX) {
+        totalHandledEvents = 0;
+    }
+    if (currentQueueEvents >= INT32_MAX) {
+        currentQueueEvents = 0;
+    }
+    totalHandledEvents++;
+    currentQueueEvents++;
+}
+
+void TelEventQueue::EventStats::CalculationSubmitToFFRTEvents()
+{
+    if (submitedToFFRTEvents >= INT32_MAX) {
+        submitedToFFRTEvents = 0;
+    }
+    if (crruentQueueEvents <= 0) {
+        currentQueueEvents = 1;
+    }
+    submitedToFFRTEvents++;
+    currentQueueEvents--;
+}
+
+void TelEventQueue::EventStats::CalculationRemovedEvents(int count)
+{
+    if (removedEvents + count >= INT32_MAX) {
+        removedEvents = 0;
+    }
+    removedEvents += count;
+}
+
+void TelEventQueue::EventStats::PrintEventStats(std::string &name)
+{
+    AppExecFwk::InnerEvent::TimePoint now = AppExecFwk::InnerEvent::Clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::minutes>(now - lastPrintTime_);
+    if (duration.count() < PRINT_INTELVAL_MINUTES) {
+        return;
+    }
+    lastPrintTime_ = now;
+    TELEPHONY_LOGI(
+        "%{public}s, totalHandled %{public}d, currentQueue %{public}d, submitedToFFRT %{public}d, removed %{public}d,",
+         name_.c_str(), totalHandledEvents.load(), currentQueueEvents.load(),
+         submitedToFFRTEvents.load(), removedEvents.load());
 }
 
 } // namespace Telephony
