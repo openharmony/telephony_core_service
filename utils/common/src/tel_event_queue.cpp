@@ -24,6 +24,8 @@ namespace {
 enum class TelPriority : uint32_t { IMMEDIATE = 0, HIGH, LOW };
 }
 
+static constexpr int PRINT_INTELVAL_MINUTES = 5;
+
 TelEventQueue::TelEventQueue(const std::string &name) : name_(name)
 {
     TELEPHONY_LOGI("%{public}s create", name_.c_str());
@@ -300,7 +302,7 @@ void TelEventQueue::EventStats::CalculationSubmitToFFRTEvents()
     if (submitedToFFRTEvents >= INT32_MAX) {
         submitedToFFRTEvents = 0;
     }
-    if (crruentQueueEvents <= 0) {
+    if (currentQueueEvents <= 0) {
         currentQueueEvents = 1;
     }
     submitedToFFRTEvents++;
@@ -325,7 +327,7 @@ void TelEventQueue::EventStats::PrintEventStats(std::string &name)
     lastPrintTime_ = now;
     TELEPHONY_LOGI(
         "%{public}s, totalHandled %{public}d, currentQueue %{public}d, submitedToFFRT %{public}d, removed %{public}d",
-        name_.c_str(),
+        name.c_str(),
         totalHandledEvents.load(),
         currentQueueEvents.load(),
         submitedToFFRTEvents.load(),
