@@ -329,7 +329,8 @@ void TelEventQueue::EventStats::PrintEventStats(std::string &name)
          totalHandledEvents.load(),
          currentQueueEvents.load(),
          submitedToFFRTEvents.load(),
-         removedEvents.load());
+         removedEvents.load()
+    );
 }
 
 } // namespace Telephony
