@@ -45,8 +45,8 @@ private:
         void CalculationRemovedEvents(int count);
         void PrintEventStats(std::string &name);
     private:
-        std::atomic_uint64_t totalHandledEvents { 0 }; 
-        std::atomic_uint64_t currentQueueEvents { 0 }; 
+        std::atomic_uint64_t totalHandledEvents { 0 };
+        std::atomic_uint64_t currentQueueEvents { 0 };
         std::atomic_uint64_t submitedToFFRTEvents { 0 };
         std::atomic_uint64_t executedEvents { 0 };
         std::atomic_uint64_t removedEvents { 0 };
