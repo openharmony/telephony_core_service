@@ -59,6 +59,12 @@ int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
     return static_cast<int32_t>(radioProtocol_[slotId].technology);
 }
 
+int32_t RadioProtocolController::GetRadioProtocolModemId(int32_t slotId)
+{
+    std::unique_lock<std::mutex> radioProtocolLock(radioProtocolMutex_);
+    return static_cast<int32_t>(radioProtocol_[slotId].modemId);
+}
+
 void RadioProtocolController::GetRadioProtocol(int32_t slotId)
 {
     auto telRilManager = telRilManager_.lock();
