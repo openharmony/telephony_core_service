@@ -32,6 +32,7 @@ public:
 
     void Init();
     int32_t GetRadioProtocolTech(int32_t slotId);
+	int32_t GetRadioProtocolModemId(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
     bool SetRadioProtocol(int32_t slotId);
     void UnRegisterEvents();
