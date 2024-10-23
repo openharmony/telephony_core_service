@@ -320,14 +320,14 @@ void TelEventQueue::EventStats::PrintEventStats(std::string &name)
     }
     lastPrintTime_ = now;
     TELEPHONY_LOGI(
-        "%{public}s, totalHandledEvents %{public}lu, currentQueueEvents %{public}lu," 
-        " submitedToFFRTEvents %{public}lu, executedEvents %{public}lu, removedEvents %{public}lu",
+        "%{public}s, totalHandledEvents %{public}llu, currentQueueEvents %{public}llu,"
+        " submitedToFFRTEvents %{public}llu, executedEvents %{public}llu, removedEvents %{public}llu",
         name.c_str(),
-        totalHandledEvents.load(),
-        currentQueueEvents.load(),
-        submitedToFFRTEvents.load(),
-        executedEvents.load(),
-        removedEvents.load()
+        static_cast<unsigned long long>(totalHandledEvents.load()),
+        static_cast<unsigned long long>(currentQueueEvents.load()),
+        static_cast<unsigned long long>(submitedToFFRTEvents.load()),
+        static_cast<unsigned long long>(executedEvents.load()),
+        static_cast<unsigned long long>(removedEvents.load())
     );
 }
 
