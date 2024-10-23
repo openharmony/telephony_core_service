@@ -229,7 +229,7 @@ struct EsimApduData {
     /** The flag of user actively closes the channel */
     bool closeChannelFlag_ = false;
 
-    /** The flag of user do not use default request header */
+    /** Do not use the default request header flag */
     bool unusedDefaultReqHeadFlag_ = false;
 
     /** The data needs to be send */
