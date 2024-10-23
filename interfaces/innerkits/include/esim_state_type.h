@@ -226,13 +226,13 @@ struct EuiccNotificationList {
  * @brief The Data which is sent by the service of LPA
  */
 struct EsimApduData {
-    /** Query result. For details, see {@link RilErrType}. */
+    /** The flag of user actively closes the channel */
     bool closeChannelFlag_ = false;
 
-    /** Query result. For details, see {@link RilErrType}. */
+    /** The flag of user do not use default request header */
     bool unusedDefaultReqHeadFlag_ = false;
 
-    /** Number of remaining attempts */
+    /** The data needs to be send */
     std::u16string data_ = u"";
 
     /** APDU instruction type. For details, see ETSI 102 221 [55]. */
