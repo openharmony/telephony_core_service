@@ -2283,15 +2283,25 @@ int32_t CoreServiceStub::OnIsEsimSupported(MessageParcel &data, MessageParcel &r
 
 int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &reply)
 {
+    EsimApduData apduData;
     int32_t slotId = data.ReadInt32();
     std::u16string aid = data.ReadString16();
-    std::u16string apduData = data.ReadString16();
+    apduData.closeChannelFlag_ = data.ReadBool();
+    apduData.unusedDefaultReqHeadFlag_ = data.ReadBool();
+    apduData.data_ = data.ReadString16();
+    apduData.instructionType_ = data.ReadInt32();
+    apduData.instruction_ = data.ReadInt32();
+    apduData.p1_ = data.ReadInt32();
+    apduData.p2_ = data.ReadInt32();
+    apduData.p3_ = data.ReadInt32();
     ResponseEsimResult responseResult;
     int32_t result = SendApduData(slotId, aid, apduData, responseResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
         ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
         ret = (ret && reply.WriteString16(responseResult.response_));
+        ret = (ret && reply.WriteInt32(responseResult.sw1_));
+        ret = (ret && reply.WriteInt32(responseResult.sw2_));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

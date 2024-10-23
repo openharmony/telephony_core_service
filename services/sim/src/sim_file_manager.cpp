@@ -1124,7 +1124,7 @@ bool SimFileManager::IsEsimSupported()
     return result;
 }
 
-ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const std::u16string &apduData)
+ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");

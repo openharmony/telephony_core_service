@@ -172,8 +172,8 @@ public:
     virtual int32_t SetDefaultSmdpAddress(
         int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) = 0;
     virtual bool IsEsimSupported(int32_t slotId) = 0;
-    virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
-        const std::u16string &apduData, ResponseEsimResult &responseResult) = 0;
+    virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
+        ResponseEsimResult &responseResult) = 0;
     virtual int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
         ResponseEsimResult &responseResult) = 0;
     virtual int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,

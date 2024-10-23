@@ -3724,8 +3724,45 @@ bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
     return reply.ReadBool();
 }
 
+bool CoreServiceProxy::WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData)
+{
+    if (!data.WriteBool(apduData.closeChannelFlag_)) {
+        TELEPHONY_LOGE("WriteBool closeChannelFlag is failed");
+        return false;
+    }
+    if (!data.WriteBool(apduData.unusedDefaultReqHeadFlag_)) {
+        TELEPHONY_LOGE("WriteBool unusedDefaultReqHeadFlag is failed");
+        return false;
+    }
+    if (!data.WriteString16(apduData.data_)) {
+        TELEPHONY_LOGE("WriteString16 data is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.instructionType_)) {
+        TELEPHONY_LOGE("WriteInt32 instructionType_ is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.instruction_)) {
+        TELEPHONY_LOGE("WriteInt32 instruction_ is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p1_)) {
+        TELEPHONY_LOGE("WriteInt32 p1 is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p2_)) {
+        TELEPHONY_LOGE("WriteInt32 p2 is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p3_)) {
+        TELEPHONY_LOGE("WriteInt32 p3 is failed");
+        return false;
+    }
+    return true;
+}
+
 int32_t CoreServiceProxy::SendApduData(
-    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3742,8 +3779,8 @@ int32_t CoreServiceProxy::SendApduData(
         TELEPHONY_LOGE("WriteString16 aid is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!data.WriteString16(apduData)) {
-        TELEPHONY_LOGE("WriteString16 apduData is false");
+    if (!WriteEsimApduData(data, apduData)) {
+        TELEPHONY_LOGE("WriteEsimApduData is false");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
@@ -3761,6 +3798,8 @@ int32_t CoreServiceProxy::SendApduData(
     if (result == TELEPHONY_ERR_SUCCESS) {
         responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
+        responseResult.sw1_ = reply.ReadInt32();
+        responseResult.sw2_ = reply.ReadInt32();
     }
     return result;
 }

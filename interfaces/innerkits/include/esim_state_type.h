@@ -221,6 +221,45 @@ struct EuiccNotification {
 struct EuiccNotificationList {
     std::vector<EuiccNotification> euiccNotification_{};
 };
+
+/**
+ * @brief The Data which is sent by the service of LPA
+ */
+struct EsimApduData {
+    /** The flag of user actively closes the channel */
+    bool closeChannelFlag_ = false;
+
+    /** Do not use the default request header flag */
+    bool unusedDefaultReqHeadFlag_ = false;
+
+    /** The data needs to be send */
+    std::u16string data_ = u"";
+
+    /** APDU instruction type. For details, see ETSI 102 221 [55]. */
+    int32_t instructionType_ = 0;
+
+    /** APDU instruction. For details, see ETSI 102 221 [55]. */
+    int32_t instruction_ = 0;
+
+    /**
+     * Command parameter 1 of the SIM data request. For details, see 3GPP
+     * TS 51.011[28].
+     */
+    int32_t p1_ = 0;
+
+    /**
+     * Command parameter 2 of the SIM data request. For details, see 3GPP
+     * TS 51.011[28].
+     */
+    int32_t p2_ = 0;
+
+    /**
+     * Command parameter 3 of the SIM data request. For details, see 3GPP
+     * TS 51.011[28]. If p3 is a negative value, a 4-byte APDU is sent to the
+     * SIM card.
+     */
+    int32_t p3_ = 0;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_ESIM_STATE_TYPE_H

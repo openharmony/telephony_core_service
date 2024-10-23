@@ -1059,7 +1059,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SendApduData(
-        int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult);
+        int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult);
 
     /**
      * @brief Prepares the profile download request sent to SM-DP+.
