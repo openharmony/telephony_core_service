@@ -1687,17 +1687,14 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
         TELEPHONY_LOGE("[slot%{public}d] callback is nullptr", slotId);
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    bool isExisted = false;
     std::lock_guard<std::mutex> lock(mutexIms_);
-    for (auto iter : listImsRegInfoCallbackRecord_) {
-        if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType) && (iter.tokenId == tokenId)) {
-            isExisted = true;
+    auto iter = listImsRegInfoCallbackRecord_.begin();
+    for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
+        if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
+            listImsRegInfoCallbackRecord_.erase(iter);
+            TELEPHONY_LOGI("[slot%{public}d] callback is existent, delete old callback", slotId);
             break;
         }
-    }
-    if (isExisted) {
-        TELEPHONY_LOGI("[slot%{public}d] Ignore register action, since callback is existent", slotId);
-        return TELEPHONY_SUCCESS;
     }
 
     ImsRegInfoCallbackRecord imsRecord;
