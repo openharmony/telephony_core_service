@@ -2677,6 +2677,28 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_001, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_RadioProtocolController_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RadioProtocolController_002, Function | MediumTest | Level1)
+{
+	auto telRilManager = std::make_shared<TelRilManager>();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(INVALID_SLOTID, 1);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+	RadioProtocol radioProtocol1;
+    radioProtocol1.slotId = SLOT_ID_0;
+    radioProtocol1.sessionId = 0;
+    radioProtocol1.phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL;
+    radioProtocol1.technology = 0;
+    radioProtocol1.modemId = 0;
+    radioProtocol1.status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
+    radioProtocolController->radioProtocol_.push_back(radioProtocol1);
+	EXPECT_EQ(radioProtocolController->GetRadioProtocolModemId(SLOT_ID_0), 0);
+}
+
+/**
  * @tc.number   Telephony_StkController_001
  * @tc.name     test error branch
  * @tc.desc     Function test
