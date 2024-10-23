@@ -2687,7 +2687,7 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_002, Function | MediumTes
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(INVALID_SLOTID, 1);
     auto radioProtocolController =
         std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
-	RadioProtocol radioProtocol1;
+    RadioProtocol radioProtocol1;
     radioProtocol1.slotId = SLOT_ID_0;
     radioProtocol1.sessionId = 0;
     radioProtocol1.phase = RadioProtocolPhase::RADIO_PROTOCOL_PHASE_INITIAL;
