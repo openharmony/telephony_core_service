@@ -194,7 +194,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SendApduData_0100, Function | MediumTe
 {
     int32_t slotId = 0;
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);

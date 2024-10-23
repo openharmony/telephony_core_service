@@ -55,7 +55,6 @@ if (core_service_support_esim) {
   idl_gen_interface("esim_service_api") {
     src_idl = rebase_path("IEsimService.idl")
     dst_file = string_join(",", idl_interface_sources)
-    hitrace = "HITRACE_TAG_ABILITY_MANAGER"
     log_domainid = "0xD001F04"
     log_tag = "CoreServiceApi"
   }
@@ -136,10 +135,7 @@ ohos_shared_library("tel_core_service_api") {
   ]
 
   if (core_service_support_esim) {
-    external_deps += [
-      "hitrace:hitrace_meter",
-      "ipc:ipc_core",
-    ]
+    external_deps += [ "ipc:ipc_core" ]
   }
 
   cflags_cc = [

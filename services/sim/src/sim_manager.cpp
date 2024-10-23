@@ -1402,7 +1402,7 @@ bool SimManager::IsEsimSupported(int32_t slotId)
 }
 
 int32_t SimManager::SendApduData(
-    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");

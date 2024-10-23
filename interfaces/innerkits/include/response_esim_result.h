@@ -29,6 +29,8 @@ namespace Telephony {
 struct ResponseEsimResult : public Parcelable {
     ResultState resultCode_;
     std::u16string response_ = u"";
+    int32_t sw1_ = 0;
+    int32_t sw2_ = 0;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

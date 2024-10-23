@@ -22,6 +22,7 @@
       *CoreManagerInner*;
       *CoreServiceClient*;
       *CoreServiceProxy*;
+      *DownloadProfileConfigInfo*;
       *DownloadProfileResult*;
       *DownloadableProfile*;
       *EsimServiceClient*;

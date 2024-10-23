@@ -94,7 +94,7 @@ public:
     ResultState ResetMemory(ResetOption resetOption);
     ResultState SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
     bool IsEsimSupported();
-    ResponseEsimResult SendApduData(const std::u16string &aid, const std::u16string &apduData);
+    ResponseEsimResult SendApduData(const std::u16string &aid, const EsimApduData &apduData);
     ResponseEsimResult ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult ObtainLoadBoundProfilePackage(int32_t portIndex, const std::u16string boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
@@ -216,6 +216,7 @@ private:
     void GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei);
     void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
+    bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;

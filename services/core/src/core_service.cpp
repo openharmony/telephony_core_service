@@ -1864,7 +1864,7 @@ bool CoreService::IsEsimSupported(int32_t slotId)
 }
 
 int32_t CoreService::SendApduData(
-    int32_t slotId, const std::u16string &aid, const std::u16string &apduData, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");

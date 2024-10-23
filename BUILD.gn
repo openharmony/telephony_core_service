@@ -132,7 +132,6 @@ ohos_shared_library("tel_core_service") {
     "services/core/include",
     "services/satellite_service_interaction/include",
     "utils/log/include",
-    "utils/codec/include",
   ]
 
   if (core_service_support_esim) {

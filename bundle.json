@@ -52,7 +52,6 @@
                 "hicollie",
                 "hilog",
                 "hisysevent",
-                "hitrace",
                 "i18n",
                 "init",
                 "ipc",
@@ -107,24 +106,24 @@
             "inner_kits": [
                 {
                     "header": {
-                        "header_base" : "//base/telephony/core_service/interfaces/innerkits",
+                        "header_base": "//base/telephony/core_service/interfaces/innerkits",
                         "header_files": []
                     },
-                    "name":"//base/telephony/core_service/interfaces/innerkits:tel_core_service_api"
+                    "name": "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api"
                 },
                 {
                     "header": {
-                        "header_base" : "//base/telephony/core_service/utils",
+                        "header_base": "//base/telephony/core_service/utils",
                         "header_files": []
                     },
-                    "name":"//base/telephony/core_service/utils:libtel_common"
+                    "name": "//base/telephony/core_service/utils:libtel_common"
                 },
                 {
                     "header": {
-                        "header_base" : "//base/telephony/core_service/utils",
+                        "header_base": "//base/telephony/core_service/utils",
                         "header_files": []
                     },
-                    "name":"//base/telephony/core_service/utils:libtel_vcard"
+                    "name": "//base/telephony/core_service/utils:libtel_vcard"
                 }
             ],
             "test": [

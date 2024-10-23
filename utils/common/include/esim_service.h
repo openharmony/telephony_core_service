@@ -132,12 +132,11 @@ typedef struct TagEsimProfile {
     std::u16string serverCertificate;
     std::u16string matchingId;
     std::u16string imei;
-    std::u16string toBeSendApduDataHexStr;
     std::u16string boundProfilePackage;
     OHOS::Telephony::Event events = OHOS::Telephony::Event::EVENT_DONOTHING;
     std::u16string defaultSmdpAddress = u"";
     std::u16string aid = u"";
-    std::u16string apduData = u"";
+    EsimApduData apduData;
 } EsimProfile;
 
 typedef struct TagEs9PlusInitAuthResp {
