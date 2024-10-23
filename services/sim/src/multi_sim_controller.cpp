@@ -34,6 +34,7 @@ namespace OHOS {
 namespace Telephony {
 static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
+static const int32_t MAIN_MODEM_ID = 0;
 const int32_t SYSTEM_PARAMETER_LENGTH = 128;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
@@ -556,6 +557,13 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
                 CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
             });
             initDataTask.detach();
+        } else if (radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) != MAIN_MODEM_ID) {
+            TELEPHONY_LOGI("main slot is different with modemid, need to set slot%{public}d primary", defaultSlotId);
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
+                pthread_setname_np(pthread_self(), "SetPrimarySlotId");
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
+            });
+            initDataTask.detach();
         } else {
             TELEPHONY_LOGI("no need set main slot, defaultslot same main slot");
             SavePrimarySlotIdInfo(defaultSlotId);
@@ -854,7 +862,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    if (lastPrimarySlotId_ == slotId) {
+    if (radioProtocolController_->GetRadioProtocolModemId(slotId) == MAIN_MODEM_ID) {
         TELEPHONY_LOGI("The current slot is the main slot, no need to set primary slot");
         SavePrimarySlotIdInfo(slotId);
         return TELEPHONY_ERR_SUCCESS;
