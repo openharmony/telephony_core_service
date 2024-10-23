@@ -563,7 +563,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
                 CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
             });
-			initDataTask.detach();
+            initDataTask.detach();
         } else {
             TELEPHONY_LOGI("no need set main slot, defaultslot same main slot");
             SavePrimarySlotIdInfo(defaultSlotId);
