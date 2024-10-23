@@ -2683,7 +2683,7 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_001, Function | MediumTes
  */
 HWTEST_F(BranchTest, Telephony_RadioProtocolController_002, Function | MediumTest | Level1)
 {
-	auto telRilManager = std::make_shared<TelRilManager>();
+    auto telRilManager = std::make_shared<TelRilManager>();
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(INVALID_SLOTID, 1);
     auto radioProtocolController =
         std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
