@@ -40,7 +40,9 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 const int32_t MILLI_TO_BASE = 1000;
+const int32_t NANO_TO_MILLI = 1000000;
 const int32_t MAX_UPDATE_TIME = 5;
+const int32_t TIME_STRING_SPLIT_NUM = 2;
 const uint32_t TIME_SPLIT_NUM = 3;
 const uint32_t TIMEZONE_SPLIT_NUM = 2;
 const uint32_t YEAR_LENGTH_TWO = 2;
@@ -97,9 +99,18 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
 {
+    std::string split = ";";
+    std::vector<std::string> str;
+    SplitStr(nitzStr, split, str);
+    int32_t size = static_cast<int32_t>(str.size());
+    if (size != TIME_STRING_SPLIT_NUM) {
+        return false;
+    }
+    std::string nitzInfo = str[0];
+    nitzRecvTime_ = std::stoll(str[1]);
     std::string strSep = ",";
     std::vector<std::string> strsRet;
-    SplitStr(nitzStr, strSep, strsRet);
+    SplitStr(nitzInfo, strSep, strsRet);
     if (static_cast<uint32_t>(strsRet.size()) < static_cast<uint32_t>(TIMEZONE_SPLIT_NUM)) {
         TELEPHONY_LOGE("NitzUpdate::NitzParse nitz string error slotId:%{public}d", slotId_);
         return false;
@@ -193,8 +204,13 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     t.tm_hour = networkTime.hour;
     t.tm_min = networkTime.minute;
     t.tm_sec = networkTime.second;
-
-    if (!IsValidTime(static_cast<int64_t>(timegm(&t)))) {
+    int64_t nitzTime = static_cast<int64_t>(timegm(&t));
+    int64_t currentTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeNs();
+    int64_t offset = (currentTime - nitzRecvTime_) / NANO_TO_MILLI;
+    nitzTime += offset;
+    TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
+        slotId_, currentTime, offset, nitzTime);
+    if (!IsValidTime(nitzTime)) {
         TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
         return;
     }
@@ -203,7 +219,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
         return;
     }
-    SaveTime(static_cast<int64_t>(timegm(&t)));
+    SaveTime(nitzTime);
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
