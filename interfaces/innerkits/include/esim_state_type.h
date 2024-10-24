@@ -260,6 +260,7 @@ struct EsimApduData {
      */
     int32_t p3_ = 0;
 };
+
 /**
  * @brief Euicc Information.
  */
