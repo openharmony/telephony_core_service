@@ -1891,7 +1891,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
 bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
+        TELEPHONY_LOGE("event is nullptr");
         return false;
     }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
