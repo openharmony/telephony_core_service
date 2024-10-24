@@ -213,7 +213,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     }
     nitzTime += offset;
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
-        slotId_, currentTime, offset, nitzTime);
+        slotId_, static_cast<long long>(currentTime), static_cast<long long>(offset), static_cast<long long>(nitzTime));
     if (!IsValidTime(nitzTime)) {
         TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
         return;
