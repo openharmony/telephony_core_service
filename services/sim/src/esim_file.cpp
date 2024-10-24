@@ -1633,11 +1633,10 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     }
     Asn1AddChildAsBase64(builder, dst.smdpSigned2);
     Asn1AddChildAsBase64(builder, dst.smdpSignature2);
-    if (dst.hashCc.size() == 0) {
-        return false;
+    if (dst.hashCc.size() != 0) {
+        std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
+        builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     }
-    std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
-    builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     Asn1AddChildAsBase64(builder, dst.smdpCertificate);
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
