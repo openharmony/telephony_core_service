@@ -122,26 +122,26 @@ enum PdpErrorReason {
     PDP_ERR_NONE = 0,
     PDP_ERR_RETRY,
     PDP_ERR_UNKNOWN = 65535, /* Unknown error */
-    PDP_ERR_OPERATOR_DETERMINED_BARRING = 8, /* Operator Determined Barring---No need to retry */
+    PDP_ERR_OPERATOR_DETERMINED_BARRING = 8, /* Operator Determined Barring */
     PDP_ERR_SHORTAGE_RESOURCES = 26, /* insufficient resources */
-    PDP_ERR_MISSING_OR_UNKNOWN_APN, /* missing or unknown APN---No need to retry */
-    PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE, /* unknown PDP address or PDP type---No need to retry */
-    PDP_ERR_USER_VERIFICATION, /* user authentication failed---No need to retry */
-    PDP_ERR_ACTIVATION_REJECTED_GGSN, /* activation rejected by GGSN, Serving GW or PDN GW---No need to retry */
+    PDP_ERR_MISSING_OR_UNKNOWN_APN, /* missing or unknown APN */
+    PDP_ERR_UNKNOWN_PDP_ADDR_OR_TYPE, /* unknown PDP address or PDP type */
+    PDP_ERR_USER_VERIFICATION, /* user authentication failed */
+    PDP_ERR_ACTIVATION_REJECTED_GGSN, /* activation rejected by GGSN, Serving GW or PDN GW */
     PDP_ERR_ACTIVATION_REJECTED_UNSPECIFIED, /* activation rejected, unspecified */
-    PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED, /* service option not supported---No need to retry */
+    PDP_ERR_SERVICE_OPTION_NOT_SUPPORTED, /* service option not supported */
     PDP_ERR_REQUESTED_SERVICE_OPTION_NOT_SUBSCRIBED, /* requested service option not subscribed
-                                                           * ---No need to retry */
+                                                           *  */
     PDP_ERR_SERVICE_OPTION_TEMPORARILY_OUT_OF_ORDER, /* service option temporarily out of order */
-    PDP_ERR_NSAPI_ALREADY_USED, /* NSAPI already used---No need to retry */
-    PDP_ERR_IPV4_ONLY_ALLOWED = 50, /* PDP type IPv4 only allowed---No need to retry */
-    PDP_ERR_IPV6_ONLY_ALLOWED, /* PDP type IPv6 only allowed---No need to retry */
-    PDP_ERR_IPV4V6_ONLY_ALLOWED = 57, /* PDP type IPv4v6 only allowed---No need to retry */
-    PDP_ERR_NON_IP_ONLY_ALLOWED, /* PDP type non IP only allowed---No need to retry */
-    PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS = 65, /* maximum number of PDP contexts reached---No need to retry */
+    PDP_ERR_NSAPI_ALREADY_USED, /* NSAPI already used */
+    PDP_ERR_IPV4_ONLY_ALLOWED = 50, /* PDP type IPv4 only allowed */
+    PDP_ERR_IPV6_ONLY_ALLOWED, /* PDP type IPv6 only allowed */
+    PDP_ERR_IPV4V6_ONLY_ALLOWED = 57, /* PDP type IPv4v6 only allowed */
+    PDP_ERR_NON_IP_ONLY_ALLOWED, /* PDP type non IP only allowed */
+    PDP_ERR_MAX_NUM_OF_PDP_CONTEXTS = 65, /* maximum number of PDP contexts reached */
     PDP_ERR_APN_NOT_SUPPORTED_IN_CURRENT_RAT_PLMN, /* requested APN not supported in current RAT
                                                          * and PLMN combination */
-    PDP_ERR_PROTOCOL_ERRORS = 95, /* #95 - 111: protocol errors---No need to retry */
+    PDP_ERR_PROTOCOL_ERRORS = 111, /* protocol errors */
     PDP_ERR_APN_RESTRICTION_VALUE_INCOMPATIBLE = 112, /* APN restriction value incompatible
                                                             * with active PDP context */
     PDP_ERR_MULT_ACCESSES_PDN_NOT_ALLOWED = 113, /* Multiple accesses to a PDN connection not allowed */
