@@ -107,7 +107,8 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
         return false;
     }
     std::string nitzInfo = str[0];
-    nitzRecvTime_ = std::stoll(str[1]);
+    std::istringstream time(str[1]);
+    time >> nitzRecvTime_;
     std::string strSep = ",";
     std::vector<std::string> strsRet;
     SplitStr(nitzInfo, strSep, strsRet);
