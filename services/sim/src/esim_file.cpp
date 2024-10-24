@@ -191,7 +191,7 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
     if (hexStrLen == 0) {
-        TELEPHONY_LOGE("hexStrLen is zero!");
+        TELEPHONY_LOGE("hexStrLen is zero");
         return;
     }
     RequestApduBuild codec(currentChannelId_);
