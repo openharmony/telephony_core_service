@@ -312,9 +312,9 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetEuiccInfo2_0100, Function | MediumT
 {
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
+    EuiccInfo2 euiccInfo2;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
-    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo2(slotId, portIndex, responseResult);
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo2(slotId, portIndex, euiccInfo2);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 

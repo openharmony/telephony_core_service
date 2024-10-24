@@ -260,6 +260,29 @@ struct EsimApduData {
      */
     int32_t p3_ = 0;
 };
+/**
+ * @brief Euicc Information.
+ */
+struct EuiccInfo2 {
+    std::string raw_ = "";
+    uint32_t rawLen_ = 0;
+    std::string svn_ = "";
+    std::string profileVersion_ = "";
+    std::string firmwareVer_ = "";
+    std::string extCardResource_ = "";
+    std::string uiccCapability_ = "";
+    std::string ts102241Version_ = "";
+    std::string globalPlatformVersion_ = "";
+    std::string rspCapability_ = "";
+    std::string euiccCiPKIdListForVerification_ = "";
+    std::string euiccCiPKIdListForSigning_ = "";
+    int32_t euiccCategory_ = 0;
+    std::string forbiddenProfilePolicyRules_ = "";
+    std::string ppVersion_ = "";
+    std::string sasAccreditationNumber_ = "";
+    std::string response_ = "";
+    ResultState resultCode_;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_ESIM_STATE_TYPE_H

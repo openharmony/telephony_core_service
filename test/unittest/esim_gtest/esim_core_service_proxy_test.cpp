@@ -538,7 +538,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_001, Function | MediumTest | Lev
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     std::u16string eId;
     EXPECT_EQ(proxy.SendApduData(SLOT_ID, aid, apduData, responseResult), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -549,7 +549,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_002, Function | MediumTest | Lev
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     std::u16string eId;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
@@ -561,7 +561,7 @@ HWTEST_F(EsimCoreServiceProxyTest, SendApduData_003, Function | MediumTest | Lev
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     std::u16string eId;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
@@ -898,8 +898,8 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_001, Function | MediumTest | Le
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
-    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    EuiccInfo2 euiccInfo2;
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, euiccInfo2);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -909,9 +909,9 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_002, Function | MediumTest | Le
     CoreServiceProxy proxy(remote);
 
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
+    EuiccInfo2 euiccInfo2;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(-500));
-    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, euiccInfo2);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -921,9 +921,9 @@ HWTEST_F(EsimCoreServiceProxyTest, GetEuiccInfo2_003, Function | MediumTest | Le
     CoreServiceProxy proxy(remote);
 
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
+    EuiccInfo2 euiccInfo2;
     EXPECT_CALL(*remote, SendRequest(testing::_, testing::_, testing::_, testing::_)).WillOnce(testing::Return(0));
-    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, responseResult);
+    int32_t ret = proxy.GetEuiccInfo2(SLOT_ID, portIndex, euiccInfo2);
     EXPECT_EQ(ret, 0);
 }
 

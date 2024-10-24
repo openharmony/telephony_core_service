@@ -621,7 +621,7 @@ public:
         return 0;
     }
 
-    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2) override
     {
         return 0;
     }
@@ -669,7 +669,7 @@ public:
     }
 
     int32_t SendApduData(int32_t slotId, const std::u16string &aid,
-        const std::u16string &apduData, ResponseEsimResult &responseResult) override
+        const EsimApduData &apduData, ResponseEsimResult &responseResult) override
     {
         return 0;
     }

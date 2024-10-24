@@ -301,7 +301,7 @@ public:
     int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
         EuiccNotificationList &notificationList) override;
 
-    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2) override;
 
     int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult) override;

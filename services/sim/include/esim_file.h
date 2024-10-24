@@ -104,7 +104,7 @@ public:
     ResultState DeleteProfile(const std::u16string &iccId);
     ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
     ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
-    ResponseEsimResult ObtainEuiccInfo2(int32_t portIndex);
+    EuiccInfo2 ObtainEuiccInfo2(int32_t portIndex);
     ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 
 private:
@@ -148,8 +148,6 @@ private:
     bool GetProfileDoneParseProfileInfo(std::shared_ptr<Asn1Node> &root);
     bool ProcessResetMemory(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
-    bool setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessSendApduData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
@@ -217,6 +215,7 @@ private:
     void CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src);
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
+    void ResetEuiccNotification();
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -240,7 +239,7 @@ private:
     std::string smdsAddress_ = "";
     EuiccRulesAuthTable eUiccRulesAuthTable_;
     ResponseEsimResult responseChallengeResult_;
-    ResponseEsimResult responseInfo2Result_;
+    EuiccInfo2 euiccInfo2Result_;
     ResponseEsimResult responseAuthenticateResult_;
     ResponseEsimResult preDownloadResult_;
     ResponseEsimBppResult loadBPPResult_;
