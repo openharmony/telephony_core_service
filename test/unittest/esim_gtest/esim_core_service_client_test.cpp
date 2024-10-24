@@ -170,7 +170,7 @@ HWTEST_F(EsimCoreServiceClientTest, SendApduData_0001, Function | MediumTest | L
 {
     int32_t slotId = 0;
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     int32_t result = CoreServiceClient::GetInstance().SendApduData(slotId, aid, apduData, responseResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
@@ -276,8 +276,8 @@ HWTEST_F(EsimCoreServiceClientTest, GetEuiccInfo2_0001, Function | MediumTest | 
 {
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
-    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo2(slotId, portIndex, responseResult);
+    EuiccInfo2 euiccInfo2;
+    int32_t result = CoreServiceClient::GetInstance().GetEuiccInfo2(slotId, portIndex, euiccInfo2);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 

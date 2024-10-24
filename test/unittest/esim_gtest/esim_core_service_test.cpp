@@ -237,7 +237,7 @@ HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     std::u16string aid = Str8ToStr16("aid test");
-    std::u16string apduData = Str8ToStr16("apduData test");
+    EsimApduData apduData;
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_SUCCESS);
@@ -399,12 +399,12 @@ HWTEST_F(EsimCoreServiceTest, GetEuiccInfo2_0001, Function | MediumTest | Level1
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     int32_t portIndex = 0;
-    ResponseEsimResult responseResult;
+    EuiccInfo2 euiccInfo2;
     EXPECT_NE(mCoreService->GetEuiccInfo2(
-        slotId, portIndex, responseResult), TELEPHONY_ERR_SUCCESS);
+        slotId, portIndex, euiccInfo2), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
     EXPECT_EQ(mCoreService->GetEuiccInfo2(
-        slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+        slotId, portIndex, euiccInfo2), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(EsimCoreServiceTest, AuthenticateServer_0001, Function | MediumTest | Level1)

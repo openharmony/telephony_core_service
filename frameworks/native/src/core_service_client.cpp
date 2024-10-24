@@ -1330,14 +1330,14 @@ int32_t CoreServiceClient::SetProfileNickname(
 }
 
 int32_t CoreServiceClient::GetEuiccInfo2(
-    int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+    int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetEuiccInfo2(slotId, portIndex, responseResult);
+    return proxy->GetEuiccInfo2(slotId, portIndex, euiccInfo2);
 }
 
 int32_t CoreServiceClient::AuthenticateServer(

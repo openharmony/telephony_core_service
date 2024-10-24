@@ -191,7 +191,7 @@ void EsimFile::CommBuildOneApduReqInfo(ApduSimIORequestInfo &requestInfo, std::s
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
     if (hexStrLen == 0) {
-        TELEPHONY_LOGE("hexStrLen is zero!");
+        TELEPHONY_LOGE("hexStrLen is zero");
         return;
     }
     RequestApduBuild codec(currentChannelId_);
@@ -424,7 +424,6 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
 
 bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
 {
-    EuiccInfo1 euiccInfo1;
     std::shared_ptr<Asn1Node> svnNode = root->Asn1GetChild(TAG_ESIM_CTX_2);
     if (svnNode == nullptr) {
         TELEPHONY_LOGE("svnNode is nullptr");
@@ -550,7 +549,9 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
             TELEPHONY_LOGE("nickNameNode is nullptr");
             return;
         }
-        nickNameNode->Asn1AsString(eProfileInfo->nickname);
+        std::vector<uint8_t> nickNameBytes;
+        nickNameNode->Asn1AsBytes(nickNameBytes);
+        eProfileInfo->nickname = Asn1Utils::BytesToString(nickNameBytes);
     }
     if (profileNode->Asn1HasChild(TAG_ESIM_OBTAIN_OPERATOR_NAME)) {
         std::shared_ptr<Asn1Node> serviceProviderNameNode = profileNode->Asn1GetChild(TAG_ESIM_OBTAIN_OPERATOR_NAME);
@@ -864,7 +865,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
     }
-    std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_1);
     if (profileRoot == nullptr) {
         TELEPHONY_LOGE("profileRoot is nullptr!");
         return false;
@@ -1335,7 +1336,8 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddress(int32_t slotId, const AppExecF
         TELEPHONY_LOGE("builder is nullptr");
         return false;
     }
-    builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
+    std::string address = OHOS::Telephony::ToUtf8(esimProfile_.defaultSmdpAddress);
+    builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, address);
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -1458,51 +1460,6 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
         isResetMemoryReady_ = true;
     }
     resetMemoryCv_.notify_one();
-    return true;
-}
-
-bool EsimFile::setDefaultSmdpAddress(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent)
-{
-    if (!IsLogicChannelOpen()) {
-        return false;
-    }
-      
-    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SET_DEFAULT_SMDP_ADDRESS);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return false;
-    }
-    builder->Asn1AddChildAsString(TAG_ESIM_TARGET_ADDR, defaultDpAddress_);
-    ApduSimIORequestInfo reqInfo;
-    CommBuildOneApduReqInfo(reqInfo, builder);
-    if (telRilManager_ == nullptr) {
-        return false;
-    }
-    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-    if (apduResult == TELEPHONY_ERR_FAIL) {
-        return false;
-    }
-    return true;
-}
-
-bool EsimFile::setDefaultSmdpAddressDone(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::shared_ptr<Asn1Node> root = ParseEvent(event);
-    if (root == nullptr) {
-        TELEPHONY_LOGE("Asn1ParseResponse failed");
-        return false;
-    }
-    std::shared_ptr<Asn1Node> asn1NodeData = root->Asn1GetChild(TAG_ESIM_CTX_0);
-    if (asn1NodeData == nullptr) {
-        TELEPHONY_LOGE("asn1NodeData is nullptr");
-        return false;
-    }
-    setDpAddressResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
-    {
-        std::lock_guard<std::mutex> lock(setDefaultSmdpAddressMutex_);
-        isSetDefaultSmdpAddressReady_ = true;
-    }
-    setDefaultSmdpAddressCv_.notify_one();
     return true;
 }
 
@@ -1676,11 +1633,10 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     }
     Asn1AddChildAsBase64(builder, dst.smdpSigned2);
     Asn1AddChildAsBase64(builder, dst.smdpSignature2);
-    if (dst.hashCc.size() == 0) {
-        return false;
+    if (dst.hashCc.size() != 0) {
+        std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
+        builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     }
-    std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
-    builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     Asn1AddChildAsBase64(builder, dst.smdpCertificate);
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
@@ -1935,7 +1891,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
 bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
+        TELEPHONY_LOGE("event is nullptr");
         return false;
     }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
@@ -2201,6 +2157,7 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
         TELEPHONY_LOGE("ProcessRetrieveNotificationList encode failed");
         return EuiccNotificationList();
     }
+    isRetrieveNotificationListReady_ = false;
     std::unique_lock<std::mutex> lock(retrieveNotificationListMutex_);
     if (!retrieveNotificationListCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRetrieveNotificationListReady_; })) {
@@ -2222,6 +2179,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
         TELEPHONY_LOGE("ProcessRetrieveNotification encode failed");
         return EuiccNotification();
     }
+    isRetrieveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(retrieveNotificationMutex_);
     if (!retrieveNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRetrieveNotificationReady_; })) {
@@ -2242,6 +2200,7 @@ ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqN
         TELEPHONY_LOGE("ProcessRemoveNotification encode failed");
         return ResultState();
     }
+    isRemoveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(removeNotificationMutex_);
     if (!removeNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRemoveNotificationReady_; })) {
@@ -2362,6 +2321,7 @@ bool EsimFile::ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::Inn
 
 bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    ResetEuiccNotification();
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr");
         return false;
@@ -2685,24 +2645,24 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
     return true;
 }
 
-ResponseEsimResult EsimFile::ObtainEuiccInfo2(int32_t portIndex)
+EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
     if (!ProcessObtainEuiccInfo2(slotId_, eventEUICCInfo2)) {
         TELEPHONY_LOGE("ProcessObtainEuiccInfo2 encode failed");
-        return ResponseEsimResult();
+        return EuiccInfo2();
     }
     isEuiccInfo2Ready_ = false;
     std::unique_lock<std::mutex> lock(euiccInfo2Mutex_);
     if (!euiccInfo2Cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccInfo2Ready_; })) {
         SyncCloseChannel();
-        return ResponseEsimResult();
+        return EuiccInfo2();
     }
     SyncCloseChannel();
-    return responseInfo2Result_;
+    return euiccInfo2Result_;
 }
 
 ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
@@ -2756,6 +2716,14 @@ bool EsimFile::ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEv
         return false;
     }
     return true;
+}
+
+void EsimFile::ResetEuiccNotification()
+{
+    notification_.seq_ = 0;
+    notification_.targetAddr_ = u"";
+    notification_.event_ = 0;
+    notification_.data_ = u"";
 }
 
 void EsimFile::ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src)
@@ -2886,21 +2854,20 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("Asn1ParseResponse failed");
         return false;
     }
-    EuiccInfo2 euiccInfo2 = {};
-    this->EuiccInfo2ParseProfileVersion(euiccInfo2, root);
-    this->EuiccInfo2ParseSvn(euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccFirmwareVer(euiccInfo2, root);
-    this->EuiccInfo2ParseExtCardResource(euiccInfo2, root);
-    this->EuiccInfo2ParseUiccCapability(euiccInfo2, root);
-    this->EuiccInfo2ParseTs102241Version(euiccInfo2, root);
-    this->EuiccInfo2ParseGlobalPlatformVersion(euiccInfo2, root);
-    this->EuiccInfo2ParseRspCapability(euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2, root);
-    this->EuiccInfo2ParseEuiccCategory(euiccInfo2, root);
-    this->EuiccInfo2ParsePpVersion(euiccInfo2, root);
-    responseInfo2Result_.resultCode_ = ResultState::RESULT_OK;
-    responseInfo2Result_.response_ = Str8ToStr16(euiccInfo2.firmwareVer);
+    this->EuiccInfo2ParseProfileVersion(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseSvn(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseEuiccFirmwareVer(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseExtCardResource(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseUiccCapability(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseTs102241Version(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseGlobalPlatformVersion(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseRspCapability(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2Result_, root);
+    this->EuiccInfo2ParseEuiccCategory(euiccInfo2Result_, root);
+    this->EuiccInfo2ParsePpVersion(euiccInfo2Result_, root);
+    euiccInfo2Result_.resultCode_ = ResultState::RESULT_OK;
+    euiccInfo2Result_.response_ = result->resultData;
     {
         std::lock_guard<std::mutex> lock(euiccInfo2Mutex_);
         isEuiccInfo2Ready_ = true;
@@ -2922,7 +2889,7 @@ void EsimFile::EuiccInfo2ParseProfileVersion(EuiccInfo2 &euiccInfo2, std::shared
         TELEPHONY_LOGE("invalid profileVersion data");
         return;
     }
-    euiccInfo2.profileVersion = MakeVersionString(profileVersionRaw);
+    euiccInfo2.profileVersion_ = MakeVersionString(profileVersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseSvn(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -2938,7 +2905,7 @@ void EsimFile::EuiccInfo2ParseSvn(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1No
         TELEPHONY_LOGE("invalid SVN data");
         return;
     }
-    euiccInfo2.svn = MakeVersionString(svnRaw);
+    euiccInfo2.svn_ = MakeVersionString(svnRaw);
 }
 
 void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -2954,7 +2921,7 @@ void EsimFile::EuiccInfo2ParseEuiccFirmwareVer(EuiccInfo2 &euiccInfo2, std::shar
         TELEPHONY_LOGE("invalid firmwareVer data");
         return;
     }
-    euiccInfo2.svn = MakeVersionString(euiccFirmwareVerRaw);
+    euiccInfo2.firmwareVer_ = MakeVersionString(euiccFirmwareVerRaw);
 }
 
 void EsimFile::EuiccInfo2ParseExtCardResource(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -2964,7 +2931,7 @@ void EsimFile::EuiccInfo2ParseExtCardResource(EuiccInfo2 &euiccInfo2, std::share
         TELEPHONY_LOGE("extCardResourceNode is nullptr");
         return;
     }
-    extCardResourceNode->Asn1AsString(euiccInfo2.extCardResource);
+    extCardResourceNode->Asn1AsString(euiccInfo2.extCardResource_);
 }
 
 void EsimFile::EuiccInfo2ParseUiccCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -2974,7 +2941,7 @@ void EsimFile::EuiccInfo2ParseUiccCapability(EuiccInfo2 &euiccInfo2, std::shared
         TELEPHONY_LOGE("uiccCapabilityNode is nullptr");
         return;
     }
-    uiccCapabilityNode->Asn1AsString(euiccInfo2.uiccCapability);
+    uiccCapabilityNode->Asn1AsString(euiccInfo2.uiccCapability_);
 }
 
 void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -2990,7 +2957,7 @@ void EsimFile::EuiccInfo2ParseTs102241Version(EuiccInfo2 &euiccInfo2, std::share
         TELEPHONY_LOGE("invalid ts102241VersionNode data");
         return;
     }
-    euiccInfo2.ts102241Version = MakeVersionString(ts102241VersionRaw);
+    euiccInfo2.ts102241Version_ = MakeVersionString(ts102241VersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3006,7 +2973,7 @@ void EsimFile::EuiccInfo2ParseGlobalPlatformVersion(EuiccInfo2 &euiccInfo2, std:
         TELEPHONY_LOGE("invalid globalplatformVersionRaw data");
         return;
     }
-    euiccInfo2.globalPlatformVersion = MakeVersionString(globalPlatformVersionRaw);
+    euiccInfo2.globalPlatformVersion_ = MakeVersionString(globalPlatformVersionRaw);
 }
 
 void EsimFile::EuiccInfo2ParseRspCapability(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3016,7 +2983,7 @@ void EsimFile::EuiccInfo2ParseRspCapability(EuiccInfo2 &euiccInfo2, std::shared_
         TELEPHONY_LOGE("rspCapabilityNode is nullptr");
         return;
     }
-    rspCapabilityNode->Asn1AsString(euiccInfo2.rspCapability);
+    rspCapabilityNode->Asn1AsString(euiccInfo2.rspCapability_);
 }
 
 void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForVerification(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3026,7 +2993,7 @@ void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForVerification(EuiccInfo2 &euiccIn
         TELEPHONY_LOGE("ciPKIdListForVerificationNode is nullptr");
         return;
     }
-    ciPKIdListForVerificationNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForVerification);
+    ciPKIdListForVerificationNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForVerification_);
 }
 
 void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3036,7 +3003,7 @@ void EsimFile::EuiccInfo2ParseEuiccCiPKIdListForSigning(EuiccInfo2 &euiccInfo2, 
         TELEPHONY_LOGE("euiccCiPKIdListForSigningNode is nullptr");
         return;
     }
-    euiccCiPKIdListForSigningNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForSigning);
+    euiccCiPKIdListForSigningNode->Asn1NodeToHexStr(euiccInfo2.euiccCiPKIdListForSigning_);
 }
 
 void EsimFile::EuiccInfo2ParseEuiccCategory(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3046,7 +3013,7 @@ void EsimFile::EuiccInfo2ParseEuiccCategory(EuiccInfo2 &euiccInfo2, std::shared_
         TELEPHONY_LOGE("euiccCategoryNode is nullptr");
         return;
     }
-    euiccInfo2.euiccCategory = euiccCategoryNode->Asn1AsInteger();
+    euiccInfo2.euiccCategory_ = euiccCategoryNode->Asn1AsInteger();
 }
 
 void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root)
@@ -3062,7 +3029,7 @@ void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<
         TELEPHONY_LOGE("invalid ppVersion data");
         return;
     }
-    euiccInfo2.ppVersion = MakeVersionString(ppVersionNodeRaw);
+    euiccInfo2.ppVersion_ = MakeVersionString(ppVersionNodeRaw);
 }
 
 bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
