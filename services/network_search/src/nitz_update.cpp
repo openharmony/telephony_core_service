@@ -207,6 +207,10 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     int64_t nitzTime = static_cast<int64_t>(timegm(&t));
     int64_t currentTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeNs();
     int64_t offset = (currentTime - nitzRecvTime_) / NANO_TO_MILLI;
+    if (offset < 0 || offset >= INT64_MAX) {
+        TELEPHONY_LOGE("NitzUpdate::ProcessTime offset invalid, slotId:%{public}d", slotId_);
+        return;
+    }
     nitzTime += offset;
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
         slotId_, currentTime, offset, nitzTime);
