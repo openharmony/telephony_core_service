@@ -2042,7 +2042,7 @@ int32_t CoreService::SetProfileNickname(
     return simManager_->SetProfileNickname(slotId, iccId, nickname, enumResult);
 }
 
-int32_t CoreService::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+int32_t CoreService::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -2056,7 +2056,7 @@ int32_t CoreService::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEs
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetEuiccInfo2(slotId, portIndex, responseResult);
+    return simManager_->GetEuiccInfo2(slotId, portIndex, euiccInfo2);
 }
 
 int32_t CoreService::AuthenticateServer(

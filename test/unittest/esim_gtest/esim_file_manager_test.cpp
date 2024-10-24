@@ -299,7 +299,7 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string aid = u"";
-    std::u16string apduData = u"";
+    EsimApduData apduData;
     ResponseEsimResult res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode_, ResultState::RESULT_OK);
     simFileManager.eSimFile_ = nullptr;
@@ -501,11 +501,11 @@ HWTEST_F(EsimFileManagerTest, GetEuiccInfo2_001, Function | MediumTest | Level2)
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
-    ResponseEsimResult res = simFileManager.GetEuiccInfo2(portIndex);
-    EXPECT_EQ(res.resultCode_, ResultState::RESULT_OK);
+    EuiccInfo2 res = simFileManager.GetEuiccInfo2(portIndex);
+    EXPECT_FALSE(res.svn_.empty());
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetEuiccInfo2(portIndex);
-    EXPECT_EQ(res.resultCode_, ResultState::RESULT_OK);
+    EXPECT_FALSE(res.svn_.empty());
 }
 
 HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Level2)

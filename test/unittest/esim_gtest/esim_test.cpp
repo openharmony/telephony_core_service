@@ -1818,15 +1818,15 @@ HWTEST_F(EsimTest, ObtainEuiccInfo2_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
-    ResponseEsimResult responseInfo2Result;
+    EuiccInfo2 EuiccInfo2;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(responseInfo2Result.resultCode_, (esimFile->ObtainEuiccInfo2(portIndex)).resultCode_);
+    EXPECT_EQ(EuiccInfo2.svn_, (esimFile->ObtainEuiccInfo2(portIndex)).svn_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(responseInfo2Result.resultCode_, (esimFile->ObtainEuiccInfo2(portIndex)).resultCode_);
+    EXPECT_EQ(EuiccInfo2.svn_, (esimFile->ObtainEuiccInfo2(portIndex)).svn_);
 }
 
 HWTEST_F(EsimTest, ProcessObtainEUICCInfo2_001, Function | MediumTest | Level2)
@@ -1859,7 +1859,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseProfileVersion_001, Function | MediumTest | Le
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseProfileVersion(euiccInfo2, root);
-    bool bRet = euiccInfo2.profileVersion.empty() ? false : true;
+    bool bRet = euiccInfo2.profileVersion_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1875,7 +1875,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccFirmwareVer_001, Function | MediumTest | 
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccFirmwareVer(euiccInfo2, root);
-    bool bRet = euiccInfo2.globalPlatformVersion.empty() ? false : true;
+    bool bRet = euiccInfo2.globalPlatformVersion_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1891,7 +1891,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseExtCardResource_001, Function | MediumTest | L
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseExtCardResource(euiccInfo2, root);
-    bool bRet = euiccInfo2.extCardResource.empty() ? false : true;
+    bool bRet = euiccInfo2.extCardResource_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1907,7 +1907,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseUiccCapability_001, Function | MediumTest | Le
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseUiccCapability(euiccInfo2, root);
-    bool bRet = euiccInfo2.uiccCapability.empty() ? false : true;
+    bool bRet = euiccInfo2.uiccCapability_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1923,7 +1923,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseTs102241Version_001, Function | MediumTest | L
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseTs102241Version(euiccInfo2, root);
-    bool bRet = euiccInfo2.ts102241Version.empty() ? false : true;
+    bool bRet = euiccInfo2.ts102241Version_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1939,7 +1939,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseGlobalPlatformVersion_001, Function | MediumTe
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseGlobalPlatformVersion(euiccInfo2, root);
-    bool bRet = euiccInfo2.globalPlatformVersion.empty() ? false : true;
+    bool bRet = euiccInfo2.globalPlatformVersion_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1955,7 +1955,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseRspCapability_001, Function | MediumTest | Lev
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseRspCapability(euiccInfo2, root);
-    bool bRet = euiccInfo2.rspCapability.empty() ? false : true;
+    bool bRet = euiccInfo2.rspCapability_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1971,7 +1971,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForVerification_001, Function |
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2, root);
-    bool bRet = euiccInfo2.euiccCiPKIdListForVerification.empty() ? false : true;
+    bool bRet = euiccInfo2.euiccCiPKIdListForVerification_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -1987,7 +1987,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForSigning_001, Function | Medi
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2, root);
-    bool bRet = euiccInfo2.euiccCiPKIdListForSigning.empty() ? false : true;
+    bool bRet = euiccInfo2.euiccCiPKIdListForSigning_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -2003,7 +2003,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCategory_001, Function | MediumTest | Lev
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParseEuiccCategory(euiccInfo2, root);
-    bool bRet = euiccInfo2.euiccCategory == 0 ? false : true;
+    bool bRet = euiccInfo2.euiccCategory_ == 0 ? false : true;
     EXPECT_TRUE(bRet);
 }
 
@@ -2019,7 +2019,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParsePpVersion_001, Function | MediumTest | Level2)
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, byteLen);
     esimFile->EuiccInfo2ParsePpVersion(euiccInfo2, root);
-    bool bRet = euiccInfo2.ppVersion.empty() ? false : true;
+    bool bRet = euiccInfo2.ppVersion_.empty() ? false : true;
     EXPECT_TRUE(bRet);
 }
 

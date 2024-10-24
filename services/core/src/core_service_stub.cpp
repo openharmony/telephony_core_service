@@ -2505,12 +2505,28 @@ int32_t CoreServiceStub::OnGetEuiccInfo2(MessageParcel &data, MessageParcel &rep
 {
     int32_t slotId = data.ReadInt32();
     int32_t portIndex = data.ReadInt32();
-    ResponseEsimResult responseResult;
-    int32_t result = GetEuiccInfo2(slotId, portIndex, responseResult);
+    EuiccInfo2 euiccInfo2;
+    int32_t result = GetEuiccInfo2(slotId, portIndex, euiccInfo2);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(responseResult.resultCode_)));
-        ret = (ret && reply.WriteString16(responseResult.response_));
+        ret = (ret && reply.WriteString(euiccInfo2.raw_));
+        ret = (ret && reply.WriteUint32(euiccInfo2.rawLen_));
+        ret = (ret && reply.WriteString(euiccInfo2.svn_));
+        ret = (ret && reply.WriteString(euiccInfo2.profileVersion_));
+        ret = (ret && reply.WriteString(euiccInfo2.firmwareVer_));
+        ret = (ret && reply.WriteString(euiccInfo2.extCardResource_));
+        ret = (ret && reply.WriteString(euiccInfo2.uiccCapability_));
+        ret = (ret && reply.WriteString(euiccInfo2.ts102241Version_));
+        ret = (ret && reply.WriteString(euiccInfo2.globalPlatformVersion_));
+        ret = (ret && reply.WriteString(euiccInfo2.rspCapability_));
+        ret = (ret && reply.WriteString(euiccInfo2.euiccCiPKIdListForVerification_));
+        ret = (ret && reply.WriteString(euiccInfo2.euiccCiPKIdListForSigning_));
+        ret = (ret && reply.WriteInt32(euiccInfo2.euiccCategory_));
+        ret = (ret && reply.WriteString(euiccInfo2.forbiddenProfilePolicyRules_));
+        ret = (ret && reply.WriteString(euiccInfo2.ppVersion_));
+        ret = (ret && reply.WriteString(euiccInfo2.sasAccreditationNumber_));
+        ret = (ret && reply.WriteString(euiccInfo2.response_));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(euiccInfo2.resultCode_)));
     }
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");

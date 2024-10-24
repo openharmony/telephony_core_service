@@ -118,8 +118,8 @@ int32_t Asn1Builder::Asn1AddChildAsBits(uint32_t tag, int32_t childBits)
     }
     dataLength++;
     childByte[0] = Asn1Utils::CountTrailingZeros(childByte[dataLength - 1]);
-
-    std::shared_ptr<Asn1Node> node = std::make_shared<Asn1Node>(tag, childByte, 0, dataLength);
+    std::vector<uint8_t> newChildByte(childByte.begin(), childByte.begin() + dataLength);
+    std::shared_ptr<Asn1Node> node = std::make_shared<Asn1Node>(tag, newChildByte, 0, dataLength);
     Asn1AddChild(node);
     return TELEPHONY_ERR_SUCCESS;
 }

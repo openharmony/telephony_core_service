@@ -4172,7 +4172,29 @@ int32_t CoreServiceProxy::SetProfileNickname(
     return result;
 }
 
-int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+void CoreServiceProxy::ReadEuiccInfo2FromReply(MessageParcel &reply, EuiccInfo2 &euiccInfo2)
+{
+    euiccInfo2.raw_ = reply.ReadString();
+    euiccInfo2.rawLen_ = reply.ReadUint32();
+    euiccInfo2.svn_ = reply.ReadString();
+    euiccInfo2.profileVersion_ = reply.ReadString();
+    euiccInfo2.firmwareVer_ = reply.ReadString();
+    euiccInfo2.extCardResource_ = reply.ReadString();
+    euiccInfo2.uiccCapability_ = reply.ReadString();
+    euiccInfo2.ts102241Version_ = reply.ReadString();
+    euiccInfo2.globalPlatformVersion_ = reply.ReadString();
+    euiccInfo2.rspCapability_ = reply.ReadString();
+    euiccInfo2.euiccCiPKIdListForVerification_ = reply.ReadString();
+    euiccInfo2.euiccCiPKIdListForSigning_ = reply.ReadString();
+    euiccInfo2.euiccCategory_ = reply.ReadInt32();
+    euiccInfo2.forbiddenProfilePolicyRules_ = reply.ReadString();
+    euiccInfo2.ppVersion_ = reply.ReadString();
+    euiccInfo2.sasAccreditationNumber_ = reply.ReadString();
+    euiccInfo2.response_ = reply.ReadString();
+    euiccInfo2.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+}
+
+int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4202,8 +4224,7 @@ int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Respo
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
-        responseResult.response_ = reply.ReadString16();
+        ReadEuiccInfo2FromReply(reply, euiccInfo2);
     }
     return result;
 }

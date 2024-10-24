@@ -116,7 +116,7 @@ public:
     ResultState DeleteProfile(const std::u16string &iccId);
     ResultState SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
     ResultState SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
-    ResponseEsimResult GetEuiccInfo2(int32_t portIndex);
+    EuiccInfo2 GetEuiccInfo2(int32_t portIndex);
     ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 #endif
 
