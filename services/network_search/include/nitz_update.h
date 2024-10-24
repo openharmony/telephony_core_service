@@ -61,6 +61,7 @@ private:
     static int32_t offset_;
     static int64_t lastNetworkTime_;
     static std::string timeZone_;
+    int64_t nitzRecvTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
