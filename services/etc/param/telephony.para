@@ -17,3 +17,5 @@ telephony.sim.opkey1=-1
 const.telephony.sms.expire.days=7
 const.telephony.satellite.supported=0
 persist.telephony.retrystrategy.allow=true
+persist.telephony.setupfail.delay=3000
+persist.telephony.modemdend.delay=1000
