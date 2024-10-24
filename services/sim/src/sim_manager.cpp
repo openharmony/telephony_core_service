@@ -1510,13 +1510,13 @@ int32_t SimManager::SetProfileNickname(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+int32_t SimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    responseResult = simFileManager_[slotId]->GetEuiccInfo2(portIndex);
+    euiccInfo2 = simFileManager_[slotId]->GetEuiccInfo2(portIndex);
     return TELEPHONY_ERR_SUCCESS;
 }
 

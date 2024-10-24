@@ -1183,7 +1183,7 @@ public:
      * @param responseResult[out], get the result code and the info2
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2);
 
     /**
      * @brief  Authenticates the SM-DP+ server by the eUICC.

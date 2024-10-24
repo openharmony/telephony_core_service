@@ -87,31 +87,6 @@ constexpr int32_t ICCID_NUMBER_MAX = 10;
 constexpr int32_t EVENT_INSTALL = 1152;
 constexpr int32_t CMD_HEX_MAX_DATA_LENGTH = 255;
 
-typedef struct TagEuiccInfo {
-    std::string raw;
-    uint32_t rawLen;
-    std::string svn;
-} EuiccInfo1;
-
-typedef struct TagEuiccInfo2 {
-    std::string raw;
-    uint32_t rawLen;
-    std::string svn;
-    std::string profileVersion;
-    std::string firmwareVer;
-    std::string extCardResource;
-    std::string uiccCapability;
-    std::string ts102241Version;
-    std::string globalPlatformVersion;
-    std::string rspCapability;
-    std::string euiccCiPKIdListForVerification;
-    std::string euiccCiPKIdListForSigning;
-    int32_t euiccCategory = 0;
-    std::string forbiddenProfilePolicyRules;
-    std::string ppVersion;
-    std::string sasAccreditationNumber;
-} EuiccInfo2;
-
 typedef struct TagEsimProfile {
     std::u16string iccId = u"";
     std::u16string portIndex = u"";

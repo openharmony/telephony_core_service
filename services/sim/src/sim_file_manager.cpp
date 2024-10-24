@@ -1222,13 +1222,13 @@ ResultState SimFileManager::SetProfileNickname(const std::u16string &iccId, cons
     return result;
 }
 
-ResponseEsimResult SimFileManager::GetEuiccInfo2(int32_t portIndex)
+EuiccInfo2 SimFileManager::GetEuiccInfo2(int32_t portIndex)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResponseEsimResult();
+        return EuiccInfo2();
     }
-    ResponseEsimResult result = eSimFile_->ObtainEuiccInfo2(portIndex);
+    EuiccInfo2 result = eSimFile_->ObtainEuiccInfo2(portIndex);
     return result;
 }
 
