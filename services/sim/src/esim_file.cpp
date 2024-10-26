@@ -2810,7 +2810,10 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     std::vector<uint8_t> tmpBytes;
     std::vector<uint8_t> imeiBytes;
     Asn1Utils::BcdToBytes(pbytes.imei, tmpBytes);
-    const uint32_t AUTH_SERVER_TAC_LEN = 4;
+    if (tmpBytes.size() < AUTH_SERVER_TAC_LEN) {
+        TELEPHONY_LOGE("tmpBytes.size is small than AUTH_SERVER_TAC_LEN");
+        return;
+    }
     std::vector<uint8_t> tacBytes(tmpBytes.begin(), tmpBytes.begin() + AUTH_SERVER_TAC_LEN);
     GetImeiBytes(imeiBytes, pbytes.imei);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
