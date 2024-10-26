@@ -216,18 +216,6 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sms_001, Function | MediumTest | Le
     ch = 67;
     telRilSms->ConvertHexCharToInt(ch);
 
-    uint8_t hexString = 1;
-    size_t length = 1;
-    telRilSms->ConvertHexStringToBytes(&hexString, length);
-
-    hexString = 1;
-    length = 0;
-    telRilSms->ConvertHexStringToBytes(&hexString, length);
-
-    hexString = 1;
-    length = 2;
-    telRilSms->ConvertHexStringToBytes(&hexString, length);
-
     HDI::Ril::V1_1::SmsMessageInfo iSmsMessageInfo;
     telRilSms->NewSmsNotify(iSmsMessageInfo);
     telRilSms->NewCdmaSmsNotify(iSmsMessageInfo);

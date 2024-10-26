@@ -174,39 +174,6 @@ uint8_t TelRilSms::ConvertHexCharToInt(uint8_t ch)
     }
 }
 
-uint8_t *TelRilSms::ConvertHexStringToBytes(const uint8_t *hexString, size_t length)
-{
-    const int32_t HEX_NUM_PER_BYTE = 2;
-    const int32_t BIT_NUM_PER_HEX = 4;
-
-    if (length % HEX_NUM_PER_BYTE) {
-        return nullptr;
-    }
-    int32_t len = (int32_t)length / HEX_NUM_PER_BYTE;
-    if (len <= 0) {
-        TELEPHONY_LOGE("hexString is null");
-        return nullptr;
-    }
-    uint8_t *bytes = (uint8_t *)malloc(len * sizeof(uint8_t));
-    if (bytes == nullptr) {
-        TELEPHONY_LOGE("ConvertHexStringToBytes: cannot allocate memory for bytes string");
-        return nullptr;
-    }
-    uint8_t *hexStr = (uint8_t *)hexString;
-    size_t i = 0;
-    while (i < length) {
-        uint8_t hexCh1 = ConvertHexCharToInt(hexStr[i]);
-        uint8_t hexCh2 = ConvertHexCharToInt(hexStr[i + 1]);
-        if (hexCh1 == INVALID_HEX_CHAR || hexCh2 == INVALID_HEX_CHAR) {
-            free(bytes);
-            return nullptr;
-        }
-        bytes[i / HEX_NUM_PER_BYTE] = ((hexCh1 << BIT_NUM_PER_HEX) | hexCh2);
-        i += HEX_NUM_PER_BYTE;
-    }
-    return bytes;
-}
-
 int32_t TelRilSms::NewSmsNotify(const HDI::Ril::V1_1::SmsMessageInfo &iSmsMessageInfo)
 {
     std::shared_ptr<SmsMessageInfo> smsMessageInfo = std::make_shared<SmsMessageInfo>();
