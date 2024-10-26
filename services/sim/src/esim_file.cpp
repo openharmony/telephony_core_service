@@ -2650,6 +2650,7 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
+    recvCombineStr_ = "";
     if (!ProcessObtainEuiccInfo2(slotId_, eventEUICCInfo2)) {
         TELEPHONY_LOGE("ProcessObtainEuiccInfo2 encode failed");
         return EuiccInfo2();
@@ -2774,6 +2775,8 @@ void EsimFile::AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder)
 {
     std::vector<uint8_t> versionBytes;
     Asn1Utils::UintToBytes(VERSION_NUMBER, versionBytes);
+    versionBytes.push_back(0);
+    versionBytes.push_back(0);
     devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, versionBytes, versionBytes.size());
     devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_1, versionBytes, versionBytes.size());
     devCapsBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_5, versionBytes, versionBytes.size());
@@ -2804,9 +2807,11 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     }
     ctxParams1Builder->Asn1AddChildAsString(TAG_ESIM_CTX_0, pbytes.matchingId);
     std::shared_ptr<Asn1Node> subNode = nullptr;
-    std::vector<uint8_t> tacBytes;
+    std::vector<uint8_t> tmpBytes;
     std::vector<uint8_t> imeiBytes;
-    Asn1Utils::BcdToBytes(pbytes.imei, tacBytes);
+    Asn1Utils::BcdToBytes(pbytes.imei, tmpBytes);
+    const uint32_t AUTH_SERVER_TAC_LEN = 4;
+    std::vector<uint8_t> tacBytes(tmpBytes.begin(), tmpBytes.begin() + AUTH_SERVER_TAC_LEN);
     GetImeiBytes(imeiBytes, pbytes.imei);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
     if (subBuilder == nullptr) {
@@ -2843,11 +2848,11 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("rcvMsg is nullptr");
         return false;
     }
-    IccFileData *result = &(rcvMsg->fileData);
-    if (result == nullptr) {
-        return false;
+    IccFileData &result = rcvMsg->fileData;
+    if (!MergeRecvLongDataComplete(result, MSG_ESIM_OBTAIN_EUICC_INFO2_DONE)) {
+        return true;
     }
-    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(result->resultData);
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
@@ -2867,7 +2872,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     this->EuiccInfo2ParseEuiccCategory(euiccInfo2Result_, root);
     this->EuiccInfo2ParsePpVersion(euiccInfo2Result_, root);
     euiccInfo2Result_.resultCode_ = ResultState::RESULT_OK;
-    euiccInfo2Result_.response_ = result->resultData;
+    euiccInfo2Result_.response_ = result.resultData;
     {
         std::lock_guard<std::mutex> lock(euiccInfo2Mutex_);
         isEuiccInfo2Ready_ = true;
