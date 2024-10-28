@@ -40,8 +40,8 @@ void NetworkType::ProcessGetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         return;
     }
     std::shared_ptr<NetworkSearchManager> networkSearchManager = networkSearchManager_.lock();
-    if (TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_ != nullptr && preferredNetworkInfo != nullptr) {
-        TELEPHONY_EXT_WRAPPER.getPreferredNetworkExt_(preferredNetworkInfo->preferredNetworkType);
+    if (networkSearchManager != nullptr && preferredNetworkInfo != nullptr) {
+        networkSearchManager->SetCachePreferredNetworkValue(slotId_, preferredNetworkInfo->preferredNetworkType);
     }
     MessageParcel data;
     int64_t index = -1;
