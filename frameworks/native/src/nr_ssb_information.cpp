@@ -46,7 +46,7 @@ bool NrSsbInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(timeAdvance_)) {
         return false;
     }
-    for (int32_t i = 0; i < SCELL_SSB_LIST && i < sCellSsbList_.size(); ++i) {
+    for (int32_t i = 0; i < SCELL_SSB_LIST && i < static_cast<int32_t>(sCellSsbList_.size()); ++i) {
         if (!parcel.WriteInt32(sCellSsbList_[i].ssbId)) {
             return false;
         }
