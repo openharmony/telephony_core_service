@@ -40,11 +40,6 @@ void Asn1Builder::Asn1AddChild(const std::shared_ptr<Asn1Node> node)
 int32_t Asn1Builder::Asn1AddChildAsBytes(uint32_t tag, const std::vector<uint8_t> &childByte, uint32_t byteLen)
 {
     TELEPHONY_LOGD("enter Asn1AddChildAsBytes");
-    if (childByte.empty()) {
-        TELEPHONY_LOGE("childByte is empty.");
-        return TELEPHONY_ERR_ARGUMENT_NULL;
-    }
-
     if (Asn1Utils::IsConstructedTag(tag)) {
         TELEPHONY_LOGE("Cannot set value of a constructed tag: %{public}u", tag);
         return TELEPHONY_ERR_FAIL;
@@ -57,11 +52,6 @@ int32_t Asn1Builder::Asn1AddChildAsBytes(uint32_t tag, const std::vector<uint8_t
 int32_t Asn1Builder::Asn1AddChildAsString(uint32_t tag, const std::string &childStr)
 {
     TELEPHONY_LOGD("enter Asn1AddChildAsString");
-    if (childStr.empty()) {
-        TELEPHONY_LOGE("childStr is empty.");
-        return TELEPHONY_ERR_ARGUMENT_NULL;
-    }
-
     std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(childStr);
     return Asn1AddChildAsBytes(tag, bytes, bytes.size());
 }
