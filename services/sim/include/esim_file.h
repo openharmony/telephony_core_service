@@ -57,7 +57,6 @@ static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
 constexpr static const int32_t ATR_LENGTH = 47;
 constexpr static const uint32_t OFFSET_FOUR_BIT = 4;
 constexpr static const uint32_t VERSION_NUMBER = 11;
-constexpr static const uint32_t AUTH_SERVER_TAC_LEN = 4;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
