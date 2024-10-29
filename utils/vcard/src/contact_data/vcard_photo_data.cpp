@@ -22,7 +22,7 @@ namespace Telephony {
 int32_t VCardPhotoData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::PHOTO);
-    valuesBucket.Put(ContactData::DETAIL_INFO, bytes_);
+    valuesBucket.Put(ContactData::BLOB_DATA, std::vector<uint8_t>(bytes_.begin(), bytes_.end()));
     return TELEPHONY_SUCCESS;
 }
 
