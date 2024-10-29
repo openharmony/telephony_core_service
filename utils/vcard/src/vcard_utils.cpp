@@ -48,7 +48,7 @@ std::map<PhoneVcType, std::string> phoneLabelIdToType = { { PhoneVcType::NUM_HOM
     { PhoneVcType::NUM_RADIO, VCARD_PARAM_PHONE_EXTRA_TYPE_RADIO }, { PhoneVcType::NUM_TELEX, VCARD_PARAM_TYPE_TLX },
     { PhoneVcType::NUM_TTY_TDD, VCARD_PARAM_PHONE_EXTRA_TYPE_TTY_TDD },
     { PhoneVcType::NUM_ASSISTANT, VCARD_PARAM_PHONE_EXTRA_TYPE_ASSISTANT },
-    { PhoneVcType::NUM_MMS, VCARD_PARAM_TYPE_MSG } };
+    { PhoneVcType::NUM_MMS, VCARD_PARAM_TYPE_MSG }, { PhoneVcType::NUM_MAIN, VCARD_PARAM_TYPE_PREF }};
 std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR, PhoneVcType::NUM_CAR },
     { VCARD_PARAM_TYPE_PAGER, PhoneVcType::NUM_PAGER }, { VCARD_PARAM_TYPE_ISDN, PhoneVcType::NUM_ISDN },
     { VCARD_PARAM_TYPE_HOME, PhoneVcType::NUM_MOBILE }, { VCARD_PARAM_TYPE_WORK, PhoneVcType::NUM_WORK },

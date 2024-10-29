@@ -379,8 +379,12 @@ int32_t VCardConstructor::ConstructRelation(std::shared_ptr<VCardContact> contac
         if (relationData == nullptr) {
             continue;
         }
+        std::string labelId = relationData->GetLabelId();
+        if (labelId == std::to_string(static_cast<int32_t>(RelationType::CUSTOM_LABEL))) {
+            labelId = std::to_string(VALUE_INDEX_ZERO);
+        }
         AddCustomType(VCARD_TYPE_X_MOBILE_RELATION,
-            { relationData->GetRelationName(), relationData->GetLabelId(), relationData->GetLabelName() });
+            { relationData->GetRelationName(), labelId, relationData->GetLabelName() });
     }
     return TELEPHONY_SUCCESS;
 }
@@ -534,7 +538,7 @@ void VCardConstructor::AddPostalLine(
         postalTypeStr = "X-" + labelName;
     }
     if (postalType == static_cast<int32_t>(PostalType::ADDR_OTHER)) {
-        postalTypeStr = "X-" + std::string(VCARD_PARAM_ADR_EXTRA_TYPE_OTHER);
+        postalTypeStr = "";
     }
     if (!postalTypeStr.empty()) {
         paramTypes.push_back(postalTypeStr);
@@ -704,7 +708,7 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
         {static_cast<int32_t>(EventType::EVENT_ANNIVERSARY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_ANNIVERSARY)},
         {static_cast<int32_t>(EventType::EVENT_LUNAR_BIRTHDAY),
             static_cast<int32_t>(EventHM4Type::EVENT_HM4_LUNAR_BIRTHDAY)},
-        {static_cast<int32_t>(EventType::EVENT_OTHER), static_cast<int32_t>(EventHM4Type::EVENT_HM4_OTHER)},
+        {static_cast<int32_t>(EventType::CUSTOM_LABEL), static_cast<int32_t>(EventHM4Type::EVENT_HM4_OTHER)},
         {static_cast<int32_t>(EventType::EVENT_BIRTHDAY), static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)}
     };
     for (auto eventData : contact->GetEventDatas()) {
@@ -820,6 +824,9 @@ void VCardConstructor::AddEmailLine(
     }
     if (emailType == static_cast<int32_t>(EmailType::CUSTOM_LABEL)) {
         postalTypeStr = "X-" + labelName;
+    }
+    if (emailType == static_cast<int32_t>(EmailType::EMAIL_OTHER)) {
+        postalTypeStr = "";
     }
     if (!postalTypeStr.empty()) {
         paramTypes.push_back(postalTypeStr);
