@@ -54,6 +54,7 @@ private:
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     OperatorConfig opc_;
     int32_t slotId_;
+    std::string modemSimMatchedOpNameCache_ = "";
     bool isLoadingConfig = false;
     std::mutex mutex_;
 };
