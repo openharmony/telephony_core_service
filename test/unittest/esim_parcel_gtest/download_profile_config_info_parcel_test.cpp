@@ -194,5 +194,6 @@ HWTEST_F(DownloadProfileConfigInfoTest, Unmarshalling_0400, Function | MediumTes
     EXPECT_EQ(info.Unmarshalling(parcel), nullptr);
     ResetParcelState();
 }
+
 } // namespace Telephony
 } // namespace OHOS
