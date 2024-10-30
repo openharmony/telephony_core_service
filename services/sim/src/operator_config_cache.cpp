@@ -244,6 +244,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             std::unique_lock<std::mutex> lock(mutex_);
             ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
+            modemSimMatchedOpNameCache_ = "";
             lock.unlock();
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc);
@@ -275,9 +276,17 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId)
     CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
     std::string operKey = Str16ToStr8(simFileManager->GetOpKey());
-    std::string operNameNew = (operKey == "") ? "NULL" : operName;
+    if (operKey == "") {
+        operName = "NULL";
+    } else {
+        if (modemSimMatchedOpNameCache_ == "") {
+            modemSimMatchedOpNameCache_ = operName;
+        } else {
+            operName = modemSimMatchedOpNameCache_;
+        }
+    }
     int32_t response = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(slotId,
-        static_cast<int32_t>(simState), operNameNew, operKey);
+        static_cast<int32_t>(simState), operName, operKey);
     TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo response = %{public}d", response);
 }
 
