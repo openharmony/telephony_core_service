@@ -1523,5 +1523,6 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorFileParser, Function | MediumTest |
     cJSON_Delete(value);
     value = nullptr;
 }
+
 } // namespace Telephony
 } // namespace OHOS
