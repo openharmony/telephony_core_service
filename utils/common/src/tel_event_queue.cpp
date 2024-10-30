@@ -45,6 +45,7 @@ TelEventQueue::~TelEventQueue()
     TELEPHONY_LOGD("%{public}s need to wait", name_.c_str());
     queue_->wait(curTask_);
     curTask_ = ffrt::task_handle();
+    std::lock_guard<std::mutex> lock(taskCtx_);
     queue_ = nullptr;
 }
 
