@@ -966,8 +966,8 @@ void VCardContact::AddEmailsData(std::string rawValue, std::string propValue, st
     std::vector<std::string> typeCollection;
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
     if (it == parasMap.end()) {
-        TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_TYPE);
-        return;
+        TELEPHONY_LOGI("Map does not contain this key, %{public}s, use OTHER type", VCARD_PARAM_TYPE);
+        // contains no type info will fallback to OTHER type
     } else {
         typeCollection = it->second;
     }
@@ -1022,8 +1022,8 @@ void VCardContact::AddPostalDatas(std::string rawValue, std::string propValue, s
     std::vector<std::string> typeCollection;
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
     if (it == parasMap.end()) {
-        TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_TYPE);
-        return;
+        TELEPHONY_LOGI("Map does not contain this key, %{public}s, use OTHER type", VCARD_PARAM_TYPE);
+        // contains no type info will fallback to OTHER type
     } else {
         typeCollection = it->second;
     }
@@ -1054,7 +1054,7 @@ void VCardContact::AddPostalDatas(std::string rawValue, std::string propValue, s
             TELEPHONY_LOGI("No need to do anything");
         }
     }
-    AddPostal(type < 0 ? static_cast<int32_t>(PostalType::ADDR_HOME) : type, values, label, isPrimary);
+    AddPostal(type < 0 ? static_cast<int32_t>(PostalType::ADDR_OTHER) : type, values, label, isPrimary);
 }
 
 void VCardContact::AddSoundDatas(std::string rawValue, std::string propValue, std::vector<std::string> values,
