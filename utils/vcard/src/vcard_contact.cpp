@@ -967,7 +967,7 @@ void VCardContact::AddEmailsData(std::string rawValue, std::string propValue, st
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
     if (it == parasMap.end()) {
         TELEPHONY_LOGI("Map does not contain this key, %{public}s, use OTHER type", VCARD_PARAM_TYPE);
-        // 不包含TYPE信息默认为其他类型的邮箱
+        // contains no type info will fallback to OTHER type
     } else {
         typeCollection = it->second;
     }
@@ -1023,7 +1023,7 @@ void VCardContact::AddPostalDatas(std::string rawValue, std::string propValue, s
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
     if (it == parasMap.end()) {
         TELEPHONY_LOGI("Map does not contain this key, %{public}s, use OTHER type", VCARD_PARAM_TYPE);
-        // 不包含TYPE信息默认为其他类型的地址
+        // contains no type info will fallback to OTHER type
     } else {
         typeCollection = it->second;
     }
