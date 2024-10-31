@@ -80,6 +80,17 @@ napi_status NapiValueConverted(napi_env env, napi_value arg, T *buf)
     return napi_get_value_string_utf8(env, arg, buf, bufSize, &result);
 }
 
+template<typename T, std::enable_if_t<std::is_same_v<T, std::string>, int32_t> = 0>
+napi_status NapiValueConverted(napi_env env, napi_value arg, T *str)
+{
+    size_t result {0};
+    constexpr size_t bufSize { 1024 };
+    char buf[bufSize] = {0};
+    napi_status res = napi_get_value_string_utf8(env, arg, buf, bufSize, &result);
+    *str = buf;
+    return res;
+}
+
 template<typename T, std::enable_if_t<std::is_same_v<T, napi_value>, int32_t> = 0>
 napi_status NapiValueConverted(napi_env env, napi_value arg, T *npaiValue)
 {
