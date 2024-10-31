@@ -349,7 +349,7 @@ bool StkController::CheckIsBipCmd(const std::string &cmdData)
     std::string commandType = cmdData.substr(typeOffset, STK_CMD_TYPE_LEN);
     if (commandType == STK_BIP_CMD_OPEN_CHANNEL || commandType == STK_BIP_CMD_SEND_DATA ||
         commandType == STK_BIP_CMD_RECEVIE_DATA || commandType == STK_BIP_CMD_GET_CHANNEL_STATUS ||
-        commandType == STK_BIP_CMD_CLOSE_CHANNEL || commandType == STK_BIP_CMD_GET_INPUT) {
+        commandType == STK_BIP_CMD_CLOSE_CHANNEL) {
         if (TELEPHONY_EXT_WRAPPER.sendEvent_ &&
             TELEPHONY_EXT_WRAPPER.sendEvent_(std::make_shared<std::string>(cmdData), slotId_)) {
                 TELEPHONY_LOGE("StkController slotId_ [%{public}d] ", slotId_);
