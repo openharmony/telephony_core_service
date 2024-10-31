@@ -41,7 +41,6 @@
 #define STK_BIP_CMD_RECEVIE_DATA "42"
 #define STK_BIP_CMD_GET_CHANNEL_STATUS "44"
 #define STK_BIP_CMD_CLOSE_CHANNEL "41"
-#define STK_BIP_CMD_GET_INPUT "23"
 
 namespace OHOS {
 namespace Telephony {
