@@ -42,7 +42,7 @@ constexpr int32_t SLOT_ID = 0;
 const int32_t INVALID_SLOTID = -1;
 constexpr int32_t NR_NSA_OPTION_ONLY = 1;
 constexpr int32_t SIGNAL_STRENGTH_GOOD = 3;
-const std::string NITZ_STR = "23/10/16,09:10:33+32,00";
+const std::string NITZ_STR = "23/10/16,09:10:33+32,00;3000000000";
 const std::string NITZ_STR_INVALID = "202312102359";
 constexpr int32_t LTE_RSSI_GOOD = -80;
 } // namespace
