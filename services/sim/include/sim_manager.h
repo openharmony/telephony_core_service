@@ -222,7 +222,7 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
     int32_t slotCount_ = SLOT_ID_ZERO;
     int32_t dsdsMode_ = DSDS_MODE_V2;
-    std::mutex mtx_;
+    std::shared_mutex mtx_;
 };
 } // namespace Telephony
 } // namespace OHOS
