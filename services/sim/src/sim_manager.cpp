@@ -138,7 +138,7 @@ void SimManager::InitSingleSimObject()
 
 int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
-    std::shared_lock<std::shared_mutex> lock(mtx_);
+    std::shared_lock<std::shared_mutex> lck(mtx_);
     if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
