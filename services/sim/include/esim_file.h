@@ -57,6 +57,9 @@ static std::string ISDR_AID = "A0000005591010FFFFFFFF8900000100";
 constexpr static const int32_t ATR_LENGTH = 47;
 constexpr static const uint32_t OFFSET_FOUR_BIT = 4;
 constexpr static const uint32_t VERSION_NUMBER = 11;
+constexpr static const uint32_t RESPONS_DATA_FINISH = 0;
+constexpr static const uint32_t RESPONS_DATA_NOT_FINISH = 1;
+constexpr static const uint32_t RESPONS_DATA_ERROR = 2;
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -120,7 +123,7 @@ private:
     void SyncOpenChannel();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void SyncOpenChannel(const std::u16string &aid);
-    void CopyApdCmdToReqInfo(ApduSimIORequestInfo *pReqInfo, ApduCommand *apdCmd);
+    void CopyApdCmdToReqInfo(ApduSimIORequestInfo &reqInfo, ApduCommand *apdCmd);
     void CommBuildOneApduReqInfo(ApduSimIORequestInfo &reqInfo, std::shared_ptr<Asn1Builder> &builder);
     bool ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessObtainEidDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -173,9 +176,9 @@ private:
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
     void SplitSendLongData(int32_t slotId, std::string hexStr, int32_t esimMessageId);
-    bool MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
+    uint32_t MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
-    bool CombineResponseDataFinish(IccFileData &fileData);
+    uint32_t CombineResponseDataFinish(IccFileData &fileData);
     void ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
     bool ProcessRetrieveNotificationList(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
@@ -216,6 +219,7 @@ private:
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
     void ResetEuiccNotification();
+    void NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -352,8 +356,9 @@ private:
     std::mutex authenticateServerMutex_;
     std::condition_variable authenticateServerCv_;
     bool isAuthenticateServerReady_ = false;
+
+    std::mutex itfMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // OHOS_ESIM_FILE_H
