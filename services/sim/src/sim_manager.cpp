@@ -44,7 +44,7 @@ bool SimManager::OnInit(int32_t slotCount)
 void SimManager::InitMultiSimObject()
 {
     // Program memory
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<std::shared_mutex> lck(mtx_);
     simStateManager_.resize(slotCount_);
     simFileManager_.resize(slotCount_);
     simSmsManager_.resize(slotCount_);
@@ -79,7 +79,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
     if (slotId != SIM_SLOT_2) {
         return TELEPHONY_ERROR;
     }
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<std::shared_mutex> lck(mtx_);
     if (simStateManager_.size() == MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("SimManager InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;
@@ -138,7 +138,7 @@ void SimManager::InitSingleSimObject()
 
 int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::shared_lock<std::shared_mutex> lock(mtx_);
     if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
