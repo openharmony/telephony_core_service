@@ -293,7 +293,6 @@ void IccDiallingNumbersHandler::ProcessExtensionRecordNumbers(const AppExecFwk::
         return;
     }
     if (fd->exception != nullptr) {
-        loadRequest->SetException(fd->exception);
         TELEPHONY_LOGE("IccDiallingNumbersHandler::ProcessExtensionRecordNumbers load failed with exception");
         return;
     }
