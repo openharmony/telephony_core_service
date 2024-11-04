@@ -47,12 +47,16 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
 
     int32_t resolvableErrorsValue;
     int32_t resultValue;
+    int32_t profileClassValue;
     if (!parcel.ReadInt32(pprType_) || !parcel.ReadBool(pprFlag_) ||
-        !parcel.ReadInt32(resolvableErrorsValue) || !parcel.ReadInt32(resultValue)) {
+        !parcel.ReadInt32(resolvableErrorsValue) || !parcel.ReadInt32(resultValue) ||
+        !parcel.ReadString16(serviceProviderName_) || !parcel.ReadString16(profileName_) ||
+        !parcel.ReadString16(iccId_) || !parcel.ReadInt32(profileClassValue)) {
         return false;
     }
     resolvableErrors_ = static_cast<SolvableErrors>(resolvableErrorsValue);
     result_ = static_cast<ResultState>(resultValue);
+    profileClass_ = static_cast<ProfileClass>(profileClassValue);
 
     return true;
 }
@@ -75,7 +79,9 @@ bool GetDownloadableProfileMetadataResult::Marshalling(Parcel &parcel) const
 
     if (!parcel.WriteInt32(pprType_) || !parcel.WriteBool(pprFlag_) ||
         !parcel.WriteInt32(static_cast<int32_t>(resolvableErrors_)) ||
-        !parcel.WriteInt32(static_cast<int32_t>(result_))) {
+        !parcel.WriteInt32(static_cast<int32_t>(result_)) || !parcel.WriteString16(serviceProviderName_) ||
+        !parcel.WriteString16(profileName_) || !parcel.WriteString16(iccId_) || 
+        !parcel.WriteInt32(static_cast<int32_t>(profileClass_))) {
         return false;
     }
     return true;
