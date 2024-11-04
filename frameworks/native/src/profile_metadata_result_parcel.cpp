@@ -80,7 +80,7 @@ bool GetDownloadableProfileMetadataResult::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(pprType_) || !parcel.WriteBool(pprFlag_) ||
         !parcel.WriteInt32(static_cast<int32_t>(resolvableErrors_)) ||
         !parcel.WriteInt32(static_cast<int32_t>(result_)) || !parcel.WriteString16(serviceProviderName_) ||
-        !parcel.WriteString16(profileName_) || !parcel.WriteString16(iccId_) || 
+        !parcel.WriteString16(profileName_) || !parcel.WriteString16(iccId_) ||
         !parcel.WriteInt32(static_cast<int32_t>(profileClass_))) {
         return false;
     }

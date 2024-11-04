@@ -2323,7 +2323,7 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
         NotifyReady(retrieveNotificationListMutex_, isRetrieveNotificationListReady_, retrieveNotificationListCv_);
         return false;
     }
-    NotifyReady(retrieveNotificationListMutex_, isRetrieveNotificationListReady_, retrieveNotificationListCv_);    
+    NotifyReady(retrieveNotificationListMutex_, isRetrieveNotificationListReady_, retrieveNotificationListCv_);
     return true;
 }
 
