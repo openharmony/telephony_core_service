@@ -2309,7 +2309,7 @@ bool EsimFile::ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent:
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr");
-        NotifyReady(retrieveNotificationListMutex_, isRetrieveNotificationListReady_, retrieveNotificationListCv_);  
+        NotifyReady(retrieveNotificationListMutex_, isRetrieveNotificationListReady_, retrieveNotificationListCv_);
         return false;
     }
     std::shared_ptr<Asn1Node> root = ParseEvent(event);
