@@ -292,7 +292,14 @@ void OperatorName::NotifyGsmSpnChanged(
     if (isForce || curSpnRule_ != spnRule || curRegState_ != regStatus || curSpnShow_ != showSpn ||
         curPlmnShow_ != showPlmn || curSpn_.compare(spn) || curPlmn_.compare(plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
-        PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
+        bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
+        if (isSatelliteOn && !domesticSpn.empty()) {
+            plmn = domesticSpn;
+            std::string emptyDomesticSpn = "";
+            PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, emptyDomesticSpn);
+        } else {
+            PublishEvent(spnRule, regStatus, showPlmn, plmn, showSpn, spn, domesticSpn);
+        }
     } else {
         TELEPHONY_LOGD(
             "OperatorName::NotifyGsmSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
