@@ -219,6 +219,7 @@ private:
     bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
     void ResetEuiccNotification();
     void NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv);
+    bool RealProcessPrepareDownloadDone(std::string &combineHexStr);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
