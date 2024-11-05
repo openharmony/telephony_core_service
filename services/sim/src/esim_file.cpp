@@ -1766,6 +1766,11 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
     }
+    return RealProcessPrepareDownloadDone(recvCombineStr_);
+}
+
+bool EsimFile::RealProcessPrepareDownloadDone(std::string &combineHexStr)
+{
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
