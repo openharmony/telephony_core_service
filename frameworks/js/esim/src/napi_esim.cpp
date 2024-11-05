@@ -412,7 +412,6 @@ ResetOption GetDefaultResetOption(void)
 
 napi_value GetEid(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetEid enter!");
     size_t parameterCount = PARAMETER_COUNT_ONE;
     napi_value parameters[] = { nullptr };
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
@@ -438,7 +437,6 @@ napi_value GetEid(napi_env env, napi_callback_info info)
 
 napi_value IsEsimSupported(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("IsEsimSupported enter!");
     size_t parameterCount = PARAMETER_COUNT_ONE;
     napi_value parameters[] = { nullptr };
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
@@ -505,7 +503,6 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetEuiccInfo(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetEuiccInfo enter!");
     auto euiccInfo = new (std::nothrow) AsyncEuiccInfo();
     if (euiccInfo == nullptr) {
         return nullptr;
@@ -565,7 +562,6 @@ void GetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetDefaultSmdpAddress(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetDefaultSmdpAddress enter!");
     return NapiCreateAsyncWork<std::string, NativeGetDefaultSmdpAddress, GetDefaultSmdpAddressCallback>(env,
         info, "GetDefaultSmdpAddress");
 }
@@ -609,7 +605,6 @@ void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("SetDefaultSmdpAddress enter!");
     auto asyncContext = new (std::nothrow) AsyncContextInfo();
     if (asyncContext == nullptr) {
         return nullptr;
@@ -674,7 +669,6 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value SwitchToProfile(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("SwitchToProfile enter!");
     auto profileContext = new (std::nothrow) AsyncSwitchProfileInfo();
     if (profileContext == nullptr) {
         return nullptr;
@@ -739,7 +733,6 @@ void DeleteProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DeleteProfile(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("DeleteProfile enter!");
     auto asyncContext = new (std::nothrow) AsyncContextInfo();
     if (asyncContext == nullptr) {
         return nullptr;
@@ -806,7 +799,6 @@ void ResetMemoryCallback(napi_env env, napi_status status, void *data)
 
 napi_value ResetMemory(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("ResetMemory enter!");
     parameterCount = 0;
     napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
@@ -886,7 +878,6 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DownloadProfile(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("DownloadProfile enter!");
     auto profileContext = new (std::nothrow) AsyncDownloadProfileInfo();
     if (profileContext == nullptr) {
         return nullptr;
@@ -955,7 +946,6 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetDownloadableProfiles enter!");
     auto profileContext = new (std::nothrow) AsyncDefaultProfileList();
     if (profileContext == nullptr) {
         return nullptr;
@@ -1017,7 +1007,6 @@ void GetOsuStatusCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetOsuStatus(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetOsuStatus enter!");
     return NapiCreateAsyncWork<int32_t, NativeGetOsuStatus, GetOsuStatusCallback>(env, info, "GetOsuStatus");
 }
 
@@ -1059,7 +1048,6 @@ void StartOsuCallback(napi_env env, napi_status status, void *data)
 
 napi_value StartOsu(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("StartOsu enter!");
     return NapiCreateAsyncWork<int32_t, NativeStartOsu, StartOsuCallback>(env, info, "StartOsu");
 }
 
@@ -1103,7 +1091,6 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetProfileNickname(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("SetProfileNickname enter!");
     auto profileContext = new (std::nothrow) AsyncProfileNickname();
     if (profileContext == nullptr) {
         return nullptr;
@@ -1174,7 +1161,6 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
 
 napi_value CancelSession(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("CancelSession enter!");
     auto sessionContext = new (std::nothrow) AsyncCancelSession();
     if (sessionContext == nullptr) {
         return nullptr;
@@ -1244,7 +1230,6 @@ void GetDownloadableProfileMetadataCallback(napi_env env, napi_status status, vo
 
 napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetDownloadableProfileMetadata enter!");
     auto metadata = new (std::nothrow) AsyncProfileMetadataInfo();
     if (metadata == nullptr) {
         return nullptr;
@@ -1313,7 +1298,6 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetEuiccProfileInfoList(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("GetEuiccProfileInfoList enter!");
     auto euiccInfo = new (std::nothrow) AsyncEuiccProfileInfoList();
     if (euiccInfo == nullptr) {
         return nullptr;
@@ -1376,7 +1360,6 @@ void ReserveProfilesForFactoryRestoreCallback(napi_env env, napi_status status, 
 
 napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("ReserveProfilesForFactoryRestore enter!");
     auto asyncContext = new (std::nothrow) AsyncCommonInfo();
     if (asyncContext == nullptr) {
         return nullptr;
