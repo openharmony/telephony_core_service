@@ -1567,13 +1567,6 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
         SyncCloseChannel();
         return ResponseEsimResult();
     }
-    isPrepareDownloadReady_ = false;
-    std::unique_lock<std::mutex> lock(prepareDownloadMutex_);
-    if (!prepareDownloadCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return isPrepareDownloadReady_; })) {
-        SyncCloseChannel();
-        return ResponseEsimResult();
-    }
     SyncCloseChannel();
     return preDownloadResult_;
 }
@@ -1588,13 +1581,6 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     recvCombineStr_ = "";
     if (!ProcessLoadBoundProfilePackage(slotId_)) {
         TELEPHONY_LOGE("ProcessLoadBoundProfilePackage encode failed");
-        SyncCloseChannel();
-        return ResponseEsimBppResult();
-    }
-    isLoadBppReady_ = false;
-    std::unique_lock<std::mutex> lock(loadBppMutex_);
-    if (!loadBppCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return isLoadBppReady_; })) {
         SyncCloseChannel();
         return ResponseEsimBppResult();
     }
@@ -1674,32 +1660,29 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     if (hexStrLen == 0) {
         return false;
     }
-    SplitSendLongData(slotId, hexStr, MSG_ESIM_PREPARE_DOWNLOAD_DONE);
-    return true;
-}
-
-void EsimFile::SplitSendLongData(int32_t slotId, std::string hexStr, int32_t esimMessageId)
-{
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
         CopyApdCmdToReqInfo(reqInfo, cmd.get());
-        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(esimMessageId);
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
         if (telRilManager_ == nullptr) {
-            return;
+            return false;
         }
+        std::unique_lock<std::mutex> lock(prepareDownloadMutex_);
+        isPrepareDownloadReady_ = false;
         telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
+        if (!prepareDownloadCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+            [this]() { return isPrepareDownloadReady_; })) {
+            return false;
+        }
     }
+    return true;
 }
 
 uint32_t EsimFile::CombineResponseDataFinish(IccFileData &fileData)
 {
-    if (fileData.resultData.length() == 0) {
-        return RESPONS_DATA_NOT_FINISH;
-    }
-    recvCombineStr_ = recvCombineStr_ + fileData.resultData;
     if (fileData.sw1 == SW1_MORE_RESPONSE) {
         return RESPONS_DATA_NOT_FINISH;
     } else if (fileData.sw1 == SW1_VALUE_90 && fileData.sw2 == SW2_VALUE_00) {
@@ -1747,6 +1730,7 @@ uint32_t EsimFile::MergeRecvLongDataComplete(IccFileData &fileData, int32_t even
         TELEPHONY_LOGI("RESPONS_DATA_ERROR current_len:%{public}zu", recvCombineStr_.length());
         return result;
     }
+    recvCombineStr_ = recvCombineStr_ + fileData.resultData;
     if (result == RESPONS_DATA_NOT_FINISH) {
         ProcessIfNeedMoreResponse(fileData, eventId);
         TELEPHONY_LOGI("RESPONS_DATA_NOT_FINISH current_len:%{public}zu", recvCombineStr_.length());
@@ -1774,6 +1758,10 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     if (mergeResult == RESPONS_DATA_ERROR) {
         NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
         return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
+        return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
@@ -1931,8 +1919,11 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
         if (telRilManager_ == nullptr) {
             return false;
         }
-        int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (apduResult == TELEPHONY_ERR_FAIL) {
+        std::unique_lock<std::mutex> lock(loadBppMutex_);
+        isLoadBppReady_ = false;
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
+        if (!loadBppCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+            [this]() { return isLoadBppReady_; })) {
             return false;
         }
     }
@@ -1957,6 +1948,10 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
     if (mergeResult == RESPONS_DATA_ERROR) {
         NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
         return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
+        return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
@@ -2182,6 +2177,10 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
         NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
         return false;
     }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
+        return true;
+    }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
     }
@@ -2399,6 +2398,10 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
     if (mergeResult == RESPONS_DATA_ERROR) {
         NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
         return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
+        return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
@@ -2753,13 +2756,6 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
         SyncCloseChannel();
         return ResponseEsimResult();
     }
-    isAuthenticateServerReady_ = false;
-    std::unique_lock<std::mutex> lock(authenticateServerMutex_);
-    if (!authenticateServerCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-        [this]() { return isAuthenticateServerReady_; })) {
-        SyncCloseChannel();
-        return ResponseEsimResult();
-    }
     SyncCloseChannel();
     return responseAuthenticateResult_;
 }
@@ -2836,7 +2832,25 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     builder->Asn1AddChild(ctxNode);
     std::string hexStr;
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
-    SplitSendLongData(slotId, hexStr, MSG_ESIM_AUTHENTICATE_SERVER);
+    RequestApduBuild codec(currentChannelId_);
+    codec.BuildStoreData(hexStr);
+    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
+    for (const auto &cmd : apduCommandList) {
+        ApduSimIORequestInfo reqInfo;
+        CopyApdCmdToReqInfo(reqInfo, cmd.get());
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_AUTHENTICATE_SERVER);
+        if (telRilManager_ == nullptr) {
+            TELEPHONY_LOGE("telRilManager_ is nullptr");
+            return false;
+        }
+        std::unique_lock<std::mutex> lock(authenticateServerMutex_);
+        isAuthenticateServerReady_ = false;
+        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
+        if (!authenticateServerCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+            [this]() { return isAuthenticateServerReady_; })) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -2927,6 +2941,10 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     if (mergeResult == RESPONS_DATA_ERROR) {
         NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
         return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
+        return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
@@ -3178,6 +3196,10 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
     if (mergeResult == RESPONS_DATA_ERROR) {
         NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
         return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
+        NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
+        return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
         return true;
