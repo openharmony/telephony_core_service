@@ -534,7 +534,7 @@ void VCardConstructor::AddPostalLine(
     if (postalType == static_cast<int32_t>(PostalType::ADDR_WORK)) {
         postalTypeStr = VCARD_PARAM_TYPE_WORK;
     }
-    if (postalType == static_cast<int32_t>(PostalType::CUSTOM_LABEL)) {
+    if (postalType == static_cast<int32_t>(PostalType::CUSTOM_LABEL) && VCardUtils::IsPrintableAscii(labelName)) {
         postalTypeStr = "X-" + labelName;
     }
     if (postalType == static_cast<int32_t>(PostalType::ADDR_OTHER)) {
@@ -764,7 +764,7 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
         AddParamTypes(paramTypes);
     } else if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENTGH + 1) {
         auto phoneType = static_cast<PhoneVcType>(std::stoll(labelId));
-        if (phoneType == PhoneVcType::CUSTOM_LABEL) {
+        if (phoneType == PhoneVcType::CUSTOM_LABEL && VCardUtils::IsPrintableAscii({ labelName })) {
             paramTypes.push_back("X-" + labelName);
             AddParamTypes(paramTypes);
         }
@@ -822,7 +822,7 @@ void VCardConstructor::AddEmailLine(
     if (emailType == static_cast<int32_t>(EmailType::EMAIL_WORK)) {
         postalTypeStr = VCARD_PARAM_TYPE_WORK;
     }
-    if (emailType == static_cast<int32_t>(EmailType::CUSTOM_LABEL)) {
+    if (emailType == static_cast<int32_t>(EmailType::CUSTOM_LABEL) && VCardUtils::IsPrintableAscii(labelName)) {
         postalTypeStr = "X-" + labelName;
     }
     if (emailType == static_cast<int32_t>(EmailType::EMAIL_OTHER)) {
