@@ -17,6 +17,7 @@
  
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_common_utils.h"
  
 namespace OHOS {
 namespace Telephony {
@@ -37,8 +38,8 @@ int32_t VCardGroupData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
     std::string groupId;
     resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
     resultSet->GetString(index, groupId);
-    if (groupId.empty()) {
-        TELEPHONY_LOGE("BuildData groupId is empty");
+    if (groupId.empty() || !IsValidDecValue(groupId)) {
+        TELEPHONY_LOGE("BuildData groupId is empty or invalid.");
         return TELEPHONY_ERROR;
     }
     groupId_ = std::stoi(groupId);
