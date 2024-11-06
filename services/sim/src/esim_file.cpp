@@ -419,6 +419,8 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
         NotifyReady(euiccInfo1Mutex_, isEuiccInfo1Ready_, euiccInfo1Cv_);
         return false;
     }
+    TELEPHONY_LOGI("input raw data:sw1=%{public}02X, sw2=%{public}02X, length=%{public}zu",
+        rawData.sw1, rawData.sw2, rawData.resultData.length());
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(rawData.resultData);
     uint32_t byteLen = responseByte.size();
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
@@ -1753,18 +1755,12 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_PREPARE_DOWNLOAD_DONE);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_,
+        MSG_ESIM_PREPARE_DOWNLOAD_DONE, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     return RealProcessPrepareDownloadDone(recvCombineStr_);
 }
@@ -1948,22 +1944,15 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
         NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(loadBppMutex_, isLoadBppReady_, loadBppCv_,
+        MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     return RealProcessLoadBoundProfilePackageDone(recvCombineStr_);
 }
-
 bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
 {
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
@@ -2176,18 +2165,12 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
         NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_LIST_NOTIFICATION);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_,
+        MSG_ESIM_LIST_NOTIFICATION, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
@@ -2397,19 +2380,12 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
         return false;
     }
-
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(retrieveNotificationMutex_, isRetrieveNotificationReady_,
+        retrieveNotificationCv_, MSG_ESIM_RETRIEVE_NOTIFICATION_DONE, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
@@ -2941,18 +2917,12 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
         NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_,
+        MSG_ESIM_OBTAIN_EUICC_INFO2_DONE, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
@@ -2975,7 +2945,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     this->EuiccInfo2ParseEuiccCategory(euiccInfo2Result_, root);
     this->EuiccInfo2ParsePpVersion(euiccInfo2Result_, root);
     euiccInfo2Result_.resultCode_ = ResultState::RESULT_OK;
-    euiccInfo2Result_.response_ = iccFileData.resultData;
+    euiccInfo2Result_.response_ = newRecvData_.resultData;
     NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
     return true;
 }
@@ -3196,18 +3166,12 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
         NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
         return false;
     }
-    IccFileData &iccFileData = rcvMsg->fileData;
-    uint32_t mergeResult = MergeRecvLongDataComplete(iccFileData, MSG_ESIM_AUTHENTICATE_SERVER);
-    if (mergeResult == RESPONS_DATA_ERROR) {
-        NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
-        return false;
-    }
-    if ((mergeResult == RESPONS_DATA_FINISH) && (iccFileData.resultData.length() == 0)) {
-        NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
-        return true;
-    }
-    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
+    IccFileData newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_,
+        MSG_ESIM_AUTHENTICATE_SERVER, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
     }
     return RealProcsessAuthenticateServerDone(recvCombineStr_);
 }
@@ -3224,6 +3188,28 @@ void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable 
     std::lock_guard<std::mutex> lock(mtx);
     flag = true;
     cv.notify_one();
+}
+
+bool EsimFile::CommMergeRecvData(
+    std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish)
+{
+    uint32_t mergeResult = MergeRecvLongDataComplete(newRecvData_, eventId);
+    if (mergeResult == RESPONS_DATA_ERROR) {
+        NotifyReady(mtx, flag, cv);
+        isHandleFinish = true;
+        return false;
+    }
+    if ((mergeResult == RESPONS_DATA_FINISH) && (newRecvData_.resultData.length() == 0)) {
+        NotifyReady(mtx, flag, cv);
+        isHandleFinish = true;
+        return true;
+    }
+    if (mergeResult == RESPONS_DATA_NOT_FINISH) {
+        return true;
+        isHandleFinish = true;
+    }
+    isHandleFinish = false;
+    return false;
 }
 
 void EsimFile::InitChanneMemberFunc()
