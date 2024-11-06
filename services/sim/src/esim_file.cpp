@@ -1755,7 +1755,7 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
         NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_,
         MSG_ESIM_PREPARE_DOWNLOAD_DONE, isHandleFinish);
@@ -1944,7 +1944,7 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
         NotifyReady(loadBppMutex_, isLoadBppReady_, loadBppCv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(loadBppMutex_, isLoadBppReady_, loadBppCv_,
         MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE, isHandleFinish);
@@ -2165,7 +2165,7 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
         NotifyReady(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(listNotificationsMutex_, isListNotificationsReady_, listNotificationsCv_,
         MSG_ESIM_LIST_NOTIFICATION, isHandleFinish);
@@ -2380,7 +2380,7 @@ bool EsimFile::ProcessRetrieveNotificationDone(const AppExecFwk::InnerEvent::Poi
         NotifyReady(retrieveNotificationMutex_, isRetrieveNotificationReady_, retrieveNotificationCv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(retrieveNotificationMutex_, isRetrieveNotificationReady_,
         retrieveNotificationCv_, MSG_ESIM_RETRIEVE_NOTIFICATION_DONE, isHandleFinish);
@@ -2917,7 +2917,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
         NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_,
         MSG_ESIM_OBTAIN_EUICC_INFO2_DONE, isHandleFinish);
@@ -3166,7 +3166,7 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
         NotifyReady(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
         return false;
     }
-    IccFileData newRecvData_ = rcvMsg->fileData;
+    newRecvData_ = rcvMsg->fileData;
     bool isHandleFinish = false;
     bool retValue = CommMergeRecvData(authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_,
         MSG_ESIM_AUTHENTICATE_SERVER, isHandleFinish);
