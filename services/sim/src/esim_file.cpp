@@ -1727,7 +1727,7 @@ uint32_t EsimFile::MergeRecvLongDataComplete(IccFileData &fileData, int32_t even
         eventId, fileData.sw1, fileData.sw2, fileData.resultData.length());
     uint32_t result = CombineResponseDataFinish(fileData);
     if (result == RESPONS_DATA_ERROR) {
-        TELEPHONY_LOGI("RESPONS_DATA_ERROR current_len:%{public}zu", recvCombineStr_.length());
+        TELEPHONY_LOGE("RESPONS_DATA_ERROR current_len:%{public}zu", recvCombineStr_.length());
         return result;
     }
     recvCombineStr_ = recvCombineStr_ + fileData.resultData;
