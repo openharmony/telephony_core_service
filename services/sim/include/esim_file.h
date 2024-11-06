@@ -220,6 +220,8 @@ private:
     void ResetEuiccNotification();
     void NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv);
     bool RealProcessPrepareDownloadDone(std::string &combineHexStr);
+    bool CommMergeRecvData(
+        std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
@@ -254,6 +256,7 @@ private:
     ResponseEsimResult transApduDataResponse_;
     bool isSupported_ = false;
     std::string recvCombineStr_ = "";
+    IccFileData newRecvData_;
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
