@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t BUF_SIZE = 1024;
 template<typename T, std::enable_if_t<std::is_same_v<T, int32_t>, int32_t> = 0>
 napi_valuetype GetInputArgvType(T *)
 {
@@ -78,6 +79,16 @@ napi_status NapiValueConverted(napi_env env, napi_value arg, T *buf)
     size_t result {0};
     constexpr size_t bufSize { 1024 };
     return napi_get_value_string_utf8(env, arg, buf, bufSize, &result);
+}
+
+template<typename T, std::enable_if_t<std::is_same_v<T, std::string>, int32_t> = 0>
+napi_status NapiValueConverted(napi_env env, napi_value arg, T *str)
+{
+    size_t result { 0 };
+    char buf[BUF_SIZE] = { 0 };
+    napi_status res = napi_get_value_string_utf8(env, arg, buf, BUF_SIZE, &result);
+    *str = std::string(buf);
+    return res;
 }
 
 template<typename T, std::enable_if_t<std::is_same_v<T, napi_value>, int32_t> = 0>

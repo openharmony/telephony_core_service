@@ -900,10 +900,9 @@ napi_value GetSimAuthentication(napi_env env, napi_callback_info info)
 {
     auto asyncContext = new AsyncSimAuthInfo();
     BaseContext &context = asyncContext->asyncContext.context;
-    char authDataStr[ARRAY_SIZE] = {0};
 
-    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &asyncContext->authType, authDataStr,
-        &context.callbackRef);
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, &asyncContext->authType,
+        &asyncContext->authData, &context.callbackRef);
     AsyncPara para {
         .funcName = "GetSimAuthentication",
         .env = env,
@@ -913,7 +912,6 @@ napi_value GetSimAuthentication(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSimAuthInfo>(para, asyncContext, initPara);
     if (result) {
-        asyncContext->authData = std::string(authDataStr);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
