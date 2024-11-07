@@ -43,7 +43,7 @@ struct PermissionPara {
     std::string func = "";
     std::string permission = "";
 };
-size_t parameterCount = 0;
+size_t resetParameterCount = 0;
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
@@ -770,7 +770,7 @@ void NativeResetMemory(napi_env env, void *data)
         asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    if (parameterCount == PARAMETER_COUNT_ONE) {
+    if (resetParameterCount == PARAMETER_COUNT_ONE) {
         profileContext->option = static_cast<int32_t>(GetDefaultResetOption());
     }
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
@@ -799,12 +799,12 @@ void ResetMemoryCallback(napi_env env, napi_status status, void *data)
 
 napi_value ResetMemory(napi_env env, napi_callback_info info)
 {
-    parameterCount = 0;
+    resetParameterCount = 0;
     napi_value parameters[PARAMETER_COUNT_TWO] = { 0 };
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data);
-    if (parameterCount == PARAMETER_COUNT_ONE) {
+    napi_get_cb_info(env, info, &resetParameterCount, parameters, &thisVar, &data);
+    if (resetParameterCount == PARAMETER_COUNT_ONE) {
         return NapiCreateAsyncWork<int32_t, NativeResetMemory, ResetMemoryCallback>(env, info, "ResetMemory");
     }
 

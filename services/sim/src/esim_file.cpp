@@ -3205,8 +3205,8 @@ bool EsimFile::CommMergeRecvData(
         return true;
     }
     if (mergeResult == RESPONS_DATA_NOT_FINISH) {
-        return true;
         isHandleFinish = true;
+        return true;
     }
     isHandleFinish = false;
     return false;
