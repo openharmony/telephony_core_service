@@ -20,7 +20,8 @@
         "name": "core_service",
         "subsystem": "telephony",
         "syscap": [
-            "SystemCapability.Telephony.CoreService"
+            "SystemCapability.Telephony.CoreService",
+            "SystemCapability.Telephony.CoreService.Esim"
         ],
         "features": [
             "core_service_support_esim"
