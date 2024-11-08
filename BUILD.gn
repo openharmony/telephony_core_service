@@ -121,7 +121,10 @@ ohos_shared_library("tel_core_service") {
     "services/core/src/core_service_stub.cpp",
   ]
   if (core_service_support_esim) {
-    sources += [ "$TELEPHONY_SIM_ROOT/src/esim_file.cpp" ]
+    sources += [
+      "$TELEPHONY_SIM_ROOT/src/esim_controller.cpp",
+      "$TELEPHONY_SIM_ROOT/src/esim_file.cpp",
+    ]
   }
 
   include_dirs = [
