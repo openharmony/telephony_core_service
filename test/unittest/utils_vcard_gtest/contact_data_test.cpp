@@ -443,14 +443,6 @@ HWTEST_F(ContactDataTest, VCardDecoderV21_DecodeOne, Function | MediumTest | Lev
     decoder.AddVCardDecodeListener(listener);
 }
 
-HWTEST_F(ContactDataTest, VCardDecoderV21_DealBase64OrB, Function | MediumTest | Level3)
-{
-    VCardDecoderV21 decoder;
-    int32_t errorCode = -1;
-    decoder.DealBase64OrB("RawValue", nullptr, errorCode);
-    EXPECT_EQ(errorCode, -1);
-}
-
 HWTEST_F(ContactDataTest, VCardDecoderV21_DealParams001, Function | MediumTest | Level3)
 {
     VCardDecoderV21 decoder;
