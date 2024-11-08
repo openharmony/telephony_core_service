@@ -22,6 +22,9 @@
 #include "common_event_publish_info.h"
 #include "common_event_support.h"
 #include "extension_ability_info.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_controller.h"
+#endif
 #include "tel_ril_types.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -371,6 +374,13 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     if (CheckIsBipCmd(cmdData)) {
         return;
     }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {
+        EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
+        return;
+    }
+#endif
 
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_COMMAND);
