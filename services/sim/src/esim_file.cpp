@@ -1648,26 +1648,33 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     }
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
+    SplitSendLongData(codec, MSG_ESIM_PREPARE_DOWNLOAD_DONE,
+        prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
+    return true;
+}
+
+void EsimFile::SplitSendLongData(
+    RequestApduBuild &codec, int32_t esimMessageId, std::mutex &mtx, bool &flag, std::condition_variable &cv)
+{
     std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
-        ApduSimIORequestInfo reqInfo;
         if (!cmd) {
-            return false;
+            return;
         }
+        ApduSimIORequestInfo reqInfo;
         CopyApdCmdToReqInfo(reqInfo, cmd.get());
-        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
+        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(esimMessageId);
         if (telRilManager_ == nullptr) {
-            return false;
+            return;
         }
-        std::unique_lock<std::mutex> lock(prepareDownloadMutex_);
-        isPrepareDownloadReady_ = false;
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
-        if (!prepareDownloadCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-            [this]() { return isPrepareDownloadReady_; })) {
-            return false;
+        std::unique_lock<std::mutex> lock(mtx);
+        flag = false;
+        telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, tmpResponseEvent);
+        if (!cv.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+            [&flag]() { return flag; })) {
+            return;
         }
     }
-    return true;
 }
 
 uint32_t EsimFile::CombineResponseDataFinish(IccFileData &fileData)
@@ -1899,25 +1906,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     if (sequenceOf86 != nullptr) {
         BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
     }
-    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
-    for (const auto &cmd : apduCommandList) {
-        ApduSimIORequestInfo reqInfo;
-        if (!cmd) {
-            return false;
-        }
-        CopyApdCmdToReqInfo(reqInfo, cmd.get());
-        AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE);
-        if (telRilManager_ == nullptr) {
-            return false;
-        }
-        std::unique_lock<std::mutex> lock(loadBppMutex_);
-        isLoadBppReady_ = false;
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-        if (!loadBppCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-            [this]() { return isLoadBppReady_; })) {
-            return false;
-        }
-    }
+    SplitSendLongData(codec, MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE, loadBppMutex_, isLoadBppReady_, loadBppCv_);
     return true;
 }
 
@@ -2797,26 +2786,8 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
-    std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
-    for (const auto &cmd : apduCommandList) {
-        ApduSimIORequestInfo reqInfo;
-        if (!cmd) {
-            return false;
-        }
-        CopyApdCmdToReqInfo(reqInfo, cmd.get());
-        AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_AUTHENTICATE_SERVER);
-        if (telRilManager_ == nullptr) {
-            TELEPHONY_LOGE("telRilManager_ is nullptr");
-            return false;
-        }
-        std::unique_lock<std::mutex> lock(authenticateServerMutex_);
-        isAuthenticateServerReady_ = false;
-        telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, tmpResponseEvent);
-        if (!authenticateServerCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-            [this]() { return isAuthenticateServerReady_; })) {
-            return false;
-        }
-    }
+    SplitSendLongData(codec, MSG_ESIM_AUTHENTICATE_SERVER,
+        authenticateServerMutex_, isAuthenticateServerReady_, authenticateServerCv_);
     return true;
 }
 

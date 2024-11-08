@@ -175,6 +175,8 @@ private:
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
+    void SplitSendLongData(RequestApduBuild &codec, int32_t esimMessageId,
+        std::mutex &mtx, bool &flag, std::condition_variable &cv);
     uint32_t MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     uint32_t CombineResponseDataFinish(IccFileData &fileData);
