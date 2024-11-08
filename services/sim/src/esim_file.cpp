@@ -106,7 +106,6 @@ void EsimFile::SyncCloseChannel()
 
 std::string EsimFile::ObtainEid()
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventGetEid = BuildCallerInfo(MSG_ESIM_OBTAIN_EID_DONE);
     if (!ProcessObtainEid(slotId_, eventGetEid)) {
@@ -128,7 +127,6 @@ std::string EsimFile::ObtainEid()
 
 GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventRequestAllProfiles = BuildCallerInfo(MSG_ESIM_REQUEST_ALL_PROFILES);
     if (!ProcessRequestAllProfiles(slotId_, eventRequestAllProfiles)) {
@@ -149,7 +147,6 @@ GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 
 EuiccInfo EsimFile::GetEuiccInfo()
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo1 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO_1_DONE);
     if (!ProcessObtainEuiccInfo1(slotId_, eventEUICCInfo1)) {
@@ -678,7 +675,6 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
 
 ResultState EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     SyncOpenChannel();
@@ -701,7 +697,6 @@ ResultState EsimFile::DisableProfile(int32_t portIndex, const std::u16string &ic
 
 std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventObtainSmdsAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_SMDS_ADDRESS);
@@ -723,7 +718,6 @@ std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 
 EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable = BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
@@ -745,7 +739,6 @@ EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 
 ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
@@ -1048,7 +1041,6 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
 
 std::string EsimFile::ObtainDefaultSmdpAddress()
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSmdpAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_DEFAULT_SMDP_ADDRESS_DONE);
     if (!ProcessObtainDefaultSmdpAddress(slotId_, eventSmdpAddress)) {
@@ -1069,7 +1061,6 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
 
 ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.transactionId = transactionId;
     esimProfile_.cancelReason = cancelReason;
     SyncOpenChannel();
@@ -1092,7 +1083,6 @@ ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, 
 
 EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &iccId)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     SyncOpenChannel();
@@ -1313,7 +1303,6 @@ bool EsimFile::ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &even
 
 ResultState EsimFile::ResetMemory(ResetOption resetOption)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.option = resetOption;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventResetMemory = BuildCallerInfo(MSG_ESIM_RESET_MEMORY);
@@ -1335,7 +1324,6 @@ ResultState EsimFile::ResetMemory(ResetOption resetOption)
 
 ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress = BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
@@ -1409,7 +1397,6 @@ bool EsimFile::IsEsimSupported()
 
 ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     if (aid.empty()) {
         return ResponseEsimResult();
     }
@@ -1556,7 +1543,6 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
 
 ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = downLoadConfigInfo.portIndex_;
     esimProfile_.hashCc = downLoadConfigInfo.hashCc_;
     esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2_;
@@ -1576,7 +1562,6 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
 ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     const std::u16string boundProfilePackage)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.boundProfilePackage = boundProfilePackage;
     SyncOpenChannel();
@@ -1592,7 +1577,6 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
 
 EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event events)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
     AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
@@ -1667,6 +1651,9 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
+        if (!cmd) {
+            return false;
+        }
         CopyApdCmdToReqInfo(reqInfo, cmd.get());
         AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_PREPARE_DOWNLOAD_DONE);
         if (telRilManager_ == nullptr) {
@@ -1915,6 +1902,9 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
+        if (!cmd) {
+            return false;
+        }
         CopyApdCmdToReqInfo(reqInfo, cmd.get());
         AppExecFwk::InnerEvent::Pointer responseEvent = BuildCallerInfo(MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE);
         if (telRilManager_ == nullptr) {
@@ -2191,7 +2181,6 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
 
 EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Event events)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
     SyncOpenChannel();
@@ -2215,7 +2204,6 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
 
 EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
     SyncOpenChannel();
@@ -2239,7 +2227,6 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 
 ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
     SyncOpenChannel();
@@ -2481,7 +2468,6 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
 
 ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.iccId = iccId;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventDeleteProfile = BuildCallerInfo(MSG_ESIM_DELETE_PROFILE);
@@ -2503,7 +2489,6 @@ ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
 
 ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     esimProfile_.forceDisableProfile = forceDisableProfile;
@@ -2527,7 +2512,6 @@ ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &i
 
 ResultState EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.iccId = iccId;
     esimProfile_.nickname = nickname;
     SyncOpenChannel();
@@ -2696,7 +2680,6 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
 
 EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = portIndex;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
@@ -2719,7 +2702,6 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 
 ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
-    std::unique_lock<std::mutex> itfLock(itfMutex_);
     esimProfile_.portIndex = authenticateConfigInfo.portIndex_;
     esimProfile_.matchingId = authenticateConfigInfo.matchingId_;
     esimProfile_.serverSigned1 = authenticateConfigInfo.serverSigned1_;
@@ -2818,6 +2800,9 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     std::list<std::unique_ptr<ApduCommand>> apduCommandList = codec.GetCommands();
     for (const auto &cmd : apduCommandList) {
         ApduSimIORequestInfo reqInfo;
+        if (!cmd) {
+            return false;
+        }
         CopyApdCmdToReqInfo(reqInfo, cmd.get());
         AppExecFwk::InnerEvent::Pointer tmpResponseEvent = BuildCallerInfo(MSG_ESIM_AUTHENTICATE_SERVER);
         if (telRilManager_ == nullptr) {

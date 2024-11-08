@@ -359,8 +359,6 @@ private:
     std::mutex authenticateServerMutex_;
     std::condition_variable authenticateServerCv_;
     bool isAuthenticateServerReady_ = false;
-
-    std::mutex itfMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
