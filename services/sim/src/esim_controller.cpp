@@ -30,7 +30,7 @@ static const std::string CHECK_CMD_TAG = "81";
 static const std::string CHECK_GET_INPUT_TAG = "23";
 static const std::string VERIFY_BIND_START_DATA = "0456657269667942696E645374617274";
 static const std::string VERIFY_BIND_END_DATA = "0456657269667942696E64456E64";
-static const std::string ESIM_CA_LIBPATH = "/system/lib64/libesim_ca.z.so";
+static const std::string ESIM_CA_LIBPATH = "libesim_ca.z.so";
 
 constexpr size_t CHECK_CMD_HEAD_START = 0;
 constexpr size_t CHECK_CMD_TAG_START = 4;
@@ -42,7 +42,7 @@ EsimController::EsimController() {}
 
 EsimController::~EsimController() {}
 
-bool EsimController::ChecIsVerifyBindCommand(const std::string& cmdData)
+bool EsimController::ChecIsVerifyBindCommand(const std::string &cmdData)
 {
     std::string checkCmdData = cmdData;
     std::transform(checkCmdData.begin(), checkCmdData.end(), checkCmdData.begin(), ::toupper);
@@ -66,7 +66,7 @@ bool EsimController::ChecIsVerifyBindCommand(const std::string& cmdData)
         VERIFY_BIND_END_DATA) == COMPARE_EQUAL_VALUE);
 }
 
-void EsimController::ProcessCommandMessage(int slotId, const std::string& cmdData)
+void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdData)
 {
     TELEPHONY_LOGI("EsimController:Start process verify bind message.");
     ffrt::submit([=]() {
