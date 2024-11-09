@@ -74,7 +74,7 @@ void EsimController::ProcessCommandMessage(int slotId, const std::string& cmdDat
     });
 }
 
-void EsimController::ProcessCommandByCa(int slotId, const std::string cmdData)
+void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
 {
     std::lock_guard<std::mutex> locker(caMutex_);
     void *handler = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
