@@ -26,7 +26,7 @@ namespace Telephony {
 /**
  * @brief Result state.
  */
-enum class ResultState {
+enum class ResultCode {
     RESULT_SOLVABLE_ERRORS = -2,
     RESULT_MUST_DISABLE_PROFILE = -1,
     RESULT_OK = 0,
@@ -37,11 +37,11 @@ enum class ResultState {
  * @brief Euicc OTA update status.
  */
 enum class OsuStatus {
-    EUICC_UPGRAD_IN_PROGRESS = 1,
-    EUICC_UPGRAD_FAILED = 2,
-    EUICC_UPGRAD_SUCCESSFUL = 3,
-    EUICC_UPGRAD_ALREADY_LATEST = 4,
-    EUICC_UPGRAD_SERVICE_UNAVAILABLE = 5,
+    EUICC_UPGRADE_IN_PROGRESS = 1,
+    EUICC_UPGRADE_FAILED = 2,
+    EUICC_UPGRADE_SUCCESSFUL = 3,
+    EUICC_UPGRADE_ALREADY_LATEST = 4,
+    EUICC_UPGRADE_SERVICE_UNAVAILABLE = 5,
 };
 
 /**
@@ -95,8 +95,8 @@ enum class PolicyRules {
  * @brief The bit map of resolvable errors.
  */
 enum class SolvableErrors {
-    SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE = 1 << 0,
-    SOLVABLE_ERROR_NEEED_POLICY_RULE = 1 << 1,
+    SOLVABLE_ERROR_NEED_CONFIRMATION_CODE = 1 << 0,
+    SOLVABLE_ERROR_NEED_POLICY_RULE = 1 << 1,
 };
 
 /**
@@ -282,7 +282,7 @@ struct EuiccInfo2 {
     std::string ppVersion_ = "";
     std::string sasAccreditationNumber_ = "";
     std::string response_ = "";
-    ResultState resultCode_;
+    ResultCode resultCode_;
 };
 } // namespace Telephony
 } // namespace OHOS

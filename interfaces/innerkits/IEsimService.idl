@@ -64,5 +64,5 @@ interface OHOS.Telephony.IEsimService {
     void GetDefaultSmdpAddress([in] int slotId, [out] String defaultSmdpAddress);
     void CancelSession([in] int slotId, [in] String transactionId, [in] int cancelReason,
         [out] ResponseEsimResult responseResult);
-    void IsEsimSupported([in] int slotId);
+    void IsSupported([in] int slotId);
 }

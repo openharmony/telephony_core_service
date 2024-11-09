@@ -186,7 +186,7 @@ napi_value DownloadProfileResultConversion(napi_env env, const DownloadProfileRe
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.result_));
+    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(resultInfo.result_));
     SetPropertyToNapiObject(env, val, "solvableErrors", static_cast<int32_t>(resultInfo.resolvableErrors_));
     SetPropertyToNapiObject(env, val, "cardId", resultInfo.cardId_);
 
@@ -226,7 +226,7 @@ napi_value ProfileResultListConversion(napi_env env, const GetDownloadableProfil
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultListInfo.result_));
+    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(resultListInfo.result_));
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
     for (size_t i = 0; i < resultListInfo.downloadableProfiles_.size(); i++) {
@@ -251,7 +251,7 @@ napi_value MetadataResultConversion(napi_env env, const GetDownloadableProfileMe
     SetPropertyToNapiObject(env, val, "profileName", NapiUtil::ToUtf8(metadataInfo.profileName_));
     SetPropertyToNapiObject(env, val, "profileClass", static_cast<int32_t>(metadataInfo.profileClass_));
     SetPropertyToNapiObject(env, val, "solvableErrors", static_cast<int32_t>(metadataInfo.resolvableErrors_));
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(metadataInfo.result_));
+    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(metadataInfo.result_));
 
     return val;
 }
@@ -296,7 +296,7 @@ napi_value EuiccProfileListConversion(napi_env env, const GetEuiccProfileInfoLis
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(euiccListInfo.result_));
+    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(euiccListInfo.result_));
     SetPropertyToNapiObject(env, val, "isRemovable", euiccListInfo.isRemovable_);
     napi_value resultArray = nullptr;
     napi_create_array(env, &resultArray);
@@ -313,7 +313,7 @@ napi_value ResponseEsimResultConversion(napi_env env, const ResponseEsimResult &
 {
     napi_value val = nullptr;
     napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "requestResponseResult", static_cast<int32_t>(resultInfo.resultCode_));
+    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(resultInfo.resultCode_));
     SetPropertyToNapiObject(env, val, "response", NapiUtil::ToUtf8(resultInfo.response_));
 
     return val;
@@ -435,7 +435,7 @@ napi_value GetEid(napi_env env, napi_callback_info info)
     return value;
 }
 
-napi_value IsEsimSupported(napi_env env, napi_callback_info info)
+napi_value IsSupported(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_ONE;
     napi_value parameters[] = { nullptr };
@@ -443,18 +443,18 @@ napi_value IsEsimSupported(napi_env env, napi_callback_info info)
     bool isSupported = false;
     napi_value value = nullptr;
     if (parameterCount != PARAMETER_COUNT_ONE) {
-        TELEPHONY_LOGE("isEsimSupported parameter count is incorrect");
+        TELEPHONY_LOGE("isSupported parameter count is incorrect");
         NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
         return value;
     }
     int32_t slotId = UNDEFINED_VALUE;
     if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("isEsimSupported convert parameter fail");
+        TELEPHONY_LOGE("isSupported convert parameter fail");
         NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
         return value;
     }
     if (IsValidSlotId(slotId)) {
-        isSupported = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsEsimSupported(slotId);
+        isSupported = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
     }
     NAPI_CALL(env, napi_get_boolean(env, isSupported, &value));
     return value;
@@ -664,7 +664,7 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
         return;
     }
     NapiAsyncPermissionCompleteCallback(
-        env, status, context->asyncContext, false, { "SwitchToProfile", Permission::SET_TELEPHONY_ESIM_STATE_OPEN });
+        env, status, context->asyncContext, false, { "SwitchToProfile", Permission::SET_TELEPHONY_ESIM_STATE });
 }
 
 napi_value SwitchToProfile(napi_env env, napi_callback_info info)
@@ -1086,7 +1086,7 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
         return;
     }
     NapiAsyncPermissionCompleteCallback(
-        env, status, context->asyncContext, false, { "SetProfileNickname", Permission::SET_TELEPHONY_ESIM_STATE_OPEN });
+        env, status, context->asyncContext, false, { "SetProfileNickname", Permission::SET_TELEPHONY_ESIM_STATE });
 }
 
 napi_value SetProfileNickname(napi_env env, napi_callback_info info)
@@ -1418,16 +1418,16 @@ napi_status InitEnumCancelReason(napi_env env, napi_value exports)
 napi_status InitEnumOsuStatus(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_IN_PROGRESS",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_IN_PROGRESS))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_FAILED",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_FAILED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_SUCCESSFUL",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_SUCCESSFUL))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_ALREADY_LATEST",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_ALREADY_LATEST))),
-        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRAD_SERVICE_UNAVAILABLE",
-            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRAD_SERVICE_UNAVAILABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRADE_IN_PROGRESS",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRADE_IN_PROGRESS))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRADE_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRADE_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRADE_SUCCESSFUL",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRADE_SUCCESSFUL))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRADE_ALREADY_LATEST",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRADE_ALREADY_LATEST))),
+        DECLARE_NAPI_STATIC_PROPERTY("EUICC_UPGRADE_SERVICE_UNAVAILABLE",
+            GetNapiValue(env, static_cast<int32_t>(OsuStatus::EUICC_UPGRADE_SERVICE_UNAVAILABLE))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
@@ -1489,27 +1489,27 @@ napi_status InitEnumResult(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_SOLVABLE_ERRORS",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_SOLVABLE_ERRORS))),
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SOLVABLE_ERRORS))),
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_MUST_DISABLE_PROFILE",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_MUST_DISABLE_PROFILE))),
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_MUST_DISABLE_PROFILE))),
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_OK",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_OK))),
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_OK))),
         DECLARE_NAPI_STATIC_PROPERTY("RESULT_UNDEFINED_ERROR",
-            GetNapiValue(env, static_cast<int32_t>(ResultState::RESULT_UNDEFINED_ERROR))),
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_UNDEFINED_ERROR))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
-    NapiUtil::DefineEnumClassByName(env, exports, "ResultState", arrSize, desc);
+    NapiUtil::DefineEnumClassByName(env, exports, "ResultCode", arrSize, desc);
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
 napi_status InitEnumResolvableErrors(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE",
-            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEEED_CONFIRMATION_CODE))),
-        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEEED_POLICY_RULE",
-            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEEED_POLICY_RULE))),
+        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEED_CONFIRMATION_CODE",
+            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEED_CONFIRMATION_CODE))),
+        DECLARE_NAPI_STATIC_PROPERTY("SOLVABLE_ERROR_NEED_POLICY_RULE",
+            GetNapiValue(env, static_cast<int32_t>(SolvableErrors::SOLVABLE_ERROR_NEED_POLICY_RULE))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
@@ -1520,7 +1520,7 @@ napi_status InitEnumResolvableErrors(napi_env env, napi_value exports)
 napi_status InitEuiccServiceInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("isEsimSupported", IsEsimSupported),
+        DECLARE_NAPI_FUNCTION("isSupported", IsSupported),
         DECLARE_NAPI_FUNCTION("getEid", GetEid),
         DECLARE_NAPI_FUNCTION("getOsuStatus", GetOsuStatus),
         DECLARE_NAPI_FUNCTION("startOsu", StartOsu),

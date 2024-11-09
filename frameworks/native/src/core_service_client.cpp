@@ -1115,7 +1115,7 @@ int32_t CoreServiceClient::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 }
 
 int32_t CoreServiceClient::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1189,7 +1189,7 @@ int32_t CoreServiceClient::GetProfile(
     return proxy->GetProfile(slotId, portIndex, iccId, eUiccProfile);
 }
 
-int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1200,7 +1200,7 @@ int32_t CoreServiceClient::ResetMemory(int32_t slotId, ResetOption resetOption, 
 }
 
 int32_t CoreServiceClient::SetDefaultSmdpAddress(
-    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1210,14 +1210,14 @@ int32_t CoreServiceClient::SetDefaultSmdpAddress(
     return proxy->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
 }
 
-bool CoreServiceClient::IsEsimSupported(int32_t slotId)
+bool CoreServiceClient::IsSupported(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->IsEsimSupported(slotId);
+    return proxy->IsSupported(slotId);
 }
 
 int32_t CoreServiceClient::SendApduData(
@@ -1287,7 +1287,7 @@ int32_t CoreServiceClient::RetrieveNotification(
 }
 
 int32_t CoreServiceClient::RemoveNotificationFromList(
-    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1297,7 +1297,7 @@ int32_t CoreServiceClient::RemoveNotificationFromList(
     return proxy->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
 }
 
-int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1308,7 +1308,7 @@ int32_t CoreServiceClient::DeleteProfile(int32_t slotId, const std::u16string &i
 }
 
 int32_t CoreServiceClient::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -1319,7 +1319,7 @@ int32_t CoreServiceClient::SwitchToProfile(
 }
 
 int32_t CoreServiceClient::SetProfileNickname(
-    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {

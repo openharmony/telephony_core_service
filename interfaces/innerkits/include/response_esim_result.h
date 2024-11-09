@@ -27,7 +27,7 @@ namespace Telephony {
  * @brief Result of a operation.
  */
 struct ResponseEsimResult : public Parcelable {
-    ResultState resultCode_;
+    ResultCode resultCode_;
     std::u16string response_ = u"";
     int32_t sw1_ = 0;
     int32_t sw2_ = 0;

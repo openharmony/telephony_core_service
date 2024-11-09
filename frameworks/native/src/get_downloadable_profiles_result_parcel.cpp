@@ -26,7 +26,7 @@ bool GetDownloadableProfilesResult::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(resultValue)) {
         return false;
     }
-    result_ = static_cast<ResultState>(resultValue);
+    result_ = static_cast<ResultCode>(resultValue);
 
     uint32_t size;
     if (!parcel.ReadUint32(size)) {

@@ -219,7 +219,7 @@ public:
      * @param slotId[in], indicates the card slot index number.
      * @return Return true if the eSIM capability is supported; return false otherwise.
      */
-    bool IsEsimSupported(int32_t slotId);
+    bool IsSupported(int32_t slotId);
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

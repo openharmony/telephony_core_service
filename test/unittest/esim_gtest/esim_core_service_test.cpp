@@ -92,7 +92,7 @@ HWTEST_F(EsimCoreServiceTest, DisableProfile_0001, Function | MediumTest | Level
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool refresh = true;
-    ResultState disableProfileResult;
+    ResultCode disableProfileResult;
     EXPECT_NE(mCoreService->DisableProfile(
         slotId, portIndex, iccId, refresh, disableProfileResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
@@ -195,7 +195,7 @@ HWTEST_F(EsimCoreServiceTest, ResetMemory_0001, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
-    ResultState ResetMemoryResult;
+    ResultCode ResetMemoryResult;
     const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EXPECT_NE(mCoreService->ResetMemory(
         slotId, resetOption, ResetMemoryResult), TELEPHONY_ERR_SUCCESS);
@@ -211,7 +211,7 @@ HWTEST_F(EsimCoreServiceTest, SetDefaultSmdpAddress_0001, Function | MediumTest 
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
-    ResultState SetAddressResult;
+    ResultCode SetAddressResult;
     EXPECT_NE(mCoreService->SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;
@@ -225,9 +225,9 @@ HWTEST_F(EsimCoreServiceTest, IsEsimSupported_0001, Function | MediumTest | Leve
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
-    EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
+    EXPECT_FALSE(mCoreService->IsSupported(slotId));
     mCoreService->simManager_ = nullptr;
-    EXPECT_FALSE(mCoreService->IsEsimSupported(slotId));
+    EXPECT_FALSE(mCoreService->IsSupported(slotId));
 }
 
 HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
@@ -335,7 +335,7 @@ HWTEST_F(EsimCoreServiceTest, RemoveNotificationFromList_0001, Function | Medium
     int32_t slotId = 0;
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
-    ResultState removeNotifFromListResult;
+    ResultCode removeNotifFromListResult;
     EXPECT_NE(mCoreService->RemoveNotificationFromList(
         slotId, portIndex, seqNumber, removeNotifFromListResult), TELEPHONY_ERR_SUCCESS);
 
@@ -351,7 +351,7 @@ HWTEST_F(EsimCoreServiceTest, DeleteProfile_0001, Function | MediumTest | Level1
     mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    ResultState deleteProfileResult;
+    ResultCode deleteProfileResult;
     EXPECT_NE(mCoreService->DeleteProfile(slotId, iccId, deleteProfileResult), TELEPHONY_ERR_SUCCESS);
 
     mCoreService->simManager_ = nullptr;
@@ -367,7 +367,7 @@ HWTEST_F(EsimCoreServiceTest, SwitchToProfile_0001, Function | MediumTest | Leve
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool forceDisableProfile = true;
-    ResultState switchProfileResult;
+    ResultCode switchProfileResult;
     EXPECT_NE(mCoreService->SwitchToProfile(
         slotId, portIndex, iccId, forceDisableProfile, switchProfileResult), TELEPHONY_ERR_SUCCESS);
 
@@ -384,7 +384,7 @@ HWTEST_F(EsimCoreServiceTest, SetProfileNickname_0001, Function | MediumTest | L
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
-    ResultState UpdateResult;
+    ResultCode UpdateResult;
     EXPECT_NE(mCoreService->SetProfileNickname(
         slotId, iccId, nickname, UpdateResult), TELEPHONY_ERR_SUCCESS);
     mCoreService->simManager_ = nullptr;

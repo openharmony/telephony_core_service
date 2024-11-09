@@ -1292,7 +1292,7 @@ int32_t SimManager::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 }
 
 int32_t SimManager::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
@@ -1354,7 +1354,7 @@ int32_t SimManager::CancelSession(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = simFileManager_[slotId]->CancelSession(transactionId, cancelReason);
-    if (responseResult.resultCode_ != ResultState::RESULT_OK) {
+    if (responseResult.resultCode_ != ResultCode::RESULT_OK) {
         return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_ERR_SUCCESS;
@@ -1374,7 +1374,7 @@ int32_t SimManager::GetProfile(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
@@ -1385,7 +1385,7 @@ int32_t SimManager::ResetMemory(int32_t slotId, ResetOption resetOption, ResultS
 }
 
 int32_t SimManager::SetDefaultSmdpAddress(
-    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
@@ -1395,13 +1395,13 @@ int32_t SimManager::SetDefaultSmdpAddress(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-bool SimManager::IsEsimSupported(int32_t slotId)
+bool SimManager::IsSupported(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or simFileManager_ is null!");
         return false;
     }
-    return simFileManager_[slotId]->IsEsimSupported();
+    return simFileManager_[slotId]->IsSupported();
 }
 
 int32_t SimManager::SendApduData(
@@ -1471,7 +1471,7 @@ int32_t SimManager::RetrieveNotification(
 }
 
 int32_t SimManager::RemoveNotificationFromList(
-    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("RemoveNotificationFromList simFileManager is null!");
@@ -1481,7 +1481,7 @@ int32_t SimManager::RemoveNotificationFromList(
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+int32_t SimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
@@ -1492,7 +1492,7 @@ int32_t SimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, R
 }
 
 int32_t SimManager::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
@@ -1503,7 +1503,7 @@ int32_t SimManager::SwitchToProfile(
 }
 
 int32_t SimManager::SetProfileNickname(
-    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
