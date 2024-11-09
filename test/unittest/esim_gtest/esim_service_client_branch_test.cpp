@@ -244,7 +244,7 @@ HWTEST_F(EsimServiceClientBranchTest, IsEsimSupported_0001, Function | MediumTes
 {
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().IsEsimSupported(SLOT_ID);
+    bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
     EXPECT_EQ(result, false);
 }
 

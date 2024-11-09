@@ -165,7 +165,7 @@ public:
     virtual int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) = 0;
     virtual int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) = 0;
     virtual int32_t DisableProfile(
-        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) = 0;
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult) = 0;
     virtual int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) = 0;
     virtual int32_t GetRulesAuthTable(
         int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) = 0;
@@ -176,10 +176,10 @@ public:
         ResponseEsimResult &responseResult) = 0;
     virtual int32_t GetProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) = 0;
-    virtual int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) = 0;
+    virtual int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult) = 0;
     virtual int32_t SetDefaultSmdpAddress(
-        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) = 0;
-    virtual bool IsEsimSupported(int32_t slotId) = 0;
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult) = 0;
+    virtual bool IsSupported(int32_t slotId) = 0;
     virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
         const EsimApduData &apduData, ResponseEsimResult &responseResult) = 0;
     virtual int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
@@ -193,12 +193,12 @@ public:
     virtual int32_t RetrieveNotification(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) = 0;
     virtual int32_t RemoveNotificationFromList(
-        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) = 0;
-    virtual int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) = 0;
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult) = 0;
+    virtual int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult) = 0;
     virtual int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
-        const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult) = 0;
+        const std::u16string &iccId, bool forceDisableProfile, ResultCode &enumResult) = 0;
     virtual int32_t SetProfileNickname(
-        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) = 0;
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult) = 0;
     virtual int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2) = 0;
     virtual int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult) = 0;

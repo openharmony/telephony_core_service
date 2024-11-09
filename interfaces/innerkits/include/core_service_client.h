@@ -957,7 +957,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t DisableProfile(
-        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult);
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult);
 
     /**
      * @brief Requests the SM-DS address from eUICC.
@@ -1029,7 +1029,7 @@ public:
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult);
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult);
 
     /**
      * @brief This procedure is used to set or update the Default SM-DP+ address stored in an eUICC.
@@ -1039,7 +1039,7 @@ public:
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetDefaultSmdpAddress(int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult);
+    int32_t SetDefaultSmdpAddress(int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult);
 
     /**
      * @brief Whether support for esim
@@ -1047,7 +1047,7 @@ public:
      * @param slotId[in], sim slot id
      * @return returns true if the device support; returns false otherwise.
      */
-    bool IsEsimSupported(int32_t slotId);
+    bool IsSupported(int32_t slotId);
 
     /**
      * @brief Provide sending upgrade or card binding data to the ESIM channel.
@@ -1137,7 +1137,7 @@ public:
      * @param enumResult[out], get the result code
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t RemoveNotificationFromList(int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult);
+    int32_t RemoveNotificationFromList(int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult);
 
     /**
      * @brief Deletes the given profile.
@@ -1147,7 +1147,7 @@ public:
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult);
+    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult);
 
     /**
      * @brief Obtain the international mobile subscriber identity
@@ -1161,7 +1161,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile,
-        ResultState &enumResult);
+        ResultCode &enumResult);
 
     /**
      * @brief Obtain the international mobile subscriber identity
@@ -1173,7 +1173,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SetProfileNickname(
-        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult);
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult);
 
     /**
      * @brief Gets the eUICC info2 defined in GSMA RSP v2.0+ for new profile downloading.

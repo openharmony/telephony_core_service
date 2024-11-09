@@ -314,14 +314,14 @@ int32_t EsimServiceClient::CancelSession(
     return proxy->CancelSession(slotId, transactionId, cancelReason, responseResult);
 }
 
-bool EsimServiceClient::IsEsimSupported(int32_t slotId)
+bool EsimServiceClient::IsSupported(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->IsEsimSupported(slotId);
+    return proxy->IsSupported(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS
