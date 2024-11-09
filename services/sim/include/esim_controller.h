@@ -28,8 +28,8 @@ class EsimController : public DelayedRefSingleton<EsimController> {
     DECLARE_DELAYED_REF_SINGLETON(EsimController);
 
 public:
-    bool ChecIsVerifyBindCommand(const std::string& cmdData);
-    void ProcessCommandMessage(int slotId, const std::string& cmdData);
+    bool ChecIsVerifyBindCommand(const std::string &cmdData);
+    void ProcessCommandMessage(int slotId, const std::string &cmdData);
     void ProcessCommandByCa(int slotId, const std::string &cmdData);
 private:
     std::mutex caMutex_;
