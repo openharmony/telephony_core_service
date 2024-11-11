@@ -327,7 +327,7 @@ void NapiUtil::Handle1ValueCallback(napi_env env, BaseContext *baseContext, napi
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, baseContext->callbackRef));
         TELEPHONY_LOGD("normal callback end");
     } else if (baseContext->deferred != nullptr) {
-        TELEPHONY_LOGI("start promise callback");
+        TELEPHONY_LOGD("start promise callback");
         if (baseContext->resolved) {
             NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, baseContext->deferred, callbackValue));
             TELEPHONY_LOGI("napi_resolve_deferred end");
