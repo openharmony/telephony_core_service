@@ -123,7 +123,8 @@ void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo event is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    std::shared_ptr<CellListCurrentInformation> cellInformationList = event->GetSharedObject<CellListCurrentInformation>();
+    std::shared_ptr<CellListCurrentInformation> cellInformationList = 
+        event->GetSharedObject<CellListCurrentInformation>();
     CellListCurrentInformation *cellInfoList = cellInformationList.get();
     if (cellInfoList == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo cellInfoList is nullptr slotId:%{public}d", slotId_);
