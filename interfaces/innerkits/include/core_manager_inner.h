@@ -50,7 +50,7 @@ public:
     int32_t GetDefaultSlotId(void);
     int32_t GetMaxSimCount(void);
     int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
-    int32_t UnregisterSimAccountCallback(const int32_t tokenId);
+    int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback);
 
     /******************** telRilManager start *******************/
     int32_t SetRadioState(

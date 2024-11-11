@@ -426,14 +426,16 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     const int32_t tokenId, const sptr<SimAccountCallback> &callback)
 {
     if (callback == nullptr) {
-        TELEPHONY_LOGE(" callback is nullptr");
+        TELEPHONY_LOGE("callback is nullptr");
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
     std::lock_guard<std::mutex> lock(mutexInner_);
     bool isExisted = false;
     for (auto &iter : listSimAccountCallbackRecord_) {
-        if (iter.tokenId == tokenId) {
-            iter.simAccountCallback = callback;
+        if (iter.simAccountCallback == nullptr) {
+            continue;
+        }
+        if (iter.simAccountCallback->AsObject().GetRefPtr() == callback->AsObject().GetRefPtr()) {
             isExisted = true;
             break;
         }
@@ -451,13 +453,21 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     return TELEPHONY_SUCCESS;
 }
 
-int32_t MultiSimMonitor::UnregisterSimAccountCallback(const int32_t tokenId)
+int32_t MultiSimMonitor::UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
     std::lock_guard<std::mutex> lock(mutexInner_);
     bool isSuccess = false;
     auto iter = listSimAccountCallbackRecord_.begin();
     for (; iter != listSimAccountCallbackRecord_.end();) {
-        if (iter->tokenId == tokenId) {
+        if (iter->simAccountCallback == nullptr) {
+            iter++;
+            continue;
+        }
+        if (iter->simAccountCallback->AsObject().GetRefPtr() == callback->AsObject().GetRefPtr()) {
             iter = listSimAccountCallbackRecord_.erase(iter);
             isSuccess = true;
             break;

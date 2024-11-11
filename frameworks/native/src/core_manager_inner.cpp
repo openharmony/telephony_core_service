@@ -215,13 +215,13 @@ int32_t CoreManagerInner::RegisterSimAccountCallback(
     return simManager_->RegisterSimAccountCallback(tokenId, callback);
 }
 
-int32_t CoreManagerInner::UnregisterSimAccountCallback(const int32_t tokenId)
+int32_t CoreManagerInner::UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UnregisterSimAccountCallback(tokenId);
+    return simManager_->UnregisterSimAccountCallback(callback);
 }
 
 /******************** telRilManager start *******************/
