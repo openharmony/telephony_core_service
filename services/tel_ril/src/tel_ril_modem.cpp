@@ -181,7 +181,7 @@ int32_t TelRilModem::NcfgFinishedResult(int32_t state)
 int32_t TelRilModem::RestartRildNvMatch(int32_t state)
 {
     return Notify<Int32Parcel>(
-        TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_DSDS_MODE_CHANGED);
+        TELEPHONY_LOG_FUNC_NAME, std::make_shared<Int32Parcel>(state), RadioEvent::RADIO_RESTART_RILD_NV_MATCH);
 }
 
 void TelRilModem::BuildVoiceRadioTechnology(const HDI::Ril::V1_1::VoiceRadioTechnology &voiceRadioTechnology,
