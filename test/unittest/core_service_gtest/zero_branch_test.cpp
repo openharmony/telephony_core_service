@@ -1216,7 +1216,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
     sptr<SimAccountCallback> simAccountCallback;
     int32_t imsSwitchValue = 1;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(tokenId, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(tokenId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmscAddr(INVALID_SLOTID, 1, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERROR);
     EXPECT_GT(mInner.SetVoNRSwitch(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
@@ -1588,7 +1588,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
     EXPECT_NE(simManager->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->RegisterSimAccountCallback(tokenId, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->UnregisterSimAccountCallback(tokenId), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->UnregisterSimAccountCallback(nullptr), TELEPHONY_ERR_SUCCESS);
     int32_t dsdsMode = INVALID_VALUE;
     simManager->GetDsdsMode(dsdsMode);
     simManager->SetDsdsMode(0);
@@ -3084,7 +3084,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
-    EXPECT_EQ(multiSimMonitor->UnregisterSimAccountCallback(tokenId), TELEPHONY_ERROR);
+    EXPECT_GT(multiSimMonitor->UnregisterSimAccountCallback(callback), TELEPHONY_ERROR);
 }
 
 /**

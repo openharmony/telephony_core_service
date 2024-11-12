@@ -287,7 +287,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_002, Function |
     mInner.simManager_ = simManager;
     sptr<SimAccountCallback> simAccountCallback;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(-1, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(-1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
@@ -502,7 +502,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_008, Function |
     mInner.simManager_ = simManager;
     sptr<SimAccountCallback> simAccountCallback;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(-1, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(-1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
     std::string testStr = "";
@@ -531,7 +531,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_009, Function |
     mInner.simManager_ = simManager;
     sptr<SimAccountCallback> simAccountCallback;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(-1, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(-1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
 
@@ -558,7 +558,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0010, Function 
     mInner.simManager_ = simManager;
     sptr<SimAccountCallback> simAccountCallback;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(-1, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(-1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
     DtmfParam dtmfParam;
@@ -594,7 +594,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0011, Function 
     mInner.simManager_ = simManager;
     sptr<SimAccountCallback> simAccountCallback;
     EXPECT_EQ(mInner.RegisterSimAccountCallback(-1, simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.UnregisterSimAccountCallback(-1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.UnregisterSimAccountCallback(simAccountCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
 
