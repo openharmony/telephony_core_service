@@ -222,6 +222,7 @@ public:
     static constexpr const char *ACCOUNT_ID = "account_id";
     static constexpr const char *CONTACT_ID = "contact_id";
     static constexpr const char *IS_DELETED = "is_deleted";
+    static constexpr const char *PRIMARY_CONTACT = "primary_contact";
 };
 
 // contact_data

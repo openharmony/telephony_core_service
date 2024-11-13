@@ -103,8 +103,6 @@ void VCardContact::AddOtherDatas(std::string name, std::string rawValue, std::st
     } else if (name == VCARD_TYPE_X_AIM || name == VCARD_TYPE_X_MSN || name == VCARD_TYPE_X_YAHOO ||
                name == VCARD_TYPE_X_ICQ || name == VCARD_TYPE_X_JABBER || name == VCARD_TYPE_X_QQ) {
         AddIms(name, rawValue, propValue, values, parasMap);
-    } else {
-        TELEPHONY_LOGI("No need to do anything");
     }
 }
 
