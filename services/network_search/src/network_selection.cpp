@@ -226,7 +226,8 @@ bool NetworkSelection::ResponseInfoOfResult(
         index = responseInfo->flag;
         sptr<NetworkSearchResult> networkSearchResult = new (std::nothrow) NetworkSearchResult;
         if (networkSearchResult == nullptr) {
-            TELEPHONY_LOGE("NetworkSelection::RilRadioResponseInfoOfResult networkSearchResult is nullptr slotId:%{public}d", slotId_);
+            TELEPHONY_LOGE("NetworkSelection::RilRadioResponseInfoOfResult networkSearchResult is nullptr "
+                "slotId:%{public}d", slotId_);
             return false;
         }
         networkSearchResult->Marshalling(data);
