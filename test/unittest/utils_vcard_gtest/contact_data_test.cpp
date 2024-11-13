@@ -633,7 +633,7 @@ HWTEST_F(ContactDataTest, VCardRdbHelper, Function | MediumTest | Level3)
 {
     VCardRdbHelper::GetInstance().SetDataHelper(nullptr);
 
-    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContactMaxId(), DB_FAILD);
+    EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContactMaxId(0), DB_FAILD);
 
     std::vector<DataShare::DataShareValuesBucket> rawContactValues;
     OHOS::DataShare::DataShareValuesBucket rawContactValue;
