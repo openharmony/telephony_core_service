@@ -124,7 +124,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_001, Function | Me
 }
 
 /**
- * @tc.number   Telephony_CoreService_NetWork_001
+ * @tc.number   Telephony_CoreService_NetWork_002
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
