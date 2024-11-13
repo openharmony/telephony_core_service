@@ -113,8 +113,6 @@ void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::v
         AddIms(name, rawValue, propValue, values, parasMap);
     } else if (name == VCARD_TYPE_X_GROUP) {
         AddGroups(rawValue);
-    } else {
-        TELEPHONY_LOGI("No need to do anything");
     }
 }
 
