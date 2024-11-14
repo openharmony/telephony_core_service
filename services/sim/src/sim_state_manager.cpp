@@ -190,15 +190,15 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
     }
     std::unique_lock<std::mutex> lck(rtx_);
     TELEPHONY_LOGD("SimStateManager::UnlockPin slotId = %{public}d", slotId);
-    responseSimMatchReady_ = false;
+    responseSimUnlockPinReady_ = false;
     simStateHandle_->UnlockPin(slotId, pin);
-    while (!responseSimMatchReady_) {
+    while (!responseSimUnlockPinReady_) {
         TELEPHONY_LOGI("UnlockPin::wait(), response = false");
         if (rv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
-    if (!responseSimMatchReady_) {
+    if (!responseSimUnlockPinReady_) {
         TELEPHONY_LOGE("unlock pin sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
