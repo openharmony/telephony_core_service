@@ -169,7 +169,7 @@ void SimStateManager::SyncSimMatchResponse()
     std::unique_lock<std::mutex> lck(stx_);
     responseSimMatchReady_ = true;
     TELEPHONY_LOGI("SimStateManager::SyncSimMatchResponse(), responseSimMatchReady = %{public}d", 
-                responseSimMatchReady_);
+                    responseSimMatchReady_);
     sv_.notify_one();
 }
 
@@ -177,8 +177,8 @@ void SimStateManager::SyncUnlockPinResponse()
 {
     std::unique_lock<std::mutex> lck(unlockPinCtx_);
     responseUnlockPinReady_ = true;
-    TELEPHONY_LOGI(
-        "SimStateManager::SyncUnlockPinResponse(), responsUnlockPinReady = %{public}d", responseUnlockPinReady_);
+    TELEPHONY_LOGI("SimStateManager::SyncUnlockPinResponse(), responsUnlockPinReady = %{public}d",
+                    responseUnlockPinReady_);
     unlockPinCv_.notify_one();
 }
 
