@@ -148,7 +148,7 @@ public:
     int32_t QueryImsSwitch(int32_t, int32_t &imsSwitchValue) override;
     int32_t RegisterSimAccountCallback(
         const int32_t tokenId, const sptr<SimAccountCallback> &callback) override;
-    int32_t UnregisterSimAccountCallback(const int32_t tokenId) override;
+    int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback) override;
 
     bool IsSetActiveSimInProgress(int32_t slotId) override;
     bool IsSetPrimarySlotIdInProgress() override;

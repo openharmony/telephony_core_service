@@ -458,7 +458,7 @@ int32_t CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16st
     if (result == TELEPHONY_ERR_SUCCESS) {
         countryCode = reply.ReadString16();
     }
-    TELEPHONY_LOGI("GetIsoCountryCodeForNetwork call end");
+    TELEPHONY_LOGD("GetIsoCountryCodeForNetwork call end");
     return result;
 }
 

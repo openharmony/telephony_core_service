@@ -19,6 +19,7 @@
 #include <cstdint>
 
 #include "addcoreservicetoken_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 #include "ims_reg_info_callback_stub.h"
 #include "napi_ims_reg_info_callback.h"
 #include "napi_ims_reg_info_callback_manager.h"
@@ -27,24 +28,32 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t TECH_NUM = 4;
 constexpr int32_t IMS_SERVICE_TYPE_NUM = 4;
+constexpr int32_t MIN_SLOT_ID = -1;
+constexpr int32_t MAX_SLOT_ID = 4;
+
+int32_t GetRandomInt(int min, int max, const uint8_t *data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    return fdp.ConsumeIntegralInRange<int32_t>(min, max);
+}
+
 void OnRemoteRequest(const uint8_t *data, size_t size)
 {
     MessageParcel dataMessageParcel;
     if (!dataMessageParcel.WriteInterfaceToken(ImsRegInfoCallbackStub::GetDescriptor())) {
         return;
     }
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t reg = static_cast<int32_t>(*data % BOOL_NUM);
-    int32_t tech = static_cast<int32_t>(*data % TECH_NUM);
+    int32_t slotId = GetRandomInt(MIN_SLOT_ID, MAX_SLOT_ID, data, size);
+    int32_t reg = GetRandomInt(0, BOOL_NUM, data, size);
+    int32_t tech = GetRandomInt(0, TECH_NUM, data, size);
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(reg);
     dataMessageParcel.WriteInt32(tech);
 
-    uint32_t code = static_cast<uint32_t>(*data % IMS_SERVICE_TYPE_NUM);
+    uint32_t code = static_cast<uint32_t>(GetRandomInt(0, IMS_SERVICE_TYPE_NUM, data, size));
     MessageParcel reply;
     MessageOption option;
     sptr<NapiImsRegInfoCallback> imsCallback = new NapiImsRegInfoCallback();
