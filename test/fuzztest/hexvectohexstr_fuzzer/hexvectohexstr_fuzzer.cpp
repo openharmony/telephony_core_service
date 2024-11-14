@@ -19,19 +19,28 @@
 #include <cstdint>
 
 #include "addcoreservicetoken_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 #include "napi_util.h"
 #include "system_ability_definition.h"
 #include "tag_service.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+constexpr int32_t TEST_MAX_UINT8 = 255;
+
+int32_t GetRandomInt(int min, int max, const uint8_t *data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    return fdp.ConsumeIntegralInRange<int32_t>(min, max);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
-    uint8_t result = static_cast<uint8_t>(*data);
+    uint8_t result = static_cast<uint8_t>(GetRandomInt(0, TEST_MAX_UINT8, data, size));
     std::vector<uint8_t> parameter;
     parameter.push_back(result);
     auto tagService = std::make_shared<TagService>(parameter);

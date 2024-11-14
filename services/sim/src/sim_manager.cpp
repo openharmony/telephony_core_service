@@ -1202,13 +1202,13 @@ int32_t SimManager::RegisterSimAccountCallback(const int32_t tokenId, const sptr
     return multiSimMonitor_->RegisterSimAccountCallback(tokenId, callback);
 }
 
-int32_t SimManager::UnregisterSimAccountCallback(const int32_t tokenId)
+int32_t SimManager::UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback)
 {
     if (multiSimMonitor_ == nullptr) {
         TELEPHONY_LOGE("multiSimMonitor is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimMonitor_->UnregisterSimAccountCallback(tokenId);
+    return multiSimMonitor_->UnregisterSimAccountCallback(callback);
 }
 
 bool SimManager::IsSetActiveSimInProgress(int32_t slotId)

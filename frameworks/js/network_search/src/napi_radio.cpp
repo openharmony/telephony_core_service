@@ -170,7 +170,7 @@ static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGI("GetRadioTechCallback end");
+    TELEPHONY_LOGD("GetRadioTechCallback end");
 }
 
 static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters[], size_t parameterCount)
@@ -1968,7 +1968,7 @@ static void NativeSendUpdateCellLocationRequest(napi_env env, void *data)
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = true;
     }
-    TELEPHONY_LOGI("NativeSendUpdateCellLocationRequest end");
+    TELEPHONY_LOGD("NativeSendUpdateCellLocationRequest end");
 }
 
 static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status status, void *data)
@@ -1983,7 +1983,7 @@ static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status stat
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGI("SendUpdateCellLocationRequestCallback end");
+    TELEPHONY_LOGD("SendUpdateCellLocationRequestCallback end");
 }
 
 static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info info)
