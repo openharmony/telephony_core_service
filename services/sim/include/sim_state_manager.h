@@ -69,11 +69,11 @@ public:
     bool responseSimUnlockPinReady_ = false;
     std::mutex ctx_;
     std::mutex stx_;
-    std::mutex rtx_;
+    std::mutex UnlockPin_ctx_;
     std::condition_variable cv_;
     std::condition_variable sv_;
-    std::condition_variable rv_;
-    
+    std::condition_variable UnlockPin_cv_;
+
 private:
     void RequestUnlock(UnlockCmd type);
 
