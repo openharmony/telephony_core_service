@@ -177,7 +177,7 @@ void SimStateManager::SyncUnlockPinResponse()
 {
     std::unique_lock<std::mutex> lck(unlockPinCtx_);
     responseUnlockPinReady_ = true;
-    TELEPHONY_LOGI("SimStateManager::SyncUnlockPinResponse(), responsUnlockPinReady = %{public}d",
+    TELEPHONY_LOGI("SimStateManager::SyncUnlockPinResponse(), responseUnlockPinReady = %{public}d",
                    responseUnlockPinReady_);
     unlockPinCv_.notify_one();
 }
