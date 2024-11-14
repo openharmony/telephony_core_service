@@ -62,7 +62,7 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     auto inParaTp = std::make_tuple(&asyncContext->slotId, &context.callbackRef);
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, inParaTp);
     if (errCode.has_value()) {
-        JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+        JsError error = NapiUtil::ConverEsimErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
@@ -102,7 +102,7 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
 
     std::optional<NapiError> errCode = MatchParameters(env, argv, argc, theTuple);
     if (errCode.has_value()) {
-        JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
+        JsError error = NapiUtil::ConverEsimErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
@@ -305,16 +305,6 @@ napi_value EuiccProfileListConversion(napi_env env, const GetEuiccProfileInfoLis
         napi_set_element(env, resultArray, i, res);
     }
     napi_set_named_property(env, val, "profiles", resultArray);
-
-    return val;
-}
-
-napi_value ResponseEsimResultConversion(napi_env env, const ResponseEsimResult &resultInfo)
-{
-    napi_value val = nullptr;
-    napi_create_object(env, &val);
-    SetPropertyToNapiObject(env, val, "responseResult", static_cast<int32_t>(resultInfo.resultCode_));
-    SetPropertyToNapiObject(env, val, "response", NapiUtil::ToUtf8(resultInfo.response_));
 
     return val;
 }
@@ -1123,7 +1113,7 @@ void NativeCancelSession(napi_env env, void *data)
         return;
     }
     AsyncCancelSession *sessionContext = static_cast<AsyncCancelSession *>(data);
-    AsyncContext<napi_value> &asyncContext = sessionContext->asyncContext;
+    AsyncContext<int32_t> &asyncContext = sessionContext->asyncContext;
     if (!IsValidSlotId(asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeCancelSession slotId is invalid");
         asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
@@ -1135,7 +1125,7 @@ void NativeCancelSession(napi_env env, void *data)
         asyncContext.slotId, sessionContext->transactionId, sessionContext->cancelReason, responseResult);
     TELEPHONY_LOGI("NAPI NativeCancelSession %{public}d", errorCode);
     if (errorCode == ERROR_NONE) {
-        sessionContext->responseResult = responseResult;
+        sessionContext->asyncContext.callbackVal = static_cast<int32_t>(responseResult.resultCode_);
         sessionContext->asyncContext.context.resolved = true;
     } else {
         sessionContext->asyncContext.context.resolved = false;
@@ -1150,10 +1140,6 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("CancelSessionCallback context is nullptr");
         return;
-    }
-    AsyncContext<napi_value> &asyncContext = context->asyncContext;
-    if (asyncContext.context.resolved) {
-        asyncContext.callbackVal = ResponseEsimResultConversion(env, context->responseResult);
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "CancelSession", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -1488,14 +1474,108 @@ napi_status InitEnumPolicyRules(napi_env env, napi_value exports)
 napi_status InitEnumResult(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_SOLVABLE_ERRORS",
-            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SOLVABLE_ERRORS))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_MUST_DISABLE_PROFILE",
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SOLVABLE_ERRORS", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SOLVABLE_ERRORS))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_MUST_DISABLE_PROFILE",
             GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_MUST_DISABLE_PROFILE))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_OK",
-            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_OK))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESULT_UNDEFINED_ERROR",
-            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_UNDEFINED_ERROR))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESULT_OK", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_OK))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_GET_EID_FAILED", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_GET_EID_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_ACTIVATION_CODE_CHANGED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ACTIVATION_CODE_CHANGED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_ACTIVATION_CODE_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ACTIVATION_CODE_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SMDP_ADDRESS_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SMDP_ADDRESS_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_EUICC_INFO_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_EUICC_INFO_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_TLS_HANDSHAKE_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_TLS_HANDSHAKE_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CERTIFICATE_IO_ERROR",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CERTIFICATE_IO_ERROR))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CERTIFICATE_RESPONSE_TIMEOUT",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CERTIFICATE_RESPONSE_TIMEOUT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_AUTHENTICATION_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_AUTHENTICATION_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_RESPONSE_HTTP_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_RESPONSE_HTTP_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CONFIRMATION_CODE_INCORRECT",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CONFIRMATION_CODE_INCORRECT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_EXCEEDED_CONFIRMATION_CODE_TRY_LIMIT",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_EXCEEDED_CONFIRMATION_CODE_TRY_LIMIT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_NO_PROFILE_ON_SERVER",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_NO_PROFILE_ON_SERVER))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_TRANSACTION_ID_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_TRANSACTION_ID_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SERVER_ADDRESS_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SERVER_ADDRESS_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_GET_BOUND_PROFILE_PACKAGE_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_GET_BOUND_PROFILE_PACKAGE_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_USER_CANCEL_DOWNLOAD",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_USER_CANCEL_DOWNLOAD))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SERVER_UNAVAILABLE",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SERVER_UNAVAILABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_PROFILE_NON_DELETE",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_PROFILE_NON_DELETE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SMDP_ADDRESS_INCORRECT",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SMDP_ADDRESS_INCORRECT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_ANALYZE_AUTHENTICATION_SERVER_RESPONSE_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ANALYZE_AUTHENTICATION_SERVER_RESPONSE_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_ANALYZE_AUTHENTICATION_CLIENT_RESPONSE_FAILED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ANALYZE_AUTHENTICATION_CLIENT_RESPONSE_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_ANALYZE_AUTHENTICATION_CLIENT_MATCHING_ID_REFUSED",
+            GetNapiValue(
+                env, static_cast<int32_t>(ResultCode::RESULT_ANALYZE_AUTHENTICATION_CLIENT_MATCHING_ID_REFUSED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_PROFILE_TYPE_ERROR_AUTHENTICATION_STOPPED",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_PROFILE_TYPE_ERROR_AUTHENTICATION_STOPPED))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CARRIER_SERVER_REFUSED_ERRORS",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CARRIER_SERVER_REFUSED_ERRORS))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CERTIFICATE_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CERTIFICATE_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_OUT_OF_MEMORY",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_OUT_OF_MEMORY))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_PPR_FORBIDDEN", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_PPR_FORBIDDEN))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_NOTHING_TO_DELETE", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_NOTHING_TO_DELETE))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_PPR_NOT_MATCH", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_PPR_NOT_MATCH))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_CAT_BUSY", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_CAT_BUSY))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_PROFILE_EID_INVALID",
+            GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_PROFILE_EID_INVALID))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_DOWNLOAD_TIMEOUT", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_DOWNLOAD_TIMEOUT))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "RESULT_SGP_22_OTHER", GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);

@@ -159,7 +159,7 @@ HWTEST_F(EsimCoreServiceClientTest, SetDefaultSmdpAddress_0001, Function | Mediu
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(EsimCoreServiceClientTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimCoreServiceClientTest, IsSupported_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     bool result = CoreServiceClient::GetInstance().IsSupported(slotId);

@@ -105,10 +105,9 @@ struct AsyncProfileNickname {
 };
 
 struct AsyncCancelSession {
-    AsyncContext<napi_value> asyncContext;
+    AsyncContext<int32_t> asyncContext;
     std::string transactionId = "";
     int32_t cancelReason = static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED);
-    ResultCode responseResult;
 };
 
 struct AsyncProfileMetadataInfo {

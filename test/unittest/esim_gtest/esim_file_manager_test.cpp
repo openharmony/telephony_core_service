@@ -110,10 +110,10 @@ HWTEST_F(EsimFileManagerTest, DisableProfile_001, Function | MediumTest | Level2
     int32_t portIndex = 0;
     std::u16string iccId = u"";
     ResultCode res = simFileManager.DisableProfile(portIndex, iccId);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.DisableProfile(portIndex, iccId);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, GetSmdsAddress_001, Function | MediumTest | Level2)
@@ -244,10 +244,10 @@ HWTEST_F(EsimFileManagerTest, ResetMemory_001, Function | MediumTest | Level2)
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     ResultCode res = simFileManager.ResetMemory(resetOption);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.ResetMemory(resetOption);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, SetDefaultSmdpAddress_001, Function | MediumTest | Level2)
@@ -263,13 +263,13 @@ HWTEST_F(EsimFileManagerTest, SetDefaultSmdpAddress_001, Function | MediumTest |
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string defaultSmdpAddress = u"";
     ResultCode res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
-HWTEST_F(EsimFileManagerTest, IsEsimSupported_001, Function | MediumTest | Level2)
+HWTEST_F(EsimFileManagerTest, IsSupported_001, Function | MediumTest | Level2)
 {
     std::string expectedEid = "12345";
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -423,10 +423,10 @@ HWTEST_F(EsimFileManagerTest, RemoveNotificationFromList_001, Function | MediumT
     int32_t portIndex = 0;
     int32_t seqNumber = 0;
     ResultCode res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, DeleteProfile_001, Function | MediumTest | Level2)
@@ -442,10 +442,10 @@ HWTEST_F(EsimFileManagerTest, DeleteProfile_001, Function | MediumTest | Level2)
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string iccId = u"";
     ResultCode res = simFileManager.DeleteProfile(iccId);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.DeleteProfile(iccId);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level2)
@@ -463,10 +463,10 @@ HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level
     std::u16string iccId = u"";
     bool forceDisableProfile = false;
     ResultCode res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Level2)
@@ -483,10 +483,10 @@ HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Le
     std::u16string iccId = u"";
     std::u16string nickname = u"";
     ResultCode res = simFileManager.SetProfileNickname(iccId, nickname);
-    EXPECT_NE(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetProfileNickname(iccId, nickname);
-    EXPECT_EQ(res, ResultCode::RESULT_UNDEFINED_ERROR);
+    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
 }
 
 HWTEST_F(EsimFileManagerTest, GetEuiccInfo2_001, Function | MediumTest | Level2)

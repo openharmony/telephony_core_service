@@ -182,7 +182,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SetDefaultSmdpAddress_0100, Function |
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-HWTEST_F(EsimCoreServiceClientBranchTest, IsEsimSupported_0100, Function | MediumTest | Level1)
+HWTEST_F(EsimCoreServiceClientBranchTest, IsSupported_0100, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));

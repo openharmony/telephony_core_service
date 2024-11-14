@@ -219,7 +219,7 @@ HWTEST_F(EsimCoreServiceTest, SetDefaultSmdpAddress_0001, Function | MediumTest 
         slotId, defaultSmdpAddress, SetAddressResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(EsimCoreServiceTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimCoreServiceTest, IsSupported_0001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();

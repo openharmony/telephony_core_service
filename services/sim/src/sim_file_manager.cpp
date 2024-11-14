@@ -1028,7 +1028,7 @@ ResultCode SimFileManager::DisableProfile(int32_t portIndex, const std::u16strin
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode enumResult = eSimFile_->DisableProfile(portIndex, iccId);
     return enumResult;
@@ -1098,7 +1098,7 @@ ResultCode SimFileManager::ResetMemory(ResetOption resetOption)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode result = eSimFile_->ResetMemory(resetOption);
     return result;
@@ -1108,7 +1108,7 @@ ResultCode SimFileManager::SetDefaultSmdpAddress(const std::u16string &defaultSm
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode result = eSimFile_->SetDefaultSmdpAddress(defaultSmdpAddress);
     return result;
@@ -1187,7 +1187,7 @@ ResultCode SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_t
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("RemoveNotificationFromList eSimFile_ is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     return eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
 }
@@ -1196,7 +1196,7 @@ ResultCode SimFileManager::DeleteProfile(const std::u16string &iccId)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode result = eSimFile_->DeleteProfile(iccId);
     return result;
@@ -1206,7 +1206,7 @@ ResultCode SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16stri
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return result;
@@ -1216,7 +1216,7 @@ ResultCode SimFileManager::SetProfileNickname(const std::u16string &iccId, const
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_UNDEFINED_ERROR;
+        return ResultCode::RESULT_SGP_22_OTHER;
     }
     ResultCode result = eSimFile_->SetProfileNickname(iccId, nickname);
     return result;

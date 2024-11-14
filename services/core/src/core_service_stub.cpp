@@ -310,7 +310,7 @@ void CoreServiceStub::AddHandlerEsimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultSmdpAddress(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnIsEsimSupported(data, reply); };
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsSupported(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnPrepareDownload(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE)] =
@@ -2269,7 +2269,7 @@ int32_t CoreServiceStub::OnSetDefaultSmdpAddress(MessageParcel &data, MessagePar
     return NO_ERROR;
 }
 
-int32_t CoreServiceStub::OnIsEsimSupported(MessageParcel &data, MessageParcel &reply)
+int32_t CoreServiceStub::OnIsSupported(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
     bool result = IsSupported(slotId);
