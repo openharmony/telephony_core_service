@@ -61,12 +61,12 @@ public:
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response);
     void SyncCmdResponse();
     void SyncSimMatchResponse();
-    void SyncSimUnlockPinResponse();
+    void SyncUnlockPinResponse();
 
 public:
     bool responseReady_ = false;
     bool responseSimMatchReady_ = false;
-    bool responseSimUnlockPinReady_ = false;
+    bool responseUnlockPinReady_ = false;
     std::mutex ctx_;
     std::mutex stx_;
     std::mutex unlockPinCtx_;
