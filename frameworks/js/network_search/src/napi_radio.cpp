@@ -2162,7 +2162,7 @@ napi_value JudgmentData(napi_env env, sptr<CellInformation> infoItem, CellInform
 static void NativeGetCellInformation(napi_env env, void *data)
 {
     auto asyncContext = static_cast<CellInformationContext *>(data);
-    if (!IsValidSlotId(asyncContext->slotId)) {
+    if (!IsValidSlotIdEx(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeGetCellInformation slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
