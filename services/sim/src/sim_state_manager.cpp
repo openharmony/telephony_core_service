@@ -168,7 +168,7 @@ void SimStateManager::SyncSimMatchResponse()
 {
     std::unique_lock<std::mutex> lck(stx_);
     responseSimMatchReady_ = true;
-    TELEPHONY_LOGI("SimStateManager::SyncSimMatchResponse(), responseSimMatchReady = %{public}d", 
+    TELEPHONY_LOGI("SimStateManager::SyncSimMatchResponse(), responseSimMatchReady = %{public}d",
                    responseSim_);
     sv_.notify_one();
 }
