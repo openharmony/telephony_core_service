@@ -1471,7 +1471,7 @@ napi_status InitEnumPolicyRules(napi_env env, napi_value exports)
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
-napi_status InitEnumResult(napi_env env, napi_value exports)
+napi_status InitEnumResultFirst(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY(
@@ -1506,6 +1506,16 @@ napi_status InitEnumResult(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "RESULT_AUTHENTICATION_FAILED",
             GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_AUTHENTICATION_FAILED))),
+    };
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "ResultCode", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
+napi_status InitEnumResultSecond(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY(
             "RESULT_RESPONSE_HTTP_FAILED",
             GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_RESPONSE_HTTP_FAILED))),
@@ -1542,6 +1552,16 @@ napi_status InitEnumResult(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "RESULT_ANALYZE_AUTHENTICATION_SERVER_RESPONSE_FAILED",
             GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ANALYZE_AUTHENTICATION_SERVER_RESPONSE_FAILED))),
+    };
+
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "ResultCode", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
+napi_status InitEnumResultOther(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY(
             "RESULT_ANALYZE_AUTHENTICATION_CLIENT_RESPONSE_FAILED",
             GetNapiValue(env, static_cast<int32_t>(ResultCode::RESULT_ANALYZE_AUTHENTICATION_CLIENT_RESPONSE_FAILED))),
@@ -1632,7 +1652,9 @@ napi_value InitNapiEsim(napi_env env, napi_value exports)
     NAPI_CALL(env, InitEnumProfileState(env, exports));
     NAPI_CALL(env, InitEnumProfileClass(env, exports));
     NAPI_CALL(env, InitEnumPolicyRules(env, exports));
-    NAPI_CALL(env, InitEnumResult(env, exports));
+    NAPI_CALL(env, InitEnumResultFirst(env, exports));
+    NAPI_CALL(env, InitEnumResultSecond(env, exports));
+    NAPI_CALL(env, InitEnumResultOther(env, exports));
     NAPI_CALL(env, InitEnumResolvableErrors(env, exports));
     return exports;
 }
