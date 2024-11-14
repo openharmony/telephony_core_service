@@ -591,7 +591,7 @@ void SimStateHandle::GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEven
     std::shared_ptr<LockStatusResp> param = event->GetSharedObject<LockStatusResp>();
     std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
-        TELEPHONY_LOGE("SimStateHandle::GetUnlockResult() fail");
+        TELEPHONY_LOGE("SimStateHandle::GetSimUnlockResult() fail");
         return;
     }
     if (param != nullptr) {
@@ -603,7 +603,7 @@ void SimStateHandle::GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEven
         TELEPHONY_LOGE("SimStateHandle::GetUnlockResult param is null");
         unlockRespon_.result = static_cast<int32_t>(response->error);
     }
-    TELEPHONY_LOGI("SimStateHandle::GetUnlockResponse(), iccUnlockResponse = %{public}d", unlockRespon_.result);
+    TELEPHONY_LOGI("SimStateHandle::GetSimUnlockResponse(), iccUnlockResponse = %{public}d", unlockRespon_.result);
 }
 
 void SimStateHandle::GetUnlockSimLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
