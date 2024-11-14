@@ -66,6 +66,7 @@ public:
 public:
     bool responseReady_ = false;
     bool responseSimMatchReady_ = false;
+    bool responseSimUnlockPinReady_ = false;
     std::mutex ctx_;
     std::mutex stx_;
     std::mutex rtx_;
