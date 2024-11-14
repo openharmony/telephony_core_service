@@ -179,7 +179,7 @@ void SimStateManager::SyncSimUnlockPinResponse()
     responseSimUnlockPinReady_ = true;
     TELEPHONY_LOGI(
         "SimStateManager::SyncSimUnlockPinResponse(), responsSimUnlockPinReady = %{public}d", responseSimUnlockPinReady_);
-    sv_.notify_one();
+    rv_.notify_one();
 }
 
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
