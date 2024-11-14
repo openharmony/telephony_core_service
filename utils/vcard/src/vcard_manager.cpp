@@ -196,7 +196,6 @@ void VCardManager::BatchInsertContactData(
     std::vector<DataShare::DataShareValuesBucket> contactDataValues;
     for (size_t i = 0; i < rawIds.size(); i++) {
         int32_t rawId = rawIds[i];
-        TELEPHONY_LOGI("rawId %{public}d", rawId);
         std::shared_ptr<VCardContact> contact = contactList[i];
         if (contact == nullptr) {
             errorCode = TELEPHONY_ERROR;
