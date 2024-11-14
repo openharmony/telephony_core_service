@@ -510,6 +510,9 @@ bool NapiUtil::CreateEsimServiceErrorMessageForJs(int32_t errorCode, JsErrorCode
         case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
             jsErrorCode = JS_ERROR_ESIM_SERVICE_ERROR;
             break;
+        case TELEPHONY_ERR_NOT_SUPPORT_ESIM:
+            jsErrorCode = JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API;
+            break;
         default:
             flag = false;
             break;
