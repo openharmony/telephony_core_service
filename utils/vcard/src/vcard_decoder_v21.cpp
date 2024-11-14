@@ -739,7 +739,7 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
     str += value;
     while (true) {
         std::string line = PeekLine();
-        if (line.empty()) {
+        if (line[0] != ' ') {
             break;
         }
         std::string nameUp = getUpperName(line);
