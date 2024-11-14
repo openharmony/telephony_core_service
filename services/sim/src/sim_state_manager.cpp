@@ -173,23 +173,32 @@ void SimStateManager::SyncSimMatchResponse()
     sv_.notify_one();
 }
 
+void SimStateManager::SyncSimUnlockPinResponse()
+{
+    std::unique_lock<std::mutex> lck(rtx_);
+    responseSimUnlockPinReady_ = true;
+    TELEPHONY_LOGI(
+        "SimStateManager::SyncSimUnlockPinResponse(), responsSimUnlockPinReady = %{public}d", responseSimUnlockPinReady_);
+    sv_.notify_one();
+}
+
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<std::mutex> lck(rtx_);
     TELEPHONY_LOGD("SimStateManager::UnlockPin slotId = %{public}d", slotId);
-    responseReady_ = false;
+    responseSimMatchReady_ = false;
     simStateHandle_->UnlockPin(slotId, pin);
-    while (!responseReady_) {
+    while (!responseSimMatchReady_) {
         TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
+        if (rv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
-    if (!responseReady_) {
+    if (!responseSimMatchReady_) {
         TELEPHONY_LOGE("unlock pin sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
     }
