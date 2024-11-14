@@ -39,7 +39,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int DEFAULT_ERROR = ERROR_SERVICE_UNAVAILABLE;
-constexpr int BUF_SIZE = 32;
+constexpr int BUF_SIZE = 192;
 constexpr int CALLBACK_VALUES_SIZE = 1;
 constexpr int WAIT_TIME_SECOND = 60 * 3;
 constexpr int WAIT_NETWORK_MANUAL_SEARCH_TIME_SECOND = 60 * 5;
