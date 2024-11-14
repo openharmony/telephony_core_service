@@ -510,14 +510,14 @@ HWTEST_F(EsimCoreServiceProxyTest, SetDefaultSmdpAddress_003, Function | MediumT
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_001, Function | MediumTest | Level2)
+HWTEST_F(EsimCoreServiceProxyTest, IsSupported_001, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = nullptr;
     CoreServiceProxy proxy(remote);
     EXPECT_FALSE(proxy.IsSupported(SLOT_ID));
 }
 
-HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_002, Function | MediumTest | Level2)
+HWTEST_F(EsimCoreServiceProxyTest, IsSupported_002, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);
@@ -525,7 +525,7 @@ HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_002, Function | MediumTest | 
     EXPECT_FALSE(proxy.IsSupported(SLOT_ID));
 }
 
-HWTEST_F(EsimCoreServiceProxyTest, IsEsimSupported_003, Function | MediumTest | Level2)
+HWTEST_F(EsimCoreServiceProxyTest, IsSupported_003, Function | MediumTest | Level2)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     CoreServiceProxy proxy(remote);

@@ -176,6 +176,21 @@ enum JsErrorCode {
      * VCard file invalid.
      */
     JS_ERROR_VCARD_FILE_INVALID,
+
+    /**
+     * Success.
+     */
+    JS_ERROR_ESIM_SUCCESS = 3120000,
+
+    /**
+     * Service connection failed.
+     */
+    JS_ERROR_ESIM_SERVICE_ERROR = 3120001,
+
+    /**
+     * System internal error.
+     */
+    JS_ERROR_ESIM_SYSTEM_ERROR = 3120002,
 };
 
 struct JsError {
