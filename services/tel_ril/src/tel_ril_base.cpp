@@ -36,6 +36,11 @@ void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface)
     rilInterface_ = rilInterface;
 }
 
+sptr<HDI::Ril::V1_3::IRil> getRilInterface()
+{
+    return;
+}
+
 std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), result);
