@@ -240,11 +240,11 @@ HWTEST_F(EsimServiceClientBranchTest, CancelSession_0001, Function | MediumTest 
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-HWTEST_F(EsimServiceClientBranchTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimServiceClientBranchTest, IsSupported_0001, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().IsEsimSupported(SLOT_ID);
+    bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
     EXPECT_EQ(result, false);
 }
 

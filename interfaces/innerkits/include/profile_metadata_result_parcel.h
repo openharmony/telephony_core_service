@@ -33,7 +33,7 @@ struct GetDownloadableProfileMetadataResult : public Parcelable {
     int32_t pprType_ = 0;
     bool pprFlag_ = false;
     SolvableErrors resolvableErrors_;
-    ResultState result_;
+    ResultCode result_;
     std::u16string serviceProviderName_ = u"";
     std::u16string profileName_ = u"";
     std::u16string iccId_ = u"";

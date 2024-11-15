@@ -92,7 +92,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, DisableProfile_0100, Function | Medium
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool refresh = true;
-    ResultState disableProfileResult;
+    ResultCode disableProfileResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result =
         CoreServiceClient::GetInstance().DisableProfile(slotId, portIndex, iccId, refresh, disableProfileResult);
@@ -164,7 +164,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, GetProfile_0100, Function | MediumTest
 HWTEST_F(EsimCoreServiceClientBranchTest, ResetMemory_0100, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    ResultState ResetMemoryResult;
+    ResultCode ResetMemoryResult;
     const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().ResetMemory(slotId, resetOption, ResetMemoryResult);
@@ -175,18 +175,18 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SetDefaultSmdpAddress_0100, Function |
 {
     int32_t slotId = 0;
     std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
-    ResultState SetAddressResult;
+    ResultCode SetAddressResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().
         SetDefaultSmdpAddress(slotId, defaultSmdpAddress, SetAddressResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-HWTEST_F(EsimCoreServiceClientBranchTest, IsEsimSupported_0100, Function | MediumTest | Level1)
+HWTEST_F(EsimCoreServiceClientBranchTest, IsSupported_0100, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
-    int32_t result = CoreServiceClient::GetInstance().IsEsimSupported(slotId);
+    int32_t result = CoreServiceClient::GetInstance().IsSupported(slotId);
     EXPECT_EQ(result, false);
 }
 
@@ -266,7 +266,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, RemoveNotificationFromList_0100, Funct
     int32_t slotId = 0;
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
-    ResultState enumResult;
+    ResultCode enumResult;
 
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().RemoveNotificationFromList(slotId, portIndex,
@@ -278,7 +278,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, DeleteProfile_0001, Function | MediumT
 {
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    ResultState DeleteProfileResult;
+    ResultCode DeleteProfileResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().DeleteProfile(slotId, iccId, DeleteProfileResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -290,7 +290,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SwitchToProfile_0100, Function | Mediu
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool forceDisableProfile = true;
-    ResultState SwitchProfileResult;
+    ResultCode SwitchProfileResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
         slotId, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
@@ -302,7 +302,7 @@ HWTEST_F(EsimCoreServiceClientBranchTest, SetProfileNickname_0100, Function | Me
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
-    ResultState UpdateResult;
+    ResultCode UpdateResult;
     EXPECT_CALL(*samgr, CheckSystemAbility(testing::_)).WillOnce(testing::Return(nullptr));
     int32_t result = CoreServiceClient::GetInstance().SetProfileNickname(slotId, iccId, nickname, UpdateResult);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);

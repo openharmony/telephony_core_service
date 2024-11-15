@@ -490,7 +490,7 @@ HWTEST_F(EsimTest, DisableProfile_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
-    ResultState disableProfileResult = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultCode disableProfileResult = ResultCode::RESULT_SGP_22_OTHER;
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(disableProfileResult, esimFile->DisableProfile(portIndex, iccId));
     int32_t slotId = 0;
@@ -938,7 +938,7 @@ HWTEST_F(EsimTest, ResetMemory_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     ResetOption resetOption = ResetOption::DELETE_FIELD_LOADED_TEST_PROFILES;
-    ResultState resetResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultCode resetResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(resetResult_, esimFile->ResetMemory(resetOption));
     int32_t slotId = 0;
@@ -1431,7 +1431,7 @@ HWTEST_F(EsimTest, RemoveNotificationFromList_001, Function | MediumTest | Level
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
-    ResultState removeNotifResult = ResultState::RESULT_OK;
+    ResultCode removeNotifResult = ResultCode::RESULT_OK;
     esimFile->currentChannelId_ = 0;
     EXPECT_EQ(removeNotifResult, esimFile->RemoveNotificationFromList(portIndex, seqNumber));
     int32_t slotId = 0;
@@ -1556,7 +1556,7 @@ HWTEST_F(EsimTest, DeleteProfile_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
     std::u16string iccId;
-    ResultState disableProfileResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultCode disableProfileResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(disableProfileResult_, esimFile->DeleteProfile(iccId));
 
@@ -1577,7 +1577,7 @@ HWTEST_F(EsimTest, SwitchToProfile_001, Function | MediumTest | Level2)
     int32_t portIndex = 0;
     std::u16string iccId;
     bool forceDisableProfile = false;
-    ResultState switchResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultCode switchResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(switchResult_, esimFile->SwitchToProfile(portIndex, iccId, forceDisableProfile));
 
@@ -1597,7 +1597,7 @@ HWTEST_F(EsimTest, SetProfileNickname_001, Function | MediumTest | Level2)
 
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
-    ResultState updateNicknameResult_ = ResultState::RESULT_UNDEFINED_ERROR;
+    ResultCode updateNicknameResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(updateNicknameResult_, esimFile->SetProfileNickname(iccId, nickname));
 

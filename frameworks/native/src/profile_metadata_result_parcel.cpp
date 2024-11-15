@@ -55,7 +55,7 @@ bool GetDownloadableProfileMetadataResult::ReadFromParcel(Parcel &parcel)
         return false;
     }
     resolvableErrors_ = static_cast<SolvableErrors>(resolvableErrorsValue);
-    result_ = static_cast<ResultState>(resultValue);
+    result_ = static_cast<ResultCode>(resultValue);
     profileClass_ = static_cast<ProfileClass>(profileClassValue);
 
     return true;

@@ -63,6 +63,7 @@ public:
     static void ThrowError(napi_env env, int32_t errorCode, const std::string &message);
     static void ThrowParameterError(napi_env env);
     static void ReleaseBaseContext(napi_env env, BaseContext *baseContext);
+    static JsError ConverEsimErrorMessageForJs(int32_t errorCode);
 
 private:
     static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
@@ -82,6 +83,9 @@ private:
     static napi_value CreateError(napi_env env, int32_t err, const std::string &msg);
     static std::string GetErrorMessage(int32_t errorCode);
     static bool CreateVcardErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateEsimParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateEsimServiceErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateEsimSystemErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
 };
 } // namespace Telephony
 } // namespace OHOS

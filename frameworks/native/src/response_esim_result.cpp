@@ -25,7 +25,7 @@ bool ResponseEsimResult::ReadFromParcel(Parcel &parcel)
     if (!parcel.ReadInt32(resultValue) || !parcel.ReadString16(response_)) {
         return false;
     }
-    resultCode_ = static_cast<ResultState>(resultValue);
+    resultCode_ = static_cast<ResultCode>(resultValue);
     return true;
 }
 

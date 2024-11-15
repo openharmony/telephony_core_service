@@ -495,7 +495,7 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
         ConvertProfileInfoToApiStruct(euiccProfile, euiccProfileInfo);
         euiccProfileInfoList_.profiles_.push_back(euiccProfile);
     }
-    euiccProfileInfoList_.result_ = ResultState::RESULT_OK;
+    euiccProfileInfoList_.result_ = ResultCode::RESULT_OK;
     return true;
 }
 
@@ -673,7 +673,7 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
     return;
 }
 
-ResultState EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
+ResultCode EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
@@ -682,14 +682,14 @@ ResultState EsimFile::DisableProfile(int32_t portIndex, const std::u16string &ic
     if (!ProcessDisableProfile(slotId_, eventDisableProfile)) {
         TELEPHONY_LOGE("ProcessDisableProfile encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isDisableProfileReady_ = false;
     std::unique_lock<std::mutex> lock(disableProfileMutex_);
     if (!disableProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDisableProfileReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return disableProfileResult_;
@@ -867,7 +867,7 @@ bool EsimFile::ProcessDisableProfileDone(const AppExecFwk::InnerEvent::Pointer &
         NotifyReady(disableProfileMutex_, isDisableProfileReady_, disableProfileCv_);
         return false;
     }
-    disableProfileResult_ = static_cast<ResultState>(pAsn1Node->Asn1AsInteger());
+    disableProfileResult_ = static_cast<ResultCode>(pAsn1Node->Asn1AsInteger());
     NotifyReady(disableProfileMutex_, isDisableProfileReady_, disableProfileCv_);
     return true;
 }
@@ -1033,7 +1033,7 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
         return false;
     }
     std::string resultStr = Asn1Utils::BytesToHexStr(profileResponseByte);
-    responseChallengeResult_.resultCode_ = ResultState::RESULT_OK;
+    responseChallengeResult_.resultCode_ = ResultCode::RESULT_OK;
     responseChallengeResult_.response_ = OHOS::Telephony::ToUtf16(resultStr);
     NotifyReady(euiccChallengeMutex_, isEuiccChallengeReady_, euiccChallengeCv_);
     return true;
@@ -1255,7 +1255,7 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
         NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
         return false;
     }
-    cancelSessionResult_.resultCode_ = ResultState::RESULT_OK;
+    cancelSessionResult_.resultCode_ = ResultCode::RESULT_OK;
     cancelSessionResult_.response_ = OHOS::Telephony::ToUtf16(responseResult);
     NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
     return true;
@@ -1301,7 +1301,7 @@ bool EsimFile::ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &even
     return true;
 }
 
-ResultState EsimFile::ResetMemory(ResetOption resetOption)
+ResultCode EsimFile::ResetMemory(ResetOption resetOption)
 {
     esimProfile_.option = resetOption;
     SyncOpenChannel();
@@ -1309,20 +1309,20 @@ ResultState EsimFile::ResetMemory(ResetOption resetOption)
     if (!ProcessResetMemory(slotId_, eventResetMemory)) {
         TELEPHONY_LOGE("ProcessResetMemory encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isResetMemoryReady_ = false;
     std::unique_lock<std::mutex> lock(resetMemoryMutex_);
     if (!resetMemoryCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isResetMemoryReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return resetResult_;
 }
 
-ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
+ResultCode EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
     SyncOpenChannel();
@@ -1330,14 +1330,14 @@ ResultState EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAdd
     if (!ProcessEstablishDefaultSmdpAddress(slotId_, eventSetSmdpAddress)) {
         TELEPHONY_LOGE("ProcessEstablishDefaultSmdpAddress encode failed!!");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isSetDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(setDefaultSmdpAddressMutex_);
     if (!setDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return setDpAddressResult_;
@@ -1379,12 +1379,12 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEve
         NotifyReady(setDefaultSmdpAddressMutex_, isSetDefaultSmdpAddressReady_, setDefaultSmdpAddressCv_);
         return false;
     }
-    setDpAddressResult_ = static_cast<ResultState>(pAsn1Node->Asn1AsInteger());
+    setDpAddressResult_ = static_cast<ResultCode>(pAsn1Node->Asn1AsInteger());
     NotifyReady(setDefaultSmdpAddressMutex_, isSetDefaultSmdpAddressReady_, setDefaultSmdpAddressCv_);
     return true;
 }
 
-bool EsimFile::IsEsimSupported()
+bool EsimFile::IsSupported()
 {
     char buf[ATR_LENGTH + 1] = {0};
     GetParameter(TEL_ESIM_SUPPORT, "", buf, ATR_LENGTH);
@@ -1473,7 +1473,7 @@ bool EsimFile::ProcessResetMemoryDone(const AppExecFwk::InnerEvent::Pointer &eve
         NotifyReady(resetMemoryMutex_, isResetMemoryReady_, resetMemoryCv_);
         return false;
     }
-    resetResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+    resetResult_ = static_cast<ResultCode>(asn1NodeData->Asn1AsInteger());
     NotifyReady(resetMemoryMutex_, isResetMemoryReady_, resetMemoryCv_);
     return true;
 }
@@ -1533,7 +1533,7 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
         NotifyReady(sendApduDataMutex_, isSendApduDataReady_, sendApduDataCv_);
         return false;
     }
-    transApduDataResponse_.resultCode_ = ResultState::RESULT_OK;
+    transApduDataResponse_.resultCode_ = ResultCode::RESULT_OK;
     transApduDataResponse_.response_ = OHOS::Telephony::ToUtf16(result->resultData);
     transApduDataResponse_.sw1_ = result->sw1;
     transApduDataResponse_.sw2_ = result->sw2;
@@ -1781,7 +1781,7 @@ bool EsimFile::RealProcessPrepareDownloadDone(std::string &combineHexStr)
             }
         }
     }
-    preDownloadResult_.resultCode_ = ResultState::RESULT_OK;
+    preDownloadResult_.resultCode_ = ResultCode::RESULT_OK;
     std::string responseByteStr = Asn1Utils::BytesToString(responseByte);
     std::string destString = VCardUtils::EncodeBase64(responseByteStr);
     preDownloadResult_.response_ = OHOS::Telephony::ToUtf16(destString);
@@ -2214,7 +2214,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
     return notification_;
 }
 
-ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
+ResultCode EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
@@ -2223,14 +2223,14 @@ ResultState EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqN
     if (!ProcessRemoveNotification(slotId_, eventRemoveNotif)) {
         TELEPHONY_LOGE("ProcessRemoveNotification encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isRemoveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(removeNotificationMutex_);
     if (!removeNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRemoveNotificationReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return removeNotifResult_;
@@ -2450,12 +2450,12 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
         NotifyReady(removeNotificationMutex_, isRemoveNotificationReady_, removeNotificationCv_);
         return false;
     }
-    removeNotifResult_ = static_cast<ResultState>(node->Asn1AsInteger());
+    removeNotifResult_ = static_cast<ResultCode>(node->Asn1AsInteger());
     NotifyReady(removeNotificationMutex_, isRemoveNotificationReady_, removeNotificationCv_);
     return true;
 }
 
-ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
+ResultCode EsimFile::DeleteProfile(const std::u16string &iccId)
 {
     esimProfile_.iccId = iccId;
     SyncOpenChannel();
@@ -2463,20 +2463,20 @@ ResultState EsimFile::DeleteProfile(const std::u16string &iccId)
     if (!ProcessDeleteProfile(slotId_, eventDeleteProfile)) {
         TELEPHONY_LOGE("ProcessDeleteProfile encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isDeleteProfileReady_ = false;
     std::unique_lock<std::mutex> lock(deleteProfileMutex_);
     if (!deleteProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDeleteProfileReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return delProfile_;
 }
 
-ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
+ResultCode EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
@@ -2486,20 +2486,20 @@ ResultState EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &i
     if (!ProcessSwitchToProfile(slotId_, eventSwitchToProfile)) {
         TELEPHONY_LOGE("ProcessSwitchToProfile encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isSwitchToProfileReady_ = false;
     std::unique_lock<std::mutex> lock(switchToProfileMutex_);
     if (!switchToProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSwitchToProfileReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return switchResult_;
 }
 
-ResultState EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
+ResultCode EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
 {
     esimProfile_.iccId = iccId;
     esimProfile_.nickname = nickname;
@@ -2508,14 +2508,14 @@ ResultState EsimFile::SetProfileNickname(const std::u16string &iccId, const std:
     if (!ProcessSetNickname(slotId_, eventSetNickName)) {
         TELEPHONY_LOGE("ProcessSetNickname encode failed");
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     isSetNicknameReady_ = false;
     std::unique_lock<std::mutex> lock(setNicknameMutex_);
     if (!setNicknameCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetNicknameReady_; })) {
         SyncCloseChannel();
-        return ResultState();
+        return ResultCode();
     }
     SyncCloseChannel();
     return setNicknameResult_;
@@ -2590,7 +2590,7 @@ bool EsimFile::ProcessDeleteProfileDone(const AppExecFwk::InnerEvent::Pointer &e
         NotifyReady(deleteProfileMutex_, isDeleteProfileReady_, deleteProfileCv_);
         return false;
     }
-    delProfile_ = static_cast<ResultState>(Asn1NodeData->Asn1AsInteger());
+    delProfile_ = static_cast<ResultCode>(Asn1NodeData->Asn1AsInteger());
     NotifyReady(deleteProfileMutex_, isDeleteProfileReady_, deleteProfileCv_);
     return true;
 }
@@ -2643,7 +2643,7 @@ bool EsimFile::ProcessSwitchToProfileDone(const AppExecFwk::InnerEvent::Pointer 
         NotifyReady(switchToProfileMutex_, isSwitchToProfileReady_, switchToProfileCv_);
         return false;
     }
-    switchResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+    switchResult_ = static_cast<ResultCode>(asn1NodeData->Asn1AsInteger());
     NotifyReady(switchToProfileMutex_, isSwitchToProfileReady_, switchToProfileCv_);
     return true;
 }
@@ -2662,7 +2662,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
         NotifyReady(setNicknameMutex_, isSetNicknameReady_, setNicknameCv_);
         return false;
     }
-    setNicknameResult_ = static_cast<ResultState>(asn1NodeData->Asn1AsInteger());
+    setNicknameResult_ = static_cast<ResultCode>(asn1NodeData->Asn1AsInteger());
     NotifyReady(setNicknameMutex_, isSetNicknameReady_, setNicknameCv_);
     return true;
 }
@@ -2900,7 +2900,7 @@ bool EsimFile::ProcessObtainEuiccInfo2Done(const AppExecFwk::InnerEvent::Pointer
     this->EuiccInfo2ParseEuiccCiPKIdListForSigning(euiccInfo2Result_, root);
     this->EuiccInfo2ParseEuiccCategory(euiccInfo2Result_, root);
     this->EuiccInfo2ParsePpVersion(euiccInfo2Result_, root);
-    euiccInfo2Result_.resultCode_ = ResultState::RESULT_OK;
+    euiccInfo2Result_.resultCode_ = ResultCode::RESULT_OK;
     euiccInfo2Result_.response_ = newRecvData_.resultData;
     NotifyReady(euiccInfo2Mutex_, isEuiccInfo2Ready_, euiccInfo2Cv_);
     return true;
@@ -3134,7 +3134,7 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
 
 void EsimFile::CovertAuthToApiStruct(ResponseEsimResult &dst, AuthServerResponse &src)
 {
-    dst.resultCode_ = static_cast<ResultState>(src.errCode);
+    dst.resultCode_ = static_cast<ResultCode>(src.errCode);
     std::string hexStr = Asn1Utils::BytesToHexStr(src.respStr);
     dst.response_ = OHOS::Telephony::ToUtf16(hexStr);
 }
