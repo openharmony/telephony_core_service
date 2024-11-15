@@ -98,6 +98,7 @@ private:
     const std::vector<std::string> ctDomesticMccMnc_ { "46021", "46060" };
     const std::vector<std::string> cbDomesticnMccMnc_ { "46032", "46051" };
     bool enableCust_ = false;
+    bool netPriCust_ = false;
     std::string spnCust_ = "";
     int32_t displayConditionCust_ = SPN_INVALID;
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnCust_;
