@@ -57,6 +57,7 @@ public:
 
     static std::shared_ptr<TelRilRequest> CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result);
     void ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface);
+    sptr<HDI::Ril::V1_3::IRil> getRilInterface();
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const RadioResponseInfo &responseInfo);
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo);
 
