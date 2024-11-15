@@ -1702,7 +1702,7 @@ int32_t CoreService::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 }
 
 int32_t CoreService::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1823,7 +1823,7 @@ int32_t CoreService::GetProfile(
     return simManager_->GetProfile(slotId, portIndex, iccId, eUiccProfile);
 }
 
-int32_t CoreService::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+int32_t CoreService::ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1841,7 +1841,7 @@ int32_t CoreService::ResetMemory(int32_t slotId, ResetOption resetOption, Result
 }
 
 int32_t CoreService::SetDefaultSmdpAddress(
-    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1858,13 +1858,13 @@ int32_t CoreService::SetDefaultSmdpAddress(
     return simManager_->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
 }
 
-bool CoreService::IsEsimSupported(int32_t slotId)
+bool CoreService::IsSupported(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return false;
     }
-    return simManager_->IsEsimSupported(slotId);
+    return simManager_->IsSupported(slotId);
 }
 
 int32_t CoreService::SendApduData(
@@ -1976,7 +1976,7 @@ int32_t CoreService::RetrieveNotification(
 }
 
 int32_t CoreService::RemoveNotificationFromList(
-    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1993,7 +1993,7 @@ int32_t CoreService::RemoveNotificationFromList(
     return simManager_->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
 }
 
-int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -2011,14 +2011,14 @@ int32_t CoreService::DeleteProfile(int32_t slotId, const std::u16string &iccId, 
 }
 
 int32_t CoreService::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE_OPEN)) {
-        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE_OPEN");
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {
@@ -2029,14 +2029,14 @@ int32_t CoreService::SwitchToProfile(
 }
 
 int32_t CoreService::SetProfileNickname(
-    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE_OPEN)) {
-        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE_OPEN");
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_ESIM_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (simManager_ == nullptr) {

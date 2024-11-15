@@ -60,6 +60,9 @@ static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Co
 static constexpr const char *JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING = "call count exceeds limit";
 static constexpr const char *JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING =
     "Current on a call, unable to initiate a new call";
+static constexpr const char *JS_ERROR_ESIM_SUCCESS_STRING = "Success.";
+static constexpr const char *JS_ERROR_ESIM_SERVICE_ERROR_STRING = "Service connection failed.";
+static constexpr const char *JS_ERROR_ESIM_SYSTEM_ERROR_STRING = "System internal error.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -89,6 +92,9 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_CONFERENCE_CALL_NOT_ACTIVE, JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT, JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_DIAL_IS_BUSY, JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING },
+    { JsErrorCode::JS_ERROR_ESIM_SUCCESS, JS_ERROR_ESIM_SUCCESS_STRING },
+    { JsErrorCode::JS_ERROR_ESIM_SERVICE_ERROR, JS_ERROR_ESIM_SERVICE_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_ESIM_SYSTEM_ERROR, JS_ERROR_ESIM_SYSTEM_ERROR_STRING },
 };
 const std::string ERROR_STRING = "error";
 const std::u16string ERROR_USTRING = u"error";
@@ -467,6 +473,90 @@ JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
         !CreateObserverErrorMessageForJs(errorCode, error.errorCode)) {
         error.errorCode = JS_ERROR_TELEPHONY_UNKNOW_ERROR;
         TELEPHONY_LOGE("NapiUtil::ConverErrorMessageForJs errorCode is out of range");
+    }
+    error.errorMessage = GetErrorMessage(error.errorCode);
+    TELEPHONY_LOGI("errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
+    return error;
+}
+
+bool NapiUtil::CreateEsimParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+    switch (errorCode) {
+        case ERROR_PARAMETER_COUNTS_INVALID:
+        case ERROR_PARAMETER_TYPE_INVALID:
+        case ERROR_SLOT_ID_INVALID:
+        case napi_status::napi_generic_failure:
+        case napi_status::napi_invalid_arg:
+            jsErrorCode = JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateEsimServiceErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+
+    switch (errorCode) {
+        case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
+        case TELEPHONY_ERR_WRITE_DATA_FAIL:
+        case TELEPHONY_ERR_WRITE_REPLY_FAIL:
+        case TELEPHONY_ERR_READ_DATA_FAIL:
+        case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
+            jsErrorCode = JS_ERROR_ESIM_SERVICE_ERROR;
+            break;
+        case TELEPHONY_ERR_NOT_SUPPORT_ESIM:
+            jsErrorCode = JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+bool NapiUtil::CreateEsimSystemErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+
+    switch (errorCode) {
+        case TELEPHONY_ERR_FAIL:
+        case TELEPHONY_ERR_LOCAL_PTR_NULL:
+            jsErrorCode = JS_ERROR_ESIM_SYSTEM_ERROR;
+            break;
+        case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
+            jsErrorCode = JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+    return flag;
+}
+
+JsError NapiUtil::ConverEsimErrorMessageForJs(int32_t errorCode)
+{
+    JsError error = {};
+    if (errorCode == TELEPHONY_ERR_SUCCESS) {
+        error.errorCode = JS_ERROR_ESIM_SUCCESS;
+        error.errorMessage = GetErrorMessage(JS_ERROR_ESIM_SUCCESS);
+        return error;
+    }
+
+    if (CreateEsimParameterErrorMessageForJs(errorCode, error.errorCode)) {
+        error.errorMessage = GetErrorMessage(error.errorCode);
+        return error;
+    }
+
+    if (!CreateEsimServiceErrorMessageForJs(errorCode, error.errorCode) &&
+        !CreateEsimSystemErrorMessageForJs(errorCode, error.errorCode)) {
+        error.errorCode = JS_ERROR_ESIM_SYSTEM_ERROR;
+        TELEPHONY_LOGE("NapiUtil::ConverEsimErrorMessageForJs errorCode is out of range");
     }
     error.errorMessage = GetErrorMessage(error.errorCode);
     TELEPHONY_LOGI("errorCode from %{public}d to %{public}d", errorCode, error.errorCode);

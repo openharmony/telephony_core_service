@@ -26,7 +26,7 @@ namespace Telephony {
  * @brief Result set for downloading configuration files.
  */
 struct DownloadProfileResult : public Parcelable {
-    ResultState result_;
+    ResultCode result_;
     SolvableErrors resolvableErrors_;
     uint32_t cardId_ = 0;
 

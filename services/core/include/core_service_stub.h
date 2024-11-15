@@ -158,7 +158,7 @@ private:
     int32_t OnGetProfile(MessageParcel &data, MessageParcel &reply);
     int32_t OnResetMemory(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDefaultSmdpAddress(MessageParcel &data, MessageParcel &reply);
-    int32_t OnIsEsimSupported(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsSupported(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
     int32_t OnPrepareDownload(MessageParcel &data, MessageParcel &reply);
     int32_t OnLoadBoundProfilePackage(MessageParcel &data, MessageParcel &reply);

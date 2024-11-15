@@ -160,7 +160,7 @@ public:
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
     int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) override;
     int32_t DisableProfile(
-        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult) override;
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult) override;
     int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress) override;
     int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable) override;
     int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult) override;
@@ -169,10 +169,10 @@ public:
         ResponseEsimResult &responseResult) override;
     int32_t GetProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile) override;
-    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult) override;
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult) override;
     int32_t SetDefaultSmdpAddress(
-        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult) override;
-    bool IsEsimSupported(int32_t slotId) override;
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult) override;
+    bool IsSupported(int32_t slotId) override;
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
     int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
@@ -186,15 +186,15 @@ public:
     int32_t RetrieveNotification(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification) override;
     int32_t RemoveNotificationFromList(
-        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult) override;
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult) override;
     int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2) override;
     int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimResult &responseResult) override;
-    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult) override;
+    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult) override;
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId,
-        bool forceDisableProfile, ResultState &enumResult) override;
+        bool forceDisableProfile, ResultCode &enumResult) override;
     int32_t SetProfileNickname(
-        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult) override;
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult) override;
 #endif
 
 private:

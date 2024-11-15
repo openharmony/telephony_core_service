@@ -310,7 +310,7 @@ void CoreServiceStub::AddHandlerEsimToMap()
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_DEFAULT_SMDP_ADDRESS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDefaultSmdpAddress(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnIsEsimSupported(data, reply); };
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsSupported(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::PREPARE_DOWNLOAD)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnPrepareDownload(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::LOAD_BOUND_PROFILE_PACKAGE)] =
@@ -2082,7 +2082,7 @@ int32_t CoreServiceStub::OnDisableProfile(MessageParcel &data, MessageParcel &re
     int32_t portIndex = data.ReadInt32();
     std::u16string iccId = data.ReadString16();
     bool refresh = data.ReadBool();
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2239,7 +2239,7 @@ int32_t CoreServiceStub::OnResetMemory(MessageParcel &data, MessageParcel &reply
 {
     int32_t slotId = data.ReadInt32();
     ResetOption resetOption = static_cast<ResetOption>(data.ReadInt32());
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = ResetMemory(slotId, resetOption, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2256,7 +2256,7 @@ int32_t CoreServiceStub::OnSetDefaultSmdpAddress(MessageParcel &data, MessagePar
 {
     int32_t slotId = data.ReadInt32();
     std::u16string defaultSmdpAddress = data.ReadString16();
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2269,10 +2269,10 @@ int32_t CoreServiceStub::OnSetDefaultSmdpAddress(MessageParcel &data, MessagePar
     return NO_ERROR;
 }
 
-int32_t CoreServiceStub::OnIsEsimSupported(MessageParcel &data, MessageParcel &reply)
+int32_t CoreServiceStub::OnIsSupported(MessageParcel &data, MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    bool result = IsEsimSupported(slotId);
+    bool result = IsSupported(slotId);
     bool ret = reply.WriteBool(result);
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
@@ -2434,7 +2434,7 @@ int32_t CoreServiceStub::OnRemoveNotificationFromList(MessageParcel &data, Messa
     int32_t portIndex = data.ReadInt32();
     int32_t seqNumber = data.ReadInt32();
 
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2451,7 +2451,7 @@ int32_t CoreServiceStub::OnDeleteProfile(MessageParcel &data, MessageParcel &rep
 {
     int32_t slotId = data.ReadInt32();
     std::u16string iccId = data.ReadString16();
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = DeleteProfile(slotId, iccId, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2470,7 +2470,7 @@ int32_t CoreServiceStub::OnSwitchToProfile(MessageParcel &data, MessageParcel &r
     int32_t portIndex = data.ReadInt32();
     std::u16string iccId = data.ReadString16();
     bool forceDisableProfile = data.ReadBool();
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {
@@ -2488,7 +2488,7 @@ int32_t CoreServiceStub::OnSetProfileNickname(MessageParcel &data, MessageParcel
     int32_t slotId = data.ReadInt32();
     std::u16string iccId = data.ReadString16();
     std::u16string nickname = data.ReadString16();
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = SetProfileNickname(slotId, iccId, nickname, enumResult);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {

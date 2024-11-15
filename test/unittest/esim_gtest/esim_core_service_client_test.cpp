@@ -78,7 +78,7 @@ HWTEST_F(EsimCoreServiceClientTest, DisableProfile_0001, Function | MediumTest |
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool refresh = true;
-    ResultState disableProfileResult;
+    ResultCode disableProfileResult;
     int32_t result = CoreServiceClient::GetInstance().DisableProfile(
         slotId, portIndex, iccId, refresh, disableProfileResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
@@ -143,7 +143,7 @@ HWTEST_F(EsimCoreServiceClientTest, GetProfile_0001, Function | MediumTest | Lev
 HWTEST_F(EsimCoreServiceClientTest, ResetMemory_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    ResultState ResetMemoryResult;
+    ResultCode ResetMemoryResult;
     const ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     int32_t result = CoreServiceClient::GetInstance().ResetMemory(slotId, resetOption, ResetMemoryResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
@@ -153,16 +153,16 @@ HWTEST_F(EsimCoreServiceClientTest, SetDefaultSmdpAddress_0001, Function | Mediu
 {
     int32_t slotId = 0;
     std::u16string defaultSmdpAddress = Str8ToStr16("test.com");
-    ResultState SetAddressResult;
+    ResultCode SetAddressResult;
     int32_t result = CoreServiceClient::GetInstance().SetDefaultSmdpAddress(
         slotId, defaultSmdpAddress, SetAddressResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(EsimCoreServiceClientTest, IsEsimSupported_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimCoreServiceClientTest, IsSupported_0001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
-    bool result = CoreServiceClient::GetInstance().IsEsimSupported(slotId);
+    bool result = CoreServiceClient::GetInstance().IsSupported(slotId);
     EXPECT_NE(result, true);
 }
 
@@ -235,7 +235,7 @@ HWTEST_F(EsimCoreServiceClientTest, RemoveNotificationFromList_0001, Function | 
     int32_t slotId = 0;
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
-    ResultState enumResult;
+    ResultCode enumResult;
     int32_t result = CoreServiceClient::GetInstance().RemoveNotificationFromList(
         slotId, portIndex, seqNumber, enumResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
@@ -245,7 +245,7 @@ HWTEST_F(EsimCoreServiceClientTest, DeleteProfile_0001, Function | MediumTest | 
 {
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
-    ResultState DeleteProfileResult;
+    ResultCode DeleteProfileResult;
     int32_t result = CoreServiceClient::GetInstance().DeleteProfile(slotId, iccId, DeleteProfileResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
@@ -256,7 +256,7 @@ HWTEST_F(EsimCoreServiceClientTest, SwitchToProfile_0001, Function | MediumTest 
     int32_t portIndex = 1;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     bool forceDisableProfile = true;
-    ResultState SwitchProfileResult;
+    ResultCode SwitchProfileResult;
     int32_t result = CoreServiceClient::GetInstance().SwitchToProfile(
         slotId, portIndex, iccId, forceDisableProfile, SwitchProfileResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
@@ -267,7 +267,7 @@ HWTEST_F(EsimCoreServiceClientTest, SetProfileNickname_0001, Function | MediumTe
     int32_t slotId = 0;
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
-    ResultState UpdateResult;
+    ResultCode UpdateResult;
     int32_t result = CoreServiceClient::GetInstance().SetProfileNickname(slotId, iccId, nickname, UpdateResult);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }

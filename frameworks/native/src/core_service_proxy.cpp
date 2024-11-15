@@ -3287,7 +3287,7 @@ int32_t CoreServiceProxy::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfil
             ReadEuiccProfileFromReply(reply, euiccProfile);
         }
         euiccProfileInfoList.isRemovable_ = reply.ReadBool();
-        euiccProfileInfoList.result_ = static_cast<ResultState>(reply.ReadInt32());
+        euiccProfileInfoList.result_ = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
@@ -3324,7 +3324,7 @@ int32_t CoreServiceProxy::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 }
 
 int32_t CoreServiceProxy::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3362,7 +3362,7 @@ int32_t CoreServiceProxy::DisableProfile(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
@@ -3506,7 +3506,7 @@ int32_t CoreServiceProxy::GetEuiccChallenge(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
     }
     return result;
@@ -3579,7 +3579,7 @@ int32_t CoreServiceProxy::CancelSession(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
     }
     return result;
@@ -3625,7 +3625,7 @@ int32_t CoreServiceProxy::GetProfile(
     return result;
 }
 
-int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, ResultState &enumResult)
+int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3655,13 +3655,13 @@ int32_t CoreServiceProxy::ResetMemory(int32_t slotId, ResetOption resetOption, R
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
 
 int32_t CoreServiceProxy::SetDefaultSmdpAddress(
-    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultState &enumResult)
+    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3692,12 +3692,12 @@ int32_t CoreServiceProxy::SetDefaultSmdpAddress(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
 
-bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
+bool CoreServiceProxy::IsSupported(int32_t slotId)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -3718,7 +3718,7 @@ bool CoreServiceProxy::IsEsimSupported(int32_t slotId)
     int32_t requestResult =
         remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::IS_ESIM_SUPPORTED), data, reply, option);
     if (requestResult != ERR_NONE) {
-        TELEPHONY_LOGE("IsEsimSupported sendRequest failed, error code is %{public}d", requestResult);
+        TELEPHONY_LOGE("IsSupported sendRequest failed, error code is %{public}d", requestResult);
         return false;
     }
     return reply.ReadBool();
@@ -3796,7 +3796,7 @@ int32_t CoreServiceProxy::SendApduData(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
         responseResult.sw1_ = reply.ReadInt32();
         responseResult.sw2_ = reply.ReadInt32();
@@ -3839,7 +3839,7 @@ int32_t CoreServiceProxy::PrepareDownload(int32_t slotId, const DownLoadConfigIn
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
     }
     return result;
@@ -4036,7 +4036,7 @@ int32_t CoreServiceProxy::RetrieveNotification(
 }
 
 int32_t CoreServiceProxy::RemoveNotificationFromList(
-    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4071,12 +4071,12 @@ int32_t CoreServiceProxy::RemoveNotificationFromList(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
 
-int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultState &enumResult)
+int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4102,13 +4102,13 @@ int32_t CoreServiceProxy::DeleteProfile(int32_t slotId, const std::u16string &ic
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
 
 int32_t CoreServiceProxy::SwitchToProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultState &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4135,13 +4135,13 @@ int32_t CoreServiceProxy::SwitchToProfile(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
 
 int32_t CoreServiceProxy::SetProfileNickname(
-    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultState &enumResult)
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -4167,7 +4167,7 @@ int32_t CoreServiceProxy::SetProfileNickname(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        enumResult = static_cast<ResultState>(reply.ReadInt32());
+        enumResult = static_cast<ResultCode>(reply.ReadInt32());
     }
     return result;
 }
@@ -4191,7 +4191,7 @@ void CoreServiceProxy::ReadEuiccInfo2FromReply(MessageParcel &reply, EuiccInfo2 
     euiccInfo2.ppVersion_ = reply.ReadString();
     euiccInfo2.sasAccreditationNumber_ = reply.ReadString();
     euiccInfo2.response_ = reply.ReadString();
-    euiccInfo2.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+    euiccInfo2.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
 }
 
 int32_t CoreServiceProxy::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
@@ -4245,7 +4245,7 @@ int32_t CoreServiceProxy::RealAuthenticateServer(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultState>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
     }
     return result;
