@@ -22,6 +22,7 @@ namespace Telephony {
 std::atomic_int TelRilBase::nextSerialId_(1);
 std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
 std::mutex TelRilBase::requestLock_;
+std::mutex idleLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
 TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
@@ -33,7 +34,14 @@ TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
 
 void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface)
 {
+    std::lock_guard<std::mutex> lock(idleLock_);
     rilInterface_ = rilInterface;
+}
+
+sptr<HDI::Ril::V1_3::IRil> TelRilBase::GetRilInterface()
+{
+    std::lock_guard<std::mutex> lock(idleLock_);
+    return rilInterface_;
 }
 
 sptr<HDI::Ril::V1_3::IRil> getRilInterface()
@@ -88,7 +96,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const RadioResponse
 
 int32_t TelRilBase::GetSerialId(const AppExecFwk::InnerEvent::Pointer &response)
 {
-    if (rilInterface_ == nullptr) {
+    if (GetRilInterface() == nullptr) {
         TELEPHONY_LOGE("ERROR : rilInterface_ == nullptr !!!");
         return -TELEPHONY_ERR_ARGUMENT_INVALID;
     }
