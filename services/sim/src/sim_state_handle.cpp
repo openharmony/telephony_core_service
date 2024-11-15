@@ -707,6 +707,8 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         }
         if (eventId == MSG_SIM_SEND_NCFG_OPER_INFO_DONE) {
             simStateManager->SyncSimMatchResponse();
+        } else if (eventId == MSG_SIM_UNLOCK_PIN_DONE) {
+            simStateManager->SyncUnlockPinResponse();
         } else {
             simStateManager->SyncCmdResponse();
         }
