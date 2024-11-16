@@ -173,6 +173,19 @@ void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const
     NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
 }
 
+template <typename T>
+void NapiAsyncCommomCompleteCallback(
+    napi_env env, napi_status status, const AsyncContext<T> &asyncContext, bool funcIgnoreReturnVal)
+{
+    if (status != napi_ok) {
+        napi_throw_type_error(env, nullptr, "excute failed");
+        return;
+    }
+
+    JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext.context.errorCode);
+    NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
+}
+
 napi_value EuiccInfoConversion(napi_env env, const EuiccInfo &resultInfo)
 {
     napi_value val = nullptr;
@@ -448,6 +461,65 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
     }
     NAPI_CALL(env, napi_get_boolean(env, isSupported, &value));
     return value;
+}
+
+void NativeAddProfile(napi_env env, void *data)
+{
+    TELEPHONY_LOGI("[zxq]NativeAddProfile enter");
+    if (data == nullptr) {
+        return;
+    }
+    AsyncAddProfileInfo *addProfileContext = static_cast<AsyncAddProfileInfo *>(data);
+    int32_t slotId = GetDefaultEsimSlotId<int32_t>();
+    DownloadableProfile profile = GetProfileInfo(addProfileContext->profile);
+    int32_t errcode = DelayedRefSingleton<EsimServiceClient>::GetInstance().AddProfile(slotId, profile);
+    if (errcode == ERROR_NONE) {
+        TELEPHONY_LOGI("[zxq]NativeAddProfile success");
+        addProfileContext->asyncContext.context.resolved = true;
+        addProfileContext->asyncContext.callbackVal = true;
+    } else {
+        addProfileContext->asyncContext.context.resolved = false;
+        
+        TELEPHONY_LOGI("NAPI AddProfile %{public}d", errcode);
+    }
+
+}
+
+void AddProfileCallback(napi_env env, napi_status status, void *data)
+{
+    TELEPHONY_LOGI("[zxq]AddProfileCallback enter");
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncAddProfileInfo> context(static_cast<AsyncAddProfileInfo *>(data));
+    if (context == nullptr) {
+        TELEPHONY_LOGE("AddProfileCallback context is nullptr");
+        return;
+    }
+    NapiAsyncCommomCompleteCallback(env, status, context->asyncContext, false);
+}
+
+napi_value AddProfile(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("[zxq]AddProfile enter");
+    auto addProfile = new (std::nothrow) AsyncAddProfileInfo();
+    if (addProfile == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = addProfile->asyncContext.context;
+    napi_value object = NapiUtil::CreateUndefined(env);
+    auto initPara = std::make_tuple(&object, &context.callbackRef);
+    AsyncPara para{
+        .funcName = "AddProfile",
+        .env = env,
+        .info = info,
+        .execute = NativeAddProfile,
+        .complete = AddProfileCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncAddProfileInfo>(para, addProfile, initPara);
+    if (result) {
+        ProfileInfoAnalyze(env, object, addProfile->profile);
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    }
+    return result;
 }
 
 void NativeGetEuiccInfo(napi_env env, void *data)
@@ -1621,6 +1693,7 @@ napi_status InitEuiccServiceInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("isSupported", IsSupported),
+        DECLARE_NAPI_FUNCTION("addProfile", AddProfile),
         DECLARE_NAPI_FUNCTION("getEid", GetEid),
         DECLARE_NAPI_FUNCTION("getOsuStatus", GetOsuStatus),
         DECLARE_NAPI_FUNCTION("startOsu", StartOsu),
