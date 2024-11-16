@@ -27,6 +27,7 @@
 #include "vcard_photo_data.h"
 #include "vcard_postal_data.h"
 #include "vcard_relation_data.h"
+#include "vcard_configuration.h"
 #include "vcard_contact.h"
 #include "vcard_constant.h"
 #include "vcard_decoder_v21.h"
@@ -572,6 +573,129 @@ HWTEST_F(ContactDataTest, VCardDecoderV30_UnescapeChar, Function | MediumTest | 
     EXPECT_STREQ(decoder.UnescapeChar('n').c_str(), "\n");
     EXPECT_STREQ(decoder.UnescapeChar('N').c_str(), "\n");
     EXPECT_STREQ(decoder.UnescapeChar('X').c_str(), "X");
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_GetLine_001, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    decoder.preLine_ = "";
+    EXPECT_STREQ(decoder.GetLine().c_str(), "");
+    decoder.preLine_ = "abc";
+    EXPECT_STREQ(decoder.preLine_.c_str(), "abc");
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_PeekLine_001, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    decoder.preLine_ = "";
+    EXPECT_STREQ(decoder.GetLine().c_str(), "");
+}
+
+/**
+ * @tc.name  : DealParamV30_ShouldHandleQuotedValues_WhenQuotedValuesArePresent
+ * @tc.number: VCardDecoderV30Test_001
+ * @tc.desc  : Test DealParamV30 method when paramValue contains quoted values
+ */
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParamV30_001, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode;
+    std::string param = "TEST_PARAM";
+    std::string paramValue = "\"quoted,value\"";
+    decoder.DealParamV30(param, paramValue, rawData, errorCode);
+    EXPECT_EQ(rawData->GetParameters(param).size(), 1);
+}
+
+/**
+ * @tc.name  : DealParamV30_ShouldHandleNonQuotedValues_WhenNonQuotedValuesArePresent
+ * @tc.number: VCardDecoderV30Test_002
+ * @tc.desc  : Test DealParamV30 method when paramValue contains non-quoted values
+ */
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParamV30_002, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode;
+    std::string param = "TEST_PARAM";
+    std::string paramValue = "non,quoted,value";
+    decoder.DealParamV30(param, paramValue, rawData, errorCode);
+    EXPECT_EQ(rawData->GetParameters(param).size(), 3);
+}
+
+/**
+ * @tc.name  : DealParamV30_ShouldHandleEmptyValues_WhenValueIsEmpty
+ * @tc.number: VCardDecoderV30Test_003
+ * @tc.desc  : Test DealParamV30 method when paramValue is empty
+ */
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParamV30_003, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode;
+    std::string param = "TEST_PARAM";
+    std::string paramValue = "";
+    decoder.DealParamV30(param, paramValue, rawData, errorCode);
+    EXPECT_EQ(rawData->GetParameters(param).size(), 0);
+}
+
+/**
+ * @tc.name  : DealParamV30_ShouldHandleNonQuotedValuesWithTrailingComma_WhenTrailingCommaIsPresent
+ * @tc.number: VCardDecoderV30Test_004
+ * @tc.desc  : Test DealParamV30 method when paramValue contains non-quoted values with trailing comma
+ */
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParamV30_004, Function | MediumTest | Level3)
+{
+    VCardDecoderV30 decoder;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode;
+    std::string param = "TEST_PARAM";
+    std::string paramValue = "non,quoted,value,";
+    decoder.DealParamV30(param, paramValue, rawData, errorCode);
+    EXPECT_EQ(rawData->GetParameters(param).size(), 3);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParams_001, Function | MediumTest | Level3)
+{
+    int32_t errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    VCardDecoderV30 decoder;
+    decoder.DealParams("invalid_params", rawData, errorCode);
+    ASSERT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParams_002, Function | MediumTest | Level3)
+{
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    VCardDecoderV30 decoder;
+    decoder.DealParams("valid_params=value", rawData, errorCode);
+    ASSERT_EQ(errorCode, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardDecoderV30_DealParams_003, Function | MediumTest | Level3)
+{
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    VCardDecoderV30 decoder;
+    decoder.DealParams("invalid_params", rawData, errorCode);
+    ASSERT_EQ(errorCode, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardConfiguration_IsJapaneseDevice_001, Function | MediumTest | Level3)
+{
+    int32_t vcardType = VCardConfiguration::VCARD_TYPE_V21_JAPANESE;
+    VCardConfiguration vCardConfig;
+    bool result = vCardConfig.IsJapaneseDevice(vcardType);
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(ContactDataTest, VCardConfiguration_IsJapaneseDevice_002, Function | MediumTest | Level3)
+{
+    int32_t vcardType = 2;
+    VCardConfiguration vCardConfig;
+    bool result = vCardConfig.IsJapaneseDevice(vcardType);
+    ASSERT_FALSE(result);
 }
 
 HWTEST_F(ContactDataTest, VCardEncoder, Function | MediumTest | Level3)
