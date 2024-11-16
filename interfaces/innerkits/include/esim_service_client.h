@@ -221,6 +221,15 @@ public:
      */
     bool IsSupported(int32_t slotId);
 
+    /**
+     * @brief Starts a page through an ability, on which users can touch the button to download a profile.
+     *
+     * @param slotId[in], indicates the card slot index number.
+     * @param profile[in], the Bound Profile Package data returned by SM-DP+ server.
+     * @return Return true if the profile is added successfully; return false otherwise.
+     */
+    int32_t AddProfile(int32_t slotId, DownloadableProfile profile);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class EsimServiceDeathRecipient : public IRemoteObject::DeathRecipient {

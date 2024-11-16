@@ -122,6 +122,11 @@ struct AsyncResetMemory {
     AsyncContext<int32_t> asyncContext;
     int32_t option = ERROR_DEFAULT;
 };
+
+struct AsyncAddProfileInfo {
+    AsyncContext<bool> asyncContext;
+    AsyncDownloadableProfile profile;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_ESIM_H
