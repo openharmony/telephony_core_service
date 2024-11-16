@@ -465,7 +465,6 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
 
 void NativeAddProfile(napi_env env, void *data)
 {
-    TELEPHONY_LOGI("[zxq]NativeAddProfile enter");
     if (data == nullptr) {
         return;
     }
@@ -474,12 +473,11 @@ void NativeAddProfile(napi_env env, void *data)
     DownloadableProfile profile = GetProfileInfo(addProfileContext->profile);
     int32_t errcode = DelayedRefSingleton<EsimServiceClient>::GetInstance().AddProfile(slotId, profile);
     if (errcode == ERROR_NONE) {
-        TELEPHONY_LOGI("[zxq]NativeAddProfile success");
         addProfileContext->asyncContext.context.resolved = true;
         addProfileContext->asyncContext.callbackVal = true;
     } else {
         addProfileContext->asyncContext.context.resolved = false;
-        
+        addProfileContext->asyncContext.callbackVal = false;
         TELEPHONY_LOGI("NAPI AddProfile %{public}d", errcode);
     }
 
@@ -487,7 +485,6 @@ void NativeAddProfile(napi_env env, void *data)
 
 void AddProfileCallback(napi_env env, napi_status status, void *data)
 {
-    TELEPHONY_LOGI("[zxq]AddProfileCallback enter");
     NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
     std::unique_ptr<AsyncAddProfileInfo> context(static_cast<AsyncAddProfileInfo *>(data));
     if (context == nullptr) {
@@ -499,7 +496,6 @@ void AddProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value AddProfile(napi_env env, napi_callback_info info)
 {
-    TELEPHONY_LOGI("[zxq]AddProfile enter");
     auto addProfile = new (std::nothrow) AsyncAddProfileInfo();
     if (addProfile == nullptr) {
         return nullptr;
