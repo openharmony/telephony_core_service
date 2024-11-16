@@ -478,9 +478,7 @@ void NativeAddProfile(napi_env env, void *data)
     } else {
         addProfileContext->asyncContext.context.resolved = false;
         addProfileContext->asyncContext.callbackVal = false;
-        TELEPHONY_LOGI("NAPI AddProfile %{public}d", errcode);
     }
-
 }
 
 void AddProfileCallback(napi_env env, napi_status status, void *data)
