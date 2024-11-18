@@ -316,7 +316,9 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         notifyInitApnConfigs(slotId);
         SendSimMatchedOperatorInfo(slotId);
     }
-    if (opkey != std::string(INITIAL_OPKEY)) {
+    if (opkey != std::string(INITIAL_OPKEY) ||
+        (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
+            simState == SimState::SIM_STATE_UNKNOWN)) {
         AAFwk::Want want;
         want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
         want.SetParam(KEY_SLOTID, slotId);
