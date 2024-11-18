@@ -323,5 +323,15 @@ bool EsimServiceClient::IsSupported(int32_t slotId)
     }
     return proxy->IsSupported(slotId);
 }
+
+int32_t EsimServiceClient::AddProfile(int32_t slotId, DownloadableProfile profile)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->AddProfile(slotId, profile);
+}
 } // namespace Telephony
 } // namespace OHOS
