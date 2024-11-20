@@ -115,7 +115,8 @@ template<typename FuncType, typename... ParamTypes>
 inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
     FuncType &&_func, ParamTypes &&... _args)
 {
-    if (GetRilInterface() == nullptr) {
+    sptr<HDI::Ril::V1_3::IRil> rilInterface = GetRilInterface();
+    if (rilInterface == nullptr) {
         TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -124,7 +125,7 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
         TELEPHONY_LOGE("%{public}s() telRilRequest is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return (GetRilInterface()->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
+    return (rilInterface->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
 }
 
 inline int32_t TelRilBase::Response(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo)
