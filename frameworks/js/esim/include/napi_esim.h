@@ -35,6 +35,8 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t DEFAULT_ERROR = -1;
+#define REGISTER_NAPI_STATIC_PROPERTY(para) \
+    DECLARE_NAPI_STATIC_PROPERTY(#para, GetNapiValue(env, static_cast<int32_t>(ResultCode::para)))
 
 template<typename T>
 struct AsyncContext {
