@@ -24,6 +24,7 @@ struct DownloadProfileConfigInfo : public Parcelable {
     int32_t portIndex_ = 0;
     bool isSwitchAfterDownload_ = false;
     bool isForceDeactivateSim_ = false;
+    bool isAlowPpr_ = false;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
