@@ -31,6 +31,9 @@ CoreServiceClient::CoreServiceClient() = default;
 CoreServiceClient::~CoreServiceClient()
 {
     RemoveDeathRecipient(nullptr, false);
+    if (deathRecipient_ != nullptr) {
+        reinterpret_cast<CoreServiceDeathRecipient*>(deathRecipient_.GetRefPtr())->SetValid(false);
+    }
 }
 
 sptr<ICoreService> CoreServiceClient::GetProxy()
