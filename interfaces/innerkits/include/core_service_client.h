@@ -16,6 +16,7 @@
 #ifndef CORE_SERVICE_CLIENT_H
 #define CORE_SERVICE_CLIENT_H
 
+#include <atomic>
 #include <cstdint>
 #include <iremote_object.h>
 #include <singleton.h>
@@ -1212,15 +1213,23 @@ private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
+        explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client), isValid_(true) {}
         ~CoreServiceDeathRecipient() override = default;
         __attribute__((no_sanitize("cfi"))) void OnRemoteDied(const wptr<IRemoteObject> &remote) override
         {
-            client_.OnRemoteDied(remote);
+            if (isValid_.load()) {
+                client_.OnRemoteDied(remote);
+            }
+        }
+
+        void SetValid(bool isValid)
+        {
+            isValid_.store(isValid);
         }
 
     private:
         CoreServiceClient &client_;
+        std::atomic_bool isValid_;
     };
 
 private:
