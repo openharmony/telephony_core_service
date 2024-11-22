@@ -82,12 +82,17 @@ struct AsyncDownloadableProfile {
     std::vector<AsyncAccessRule> accessRules{};
 };
 
+struct AsyncDownloadConfiguration {
+    bool switchAfterDownload = false;
+    bool forceDisableProfile = false;
+    bool isPprAllowed = false;
+};
+
 struct AsyncDownloadProfileInfo {
     AsyncContext<napi_value> asyncContext;
     int32_t portIndex = ERROR_DEFAULT;
     AsyncDownloadableProfile profile;
-    bool switchAfterDownload = false;
-    bool forceDisableProfile = false;
+    AsyncDownloadConfiguration configuration;
     DownloadProfileResult result;
 };
 

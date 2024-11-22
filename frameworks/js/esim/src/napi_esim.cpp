@@ -408,6 +408,24 @@ void ProfileInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadableProfile &
     }
 }
 
+void ConfigurationInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadConfiguration &configuration)
+{
+    napi_value switchState = NapiUtil::GetNamedProperty(env, arg, "switchAfterDownload");
+    if (switchState) {
+        NapiValueToCppValue(env, switchState, napi_boolean, &configuration.switchAfterDownload);
+    }
+
+    napi_value forceState = NapiUtil::GetNamedProperty(env, arg, "forceDisableProfile");
+    if (forceState) {
+        NapiValueToCppValue(env, forceState, napi_boolean, &configuration.forceDisableProfile);
+    }
+
+    napi_value alowState = NapiUtil::GetNamedProperty(env, arg, "isPprAllowed");
+    if (alowState) {
+        NapiValueToCppValue(env, alowState, napi_boolean, &configuration.isPprAllowed);
+    }
+}
+
 ResetOption GetDefaultResetOption(void)
 {
     return ResetOption::DELETE_OPERATIONAL_PROFILES;
@@ -901,8 +919,9 @@ void NativeDownloadProfile(napi_env env, void *data)
     DownloadProfileResult result;
     DownloadProfileConfigInfo configInfo;
     configInfo.portIndex_ = profileContext->portIndex;
-    configInfo.isSwitchAfterDownload_ = profileContext->switchAfterDownload;
-    configInfo.isForceDeactivateSim_ = profileContext->forceDisableProfile;
+    configInfo.isSwitchAfterDownload_ = profileContext->configuration.switchAfterDownload;
+    configInfo.isForceDeactivateSim_ = profileContext->configuration.forceDisableProfile;
+    configInfo.isPprAllowed_ = profileContext->configuration.isPprAllowed;
     DownloadableProfile profile = GetProfileInfo(profileContext->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
         profileContext->asyncContext.slotId, configInfo, profile, result);
@@ -939,10 +958,10 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
         return nullptr;
     }
     BaseContext &context = profileContext->asyncContext.context;
-    napi_value object = NapiUtil::CreateUndefined(env);
-    auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        &object, &profileContext->switchAfterDownload, &profileContext->forceDisableProfile,
-        &context.callbackRef);
+    napi_value profileObject = NapiUtil::CreateUndefined(env);
+    napi_value configurationObject = NapiUtil::CreateUndefined(env);
+    auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex, &profileObject,
+        &configurationObject, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "DownloadProfile",
@@ -953,7 +972,8 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDownloadProfileInfo>(para, profileContext, initPara);
     if (result) {
-        ProfileInfoAnalyze(env, object, profileContext->profile);
+        ProfileInfoAnalyze(env, profileObject, profileContext->profile);
+        ConfigurationInfoAnalyze(env, configurationObject, profileContext->configuration);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
