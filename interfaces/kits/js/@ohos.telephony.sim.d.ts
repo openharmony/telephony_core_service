@@ -2213,7 +2213,7 @@ declare namespace sim {
    * @throws { BusinessError } 8301002 - An error occurred when operating the SIM card.
    * @syscap SystemCapability.Telephony.CoreService.
    * @systemapi Hide this for inner system use.
-   * @since 12
+   * @since 14
    */
   function getSimAuthentication(slotId: number, authType: AuthType,
       authData: string): Promise<SimAuthenticationResponse>;
@@ -3069,15 +3069,15 @@ declare namespace sim {
    * @enum { number }
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
-   * @since 12
-   */
+   * @since 14
+  */
   export enum AuthType {
     /**
      * Authentication type is EAP-SIM. See RFC 4186
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
-     * @since 12
+     * @since 14
      */
     SIM_AUTH_EAP_SIM_TYPE = 128,
 
@@ -3086,7 +3086,7 @@ declare namespace sim {
      *
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
-     * @since 12
+     * @since 14
      */
     SIM_AUTH_EAP_AKA_TYPE = 129,
   }
@@ -3097,7 +3097,7 @@ declare namespace sim {
    * @interface SimAuthenticationResponse
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
-   * @since 12
+   * @since 14
    */
   export interface SimAuthenticationResponse {
     /**
@@ -3106,7 +3106,7 @@ declare namespace sim {
      * @type { number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
-     * @since 12
+     * @since 14
      */
     simStatusWord1: number;
 
@@ -3116,7 +3116,7 @@ declare namespace sim {
      * @type { number }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
-     * @since 12
+     * @since 14
      */
     simStatusWord2: number;
 
@@ -3126,7 +3126,7 @@ declare namespace sim {
      * @type { string }
      * @syscap SystemCapability.Telephony.CoreService
      * @systemapi Hide this for inner system use.
-     * @since 12
+     * @since 14
      */
     response: string;
   }
