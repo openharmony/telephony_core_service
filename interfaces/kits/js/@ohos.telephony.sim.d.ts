@@ -3070,7 +3070,7 @@ declare namespace sim {
    * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 14
-  */
+   */
   export enum AuthType {
     /**
      * Authentication type is EAP-SIM. See RFC 4186
