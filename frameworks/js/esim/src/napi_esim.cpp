@@ -420,9 +420,9 @@ void ConfigurationInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadConfigu
         NapiValueToCppValue(env, forceState, napi_boolean, &configuration.forceDisableProfile);
     }
 
-    napi_value alowState = NapiUtil::GetNamedProperty(env, arg, "isAlowPpr");
+    napi_value alowState = NapiUtil::GetNamedProperty(env, arg, "isPprAllowed");
     if (alowState) {
-        NapiValueToCppValue(env, alowState, napi_boolean, &configuration.isAlowPpr);
+        NapiValueToCppValue(env, alowState, napi_boolean, &configuration.isPprAllowed);
     }
 }
 
@@ -921,7 +921,7 @@ void NativeDownloadProfile(napi_env env, void *data)
     configInfo.portIndex_ = profileContext->portIndex;
     configInfo.isSwitchAfterDownload_ = profileContext->configuration.switchAfterDownload;
     configInfo.isForceDeactivateSim_ = profileContext->configuration.forceDisableProfile;
-    configInfo.isAlowPpr_ = profileContext->configuration.isAlowPpr;
+    configInfo.isPprAllowed_ = profileContext->configuration.isPprAllowed;
     DownloadableProfile profile = GetProfileInfo(profileContext->profile);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().DownloadProfile(
         profileContext->asyncContext.slotId, configInfo, profile, result);
