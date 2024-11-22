@@ -85,7 +85,7 @@ struct AsyncDownloadableProfile {
 struct AsyncDownloadConfiguration {
     bool switchAfterDownload = false;
     bool forceDisableProfile = false;
-    bool isAlowPpr = false;
+    bool isPprAllowed = false;
 };
 
 struct AsyncDownloadProfileInfo {
