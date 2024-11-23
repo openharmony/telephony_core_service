@@ -563,6 +563,19 @@ JsError NapiUtil::ConverEsimErrorMessageForJs(int32_t errorCode)
     return error;
 }
 
+JsError NapiUtil::ConverEsimErrorMessageWithPermissionForJs(
+    int32_t errorCode, const std::string &funcName, const std::string &permission)
+{
+    if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
+        JsError error = {};
+        error.errorCode = JS_ERROR_TELEPHONY_PERMISSION_DENIED;
+        error.errorMessage = "BusinessError 201: Permission denied. An attempt was made to " + funcName +
+                             " forbidden by permission: " + permission;
+        return error;
+    }
+    return ConverEsimErrorMessageForJs(errorCode);
+}
+
 bool NapiUtil::CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
 {
     bool flag = true;
