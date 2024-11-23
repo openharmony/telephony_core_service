@@ -64,6 +64,8 @@ public:
     static void ThrowParameterError(napi_env env);
     static void ReleaseBaseContext(napi_env env, BaseContext *baseContext);
     static JsError ConverEsimErrorMessageForJs(int32_t errorCode);
+    static JsError ConverEsimErrorMessageWithPermissionForJs(
+        int32_t errorCode, const std::string &funcName, const std::string &permission);
 
 private:
     static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
