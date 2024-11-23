@@ -168,7 +168,7 @@ void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const
         return;
     }
 
-    JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
+    JsError error = NapiUtil::ConverEsimErrorMessageWithPermissionForJs(
         asyncContext.context.errorCode, permissionPara.func, permissionPara.permission);
     NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
 }
