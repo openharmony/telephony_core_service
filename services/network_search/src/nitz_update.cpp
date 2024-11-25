@@ -212,7 +212,6 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime offset invalid, slotId:%{public}d", slotId_);
         return;
     }
-    nitzTime += offset;
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
         slotId_, static_cast<long long>(currentTime), static_cast<long long>(offset), static_cast<long long>(nitzTime));
     if (!IsValidTime(nitzTime)) {
@@ -224,7 +223,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
         return;
     }
-    SaveTime(nitzTime);
+    SaveTime(nitzTime, offset);
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
@@ -340,9 +339,10 @@ void NitzUpdate::SaveTimeZone(std::string &timeZone)
     PublishCommonEvent(want);
 }
 
-void NitzUpdate::SaveTime(int64_t networkTime)
+void NitzUpdate::SaveTime(int64_t networkTime, int64_t offset)
 {
-    TELEPHONY_LOGI("NitzUpdate::SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d", networkTime, slotId_);
+    TELEPHONY_LOGI("SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d, offset:(%{public}" PRId64 ")",
+        networkTime, slotId_, offset);
 #ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
@@ -350,7 +350,7 @@ void NitzUpdate::SaveTime(int64_t networkTime)
         runningLock->Lock();
     }
 #endif
-    bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE);
+    bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE + offset);
     TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
@@ -434,7 +434,7 @@ void NitzUpdate::AutoTimeChange()
     if (lastNetworkTime_ == 0 || lastSystemTime_ == 0 || time < lastSystemTime_) {
         return;
     }
-    SaveTime(lastNetworkTime_ + (time - lastSystemTime_));
+    SaveTime(lastNetworkTime_ + (time - lastSystemTime_), 0);
 }
 
 void NitzUpdate::AutoTimeZoneChange()
