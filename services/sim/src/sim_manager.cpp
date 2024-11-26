@@ -314,7 +314,7 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
 
 int32_t SimManager::ResetSimLoadAccount(int32_t slotId)
 {
-     if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
+    if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
