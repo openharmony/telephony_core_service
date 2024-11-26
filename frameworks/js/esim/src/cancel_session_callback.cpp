@@ -34,7 +34,7 @@ void CancelSessionCallback::OnCancelSession(const ResponseEsimResult &result, co
     std::unique_lock<std::mutex> callbackLock(asyncContext_->asyncContext.callbackMutex);
     asyncContext_->asyncContext.context.resolved = (errorCode == TELEPHONY_ERR_SUCCESS);
     if (asyncContext_->asyncContext.context.resolved) {
-        asyncContext_->responseResult = result;
+        asyncContext_->asyncContext.callbackVal = static_cast<int32_t>(result.resultCode_);
     } else {
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
