@@ -173,19 +173,6 @@ void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const
     NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
 }
 
-template <typename T>
-void NapiAsyncCommomCompleteCallback(
-    napi_env env, napi_status status, const AsyncContext<T> &asyncContext, bool funcIgnoreReturnVal)
-{
-    if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "excute failed");
-        return;
-    }
-
-    JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext.context.errorCode);
-    NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
-}
-
 napi_value EuiccInfoConversion(napi_env env, const EuiccInfo &resultInfo)
 {
     napi_value val = nullptr;
@@ -489,7 +476,8 @@ void AddProfileCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("AddProfileCallback context is nullptr");
         return;
     }
-    NapiAsyncCommomCompleteCallback(env, status, context->asyncContext, false);
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "AddProfile", Permission::SET_TELEPHONY_ESIM_STATE });
 }
 
 napi_value AddProfile(napi_env env, napi_callback_info info)
