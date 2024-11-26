@@ -32,4 +32,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // DELETE_PROFILE_CALLBACK_H
+#endif // CANCEL_SESSION_CALLBACK_H

@@ -29,7 +29,7 @@ ohos_shared_library("esim") {
       "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     ]
 
-        sources = [
+    sources = [
       "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_config_info_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_result_parcel.cpp",

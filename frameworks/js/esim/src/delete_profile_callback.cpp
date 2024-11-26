@@ -42,7 +42,7 @@ void DeleteProfileResultCallback::OnDeleteProfile(const int32_t &result, const i
     }
     asyncContext_->asyncContext.callbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
-    TELEPHONY_LOGD("end");
+    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS

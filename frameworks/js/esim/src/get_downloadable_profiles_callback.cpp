@@ -41,7 +41,7 @@ void GetDownloadableProfilesResultCallback::OnGetDownloadableProfiles(
     }
     asyncContext_->asyncContext.callbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
-    TELEPHONY_LOGD("end");
+    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS
