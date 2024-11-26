@@ -25,7 +25,7 @@
 #include "sim_rdb_helper.h"
 #include "sim_state_manager.h"
 #include "telephony_errors.h"
-#include "tel_event_handle.h"
+#include "tel_event_handler.h"
 #include "want.h"
 
 namespace OHOS {
