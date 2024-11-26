@@ -40,7 +40,7 @@ void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t e
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGD("end");
+    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -103,11 +103,6 @@ void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
     if(info != nullptr) {
         result = *info;
     }
-    TELEPHONY_LOGI("errorCode = %{public}d", errorCode);
-
-    std::string osVersion = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(result.osVersion_);
-    std::string response = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(result.response_);
-    TELEPHONY_LOGI("[call back test]osVersion = %{public}s, response = %{public}s!", osVersion.c_str(), response.c_str());
     OnGetEuiccInfo(result, errorCode);
 }
 
@@ -125,8 +120,6 @@ void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(MessageParcel &d
     if (info != nullptr) {
         profileMetadataResult = *info;
     }
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
-    TELEPHONY_LOGI("profileMetadataResult->iccId_ = %{public}s", std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(profileMetadataResult.iccId_).c_str());
     OnGetDownloadableProfileMetadata(profileMetadataResult, errCode);
 }
 
@@ -144,21 +137,6 @@ void IEsimServiceCallbackStub::OnGetDownloadableProfiles(MessageParcel &data)
         profileListResult = *info;
     }
     OnGetDownloadableProfiles(profileListResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
-}
-
-void printf_euiccProfileInfoList(GetEuiccProfileInfoListResult &euiccProfileInfoList)
-{
-    TELEPHONY_LOGI("result_ = %{public}d", euiccProfileInfoList.result_);
-    std::vector<EuiccProfile>::iterator it;
-	for (it = euiccProfileInfoList.profiles_.begin(); it != euiccProfileInfoList.profiles_.end(); it++)
-	{
-        TELEPHONY_LOGI("it->iccId_ = %{public}s", std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(it->iccId_).c_str());
-        TELEPHONY_LOGI("it->nickName_ = %{public}s", std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(it->nickName_).c_str());
-        TELEPHONY_LOGI("it->serviceProviderName_ = %{public}s", std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(it->serviceProviderName_).c_str());
-        TELEPHONY_LOGI("it->profileName_ = %{public}s", std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(it->profileName_).c_str());
-        TELEPHONY_LOGI("it->state_ = %{public}d", it->state_);
-    }
 }
 
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(MessageParcel &data)
@@ -174,9 +152,7 @@ void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(MessageParcel &data)
     if (info != nullptr) {
         euiccProfileInfoList = *info;
     }
-    printf_euiccProfileInfoList(euiccProfileInfoList);
     OnGetEuiccProfileInfoList(euiccProfileInfoList, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(MessageParcel &data)
 {
@@ -188,7 +164,6 @@ void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(MessageParcel &data)
 
     std::string defaultSmdpAddress = Str16ToStr8(data.ReadString16());
     OnGetDefaultSmdpAddress(defaultSmdpAddress, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnSetDefaultSmdpAddress(MessageParcel &data)
 {
@@ -226,7 +201,6 @@ void IEsimServiceCallbackStub::OnCancelSession(MessageParcel &data)
         responseResult = *info;
     }
     OnCancelSession(responseResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnDownloadProfile(MessageParcel &data)
 {
@@ -243,7 +217,6 @@ void IEsimServiceCallbackStub::OnDownloadProfile(MessageParcel &data)
     }
 
     OnDownloadProfile(downloadProfileResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnDeleteProfile(MessageParcel &data)
 {
@@ -254,7 +227,6 @@ void IEsimServiceCallbackStub::OnDeleteProfile(MessageParcel &data)
     }
     int32_t deleteProfileResult = data.ReadInt32();
     OnDeleteProfile(deleteProfileResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnStartOsu(MessageParcel &data)
 {
@@ -266,7 +238,6 @@ void IEsimServiceCallbackStub::OnStartOsu(MessageParcel &data)
 
     OsuStatus osuStatus = (OsuStatus)data.ReadInt32();
     OnStartOsu(osuStatus, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnSwitchToProfile(MessageParcel &data)
 {
@@ -278,7 +249,6 @@ void IEsimServiceCallbackStub::OnSwitchToProfile(MessageParcel &data)
 
     int32_t switchToProfileResult = data.ReadInt32();
     OnSwitchToProfile(switchToProfileResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
 {
@@ -290,7 +260,6 @@ void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
 
     int32_t resetMemoryResult = data.ReadInt32();
     OnResetMemory(resetMemoryResult, errCode);
-    TELEPHONY_LOGI("[call back test]errCode = %{public}d", errCode);
 }
 
 int IEsimServiceCallbackStub::OnRemoteRequest(
@@ -353,7 +322,8 @@ void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(const std::string &result
 
 }
 
-void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(const GetEuiccProfileInfoListResult &result, const int32_t errorCode)
+void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(
+    const GetEuiccProfileInfoListResult &result, const int32_t errorCode)
 {
 
 }

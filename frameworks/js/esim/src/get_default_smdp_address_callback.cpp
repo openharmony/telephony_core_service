@@ -41,7 +41,7 @@ void GetDefaultSmdpAddressResultCallback::OnGetDefaultSmdpAddress(const std::str
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGD("end");
+    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS

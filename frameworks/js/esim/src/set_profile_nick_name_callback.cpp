@@ -40,7 +40,7 @@ void SetProfileNickNameResultCallback::OnSetProfileNickName(const int32_t &resul
     }
     asyncContext_->asyncContext.callbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
-    TELEPHONY_LOGD("end");
+    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS
