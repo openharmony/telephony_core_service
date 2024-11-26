@@ -34,7 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int WAIT_TIME_SECOND = 60 * 3;
+constexpr int WAIT_TIME_SECOND = 30;
 const int32_t DEFAULT_ERROR = -1;
 
 template<typename T>

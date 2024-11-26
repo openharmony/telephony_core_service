@@ -65,4 +65,5 @@ interface OHOS.Telephony.IEsimService {
     void CancelSession([in] int slotId, [in] String transactionId, [in] int cancelReason,
         [in] IEsimServiceCallback listener);
     void IsSupported([in] int slotId);
+    void AddProfile([in] int slotId, [in] DownloadableProfile profile);
 }
