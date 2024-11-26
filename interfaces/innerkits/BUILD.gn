@@ -100,6 +100,7 @@ ohos_shared_library("tel_core_service_api") {
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/profile_metadata_result_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/response_esim_result.cpp",
       "${target_gen_dir}/esim_service_proxy.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/iesim_service_callback_stub.cpp",
     ]
   }
 

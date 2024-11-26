@@ -22,6 +22,7 @@
 #include <string_ex.h>
 
 #include "iesim_service.h"
+#include "iesim_service_callback.h"
 #include "system_ability_load_callback_stub.h"
 
 namespace OHOS {
@@ -67,7 +68,7 @@ public:
      * @param startOsuResult[out], the status of OSU update when OSU status changed.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t StartOsu(int32_t slotId, int32_t &startOsuResult);
+    int32_t StartOsu(int32_t slotId, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Fills in the metadata for a downloadable profile.
@@ -81,7 +82,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetDownloadableProfileMetadata(int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-        bool forceDisableProfile, GetDownloadableProfileMetadataResult &profileMetadataResult);
+        bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Gets downloadable profile List which are available for download on this device.
@@ -94,7 +95,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetDownloadableProfiles(
-        int32_t slotId, int32_t portIndex, bool forceDisableProfile, GetDownloadableProfilesResult &profileListResult);
+        int32_t slotId, int32_t portIndex, bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Attempt to download the given downloadable Profile.
@@ -106,7 +107,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t DownloadProfile(int32_t slotId, DownloadProfileConfigInfo configInfo, const DownloadableProfile &profile,
-        DownloadProfileResult &downloadProfileResult);
+        const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Get a list of all euiccProfile informations.
@@ -115,7 +116,7 @@ public:
      * @param euiccProfileInfoList[out], a list of eUICC profile information.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList);
+    int32_t GetEuiccProfileInfoList(int32_t slotId, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Get information about the eUICC chip/device.
@@ -124,7 +125,7 @@ public:
      * @param eUiccInfo[out], the eUICC information to obtain.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
+    int32_t GetEuiccInfo(int32_t slotId, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Delete the given profile.
@@ -134,7 +135,7 @@ public:
      * @param deleteProfileResult[out], the response to deletes the given profile.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t DeleteProfile(int32_t slotId, const std::string &iccId, int32_t &deleteProfileResult);
+    int32_t DeleteProfile(int32_t slotId, const std::string &iccId, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Switch to (enable) the given profile.
@@ -148,7 +149,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SwitchToProfile(int32_t slotId, int32_t portIndex,
-        const std::string &iccId, bool forceDisableProfile, int32_t &switchToProfileResult);
+        const std::string &iccId, bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Set the nickname for the given profile.
@@ -159,8 +160,8 @@ public:
      * @param setProfileNicknameResult[out], the result of the set nickname operation.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetProfileNickname(
-        int32_t slotId, const std::string &iccId, const std::string &nickname, int32_t &setProfileNicknameResult);
+    int32_t SetProfileNickname(int32_t slotId, const std::string &iccId, const std::string &nickname, 
+        const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Erase all specific profiles and reset the eUICC.
@@ -170,7 +171,7 @@ public:
      * @param resetMemoryResult[out], the result of the reset operation.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t ResetMemory(int32_t slotId, int32_t resetOption, int32_t &resetMemoryResult);
+    int32_t ResetMemory(int32_t slotId, int32_t resetOption, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Ensure that profiles will be retained on the next factory reset.
@@ -190,7 +191,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SetDefaultSmdpAddress(
-        int32_t slotId, const std::string &defaultSmdpAddress, int32_t &setDefaultSmdpAddressResult);
+        int32_t slotId, const std::string &defaultSmdpAddress, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Gets the default SM-DP+ address stored in an eUICC.
@@ -199,7 +200,8 @@ public:
      * @param defaultSmdpAddress[out], the default SM-DP+ address.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetDefaultSmdpAddress(int32_t slotId, std::string &defaultSmdpAddress);
+    int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::string &defaultSmdpAddress, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Cancel session.
@@ -211,7 +213,7 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t CancelSession(int32_t slotId, const std::string &transactionId,
-        int32_t cancelReason, ResponseEsimResult &responseResult);
+        int32_t cancelReason, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Check whether embedded subscriptions are currently supported.
@@ -249,6 +251,7 @@ private:
     std::mutex mutexProxy_;
     sptr<IEsimService> proxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
+    sptr<IEsimServiceCallback> remoteCallback_ = nullptr;
     sptr<IEsimService> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
 };

@@ -29,7 +29,7 @@ ohos_shared_library("esim") {
       "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     ]
 
-    sources = [
+        sources = [
       "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_config_info_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/download_profile_result_parcel.cpp",
@@ -40,6 +40,19 @@ ohos_shared_library("esim") {
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/profile_metadata_result_parcel.cpp",
       "$SUBSYSTEM_DIR/core_service/frameworks/native/src/response_esim_result.cpp",
       "src/napi_esim.cpp",
+      "src/delete_profile_callback.cpp",
+      "src/download_profile_callback.cpp",
+      "src/get_downloadable_profile_metadata_callback.cpp",
+      "src/get_downloadable_profiles_callback.cpp",
+      "src/get_euicc_info_callback.cpp",
+      "src/reset_memory_callback.cpp",
+      "src/start_osu_callback.cpp",
+      "src/set_default_smdp_address_callback.cpp",
+      "src/get_default_smdp_address_callback.cpp",
+      "src/cancel_session_callback.cpp",
+      "src/get_euicc_profile_info_list_callback.cpp",
+      "src/set_profile_nick_name_callback.cpp",
+      "src/switch_to_profile.cpp",
     ]
   }
 
