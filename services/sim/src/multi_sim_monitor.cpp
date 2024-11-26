@@ -525,7 +525,7 @@ void MultiSimMonitor::RegisterSimNotify()
     }
 }
 
-int32_t ResetSimLoadAccount(int32_t slotId)
+int32_t MultiSimMonitor::ResetSimLoadAccount(int32_t slotId)
 {
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("ResetSimLoadAccount slotId is invalid");
