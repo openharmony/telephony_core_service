@@ -384,7 +384,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
             iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
             if (newSimStatus == ICC_CARD_ABSENT) {
                 TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
-                core_manager_inner::GetInstance().ResetSimLoadAccount(slotId);
+                CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
             }
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
