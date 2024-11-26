@@ -2499,7 +2499,6 @@ int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfil
 
 int32_t CoreManagerInner::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 {
-    TELEPHONY_LOGE("yy--------CoreManagerInner::GetEuiccInfo enter!!!!!!");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
