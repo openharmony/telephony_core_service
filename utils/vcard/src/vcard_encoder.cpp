@@ -91,6 +91,7 @@ void VCardEncoder::ContructContact(std::shared_ptr<VCardContact> contact,
         if (contactDataResultSetNum == 0) {
             contact->BuildContact(contactDataResultSet);
         }
+        contactDataResultSet->Close();
         rawResultSetNum = rawResultSet->GoToNextRow();
     }
 }
