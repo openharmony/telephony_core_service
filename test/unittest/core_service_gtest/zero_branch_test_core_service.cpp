@@ -745,7 +745,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_NitzUpdate_001, Function | MediumTest 
     EXPECT_TRUE(nitzUpdate->NitzParse(nitzStr, networkTime));
     nitzUpdate->ProcessTime(networkTime);
     int64_t networkTimeSec = nitzUpdate->lastNetworkTime_;
-    nitzUpdate->IsValidTime(networkTimeSec);
+    nitzUpdate->IsValidTime(networkTimeSec, 0);
     nitzUpdate->SaveTime(networkTimeSec, 0);
     nitzUpdate->IsAutoTime();
     nitzStr = NITZ_STR_INVALID;
