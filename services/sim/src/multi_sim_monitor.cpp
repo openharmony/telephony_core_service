@@ -525,6 +525,17 @@ void MultiSimMonitor::RegisterSimNotify()
     }
 }
 
+int32_t ResetSimLoadAccount(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("ResetSimLoadAccount slotId is invalid");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    isSimAccountLoaded_[slotId] = 0;
+    initDataRemainCount_[slotId] = INIT_DATA_TIMES;
+    return TELEPHONY_SUCCESS;
+}
+
 void MultiSimMonitor::RegisterSimNotify(int32_t slotId)
 {
     if (!IsValidSlotId(slotId)) {

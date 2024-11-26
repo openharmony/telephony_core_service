@@ -52,6 +52,7 @@ public:
     void RegisterSimNotify();
     void RegisterSimNotify(int32_t slotId);
     void UnRegisterSimNotify();
+    int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
 
 public:
