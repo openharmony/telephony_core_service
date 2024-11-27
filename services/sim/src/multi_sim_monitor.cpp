@@ -219,9 +219,10 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         return;
     }
     if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
-        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
+        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
+        controller_->ResetSetPrimarySlotRemain(slotId);
         isSimAccountLoaded_[slotId] = 0;
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         simFileManager->ClearData();
