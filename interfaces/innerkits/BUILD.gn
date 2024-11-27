@@ -96,11 +96,11 @@ ohos_shared_library("tel_core_service_api") {
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/esim_service_client.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/euicc_info_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/get_downloadable_profiles_result_parcel.cpp",
+      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/iesim_service_callback_stub.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/profile_info_list_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/profile_metadata_result_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/response_esim_result.cpp",
       "${target_gen_dir}/esim_service_proxy.cpp",
-      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/iesim_service_callback_stub.cpp",
     ]
   }
 
