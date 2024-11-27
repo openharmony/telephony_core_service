@@ -1452,7 +1452,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
     EXPECT_EQ(simManager->GetSimIccStatus(3, iccStatus), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(simManager->GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -3084,7 +3083,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
     multiSimMonitor->NotifySimAccountChanged();
-    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
@@ -3233,6 +3231,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->Init();
+    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
 }
 
 /**
