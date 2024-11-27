@@ -1003,11 +1003,13 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
+    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);
     auto telRilManager = std::make_shared<TelRilManager>();
     mInner.simManager_ = std::make_shared<SimManager>(telRilManager);
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -1450,6 +1452,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_001, Function | MediumTest | Level1)
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
     EXPECT_EQ(simManager->GetSimIccStatus(3, iccStatus), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(simManager->GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -3081,6 +3084,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
     multiSimMonitor->NotifySimAccountChanged();
+    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
@@ -3118,6 +3122,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     multiSimMonitor->ProcessEvent(event);
     multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
     multiSimMonitor->IsVSimSlotId(0);
+    multiSimMonitor->ResetSimLoadAccount(0);
     multiSimMonitor->RegisterSimNotify(0);
     multiSimMonitor->UnRegisterSimNotify();
     ASSERT_TRUE(matchingSkills.CountEvent() == 1);
