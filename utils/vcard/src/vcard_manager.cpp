@@ -184,7 +184,7 @@ void VCardManager::BatchInsertRawContact(
         if (IsContactsIdExit(accountId)) {
             valuesBucket.Put(RawContact::CONTACT_ID, accountId);
         }
-        int32_t newRawId = rawContactMaxId + i + 1;
+        int32_t newRawId = rawContactMaxId + static_cast<int32_t>(i) + 1;
         valuesBucket.Put(RawContact::ID, newRawId);
         rawContactValues.push_back(valuesBucket);
         rawIds.push_back(newRawId);
