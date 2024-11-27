@@ -1697,6 +1697,16 @@ int32_t CoreManagerInner::GetSimSpn(int32_t slotId, std::u16string &spn)
     return simManager_->GetSimSpn(slotId, spn);
 }
 
+std::u16string CoreManagerInner::GetSimEons(
+    int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return std::u16string();
+    }
+    return simManager_->GetSimEons(slotId, plmn, lac, longNameRequired);
+}
+
 int32_t CoreManagerInner::SetVoiceMailInfo(
     int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber)
 {

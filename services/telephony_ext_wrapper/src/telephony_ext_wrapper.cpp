@@ -151,6 +151,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     if (publishSpnInfoChangedExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    updateOperatorNameParamsExt_ = (UPDATE_OPERATOR_NAME_PARAMS)dlsym(telephonyExtWrapperHandle_,
+        "UpdateOperatorNameParamsExt");
+    if (updateOperatorNameParamsExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
     InitTelephonyExtWrapperForApnCust();
 }
 

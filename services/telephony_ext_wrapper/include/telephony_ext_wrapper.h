@@ -27,6 +27,7 @@
 #include "want.h"
 #include "i_icc_file.h"
 #include "tel_ril_types.h"
+#include "operator_name_params.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -75,6 +76,8 @@ public:
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
+    typedef void (*UPDATE_OPERATOR_NAME_PARAMS)(
+        int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState, OperatorNameParams &params);
     typedef int32_t (*UPDATE_NSA_STATE_EXT)(
         int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
     typedef void (*PUBLISH_SPN_INFO_CHANGED_EXT)(OHOS::AAFwk::Want &want);
@@ -131,6 +134,7 @@ public:
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
     CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
     UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
+    UPDATE_OPERATOR_NAME_PARAMS updateOperatorNameParamsExt_ = nullptr;
     UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
     PUBLISH_SPN_INFO_CHANGED_EXT publishSpnInfoChangedExt_ = nullptr;
 
