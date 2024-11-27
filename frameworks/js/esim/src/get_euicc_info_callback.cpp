@@ -37,7 +37,6 @@ void GetEuiccInformationCallback::OnGetEuiccInfo(const EuiccInfo &result, const 
     asyncContext_->asyncContext.context.resolved = (errorCode == TELEPHONY_ERR_SUCCESS);
     if (asyncContext_->asyncContext.context.resolved) {
         asyncContext_->result = result;
-        std::string osVersion = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> {}.to_bytes(result.osVersion_);
     } else {
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }

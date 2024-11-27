@@ -159,7 +159,7 @@ public:
      * @param callback[in], call back function.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetProfileNickname(int32_t slotId, const std::string &iccId, const std::string &nickname, 
+    int32_t SetProfileNickname(int32_t slotId, const std::string &iccId, const std::string &nickname,
         const sptr<IEsimServiceCallback> &callback);
 
     /**

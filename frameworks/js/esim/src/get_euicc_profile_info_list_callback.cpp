@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace Telephony {
-GetEuiccProfileInfoListResultCallback::GetEuiccProfileInfoListResultCallback(AsyncEuiccProfileInfoList *context) : 
-    asyncContext_(context) {}
+GetEuiccProfileInfoListResultCallback::GetEuiccProfileInfoListResultCallback(AsyncEuiccProfileInfoList *context)
+    : asyncContext_(context) {}
 
 void GetEuiccProfileInfoListResultCallback::OnGetEuiccProfileInfoList(
     const GetEuiccProfileInfoListResult &result, const int32_t errorCode)

@@ -27,7 +27,6 @@ DeleteProfileResultCallback::DeleteProfileResultCallback(AsyncContextInfo *conte
 
 void DeleteProfileResultCallback::OnDeleteProfile(const int32_t &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("[DeleteProfileResultCallback::OnDeleteProfile]getpid = %{public}d, pthread_self() = %{public}ld", gettid(), pthread_self());
     TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("asyncContext null");

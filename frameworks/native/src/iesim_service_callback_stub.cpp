@@ -30,62 +30,47 @@ int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requ
     auto callbackType = requestId;
     TELEPHONY_LOGI("IEsimServiceCallbackStub::OnEsimServiceCallback requestId:%{public}d", callbackType);
     switch (callbackType) {
-        case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
             OnGetEuiccInfo(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT:
             OnGetDownloadableProfileMetadata(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILES_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILES_RESULT:
             OnGetDownloadableProfiles(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::GET_EUICC_PROFILE_INFO_LIST_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::GET_EUICC_PROFILE_INFO_LIST_RESULT:
             OnGetEuiccProfileInfoList(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::GET_DEFAULT_SMDP_ADDRESS_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::GET_DEFAULT_SMDP_ADDRESS_RESULT:
             OnGetDefaultSmdpAddress(data);
                     break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::SET_DEFAULT_SMDP_ADDRESS_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::SET_DEFAULT_SMDP_ADDRESS_RESULT:
             OnSetDefaultSmdpAddress(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::SET_PROFILE_NICKNAME_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::SET_PROFILE_NICKNAME_RESULT:
             OnSetProfileNickname(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::CANCEL_SESSION_CALLBACK_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::CANCEL_SESSION_CALLBACK_RESULT:
             OnCancelSession(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::DOWNLOAD_PROFILE_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::DOWNLOAD_PROFILE_RESULT:
             OnDownloadProfile(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::DELETE_PROFILE_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::DELETE_PROFILE_RESULT:
             OnDeleteProfile(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::START_OSU_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::START_OSU_RESULT:
             OnStartOsu(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::SWITCH_PROFILE_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::SWITCH_PROFILE_RESULT:
             OnSwitchToProfile(data);
             break;
-        }
-        case IEsimServiceCallback::EsimServiceCallback::RESET_MEMORY_RESULT: {
+        case IEsimServiceCallback::EsimServiceCallback::RESET_MEMORY_RESULT:
             OnResetMemory(data);
             break;
-        }
-    
-        default: {
+        default:
             return DEFAULT_ERROR;
-        }
     }
     return DEFAULT_RESULT;
 }
@@ -273,68 +258,47 @@ int IEsimServiceCallbackStub::OnRemoteRequest(
     }
     return OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
 }
-
 void IEsimServiceCallbackStub::OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode)
 {
-
 }
-
 void IEsimServiceCallbackStub::OnDeleteProfile(const int32_t &result, const int32_t errorCode)
 {
-
 }
-
 void IEsimServiceCallbackStub::OnDownloadProfile(const DownloadProfileResult &result, const int32_t errorCode)
 {
-
 }
-
 void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(
     const GetDownloadableProfileMetadataResult &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnGetDownloadableProfiles(
     const GetDownloadableProfilesResult &result, const int32_t errorCode)
 {
-
 }
-	
 void IEsimServiceCallbackStub::OnResetMemory(const int32_t &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnStartOsu(const OsuStatus &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnSwitchToProfile(const int32_t &result, const int32_t errorCode)
 {
-
 }
-
 void IEsimServiceCallbackStub::OnCancelSession(const ResponseEsimResult &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode)
 {
-
 }
-
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(
     const GetEuiccProfileInfoListResult &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode)
 {
-
 }
 void IEsimServiceCallbackStub::OnSetProfileNickName(const int32_t &result, const int32_t errorCode)
 {
-
 }
-
 } // namespace Telephonyd
 } // namespace OHOS

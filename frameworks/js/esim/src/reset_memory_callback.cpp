@@ -27,8 +27,7 @@ ResetMemoryResultCallback::ResetMemoryResultCallback(AsyncResetMemory *context) 
 
 void ResetMemoryResultCallback::OnResetMemory(const int32_t &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("[ResetMemoryResultCallback::OnResetMemory]getpid = %{public}d, pthread_self() = %{public}ld", gettid(), pthread_self());
-    TELEPHONY_LOGI("start errorCode = %{public}d, asyncContext_ = %{public}p", errorCode, asyncContext_);
+    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGI("asyncContext null");
         return;

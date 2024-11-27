@@ -21,7 +21,8 @@
 
 namespace OHOS {
 namespace Telephony {
-SetProfileNickNameResultCallback::SetProfileNickNameResultCallback(AsyncProfileNickname *context) : asyncContext_(context)
+SetProfileNickNameResultCallback::SetProfileNickNameResultCallback(AsyncProfileNickname *context)
+    : asyncContext_(context)
 {}
 
 void SetProfileNickNameResultCallback::OnSetProfileNickName(const int32_t &result, const int32_t errorCode)

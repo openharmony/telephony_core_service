@@ -21,7 +21,8 @@
 
 namespace OHOS {
 namespace Telephony {
-SetDefaultSmdpAddressResultCallback::SetDefaultSmdpAddressResultCallback(AsyncContextInfo *context) : asyncContext_(context)
+SetDefaultSmdpAddressResultCallback::SetDefaultSmdpAddressResultCallback(AsyncContextInfo *context)
+    : asyncContext_(context)
 {}
 
 void SetDefaultSmdpAddressResultCallback::OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode)
