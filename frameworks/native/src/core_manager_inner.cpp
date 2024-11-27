@@ -1802,6 +1802,15 @@ int32_t CoreManagerInner::SetActiveSim(int32_t slotId, int32_t enable)
     return simManager_->SetActiveSim(slotId, enable);
 }
 
+int32_t CoreManagerInner::ResetSimLoadAccount(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->ResetSimLoadAccount(slotId);
+}
+
 int32_t CoreManagerInner::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
     if (simManager_ == nullptr) {

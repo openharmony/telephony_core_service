@@ -298,6 +298,7 @@ public:
     std::vector<std::string> ObtainAllSmsOfIcc(int slotId);
     bool IsSimActive(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable);
+    int32_t ResetSimLoadAccount(int32_t slotId);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t SetDefaultSmsSlotId(int32_t slotId);
