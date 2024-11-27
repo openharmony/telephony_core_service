@@ -1811,7 +1811,6 @@ int32_t CoreManagerInner::ResetSimLoadAccount(int32_t slotId)
     return simManager_->ResetSimLoadAccount(slotId);
 }
 
-
 int32_t CoreManagerInner::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
     if (simManager_ == nullptr) {
