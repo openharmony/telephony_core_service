@@ -1003,11 +1003,13 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
+    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);
     auto telRilManager = std::make_shared<TelRilManager>();
     mInner.simManager_ = std::make_shared<SimManager>(telRilManager);
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -3118,6 +3120,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     multiSimMonitor->ProcessEvent(event);
     multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
     multiSimMonitor->IsVSimSlotId(0);
+    multiSimMonitor->ResetSimLoadAccount(0);
     multiSimMonitor->RegisterSimNotify(0);
     multiSimMonitor->UnRegisterSimNotify();
     ASSERT_TRUE(matchingSkills.CountEvent() == 1);
@@ -3228,6 +3231,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->Init();
+    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
 }
 
 /**
