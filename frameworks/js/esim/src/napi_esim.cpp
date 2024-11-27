@@ -615,23 +615,23 @@ void NativeGetDefaultSmdpAddress(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    auto ContextInfo = static_cast<AsyncContext<std::string> *>(data);
-    if (!IsValidSlotId(ContextInfo->slotId)) {
+    auto contextInfo = static_cast<AsyncContext<std::string> *>(data);
+    if (!IsValidSlotId(contextInfo->slotId)) {
         TELEPHONY_LOGE("NativeGetDefaultSmdpAddress slotId is invalid");
-        ContextInfo->context.errorCode = ERROR_SLOT_ID_INVALID;
+        contextInfo->context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
     std::unique_ptr<GetDefaultSmdpAddressResultCallback> callback =
-        std::make_unique<GetDefaultSmdpAddressResultCallback>(ContextInfo);
+        std::make_unique<GetDefaultSmdpAddressResultCallback>(contextInfo);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDefaultSmdpAddress(
-        ContextInfo->slotId, callback.release());
-    ContextInfo->context.errorCode = errorCode;
-    std::unique_lock<std::mutex> callbackLock(ContextInfo->callbackMutex);
+        contextInfo->slotId, callback.release());
+    contextInfo->context.errorCode = errorCode;
+    std::unique_lock<std::mutex> callbackLock(contextInfo->callbackMutex);
     TELEPHONY_LOGI("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
-    ContextInfo->context.errorCode = errorCode;
+    contextInfo->context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
-        ContextInfo->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [ContextInfo] { return ContextInfo->callbackEnd; });
+        contextInfo->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [contextInfo] { return contextInfo->callbackEnd; });
         TELEPHONY_LOGI("NativeGetDefaultSmdpAddress after callback end");
     }
 }
@@ -730,7 +730,8 @@ void NativeSwitchToProfile(napi_env env, void *data)
         profileContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    std::unique_ptr<SwitchToProfileResultCallback> callback = std::make_unique<SwitchToProfileResultCallback>(profileContext);
+    std::unique_ptr<SwitchToProfileResultCallback> callback =
+        std::make_unique<SwitchToProfileResultCallback>(profileContext);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SwitchToProfile(
         profileContext->asyncContext.slotId, profileContext->portIndex, profileContext->iccid,
         profileContext->forceDisableProfile, callback.release());
@@ -862,7 +863,7 @@ void NativeResetMemory(napi_env env, void *data)
     if (resetParameterCount == PARAMETER_COUNT_ONE) {
         profileContext->option = static_cast<int32_t>(GetDefaultResetOption());
     }
-	int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
         profileContext->asyncContext.slotId, profileContext->option, callback.release());
     std::unique_lock<std::mutex> callbackLock(profileContext->asyncContext.callbackMutex);
     TELEPHONY_LOGI("NAPI NativeResetMemory %{public}d", errorCode);
@@ -1297,9 +1298,8 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
 
     std::unique_ptr<GetDownloadableProfileMetadataResultCallback> callback =
         std::make_unique<GetDownloadableProfileMetadataResultCallback>(metadata);
-    GetDownloadableProfileMetadataResult result;
     DownloadableProfile profile = GetProfileInfo(metadata->profile);
-	int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfileMetadata(
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfileMetadata(
         metadata->asyncContext.slotId, metadata->portIndex, profile, metadata->forceDisableProfile, callback.release());
     std::unique_lock<std::mutex> callbackLock(metadata->asyncContext.callbackMutex);
     TELEPHONY_LOGI("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
@@ -1365,7 +1365,7 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
         profileContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    std::unique_ptr<GetEuiccProfileInfoListResultCallback> callback = 
+    std::unique_ptr<GetEuiccProfileInfoListResultCallback> callback =
         std::make_unique<GetEuiccProfileInfoListResultCallback>(profileContext);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEuiccProfileInfoList(
         profileContext->asyncContext.slotId, callback.release());

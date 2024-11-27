@@ -230,7 +230,8 @@ int32_t EsimServiceClient::GetEuiccInfo(int32_t slotId, const sptr<IEsimServiceC
     return proxy->GetEuiccInfo(slotId, callback);
 }
 
-int32_t EsimServiceClient::DeleteProfile(int32_t slotId, const std::string &iccId, const sptr<IEsimServiceCallback> &callback)
+int32_t EsimServiceClient::DeleteProfile(
+    int32_t slotId, const std::string &iccId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -304,8 +305,7 @@ int32_t EsimServiceClient::GetDefaultSmdpAddress(int32_t slotId, const sptr<IEsi
 }
 
 int32_t EsimServiceClient::CancelSession(
-    int32_t slotId, const std::string &transactionId, int32_t cancelReason, 
-    const sptr<IEsimServiceCallback> &callback)
+    int32_t slotId, const std::string &transactionId, int32_t cancelReason, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
