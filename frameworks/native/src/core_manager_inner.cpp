@@ -434,20 +434,20 @@ int32_t CoreManagerInner::GetOperatorInfo(
     return telRilManager_->GetOperatorInfo(slotId, response);
 }
 
-int32_t CoreManagerInner::GetCellInfoList(
+int32_t CoreManagerInner::GetNeighboringCellInfoList(
     int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (telRilManager_ == nullptr) {
-        TELEPHONY_LOGE("get cell info list telRilManager is null!");
+        TELEPHONY_LOGE("get neighboring cell info list telRilManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
     if (response == nullptr) {
-        TELEPHONY_LOGE("get cell info list response is null!");
+        TELEPHONY_LOGE("get neighboring cell info list response is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response->SetOwner(handler);
-    return telRilManager_->GetCellInfoList(slotId, response);
+    return telRilManager_->GetNeighboringCellInfoList(slotId, response);
 }
 
 int32_t CoreManagerInner::GetCurrentCellInfo(

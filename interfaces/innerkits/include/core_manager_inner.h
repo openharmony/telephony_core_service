@@ -147,7 +147,8 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetOperatorInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetCellInfoList(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t GetNeighboringCellInfoList(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetCurrentCellInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 

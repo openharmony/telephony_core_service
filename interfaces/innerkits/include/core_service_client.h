@@ -825,7 +825,14 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
-
+    /**
+     * @brief Obtain the neighboring cell information list
+     *
+     * @param slotId[in], primary slot id
+     * @param cellInfo[out], the neighboring cell information of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
     /**
      * @brief Requests for a cell location update
      *
@@ -1033,10 +1040,10 @@ public:
     int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult);
 
     /**
-     * @brief This procedure is used to set or update the Default SM-DP+ address stored in an eUICC.
+     * @brief This procedure is used to set or update the Default SM-DP address stored in an eUICC.
      *
      * @param slotId[in], sim slot id
-     * @param defaultSmdpAddress[in], the default SM-DP+ address to set
+     * @param defaultSmdpAddress[in], the default SM-DP address to set
      * @param enumResult[out], the response to obtain
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
@@ -1063,19 +1070,19 @@ public:
         int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult);
 
     /**
-     * @brief Prepares the profile download request sent to SM-DP+.
+     * @brief Prepares the profile download request sent to SM-DP.
      *
      * @param slotId[in], sim slot id
      * @param downLoadConfigInfo.portIndex[in], the Id of the eUICC
      * @param downLoadConfigInfo.hashCc[in], the hash of confirmation code.
      * It can be null if there is no confirmation code required
      * @param downLoadConfigInfo.smdpSigned2[in],
-     * ASN.1 data in byte array indicating the data to be signed by the SM-DP+
-     * returned by SM-DP+ server
-     * @param downLoadConfigInfo.smdpSignature2[in], ASN.1 data in byte array indicating the SM-DP+
-     * signature returned by SM-DP+ server
-     * @param downLoadConfigInfo.smdpCertificate[in], ASN.1 data in byte array indicating the SM-DP+
-     * Certificate returned by SM-DP+ server
+     * ASN.1 data in byte array indicating the data to be signed by the SM-DP
+     * returned by SM-DP server
+     * @param downLoadConfigInfo.smdpSignature2[in], ASN.1 data in byte array indicating the SM-DP
+     * signature returned by SM-DP server
+     * @param downLoadConfigInfo.smdpCertificate[in], ASN.1 data in byte array indicating the SM-DP
+     * Certificate returned by SM-DP server
      * @param responseResult[out], get the result code and a byte array
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
@@ -1087,7 +1094,7 @@ public:
      *
      * @param slotId[in], sim slot id
      * @param portIndex[in], the Id of the eUICC
-     * @param boundProfilePackage[in], the Bound Profile Package data returned by SM-DP+ server
+     * @param boundProfilePackage[in], the Bound Profile Package data returned by SM-DP server
      * @param responseResult[out], get the result code and a byte array
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
@@ -1095,7 +1102,7 @@ public:
         ResponseEsimBppResult &responseResult);
 
     /**
-     * @brief  Authenticates the SM-DP+ server by the eUICC.
+     * @brief  Authenticates the SM-DP server by the eUICC.
      *
      * @param slotId[in], sim slot id
      * @param portIndex[in], the Id of the eUICC
@@ -1177,7 +1184,7 @@ public:
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult);
 
     /**
-     * @brief Gets the eUICC info2 defined in GSMA RSP v2.0+ for new profile downloading.
+     * @brief Gets the eUICC info2 defined in GSMA RSP v2.0 for new profile downloading.
      *
      * @param slotId[in], sim slot id
      * @param portIndex[in], the Id of the eUICC
@@ -1187,21 +1194,21 @@ public:
     int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2);
 
     /**
-     * @brief  Authenticates the SM-DP+ server by the eUICC.
+     * @brief  Authenticates the SM-DP server by the eUICC.
      *
      * @param slotId[in], sim slot id
      * @param authenticateConfigInfo.portIndex[in], the Id of the eUICC
-     * @param authenticateConfigInfo.matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0+
+     * @param authenticateConfigInfo.matchingId[in], matchingId the activation code token defined in GSMA RSP v2.0
      * or empty when it is not required
      * @param authenticateConfigInfo.serverSigned1[in], ASN.1 data in byte array signed and returned
-     * by the SM-DP+ server
-     * @param authenticateConfigInfo.serverSignature1[in], ASN.1 data in byte array indicating a SM-DP+ signature
-     * which is returned by SM-DP+ server
+     * by the SM-DP server
+     * @param authenticateConfigInfo.serverSignature1[in], ASN.1 data in byte array indicating a SM-DP signature
+     * which is returned by SM-DP server
      * @param authenticateConfigInfo.euiccCiPkIdToBeUsed[in], ASN.1 data in byte array indicating CI Public Key
-     * Identifier to be used by the eUICC for signature which is returned by SM-DP+ server.
-     * This is defined in GSMA RSP v2.0+
-     * @param authenticateConfigInfo.serverCertificate[in], ASN.1 data in byte array indicating SM-DP+ Certificate
-     * returned by SM-DP+ server
+     * Identifier to be used by the eUICC for signature which is returned by SM-DP server.
+     * This is defined in GSMA RSP v2.0
+     * @param authenticateConfigInfo.serverCertificate[in], ASN.1 data in byte array indicating SM-DP Certificate
+     * returned by SM-DP server
      * @param responseResult[out], get the result code and the challenge
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */

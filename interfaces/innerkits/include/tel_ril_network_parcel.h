@@ -31,7 +31,7 @@ struct OperatorInfoResult {
     /** Short carrier name of the registered network. */
     std::string shortName = "";
 
-    /** MCC+MNC of the registered network. */
+    /** MCCMNC of the registered network. */
     std::string numeric = "";
 
     /** flag, Used by search network manager in response. */
@@ -48,7 +48,7 @@ struct AvailableNetworkInfo {
     /** Short name of the registered network in alphanumeric format. */
     std::string shortName = "";
 
-    /** Available network ID(MCC+MNC). */
+    /** Available network ID(MCCMNC). */
     std::string numeric = "";
 
     /** Network status. For details, see {@link RilRegStatus}. */
@@ -605,6 +605,12 @@ typedef struct {
 
     /** NR cell ID. */
     int64_t nci;
+
+    /** Reference Signal Received Power. */
+    int32_t rsrp;
+
+    /** Reference Signal Received Quality. */
+    int32_t rsrq;
 } CellListRatNr;
 
 /**
