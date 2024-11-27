@@ -1232,7 +1232,7 @@ void NativeCancelSession(napi_env env, void *data)
 
     std::unique_ptr<CancelSessionCallback> callback = std::make_unique<CancelSessionCallback>(cancelSessionContext);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().CancelSession(
-        cancelSessionContext->asyncContext.slotId, cancelSessionContext->transactionId, 
+        cancelSessionContext->asyncContext.slotId, cancelSessionContext->transactionId,
         cancelSessionContext->cancelReason, callback.release());
     std::unique_lock<std::mutex> callbackLock(cancelSessionContext->asyncContext.callbackMutex);
     TELEPHONY_LOGI("NAPI NativeCancelSession %{public}d", errorCode);

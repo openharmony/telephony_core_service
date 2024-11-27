@@ -44,7 +44,7 @@ int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requ
             break;
         case IEsimServiceCallback::EsimServiceCallback::GET_DEFAULT_SMDP_ADDRESS_RESULT:
             OnGetDefaultSmdpAddress(data);
-                    break;
+            break;
         case IEsimServiceCallback::EsimServiceCallback::SET_DEFAULT_SMDP_ADDRESS_RESULT:
             OnSetDefaultSmdpAddress(data);
             break;
@@ -85,7 +85,7 @@ void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
 
     std::unique_ptr<EuiccInfo> info(data.ReadParcelable<EuiccInfo>());
     EuiccInfo result;
-    if(info != nullptr) {
+    if (info != nullptr) {
         result = *info;
     }
     OnGetEuiccInfo(result, errorCode);
