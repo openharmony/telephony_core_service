@@ -129,6 +129,7 @@ public:
     int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;

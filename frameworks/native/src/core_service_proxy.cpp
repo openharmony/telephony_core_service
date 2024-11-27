@@ -346,7 +346,7 @@ void CoreServiceProxy::ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<
         return;
     }
     SignalInformation::NetworkType type;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i) {
         type = static_cast<SignalInformation::NetworkType>(reply.ReadInt32());
         switch (type) {
             case SignalInformation::NetworkType::GSM: {
@@ -1456,7 +1456,7 @@ int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
             return false;
         }
         iccAccountInfoList.clear();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i) {
             IccAccountInfo accountInfo;
             accountInfo.ReadFromParcel(reply);
             TELEPHONY_LOGD("CoreServiceProxy::GetActiveSimAccountInfoList success");
@@ -1513,7 +1513,7 @@ bool CoreServiceProxy::IsValidSlotIdEx(int32_t slotId)
 {
     int32_t count = GetMaxSimCount();
     // One more slot for VSim.
-    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count + 1)) {
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count  1)) {
         return true;
     }
 
@@ -2261,7 +2261,7 @@ int32_t CoreServiceProxy::QueryIccDiallingNumbers(
         TELEPHONY_LOGE("CoreServiceProxy::QueryIccDiallingNumbers over max size");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i) {
         std::shared_ptr<DiallingNumbersInfo> diallingNumber = DiallingNumbersInfo::UnMarshalling(reply);
         if (diallingNumber != nullptr) {
             result.emplace_back(diallingNumber);
@@ -2722,6 +2722,38 @@ int32_t CoreServiceProxy::GetCellInfoList(int32_t slotId, std::vector<sptr<CellI
     return result;
 }
 
+int32_t CoreServiceProxy::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInt32 imsSrvType is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NEIGHBORING_CELL_INFO_LIST),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GET_NEIGHBORING_CELL_INFO_LIST failed, error code is %{public}d\n", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ProcessCellInfo(reply, cellInfo);
+    }
+    TELEPHONY_LOGD("CoreServiceProxy::GetNeighboringCellInfoList cell size:%{public}zu\n", cellInfo.size());
+    return result;
+}
+
 void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells)
 {
     int32_t size = reply.ReadInt32();
@@ -2731,7 +2763,7 @@ void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<Ce
         return;
     }
     CellInformation::CellType type;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; i) {
         type = static_cast<CellInformation::CellType>(reply.ReadInt32());
         switch (type) {
             case CellInformation::CellType::CELL_TYPE_GSM: {
@@ -3243,7 +3275,7 @@ void CoreServiceProxy::ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProf
         return;
     }
     euiccProfile.accessRules_.resize(accessRulesSize);
-    for (uint32_t j = 0; j < accessRulesSize; ++j) {
+    for (uint32_t j = 0; j < accessRulesSize; j) {
         AccessRule &rule = euiccProfile.accessRules_[j];
         rule.certificateHashHexStr_ = reply.ReadString16();
         rule.packageName_ = reply.ReadString16();
@@ -3282,7 +3314,7 @@ int32_t CoreServiceProxy::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfil
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
         euiccProfileInfoList.profiles_.resize(profileCount);
-        for (uint32_t i = 0; i < profileCount; ++i) {
+        for (uint32_t i = 0; i < profileCount; i) {
             EuiccProfile &euiccProfile = euiccProfileInfoList.profiles_[i];
             ReadEuiccProfileFromReply(reply, euiccProfile);
         }
@@ -3411,7 +3443,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRules_.resize(policyRulesSize);
-        for (uint32_t i = 0; i < policyRulesSize; ++i) {
+        for (uint32_t i = 0; i < policyRulesSize; i) {
             eUiccRulesAuthTable.policyRules_[i] = reply.ReadInt32();
         }
         uint32_t carrierIdsSize = reply.ReadUint32();
@@ -3419,7 +3451,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.carrierIds_.resize(carrierIdsSize);
-        for (uint32_t j = 0; j < carrierIdsSize; ++j) {
+        for (uint32_t j = 0; j < carrierIdsSize; j) {
             CarrierIdentifier &ci = eUiccRulesAuthTable.carrierIds_[j];
             ci.mcc_ = reply.ReadString16();
             ci.mnc_ = reply.ReadString16();
@@ -3435,7 +3467,7 @@ int32_t CoreServiceProxy::ParseRulesAuthTableReply(MessageParcel &reply, EuiccRu
             return TELEPHONY_ERR_FAIL;
         }
         eUiccRulesAuthTable.policyRuleFlags_.resize(policyRuleFlagsSize);
-        for (uint32_t k = 0; k < policyRuleFlagsSize; ++k) {
+        for (uint32_t k = 0; k < policyRuleFlagsSize; k) {
             eUiccRulesAuthTable.policyRuleFlags_[k] = reply.ReadInt32();
         }
         eUiccRulesAuthTable.position_ = reply.ReadInt32();
@@ -3926,7 +3958,7 @@ int32_t CoreServiceProxy::ListNotifications(
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
         notificationList.euiccNotification_.resize(euiccNotificationCount);
-        for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
+        for (uint32_t i = 0; i < euiccNotificationCount; i) {
             EuiccNotification &nf = notificationList.euiccNotification_[i];
             nf.seq_ = reply.ReadInt32();
             nf.targetAddr_ = reply.ReadString16();
@@ -3980,7 +4012,7 @@ int32_t CoreServiceProxy::RetrieveNotificationList(
             return TELEPHONY_ERR_READ_DATA_FAIL;
         }
         notificationList.euiccNotification_.resize(euiccNotificationCount);
-        for (uint32_t i = 0; i < euiccNotificationCount; ++i) {
+        for (uint32_t i = 0; i < euiccNotificationCount; i) {
             EuiccNotification &nf = notificationList.euiccNotification_[i];
             nf.seq_ = reply.ReadInt32();
             nf.targetAddr_ = reply.ReadString16();

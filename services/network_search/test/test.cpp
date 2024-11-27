@@ -531,7 +531,7 @@ void TestUnregisterImsRegStateCallback()
         return;
     }
     auto itor = imsRegStateCallbackList_.begin();
-    for (; itor != imsRegStateCallbackList_.end(); ++itor) {
+    for (; itor != imsRegStateCallbackList_.end(); itor) {
         if (itor->slotId == slotId && itor->imsSrvType == imsSrvType) {
             if (itor->imsCallback != nullptr) {
                 delete itor->imsCallback;
@@ -699,6 +699,48 @@ void TestGetCellInfoList()
         }
     }
 }
+
+void TestGetNeighboringCellInfoList()
+{
+    AccessToken token;
+    if (g_telephonyService == nullptr) {
+        TELEPHONY_LOGE("TestGetNeighboringCellInfoList failed: g_telephonyService is null");
+        return;
+    }
+    sptr<NetworkState> networkState = new (std::nothrow) NetworkState();
+    std::vector<sptr<CellInformation>> cellList;
+    if (g_telephonyService->GetNeighboringCellInfoList(InputSlotId(), cellList) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("TestGetNeighboringCellInfoList GetNeighboringCellInfoList failed.");
+        return;
+    }
+    CellInformation::CellType type;
+    for (const auto &v : cellList) {
+        type = v->GetNetworkType();
+        TELEPHONY_LOGI(
+            "TelephonyTestService Remote NeighboringCellInfoList result NetworkTypeId:%{public}d", static_cast<int32_t>(type));
+        if (type == CellInformation::CellType::CELL_TYPE_GSM) {
+            GsmCellInformation *gsm = reinterpret_cast<GsmCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", gsm->ToString().c_str());
+        } else if (type == CellInformation::CellType::CELL_TYPE_LTE) {
+            LteCellInformation *lte = reinterpret_cast<LteCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", lte->ToString().c_str());
+        } else if (type == CellInformation::CellType::CELL_TYPE_WCDMA) {
+            WcdmaCellInformation *wcdma = reinterpret_cast<WcdmaCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", wcdma->ToString().c_str());
+        } else if (type == CellInformation::CellType::CELL_TYPE_CDMA) {
+            CdmaCellInformation *cdma = reinterpret_cast<CdmaCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", cdma->ToString().c_str());
+        } else if (type == CellInformation::CellType::CELL_TYPE_TDSCDMA) {
+            TdscdmaCellInformation *tdscdma = reinterpret_cast<TdscdmaCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", tdscdma->ToString().c_str());
+        } else if (type == CellInformation::CellType::CELL_TYPE_NR) {
+            NrCellInformation *nr = reinterpret_cast<NrCellInformation *>(v.GetRefPtr());
+            TELEPHONY_LOGI("result:%{public}s", nr->ToString().c_str());
+        }
+    }
+    
+}
+
 
 void TestSendUpdateCellLocationRequest()
 {

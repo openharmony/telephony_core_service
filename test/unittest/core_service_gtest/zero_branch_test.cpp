@@ -1000,7 +1000,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.SetEmergencyCallList(0, 0, eccVec, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCallFailReason(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetOperatorInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNeighboringCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
     auto telRilManager = std::make_shared<TelRilManager>();

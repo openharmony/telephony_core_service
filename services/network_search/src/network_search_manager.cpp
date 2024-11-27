@@ -64,7 +64,7 @@ NetworkSearchManager::NetworkSearchManager(
 
 NetworkSearchManager::~NetworkSearchManager()
 {
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId) {
         std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             inner->UnRegisterDeviceStateObserver();
@@ -187,7 +187,7 @@ bool NetworkSearchManager::OnInit()
         return false;
     }
     ClearManagerInner();
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId) {
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
@@ -711,7 +711,7 @@ bool NetworkSearchManager::SetNetworkSelectionMode(
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
         operatorCurrentRadio = std::to_string(networkInformation->GetRadioTech());
-        operatorInfo = plmnNumeric + "," + operatorCurrentRadio;
+        operatorInfo = plmnNumeric  ","  operatorCurrentRadio;
     }
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, selectMode, operatorInfo);
 }
@@ -731,7 +731,7 @@ int32_t NetworkSearchManager::SetNetworkSelectionMode(int32_t slotId, int32_t se
     if (networkInformation != nullptr) {
         plmnNumeric = networkInformation->GetOperatorNumeric();
         operatorCurrentRadio = std::to_string(networkInformation->GetRadioTech());
-        operatorInfo = plmnNumeric + "," + operatorCurrentRadio;
+        operatorInfo = plmnNumeric  ","  operatorCurrentRadio;
     }
     bool ret = eventSender_->SendCallback(
         slotId, RadioEvent::RADIO_SET_NETWORK_SELECTION_MODE, &callback, selectMode, operatorInfo);
@@ -897,7 +897,7 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
     }
 
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
-    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE  "_"  std::to_string(slotId);
     std::string value = std::to_string(networkMode);
     if (settingHelper->Update(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Update %{public}s fail", key.c_str());
@@ -948,7 +948,7 @@ int32_t NetworkSearchManager::GetPreferredNetworkValue(int32_t slotId) const
     }
 
     Uri uri(SettingUtils::NETWORK_SEARCH_SETTING_PREFERRED_NETWORK_MODE_URI);
-    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE + "_" + std::to_string(slotId);
+    std::string key = SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE  "_"  std::to_string(slotId);
     std::string value = "";
     if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
@@ -1066,6 +1066,21 @@ int32_t NetworkSearchManager::GetCellInfoList(int32_t slotId, std::vector<sptr<C
     if (inner != nullptr) {
         if (inner->networkSearchHandler_ != nullptr) {
             inner->networkSearchHandler_->GetCellInfoList(cellInfo);
+            if (TELEPHONY_EXT_WRAPPER.getCellInfoList_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getCellInfoList_(slotId, cellInfo);
+            }
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
+int32_t NetworkSearchManager::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        if (inner->networkSearchHandler_ != nullptr) {
+            inner->networkSearchHandler_->GetNeighboringCellInfoList(cellInfo);
             if (TELEPHONY_EXT_WRAPPER.getCellInfoList_ != nullptr) {
                 TELEPHONY_EXT_WRAPPER.getCellInfoList_(slotId, cellInfo);
             }
@@ -1596,7 +1611,7 @@ std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInne
 
 void NetworkSearchManager::ClearManagerInner()
 {
-    for (int32_t slotId = 0; slotId < static_cast<int32_t>(mapManagerInner_.size()); slotId++) {
+    for (int32_t slotId = 0; slotId < static_cast<int32_t>(mapManagerInner_.size()); slotId) {
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             std::lock_guard<std::mutex> lock(inner->mutex_);
@@ -1689,7 +1704,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
     }
     std::lock_guard<std::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
-    for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
+    for (; iter != listImsRegInfoCallbackRecord_.end(); iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
             listImsRegInfoCallbackRecord_.erase(iter);
             TELEPHONY_LOGI("[slot%{public}d] callback is existent, delete old callback", slotId);
@@ -1714,7 +1729,7 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     bool isSuccess = false;
     std::lock_guard<std::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
-    for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
+    for (; iter != listImsRegInfoCallbackRecord_.end(); iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
             listImsRegInfoCallbackRecord_.erase(iter);
             isSuccess = true;
@@ -1743,7 +1758,7 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
                 continue;
             }
             iter.imsCallback->OnImsRegInfoChanged(slotId, imsSrvType, info);
-            callbackCounts++;
+            callbackCounts;
         }
     }
     TELEPHONY_LOGI(

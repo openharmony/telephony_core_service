@@ -180,6 +180,7 @@ public:
     int32_t GetCsRegState(int32_t slotId) override;
     int32_t GetPsRoamingState(int32_t slotId) override;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
     sptr<CellLocation> GetCellLocation(int32_t slotId) override;
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;

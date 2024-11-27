@@ -114,7 +114,7 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId) {
         networkSearchManager_->InitAirplaneMode(slotId);
     }
     TELEPHONY_LOGI("CoreService::Init success");
@@ -1430,6 +1430,22 @@ int32_t CoreService::GetCellInfoList(int32_t slotId, std::vector<sptr<CellInform
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetCellInfoList(slotId, cellInfo);
+}
+
+int32_t CoreService::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetNeighboringCellInfoList(slotId, cellInfo);
 }
 
 int32_t CoreService::SendUpdateCellLocationRequest(int32_t slotId)
