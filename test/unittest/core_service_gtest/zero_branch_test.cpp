@@ -61,6 +61,7 @@
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1872,6 +1873,20 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_003, Function | MediumTest | Leve
         RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 
+static void UpdateOperatorNameParamsTest(
+    std::shared_ptr<OperatorName> &operatorName, sptr<NetworkState> &networkState, OperatorNameParams &params)
+{
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_NO_SERVICE, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_EMERGENCY_ONLY, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_SEARCH, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_UNKNOWN, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_POWER_OFF, networkState, params);
+    params.spn = params.plmn;
+    params.showSpn = params.showPlmn;
+    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
+}
+
 /**
  * @tc.number   Telephony_OperatorName_001
  * @tc.name     test error branch
@@ -1889,8 +1904,6 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     auto operatorName = std::make_shared<OperatorName>(
         subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     auto operatorInfo = std::make_shared<OperatorInfoResult>();
-    std::string plmn = "";
-    bool showPlmn = true;
     std::string numeric = "qwe";
     std::vector<std::string> pnnCust;
     sptr<NetworkState> networkState;
@@ -1901,13 +1914,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->UpdateOplCust(pnnCust);
     EXPECT_EQ(operatorName->GetPlmn(networkState, true), "");
     networkState = new NetworkState;
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_NO_SERVICE, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_EMERGENCY_ONLY, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_SEARCH, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_UNKNOWN, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_POWER_OFF, networkState, 1, plmn, showPlmn);
-    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
+    OperatorNameParams params = {true, "", false, "", 1};
+    UpdateOperatorNameParamsTest(operatorName, networkState, params);
     operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->GsmOperatorInfo(operatorInfo);
@@ -1920,6 +1928,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->CdmaOperatorInfo(operatorInfo);
     EXPECT_EQ(operatorName->GetCurrentLac(), 0);
     EXPECT_TRUE(operatorName->GetNetworkStatus() == nullptr);
+
+    std::string plmn = params.spn;
     EXPECT_EQ(operatorName->GetCustomName(plmn), "");
     EXPECT_EQ(operatorName->GetCustomName(numeric), "");
     EXPECT_EQ(operatorName->GetCustSpnRule(true), 0);
@@ -1956,8 +1966,9 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorName->UpdatePnnCust(pnnCust);
     operatorName->UpdateOplCust(oplCust);
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "");
-    bool showSpn = true;
-    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showSpn);
+
+    OperatorNameParams params = {false, "", true, plmn, 1};
+    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
     std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
@@ -3392,6 +3403,23 @@ HWTEST_F(BranchTest, Telephony_RadioInfo, Function | MediumTest | Level1)
     radioInfo->SetRadioOnIfNeeded();
     nsm.reset();
     radioInfo->SetRadioOnIfNeeded();
+}
+
+/**
+ * @tc.number   Telephony_Network_InitTelephonyExtService_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_Network_InitTelephonyExtService_001, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
+    } else {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateOperatorNameParamsExt_ != nullptr);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

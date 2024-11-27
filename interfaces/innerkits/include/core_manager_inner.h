@@ -239,6 +239,7 @@ public:
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
     int32_t GetSimSpn(int32_t slotId, std::u16string &spn);
+    std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
