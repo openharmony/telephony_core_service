@@ -754,7 +754,7 @@ void OperatorName::UpdateOperatorLongName(std::string &operatorLongName, const s
     }
 
     std::string customizedOperatorLongName = GetCustomName(numeric);
-    if (!customizedOperatorLongName.empty()) {
+    if (!customizedOperatorLongName.empty() && !netPriCust_) {
         operatorLongName = customizedOperatorLongName;
     }
 }
