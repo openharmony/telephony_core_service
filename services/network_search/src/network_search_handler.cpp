@@ -215,7 +215,7 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
 
 NetworkSearchHandler::NetworkSearchHandler(const std::weak_ptr<NetworkSearchManager> &networkSearchManager,
     const std::weak_ptr<ITelRilManager> &telRilManager, const std::weak_ptr<ISimManager> &simManager, int32_t slotId)
-    : TelEventHandler("NetworkSearchManager_"  std::to_string(slotId)), networkSearchManager_(networkSearchManager),
+    : TelEventHandler("NetworkSearchManager_" + std::to_string(slotId)), networkSearchManager_(networkSearchManager),
       telRilManager_(telRilManager), simManager_(simManager), slotId_(slotId)
 {}
 
@@ -1185,7 +1185,7 @@ int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
         cellInfo_->GetCellInfoList(cells);
     }
     uint32_t curTime = static_cast<uint32_t>(time(0));
-    if ((curTime < cellRequestMinInterval_  lastCellRequestTime_) && cells.size() != 0) {
+    if ((curTime < cellRequestMinInterval_ + lastCellRequestTime_) && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -1484,7 +1484,7 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     }
     std::string plmn = *object;
     networkSearchManager->SetResidentNetworkNumeric(slotId_, plmn);
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (networkSearchManager->GetCsRegState(slotId) ==
             static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
             networkSearchManager->GetPsRegState(slotId) ==
