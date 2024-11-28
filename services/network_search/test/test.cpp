@@ -738,7 +738,6 @@ void TestGetNeighboringCellInfoList()
             TELEPHONY_LOGI("result:%{public}s", nr->ToString().c_str());
         }
     }
-    
 }
 
 
