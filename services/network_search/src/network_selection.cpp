@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const std::set<std::string> NetworkSelection::radioTechStrings_ = {" 2G", " 3G", " 4G", " 5G"};
 NetworkSelection::NetworkSelection(std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
@@ -188,8 +189,7 @@ bool NetworkSelection::AvailNetworkResult(
         if (availableSize > 0) {
             for (auto &availableNetworkInfoItem : availableNetworkInfo) {
                 std::string numeric = availableNetworkInfoItem.numeric;
-                std::string customName = OperatorNameUtils::GetInstance().GetCustomName(numeric);
-                std::string longName = customName.empty()? availableNetworkInfoItem.longName : customName;
+                std::string longName = GetCustomName(availableNetworkInfoItem);
                 std::string shortName = availableNetworkInfoItem.shortName;
                 int32_t status = availableNetworkInfoItem.status;
                 int32_t rat = availableNetworkInfoItem.rat;
@@ -215,6 +215,24 @@ bool NetworkSelection::AvailNetworkResult(
         }
     }
     return true;
+}
+
+std::string NetworkSelection::GetCustomName(const AvailableNetworkInfo &info)
+{
+    std::string rawName = info.longName;
+    std::string plmn = OperatorNameUtils::GetInstance().GetCustomName(info.numeric);
+    if (info.empty()) {
+        return rawName;
+    }
+    auto indexOfBlank = rawName.find_last_of(' ');
+    if (indexOfBlank == std::string::nops) {
+        return plmn;
+    }
+    std::string radioTechStr = rawName.subStr(indexOfBlank);
+    if (radioTechStrings_.find(radioTechStr) != radioTechStrings_.end()) {
+        return plmn + radioTechStr;
+    }
+    return plmn;
 }
 
 bool NetworkSelection::ResponseInfoOfResult(
