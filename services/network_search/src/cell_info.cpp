@@ -102,7 +102,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
         "CellInfo::ProcessNeighboringCellInfo cell size:%{public}d, cur size:%{public}zu slotId:%{public}d",
         cellInfo->itemNum, cellInfos_.size(), slotId_);
     std::vector<CellNearbyInfo> cell = cellInfo->cellNearbyInfo;
-    for (int32_t i = 0; i < cellSize; i) {
+    for (int32_t i = 0; i < cellSize; ++i) {
         int32_t type = cell[i].ratType;
         auto itFunc = memberFuncMap_.find(static_cast<TelRilRatType>(type));
         if (itFunc != memberFuncMap_.end()) {
@@ -141,7 +141,7 @@ void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &eve
     TELEPHONY_LOGI("CellInfo::ProcessCurrentCellInfo cell size:%{public}d, slotId:%{public}d",
         cellInfoList->itemNum, slotId_);
     std::vector<CurrentCellInformation> cell = cellInfoList->cellCurrentInfo;
-    for (int32_t i = 0; i < cellSize; i) {
+    for (int32_t i = 0; i < cellSize; ++i) {
         CurrentCellInformation currentCell = cell[i];
         ProcessCurrentCell(&currentCell);
     }
