@@ -145,6 +145,7 @@ public:
     virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     virtual int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
+    virtual int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(

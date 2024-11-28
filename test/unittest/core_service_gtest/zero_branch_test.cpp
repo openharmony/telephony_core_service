@@ -399,6 +399,7 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
         return;
     }
     auto imsRegInfoCallbackProxy = std::make_shared<ImsRegInfoCallbackProxy>(remote);
+    EXPECT_NE(imsRegInfoCallbackProxy, nullptr);
     ImsRegInfo info;
     imsRegInfoCallbackProxy->OnImsRegInfoChanged(0, ImsServiceType::TYPE_VOICE, info);
 }
@@ -1000,7 +1001,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.SetEmergencyCallList(0, 0, eccVec, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCallFailReason(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetOperatorInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNeighboringCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
     EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);

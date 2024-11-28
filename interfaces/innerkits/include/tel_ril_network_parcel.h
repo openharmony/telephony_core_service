@@ -605,6 +605,12 @@ typedef struct {
 
     /** NR cell ID. */
     int64_t nci;
+
+    /** Reference Signal Received Power. */
+    int32_t rsrp;
+
+    /** Reference Signal Received Quality. */
+    int32_t rsrq;
 } CellListRatNr;
 
 /**

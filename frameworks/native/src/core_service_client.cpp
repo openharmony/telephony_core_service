@@ -980,6 +980,16 @@ int32_t CoreServiceClient::GetCellInfoList(int32_t slotId, std::vector<sptr<Cell
     return proxy->GetCellInfoList(slotId, cellInfo);
 }
 
+int32_t CoreServiceClient::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNeighboringCellInfoList(slotId, cellInfo);
+}
+
 int32_t CoreServiceClient::SendUpdateCellLocationRequest(int32_t slotId)
 {
     auto proxy = GetProxy();
