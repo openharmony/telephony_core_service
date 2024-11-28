@@ -176,7 +176,7 @@ void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &error
 void VCardManager::BatchInsertRawContact(
     int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode)
 {
-    int32_t rawContactMaxId = VCardRdbHelper::GetInstance().QueryRawContactMaxId();
+    int32_t rawContactMaxId = VCardRdbHelper::GetInstance().QueryRawContactMaxId(static_cast<int32_t>(size));
     std::vector<DataShare::DataShareValuesBucket> rawContactValues;
     for (uint32_t i = 0; i < size; i++) {
         OHOS::DataShare::DataShareValuesBucket valuesBucket;
@@ -184,8 +184,10 @@ void VCardManager::BatchInsertRawContact(
         if (IsContactsIdExit(accountId)) {
             valuesBucket.Put(RawContact::CONTACT_ID, accountId);
         }
+        int32_t newRawId = rawContactMaxId + i + 1;
+        valuesBucket.Put(RawContact::ID, newRawId);
         rawContactValues.push_back(valuesBucket);
-        rawIds.push_back(rawContactMaxId + i + 1);
+        rawIds.push_back(newRawId);
     }
     VCardRdbHelper::GetInstance().BatchInsertRawContact(rawContactValues);
 }
