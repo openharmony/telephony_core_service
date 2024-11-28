@@ -52,6 +52,7 @@ public:
     void GetSignalInfo(std::vector<sptr<SignalInformation>> &signals);
     void UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech) const;
     int32_t GetCellInfoList(std::vector<sptr<CellInformation>> &cells);
+    int32_t GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &cells);
     void DcPhysicalLinkActiveUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void NotifyStateChange(const AppExecFwk::InnerEvent::Pointer &event);
     void HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::Pointer &event);

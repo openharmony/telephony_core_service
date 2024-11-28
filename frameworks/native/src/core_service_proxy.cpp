@@ -2722,6 +2722,38 @@ int32_t CoreServiceProxy::GetCellInfoList(int32_t slotId, std::vector<sptr<CellI
     return result;
 }
 
+int32_t CoreServiceProxy::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInt32 imsSrvType is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NEIGHBORING_CELL_INFO_LIST),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GET_NEIGHBORING_CELL_INFO_LIST failed, error code is %{public}d\n", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ProcessCellInfo(reply, cellInfo);
+    }
+    TELEPHONY_LOGD("CoreServiceProxy::GetNeighboringCellInfoList cell size:%{public}zu\n", cellInfo.size());
+    return result;
+}
+
 void CoreServiceProxy::ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells)
 {
     int32_t size = reply.ReadInt32();

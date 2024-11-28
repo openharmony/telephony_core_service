@@ -1151,6 +1151,16 @@ int32_t NetworkSearchHandler::GetCellInfoList(std::vector<sptr<CellInformation>>
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+int32_t NetworkSearchHandler::GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &cells)
+{
+    TELEPHONY_LOGD("NetworkSearchHandler::GetNeighboringCellInfoList slotId:%{public}d", slotId_);
+    if (cellInfo_ != nullptr) {
+        cellInfo_->GetNeighboringCellInfoList(cells);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 sptr<CellLocation> NetworkSearchHandler::GetCellLocation()
 {
     TELEPHONY_LOGD("NetworkSearchHandler::GetCellLocation slotId:%{public}d", slotId_);
@@ -1186,6 +1196,11 @@ int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
         lastCellRequestTime_ = curTime;
         event->SetOwner(shared_from_this());
         telRilManager->GetCurrentCellInfo(slotId_, event);
+    }
+    auto event2 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_GET_NEIGHBORING_CELL_INFO);
+    if (event2 != nullptr && telRilManager != nullptr) {
+        event2->SetOwner(shared_from_this());
+        telRilManager->GetNeighboringCellInfoList(slotId_, event2);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
