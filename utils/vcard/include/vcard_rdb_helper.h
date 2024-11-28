@@ -43,7 +43,7 @@ public:
     static void SetDataHelper(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper);
     static void Release();
     static VCardRdbHelper &GetInstance();
-    static int32_t QueryRawContactMaxId();
+    static int32_t QueryRawContactMaxId(int32_t queryNum);
     static int32_t BatchInsertRawContact(const std::vector<DataShare::DataShareValuesBucket> &rawContactValues);
     static int32_t BatchInsertContactData(const std::vector<DataShare::DataShareValuesBucket> &contactsDataValues);
 

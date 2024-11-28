@@ -39,6 +39,7 @@ std::string VCardEncoder::ContructVCard(std::shared_ptr<DataShare::DataShareResu
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(RawContact::CONTACT_ID, id)->And()->EqualTo(RawContact::IS_DELETED, CONTACTS_NOT_DELETED);
+    predicates.NotEqualTo(RawContact::PRIMARY_CONTACT, TELEPHONY_ERROR);
     auto rawResultSet = VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates);
     if (rawResultSet == nullptr) {
         TELEPHONY_LOGE("QueryContactData failed");
