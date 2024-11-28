@@ -368,7 +368,7 @@ int32_t CoreServiceStub::SetTimer(uint32_t code)
     std::map<uint32_t, std::string>::iterator itCollieId = collieCodeStringMap_.find(code);
     if (itCollieId != collieCodeStringMap_.end()) {
         std::string collieStr = itCollieId->second;
-        std::string collieName = "CoreServiceStub: "  collieStr;
+        std::string collieName = "CoreServiceStub: " + collieStr;
         unsigned int flag = HiviewDFX::XCOLLIE_FLAG_NOOP;
         auto TimerCallback = [collieStr](void *) {
             TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s", collieStr.c_str());
@@ -1439,7 +1439,7 @@ int32_t CoreServiceStub::OnGetActiveSimAccountInfoList(MessageParcel &data, Mess
             TELEPHONY_LOGE("OnGetActiveSimAccountInfoList IccAccountInfo reply Marshalling is false");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
         }
-        it;
+        ++it;
     }
     return NO_ERROR;
 }
