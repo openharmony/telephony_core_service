@@ -531,7 +531,7 @@ void TestUnregisterImsRegStateCallback()
         return;
     }
     auto itor = imsRegStateCallbackList_.begin();
-    for (; itor != imsRegStateCallbackList_.end(); itor) {
+    for (; itor != imsRegStateCallbackList_.end(); ++itor) {
         if (itor->slotId == slotId && itor->imsSrvType == imsSrvType) {
             if (itor->imsCallback != nullptr) {
                 delete itor->imsCallback;
@@ -716,8 +716,8 @@ void TestGetNeighboringCellInfoList()
     CellInformation::CellType type;
     for (const auto &v : cellList) {
         type = v->GetNetworkType();
-        TELEPHONY_LOGI(
-            "TelephonyTestService Remote NeighboringCellInfoList result NetworkTypeId:%{public}d", static_cast<int32_t>(type));
+        TELEPHONY_LOGI("TelephonyTestService Remote NeighboringCellInfoList result NetworkTypeId:%{public}d",
+            static_cast<int32_t>(type));
         if (type == CellInformation::CellType::CELL_TYPE_GSM) {
             GsmCellInformation *gsm = reinterpret_cast<GsmCellInformation *>(v.GetRefPtr());
             TELEPHONY_LOGI("result:%{public}s", gsm->ToString().c_str());
