@@ -288,7 +288,8 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::GetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::SetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_SSBID_INFO] = &TelRilTest::GetNrSsbIdTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE] = &TelRilTest::GetNeighboringCellInfoListTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE] =
+        &TelRilTest::GetNeighboringCellInfoListTest;
 }
 
 void TelRilTest::InitModem()
