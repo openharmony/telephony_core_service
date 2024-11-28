@@ -399,6 +399,7 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
         return;
     }
     auto imsRegInfoCallbackProxy = std::make_shared<ImsRegInfoCallbackProxy>(remote);
+    EXPECT_NE(imsRegInfoCallbackProxy, nullptr);
     ImsRegInfo info;
     imsRegInfoCallbackProxy->OnImsRegInfoChanged(0, ImsServiceType::TYPE_VOICE, info);
 }
