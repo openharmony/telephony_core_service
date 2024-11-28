@@ -27,7 +27,6 @@ GetDownloadableProfilesResultCallback::GetDownloadableProfilesResultCallback(
 void GetDownloadableProfilesResultCallback::OnGetDownloadableProfiles(
     const GetDownloadableProfilesResult &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("asyncContext null");
         return;
@@ -38,10 +37,10 @@ void GetDownloadableProfilesResultCallback::OnGetDownloadableProfiles(
         asyncContext_->result = result;
     } else {
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
+        TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
     asyncContext_->asyncContext.callbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
-    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS

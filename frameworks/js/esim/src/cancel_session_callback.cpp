@@ -26,7 +26,6 @@ CancelSessionCallback::CancelSessionCallback(AsyncCancelSession *context) : asyn
 
 void CancelSessionCallback::OnCancelSession(const ResponseEsimResult &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("asyncContext null");
         return;
@@ -37,10 +36,10 @@ void CancelSessionCallback::OnCancelSession(const ResponseEsimResult &result, co
         asyncContext_->asyncContext.callbackVal = static_cast<int32_t>(result.resultCode_);
     } else {
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
+        TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
     asyncContext_->asyncContext.callbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
-    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -28,7 +28,6 @@ GetDefaultSmdpAddressResultCallback::GetDefaultSmdpAddressResultCallback(AsyncCo
 
 void GetDefaultSmdpAddressResultCallback::OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("asyncContext null");
         return;
@@ -39,10 +38,10 @@ void GetDefaultSmdpAddressResultCallback::OnGetDefaultSmdpAddress(const std::str
         asyncContext_->callbackVal = result;
     } else {
         asyncContext_->context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
+        TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS
