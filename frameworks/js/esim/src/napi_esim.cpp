@@ -567,7 +567,6 @@ void NativeGetEuiccInfo(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         euiccContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [euiccContext] { return euiccContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeGetEuiccInfo after callback end");
     }
 }
 
@@ -625,14 +624,12 @@ void NativeGetDefaultSmdpAddress(napi_env env, void *data)
         std::make_unique<GetDefaultSmdpAddressResultCallback>(contextInfo);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDefaultSmdpAddress(
         contextInfo->slotId, callback.release());
-    contextInfo->context.errorCode = errorCode;
     std::unique_lock<std::mutex> callbackLock(contextInfo->callbackMutex);
     TELEPHONY_LOGI("NAPI NativeGetDefaultSmdpAddress %{public}d", errorCode);
     contextInfo->context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         contextInfo->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [contextInfo] { return contextInfo->callbackEnd; });
-        TELEPHONY_LOGI("NativeGetDefaultSmdpAddress after callback end");
     }
 }
 
@@ -665,18 +662,15 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
         context->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<SetDefaultSmdpAddressResultCallback> callback =
         std::make_unique<SetDefaultSmdpAddressResultCallback>(context);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().SetDefaultSmdpAddress(
         context->asyncContext.slotId, context->inputStr, callback.release());
     std::unique_lock<std::mutex> callbackLock(context->asyncContext.callbackMutex);
     TELEPHONY_LOGI("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
-
     if (errorCode == TELEPHONY_SUCCESS) {
         context->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [context] { return context->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeSetDefaultSmdpAddress after callback end");
     }
     context->asyncContext.context.errorCode = errorCode;
 }
@@ -723,7 +717,6 @@ void NativeSwitchToProfile(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto profileContext = static_cast<AsyncSwitchProfileInfo *>(data);
     if (!IsValidSlotId(profileContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccInfo slotId is invalid");
@@ -741,7 +734,6 @@ void NativeSwitchToProfile(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeSwitchToProfile after callback end");
     }
 }
 
@@ -789,7 +781,6 @@ void NativeDeleteProfile(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto context = static_cast<AsyncContextInfo *>(data);
     if (!IsValidSlotId(context->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccInfo slotId is invalid");
@@ -805,7 +796,6 @@ void NativeDeleteProfile(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         context->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [context] { return context->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeDeleteProfile after callback end");
     }
 }
 
@@ -851,14 +841,12 @@ void NativeResetMemory(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto profileContext = static_cast<AsyncResetMemory *>(data);
     if (!IsValidSlotId(profileContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccInfo slotId is invalid");
         profileContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<ResetMemoryResultCallback> callback = std::make_unique<ResetMemoryResultCallback>(profileContext);
     if (resetParameterCount == PARAMETER_COUNT_ONE) {
         profileContext->option = static_cast<int32_t>(GetDefaultResetOption());
@@ -871,7 +859,6 @@ void NativeResetMemory(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeResetMemory after callback end");
     }
 }
 
@@ -925,14 +912,12 @@ void NativeDownloadProfile(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto profileContext = static_cast<AsyncDownloadProfileInfo *>(data);
     if (!IsValidSlotId(profileContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccInfo slotId is invalid");
         profileContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<DownloadProfileResultCallback> callback =
         std::make_unique<DownloadProfileResultCallback>(profileContext);
     DownloadProfileResult result;
@@ -950,7 +935,6 @@ void NativeDownloadProfile(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeDownloadProfile after callback end");
     }
 }
 
@@ -1003,14 +987,12 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto profileContext = static_cast<AsyncDefaultProfileList *>(data);
     if (!IsValidSlotId(profileContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccInfo slotId is invalid");
         profileContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<GetDownloadableProfilesResultCallback> callback =
         std::make_unique<GetDownloadableProfilesResultCallback>(profileContext);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetDownloadableProfiles(
@@ -1022,7 +1004,6 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeGetDownloadableProfiles after callback end");
     }
 }
 
@@ -1130,7 +1111,6 @@ void NativeStartOsu(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->callbackEnd; });
-        TELEPHONY_LOGI("NativeStartOsu after callback end");
     }
 }
 
@@ -1174,7 +1154,6 @@ void NativeSetProfileNickname(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         setprofileNickNameContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [setprofileNickNameContext] { return setprofileNickNameContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeDeleteProfile after callback end");
     }
 }
 
@@ -1229,7 +1208,6 @@ void NativeCancelSession(napi_env env, void *data)
         cancelSessionContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<CancelSessionCallback> callback = std::make_unique<CancelSessionCallback>(cancelSessionContext);
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().CancelSession(
         cancelSessionContext->asyncContext.slotId, cancelSessionContext->transactionId,
@@ -1240,7 +1218,6 @@ void NativeCancelSession(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         cancelSessionContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [cancelSessionContext] { return cancelSessionContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeCancelSession after callback end");
     }
 }
 
@@ -1288,14 +1265,12 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto metadata = static_cast<AsyncProfileMetadataInfo *>(data);
     if (!IsValidSlotId(metadata->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetDownloadableProfileMetadata slotId is invalid");
         metadata->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-
     std::unique_ptr<GetDownloadableProfileMetadataResultCallback> callback =
         std::make_unique<GetDownloadableProfileMetadataResultCallback>(metadata);
     DownloadableProfile profile = GetProfileInfo(metadata->profile);
@@ -1307,7 +1282,6 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         metadata->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [metadata] { return metadata->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeGetDownloadableProfileMetadata after callback end");
     }
 }
 
@@ -1358,7 +1332,6 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-
     auto profileContext = static_cast<AsyncEuiccProfileInfoList *>(data);
     if (!IsValidSlotId(profileContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("NativeGetEuiccProfileInfoList slotId is invalid");
@@ -1375,7 +1348,6 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->asyncContext.callbackEnd; });
-        TELEPHONY_LOGI("NativeDeleteProfile after callback end");
     }
 }
 

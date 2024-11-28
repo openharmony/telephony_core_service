@@ -26,7 +26,6 @@ StartOsuResultCallback::StartOsuResultCallback(AsyncContext<int32_t> *context) :
 
 void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t errorCode)
 {
-    TELEPHONY_LOGI("start errorCode = %{public}d", errorCode);
     if (asyncContext_ == nullptr) {
         TELEPHONY_LOGE("asyncContext null");
         return;
@@ -37,10 +36,10 @@ void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t e
         asyncContext_->callbackVal = static_cast<int32_t>(result);
     } else {
         asyncContext_->context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
+        TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();
-    TELEPHONY_LOGI("end");
 }
 } // namespace Telephony
 } // namespace OHOS
