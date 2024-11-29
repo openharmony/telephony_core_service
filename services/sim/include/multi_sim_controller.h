@@ -121,6 +121,7 @@ private:
     int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
     bool IsAllModemInitDone();
     int32_t IsSatelliteSupported();
+    int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
 

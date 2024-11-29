@@ -60,6 +60,7 @@
       OHOS::Telephony::TelRilBaseParcel*;
       OHOS::Telephony::BaseParcel::Read*;
       OHOS::Telephony::BaseParcel::Write*;
+      *IEsimServiceCallbackStub*;
     };
   local:
     *;
