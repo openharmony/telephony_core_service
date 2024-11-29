@@ -221,14 +221,14 @@ std::string NetworkSelection::GetCustomName(const AvailableNetworkInfo &info)
 {
     std::string rawName = info.longName;
     std::string plmn = OperatorNameUtils::GetInstance().GetCustomName(info.numeric);
-    if (info.empty()) {
+    if (plmn.empty()) {
         return rawName;
     }
     auto indexOfBlank = rawName.find_last_of(' ');
-    if (indexOfBlank == std::string::nops) {
+    if (indexOfBlank == std::string::npos) {
         return plmn;
     }
-    std::string radioTechStr = rawName.subStr(indexOfBlank);
+    std::string radioTechStr = rawName.substr(indexOfBlank);
     if (radioTechStrings_.find(radioTechStr) != radioTechStrings_.end()) {
         return plmn + radioTechStr;
     }
