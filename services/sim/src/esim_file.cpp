@@ -60,7 +60,7 @@ void EsimFile::SyncOpenChannel()
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to open the channel");
             break;
         }
@@ -78,7 +78,7 @@ void EsimFile::SyncOpenChannel(const std::u16string &aid)
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to open the channel");
             break;
         }
@@ -96,7 +96,7 @@ void EsimFile::SyncCloseChannel()
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             currentChannelId_ = 0;
             TELEPHONY_LOGE("failed to close the channel");
             break;
