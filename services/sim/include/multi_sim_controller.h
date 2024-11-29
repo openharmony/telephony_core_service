@@ -116,8 +116,8 @@ private:
     int32_t GetTargetIccId(int32_t slotId, std::string &iccId);
     bool IsAllModemInitDone();
     int32_t IsSatelliteSupported();
-    void UpdateSubState(int32_t slotId, int32_t enable);
     int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
+    void UpdateSubState(int32_t slotId, int32_t enable);
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     int32_t maxCount_ = 0;
