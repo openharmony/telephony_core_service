@@ -28,7 +28,7 @@ public:
     void OnResetMemory(const int32_t &result, const int32_t errorCode) override;
 
 private:
-    AsyncResetMemory *asyncContext_;
+    AsyncResetMemory *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

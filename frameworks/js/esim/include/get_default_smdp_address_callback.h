@@ -27,7 +27,7 @@ public:
     explicit GetDefaultSmdpAddressResultCallback(AsyncContext<std::string> *context);
     void OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode) override;
 private:
-    AsyncContext<std::string> *asyncContext_;
+    AsyncContext<std::string> *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

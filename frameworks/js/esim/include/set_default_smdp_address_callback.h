@@ -28,7 +28,7 @@ public:
     void OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode) override;
 
 private:
-    AsyncContextInfo *asyncContext_;
+    AsyncContextInfo *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

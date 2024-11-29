@@ -28,7 +28,7 @@ public:
     void OnCancelSession(const ResponseEsimResult &result, const int32_t errorCode) override;
 
 private:
-    AsyncCancelSession *asyncContext_;
+    AsyncCancelSession *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
