@@ -550,7 +550,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     }
     int curSimId = 0;
     if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
-        if (!simFileManager_[slotId]->IsSupported()){
+        if (!simFileManager_[slotId]->IsSupported()) {
             TELEPHONY_LOGE("failed by out of range");
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
