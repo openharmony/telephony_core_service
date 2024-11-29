@@ -32,6 +32,7 @@ public:
     virtual ~CellInfo() = default;
     static void InitCellSignalBar(const int32_t bar = 5);
     void GetCellInfoList(std::vector<sptr<CellInformation>> &cellInfo);
+    void GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &cellInfo);
     void ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ClearCellInfoList();
@@ -69,6 +70,7 @@ private:
     sptr<CellLocation> GetCellLocationExt(CellInformation::CellType type);
     std::mutex mutex_;
     std::vector<sptr<CellInformation>> cellInfos_;
+    std::vector<sptr<CellInformation>> neighboringCellInfos_;
     sptr<CellInformation> currentCellInfo_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 

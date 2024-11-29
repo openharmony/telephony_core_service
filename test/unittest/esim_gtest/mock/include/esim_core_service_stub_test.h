@@ -470,6 +470,11 @@ public:
         return 0;
     }
 
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override
+    {
+        return 0;
+    }
+
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override
     {
         return 0;

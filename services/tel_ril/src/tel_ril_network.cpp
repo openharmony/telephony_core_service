@@ -80,7 +80,7 @@ int32_t TelRilNetwork::GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer
     return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetPreferredNetwork);
 }
 
-int32_t TelRilNetwork::GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilNetwork::GetNeighboringCellInfoList(const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::GetNeighboringCellInfoList);
 }
@@ -706,6 +706,8 @@ void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ri
     cellInfo.ServiceCellParas.nr.pci = info.serviceCells.nr.pci;
     cellInfo.ServiceCellParas.nr.tac = info.serviceCells.nr.tac;
     cellInfo.ServiceCellParas.nr.nci = info.serviceCells.nr.nci;
+    cellInfo.ServiceCellParas.nr.rsrp = info.serviceCells.nr.rsrp;
+    cellInfo.ServiceCellParas.nr.rsrq = info.serviceCells.nr.rsrq;
 }
 
 void TelRilNetwork::BuildCurrentCellInfoList(

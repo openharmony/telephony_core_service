@@ -827,6 +827,15 @@ public:
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
 
     /**
+     * @brief Obtain the neighboring cell information list
+     *
+     * @param slotId[in], primary slot id
+     * @param cellInfo[out], the neighboring cell information of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
+
+    /**
      * @brief Requests for a cell location update
      *
      * @param slotId[in], primary slot id

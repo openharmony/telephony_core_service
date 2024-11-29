@@ -147,7 +147,8 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetOperatorInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetCellInfoList(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t GetNeighboringCellInfoList(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetCurrentCellInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -298,6 +299,7 @@ public:
     std::vector<std::string> ObtainAllSmsOfIcc(int slotId);
     bool IsSimActive(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable);
+    int32_t ResetSimLoadAccount(int32_t slotId);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t SetDefaultSmsSlotId(int32_t slotId);

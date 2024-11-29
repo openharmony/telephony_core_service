@@ -222,6 +222,8 @@ public:
 
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
 
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
 
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;

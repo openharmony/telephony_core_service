@@ -288,7 +288,8 @@ void TelRilTest::InitNetwork()
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_OPTION_MODE] = &TelRilTest::GetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_SET_NR_OPTION_MODE] = &TelRilTest::SetNrOptionModeTest;
     memberFuncMap_[DiffInterfaceId::TEST_GET_NR_SSBID_INFO] = &TelRilTest::GetNrSsbIdTest;
-    memberFuncMap_[DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE] = &TelRilTest::GetCellInfoListTest;
+    memberFuncMap_[DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE] =
+        &TelRilTest::GetNeighboringCellInfoListTest;
 }
 
 void TelRilTest::InitModem()
@@ -1895,19 +1896,19 @@ void TelRilTest::GetNrSsbIdTest(int32_t slotId, std::shared_ptr<AppExecFwk::Even
 }
 
 /**
- * @brief Get cellinfo list
+ * @brief Get Neighboring cellinfo list
  *
  * @param handler
  */
-void TelRilTest::GetCellInfoListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+void TelRilTest::GetNeighboringCellInfoListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
 {
-    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE);
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE);
     auto event = AppExecFwk::InnerEvent::Get(eventId);
     if (event != nullptr && telRilManager_ != nullptr) {
         event->SetOwner(handler);
-        TELEPHONY_LOGI("TelRilTest::GetCellInfoListTest -->");
-        telRilManager_->GetCellInfoList(slotId, event);
-        TELEPHONY_LOGI("TelRilTest::GetCellInfoListTest --> finished");
+        TELEPHONY_LOGI("TelRilTest::GetNeighboringCellInfoList -->");
+        telRilManager_->GetNeighboringCellInfoList(slotId, event);
+        TELEPHONY_LOGI("TelRilTest::GetNeighboringCellInfoList --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

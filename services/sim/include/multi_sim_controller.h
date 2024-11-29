@@ -25,11 +25,12 @@
 #include "sim_rdb_helper.h"
 #include "sim_state_manager.h"
 #include "telephony_errors.h"
+#include "tel_event_handler.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Telephony {
-class MultiSimController {
+class MultiSimController : public TelEventHandler {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
         std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -61,6 +62,7 @@ public:
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
     bool ForgetAllData(int32_t slotId);
+    void ResetSetPrimarySlotRemain(int32_t slotId);
     int32_t GetSlotId(int32_t simId);
     int32_t GetSimId(int32_t slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
@@ -81,6 +83,9 @@ public:
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
+    enum {
+        SET_PRIMARY_SLOT_RETRY_EVENT = 0,
+    };
 
 private:
     bool IsValidData(int32_t slotId);
@@ -118,6 +123,8 @@ private:
     int32_t IsSatelliteSupported();
     int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
+    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     int32_t maxCount_ = 0;
@@ -136,6 +143,7 @@ private:
     std::mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
+    std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
 };
 } // namespace Telephony
