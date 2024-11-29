@@ -38,7 +38,7 @@ public:
         int32_t automaticFlag, std::string oper, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetPreferredNetwork(int32_t preferredNetworkType, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPreferredNetwork(const AppExecFwk::InnerEvent::Pointer &response);
-    int32_t GetCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNeighboringCellInfoList(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t GetPhysicalChannelConfig(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetLocateUpdates(RegNotifyMode mode, const AppExecFwk::InnerEvent::Pointer &response);

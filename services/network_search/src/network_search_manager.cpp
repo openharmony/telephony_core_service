@@ -1075,6 +1075,21 @@ int32_t NetworkSearchManager::GetCellInfoList(int32_t slotId, std::vector<sptr<C
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+int32_t NetworkSearchManager::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        if (inner->networkSearchHandler_ != nullptr) {
+            inner->networkSearchHandler_->GetNeighboringCellInfoList(cellInfo);
+            if (TELEPHONY_EXT_WRAPPER.getCellInfoList_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getCellInfoList_(slotId, cellInfo);
+            }
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 int32_t NetworkSearchManager::SendUpdateCellLocationRequest(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);

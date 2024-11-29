@@ -115,7 +115,7 @@ public:
 
     virtual int32_t GetOperatorInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
-    virtual int32_t GetCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetNeighboringCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
     virtual int32_t GetCurrentCellInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
 
