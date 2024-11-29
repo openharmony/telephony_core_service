@@ -488,18 +488,8 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
     isSetActiveSimInProgress_[slotId] = 0;
 }
 
-int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
+int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
-    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
-    if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("invalid slotid or sim card absent.");
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    int curSimId = 0;
-    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("failed by out of range");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     isSetActiveSimInProgress_[slotId] = 1;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
@@ -537,6 +527,37 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     lock.unlock();
     UpdateSubState(slotId, enable);
     CheckIfNeedSwitchMainSlotId();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
+{
+    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
+#ifndef  CORE_SERVICE_SUPPORT_ESIM
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("invalid slotid or sim card absent.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("failed by out of range");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+#else
+    if ((!IsValidData(slotId)) && (!simFileManager_[slotId]->IsEsimSupported())) {
+        TELEPHONY_LOGE("invalid slotid.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        if (!simFileManager_[slotId]->IsEsimSupported()){
+            TELEPHONY_LOGE("failed by out of range");
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
+        }
+    }
+#endif
+
+    int32_t result = SetActiveCommonSim(slotId, enable, force, curSimId);
     return TELEPHONY_ERR_SUCCESS;
 }
 
