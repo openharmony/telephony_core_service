@@ -46,6 +46,7 @@
       *NrSignalInformation*;
       *NrSsbInformation*;
       *OperatorConfig*;
+      *OperatorNameParams*;
       *ResourceUtils*;
       *SignalInformation*;
       *TdscdmaCellInformation*;
