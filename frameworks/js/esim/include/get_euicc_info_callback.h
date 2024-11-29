@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GET_EID_INFO_CALLBACK_H
-#define GET_EID_INFO_CALLBACK_H
+#ifndef GET_EUICC_INFO_CALLBACK_H
+#define GET_EUICC_INFO_CALLBACK_H
 
 #include "iesim_service_callback_stub.h"
 #include "napi_esim.h"
@@ -31,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // GET_EID_INFO_CALLBACK_H
+#endif // GET_EUICC_INFO_CALLBACK_H
