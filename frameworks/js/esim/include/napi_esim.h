@@ -34,6 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int WAIT_TIME_SECOND = 30;
 const int32_t DEFAULT_ERROR = -1;
 
 template<typename T>
@@ -41,6 +42,10 @@ struct AsyncContext {
     BaseContext context;
     int32_t slotId = ERROR_DEFAULT;
     T callbackVal;
+    std::mutex callbackMutex;
+    std::condition_variable cv;
+    bool isCallbackEnd = false;
+    bool isSendRequest = false;
 };
 
 struct AsyncContextInfo {

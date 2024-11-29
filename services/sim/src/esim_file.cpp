@@ -55,12 +55,12 @@ void EsimFile::SyncOpenChannel()
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(OHOS::Telephony::ToUtf16(ISDR_AID));
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to open the channel");
             break;
         }
@@ -73,12 +73,12 @@ void EsimFile::SyncOpenChannel(const std::u16string &aid)
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to open the channel");
             break;
         }
@@ -91,12 +91,12 @@ void EsimFile::SyncCloseChannel()
     while (IsLogicChannelOpen()) {
         ProcessEsimCloseChannel();
         std::unique_lock<std::mutex> lck(closeChannelMutex_);
-        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return !IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             currentChannelId_ = 0;
             TELEPHONY_LOGE("failed to close the channel");
             break;
