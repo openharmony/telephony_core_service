@@ -44,8 +44,8 @@ struct AsyncContext {
     T callbackVal;
     std::mutex callbackMutex;
     std::condition_variable cv;
-    bool callbackEnd = false;
-    bool sendRequest = false;
+    bool isCallbackEnd = false;
+    bool isSendRequest = false;
 };
 
 struct AsyncContextInfo {

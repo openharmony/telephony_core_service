@@ -27,7 +27,7 @@ public:
     void OnStartOsu(const OsuStatus &result, const int32_t errorCode) override;
 
 private:
-    AsyncContext<int32_t> *asyncContext_;
+    AsyncContext<int32_t> *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

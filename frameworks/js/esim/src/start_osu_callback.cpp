@@ -38,7 +38,7 @@ void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t e
         asyncContext_->context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
         TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
-    asyncContext_->callbackEnd = true;
+    asyncContext_->isCallbackEnd = true;
     asyncContext_->cv.notify_all();
 }
 } // namespace Telephony

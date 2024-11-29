@@ -117,6 +117,8 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverEsimErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        delete asyncContext;
+        asyncContext = nullptr;
         return nullptr;
     }
 
@@ -566,7 +568,7 @@ void NativeGetEuiccInfo(napi_env env, void *data)
     euiccContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         euiccContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [euiccContext] { return euiccContext->asyncContext.callbackEnd; });
+            [euiccContext] { return euiccContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -629,7 +631,7 @@ void NativeGetDefaultSmdpAddress(napi_env env, void *data)
     contextInfo->context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         contextInfo->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [contextInfo] { return contextInfo->callbackEnd; });
+            [contextInfo] { return contextInfo->isCallbackEnd; });
     }
 }
 
@@ -670,7 +672,7 @@ void NativeSetDefaultSmdpAddress(napi_env env, void *data)
     TELEPHONY_LOGI("NAPI NativeSetDefaultSmdpAddress %{public}d", errorCode);
     if (errorCode == TELEPHONY_SUCCESS) {
         context->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [context] { return context->asyncContext.callbackEnd; });
+            [context] { return context->asyncContext.isCallbackEnd; });
     }
     context->asyncContext.context.errorCode = errorCode;
 }
@@ -733,7 +735,7 @@ void NativeSwitchToProfile(napi_env env, void *data)
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->asyncContext.callbackEnd; });
+            [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -795,7 +797,7 @@ void NativeDeleteProfile(napi_env env, void *data)
     context->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         context->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [context] { return context->asyncContext.callbackEnd; });
+            [context] { return context->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -858,7 +860,7 @@ void NativeResetMemory(napi_env env, void *data)
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->asyncContext.callbackEnd; });
+            [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -934,7 +936,7 @@ void NativeDownloadProfile(napi_env env, void *data)
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->asyncContext.callbackEnd; });
+            [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -1003,7 +1005,7 @@ void NativeGetDownloadableProfiles(napi_env env, void *data)
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->asyncContext.callbackEnd; });
+            [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -1110,7 +1112,7 @@ void NativeStartOsu(napi_env env, void *data)
     profileContext->context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->callbackEnd; });
+            [profileContext] { return profileContext->isCallbackEnd; });
     }
 }
 
@@ -1153,7 +1155,7 @@ void NativeSetProfileNickname(napi_env env, void *data)
     setprofileNickNameContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         setprofileNickNameContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [setprofileNickNameContext] { return setprofileNickNameContext->asyncContext.callbackEnd; });
+            [setprofileNickNameContext] { return setprofileNickNameContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -1217,7 +1219,7 @@ void NativeCancelSession(napi_env env, void *data)
     cancelSessionContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         cancelSessionContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [cancelSessionContext] { return cancelSessionContext->asyncContext.callbackEnd; });
+            [cancelSessionContext] { return cancelSessionContext->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -1281,7 +1283,7 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     metadata->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         metadata->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [metadata] { return metadata->asyncContext.callbackEnd; });
+            [metadata] { return metadata->asyncContext.isCallbackEnd; });
     }
 }
 
@@ -1347,7 +1349,7 @@ void NativeGetEuiccProfileInfoList(napi_env env, void *data)
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
         profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
-            [profileContext] { return profileContext->asyncContext.callbackEnd; });
+            [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
 

@@ -27,7 +27,7 @@ public:
     void OnDownloadProfile(const DownloadProfileResult &result, const int32_t errorCode) override;
 
 private:
-    AsyncDownloadProfileInfo *asyncContext_;
+    AsyncDownloadProfileInfo *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -27,7 +27,7 @@ public:
     void OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode) override;
 
 private:
-    AsyncEuiccInfo *asyncContext_;
+    AsyncEuiccInfo *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

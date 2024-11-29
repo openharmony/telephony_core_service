@@ -28,7 +28,7 @@ public:
     void OnSetProfileNickName(const int32_t &result, const int32_t errorCode) override;
 
 private:
-    AsyncProfileNickname *asyncContext_;
+    AsyncProfileNickname *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

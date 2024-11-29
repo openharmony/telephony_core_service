@@ -27,7 +27,7 @@ public:
     void OnSwitchToProfile(const int32_t &result, const int32_t errorCode) override;
 
 private:
-    AsyncSwitchProfileInfo *asyncContext_;
+    AsyncSwitchProfileInfo *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -39,7 +39,7 @@ void GetDownloadableProfileMetadataResultCallback::OnGetDownloadableProfileMetad
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
         TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
-    asyncContext_->asyncContext.callbackEnd = true;
+    asyncContext_->asyncContext.isCallbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
 }
 } // namespace Telephony

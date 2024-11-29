@@ -28,7 +28,7 @@ public:
         const int32_t errorCode) override;
 
 private:
-    AsyncProfileMetadataInfo *asyncContext_;
+    AsyncProfileMetadataInfo *asyncContext_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
