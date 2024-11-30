@@ -1393,6 +1393,25 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_003, Function | MediumTest | 
     stkController->OnSendCallSetupRequestResult(event);
 }
 
+HWTEST_F(SimRilBranchTest, Telephony_StkController_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
+
+    EXPECT_FALSE(stkController->CheckIsBipCmd("00"));
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
+
+    EXPECT_FALSE(stkController->CheckIsBipCmd("D0"));
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
+
+    EXPECT_FALSE(stkController->CheckIsBipCmd("D080"));
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
+
+    EXPECT_FALSE(stkController->CheckIsBipCmd("D018813010"));
+    ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
+}
+
 HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
