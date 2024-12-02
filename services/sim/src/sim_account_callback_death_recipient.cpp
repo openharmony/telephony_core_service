@@ -22,7 +22,7 @@ namespace Telephony {
 
 void SimAccountCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    if (remote) {
+    if (remote != nullptr) {
         sptr<SimAccountCallback> callback = iface_cast<SimAccountCallback>(remote.promote());
         if (callback != nullptr) {
             TELEPHONY_LOGE("OnRemoteDied remote server death");
