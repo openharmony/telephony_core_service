@@ -16,7 +16,6 @@
 #include "sim_account_callback_death_recipient.h"
 #include "multi_sim_monitor.h"
 #include "iremote_object.h"
-#include <memory>
 
 namespace OHOS {
 namespace Telephony {
