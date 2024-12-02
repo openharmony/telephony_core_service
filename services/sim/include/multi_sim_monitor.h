@@ -68,6 +68,7 @@ private:
         int32_t tokenId = 0;
         sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
+	sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);

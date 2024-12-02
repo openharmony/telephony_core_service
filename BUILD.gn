@@ -74,6 +74,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/mcc_pool.cpp",
     "$TELEPHONY_SIM_ROOT/src/multi_sim_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/multi_sim_monitor.cpp",
+	"$TELEPHONY_SIM_ROOT/src/sim_account_callback_death_recipient.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_config_cache.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_config_loader.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_file_parser.cpp",
