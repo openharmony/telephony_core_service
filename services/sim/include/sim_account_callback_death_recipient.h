@@ -18,7 +18,6 @@
 
 #include "iremote_broker.h"
 #include "multi_sim_monitor.h"
-#include <memory>
 
 namespace OHOS {
 namespace Telephony {
