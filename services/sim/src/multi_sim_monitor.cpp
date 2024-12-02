@@ -450,7 +450,7 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     SimAccountCallbackRecord simAccountRecord;
     simAccountRecord.tokenId = tokenId;
     simAccountRecord.simAccountCallback = callback;
-	deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(*this);
+    deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(*this);
     if (deathRecipient_ == nullptr) {
         TELEPHONY_LOGE("deathRecipient is null");
         return TELEPHONY_ERR_STRCPY_FAIL;
