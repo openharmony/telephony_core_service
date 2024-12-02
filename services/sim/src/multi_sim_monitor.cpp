@@ -25,6 +25,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
+#include "sim_account_callback_death_recipient.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -449,6 +450,14 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     SimAccountCallbackRecord simAccountRecord;
     simAccountRecord.tokenId = tokenId;
     simAccountRecord.simAccountCallback = callback;
+    deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(*this);
+    if (deathRecipient_ == nullptr) {
+        TELEPHONY_LOGE("deathRecipient is null");
+        return TELEPHONY_ERR_STRCPY_FAIL;
+    }
+    if (!callback->AsObject()->AddDeathRecipient(deathRecipient_)) {
+        TELEPHONY_LOGE("simAccountCallback remote server add death recipient failed");
+    }
     listSimAccountCallbackRecord_.push_back(simAccountRecord);
     TELEPHONY_LOGI("Register successfully, callback list size is %{public}zu", listSimAccountCallbackRecord_.size());
     return TELEPHONY_SUCCESS;
