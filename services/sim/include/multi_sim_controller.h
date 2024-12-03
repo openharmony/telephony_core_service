@@ -59,6 +59,7 @@ public:
     int32_t GetSimTelephoneNumber(int32_t slotId, std::u16string &telephoneNumber);
     bool IsSimActive(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable, bool force = false);
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable, bool force = false);
     bool SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable);
     bool ForgetAllData();
     bool ForgetAllData(int32_t slotId);
@@ -127,6 +128,8 @@ private:
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
+    const int ACTIVE_SIM_IN_PROGRESS = 1;
+    const int ACTIVE_SIM_NOT_IN_PROGRESS = 0;
     int32_t maxCount_ = 0;
     int32_t primarySimId_ = 0;
     int32_t defaultSmsSimId_ = 0;

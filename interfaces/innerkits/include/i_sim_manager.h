@@ -64,6 +64,7 @@ public:
     // SimAccount
     virtual bool IsSimActive(int32_t slotId) = 0;
     virtual int32_t SetActiveSim(int32_t slotId, int32_t enable) = 0;
+    virtual int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) = 0;
     virtual int32_t ResetSimLoadAccount(int32_t slotId) = 0;
     virtual int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info) = 0;
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;

@@ -67,6 +67,7 @@ public:
     // SimAccount
     bool IsSimActive(int32_t slotId) override;
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) override;
     int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info) override;
     int32_t ResetSimLoadAccount(int32_t slotId) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;

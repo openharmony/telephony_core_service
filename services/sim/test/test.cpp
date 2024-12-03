@@ -177,6 +177,7 @@ static sptr<ICoreService> g_telephonyService = nullptr;
 std::unique_ptr<Telephony::SimAccountManager> g_simAccountManager = nullptr;
 
 const int32_t SLOT_ID = DEFAULT_SIM_SLOT_ID;
+const int32_t INVALID_SLOT_ID = -1;
 const int32_t DEFAULT_VALUE = 0;
 const int32_t FIX_DAILING = 2;
 static bool g_simDiallingNumbersRead = false;
@@ -1198,6 +1199,30 @@ static bool TestSetActiveSim()
 
     int32_t result = g_telephonyService->SetActiveSim(slotId, enable);
     std::cout << "TestSetActiveSim(), result = " << result << endl;
+    return true;
+}
+
+static bool TestSetActiveSimSatellite()
+{
+    AccessToken token;
+    int inValidSlotId = INVALID_SLOT_ID;
+    int slotId = DEFAULT_SIM_SLOT_ID;
+    int enable = ACTIVE;
+    int disable = DEACTIVE;
+    int32_t result;
+    string expect;
+
+    result = g_telephonyService->SetActiveSimSatellite(inValidSlotId, enable);
+    expect = (result != TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
+    std::cout << "SetActiveSimSatellite invalid slot [" << result << "] " << expect << std::endl;
+
+    result = g_telephonyService->SetActiveSimSatellite(DEFAULT_SIM_SLOT_ID, enable);
+    expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
+    std::cout << "SetActiveSimSatellite default slot active[" << result << "] " << expect << std::endl;
+
+    result = g_telephonyService->SetActiveSimSatellite(DEFAULT_SIM_SLOT_ID, disable);
+    expect = (result == TELEPHONY_ERR_SUCCESS) ? "success" : "fail";
+    std::cout << "SetActiveSimSatellite default slot deactive[" << result << "] " << expect << std::endl;
     return true;
 }
 
