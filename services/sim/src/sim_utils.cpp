@@ -15,6 +15,8 @@
 
 #include "sim_utils.h"
 
+#include "str_convert.h"
+
 using namespace std;
 
 namespace OHOS {
@@ -158,34 +160,43 @@ std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset
 
 std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen)
 {
-    std::string str = "";
+    std::wstring wide_str = L"";
     int i = 0;
     int n = 0;
     int pos = 0;
     int left = 0;
     uint8_t high = 0;
     uint8_t low = 0;
+    uint8_t gsmVal = 0;
     left = BYTE_LENGTH;
     n = (byteLen * BYTE_LENGTH) / CHAR_GSM_7BIT;
     TELEPHONY_LOGI("Gsm7bitConvertToString byteLen:%{public}d", byteLen);
     for (i = 0; i < n; i++) {
         if (left == BYTE_LENGTH) {
-            str.push_back(bytes[pos] & (~(0xFF << (CHAR_GSM_7BIT))));
+            gsmVal = bytes[pos] & (~(0xFF << (CHAR_GSM_7BIT)));
             left -= CHAR_GSM_7BIT;
         } else if (left == CHAR_GSM_7BIT) {
-            str.push_back((bytes[pos] & (0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH - left));
+            gsmVal = (bytes[pos] & (0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH - left);
             left = BYTE_LENGTH;
             pos++;
         } else {
             low = (bytes[pos] & (unsigned char)(0xFF << (BYTE_LENGTH - left))) >> (BYTE_LENGTH - left);
             high = (bytes[pos + 1] & (unsigned char)(~(0xFF << (CHAR_GSM_7BIT - left)))) << left;
-            str.push_back(high | low);
+            gsmVal = low | high;
             left = BYTE_LENGTH - (CHAR_GSM_7BIT - left);
             pos++;
         }
+        int gsmValIndex = static_cast<int>(gsmVal);
+        TELEPHONY_LOGI("gsmValIndex:%{public}d, prevCharWasEscape:%{public}d", gsmValIndex);
+        if (gsmValIndex < 0 || gsmValIndex >= 129)) {
+            continue;
+        }
+        wchar_t c = LANGUAGE_TABLE[gsmValIndex];
+        wide_str += c;
+        TELEPHONY_LOGI("4, %{public}s", ToUtf8(wide_str).c_str());
     }
-    TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", str.c_str());
-    return str;
+    TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
+    return ToUtf8(wide_str);
 }
 
 std::string SIMUtils::DiallingNumberStringFieldConvertToString(
@@ -312,9 +323,11 @@ std::string SIMUtils::Decode8BitConvertToString(unsigned char *data, int length,
         if (c == BYTE_VALUE) {
             break;
         }
+        TELEPHONY_LOGI("Decode8BitConvertToString c:%{public}d", c);
     }
     i -= offset;
     std::string str(reinterpret_cast<char *>(data), offset, i);
+    TELEPHONY_LOGI("Decode8BitConvertToString str:%{public}s, offset:%{public}d, i:%{public}d", str.c_str(), offset, i);
     return str;
 }
 
