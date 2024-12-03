@@ -207,6 +207,10 @@ private:
     static void SetActiveSimTestFunc1(CoreServiceTestHelper &helper);
     static void ReSetActiveSimTestFunc(CoreServiceTestHelper &helper);
     static void ReSetActiveSimTestFunc1(CoreServiceTestHelper &helper);
+    static void SetActiveSimSatelliteTestFunc(CoreServiceTestHelper &helper);
+    static void SetActiveSimSatelliteTestFunc1(CoreServiceTestHelper &helper);
+    static void ReSetActiveSimSatelliteTestFunc(CoreServiceTestHelper &helper);
+    static void ReSetActiveSimSatelliteTestFunc1(CoreServiceTestHelper &helper);
     static void HasOperatorPrivileges(CoreServiceTestHelper &helper);
     static void HasOperatorPrivileges1(CoreServiceTestHelper &helper);
     static void UnlockSimLockTestFunc(CoreServiceTestHelper &helper);

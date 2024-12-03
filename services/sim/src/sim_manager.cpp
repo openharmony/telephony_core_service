@@ -312,6 +312,19 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
     return ret;
 }
 
+int32_t SimManager::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = multiSimController_->SetActiveSimSatellite(slotId, enable);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
+}
+
 int32_t SimManager::ResetSimLoadAccount(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {

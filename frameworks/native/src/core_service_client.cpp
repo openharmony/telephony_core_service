@@ -669,6 +669,16 @@ int32_t CoreServiceClient::SetActiveSim(const int32_t slotId, int32_t enable)
     return proxy->SetActiveSim(slotId, enable);
 }
 
+int32_t CoreServiceClient::SetActiveSimSatellite(const int32_t slotId, int32_t enable)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetActiveSimSatellite(slotId, enable);
+}
+
 int32_t CoreServiceClient::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();

@@ -1391,6 +1391,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(0, 1, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
     int32_t imsSwitchValue;
@@ -1509,6 +1510,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
     EXPECT_GT(simManager->SetVoiceMailInfo(INVALID_SLOTID, testStr, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetActiveSim(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSimSatellite(0, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSimSatellite(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
