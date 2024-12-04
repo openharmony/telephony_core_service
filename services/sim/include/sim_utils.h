@@ -24,7 +24,6 @@
 #include "string_ex.h"
 #include "telephony_log_wrapper.h"
 #include "sim_char_decode.h"
-#include "str_convert.h"
 
 namespace OHOS {
 namespace Telephony {
