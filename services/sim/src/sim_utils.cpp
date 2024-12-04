@@ -187,7 +187,7 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
             pos++;
         }
         int gsmValIndex = static_cast<int>(gsmVal);
-        if (gsmValIndex < 0 || gsmValIndex >= 129) {
+        if (gsmValIndex < 0 || gsmValIndex >= 129) { // 129 is gsm val index max
             continue;
         }
         wchar_t c = LANGUAGE_TABLE[gsmValIndex];
