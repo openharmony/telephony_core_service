@@ -3185,6 +3185,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Leve
         simFileManagerWeak};
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
+    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
 }
 
 /**
