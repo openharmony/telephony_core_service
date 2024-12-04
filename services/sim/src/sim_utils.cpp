@@ -187,7 +187,6 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
             pos++;
         }
         int gsmValIndex = static_cast<int>(gsmVal);
-        TELEPHONY_LOGI("gsmValIndex:%{public}d, prevCharWasEscape:%{public}d", gsmValIndex);
         if (gsmValIndex < 0 || gsmValIndex >= 129) {
             continue;
         }
