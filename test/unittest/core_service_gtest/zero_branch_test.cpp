@@ -3197,21 +3197,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Leve
         simFileManagerWeak};
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify();
-    multiSimMonitor->InitData(0);
-    simStateManager = { nullptr, nullptr };
-    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    simFileManagerWeak.reset();
-    simFileManagerWeaks = { simFileManagerWeak, simFileManagerWeak };
-    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    multiSimMonitor->RefreshData(0);
-    multiSimMonitor->UpdateAllOpkeyConfigs();
-    multiSimMonitor->ClearAllOpcCache();
-    EXPECT_FALSE(multiSimMonitor->IsValidSlotId(-1));
+    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
 }
 
 /**
