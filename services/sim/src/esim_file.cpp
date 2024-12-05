@@ -1326,7 +1326,7 @@ ResultCode EsimFile::ResetMemory(ResetOption resetOption)
 
 ResultCode EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
-    setDpAddressResult_ = ResultCode::RESULT_SGP_22_OTHER;;
+    setDpAddressResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress = BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
