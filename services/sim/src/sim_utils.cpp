@@ -192,7 +192,6 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
         }
         wchar_t c = LANGUAGE_TABLE[gsmValIndex];
         wide_str += c;
-        TELEPHONY_LOGI("4, %{public}s", ToUtf8(wide_str).c_str());
     }
     TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
     return ToUtf8(wide_str);
@@ -322,11 +321,10 @@ std::string SIMUtils::Decode8BitConvertToString(unsigned char *data, int length,
         if (c == BYTE_VALUE) {
             break;
         }
-        TELEPHONY_LOGI("Decode8BitConvertToString c:%{public}d", c);
     }
     i -= offset;
     std::string str(reinterpret_cast<char *>(data), offset, i);
-    TELEPHONY_LOGI("Decode8BitConvertToString str:%{public}s, offset:%{public}d, i:%{public}d", str.c_str(), offset, i);
+    TELEPHONY_LOGI("Decode8BitConvertToString str:%{public}s", str.c_str());
     return str;
 }
 
