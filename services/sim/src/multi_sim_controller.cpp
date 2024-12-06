@@ -559,9 +559,7 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         }
     }
 #endif
-
-    int32_t result = SetActiveCommonSim(slotId, enable, force, curSimId);
-    return TELEPHONY_ERR_SUCCESS;
+    return SetActiveCommonSim(slotId, enable, force, curSimId);
 }
 
 void MultiSimController::CheckIfNeedSwitchMainSlotId()
