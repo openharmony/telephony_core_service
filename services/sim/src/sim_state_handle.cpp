@@ -20,6 +20,7 @@
 #include "common_event_support.h"
 #include "core_service_hisysevent.h"
 #include "enum_convert.h"
+#include "esim_service_client.h"
 #include "hilog/log.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
@@ -28,6 +29,7 @@
 #include "satellite_service_client.h"
 #include "sim_constant.h"
 #include "sim_state_manager.h"
+#include "start_osu_result_callback.h"
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "tel_ril_sim_parcel.h"
@@ -725,6 +727,9 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             if (IsRadioStateUnavailable(event)) {
                 break;
             }
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+            UpdateEsimOSVersion(slotId_);
+#endif
             [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
@@ -1018,5 +1023,23 @@ SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
 {
     return simIORespon_;
 }
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
+{
+    bool result = false;
+    int32_t udateResult = -1;
+
+    result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
+    if (result) {
+        std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
+        int32_t  udateResult = EsimServiceClient::GetInstance().StartOsu(slotId_, callback.release());
+        TELEPHONY_LOGI("StartOsu  result: %{public}d", udateResult);
+        if (udateResult==TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("cardOsu  success");
+        }
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
