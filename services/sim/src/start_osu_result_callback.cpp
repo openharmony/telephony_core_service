@@ -14,7 +14,6 @@
  */
 
 #include "start_osu_result_callback.h"
-
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
