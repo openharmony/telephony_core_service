@@ -190,6 +190,9 @@ private:
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
     std::string iccid_ = "";
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    bool isInitedEsim = false;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

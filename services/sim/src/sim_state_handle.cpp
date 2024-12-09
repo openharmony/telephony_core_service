@@ -20,7 +20,9 @@
 #include "common_event_support.h"
 #include "core_service_hisysevent.h"
 #include "enum_convert.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
+#endif
 #include "hilog/log.h"
 #include "if_system_ability_manager.h"
 #include "inner_event.h"
@@ -29,7 +31,9 @@
 #include "satellite_service_client.h"
 #include "sim_constant.h"
 #include "sim_state_manager.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "start_osu_result_callback.h"
+#endif
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "tel_ril_sim_parcel.h"
@@ -727,12 +731,12 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             if (IsRadioStateUnavailable(event)) {
                 break;
             }
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-            UpdateEsimOSVersion(slotId_);
-#endif
             [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+            UpdateEsimOSVersion(slotId_);
+#endif
             break;
         case MSG_SIM_GET_ICC_STATUS_DONE:
             GetSimCardData(slotId_, event);
@@ -1029,11 +1033,16 @@ void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
 {
     bool result = false;
     int32_t udateResult = -1;
-
+    TELEPHONY_LOGE("UpdateEsimOSVersion 1");
+    if (!isInitedEsim) {
+        isInitedEsim = true;
+        return;
+    }
+    TELEPHONY_LOGE("UpdateEsimOSVersion 2");
     result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
     if (result) {
         std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
-        int32_t  udateResult = EsimServiceClient::GetInstance().StartOsu(slotId_, callback.release());
+        udateResult = DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
         TELEPHONY_LOGI("StartOsu  result: %{public}d", udateResult);
         if (udateResult==TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGE("cardOsu  success");
