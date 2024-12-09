@@ -113,6 +113,7 @@ private:
     int32_t OnGetLockState(MessageParcel &data, MessageParcel &reply);
     int32_t OnRefreshSimState(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetActiveSim(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetActiveSimSatellite(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkCapability(MessageParcel &data, MessageParcel &reply);

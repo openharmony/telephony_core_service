@@ -159,6 +159,8 @@ public:
 
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
 
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) override;
+
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t SetPreferredNetwork(

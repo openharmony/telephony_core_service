@@ -192,6 +192,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_002, Function |
     EXPECT_FALSE(coreServiceProxy.IsValidSlotIdEx(INVALID_SLOTID));
     EXPECT_FALSE(coreServiceProxy.IsValidSlotIdForDefault(INVALID_DEFAULT_SLOTID));
     EXPECT_EQ(coreServiceProxy.SetActiveSim(INVALID_SLOTID, -1), TELEPHONY_ERR_SLOTID_INVALID);
+    EXPECT_EQ(coreServiceProxy.SetActiveSimSatellite(INVALID_SLOTID, -1), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(coreServiceProxy.GetSimTelephoneNumber(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(coreServiceProxy.GetSimTeleNumberIdentifier(INVALID_SLOTID), u"");
     EXPECT_EQ(coreServiceProxy.GetVoiceMailIdentifier(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);

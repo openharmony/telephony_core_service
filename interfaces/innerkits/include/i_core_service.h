@@ -111,6 +111,7 @@ public:
     virtual int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;
     virtual int32_t SetActiveSim(int32_t slotId, int32_t enable) = 0;
+    virtual int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) = 0;
     virtual int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) = 0;
