@@ -477,7 +477,7 @@ void AddProfileCallback(napi_env env, napi_status status, void *data)
         return;
     }
     NapiAsyncPermissionCompleteCallback(
-        env, status, context->asyncContext, false, { "AddProfile", Permission::SET_TELEPHONY_ESIM_STATE });
+        env, status, context->asyncContext, false, { "AddProfile", Permission::SET_TELEPHONY_ESIM_STATE_OPEN });
 }
 
 napi_value AddProfile(napi_env env, napi_callback_info info)
