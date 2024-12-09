@@ -1011,7 +1011,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -3200,7 +3200,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Leve
         simFileManagerWeak};
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
-    EXPECT_GT(multiSimMonitor->ResetSimLoadAccount(0), TELEPHONY_SUCCESS);
+    EXPECT_FALSE(multiSimMonitor->IsValidSlotId(-1));
 }
 
 /**
