@@ -562,6 +562,51 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     return SetActiveCommonSim(slotId, enable, force, curSimId);
 }
 
+int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable, bool force)
+{
+    TELEPHONY_LOGI("SetActiveSimSatellite enable = %{public}d slotId = %{public}d", enable, slotId);
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("invalid slotid or sim card absent.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("failed by out of range");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_IN_PROGRESS;
+    if (force) {
+        TELEPHONY_LOGD("no need to update cache");
+        UpdateSubState(slotId, enable);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(enable);
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
+    if (result == INVALID_VALUE) {
+        TELEPHONY_LOGE("failed by database");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    }
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+        TELEPHONY_LOGE("failed by out of range");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    localCacheInfo_[slotId].isActive = enable;
+    lock.unlock();
+    UpdateSubState(slotId, enable);
+    CheckIfNeedSwitchMainSlotId();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 void MultiSimController::CheckIfNeedSwitchMainSlotId()
 {
     TELEPHONY_LOGD("start");

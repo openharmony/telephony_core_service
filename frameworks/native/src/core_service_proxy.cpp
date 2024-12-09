@@ -1874,6 +1874,39 @@ int32_t CoreServiceProxy::SetActiveSim(int32_t slotId, int32_t enable)
     return result;
 }
 
+int32_t CoreServiceProxy::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("CoreServiceProxy::SetActiveSimSatellite invalid simId");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (enable != DISABLE && enable != ENABLE) {
+        TELEPHONY_LOGE("CoreServiceProxy::SetActiveSimSatellite invalid enable status");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetActiveSimSatellite WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(enable);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetActiveSimSatellite Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SetActiveSimSatellite failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
 int32_t CoreServiceProxy::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     TELEPHONY_LOGI("CoreServiceProxy GetPreferredNetwork");

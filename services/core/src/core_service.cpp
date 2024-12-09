@@ -1010,6 +1010,24 @@ int32_t CoreService::SetActiveSim(int32_t slotId, int32_t enable)
     return simManager_->SetActiveSim(slotId, enable);
 }
 
+int32_t CoreService::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGD("CoreService::SetActiveSimSatellite(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetActiveSimSatellite(slotId, enable);
+}
+
 int32_t CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {

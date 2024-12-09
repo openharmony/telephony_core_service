@@ -455,6 +455,18 @@ HWTEST_F(CoreServiceTest, CoreService_SetActiveSim_001, Function | MediumTest | 
 }
 
 /**
+ * @tc.number   CoreService_SetActiveSimSatellite_001
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceTest, CoreService_SetActiveSimSatellite_001, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    auto result = DelayedSingleton<CoreService>::GetInstance()->SetActiveSimSatellite(0, true);
+    ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
  * @tc.number   CoreService_GetPreferredNetwork_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
