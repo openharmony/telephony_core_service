@@ -50,6 +50,18 @@ static const int START_POS = 3;
 static const int END_POS = 4;
 static const int POS_NOT_BLANK = 1;
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+static wchar_t LANGUAGE_TABLE[] = {
+    L'@', L'\u00a3', L'$', L'\u00a5', L'\u00e8', L'\u00e9', L'\u00f9', L'\u00ec', L'\u00f2', L'\u00c7',
+    L'\n', L'\u00d8', L'\u00f8', L'\r', L'\u00c5', L'\u00e5', L'\u0394', L'_', L'\u03a6', L'\u0393',
+    L'\u039b', L'\u03a9', L'\u03a0', L'\u03a8', L'\u03a3', L'\u0398', L'\u039e', L'\uffff', L'\u00c6',
+    L'\u00e6', L'\u00df', L'\u00c9', L' ', L'!', L'"', L'#', L'\u00a4', L'%', L'&', L'\'', L'(',
+    L')', L'*', L'+', L',', L'-', L'.', L'/', L'0', L'1', L'2', L'3', L'4', L'5', L'6', L'7', L'8', L'9', L':',
+    L';', L'<', L'=', L'>', L'?', L'\u00a1', L'A', L'B', L'C', L'D', L'E', L'F', L'G', L'H', L'I',
+    L'J', L'K', L'L', L'M', L'N', L'O', L'P', L'Q', L'R', L'S', L'T', L'U', L'V', L'W', L'X', L'Y', L'Z',
+    L'\u00c4', L'\u00d6', L'\u00d1', L'\u00dc', L'\u00a7', L'\u00bf', L'a', L'b', L'c', L'd', L'e',
+    L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o', L'p', L'q', L'r', L's', L't', L'u',
+    L'v', L'w', L'x', L'y', L'z', L'\u00e4', L'\u00f6', L'\u00f1', L'\u00fc', L'\u00e0'
+};
 // TS 24.008 Section 10.5.3.5a Network Name
 enum {
     NETWORK_NAME_IEI,
