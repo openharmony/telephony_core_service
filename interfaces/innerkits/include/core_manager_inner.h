@@ -322,6 +322,7 @@ public:
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
+    void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
     /******************** simManager end *****************************/
 private:
     CoreManagerInner();
