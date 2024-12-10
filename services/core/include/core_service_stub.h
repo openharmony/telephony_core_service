@@ -144,6 +144,7 @@ private:
     int32_t OnIsAllowedInsertApn(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTargetOpkey(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetOpnameVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t OnGetEid(MessageParcel &data, MessageParcel &reply);
