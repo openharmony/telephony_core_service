@@ -1072,6 +1072,16 @@ int32_t CoreServiceClient::GetOpkeyVersion(std::string &versionInfo)
     return proxy->GetOpkeyVersion(versionInfo);
 }
 
+int32_t CoreServiceClient::GetOpnameVersion(std::string &versionInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetOpnameVersion(versionInfo);
+}
+
 int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     int32_t fileId, const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response)
 {
