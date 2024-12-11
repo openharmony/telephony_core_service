@@ -1031,20 +1031,17 @@ SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
 {
-    bool result = false;
-    int32_t udateResult = -1;
-
-    TELEPHONY_LOGI("UpdateEsimOSVersion begin");
-    result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
-    if (result ==TELEPHONY_ERR_SUCCESS) {
+    bool result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
+    if (result == TELEPHONY_ERR_SUCCESS) {
         std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
-        udateResult = DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
-        TELEPHONY_LOGI("StartOsu  result: %{public}d", udateResult);
-        if (udateResult==TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGE("cardOsu  success");
+        int32_t updateResult =
+            DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
+        if (updateResult == TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGE("StartOsu success");
+        } else {
+            TELEPHONY_LOGE("StartOsu fail, updateResult: %{public}d", updateResult);
         }
     }
-    TELEPHONY_LOGI("UpdateEsimOSVersion end");
 }
 #endif
 } // namespace Telephony
