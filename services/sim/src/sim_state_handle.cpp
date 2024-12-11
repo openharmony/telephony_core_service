@@ -1036,11 +1036,11 @@ void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
 
     TELEPHONY_LOGI("UpdateEsimOSVersion begin");
     result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
-    if (result ==TELEPHONY_ERR_SUCCESS) {
+    if (result == TELEPHONY_ERR_SUCCESS) {
         std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
         udateResult = DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
         TELEPHONY_LOGI("StartOsu  result: %{public}d", udateResult);
-        if (udateResult==TELEPHONY_ERR_SUCCESS) {
+        if (udateResult == TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGE("cardOsu  success");
         }
     }
