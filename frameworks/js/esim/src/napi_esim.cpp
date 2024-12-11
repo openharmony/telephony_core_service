@@ -432,10 +432,11 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
     bool isSupported = false;
     napi_value value = nullptr;
-    if (parameterCount != PARAMETER_COUNT_ONE) {
+    if (parameterCount != PARAMETER_COUNT_ONE ||
+        !NapiUtil::MatchParameters(env, parameters, { napi_number })) {
         TELEPHONY_LOGE("isSupported parameter count is incorrect");
-        NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
-        return value;
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
     }
     int32_t slotId = UNDEFINED_VALUE;
     if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
@@ -443,8 +444,18 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
         return value;
     }
-    if (IsValidSlotId(slotId)) {
-        isSupported = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
+
+    if (!IsValidSlotId(slotId)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
+    if (errorCode != TELEPHONY_SUCCESS) {
+        JsError error = NapiUtil::ConverEsimErrorMessageForJs(errorCode);
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        return nullptr;
+    } else {
+        isSupported = true;
     }
     NAPI_CALL(env, napi_get_boolean(env, isSupported, &value));
     return value;
