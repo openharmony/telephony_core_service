@@ -321,6 +321,18 @@ AccessRule GetAccessRuleInfo(AsyncAccessRule &accessType)
 
 DownloadableProfile GetProfileInfo(AsyncDownloadableProfile &profileInfo)
 {
+    if (profileInfo.activationCode.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo activationCode is null.");
+    }
+    if (profileInfo.confirmationCode.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo confirmationCode is null.");
+    }
+    if (profileInfo.carrierName.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo carrierName is null.");
+    }
+    if (profileInfo.accessRules.size() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo accessRules is null.");
+    }
     DownloadableProfile profile;
     profile.encodedActivationCode_ = NapiUtil::ToUtf16(profileInfo.activationCode.data());
     profile.confirmationCode_ = NapiUtil::ToUtf16(profileInfo.confirmationCode.data());
