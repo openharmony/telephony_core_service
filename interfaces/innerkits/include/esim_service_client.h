@@ -217,9 +217,9 @@ public:
      * @brief Check whether embedded subscriptions are currently supported.
      *
      * @param slotId[in], indicates the card slot index number.
-     * @return Return true if the eSIM capability is supported; return false otherwise.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    bool IsSupported(int32_t slotId);
+    int32_t IsSupported(int32_t slotId);
 
     /**
      * @brief Starts a page through an ability, on which users can touch the button to download a profile.
