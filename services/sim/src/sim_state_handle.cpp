@@ -731,12 +731,12 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             if (IsRadioStateUnavailable(event)) {
                 break;
             }
-            [[fallthrough]]; // fall_through
-        case RadioEvent::RADIO_SIM_STATE_CHANGE:
-            ObtainIccStatus(slotId_);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
             UpdateEsimOSVersion(slotId_);
 #endif
+            [[fallthrough]]; // fall_through
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
+            ObtainIccStatus(slotId_);
             break;
         case MSG_SIM_GET_ICC_STATUS_DONE:
             GetSimCardData(slotId_, event);
@@ -1033,14 +1033,10 @@ void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
 {
     bool result = false;
     int32_t udateResult = -1;
-    TELEPHONY_LOGE("UpdateEsimOSVersion 1");
-    if (!isInitedEsim) {
-        isInitedEsim = true;
-        return;
-    }
-    TELEPHONY_LOGE("UpdateEsimOSVersion 2");
+
+    TELEPHONY_LOGI("UpdateEsimOSVersion begin");
     result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
-    if (result) {
+    if (result ==TELEPHONY_ERR_SUCCESS) {
         std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
         udateResult = DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
         TELEPHONY_LOGI("StartOsu  result: %{public}d", udateResult);
@@ -1048,6 +1044,7 @@ void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
             TELEPHONY_LOGE("cardOsu  success");
         }
     }
+    TELEPHONY_LOGI("UpdateEsimOSVersion end");
 }
 #endif
 } // namespace Telephony
