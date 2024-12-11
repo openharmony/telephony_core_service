@@ -322,10 +322,7 @@ bool EsimServiceClient::IsSupported(int32_t slotId)
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    if (proxy->IsSupported(slotId) != TELEPHONY_ERR_SUCCESS) {
-        return false;
-    }
-    return  true;
+    return proxy->IsSupported(slotId);
 }
 
 int32_t EsimServiceClient::AddProfile(int32_t slotId, DownloadableProfile profile)

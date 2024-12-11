@@ -106,7 +106,7 @@ void EsimFile::SyncCloseChannel()
 
 std::string EsimFile::ObtainEid()
 {
-    if (!eid_.empty()){
+    if (!eid_.empty()) {
         return eid_;
     }
     SyncOpenChannel();
@@ -1400,7 +1400,7 @@ bool EsimFile::IsSupported()
     ResetResponse resetResponse;
     std::string atr(buf);
     if (atr.empty()) {
-        if (!ObtainEid().empty()){
+        if (!ObtainEid().empty()) {
             isSupported_ = true;
             return isSupported_;
         } else {
