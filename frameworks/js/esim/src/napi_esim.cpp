@@ -188,19 +188,6 @@ void NapiAsyncPermissionCompleteCallback(napi_env env, napi_status status, const
     NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
 }
 
-template <typename T>
-void NapiAsyncCommomCompleteCallback(
-    napi_env env, napi_status status, const AsyncContext<T> &asyncContext, bool funcIgnoreReturnVal)
-{
-    if (status != napi_ok) {
-        napi_throw_type_error(env, nullptr, "excute failed");
-        return;
-    }
-
-    JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext.context.errorCode);
-    NapiAsyncBaseCompleteCallback(env, asyncContext, error, funcIgnoreReturnVal);
-}
-
 napi_value EuiccInfoConversion(napi_env env, const EuiccInfo &resultInfo)
 {
     napi_value val = nullptr;
@@ -349,6 +336,18 @@ AccessRule GetAccessRuleInfo(AsyncAccessRule &accessType)
 
 DownloadableProfile GetProfileInfo(AsyncDownloadableProfile &profileInfo)
 {
+    if (profileInfo.activationCode.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo activationCode is null.");
+    }
+    if (profileInfo.confirmationCode.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo confirmationCode is null.");
+    }
+    if (profileInfo.carrierName.length() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo carrierName is null.");
+    }
+    if (profileInfo.accessRules.size() == 0) {
+        TELEPHONY_LOGE("GetProfileInfo accessRules is null.");
+    }
     DownloadableProfile profile;
     profile.encodedActivationCode_ = NapiUtil::ToUtf16(profileInfo.activationCode.data());
     profile.confirmationCode_ = NapiUtil::ToUtf16(profileInfo.confirmationCode.data());
@@ -478,10 +477,11 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
     bool isSupported = false;
     napi_value value = nullptr;
-    if (parameterCount != PARAMETER_COUNT_ONE) {
+    if (parameterCount != PARAMETER_COUNT_ONE ||
+        !NapiUtil::MatchParameters(env, parameters, { napi_number })) {
         TELEPHONY_LOGE("isSupported parameter count is incorrect");
-        NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
-        return value;
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
     }
     int32_t slotId = UNDEFINED_VALUE;
     if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
@@ -489,8 +489,18 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_create_int32(env, isSupported, &value));
         return value;
     }
-    if (IsValidSlotId(slotId)) {
-        isSupported = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
+
+    if (!IsValidSlotId(slotId)) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
+    if (errorCode != TELEPHONY_SUCCESS) {
+        JsError error = NapiUtil::ConverEsimErrorMessageForJs(errorCode);
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
+        return nullptr;
+    } else {
+        isSupported = true;
     }
     NAPI_CALL(env, napi_get_boolean(env, isSupported, &value));
     return value;
@@ -522,7 +532,8 @@ void AddProfileCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("AddProfileCallback context is nullptr");
         return;
     }
-    NapiAsyncCommomCompleteCallback(env, status, context->asyncContext, false);
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "AddProfile", Permission::SET_TELEPHONY_ESIM_STATE_OPEN });
 }
 
 napi_value AddProfile(napi_env env, napi_callback_info info)
