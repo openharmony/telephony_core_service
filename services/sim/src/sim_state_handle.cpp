@@ -1037,7 +1037,7 @@ void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
         int32_t updateResult =
             DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
         if (updateResult == TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGE("StartOsu success");
+            TELEPHONY_LOGI("StartOsu success");
         } else {
             TELEPHONY_LOGE("StartOsu fail, updateResult: %{public}d", updateResult);
         }
