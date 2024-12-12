@@ -1402,10 +1402,8 @@ bool EsimFile::IsSupported()
     if (atr.empty()) {
         if (!ObtainEid().empty()) {
             isSupported_ = true;
-            return isSupported_;
-        } else {
-            return isSupported_;
         }
+        return isSupported_;
     }
     resetResponse.AnalysisAtrData(atr);
     isSupported_ = resetResponse.IsEuiccAvailable();
