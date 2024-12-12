@@ -106,6 +106,9 @@ void EsimFile::SyncCloseChannel()
 
 std::string EsimFile::ObtainEid()
 {
+    if (!eid_.empty()) {
+        return eid_;
+    }
     SyncOpenChannel();
     AppExecFwk::InnerEvent::Pointer eventGetEid = BuildCallerInfo(MSG_ESIM_OBTAIN_EID_DONE);
     if (!ProcessObtainEid(slotId_, eventGetEid)) {
@@ -1396,6 +1399,12 @@ bool EsimFile::IsSupported()
     GetParameter(TEL_ESIM_SUPPORT, "", buf, ATR_LENGTH);
     ResetResponse resetResponse;
     std::string atr(buf);
+    if (atr.empty()) {
+        if (!ObtainEid().empty()) {
+            isSupported_ = true;
+        }
+        return isSupported_;
+    }
     resetResponse.AnalysisAtrData(atr);
     isSupported_ = resetResponse.IsEuiccAvailable();
     return isSupported_;
