@@ -315,12 +315,12 @@ int32_t EsimServiceClient::CancelSession(
     return proxy->CancelSession(slotId, transactionId, cancelReason, callback);
 }
 
-bool EsimServiceClient::IsSupported(int32_t slotId)
+int32_t EsimServiceClient::IsSupported(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->IsSupported(slotId);
 }
