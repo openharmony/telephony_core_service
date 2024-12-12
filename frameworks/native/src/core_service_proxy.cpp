@@ -1898,7 +1898,7 @@ int32_t CoreServiceProxy::SetActiveSimSatellite(int32_t slotId, int32_t enable)
         TELEPHONY_LOGE("SetActiveSimSatellite Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE), data, reply, option);
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE_SATELLITE), data, reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("SetActiveSimSatellite failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
