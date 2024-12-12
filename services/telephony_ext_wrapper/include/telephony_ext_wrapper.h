@@ -101,7 +101,7 @@ public:
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(
         int32_t slotId, std::vector<sptr<OHOS::Telephony::SignalInformation>> &signals);
     typedef void (*GET_OPKEY_VERSION)(std::string &versionInfo);
-    typedef void (*GET_OPNAME_VERSION)(std::string &versionInfo);
+    typedef void (*GetOpnameVersion)(std::string &versionInfo);
 
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
@@ -158,7 +158,7 @@ public:
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
     GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
-    GET_OPNAME_VERSION getOpnameVersion_ = nullptr;
+    GetOpnameVersion getOpnameVersion_ = nullptr;
     GET_ROAMINGBROKER_NUMERIC getRoamingBrokerNumeric_ = nullptr;
     GET_ROAMINGBROKER_IMSI getRoamingBrokerImsi_ = nullptr;
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
