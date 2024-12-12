@@ -24,8 +24,7 @@ StartOsuResultCallback::StartOsuResultCallback(int32_t flag)
     osFlag = flag;
 }
 
-void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t errorCode)
-{
-}
+void StartOsuResultCallback::OnStartOsu(const OsuStatus &result, const int32_t errorCode) {}
+
 } // namespace Telephony
 } // namespace OHOS
