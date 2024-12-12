@@ -222,7 +222,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForOpnameVersion()
 {
-    getOpnameVersion_ = (GET_OPNAME_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpnameVersion");
+    getOpnameVersion_ = (GetOpnameVersion)dlsym(telephonyExtWrapperHandle_, "GetOpnameVersion");
     if (getOpnameVersion_  == nullptr) {
         TELEPHONY_LOGE("[OpnameVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
