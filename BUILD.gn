@@ -125,6 +125,7 @@ ohos_shared_library("tel_core_service") {
     sources += [
       "$TELEPHONY_SIM_ROOT/src/esim_controller.cpp",
       "$TELEPHONY_SIM_ROOT/src/esim_file.cpp",
+      "$TELEPHONY_SIM_ROOT/src/start_osu_result_callback.cpp",
     ]
   }
 
