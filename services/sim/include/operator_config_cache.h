@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const std::string KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV = "const.telephony.is_use_cloud_ims_nv";
 const std::string KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP = "persist.telephony.volte_cap_in_chip_slot";
 class OperatorConfigCache : public TelEventHandler {
 public:
