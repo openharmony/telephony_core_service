@@ -120,7 +120,7 @@ int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &
             isRegister = imsRegStatus_ && imsServiceStatus_->supportImsVideo;
             break;
         case ImsServiceType::TYPE_UT:
-            isRegister = imsRegStatus_ && imsServiceStatus_->supportImsUt;
+            isRegister = imsServiceStatus_->supportImsUt;
             break;
         case ImsServiceType::TYPE_SMS:
             isRegister = imsRegStatus_ && imsServiceStatus_->supportImsSms;
