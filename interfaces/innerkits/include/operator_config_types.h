@@ -164,6 +164,13 @@ struct OperatorConfig : public Parcelable {
     bool ReadFromIntArrayMap(Parcel &parcel);
     bool ReadFromLongArrayMap(Parcel &parcel);
 };
+
+struct ImsCapFromChip {
+    int32_t volteCap;
+    int32_t vowifiCap;
+    int32_t vonrCap;
+    int32_t vtCap;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_OPERATOR_CONFIG_TYPES_H

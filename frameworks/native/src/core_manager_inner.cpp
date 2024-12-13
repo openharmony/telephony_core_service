@@ -2478,6 +2478,14 @@ int32_t CoreManagerInner::SavePrimarySlotId(int32_t slotId)
     return simManager_->SavePrimarySlotId(slotId);
 }
 
+void CoreManagerInner::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    return simManager_->UpdateImsCapFromChip(slotId, imsCapFromChip);
+}
 /******************** simManager_ end ************************/
 } // namespace Telephony
 } // namespace OHOS
