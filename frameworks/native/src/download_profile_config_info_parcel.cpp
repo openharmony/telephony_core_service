@@ -23,7 +23,8 @@ bool DownloadProfileConfigInfo::ReadFromParcel(Parcel &parcel)
 {
     if (!parcel.ReadInt32(portIndex_) ||
         !parcel.ReadBool(isSwitchAfterDownload_) ||
-        !parcel.ReadBool(isForceDeactivateSim_)) {
+        !parcel.ReadBool(isForceDeactivateSim_) ||
+        !parcel.ReadBool(isPprAllowed_)) {
         return false;
     }
     return true;
@@ -33,7 +34,8 @@ bool DownloadProfileConfigInfo::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(portIndex_) ||
         !parcel.WriteBool(isSwitchAfterDownload_) ||
-        !parcel.WriteBool(isForceDeactivateSim_)) {
+        !parcel.WriteBool(isForceDeactivateSim_) ||
+        !parcel.WriteBool(isPprAllowed_)) {
         return false;
     }
     return true;
