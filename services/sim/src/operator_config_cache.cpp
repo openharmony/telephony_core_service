@@ -83,7 +83,11 @@ void OperatorConfigCache::UpdateCurrentOpc(
     int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    UpdatevolteCap(slotId, poc);
+    bool isUseCloudImsNV = system::GetBoolParameter(KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV, true);
+    TELEPHONY_LOGI("[slot%{public}d], isUseCloudImsNV = %{public}d", slotId, isUseCloudImsNV);
+    if (isUseCloudImsNV) {
+        UpdatevolteCap(slotId, poc);
+    }
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
     AnnounceOperatorConfigChanged(slotId, state);
@@ -112,7 +116,7 @@ void OperatorConfigCache::UpdateOpcBoolValue(OperatorConfig &opc, const std::str
 void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
 {
     std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
-    int32_t volteCapInChip = GetIntParameter(volteCapKey.c_str(), 0);
+    int32_t volteCapInChip = GetIntParameter(volteCapKey.c_str(), -1);
     TELEPHONY_LOGI("volteCapInChip = %{public}d", volteCapInChip);
     switch (volteCapInChip) {
         case IMS_SWITCH_OFF:
