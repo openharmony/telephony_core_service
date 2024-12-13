@@ -274,6 +274,8 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpKeyExt(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPKEY_VERSION)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpkeyVersion(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_OPNAME_VERSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpnameVersion(data, reply); };
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
@@ -1971,6 +1973,21 @@ int32_t CoreServiceStub::OnGetOpkeyVersion(MessageParcel &data, MessageParcel &r
 {
     std::string versionInfo;
     int32_t result = GetOpkeyVersion(versionInfo);
+    if (!reply.WriteString(versionInfo)) {
+        TELEPHONY_LOGE("Write versionInfo result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("Write reply result failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetOpnameVersion(MessageParcel &data, MessageParcel &reply)
+{
+    std::string versionInfo;
+    int32_t result = GetOpnameVersion(versionInfo);
     if (!reply.WriteString(versionInfo)) {
         TELEPHONY_LOGE("Write versionInfo result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

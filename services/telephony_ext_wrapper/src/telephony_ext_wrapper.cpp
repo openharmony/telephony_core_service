@@ -52,6 +52,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
     InitTelephonyExtWrapperForCust();
     InitTelephonyExtWrapperForVSim();
     InitTelephonyExtWrapperForOpkeyVersion();
+    InitTelephonyExtWrapperForOpnameVersion();
     TELEPHONY_LOGI("telephony ext wrapper init success");
 }
 
@@ -215,6 +216,15 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
     getOpkeyVersion_ = (GET_OPKEY_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpkeyVersion");
     if (getOpkeyVersion_ == nullptr) {
         TELEPHONY_LOGE("[OpkeyVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForOpnameVersion()
+{
+    getOpnameVersion_ = (GetOpnameVersion)dlsym(telephonyExtWrapperHandle_, "GetOpnameVersion");
+    if (getOpnameVersion_  == nullptr) {
+        TELEPHONY_LOGE("[OpnameVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
 }
