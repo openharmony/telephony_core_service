@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
+const std::string KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV = "const.telephony.is_use_cloud_ims_nv";
+const std::string KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP = "persist.telephony.volte_cap_in_chip_slot";
 class OperatorConfigCache : public TelEventHandler {
 public:
     explicit OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
@@ -38,6 +40,9 @@ public:
     bool RegisterForIccChange();
     bool UnRegisterForIccChange();
     bool IsNeedOperatorLoad(int32_t slotId);
+    void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
+    void UpdatevolteCap(int32_t slotId, OperatorConfig &opc);
+    void UpdateOpcBoolValue(OperatorConfig &opc, const std::string &key, const bool value);
 
 private:
     OperatorFileParser parser_;
@@ -51,6 +56,9 @@ private:
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
     inline static const int32_t STATE_PARA_UPDATE = 3;
+    inline static const int32_t IMS_SWITCH_OFF = 0;
+    inline static const int32_t IMS_SWITCH_ON = 1;
+    inline static const int32_t IMS_SWITCH_DEFAULT = 2;
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     OperatorConfig opc_;
     int32_t slotId_;
