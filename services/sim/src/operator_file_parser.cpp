@@ -50,6 +50,10 @@ bool OperatorFileParser::WriteOperatorConfigJson(std::string filename, const cJS
         return false;
     }
     char *cjValue = cJSON_Print(root);
+    if (cjValue == nullptr) {
+        printf("ParseJsonFailed");
+        return false;
+    }
     int ret = fwrite(cjValue, sizeof(char), strlen(cjValue), file);
     (void)fclose(file);
     free(cjValue);
