@@ -48,13 +48,13 @@ void EsimFile::SyncOpenChannel()
 {
     uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
+    std::unique_lock<std::mutex> lck(openChannelMutex_);
     if (esimProfile_.aid != aid) {
         SyncCloseChannel();
         esimProfile_.aid = aid;
     }
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(OHOS::Telephony::ToUtf16(ISDR_AID));
-        std::unique_lock<std::mutex> lck(openChannelMutex_);
         if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
@@ -70,9 +70,9 @@ void EsimFile::SyncOpenChannel()
 void EsimFile::SyncOpenChannel(const std::u16string &aid)
 {
     uint32_t tryCnt = 0;
+    std::unique_lock<std::mutex> lck(openChannelMutex_);
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
-        std::unique_lock<std::mutex> lck(openChannelMutex_);
         if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
