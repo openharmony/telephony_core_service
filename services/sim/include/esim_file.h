@@ -229,7 +229,7 @@ private:
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     std::atomic_int nextSerialId_ = 0;
-    int32_t currentChannelId_ = -1;
+    std::atomic<int32_t> currentChannelId_ = -1;
     int32_t slotId_ = 0;
     EsimProfile esimProfile_;
     std::string eid_ = "";
