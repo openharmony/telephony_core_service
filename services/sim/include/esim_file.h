@@ -121,9 +121,9 @@ private:
     bool ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessEsimCloseChannel();
     bool ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
-    void SyncOpenChannel();
+    bool IsObtainChannelSuccess();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void SyncOpenChannel(const std::u16string &aid);
+    bool IsObtainChannelSuccess(const std::u16string &aid);
     void CopyApdCmdToReqInfo(ApduSimIORequestInfo &reqInfo, ApduCommand *apdCmd);
     void CommBuildOneApduReqInfo(ApduSimIORequestInfo &reqInfo, std::shared_ptr<Asn1Builder> &builder);
     bool ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
