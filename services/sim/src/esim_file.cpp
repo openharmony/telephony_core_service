@@ -44,7 +44,7 @@ EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("
 
 void EsimFile::StartLoad() {}
 
-void EsimFile::IsObtainChannelSuccess()
+bool EsimFile::IsObtainChannelSuccess()
 {
     uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
@@ -72,7 +72,7 @@ void EsimFile::IsObtainChannelSuccess()
     }
 }
 
-void EsimFile::IsObtainChannelSuccess(const std::u16string &aid)
+bool EsimFile::IsObtainChannelSuccess(const std::u16string &aid)
 {
     uint32_t tryCnt = 0;
     std::unique_lock<std::mutex> lck(openChannelMutex_);
