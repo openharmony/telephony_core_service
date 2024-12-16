@@ -406,7 +406,7 @@ std::string OperatorName::GetPlmn(const sptr<NetworkState> &networkState, bool l
         plmn = networkState->GetLongOperatorName();
     }
     std::string longOperatorName = networkState->GetLongOperatorName();
-    if(TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
+    if (TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
         netPriCust_ = TELEPHONY_EXT_WRAPPER.processOperatorName_(slotId_, longOperatorName, numeric);
         TELEPHONY_LOGI("OperatorName::GetPlmn netPriCust_:%{public}d", netPriCust_);
     }
@@ -756,7 +756,7 @@ void OperatorName::UpdateOperatorLongName(std::string &operatorLongName, const s
         return;
     }
 
-    if(TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
+    if (TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
         netPriCust_ = TELEPHONY_EXT_WRAPPER.processOperatorName_(slotId_, longOperatorName, numeric);
         TELEPHONY_LOGI("OperatorName::UpdateOperatorLongName netPriCust_:%{public}d", netPriCust_);
     }
