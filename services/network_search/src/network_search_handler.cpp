@@ -1649,5 +1649,11 @@ void NetworkSearchHandler::ProcessSignalIntensity(int32_t slotId, const Rssi &si
         signalInfo_->ProcessSignalIntensity(slotId, s);
     }
 }
+
+void NetworkSearchHandler::UpdateOperatorName()
+{   if (operatorName_ != nullptr) {
+        operatorName_->NotifySpnChanged(true);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
