@@ -127,10 +127,6 @@ constexpr const char *KEY_VOICE_MAIL_TAG_STRING = "voice_mail_tag_string";
  * Indicates whether to edit voice mail information to sim card.
  */
 constexpr const char *KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL = "voice_mail_edit_not_to_sim_bool";
-/**
- * Indicates whether the carrier name delivered by network has the highest priority.
- */
-constexpr const char *KEY_NET_FIRST_PRI_CUST_BOOL = "net_first_pri_cust_bool";
 
 constexpr const char *KEY_NR_MODE_SUPPORTED_INT = "nr_mode_supported_int";
 

@@ -107,6 +107,7 @@ public:
 
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
+    typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -165,11 +166,13 @@ public:
     GET_ROAMINGBROKER_IMSI getRoamingBrokerImsi_ = nullptr;
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
+    PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
+    void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
     void InitTelephonyExtWrapperForCust();
     void InitTelephonyExtWrapperForVSim();
