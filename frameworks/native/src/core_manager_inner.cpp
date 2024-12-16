@@ -1676,6 +1676,15 @@ int32_t CoreManagerInner::UpdateRadioOn(int32_t slotId)
     return networkSearchManager_->UpdateRadioOn(slotId);
 }
 
+int32_t CoreManagerInner::UpdateOperatorName(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->UpdateOperatorName(slotId);
+}
+
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/
 

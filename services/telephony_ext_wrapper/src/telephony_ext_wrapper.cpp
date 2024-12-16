@@ -104,6 +104,15 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (processStateChangeExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    InitTelephonyExtWrapperForNetWork1();
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
+{
+    processOperatorName_ = (PROCESS_OPERATOR_NAME)dlsym(telephonyExtWrapperHandle_, "ProcessOperatorNameExt");
+    if (processOperatorName_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()

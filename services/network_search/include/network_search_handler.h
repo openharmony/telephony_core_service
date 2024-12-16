@@ -101,6 +101,7 @@ public:
     bool IsPowerOnPrimaryRadioWhenNoSim() const;
     void ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     void RadioOnState();
+    void UpdateOperatorName();
 
 private:
     void RadioOffOrUnavailableState(int32_t radioState) const;

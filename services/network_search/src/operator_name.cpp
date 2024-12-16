@@ -402,8 +402,16 @@ std::string OperatorName::GetPlmn(const sptr<NetworkState> &networkState, bool l
     if (plmn.empty()) {
         plmn = GetEons(numeric, lac, longNameRequired);
     }
-    if (plmn.empty() || netPriCust_) {
+    if (plmn.empty()) {
         plmn = networkState->GetLongOperatorName();
+    }
+    std::string longOperatorName = networkState->GetLongOperatorName();
+    if(TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
+        netPriCust_ = TELEPHONY_EXT_WRAPPER.processOperatorName_(slotId_, longOperatorName, numeric);
+        TELEPHONY_LOGI("OperatorName::GetPlmn netPriCust_:%{public}d", netPriCust_);
+    }
+    if (netPriCust_) {
+        plmn = longOperatorName;
     }
     TELEPHONY_LOGD(
         "OperatorName::GetPlmn lac:%{public}d, numeric:%{public}s, longNameRequired:%{public}d, plmn:%{public}s", lac,
@@ -677,9 +685,6 @@ void OperatorName::UpdateOperatorConfig()
     if (operatorConfig.stringArrayValue.find(KEY_OPL_CUST_STRING_ARRAY) != operatorConfig.stringArrayValue.end()) {
         UpdateOplCust(operatorConfig.stringArrayValue[KEY_OPL_CUST_STRING_ARRAY]);
     }
-    if (operatorConfig.boolValue.find(KEY_NET_FIRST_PRI_CUST_BOOL) != operatorConfig.boolValue.end()) {
-        netPriCust_ = operatorConfig.boolValue[KEY_NET_FIRST_PRI_CUST_BOOL];
-    }
 }
 
 void OperatorName::UpdatePnnCust(const std::vector<std::string> &pnnCust)
@@ -749,6 +754,11 @@ void OperatorName::UpdateOperatorLongName(std::string &operatorLongName, const s
     RegServiceState regStatus = networkState->GetRegStatus();
     if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
         return;
+    }
+
+    if(TELEPHONY_EXT_WRAPPER.processOperatorName_ != nullptr) {
+        netPriCust_ = TELEPHONY_EXT_WRAPPER.processOperatorName_(slotId_, longOperatorName, numeric);
+        TELEPHONY_LOGI("OperatorName::UpdateOperatorLongName netPriCust_:%{public}d", netPriCust_);
     }
 
     std::string customizedOperatorLongName = GetCustomName(numeric);
