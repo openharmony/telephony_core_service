@@ -369,7 +369,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     iccState_ = ar;
     auto iter = simIccStatusMap_.find(newSimStatus);
     TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState newSimType[%{public}d], newSimStatus[%{public}s](%{public}d), "
-        "oldSimStatus_[%{public}s](%{public}d)", newSimType, iter->second.c_str(), newSimStatus, oldSimStatus_);
+        "oldSimStatus_%{public}d", newSimType, iter->second.c_str(), newSimStatus, oldSimStatus_);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
