@@ -194,6 +194,7 @@ void NrSsbInformation::SetSsbBaseParam(
 
 void NrSsbInformation::SetSCellSsbList(std::vector<SsbInfo> sCellSsbList)
 {
+    sCellSsbList_.clear();
     for (const auto &info : sCellSsbList) {
         SsbInfo ssbInfo;
         ssbInfo.ssbId = info.ssbId;
