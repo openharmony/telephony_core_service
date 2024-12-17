@@ -77,6 +77,7 @@ bool NrSsbInfo::UpdateNrSsbIdInfo(int32_t slotId, std::shared_ptr<NrCellSsbIds> 
     nrCellSsbIdsInfo_->sinr = nrCellSsbIds->sinr;
     nrCellSsbIdsInfo_->timeAdvance = nrCellSsbIds->timeAdvance;
     nrCellSsbIdsInfo_->nbCellCount = nrCellSsbIds->nbCellCount;
+    nrCellSsbIdsInfo_->sCellSsbList.clear();
     for (const auto &info : nrCellSsbIds->sCellSsbList) {
         SsbInfo ssbInfo;
         ssbInfo.ssbId = info.ssbId;
