@@ -220,6 +220,19 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_002, Function | MediumTest | 
     EXPECT_FALSE(stkController->PublishStkEvent(want));
 }
 
+HWTEST_F(SimRilBranchTest, Telephony_StkManager_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::string cmd = "00"; // STK_APP_CMD_TYPE_USER_CONFIRM
+    auto stkManager = std::make_shared<StkManager>(nullptr, simStateManager);
+    stkManager->Init(0);
+
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, 0);
+    stkManager->stkController_ = stkController;
+    EXPECT_EQ(stkManager->SendTerminalResponseCmd(0, cmd), TELEPHONY_SUCCESS);
+}
+
 /**
  * @tc.number   Telephony_SimStateTracker_001
  * @tc.name     test error branch
@@ -1375,18 +1388,20 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_003, Function | MediumTest | 
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
 
-    EXPECT_FALSE(stkController->CheckIsBipCmd("01234567890000"));
+    stkController->HandleStkBipCmd("01234567890000");
     ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
 
-    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894000"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894300"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894200"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894400"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("01234567894100"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("D0804567894100"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("D081D481030143"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("D082D4D481030143"));
-    EXPECT_TRUE(stkController->CheckIsBipCmd("D083D4D4D481030143"));
+    stkController->HandleStkBipCmd("01234567894000");
+    stkController->HandleStkBipCmd("01234567894300");
+    stkController->HandleStkBipCmd("01234567894200");
+    stkController->HandleStkBipCmd("01234567894400");
+    stkController->HandleStkBipCmd("01234567894100");
+    stkController->HandleStkBipCmd("D0804567894100");
+    stkController->HandleStkBipCmd("D081D481030143");
+    stkController->HandleStkBipCmd("D082D4D481030143");
+    stkController->HandleStkBipCmd("D083D4D4D481030143");
+    stkController->HandleStkBipCmd("D083D4D4D481030143");
+    stkController->HandleStkBipCmd("D0038103010500820281829902090A");
     AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
     stkController->OnSendTerminalResponseResult(event);
     stkController->OnSendEnvelopeCmdResult(event);
@@ -1399,16 +1414,16 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_004, Function | MediumTest | 
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
 
-    EXPECT_FALSE(stkController->CheckIsBipCmd("00"));
+    stkController->HandleStkBipCmd("00");
     ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
 
-    EXPECT_FALSE(stkController->CheckIsBipCmd("D0"));
+    stkController->HandleStkBipCmd("D0");
     ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
 
-    EXPECT_FALSE(stkController->CheckIsBipCmd("D080"));
+    stkController->HandleStkBipCmd("D080");
     ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
 
-    EXPECT_FALSE(stkController->CheckIsBipCmd("D018813010"));
+    stkController->HandleStkBipCmd("D018813010");
     ASSERT_EQ(TELEPHONY_EXT_WRAPPER.sendEvent_, nullptr);
 }
 
