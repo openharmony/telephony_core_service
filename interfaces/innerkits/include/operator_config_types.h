@@ -112,6 +112,10 @@ constexpr const char *KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY = "single_pdp_radio_ty
  */
 constexpr const char *KEY_DEFAULT_DATA_ROAMING_BOOL = "default_data_roaming_bool";
 /**
+ * Indicates default value of data enable bool.
+ */
+constexpr const char *KEY_DEFAULT_DATA_ENABLE_BOOL = "default_data_enable_bool";
+/**
  * Indicates the voice mail number from cust.
  */
 constexpr const char *KEY_VOICE_MAIL_NUMBER_STRING = "voice_mail_number_string";
