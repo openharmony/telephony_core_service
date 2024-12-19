@@ -334,7 +334,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         return publishResult;
     }
     TELEPHONY_LOGI("AnnounceOperatorConfigChanged dont publish OPERATOR_CONFIG_CHANGED opkey is %{public}s,"
-	    "slotId: %{public}d, state: %{public}d", opkey.data(), slotId, state);
+        "slotId: %{public}d, state: %{public}d", opkey.data(), slotId, state);
     return true;
 }
 
