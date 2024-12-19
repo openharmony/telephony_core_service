@@ -414,7 +414,7 @@ void MultiSimMonitor::CheckSimNotifyRegister()
 void MultiSimMonitor::CheckDataShareError()
 {
     if (controller_->IsDataShareError()) {
-        controller_->ResetDataShareError();
+        TELEPHONY_LOGI("CheckDataShareError, need Reset Opkey");
         CheckOpcNeedUpdata(true);
     }
 }

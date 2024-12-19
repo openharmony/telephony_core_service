@@ -62,6 +62,7 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("sim is not exist");
         return;
     }
+    TELEPHONY_LOGI("ProcessSimRecordLoad, slotId: %{public}d need trigger LoadOperatorConfig", slotId_);
     TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
 }
 
@@ -92,7 +93,7 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
         }
         TelFFRTUtils::Submit([&]() {
             OperatorConfig opc;
-            operatorConfigCache_->LoadOperatorConfig(slotId_, opc);
+            operatorConfigCache_->LoadOperatorConfig(slotId_, opc, operatorConfigCache_->STATE_PARA_LOADED);
         });
     } else {
         bool hasSimCard = false;
@@ -117,7 +118,9 @@ void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("operatorConfigCache is nullptr");
         return;
     }
+    TELEPHONY_LOGI("ProcessOperatorCacheDel, need Clear memory and opkey, slotId: %{public}d", slotId_);
     operatorConfigCache_->ClearMemoryAndOpkey(slotId);
+    CoreManagerInner::GetInstance().ResetDataShareError();
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

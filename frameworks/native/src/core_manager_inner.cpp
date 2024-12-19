@@ -2506,6 +2506,24 @@ int32_t CoreManagerInner::SavePrimarySlotId(int32_t slotId)
     return simManager_->SavePrimarySlotId(slotId);
 }
 
+bool CoreManagerInner::IsDataShareError()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->IsDataShareError();
+}
+
+void CoreManagerInner::ResetDataShareError()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    simManager_->ResetDataShareError();
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
 {
