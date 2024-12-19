@@ -327,6 +327,8 @@ public:
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
+    bool IsDataShareError();
+    void ResetDataShareError();
     /******************** simManager end *****************************/
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetEid(int32_t slotId, std::u16string &eId);
