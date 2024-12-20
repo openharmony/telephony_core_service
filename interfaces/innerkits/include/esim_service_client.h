@@ -43,14 +43,14 @@ class EsimServiceClient : public DelayedRefSingleton<EsimServiceClient> {
     DECLARE_DELAYED_REF_SINGLETON(EsimServiceClient);
 
 public:
-    /**
+     /**
      * @brief Get the EID identifying for the eUICC hardware.
      *
      * @param slotId[in], indicates the card slot index number.
-     * @param eId[out], the EID identifying the eUICC hardware.
+     * @param callback[in], call back function.
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetEid(int32_t slotId, std::string &eId);
+    int32_t GetEid(int32_t slotId, const sptr<IEsimServiceCallback> &callback);
 
     /**
      * @brief Get the current status of eUICC OSU.

@@ -54,11 +54,13 @@ public:
     virtual void OnSwitchToProfile(const int32_t &result, const int32_t errorCode);
     virtual void OnCancelSession(const ResponseEsimResult &result, const int32_t errorCode);
     virtual void OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode);
+    virtual void OnGetEid(const std::string &result, const int32_t errorCode);
     virtual void OnGetEuiccProfileInfoList(const GetEuiccProfileInfoListResult &result, const int32_t errorCode);
     virtual void OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode);
     virtual void OnSetProfileNickName(const int32_t &result, const int32_t errorCode);
 private:
     void OnGetEuiccInfo(MessageParcel &data);
+    void OnGetEid(MessageParcel &data);
     void OnGetDownloadableProfileMetadata(MessageParcel &data);
     void OnGetDownloadableProfiles(MessageParcel &data);
     void OnGetEuiccProfileInfoList(MessageParcel &data);

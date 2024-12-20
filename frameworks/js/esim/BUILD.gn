@@ -45,6 +45,7 @@ ohos_shared_library("esim") {
       "src/get_default_smdp_address_callback.cpp",
       "src/get_downloadable_profile_metadata_callback.cpp",
       "src/get_downloadable_profiles_callback.cpp",
+      "src/get_eid_callback.cpp",
       "src/get_euicc_info_callback.cpp",
       "src/get_euicc_profile_info_list_callback.cpp",
       "src/napi_esim.cpp",
