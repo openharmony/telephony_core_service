@@ -33,6 +33,9 @@ int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requ
         case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
             OnGetEuiccInfo(data);
             break;
+        case IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT:
+            OnGetEid(data);
+            break;
         case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT:
             OnGetDownloadableProfileMetadata(data);
             break;
@@ -89,6 +92,19 @@ void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
         result = *info;
     }
     OnGetEuiccInfo(result, errorCode);
+}
+
+void IEsimServiceCallbackStub::OnGetEid(MessageParcel &data)
+{
+    ErrCode errCode = data.ReadInt32();
+    if (FAILED(errCode)) {
+        TELEPHONY_LOGE("Read Int32 failed!");
+        return;
+    }
+
+    std::string eId = Str16ToStr8(data.ReadString16());
+    TELEPHONY_LOGE("[IEsimServiceCallbackStub::OnGetEid]eId = %{public}s", eId.c_str());
+    OnGetEid(eId, errCode);
 }
 
 void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(MessageParcel &data)
@@ -288,6 +304,9 @@ void IEsimServiceCallbackStub::OnCancelSession(const ResponseEsimResult &result,
 {
 }
 void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode)
+{
+}
+void IEsimServiceCallbackStub::OnGetEid(const std::string &result, const int32_t errorCode)
 {
 }
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(

@@ -46,9 +46,11 @@ declare namespace eSIM {
   /**
    * Starts a page through an ability, on which users can touch the button to download a profile.
    *
+   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE_OPEN
    * @param { DownloadableProfile } profile - Bound profile package data returned by the SM-DP+ server.
    * @returns { Promise<boolean> } Returns {@code true} if the profile is added successfully;
    * returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
    * 2. Incorrect parameter types. 3. Invalid parameter value.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -64,7 +66,7 @@ declare namespace eSIM {
    *
    * @permission ohos.permission.GET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { string } Returns the EID. When eUICC is not ready, the return value may be null.
+   * @returns { Promise<string> } Returns the EID. When eUICC is not ready, the return value may be null.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
@@ -76,7 +78,7 @@ declare namespace eSIM {
    * @systemapi Hide this for inner system use.
    * @since 14
    */
-  function getEid(slotId: number): string;
+  function getEid(slotId: number): Promise<string>;
 
   /**
    * Returns the current status of eUICC OS upgrade.

@@ -37,6 +37,7 @@ public:
 		START_OSU_RESULT,
 		SWITCH_PROFILE_RESULT,
 		RESET_MEMORY_RESULT,
+		GET_EID_RESULT,
     };
     virtual int32_t OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data) = 0;
 

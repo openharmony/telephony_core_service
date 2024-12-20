@@ -145,14 +145,14 @@ void EsimServiceClient::RemoveDeathRecipient(const wptr<IRemoteObject> &remote, 
     TELEPHONY_LOGI("RemoveDeathRecipient success");
 }
 
-int32_t EsimServiceClient::GetEid(int32_t slotId, std::string &eId)
+int32_t EsimServiceClient::GetEid(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetEid(slotId, eId);
+    return proxy->GetEid(slotId, callback);
 }
 
 int32_t EsimServiceClient::GetOsuStatus(int32_t slotId, int32_t &osuStatus)
