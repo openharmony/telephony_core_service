@@ -50,6 +50,7 @@ public:
         std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId);
+    OperatorConfig LoadOperatorConfig(int32_t slotId, int32_t state);
     int InitOpKeyData();
 
 private:

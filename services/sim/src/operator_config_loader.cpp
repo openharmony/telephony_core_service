@@ -43,6 +43,16 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
         TELEPHONY_LOGE("operatorConfigCache_ is nullptr");
         return opc;
     }
+    return LoadOperatorConfig(slotId, operatorConfigCache_->STATE_PARA_LOADED);
+}
+
+OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId, int32_t state)
+{
+    OperatorConfig opc;
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigCache_ is nullptr");
+        return opc;
+    }
     bool isNeedLoad = operatorConfigCache_->IsNeedOperatorLoad(slotId);
     TELEPHONY_LOGI("LoadOperatorConfig slotId: %{public}d isNeedLoad: %{public}d", slotId, isNeedLoad);
     if (!isNeedLoad) {
@@ -50,8 +60,12 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
     }
     TELEPHONY_LOGI("LoadOperatorConfig slotId %{public}d", slotId);
     std::string opkey = LoadOpKeyOnMccMnc(slotId);
-    operatorConfigCache_->LoadOperatorConfig(slotId, opc);
-    TELEPHONY_LOGI("LoadOperatorConfig %{public}zu", opc.configValue.size());
+    if (opkey == DEFAULT_OPERATOR_KEY) {
+        state = operatorConfigCache_->STATE_PARA_CLEAR;
+    }
+    operatorConfigCache_->LoadOperatorConfig(slotId, opc, state);
+    TELEPHONY_LOGI("LoadOperatorConfig %{public}zu, slotId: %{public}d, opkey: %{public}s, state: %{public}d",
+        opc.configValue.size(), slotId, opkey.data(), state);
     return opc;
 }
 
