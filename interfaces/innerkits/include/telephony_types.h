@@ -34,6 +34,7 @@ namespace Telephony {
 inline const int32_t SYSPARA_SIZE = 128;
 inline constexpr size_t ARRAY_SIZE = 1024;
 inline const int32_t DEFAULT_SIM_SLOT_ID = 0;
+inline const int32_t DEFAULT_OPERATOR_STATE = 0;
 inline const int32_t DEFAULT_SIM_SLOT_ID_REMOVE = -1;
 inline const int32_t INVALID_MAIN_CARD_SLOTID = -2;
 inline const int32_t ERROR_SLOT_OPKEY = -2;

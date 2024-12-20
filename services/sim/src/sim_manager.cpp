@@ -1283,6 +1283,24 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
     return multiSimController_->SavePrimarySlotId(slotId);
 }
 
+bool SimManager::IsDataShareError()
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return multiSimController_->IsDataShareError();
+}
+
+void SimManager::ResetDataShareError()
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return;
+    }
+    multiSimController_->ResetDataShareError();
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t SimManager::GetEid(int32_t slotId, std::u16string &eId)
 {

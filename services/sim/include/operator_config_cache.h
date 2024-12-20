@@ -38,6 +38,10 @@ public:
     bool RegisterForIccChange();
     bool UnRegisterForIccChange();
     bool IsNeedOperatorLoad(int32_t slotId);
+    inline static const int32_t STATE_PARA_LOADED = 1;
+    inline static const int32_t STATE_PARA_CLEAR = 2;
+    inline static const int32_t STATE_PARA_UPDATE = 3;
+    inline static const int32_t STATE_COTA_UPDATE = 4;
 
 private:
     OperatorFileParser parser_;
@@ -45,12 +49,11 @@ private:
     std::string GetOpKey(int32_t slotId);
     void CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to);
     void UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading);
-    void SendSimMatchedOperatorInfo(int32_t slotId);
+    void SendSimMatchedOperatorInfo(int32_t slotId, int32_t state);
     bool AnnounceOperatorConfigChanged(int32_t slotId, int32_t state);
     void notifyInitApnConfigs(int32_t slotId);
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
-    inline static const int32_t STATE_PARA_UPDATE = 3;
     inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     OperatorConfig opc_;
     int32_t slotId_;
