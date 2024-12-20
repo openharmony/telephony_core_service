@@ -392,7 +392,7 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
     {
         std::lock_guard<std::mutex> lock(closeChannelMutex_);
         currentChannelId_ = 0;
-         aidStr_ = u"";
+        aidStr_ = u"";
         TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     }
     closeChannelCv_.notify_one();
