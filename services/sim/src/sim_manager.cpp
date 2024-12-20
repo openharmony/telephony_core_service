@@ -1112,7 +1112,7 @@ int32_t SimManager::UpdateIccDiallingNumbers(
 void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
-        std::shared_lock<std::shared_mutex> lck(mtx_);        
+        std::shared_lock<std::shared_mutex> lck(mtx_);
         if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
