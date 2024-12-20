@@ -466,7 +466,6 @@ void NativeGetEid(napi_env env, void *data)
     if (errorCode == TELEPHONY_SUCCESS) {
         euiccEidContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [euiccEidContext] { return euiccEidContext->isCallbackEnd; });
-        TELEPHONY_LOGI("NativeGetEid after callback end");
     }
 }
 
