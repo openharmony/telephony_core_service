@@ -458,8 +458,8 @@ void NativeGetEid(napi_env env, void *data)
         return;
     }
     std::unique_ptr<GetEidResultCallback> callback = std::make_unique<GetEidResultCallback>(euiccEidContext);
-    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEid(
-        euiccEidContext->slotId, callback.release()); 
+    int32_t errorCode =
+        DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEid(euiccEidContext->slotId, callback.release());
     std::unique_lock<std::mutex> callbackLock(euiccEidContext->callbackMutex);
     TELEPHONY_LOGI("NAPI NativeGetEid %{public}d", errorCode);
     euiccEidContext->context.errorCode = errorCode;
