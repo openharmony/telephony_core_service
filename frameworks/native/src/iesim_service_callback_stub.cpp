@@ -103,7 +103,6 @@ void IEsimServiceCallbackStub::OnGetEid(MessageParcel &data)
     }
 
     std::string eId = Str16ToStr8(data.ReadString16());
-    TELEPHONY_LOGE("[IEsimServiceCallbackStub::OnGetEid]eId = %{public}s", eId.c_str());
     OnGetEid(eId, errCode);
 }
 
