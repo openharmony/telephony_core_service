@@ -43,6 +43,7 @@ DECLARE_DELAYED_REF_SINGLETON(TelephonyExtWrapper);
 public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtWrapper);
     void InitTelephonyExtWrapper();
+    void DeDeInitTelephonyExtWrapper();
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
@@ -108,6 +109,8 @@ public:
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
     typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
+    typedef void (*DynamicLoadInit)(void);
+    typedef void (*DynamicLoadDeInit)(void);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -167,10 +170,13 @@ public:
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
+    DynamicLoadInit dynamicLoadInit_ = nullptr;
+    DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
+    void* telephonyDynamicWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -179,6 +185,7 @@ private:
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
     void InitTelephonyExtWrapperForOpkeyVersion();
+    void InitTelephonyExtWrapperForDynamicLoad();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
