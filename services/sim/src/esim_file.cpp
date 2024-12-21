@@ -44,7 +44,7 @@ EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("
 
 void EsimFile::StartLoad() {}
 
-ResultCode EsimFile::IsObtainChannelSuccessExclusive()
+ResultCode EsimFile::ObtainChannelSuccessExclusive()
 {
     uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
@@ -81,7 +81,7 @@ ResultCode EsimFile::IsObtainChannelSuccessExclusive()
 /**
  * @brief Channels that support the same aid are not disabled when sending data.
  */
-ResultCode EsimFile::IsObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid)
+ResultCode EsimFile::ObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid)
 {
     uint32_t tryCnt = 0;
     std::unique_lock<std::mutex> lck(occupyChannelMutex_);
@@ -139,9 +139,9 @@ std::string EsimFile::ObtainEid()
     if (!eid_.empty()) {
         return eid_;
     }
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return "";
     }
     AppExecFwk::InnerEvent::Pointer eventGetEid = BuildCallerInfo(MSG_ESIM_OBTAIN_EID_DONE);
@@ -164,9 +164,9 @@ std::string EsimFile::ObtainEid()
 
 GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 {
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         euiccProfileInfoList_.result_ = resultFlag;
         return euiccProfileInfoList_;
     }
@@ -189,9 +189,9 @@ GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 
 EuiccInfo EsimFile::GetEuiccInfo()
 {
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccInfo();
     }
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo1 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO_1_DONE);
@@ -726,9 +726,9 @@ ResultCode EsimFile::DisableProfile(int32_t portIndex, const std::u16string &icc
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         disableProfileResult_ = resultFlag;
         return disableProfileResult_;
     }
@@ -752,9 +752,9 @@ ResultCode EsimFile::DisableProfile(int32_t portIndex, const std::u16string &icc
 std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return "";
     }
     AppExecFwk::InnerEvent::Pointer eventObtainSmdsAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_SMDS_ADDRESS);
@@ -777,9 +777,9 @@ std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccRulesAuthTable();
     }
     AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable = BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
@@ -803,9 +803,9 @@ ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         responseChallengeResult_.resultCode_ = resultFlag;
         return responseChallengeResult_;
     }
@@ -1109,9 +1109,9 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
 
 std::string EsimFile::ObtainDefaultSmdpAddress()
 {
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return "";
     }
     AppExecFwk::InnerEvent::Pointer eventSmdpAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_DEFAULT_SMDP_ADDRESS_DONE);
@@ -1135,9 +1135,9 @@ ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, 
 {
     esimProfile_.transactionId = transactionId;
     esimProfile_.cancelReason = cancelReason;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         cancelSessionResult_.resultCode_ = resultFlag;
         return cancelSessionResult_;
     }
@@ -1162,9 +1162,9 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccProfile();
     }
     AppExecFwk::InnerEvent::Pointer eventGetProfile = BuildCallerInfo(MSG_ESIM_GET_PROFILE);
@@ -1387,9 +1387,9 @@ ResultCode EsimFile::ResetMemory(ResetOption resetOption)
     resetResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.option = resetOption;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         resetResult_ = resultFlag;
         return resetResult_;
     }
@@ -1414,9 +1414,9 @@ ResultCode EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddr
 {
     setDpAddressResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         setDpAddressResult_ = resultFlag;
         return setDpAddressResult_;
     }
@@ -1522,9 +1522,9 @@ ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const EsimA
 
     esimProfile_.apduData = apduData;
     AppExecFwk::InnerEvent::Pointer eventSendApduData = BuildCallerInfo(MSG_ESIM_SEND_APUD_DATA);
-    ResultCode resultFlag = IsObtainChannelSuccessAlllowSameAidReuse(aid);
+    ResultCode resultFlag = ObtainChannelSuccessAlllowSameAidReuse(aid);
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessAlllowSameAidReuse failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessAlllowSameAidReuse failed ,%{public}d", resultFlag);
         transApduDataResponse_.resultCode_ = resultFlag;
         return transApduDataResponse_;
     }
@@ -1659,9 +1659,9 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
     esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2_;
     esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate_;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         preDownloadResult_.resultCode_ = resultFlag;
         return preDownloadResult_;
     }
@@ -1681,9 +1681,9 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     esimProfile_.portIndex = portIndex;
     esimProfile_.boundProfilePackage = boundProfilePackage;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         loadBPPResult_.resultCode_ = static_cast<int32_t>(resultFlag);
         return loadBPPResult_;
     }
@@ -1702,9 +1702,9 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
     AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccNotificationList();
     }
     recvCombineStr_ = "";
@@ -2298,9 +2298,9 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccNotificationList();
     }
     recvCombineStr_ = "";
@@ -2325,9 +2325,9 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return EuiccNotification();
     }
     recvCombineStr_ = "";
@@ -2354,9 +2354,9 @@ ResultCode EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNu
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         removeNotifResult_ = resultFlag;
         return removeNotifResult_;
     }
@@ -2601,9 +2601,9 @@ ResultCode EsimFile::DeleteProfile(const std::u16string &iccId)
     delProfile_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.iccId = iccId;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         delProfile_ = resultFlag;
         return delProfile_;
     }
@@ -2630,9 +2630,9 @@ ResultCode EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &ic
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     esimProfile_.forceDisableProfile = forceDisableProfile;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         switchResult_ = resultFlag;
         return switchResult_;
     }
@@ -2658,9 +2658,9 @@ ResultCode EsimFile::SetProfileNickname(const std::u16string &iccId, const std::
     setNicknameResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.iccId = iccId;
     esimProfile_.nickname = nickname;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         setNicknameResult_ = resultFlag;
         return setNicknameResult_;
     }
@@ -2831,9 +2831,9 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
 
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         euiccInfo2Result_.resultCode_ = resultFlag;
         return euiccInfo2Result_;
     }
@@ -2867,9 +2867,9 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
     std::u16string imei = u"";
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
     esimProfile_.imei = imei;
-    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
-        TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         responseAuthenticateResult_.resultCode_ = resultFlag;
         return responseAuthenticateResult_;
     }
