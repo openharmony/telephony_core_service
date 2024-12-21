@@ -43,7 +43,7 @@ class EsimServiceClient : public DelayedRefSingleton<EsimServiceClient> {
     DECLARE_DELAYED_REF_SINGLETON(EsimServiceClient);
 
 public:
-     /**
+    /**
      * @brief Get the EID identifying for the eUICC hardware.
      *
      * @param slotId[in], indicates the card slot index number.
