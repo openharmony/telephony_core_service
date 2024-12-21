@@ -127,6 +127,9 @@ void CoreService::OnStop()
     registerToService_ = false;
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
     telRilManager_->DeInit();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
+#endif
     TELEPHONY_LOGI("CoreService Stop success");
 }
 
