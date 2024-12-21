@@ -121,9 +121,9 @@ private:
     bool ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessEsimCloseChannel();
     bool ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
-    void SyncOpenChannel();
+    ResultCode ObtainChannelSuccessExclusive();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void SyncOpenChannel(const std::u16string &aid);
+    ResultCode ObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid);
     void CopyApdCmdToReqInfo(ApduSimIORequestInfo &reqInfo, ApduCommand *apdCmd);
     void CommBuildOneApduReqInfo(ApduSimIORequestInfo &reqInfo, std::shared_ptr<Asn1Builder> &builder);
     bool ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
@@ -225,11 +225,13 @@ private:
     bool RealProcessPrepareDownloadDone(std::string &combineHexStr);
     bool CommMergeRecvData(
         std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish);
+    bool IsSameAid(const std::u16string &aid);
+    bool IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     std::atomic_int nextSerialId_ = 0;
-    int32_t currentChannelId_ = -1;
+    std::atomic<int32_t> currentChannelId_ = -1;
     int32_t slotId_ = 0;
     EsimProfile esimProfile_;
     std::string eid_ = "";
@@ -260,6 +262,9 @@ private:
     bool isSupported_ = false;
     std::string recvCombineStr_ = "";
     IccFileData newRecvData_;
+
+    std::u16string aidStr_ = u"";
+    std::mutex occupyChannelMutex_;
 
     std::mutex closeChannelMutex_;
     std::condition_variable closeChannelCv_;
