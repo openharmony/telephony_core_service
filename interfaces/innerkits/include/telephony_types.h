@@ -22,6 +22,7 @@
 #include "network_search_types.h"
 #include "operator_config_types.h"
 #include "parameter.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
