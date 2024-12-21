@@ -67,6 +67,7 @@ inline constexpr const char *DEFAULT_VSIM_MODEM_COUNT = "0";
 inline constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 inline constexpr const char *TEL_ESIM_SUPPORT = "persist.telephony.esim.supported";
 inline constexpr const char *TEL_DEFAULT_ESIM_SLOT_ID = "const.telephony.esim.slotID";
+inline constexpr const char *DYNAMIC_POWEROFF_MODEM = "telephony.dynamic_poweroff_modem";
 
 template<typename T>
 inline T GetVirtualModemSwitch()
@@ -133,6 +134,11 @@ inline T GetPreferredNetworkType()
     GetParameter(TEL_PREFERRED_NETWORK_TYPE, DEFAULT_PREFERRED_NETWORK_TYPE, preferredNetworkType, SYSPARA_SIZE);
     T networkType = std::atoi(preferredNetworkType);
     return networkType;
+}
+
+static inline bool GetDynamicPowerOffModeSwitch()
+{
+    return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM, false)
 }
 
 enum SatelliteValue {
