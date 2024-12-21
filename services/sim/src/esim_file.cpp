@@ -48,7 +48,7 @@ ResultCode EsimFile::ObtainChannelSuccessExclusive()
 {
     uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
-    std::unique_lock<std::mutex> lck(occupyChannelMutex_);
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
 
     // The channel is in use.
     if (IsLogicChannelOpen()) {
@@ -84,7 +84,7 @@ ResultCode EsimFile::ObtainChannelSuccessExclusive()
 ResultCode EsimFile::ObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid)
 {
     uint32_t tryCnt = 0;
-    std::unique_lock<std::mutex> lck(occupyChannelMutex_);
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
 
     if (!IsValidAidForAllowSameAidReuseChannel(aid)) {
         TELEPHONY_LOGE("Aid invalid");
@@ -116,7 +116,7 @@ ResultCode EsimFile::ObtainChannelSuccessAlllowSameAidReuse(const std::u16string
 void EsimFile::SyncCloseChannel()
 {
     uint32_t tryCnt = 0;
-    std::unique_lock<std::mutex> lck(occupyChannelMutex_);
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
     while (IsLogicChannelOpen()) {
         ProcessEsimCloseChannel();
         std::unique_lock<std::mutex> lck(closeChannelMutex_);
