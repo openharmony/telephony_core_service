@@ -28,7 +28,6 @@ namespace Telephony {
 int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
     auto callbackType = requestId;
-    TELEPHONY_LOGI("IEsimServiceCallbackStub::OnEsimServiceCallback requestId:%{public}d", callbackType);
     switch (callbackType) {
         case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
             OnGetEuiccInfo(data);
@@ -265,6 +264,7 @@ void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
 int IEsimServiceCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    TELEPHONY_LOGI("IEsimServiceCallbackStub::OnRemoteRequest requestId:%{public}d", code);
     std::u16string myDescriptor = IEsimServiceCallbackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (myDescriptor != remoteDescriptor) {
