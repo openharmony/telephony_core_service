@@ -94,7 +94,7 @@ ResultCode EsimFile::IsObtainChannelSuccessAlllowSameAidReuse(const std::u16stri
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
         if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
-                                    [this]() { return IsLogicChannelOpen(); })) {
+            [this]() { return IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
@@ -139,7 +139,7 @@ std::string EsimFile::ObtainEid()
     if (!eid_.empty()) {
         return eid_;
     }
-        ResultCode resultFlag = IsObtainChannelSuccessExclusive();
+    ResultCode resultFlag = IsObtainChannelSuccessExclusive();
     if (resultFlag != ResultCode::RESULT_OK) {
         TELEPHONY_LOGE("IsObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         return "";
