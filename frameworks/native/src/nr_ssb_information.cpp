@@ -205,6 +205,7 @@ void NrSsbInformation::SetSCellSsbList(std::vector<SsbInfo> sCellSsbList)
 
 void NrSsbInformation::SetNbCellSsbList(int32_t nbCellCount, std::vector<NeighboringCellSsbInformation> nbCellSsbList)
 {
+    nbCellSsbList_.clear;
     nbCellCount_ = (nbCellCount > MAX_NBCELL_COUNT) ? MAX_NBCELL_COUNT : nbCellCount;
     for (int32_t i = 0; i < nbCellCount_; ++i) {
         NeighboringCellSsbInformation nbCellSsbInfo;
