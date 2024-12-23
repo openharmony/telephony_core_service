@@ -39,6 +39,7 @@ TelephonyExtWrapper::~TelephonyExtWrapper()
     }
     if (telephonyDynamicLoadWrapperHandle_ != nullptr) {
         dlclose(telephonyDynamicLoadWrapperHandle_);
+        telephonyDynamicLoadWrapperHandle_ = nullptr;
     }
 }
 
