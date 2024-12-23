@@ -28,10 +28,12 @@ namespace Telephony {
 int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
     auto callbackType = requestId;
-    TELEPHONY_LOGI("IEsimServiceCallbackStub::OnEsimServiceCallback requestId:%{public}d", callbackType);
     switch (callbackType) {
         case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
             OnGetEuiccInfo(data);
+            break;
+        case IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT:
+            OnGetEid(data);
             break;
         case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT:
             OnGetDownloadableProfileMetadata(data);
@@ -89,6 +91,18 @@ void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
         result = *info;
     }
     OnGetEuiccInfo(result, errorCode);
+}
+
+void IEsimServiceCallbackStub::OnGetEid(MessageParcel &data)
+{
+    ErrCode errCode = data.ReadInt32();
+    if (FAILED(errCode)) {
+        TELEPHONY_LOGE("Read Int32 failed!");
+        return;
+    }
+
+    std::string eId = Str16ToStr8(data.ReadString16());
+    OnGetEid(eId, errCode);
 }
 
 void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(MessageParcel &data)
@@ -250,6 +264,7 @@ void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
 int IEsimServiceCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    TELEPHONY_LOGI("IEsimServiceCallbackStub::OnRemoteRequest requestId:%{public}d", code);
     std::u16string myDescriptor = IEsimServiceCallbackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (myDescriptor != remoteDescriptor) {
@@ -288,6 +303,9 @@ void IEsimServiceCallbackStub::OnCancelSession(const ResponseEsimResult &result,
 {
 }
 void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode)
+{
+}
+void IEsimServiceCallbackStub::OnGetEid(const std::string &result, const int32_t errorCode)
 {
 }
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(

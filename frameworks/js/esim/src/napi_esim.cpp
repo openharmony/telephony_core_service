@@ -26,6 +26,7 @@
 #include "get_default_smdp_address_callback.h"
 #include "get_downloadable_profile_metadata_callback.h"
 #include "get_downloadable_profiles_callback.h"
+#include "get_eid_callback.h"
 #include "get_euicc_info_callback.h"
 #include "get_euicc_profile_info_list_callback.h"
 #include "napi_parameter_util.h"
@@ -445,29 +446,44 @@ ResetOption GetDefaultResetOption(void)
     return ResetOption::DELETE_OPERATIONAL_PROFILES;
 }
 
+void NativeGetEid(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto euiccEidContext = static_cast<AsyncContext<std::string> *>(data);
+    if (!IsValidSlotId(euiccEidContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetEid slotId is invalid");
+        euiccEidContext->context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    std::unique_ptr<GetEidResultCallback> callback = std::make_unique<GetEidResultCallback>(euiccEidContext);
+    int32_t errorCode =
+        DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEid(euiccEidContext->slotId, callback.release());
+    std::unique_lock<std::mutex> callbackLock(euiccEidContext->callbackMutex);
+    TELEPHONY_LOGI("NAPI NativeGetEid %{public}d", errorCode);
+    euiccEidContext->context.errorCode = errorCode;
+    if (errorCode == TELEPHONY_SUCCESS) {
+        euiccEidContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [euiccEidContext] { return euiccEidContext->isCallbackEnd; });
+    }
+}
+
+void GetEidCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    if (context == nullptr) {
+        TELEPHONY_LOGE("GetEidCallback context is nullptr");
+        return;
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, *context, false, { "GetEid", Permission::GET_TELEPHONY_ESIM_STATE });
+}
+
 napi_value GetEid(napi_env env, napi_callback_info info)
 {
-    size_t parameterCount = PARAMETER_COUNT_ONE;
-    napi_value parameters[] = { nullptr };
-    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
-    std::string id;
-    napi_value value = nullptr;
-    if (parameterCount != PARAMETER_COUNT_ONE) {
-        TELEPHONY_LOGE("GetEid parameter count is incorrect");
-        NAPI_CALL(env, napi_create_string_utf8(env, id.c_str(), id.length(), &value));
-        return value;
-    }
-    int32_t slotId = UNDEFINED_VALUE;
-    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("GetEid convert parameter fail");
-        NAPI_CALL(env, napi_create_string_utf8(env, id.c_str(), id.length(), &value));
-        return value;
-    }
-    if (IsValidSlotId(slotId)) {
-        DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEid(slotId, id);
-    }
-    NAPI_CALL(env, napi_create_string_utf8(env, id.c_str(), id.length(), &value));
-    return value;
+    return NapiCreateAsyncWork<std::string, NativeGetEid, GetEidCallback>(env, info, "GetEid");
 }
 
 napi_value IsSupported(napi_env env, napi_callback_info info)

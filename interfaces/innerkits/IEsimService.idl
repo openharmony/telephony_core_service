@@ -22,7 +22,7 @@ sequenceable profile_metadata_result_parcel..OHOS.Telephony.GetEuiccProfileInfoL
 sequenceable response_esim_result..OHOS.Telephony.ResponseEsimResult;
 interface OHOS.Telephony.IEsimServiceCallback;
 interface OHOS.Telephony.IEsimService {
-    void GetEid([in] int slotId, [out] String eId);
+    void GetEid([in] int slotId, [in] IEsimServiceCallback listener);
     void GetOsuStatus([in] int slotId, [out] int osuStatus);
     void StartOsu([in] int slotId, [in] IEsimServiceCallback listener);
     void GetDownloadableProfileMetadata(
