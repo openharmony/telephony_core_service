@@ -176,7 +176,7 @@ public:
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
-    void* telephonyDynamicWrapperHandle_ = nullptr;
+    void* telephonyDynamicLoadWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
