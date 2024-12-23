@@ -139,7 +139,7 @@ inline T GetPreferredNetworkType()
 
 static inline bool GetDynamicPowerOffModeSwitch()
 {
-    return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM, false)
+    return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM, false);
 }
 
 enum SatelliteValue {
