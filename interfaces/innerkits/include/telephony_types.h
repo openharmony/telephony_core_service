@@ -139,7 +139,7 @@ inline T GetPreferredNetworkType()
     return networkType;
 }
 
-static inline bool GetDynamicPowerOffModeSwitch()
+inline bool GetDynamicPowerOffModeSwitch()
 {
     return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM, false);
 }
