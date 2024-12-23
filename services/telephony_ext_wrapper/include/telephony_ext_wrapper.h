@@ -43,7 +43,7 @@ DECLARE_DELAYED_REF_SINGLETON(TelephonyExtWrapper);
 public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtWrapper);
     void InitTelephonyExtWrapper();
-    void DeDeInitTelephonyExtWrapper();
+    void DeInitTelephonyExtWrapper();
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
