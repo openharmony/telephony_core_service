@@ -126,5 +126,14 @@ int32_t SimAccountManager::HasOperatorPrivileges(const int32_t slotId, bool &has
     privilegeController_ = controller;
     return controller->HasOperatorPrivileges(hasOperatorPrivileges);
 }
+
+void SimAccountManager::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
+{
+    if (operatorConfigCache_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigCache_ is null");
+        return;
+    }
+    operatorConfigCache_->UpdateImsCapFromChip(slotId, imsCapFromChip);
+}
 } // namespace Telephony
 } // namespace OHOS

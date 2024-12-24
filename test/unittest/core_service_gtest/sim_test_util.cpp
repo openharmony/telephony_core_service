@@ -579,5 +579,17 @@ void SimTest::SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper)
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
+std::shared_ptr<OperatorConfigCache> CreateOperatorConfigCache(int32_t slotId)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
+                                                           std::weak_ptr<ITelRilManager>(telRilManager),
+                                                           std::weak_ptr<SimStateManager>(simStateManager));
+    return std::make_shared<OperatorConfigCache>(std::weak_ptr<SimFileManager>(simFileManager), slotId);
+}
 } // namespace Telephony
 } // namespace OHOS
