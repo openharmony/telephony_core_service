@@ -99,6 +99,7 @@ public:
     virtual int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) = 0;
     virtual int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
+    virtual int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     /**
      * @brief Obtains the location of the device.
@@ -213,6 +214,7 @@ public:
     virtual int32_t StartRadioOnState(int32_t slotId) = 0;
     virtual int32_t StartGetRilSignalIntensity(int32_t slotId) = 0;
     virtual int32_t ProcessSignalIntensity(int32_t slotId, const struct Rssi &signalIntensity) = 0;
+    virtual int32_t UpdateOperatorName(int32_t slotId) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -20,6 +20,7 @@
 #include "network_search_manager.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
+#include "operator_name_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -121,6 +122,16 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, Function | MediumT
     EXPECT_TRUE(networkSelection->ResponseInfoOfSet(responseInfo, data2, index));
     EXPECT_FALSE(data2.ReadBool());
     EXPECT_EQ(data2.ReadInt32(), static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER));
+}
+
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, Function | MediumTest | Level1)
+{
+    OperatorNameUtils::GetInstance().Init();
+    OperatorNameUtils::GetInstance().nameArray_.push_back({{"11111"}, "test", "test", "test", "test", "test", "test"});
+    EXPECT_EQ(NetworkSelection::GetCustomName({"11111", "11111", "11111", 0, 0}), "test");
+    EXPECT_EQ(NetworkSelection::GetCustomName({"11111 x", "11111", "11111", 0, 0}), "test");
+    EXPECT_EQ(NetworkSelection::GetCustomName({"11111 2G", "11111", "11111", 0, 0}), "test 2G");
+    EXPECT_EQ(NetworkSelection::GetCustomName({"00000", "00000", "00000", 0, 0}), "00000");
 }
 
 HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | MediumTest | Level1)

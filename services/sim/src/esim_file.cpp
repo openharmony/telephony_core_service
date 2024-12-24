@@ -44,69 +44,106 @@ EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("
 
 void EsimFile::StartLoad() {}
 
-void EsimFile::SyncOpenChannel()
+ResultCode EsimFile::ObtainChannelSuccessExclusive()
 {
     uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
-    if (esimProfile_.aid != aid) {
-        SyncCloseChannel();
-        esimProfile_.aid = aid;
-    }
-    while (!IsLogicChannelOpen()) {
-        ProcessEsimOpenChannel(OHOS::Telephony::ToUtf16(ISDR_AID));
-        std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
-            [this]() { return IsLogicChannelOpen(); })) {
-            break;
-        }
-        tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
-            TELEPHONY_LOGE("failed to open the channel");
-            break;
-        }
-    }
-}
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
 
-void EsimFile::SyncOpenChannel(const std::u16string &aid)
-{
-    uint32_t tryCnt = 0;
+    // The channel is in use.
+    if (IsLogicChannelOpen()) {
+        TELEPHONY_LOGE("The channel is in use");
+        return ResultCode::RESULT_EUICC_CARD_CHANNEL_IN_USE;
+    }
     while (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to open the channel");
             break;
         }
+    }
+
+    bool isOpenChannelSuccess = IsLogicChannelOpen();
+    if (isOpenChannelSuccess) {
+        aidStr_ = aid;
+        return ResultCode::RESULT_OK;
+    } else {
+        return ResultCode::RESULT_EUICC_CARD_CHANNEL_OPEN_FAILED;
+    }
+}
+
+/**
+ * @brief Channels that support the same aid are not disabled when sending data.
+ */
+ResultCode EsimFile::ObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid)
+{
+    uint32_t tryCnt = 0;
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
+
+    if (!IsValidAidForAllowSameAidReuseChannel(aid)) {
+        TELEPHONY_LOGE("Aid invalid");
+        return ResultCode::RESULT_EUICC_CARD_CHANNEL_OTHER_AID;
+    }
+    while (!IsLogicChannelOpen()) {
+        ProcessEsimOpenChannel(aid);
+        std::unique_lock<std::mutex> lck(openChannelMutex_);
+        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
+            [this]() { return IsLogicChannelOpen(); })) {
+            break;
+        }
+        tryCnt++;
+        if (tryCnt >= NUMBER_TWO) {
+            TELEPHONY_LOGE("failed to open the channel:2 times");
+            break;
+        }
+    }
+    bool isOpenChannelSuccess = IsLogicChannelOpen();
+    if (isOpenChannelSuccess) {
+        aidStr_ = aid;
+        return ResultCode::RESULT_OK;
+    } else {
+        TELEPHONY_LOGE("failed to open the channel");
+        return ResultCode::RESULT_EUICC_CARD_CHANNEL_OPEN_FAILED;
     }
 }
 
 void EsimFile::SyncCloseChannel()
 {
     uint32_t tryCnt = 0;
+    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
     while (IsLogicChannelOpen()) {
         ProcessEsimCloseChannel();
         std::unique_lock<std::mutex> lck(closeChannelMutex_);
-        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        if (closeChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return !IsLogicChannelOpen(); })) {
             break;
         }
         tryCnt++;
-        if (tryCnt >= NUMBER_THREE) {
-            currentChannelId_ = 0;
+        if (tryCnt >= NUMBER_TWO) {
             TELEPHONY_LOGE("failed to close the channel");
             break;
         }
     }
+    currentChannelId_ = 0;
+    aidStr_ = u"";
 }
 
 std::string EsimFile::ObtainEid()
 {
-    SyncOpenChannel();
+    if (!eid_.empty()) {
+        return eid_;
+    }
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return "";
+    }
     AppExecFwk::InnerEvent::Pointer eventGetEid = BuildCallerInfo(MSG_ESIM_OBTAIN_EID_DONE);
     if (!ProcessObtainEid(slotId_, eventGetEid)) {
         TELEPHONY_LOGE("ProcessObtainEid encode failed");
@@ -127,7 +164,12 @@ std::string EsimFile::ObtainEid()
 
 GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 {
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        euiccProfileInfoList_.result_ = resultFlag;
+        return euiccProfileInfoList_;
+    }
     AppExecFwk::InnerEvent::Pointer eventRequestAllProfiles = BuildCallerInfo(MSG_ESIM_REQUEST_ALL_PROFILES);
     if (!ProcessRequestAllProfiles(slotId_, eventRequestAllProfiles)) {
         TELEPHONY_LOGE("ProcessRequestAllProfiles encode failed");
@@ -147,7 +189,11 @@ GetEuiccProfileInfoListResult EsimFile::GetEuiccProfileInfoList()
 
 EuiccInfo EsimFile::GetEuiccInfo()
 {
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccInfo();
+    }
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo1 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO_1_DONE);
     if (!ProcessObtainEuiccInfo1(slotId_, eventEUICCInfo1)) {
         TELEPHONY_LOGE("ProcessObtainEuiccInfo1 encode failed");
@@ -346,6 +392,7 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
     {
         std::lock_guard<std::mutex> lock(closeChannelMutex_);
         currentChannelId_ = 0;
+        aidStr_ = u"";
         TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     }
     closeChannelCv_.notify_one();
@@ -675,21 +722,28 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
 
 ResultCode EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
+    disableProfileResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
-    SyncOpenChannel();
+    
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        disableProfileResult_ = resultFlag;
+        return disableProfileResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventDisableProfile = BuildCallerInfo(MSG_ESIM_DISABLE_PROFILE);
     if (!ProcessDisableProfile(slotId_, eventDisableProfile)) {
         TELEPHONY_LOGE("ProcessDisableProfile encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return disableProfileResult_;
     }
     isDisableProfileReady_ = false;
     std::unique_lock<std::mutex> lock(disableProfileMutex_);
     if (!disableProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDisableProfileReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return disableProfileResult_;
     }
     SyncCloseChannel();
     return disableProfileResult_;
@@ -698,7 +752,11 @@ ResultCode EsimFile::DisableProfile(int32_t portIndex, const std::u16string &icc
 std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return "";
+    }
     AppExecFwk::InnerEvent::Pointer eventObtainSmdsAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_SMDS_ADDRESS);
     if (!ProcessObtainSmdsAddress(slotId_, eventObtainSmdsAddress)) {
         TELEPHONY_LOGE("ProcessObtainSmdsAddress encode failed");
@@ -719,7 +777,11 @@ std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
 EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccRulesAuthTable();
+    }
     AppExecFwk::InnerEvent::Pointer eventRequestRulesAuthTable = BuildCallerInfo(MSG_ESIM_REQUEST_RULES_AUTH_TABLE);
     if (!ProcessRequestRulesAuthTable(slotId_, eventRequestRulesAuthTable)) {
         TELEPHONY_LOGE("ProcessRequestRulesAuthTable encode failed");
@@ -740,7 +802,13 @@ EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 ResponseEsimResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        responseChallengeResult_.resultCode_ = resultFlag;
+        return responseChallengeResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventEUICCChanllenge = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_CHALLENGE_DONE);
     if (!ProcessObtainEuiccChallenge(slotId_, eventEUICCChanllenge)) {
         TELEPHONY_LOGE("ProcessObtainEuiccChallenge encode failed");
@@ -1041,7 +1109,11 @@ bool EsimFile::ProcessObtainEuiccChallengeDone(const AppExecFwk::InnerEvent::Poi
 
 std::string EsimFile::ObtainDefaultSmdpAddress()
 {
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return "";
+    }
     AppExecFwk::InnerEvent::Pointer eventSmdpAddress = BuildCallerInfo(MSG_ESIM_OBTAIN_DEFAULT_SMDP_ADDRESS_DONE);
     if (!ProcessObtainDefaultSmdpAddress(slotId_, eventSmdpAddress)) {
         TELEPHONY_LOGE("ProcessObtainDefaultSmdpAddress encode failed");
@@ -1063,7 +1135,12 @@ ResponseEsimResult EsimFile::CancelSession(const std::u16string &transactionId, 
 {
     esimProfile_.transactionId = transactionId;
     esimProfile_.cancelReason = cancelReason;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        cancelSessionResult_.resultCode_ = resultFlag;
+        return cancelSessionResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventCancelSession = BuildCallerInfo(MSG_ESIM_CANCEL_SESSION);
     if (!ProcessCancelSession(slotId_, eventCancelSession)) {
         TELEPHONY_LOGE("ProcessCancelSession encode failed");
@@ -1085,7 +1162,11 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccProfile();
+    }
     AppExecFwk::InnerEvent::Pointer eventGetProfile = BuildCallerInfo(MSG_ESIM_GET_PROFILE);
     if (!ProcessGetProfile(slotId_, eventGetProfile)) {
         TELEPHONY_LOGE("ProcessGetProfile encode failed");
@@ -1303,20 +1384,27 @@ bool EsimFile::ProcessGetProfileDone(const AppExecFwk::InnerEvent::Pointer &even
 
 ResultCode EsimFile::ResetMemory(ResetOption resetOption)
 {
+    resetResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.option = resetOption;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        resetResult_ = resultFlag;
+        return resetResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventResetMemory = BuildCallerInfo(MSG_ESIM_RESET_MEMORY);
     if (!ProcessResetMemory(slotId_, eventResetMemory)) {
         TELEPHONY_LOGE("ProcessResetMemory encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return resetResult_;
     }
     isResetMemoryReady_ = false;
     std::unique_lock<std::mutex> lock(resetMemoryMutex_);
     if (!resetMemoryCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isResetMemoryReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return resetResult_;
     }
     SyncCloseChannel();
     return resetResult_;
@@ -1324,20 +1412,26 @@ ResultCode EsimFile::ResetMemory(ResetOption resetOption)
 
 ResultCode EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
+    setDpAddressResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.defaultSmdpAddress = defaultSmdpAddress;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        setDpAddressResult_ = resultFlag;
+        return setDpAddressResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventSetSmdpAddress = BuildCallerInfo(MSG_ESIM_ESTABLISH_DEFAULT_SMDP_ADDRESS_DONE);
     if (!ProcessEstablishDefaultSmdpAddress(slotId_, eventSetSmdpAddress)) {
         TELEPHONY_LOGE("ProcessEstablishDefaultSmdpAddress encode failed!!");
         SyncCloseChannel();
-        return ResultCode();
+        return setDpAddressResult_;
     }
     isSetDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(setDefaultSmdpAddressMutex_);
     if (!setDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return setDpAddressResult_;
     }
     SyncCloseChannel();
     return setDpAddressResult_;
@@ -1387,9 +1481,18 @@ bool EsimFile::ProcessEstablishDefaultSmdpAddressDone(const AppExecFwk::InnerEve
 bool EsimFile::IsSupported()
 {
     char buf[ATR_LENGTH + 1] = {0};
+    if (isSupported_) {
+        return isSupported_;
+    }
     GetParameter(TEL_ESIM_SUPPORT, "", buf, ATR_LENGTH);
     ResetResponse resetResponse;
     std::string atr(buf);
+    if (atr.empty()) {
+        if (!ObtainEid().empty()) {
+            isSupported_ = true;
+        }
+        return isSupported_;
+    }
     resetResponse.AnalysisAtrData(atr);
     isSupported_ = resetResponse.IsEuiccAvailable();
     return isSupported_;
@@ -1397,38 +1500,45 @@ bool EsimFile::IsSupported()
 
 ResponseEsimResult EsimFile::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
+    transApduDataResponse_.resultCode_ = ResultCode::RESULT_EUICC_CARD_DEFALUT_ERROR;
+    transApduDataResponse_.response_ = u"";
+    transApduDataResponse_.sw1_ = 0;
+    transApduDataResponse_.sw2_ = 0;
     if (aid.empty()) {
-        return ResponseEsimResult();
+        TELEPHONY_LOGE("Aid is empty");
+        transApduDataResponse_.resultCode_ = ResultCode::RESULT_EUICC_CARD_CHANNEL_AID_EMPTY;
+        return transApduDataResponse_;
     }
-    if (esimProfile_.aid != aid) {
-        SyncCloseChannel();
-        esimProfile_.aid = aid;
-    }
-    esimProfile_.apduData = apduData;
-    if (esimProfile_.apduData.closeChannelFlag_) {
-        SyncCloseChannel();
-        esimProfile_.apduData.instructionType_ = 0;
-        esimProfile_.apduData.instruction_ = 0;
-        esimProfile_.apduData.p1_ = 0;
-        esimProfile_.apduData.p2_ = 0;
-        esimProfile_.apduData.p3_ = 0;
-        esimProfile_.apduData.unusedDefaultReqHeadFlag_ = false;
-        return ResponseEsimResult();
+    if (apduData.closeChannelFlag_) {
+        if (IsSameAid(aid)) {
+            SyncCloseChannel();
+            return ResponseEsimResult();
+        } else {
+            TELEPHONY_LOGE("SendApduData Close Channel failed");
+            transApduDataResponse_.resultCode_ = ResultCode::RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED;
+            return transApduDataResponse_;
+        }
     }
 
-    SyncOpenChannel(aid);
+    esimProfile_.apduData = apduData;
     AppExecFwk::InnerEvent::Pointer eventSendApduData = BuildCallerInfo(MSG_ESIM_SEND_APUD_DATA);
+    ResultCode resultFlag = ObtainChannelSuccessAlllowSameAidReuse(aid);
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessAlllowSameAidReuse failed ,%{public}d", resultFlag);
+        transApduDataResponse_.resultCode_ = resultFlag;
+        return transApduDataResponse_;
+    }
     if (!ProcessSendApduData(slotId_, eventSendApduData)) {
         TELEPHONY_LOGE("ProcessSendApduData encode failed");
         SyncCloseChannel();
-        return ResponseEsimResult();
+        return transApduDataResponse_;
     }
     isSendApduDataReady_ = false;
     std::unique_lock<std::mutex> lock(sendApduDataMutex_);
     if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel();
-        return ResponseEsimResult();
+        return transApduDataResponse_;
     }
     return transApduDataResponse_;
 }
@@ -1548,7 +1658,13 @@ ResponseEsimResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &dow
     esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2_;
     esimProfile_.smdpSignature2 = downLoadConfigInfo.smdpSignature2_;
     esimProfile_.smdpCertificate = downLoadConfigInfo.smdpCertificate_;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        preDownloadResult_.resultCode_ = resultFlag;
+        return preDownloadResult_;
+    }
     recvCombineStr_ = "";
     if (!ProcessPrepareDownload(slotId_)) {
         TELEPHONY_LOGE("ProcessPrepareDownload encode failed");
@@ -1564,7 +1680,13 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.boundProfilePackage = boundProfilePackage;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        loadBPPResult_.resultCode_ = static_cast<int32_t>(resultFlag);
+        return loadBPPResult_;
+    }
     recvCombineStr_ = "";
     if (!ProcessLoadBoundProfilePackage(slotId_)) {
         TELEPHONY_LOGE("ProcessLoadBoundProfilePackage encode failed");
@@ -1580,7 +1702,11 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event event
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
     AppExecFwk::InnerEvent::Pointer eventListNotif = BuildCallerInfo(MSG_ESIM_LIST_NOTIFICATION);
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccNotificationList();
+    }
     recvCombineStr_ = "";
     if (!ProcessListNotifications(slotId_, events, eventListNotif)) {
         TELEPHONY_LOGE("ProcessListNotifications encode failed");
@@ -2172,7 +2298,11 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Even
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccNotificationList();
+    }
     recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRetrieveListNotif = BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_LIST);
     if (!ProcessRetrieveNotificationList(slotId_, events, eventRetrieveListNotif)) {
@@ -2195,7 +2325,11 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return EuiccNotification();
+    }
     recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRetrieveNotification = BuildCallerInfo(MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
     if (!ProcessRetrieveNotification(slotId_, eventRetrieveNotification)) {
@@ -2216,21 +2350,28 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 
 ResultCode EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
 {
+    removeNotifResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        removeNotifResult_ = resultFlag;
+        return removeNotifResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventRemoveNotif = BuildCallerInfo(MSG_ESIM_REMOVE_NOTIFICATION);
     if (!ProcessRemoveNotification(slotId_, eventRemoveNotif)) {
         TELEPHONY_LOGE("ProcessRemoveNotification encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return removeNotifResult_;
     }
     isRemoveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(removeNotificationMutex_);
     if (!removeNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRemoveNotificationReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return removeNotifResult_;
     }
     SyncCloseChannel();
     return removeNotifResult_;
@@ -2457,20 +2598,27 @@ bool EsimFile::ProcessRemoveNotificationDone(const AppExecFwk::InnerEvent::Point
 
 ResultCode EsimFile::DeleteProfile(const std::u16string &iccId)
 {
+    delProfile_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.iccId = iccId;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        delProfile_ = resultFlag;
+        return delProfile_;
+    }
     AppExecFwk::InnerEvent::Pointer eventDeleteProfile = BuildCallerInfo(MSG_ESIM_DELETE_PROFILE);
     if (!ProcessDeleteProfile(slotId_, eventDeleteProfile)) {
         TELEPHONY_LOGE("ProcessDeleteProfile encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return delProfile_;
     }
     isDeleteProfileReady_ = false;
     std::unique_lock<std::mutex> lock(deleteProfileMutex_);
     if (!deleteProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDeleteProfileReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return delProfile_;
     }
     SyncCloseChannel();
     return delProfile_;
@@ -2478,22 +2626,28 @@ ResultCode EsimFile::DeleteProfile(const std::u16string &iccId)
 
 ResultCode EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
+    switchResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     esimProfile_.forceDisableProfile = forceDisableProfile;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        switchResult_ = resultFlag;
+        return switchResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventSwitchToProfile = BuildCallerInfo(MSG_ESIM_SWITCH_PROFILE);
     if (!ProcessSwitchToProfile(slotId_, eventSwitchToProfile)) {
         TELEPHONY_LOGE("ProcessSwitchToProfile encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return switchResult_;
     }
     isSwitchToProfileReady_ = false;
     std::unique_lock<std::mutex> lock(switchToProfileMutex_);
     if (!switchToProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSwitchToProfileReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return switchResult_;
     }
     SyncCloseChannel();
     return switchResult_;
@@ -2501,21 +2655,27 @@ ResultCode EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &ic
 
 ResultCode EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
 {
+    setNicknameResult_ = ResultCode::RESULT_SGP_22_OTHER;
     esimProfile_.iccId = iccId;
     esimProfile_.nickname = nickname;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        setNicknameResult_ = resultFlag;
+        return setNicknameResult_;
+    }
     AppExecFwk::InnerEvent::Pointer eventSetNickName = BuildCallerInfo(MSG_ESIM_SET_NICK_NAME);
     if (!ProcessSetNickname(slotId_, eventSetNickName)) {
         TELEPHONY_LOGE("ProcessSetNickname encode failed");
         SyncCloseChannel();
-        return ResultCode();
+        return setNicknameResult_;
     }
     isSetNicknameReady_ = false;
     std::unique_lock<std::mutex> lock(setNicknameMutex_);
     if (!setNicknameCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetNicknameReady_; })) {
         SyncCloseChannel();
-        return ResultCode();
+        return setNicknameResult_;
     }
     SyncCloseChannel();
     return setNicknameResult_;
@@ -2670,7 +2830,13 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
 EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
     esimProfile_.portIndex = portIndex;
-    SyncOpenChannel();
+
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        euiccInfo2Result_.resultCode_ = resultFlag;
+        return euiccInfo2Result_;
+    }
     AppExecFwk::InnerEvent::Pointer eventEUICCInfo2 = BuildCallerInfo(MSG_ESIM_OBTAIN_EUICC_INFO2_DONE);
     recvCombineStr_ = "";
     if (!ProcessObtainEuiccInfo2(slotId_, eventEUICCInfo2)) {
@@ -2701,7 +2867,12 @@ ResponseEsimResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &au
     std::u16string imei = u"";
     CoreManagerInner::GetInstance().GetImei(slotId_, imei);
     esimProfile_.imei = imei;
-    SyncOpenChannel();
+    ResultCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultCode::RESULT_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        responseAuthenticateResult_.resultCode_ = resultFlag;
+        return responseAuthenticateResult_;
+    }
     recvCombineStr_ = "";
     if (!ProcessAuthenticateServer(slotId_)) {
         TELEPHONY_LOGE("ProcessAuthenticateServer encode failed");
@@ -3279,6 +3450,25 @@ std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Poi
 int32_t EsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
 {
     return 0;
+}
+
+bool EsimFile::IsSameAid(const std::u16string &aid)
+{
+    std::lock_guard<std::mutex> lock(occupyChannelMutex_);
+    if (aidStr_ == aid) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool EsimFile::IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid)
+{
+    if (aidStr_ != aid && !aidStr_.empty()) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool EsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)

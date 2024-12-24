@@ -168,6 +168,9 @@ private:
     bool IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t IsSatelliteSupported();
     void GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    void UpdateEsimOSVersion(int32_t slotId);
+#endif
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;

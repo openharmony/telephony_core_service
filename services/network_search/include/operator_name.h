@@ -25,6 +25,7 @@
 #include "sim_constant.h"
 #include "telephony_types.h"
 #include "want.h"
+#include "operator_name_params.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,18 +43,15 @@ public:
 private:
     void GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
     void CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
-    void PublishEvent(int32_t rule, RegServiceState state, bool showPlmn, const std::string &plmn, bool showSpn,
-        const std::string &spn, const std::string &domesticSpn);
+    void PublishEvent(OperatorNameParams params, RegServiceState state, const std::string &domesticSpn);
     sptr<NetworkState> GetNetworkStatus();
     void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,
         const std::string &domesticSpn, bool isForce = false);
     void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,
         const std::string &domesticSpn, bool isForce = false);
 
-    void UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &plmn,
-        bool &showPlmn);
-    void UpdateSpn(
-        RegServiceState regStatus, sptr<NetworkState> &networkState, int32_t spnRule, std::string &spn, bool &showSpn);
+    void UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, OperatorNameParams &params);
+    void UpdateSpn(RegServiceState regStatus, sptr<NetworkState> &networkState, OperatorNameParams &params);
     int32_t GetCurrentLac();
     std::string GetCustomName(const std::string &numeric);
     unsigned int GetSpnRule(sptr<NetworkState> &networkState);
@@ -75,17 +73,13 @@ private:
     bool isCTDomestic(const std::string &numeric);
     bool isCBDomestic(const std::string &numeric);
     void UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric);
-    void UpdateVSimSpn(std::string &spn, int32_t &rule, bool &showSpn);
+    void UpdateVSimSpn(OperatorNameParams &params);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
-    std::string curPlmn_ = "";
-    bool curPlmnShow_ = false;
-    std::string curSpn_ = "";
-    bool curSpnShow_ = false;
+    OperatorNameParams curParams_ = {false, "", false, "", 0};
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
-    int32_t curSpnRule_ = 0;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
     std::string csSpnFormat_;

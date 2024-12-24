@@ -16,6 +16,7 @@
 #ifndef CORE_SERVICE_CLIENT_H
 #define CORE_SERVICE_CLIENT_H
 
+#include <atomic>
 #include <cstdint>
 #include <iremote_object.h>
 #include <singleton.h>
@@ -546,6 +547,15 @@ public:
     int32_t SetActiveSim(const int32_t slotId, int32_t enable);
 
     /**
+     * @brief Set the active sim enable or not used in satellite
+     *
+     * @param slotId[in], sim slot id
+     * @param enable[in], set active sim enable or not
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetActiveSimSatellite(const int32_t slotId, int32_t enable);
+
+    /**
      * @brief Obtain the preferred network
      *
      * @param slotId[in], sim slot id
@@ -824,6 +834,15 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
+
+    /**
+     * @brief Obtain the neighboring cell information list
+     *
+     * @param slotId[in], primary slot id
+     * @param cellInfo[out], the neighboring cell information of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo);
 
     /**
      * @brief Requests for a cell location update
@@ -1220,15 +1239,23 @@ private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client) {}
+        explicit CoreServiceDeathRecipient(CoreServiceClient &client) : client_(client), isValid_(true) {}
         ~CoreServiceDeathRecipient() override = default;
         __attribute__((no_sanitize("cfi"))) void OnRemoteDied(const wptr<IRemoteObject> &remote) override
         {
-            client_.OnRemoteDied(remote);
+            if (isValid_.load()) {
+                client_.OnRemoteDied(remote);
+            }
+        }
+
+        void SetValid(bool isValid)
+        {
+            isValid_.store(isValid);
         }
 
     private:
         CoreServiceClient &client_;
+        std::atomic_bool isValid_;
     };
 
 private:

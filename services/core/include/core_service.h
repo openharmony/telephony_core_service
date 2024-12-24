@@ -159,6 +159,8 @@ public:
 
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
 
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) override;
+
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
     int32_t SetPreferredNetwork(
@@ -221,6 +223,8 @@ public:
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
 
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
 
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
 

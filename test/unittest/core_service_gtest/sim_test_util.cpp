@@ -406,6 +406,37 @@ void SimTest::ReSetActiveSimTestFunc1(CoreServiceTestHelper &helper)
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
+void SimTest::SetActiveSimSatelliteTestFunc(CoreServiceTestHelper &helper)
+{
+    int enable = 1;
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSimSatellite(SimTest::slotId_, enable);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
+void SimTest::SetActiveSimSatelliteTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int enable = 1;
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSimSatellite(SimTest::slotId1_, enable);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
+void SimTest::ReSetActiveSimSatelliteTestFunc(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int enable = 1;
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSimSatellite(SimTest::slotId_, enable);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
+void SimTest::ReSetActiveSimSatelliteTestFunc1(CoreServiceTestHelper &helper)
+{
+    AccessToken token;
+    int enable = 1;
+    int32_t result = CoreServiceClient::GetInstance().SetActiveSimSatellite(SimTest::slotId1_, enable);
+    helper.SetIntResult(result);
+    helper.NotifyAll();
+}
 void SimTest::HasOperatorPrivileges(CoreServiceTestHelper &helper)
 {
     constexpr int32_t slotId = 0;

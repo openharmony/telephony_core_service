@@ -64,6 +64,8 @@ public:
     // SimAccount
     virtual bool IsSimActive(int32_t slotId) = 0;
     virtual int32_t SetActiveSim(int32_t slotId, int32_t enable) = 0;
+    virtual int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) = 0;
+    virtual int32_t ResetSimLoadAccount(int32_t slotId) = 0;
     virtual int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info) = 0;
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual int32_t SetDefaultSmsSlotId(int32_t slotId) = 0;
@@ -152,6 +154,8 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
+    virtual bool IsDataShareError() = 0;
+    virtual void ResetDataShareError() = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
     virtual int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) = 0;

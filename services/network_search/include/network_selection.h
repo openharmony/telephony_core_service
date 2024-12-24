@@ -17,6 +17,7 @@
 #define NETWORK_SEARCH_INCLUDE_NETWORK_SELECTION_H
 
 #include <memory>
+#include <set>
 
 #include "event_handler.h"
 #include "tel_ril_network_parcel.h"
@@ -44,9 +45,11 @@ private:
         std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
     bool ResponseInfoOfSet(
         std::shared_ptr<RadioResponseInfo> responseInfo, MessageParcel &data, int64_t &index) const;
+    static std::string GetCustomName(const AvailableNetworkInfo &info);
 
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     int32_t slotId_ = 0;
+    static const std::set<std::string> radioTechStrings_;
 };
 } // namespace Telephony
 } // namespace OHOS

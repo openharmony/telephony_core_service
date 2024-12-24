@@ -25,6 +25,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
+#include "sim_account_callback_death_recipient.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -219,9 +220,10 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         return;
     }
     if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
-        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is absent");
+        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
+        controller_->ResetSetPrimarySlotRemain(slotId);
         isSimAccountLoaded_[slotId] = 0;
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         simFileManager->ClearData();
@@ -412,7 +414,7 @@ void MultiSimMonitor::CheckSimNotifyRegister()
 void MultiSimMonitor::CheckDataShareError()
 {
     if (controller_->IsDataShareError()) {
-        controller_->ResetDataShareError();
+        TELEPHONY_LOGI("CheckDataShareError, need Reset Opkey");
         CheckOpcNeedUpdata(true);
     }
 }
@@ -448,6 +450,14 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     SimAccountCallbackRecord simAccountRecord;
     simAccountRecord.tokenId = tokenId;
     simAccountRecord.simAccountCallback = callback;
+    deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(*this);
+    if (deathRecipient_ == nullptr) {
+        TELEPHONY_LOGE("deathRecipient is null");
+        return TELEPHONY_ERR_STRCPY_FAIL;
+    }
+    if (!callback->AsObject()->AddDeathRecipient(deathRecipient_)) {
+        TELEPHONY_LOGE("simAccountCallback remote server add death recipient failed");
+    }
     listSimAccountCallbackRecord_.push_back(simAccountRecord);
     TELEPHONY_LOGI("Register successfully, callback list size is %{public}zu", listSimAccountCallbackRecord_.size());
     return TELEPHONY_SUCCESS;
@@ -523,6 +533,17 @@ void MultiSimMonitor::RegisterSimNotify()
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         RegisterSimNotify(static_cast<int32_t>(slotId));
     }
+}
+
+int32_t MultiSimMonitor::ResetSimLoadAccount(int32_t slotId)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("ResetSimLoadAccount slotId is invalid");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    isSimAccountLoaded_[slotId] = 0;
+    initDataRemainCount_[slotId] = INIT_DATA_TIMES;
+    return TELEPHONY_SUCCESS;
 }
 
 void MultiSimMonitor::RegisterSimNotify(int32_t slotId)

@@ -1075,6 +1075,21 @@ int32_t NetworkSearchManager::GetCellInfoList(int32_t slotId, std::vector<sptr<C
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+int32_t NetworkSearchManager::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner != nullptr) {
+        if (inner->networkSearchHandler_ != nullptr) {
+            inner->networkSearchHandler_->GetNeighboringCellInfoList(cellInfo);
+            if (TELEPHONY_EXT_WRAPPER.getCellInfoList_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.getCellInfoList_(slotId, cellInfo);
+            }
+            return TELEPHONY_ERR_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 int32_t NetworkSearchManager::SendUpdateCellLocationRequest(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
@@ -2031,6 +2046,17 @@ void NetworkSearchManager::GetModemEflCapability()
     GetParameter(MODEM1_EFL_CAP, EFL_CAP_NOT_SUPPORT, param1, SYS_PARAMETER_SIZE);
     int32_t modem1_efl_cap = atoi(param1);
     modem1EflCapability_ = static_cast<NrMode>(modem1_efl_cap);
+}
+
+int32_t NetworkSearchManager::UpdateOperatorName(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::UpdateOperatorName slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    inner->networkSearchHandler_->UpdateOperatorName();
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

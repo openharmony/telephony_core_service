@@ -312,6 +312,29 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
     return ret;
 }
 
+int32_t SimManager::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = multiSimController_->SetActiveSimSatellite(slotId, enable);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
+}
+
+int32_t SimManager::ResetSimLoadAccount(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    multiSimMonitor_->ResetSimLoadAccount(slotId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t SimManager::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
 {
     if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
@@ -1089,6 +1112,7 @@ int32_t SimManager::UpdateIccDiallingNumbers(
 void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
+        std::shared_lock<std::shared_mutex> lck(mtx_);
         if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
@@ -1258,6 +1282,24 @@ int32_t SimManager::SavePrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     return multiSimController_->SavePrimarySlotId(slotId);
+}
+
+bool SimManager::IsDataShareError()
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return multiSimController_->IsDataShareError();
+}
+
+void SimManager::ResetDataShareError()
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return;
+    }
+    multiSimController_->ResetDataShareError();
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM

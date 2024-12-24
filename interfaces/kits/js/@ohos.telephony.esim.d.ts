@@ -46,9 +46,11 @@ declare namespace eSIM {
   /**
    * Starts a page through an ability, on which users can touch the button to download a profile.
    *
+   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE_OPEN
    * @param { DownloadableProfile } profile - Bound profile package data returned by the SM-DP+ server.
    * @returns { Promise<boolean> } Returns {@code true} if the profile is added successfully;
    * returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
    * 2. Incorrect parameter types. 3. Invalid parameter value.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -64,7 +66,7 @@ declare namespace eSIM {
    *
    * @permission ohos.permission.GET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
-   * @returns { string } Returns the EID. When eUICC is not ready, the return value may be null.
+   * @returns { Promise<string> } Returns the EID. When eUICC is not ready, the return value may be null.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
@@ -76,7 +78,7 @@ declare namespace eSIM {
    * @systemapi Hide this for inner system use.
    * @since 14
    */
-  function getEid(slotId: number): string;
+  function getEid(slotId: number): Promise<string>;
 
   /**
    * Returns the current status of eUICC OS upgrade.
@@ -173,10 +175,7 @@ declare namespace eSIM {
    * @param { number } slotId - Indicates the card slot index number.
    * @param { number } portIndex - Index of the port for the slot.
    * @param { DownloadableProfile } profile - The Bound Profile Package data returned by SM-DP+ server.
-   * @param { boolean } switchAfterDownload - Indicates whether to enable profile after successful download.
-   * @param { boolean } forceDisableProfile - If true, the active profile must be disabled in order to perform the
-   * operation. Otherwise, the resultCode should return {@link RESULT_MUST_DISABLE_PROFILE} to allow
-   * the user to agree to this operation first.
+   * @param { DownloadConfiguration } configuration - Configuration information during downloading.
    * @returns { Promise<DownloadProfileResult> } Return the given downloadableProfile.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -190,7 +189,7 @@ declare namespace eSIM {
    * @since 14
    */
   function downloadProfile(slotId: number, portIndex: number, profile: DownloadableProfile,
-      switchAfterDownload: boolean, forceDisableProfile: boolean): Promise<DownloadProfileResult>;
+    configuration: DownloadConfiguration): Promise<DownloadProfileResult>;
 
   /**
    * Returns a list of all eUICC profile information.
@@ -254,7 +253,7 @@ declare namespace eSIM {
   /**
    * Switch to (enable) the given profile on the eUICC.
    *
-   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE_OPEN
+   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
    * @param { number } portIndex - Index of the port for the slot.
    * @param { string } iccid - The iccid of the profile to switch to.
@@ -279,7 +278,7 @@ declare namespace eSIM {
   /**
    * Adds or updates the given profile nickname.
    *
-   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE_OPEN
+   * @permission ohos.permission.SET_TELEPHONY_ESIM_STATE
    * @param { number } slotId - Indicates the card slot index number.
    * @param { string } iccid - The iccid of the profile.
    * @param { string } nickname - The nickname of the profile.
@@ -1065,7 +1064,7 @@ declare namespace eSIM {
      * @syscap SystemCapability.Telephony.CoreService.Esim
      * @systemapi Hide this for inner system use.
      * @since 14
-          */
+     */
     RESULT_CERTIFICATE_RESPONSE_TIMEOUT = 209,
 
     /**
@@ -1147,7 +1146,7 @@ declare namespace eSIM {
      * @systemapi Hide this for inner system use.
      * @since 14
      */
-         RESULT_USER_CANCEL_DOWNLOAD = 218,
+    RESULT_USER_CANCEL_DOWNLOAD = 218,
 
     /**
      * The carrier server is unavailable.
@@ -1209,7 +1208,7 @@ declare namespace eSIM {
      * @syscap SystemCapability.Telephony.CoreService.Esim
      * @systemapi Hide this for inner system use.
      * @since 14
-          */
+     */
     RESULT_PROFILE_TYPE_ERROR_AUTHENTICATION_STOPPED = 233,
 
     /**
@@ -1249,6 +1248,15 @@ declare namespace eSIM {
     RESULT_PPR_FORBIDDEN = 268,
 
     /**
+     * Nothing is to be deleted.
+     * 
+     * @syscap SystemCapability.Telephony.CoreService.Esim
+     * @systemapi Hide this for inner system use.
+     * @since 14
+     */
+    RESULT_NOTHING_TO_DELETE = 270,
+
+    /**
      * The profile policy rule does not match.
      *
      * @syscap SystemCapability.Telephony.CoreService.Esim
@@ -1256,6 +1264,15 @@ declare namespace eSIM {
      * @since 14
      */
     RESULT_PPR_NOT_MATCH = 276,
+
+    /**
+     * A session is ongoing.
+     * 
+     * @syscap SystemCapability.Telephony.CoreService.Esim
+     * @systemapi Hide this for inner system use.
+     * @since 14
+     */
+    RESULT_CAT_BUSY = 283,
 
     /**
      * This eSIM profile is already in use or is invalid.
@@ -1477,6 +1494,49 @@ declare namespace eSIM {
      * @since 14
      */
     SOLVABLE_ERROR_NEED_POLICY_RULE = 1 << 1,
+  }
+
+  /**
+   * Specifies the download configuration.
+   *
+   * @interface DownloadConfiguration
+   * @syscap SystemCapability.Telephony.CoreService.Esim
+   * @systemapi Hide this for inner system use.
+   * @since 14
+   */
+  export interface DownloadConfiguration {
+    /**
+     * Specifies whether to enable the profile after successful download.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CoreService.Esim
+     * @systemapi Hide this for inner system use.
+     * @since 14
+     */
+    switchAfterDownload: boolean;
+
+    /**
+     * Specifies whether to forcibly disable the profile. If true, the active profile is disabled in order to perform
+     * the operation. Otherwise, {@link RESULT_MUST_DISABLE_PROFILE} is returned in resultCode to ask for the user's
+     * agreement to the operation.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CoreService.Esim
+     * @systemapi Hide this for inner system use.
+     * @since 14
+     */
+    forceDisableProfile: boolean;
+
+    /**
+     * Specifies whether the user allows the service provider to enforce this Profile Policy Rule (PPR)
+     * after being informed of its restrictions.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CoreService.Esim
+     * @systemapi Hide this for inner system use.
+     * @since 14
+     */
+    isPprAllowed: boolean;
   }
 }
 

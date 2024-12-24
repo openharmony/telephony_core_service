@@ -335,11 +335,30 @@ void StkController::OnSendRilSessionEnd(const AppExecFwk::InnerEvent::Pointer &e
         slotId_, publishResult);
 }
 
-bool StkController::CheckIsBipCmd(const std::string &cmdData)
+std::string SafeSubstr(const std::string& str, size_t pos, size_t len)
 {
-    std::string commandLen = cmdData.substr(STK_CMD_CMD_LEN_INDEX, STK_CMD_TYPE_LEN);
+    if (pos >= str.length()) {
+        TELEPHONY_LOGE("string pos abnormal. str: %{public}s  pos: %{public}zu, len: %{public}zu",
+            str.c_str(), pos, len);
+        return "";
+    }
+
+    if (pos + len > str.length()) {
+        TELEPHONY_LOGI("string len abnormal: str: %{public}s  pos: %{public}zu, len: %{public}zu",
+            str.c_str(), pos, len);
+        len = str.length() - pos;
+    }
+
+    return str.substr(pos, len);
+}
+
+void StkController::HandleStkBipCmd(const std::string &cmdData)
+{
+    std::string commandLen = SafeSubstr(cmdData, STK_CMD_CMD_LEN_INDEX, STK_CMD_TYPE_LEN);
     uint32_t typeOffset;
-    if (commandLen == STK_CMD_CMD_LEN_81) {
+    if (commandLen == "") {
+        return;
+    } else if (commandLen == STK_CMD_CMD_LEN_81) {
         typeOffset = STK_CMD_TYPE_81_INDEX;
     } else if (commandLen == STK_CMD_CMD_LEN_82) {
         typeOffset = STK_CMD_TYPE_82_INDEX;
@@ -349,17 +368,15 @@ bool StkController::CheckIsBipCmd(const std::string &cmdData)
         typeOffset = STK_CMD_TYPE_80_INDEX;
     }
  
-    std::string commandType = cmdData.substr(typeOffset, STK_CMD_TYPE_LEN);
+    std::string commandType = SafeSubstr(cmdData, typeOffset, STK_CMD_TYPE_LEN);
     if (commandType == STK_BIP_CMD_OPEN_CHANNEL || commandType == STK_BIP_CMD_SEND_DATA ||
         commandType == STK_BIP_CMD_RECEVIE_DATA || commandType == STK_BIP_CMD_GET_CHANNEL_STATUS ||
-        commandType == STK_BIP_CMD_CLOSE_CHANNEL) {
+        commandType == STK_BIP_CMD_CLOSE_CHANNEL || commandType == STK_BIP_CMD_SET_UP_EVENT_LIST) {
         if (TELEPHONY_EXT_WRAPPER.sendEvent_ &&
             TELEPHONY_EXT_WRAPPER.sendEvent_(std::make_shared<std::string>(cmdData), slotId_)) {
-                TELEPHONY_LOGE("StkController slotId_ [%{public}d] ", slotId_);
+                TELEPHONY_LOGI("sendEvent_. slotId_ [%{public}d]", slotId_);
         }
-        return true;
     }
-    return false;
 }
 
 void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Pointer &event)
@@ -371,9 +388,7 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     }
 
     std::string cmdData = (std::string)*stkData;
-    if (CheckIsBipCmd(cmdData)) {
-        return;
-    }
+    HandleStkBipCmd(cmdData);
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {

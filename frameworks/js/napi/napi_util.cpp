@@ -527,6 +527,7 @@ bool NapiUtil::CreateEsimSystemErrorMessageForJs(int32_t errorCode, JsErrorCode 
     switch (errorCode) {
         case TELEPHONY_ERR_FAIL:
         case TELEPHONY_ERR_LOCAL_PTR_NULL:
+        case TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT:
             jsErrorCode = JS_ERROR_ESIM_SYSTEM_ERROR;
             break;
         case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
@@ -561,6 +562,19 @@ JsError NapiUtil::ConverEsimErrorMessageForJs(int32_t errorCode)
     error.errorMessage = GetErrorMessage(error.errorCode);
     TELEPHONY_LOGI("errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
     return error;
+}
+
+JsError NapiUtil::ConverEsimErrorMessageWithPermissionForJs(
+    int32_t errorCode, const std::string &funcName, const std::string &permission)
+{
+    if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
+        JsError error = {};
+        error.errorCode = JS_ERROR_TELEPHONY_PERMISSION_DENIED;
+        error.errorMessage = "BusinessError 201: Permission denied. An attempt was made to " + funcName +
+                             " forbidden by permission: " + permission;
+        return error;
+    }
+    return ConverEsimErrorMessageForJs(errorCode);
 }
 
 bool NapiUtil::CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)

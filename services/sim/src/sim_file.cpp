@@ -422,6 +422,7 @@ void SimFile::ProcessSpnGeneral(const AppExecFwk::InnerEvent::Pointer &event)
             fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SPN_CPHS, eventCphs);
         }
         fileToGet_++;
+        displayConditionOfSpn_ = 0;
     }
 }
 
@@ -495,6 +496,7 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
         TELEPHONY_LOGE("ParseSpn invalid data: %{public}s", rawData.c_str());
         return "";
     }
+    TELEPHONY_LOGI("ParseSpn rawData: %{public}s, %{public}d, %{public}d", rawData.c_str(), spnStatus, length);
     if (spnStatus == OBTAIN_SPN_GENERAL) {
         offset = 0;
         length -= INVALID_BYTES_NUM;
@@ -507,7 +509,7 @@ std::string SimFile::ParseSpn(const std::string &rawData, int spnStatus)
         return "";
     }
     std::string ret = SIMUtils::DiallingNumberStringFieldConvertToString(bytesNew, offset, length, SPN_CHAR_POS);
-    TELEPHONY_LOGI("SimFile::ParseSpn success");
+    TELEPHONY_LOGI("SimFile::ParseSpn spn: %{public}s", ret.c_str());
     return ret;
 }
 
@@ -547,9 +549,7 @@ void SimFile::ParsePnn(const std::vector<std::string> &records)
                 tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING), tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1);
         }
         TELEPHONY_LOGI("longName: %{public}s, shortName: %{public}s", file->longName.c_str(), file->shortName.c_str());
-        if (!file->longName.empty() || !file->shortName.empty()) {
-            pnnFiles_.push_back(file);
-        }
+        pnnFiles_.push_back(file);
     }
 }
 
@@ -1892,7 +1892,7 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
     }
     if (roaming) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
-        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND)) == 0) {
+        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND)) == SPN_COND) {
             cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {

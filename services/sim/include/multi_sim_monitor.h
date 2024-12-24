@@ -52,6 +52,7 @@ public:
     void RegisterSimNotify();
     void RegisterSimNotify(int32_t slotId);
     void UnRegisterSimNotify();
+    int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
 
 public:
@@ -67,6 +68,7 @@ private:
         int32_t tokenId = 0;
         sptr<SimAccountCallback> simAccountCallback = nullptr;
     };
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);

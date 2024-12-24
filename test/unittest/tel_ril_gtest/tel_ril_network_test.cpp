@@ -214,26 +214,26 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0201, Function
 }
 
 /**
- * @tc.number Telephony_TelRilGetCellInfoListTest_0101 to do ...
- * @tc.name Get CellInfo List of the card 1
+ * @tc.number Telephony_TelRilGetNeighboringCellInfoListTest_0101 to do ...
+ * @tc.name Get Neighboring CellInfo List of the card 1
  * @tc.desc Function test
  */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetCellInfoListTest_0101, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetNeighboringCellInfoListTest_0101, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE), SLOT_ID_0, GetHandler()));
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE),
+        SLOT_ID_0, GetHandler()));
     return;
 }
 
 /**
- * @tc.number Telephony_TelRil_GetCellInfoListTest_0201 to do ...
- * @tc.name Get CellInfo List of the card 2
+ * @tc.number Telephony_TelRil_GetNeighboringCellInfoListTest_0201 to do ...
+ * @tc.name Get Neighboring CellInfo List of the card 2
  * @tc.desc Function test
  */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetCellInfoListTest_0201, Function | MediumTest | Level3)
+HWTEST_F(TelRilTest, Telephony_TelRil_GetNeighboringCellInfoListTest_0201, Function | MediumTest | Level3)
 {
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_CELL_INFO_LIST_TYPE), SLOT_ID_1, GetHandler()));
+    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NEIGHBORING_CELL_INFO_LIST_TYPE),
+        SLOT_ID_1, GetHandler()));
     return;
 }
 

@@ -111,6 +111,7 @@ public:
     virtual int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;
     virtual int32_t SetActiveSim(int32_t slotId, int32_t enable) = 0;
+    virtual int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) = 0;
     virtual int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) = 0;
@@ -145,6 +146,7 @@ public:
     virtual int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) = 0;
     virtual int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) = 0;
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
+    virtual int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
     virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
     virtual int32_t SimAuthentication(

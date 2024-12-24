@@ -22,6 +22,7 @@ namespace Telephony {
 namespace {
 const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 const std::string TELEPHONY_VSIM_WRAPPER_PATH = "libtel_vsim_symbol.z.so";
+const std::string TELEPHONY_DYNAMIC_LOAD_WRAPPER_PATH = "libtel_dynamic_load_service.z.so";
 } // namespace
 
 TelephonyExtWrapper::TelephonyExtWrapper() {}
@@ -36,11 +37,16 @@ TelephonyExtWrapper::~TelephonyExtWrapper()
         dlclose(telephonyVSimWrapperHandle_);
         telephonyVSimWrapperHandle_ = nullptr;
     }
+    if (telephonyDynamicLoadWrapperHandle_ != nullptr) {
+        dlclose(telephonyDynamicLoadWrapperHandle_);
+        telephonyDynamicLoadWrapperHandle_ = nullptr;
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapper()
 {
     TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
+    InitTelephonyExtWrapperForDynamicLoad();
     telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
     if (telephonyExtWrapperHandle_ == nullptr) {
         TELEPHONY_LOGE("libtelephony_ext_service.z.so was not loaded, error: %{public}s", dlerror());
@@ -105,6 +111,15 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
     if (processStateChangeExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    InitTelephonyExtWrapperForNetWork1();
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
+{
+    processOperatorName_ = (PROCESS_OPERATOR_NAME)dlsym(telephonyExtWrapperHandle_, "ProcessOperatorNameExt");
+    if (processOperatorName_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
@@ -150,6 +165,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     publishSpnInfoChangedExt_ = (PUBLISH_SPN_INFO_CHANGED_EXT)dlsym(telephonyExtWrapperHandle_,
         "PublishSpnInfoChangedExt");
     if (publishSpnInfoChangedExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    updateOperatorNameParamsExt_ = (UPDATE_OPERATOR_NAME_PARAMS)dlsym(telephonyExtWrapperHandle_,
+        "UpdateOperatorNameParamsExt");
+    if (updateOperatorNameParamsExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
     InitTelephonyExtWrapperForApnCust();
@@ -227,6 +247,37 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForOpnameVersion()
         TELEPHONY_LOGE("[OpnameVersion]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
+{
+    TELEPHONY_LOGI("[DynamicLoad]telephony ext wrapper dynamic load init begin");
+    telephonyDynamicLoadWrapperHandle_ = dlopen(TELEPHONY_DYNAMIC_LOAD_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (telephonyDynamicLoadWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] libtel_dynamic_load_service.z.so was not loaded, error: %{public}s", dlerror());
+        return;
+    }
+    dynamicLoadInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "InitDynamicLoadHandle");
+    if (dynamicLoadInit_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    dynamicLoadInit_();
+    TELEPHONY_LOGI("[DynamicLoad]telephony ext wrapper dynamic load init success");
+}
+
+void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
+{
+    if (telephonyDynamicLoadWrapperHandle_ == nullptr) {
+        return;
+    }
+    dynamicLoadDeInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "DeInitDynamicLoadHandle");
+    if (dynamicLoadDeInit_ == nullptr) {
+        TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+        return;
+    }
+    dynamicLoadDeInit_();
+    TELEPHONY_LOGI("DeInitTelephonyExtWrapper success");
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -147,7 +147,8 @@ public:
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
     int32_t GetOperatorInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler) const;
-    int32_t GetCellInfoList(int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t GetNeighboringCellInfoList(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetCurrentCellInfo(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
@@ -235,10 +236,12 @@ public:
     int32_t StartRadioOnState(int32_t slotId);
     int32_t StartGetRilSignalIntensity(int32_t slotId);
     int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
+    int32_t UpdateOperatorName(int32_t slotId);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
     int32_t GetSimSpn(int32_t slotId, std::u16string &spn);
+    std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired);
     int32_t SetVoiceMailInfo(int32_t slotId, const std::u16string &mailName, const std::u16string &mailNumber);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd);
@@ -298,6 +301,8 @@ public:
     std::vector<std::string> ObtainAllSmsOfIcc(int slotId);
     bool IsSimActive(int32_t slotId);
     int32_t SetActiveSim(int32_t slotId, int32_t enable);
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable);
+    int32_t ResetSimLoadAccount(int32_t slotId);
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info);
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t SetDefaultSmsSlotId(int32_t slotId);
@@ -322,7 +327,51 @@ public:
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
+    bool IsDataShareError();
+    void ResetDataShareError();
     /******************** simManager end *****************************/
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    int32_t GetEid(int32_t slotId, std::u16string &eId);
+    int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList);
+    int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
+    int32_t DisableProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult);
+    int32_t GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress);
+    int32_t GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable);
+    int32_t GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult);
+    int32_t GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress);
+    int32_t CancelSession(int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason,
+        ResponseEsimResult &responseResult);
+    int32_t GetProfile(
+        int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile);
+    int32_t ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult);
+    int32_t SetDefaultSmdpAddress(
+        int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult);
+    bool IsSupported(int32_t slotId);
+    int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
+        ResponseEsimResult &responseResult);
+    int32_t PrepareDownload(int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo,
+        ResponseEsimResult &responseResult);
+    int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
+        ResponseEsimBppResult &responseResult);
+    int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
+        EuiccNotificationList &notificationList);
+    int32_t RetrieveNotificationList(
+        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList);
+    int32_t RetrieveNotification(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification);
+    int32_t RemoveNotificationFromList(
+        int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult);
+    int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2);
+    int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
+        ResponseEsimResult &responseResult);
+    int32_t DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult);
+    int32_t SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId,
+        bool forceDisableProfile, ResultCode &enumResult);
+    int32_t SetProfileNickname(
+        int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult);
+#endif
+
 private:
     CoreManagerInner();
 

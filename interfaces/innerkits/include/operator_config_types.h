@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace Telephony {
 const std::string BROADCAST_ARG_SLOT_ID = "slotId";
+const std::string BROADCAST_ARG_OPERATOR_STATE = "state";
 const std::string KEY_EMERGENCY_CALL_STRING_ARRAY = "emergency_call_string_array";
 const int32_t DEFAULT_CALL_WAITING_SERVICE_CLASS_CONFIG = 1;
 const std::vector<std::string> IMS_CALL_DISCONNECT_REASONINFO_MAPPING_CONFIG = std::vector<std::string> {};
@@ -112,6 +113,10 @@ constexpr const char *KEY_SINGLE_PDP_RADIO_TYPE_INT_ARRAY = "single_pdp_radio_ty
  */
 constexpr const char *KEY_DEFAULT_DATA_ROAMING_BOOL = "default_data_roaming_bool";
 /**
+ * Indicates default value of data enable bool.
+ */
+constexpr const char *KEY_DEFAULT_DATA_ENABLE_BOOL = "default_data_enable_bool";
+/**
  * Indicates the voice mail number from cust.
  */
 constexpr const char *KEY_VOICE_MAIL_NUMBER_STRING = "voice_mail_number_string";
@@ -127,10 +132,6 @@ constexpr const char *KEY_VOICE_MAIL_TAG_STRING = "voice_mail_tag_string";
  * Indicates whether to edit voice mail information to sim card.
  */
 constexpr const char *KEY_VOICE_MAIL_EDIT_NOT_TO_SIM_BOOL = "voice_mail_edit_not_to_sim_bool";
-/**
- * Indicates whether the carrier name delivered by network has the highest priority.
- */
-constexpr const char *KEY_NET_FIRST_PRI_CUST_BOOL = "net_fisrt_pri_cust_bool";
 
 constexpr const char *KEY_NR_MODE_SUPPORTED_INT = "nr_mode_supported_int";
 
