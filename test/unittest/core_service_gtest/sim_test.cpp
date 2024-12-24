@@ -22,13 +22,13 @@
 #include "core_service.h"
 #include "core_service_client.h"
 #include "enum_convert.h"
-#include "operator_config_cache.h"
 #include "operator_file_parser.h"
 #include "sim_state_type.h"
 #include "sim_test_util.h"
 #include "str_convert.h"
 #include "string_ex.h"
 #include "tel_profile_util.h"
+#include "operator_config_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1701,6 +1701,235 @@ HWTEST_F(SimTest, Telephony_Sim_GetDsdsMode_0100, Function | MediumTest | Level3
         TELEPHONY_LOGI("TelephonyTestService Telephony_Sim_GetDsdsMode_0100 result: %{public}d ,DsdsMode: %{public}d",
             result, dsdsMode);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateOpcBoolValue_0100
+ * @tc.name     Update the value of the bool type in the opc
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateOpcBoolValue_0100, Function | MediumTest | Level3)
+{
+    TELEPHONY_LOGI("Telephony_Sim_UpdateOpcBoolValue_0100 enter");
+    OperatorConfig opc;
+    const std::string key = "volte_supported_bool";
+    const bool value = true;
+
+    std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+    opcc->UpdateOpcBoolValue(opc, key, value);
+
+    ASSERT_TRUE(opc.boolValue[key] == value);
+    std::u16string sValue = Str8ToStr16(value ? "true" : "false");
+    ASSERT_TRUE(opc.configValue[Str8ToStr16(key)] == sValue);
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateOpcBoolValue_0200
+ * @tc.name     Update the value of the bool type in the opc
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateOpcBoolValue_0200, Function | MediumTest | Level3)
+{
+    TELEPHONY_LOGI("Telephony_Sim_UpdateOpcBoolValue_0200 enter");
+    OperatorConfig opc;
+    const std::string key = "volte_supported_bool";
+    const bool value = false;
+
+    std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+    opcc->UpdateOpcBoolValue(opc, key, value);
+
+    ASSERT_TRUE(opc.boolValue[key] == value);
+    std::u16string sValue = Str8ToStr16(value ? "true" : "false");
+    ASSERT_TRUE(opc.configValue[Str8ToStr16(key)] == sValue);
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateOpcBoolValue_0300
+ * @tc.name     Update the value of the bool type in the opc
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateOpcBoolValue_0300, Function | MediumTest | Level3)
+{
+    TELEPHONY_LOGI("Telephony_Sim_UpdateOpcBoolValue_0300 enter");
+    OperatorConfig opc;
+    const std::string key = "volte_supported_bool";
+    const bool oldValue = true;
+    const bool newValue = true;
+    opc.boolValue[key] = oldValue;
+
+    std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+    opcc->UpdateOpcBoolValue(opc, key, newValue);
+
+    bool result = oldValue && newValue;
+    ASSERT_TRUE(opc.boolValue[key] == result);
+    std::u16string sResult = Str8ToStr16(result ? "true" : "false");
+    ASSERT_TRUE(opc.configValue[Str8ToStr16(key)] == sResult);
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateOpcBoolValue_0400
+ * @tc.name     Update the value of the bool type in the opc
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateOpcBoolValue_0400, Function | MediumTest | Level3)
+{
+    TELEPHONY_LOGI("Telephony_Sim_UpdateOpcBoolValue_0400 enter");
+    OperatorConfig opc;
+    const std::string key = "volte_supported_bool";
+    const bool oldValue = true;
+    const bool newValue = false;
+    opc.boolValue[key] = oldValue;
+
+    std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+    opcc->UpdateOpcBoolValue(opc, key, newValue);
+
+    bool result = oldValue && newValue;
+    ASSERT_TRUE(opc.boolValue[key] == result);
+    std::u16string sResult = Str8ToStr16(result ? "true" : "false");
+    ASSERT_TRUE(opc.configValue[Str8ToStr16(key)] == sResult);
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateOpcBoolValue_0500
+ * @tc.name     Update the value of the bool type in the opc
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateOpcBoolValue_0500, Function | MediumTest | Level3)
+{
+    TELEPHONY_LOGI("Telephony_Sim_UpdateOpcBoolValue_0500 enter");
+    OperatorConfig opc;
+    const std::string key = "volte_supported_bool";
+    const bool oldValue = false;
+    const bool newValue = false;
+    opc.boolValue[key] = oldValue;
+
+    std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+    opcc->UpdateOpcBoolValue(opc, key, newValue);
+
+    bool result = oldValue && newValue;
+    ASSERT_TRUE(opc.boolValue[key] == result);
+    std::u16string sResult = Str8ToStr16(result ? "true" : "false");
+    ASSERT_TRUE(opc.configValue[Str8ToStr16(key)] == sResult);
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0100
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0100, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0100 has no sim card");
+    } else {
+        const int32_t volteCap = -1;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
+        OperatorConfig opc;
+        opcc->UpdatevolteCap(SimTest::slotId_, opc);
+
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
+    }
+
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0200
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0200, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0200 has no sim card");
+    } else {
+        const int32_t volteCap = 0;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
+        OperatorConfig opc;
+        opcc->UpdatevolteCap(SimTest::slotId_, opc);
+
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
+        ASSERT_TRUE(opc.boolValue["volte_supported_bool"] == false);
+        ASSERT_TRUE(opc.configValue[Str8ToStr16("volte_supported_bool")] == Str8ToStr16("false"));
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0300
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0300, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0300 has no sim card");
+    } else {
+        const int32_t volteCap = 1;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
+        OperatorConfig opc;
+        opcc->UpdatevolteCap(SimTest::slotId_, opc);
+
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0400
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0400, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0400 has no sim card");
+    } else {
+        const int32_t volteCap = 2;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
+        OperatorConfig opc;
+        opcc->UpdatevolteCap(SimTest::slotId_, opc);
+
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
+        ASSERT_TRUE(opc.boolValue["volte_supported_bool"] == true);
+        ASSERT_TRUE(opc.configValue[Str8ToStr16("volte_supported_bool")] == Str8ToStr16("true"));
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0500
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0500, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId1_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0500 has no sim card");
+    } else {
+        const int32_t volteCap = 2;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId1_);
+        opcc->UpdateImsCapFromChip(SimTest::slotId1_, imsCapFromChip);
+        OperatorConfig opc;
+        opcc->UpdatevolteCap(SimTest::slotId1_, opc);
+
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId1_);
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
     }
 }
 

@@ -159,6 +159,7 @@ public:
     int32_t SavePrimarySlotId(int32_t slotId) override;
     bool IsDataShareError() override;
     void ResetDataShareError() override;
+    void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) override;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetEid(int32_t slotId, std::u16string &eId) override;
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;
