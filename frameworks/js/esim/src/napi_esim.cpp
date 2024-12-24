@@ -477,6 +477,10 @@ void GetEidCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("GetEidCallback context is nullptr");
         return;
     }
+    if (!context->isCallbackEnd) {
+        TELEPHONY_LOGE("GetEidCallback get result timeout.");
+        context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, *context, false, { "GetEid", Permission::GET_TELEPHONY_ESIM_STATE });
 }
@@ -611,6 +615,10 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = EuiccInfoConversion(env, context->result);
     }
+    if (!asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("GetEuiccInfoCallback get result timeout.");
+        asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "GetEuiccInfo", Permission::GET_TELEPHONY_ESIM_STATE });
 }
@@ -670,6 +678,10 @@ void GetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("GetDefaultSmdpAddressCallback context is nullptr");
         return;
     }
+    if (!context->isCallbackEnd) {
+        TELEPHONY_LOGE("GetDefaultSmdpAddressCallback get result timeout.");
+        context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, *context, false, { "GetDefaultSmdpAddress", Permission::GET_TELEPHONY_ESIM_STATE });
 }
@@ -711,6 +723,10 @@ void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("SetDefaultSmdpAddressCallback context is nullptr");
         return;
+    }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("SetDefaultSmdpAddressCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "SetDefaultSmdpAddress", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -774,6 +790,10 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("SwitchToProfileCallback context is nullptr");
         return;
     }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("SwitchToProfileCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "SwitchToProfile", Permission::SET_TELEPHONY_ESIM_STATE });
 }
@@ -835,6 +855,10 @@ void DeleteProfileCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("DeleteProfileCallback context is nullptr");
         return;
+    }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("DeleteProfileCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "DeleteProfile", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -898,6 +922,10 @@ void ResetMemoryCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("ResetMemoryCallback context is nullptr");
         return;
+    }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("ResetMemoryCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "ResetMemory", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -979,6 +1007,10 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal =  DownloadProfileResultConversion(env, context->result);
     }
+    if (!asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("DownloadProfileCallback get result timeout.");
+        asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "DownloadProfile", Permission::SET_TELEPHONY_ESIM_STATE });
 }
@@ -1047,6 +1079,10 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = ProfileResultListConversion(env, context->result);
+    }
+    if (!asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("GetDownloadableProfilesCallback get result timeout.");
+        asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(env, status, context->asyncContext, false,
         { "GetDownloadableProfiles", Permission::GET_TELEPHONY_ESIM_STATE });
@@ -1151,6 +1187,10 @@ void StartOsuCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("StartOsuCallback context is nullptr");
         return;
     }
+    if (!context->isCallbackEnd) {
+        TELEPHONY_LOGE("StartOsuCallback get result timeout.");
+        context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(
         env, status, *context, false, { "StartOsu", Permission::SET_TELEPHONY_ESIM_STATE });
 }
@@ -1193,6 +1233,10 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("SetProfileNicknameCallback context is nullptr");
         return;
+    }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("SetProfileNicknameCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "SetProfileNickname", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -1257,6 +1301,10 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
     if (context == nullptr) {
         TELEPHONY_LOGE("CancelSessionCallback context is nullptr");
         return;
+    }
+    if (!context->asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("CancelSessionCallback get result timeout.");
+        context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, context->asyncContext, false, { "CancelSession", Permission::SET_TELEPHONY_ESIM_STATE });
@@ -1326,6 +1374,10 @@ void GetDownloadableProfileMetadataCallback(napi_env env, napi_status status, vo
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = MetadataResultConversion(env, context->result);
     }
+    if (!asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("GetDownloadableProfileMetadataCallback get result timeout.");
+        asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
     NapiAsyncPermissionCompleteCallback(env, status, context->asyncContext, false,
         { "GetDownloadableProfileMetadata", Permission::SET_TELEPHONY_ESIM_STATE });
 }
@@ -1391,6 +1443,10 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
     AsyncContext<napi_value> &asyncContext = context->asyncContext;
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = EuiccProfileListConversion(env, context->result);
+    }
+    if (!asyncContext.isCallbackEnd) {
+        TELEPHONY_LOGE("GetEuiccProfileInfoListCallback get result timeout.");
+        asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
     NapiAsyncPermissionCompleteCallback(
         env, status, asyncContext, false, { "GetEuiccProfileInfoList", Permission::GET_TELEPHONY_ESIM_STATE });

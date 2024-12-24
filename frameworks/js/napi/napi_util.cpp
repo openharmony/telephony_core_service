@@ -527,6 +527,7 @@ bool NapiUtil::CreateEsimSystemErrorMessageForJs(int32_t errorCode, JsErrorCode 
     switch (errorCode) {
         case TELEPHONY_ERR_FAIL:
         case TELEPHONY_ERR_LOCAL_PTR_NULL:
+        case TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT:
             jsErrorCode = JS_ERROR_ESIM_SYSTEM_ERROR;
             break;
         case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
