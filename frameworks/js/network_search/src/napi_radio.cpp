@@ -214,6 +214,40 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "GetRadioTech", NativeGetRadioTech, GetRadioTechCallback);
 }
 
+static napi_value GetRadioTechSync(napi_env env, napi_callback_info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { 0 };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    napi_value value = nullptr;
+    int32_t psRadioTech = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
+    int32_t csRadioTech = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
+    NapiUtil::SetPropertyInt32(env, value, "psRadioTech", psRadioTech);
+    NapiUtil::SetPropertyInt32(env, value, "csRadioTech", csRadioTech);
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        return value;
+    }
+    int32_t psRadioTechPre = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    int32_t csRadioTechPre = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
+    if (IsValidSlotIdEx(slotId)) {
+        int32_t psResult = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId, &psRadioTechPre);
+        int32_t csResult = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId, &csRadioTechPre);
+        if (psResult == TELEPHONY_SUCCESS && csResult == TELEPHONY_SUCCESS) {
+            psRadioTech = WrapRadioTech(psRadioTechPre);
+            csRadioTech = WrapRadioTech(csRadioTechPre);
+        }
+    }
+    NapiUtil::SetPropertyInt32(env, value, "psRadioTech", psRadioTech);
+    NapiUtil::SetPropertyInt32(env, value, "csRadioTech", csRadioTech);
+    return value;
+}
+
 static void NativeGetSignalInfoList(napi_env env, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
@@ -3610,6 +3644,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getRadioTech", GetRadioTech),
+        DECLARE_NAPI_FUNCTION("getRadioTechSync", GetRadioTechSync),
         DECLARE_NAPI_FUNCTION("getSignalInformation", GetSignalInfoList),
         DECLARE_NAPI_FUNCTION("getSignalInformationSync", GetSignalInfoListSync),
         DECLARE_NAPI_FUNCTION("getNetworkState", GetNetworkState),
