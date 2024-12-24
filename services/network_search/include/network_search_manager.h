@@ -233,7 +233,7 @@ public:
     int32_t GetPreferredNetwork(int32_t slotId);
     int32_t SetCachePreferredNetworkValue(int32_t slotId, int32_t networkMode);
     int32_t GetCachePreferredNetworkValue(int32_t slotId, int32_t &networkMode);
-    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode);
+    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode) override;
     void SavePreferredNetworkValue(int32_t slotId, int32_t networkMode);
     int32_t GetPreferredNetworkValue(int32_t slotId) const;
     void UpdatePhone(int32_t slotId, RadioTech csRadioTech, const RadioTech &psRadioTech);
@@ -336,7 +336,6 @@ private:
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
-    void GetModemEflCapability();
 
 private:
     struct ImsRegInfoCallbackRecord {

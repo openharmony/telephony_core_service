@@ -74,6 +74,7 @@ public:
     virtual int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) = 0;
     virtual int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) = 0;
     virtual int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) = 0;
+    virtual bool SetPreferredNetwork(int32_t slotId, int32_t networkMode) = 0;
     /**
      * @brief Obtains the registration status of the packet switched (PS) domain.
      *
