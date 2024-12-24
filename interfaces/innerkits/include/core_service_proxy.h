@@ -98,6 +98,7 @@ public:
     int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) override;
     int32_t RefreshSimState(int32_t slotId) override;
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) override;
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     int32_t SetPreferredNetwork(
         int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback) override;
@@ -129,6 +130,7 @@ public:
     int32_t GetOpName(int32_t slotId, std::u16string &opname) override;
     int32_t UnlockSimLock(int32_t slotId, const PersoLockInfo &lockInfo, LockStatusResponse &response) override;
     int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
+    int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) override;
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendCallSetupRequestResult(int32_t slotId, bool accept) override;
@@ -217,6 +219,8 @@ private:
     static inline BrokerDelegator<CoreServiceProxy> delegator_;
     std::vector<IccAccountInfo> activeIccAccountInfo_;
     std::mutex mutex_;
+    static const int32_t DISABLE = 0;
+    static const int32_t ENABLE = 1;
 };
 } // namespace Telephony
 } // namespace OHOS

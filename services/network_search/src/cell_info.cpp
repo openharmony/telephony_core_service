@@ -93,8 +93,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
     int32_t cellSize = cellInfo->itemNum >= CellInformation::MAX_CELL_NUM ? CellInformation::MAX_CELL_NUM :
                                                                             cellInfo->itemNum;
     if (cellSize > 0) {
-        currentCellInfo_ = nullptr;
-        cellInfos_.clear();
+        neighboringCellInfos_.clear();
     } else {
         return;
     }
@@ -381,9 +380,12 @@ bool CellInfo::ProcessNeighboringCellGsm(CellNearbyInfo *cellInfo)
         int32_t &cellId = cellInfo->ServiceCellParas.gsm.cellId;
         int32_t &bsic = cellInfo->ServiceCellParas.gsm.bsic;
         int32_t &lac = cellInfo->ServiceCellParas.gsm.lac;
+        int32_t &rxlev = cellInfo->ServiceCellParas.gsm.rxlev;
+        rxlev = ZERO_VALUE - rxlev;
         cell->Init(0, 0, cellId);
         cell->SetGsmParam(bsic, lac, arfcn);
-        cellInfos_.emplace_back(cell);
+        cell->SetSignalIntensity(rxlev);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellGsm arfcn:%{private}d cellId:%{private}d"
             "bsic:%{private}d lac:%{private}d slotId:%{public}d",
             arfcn, cellId, bsic, lac, slotId_);
@@ -403,9 +405,12 @@ bool CellInfo::ProcessNeighboringCellLte(CellNearbyInfo *cellInfo)
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.lte.arfcn;
         int32_t pci = cellInfo->ServiceCellParas.lte.pci;
+        int32_t &rsrp = cellInfo->ServiceCellParas.lte.rsrp;
+        rsrp = ZERO_VALUE - rsrp;
         cell->Init(0, 0, 0);
         cell->SetLteParam(pci, 0, arfcn);
-        cellInfos_.emplace_back(cell);
+        cell->SetSignalIntensity(rsrp);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessLte arfcn:%{private}d pci:%{private}d slotId:%{public}d", arfcn, pci, slotId_);
         ret = true;
     }
@@ -423,9 +428,12 @@ bool CellInfo::ProcessNeighboringCellWcdma(CellNearbyInfo *cellInfo)
     if (cell != nullptr) {
         int32_t &arfcn = cellInfo->ServiceCellParas.wcdma.arfcn;
         int32_t psc = cellInfo->ServiceCellParas.wcdma.psc;
+        int32_t &rscp = cellInfo->ServiceCellParas.wcdma.rscp;
+        rscp = ZERO_VALUE - rscp;
         cell->Init(0, 0, 0);
         cell->SetWcdmaParam(psc, 0, arfcn);
-        cellInfos_.emplace_back(cell);
+        cell->SetSignalIntensity(rscp);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessWcdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, psc, slotId_);
         ret = true;
@@ -447,9 +455,12 @@ bool CellInfo::ProcessNeighboringCellCdma(CellNearbyInfo *cellInfo)
         int32_t &latitude = cellInfo->ServiceCellParas.cdma.latitude;
         int32_t &networkId = cellInfo->ServiceCellParas.cdma.networkId;
         int32_t &systemId = cellInfo->ServiceCellParas.cdma.systemId;
+        int32_t &pilotStrength = cellInfo->ServiceCellParas.cdma.pilotStrength;
+        pilotStrength = ZERO_VALUE - pilotStrength;
         cell->Init(0, 0, 0);
         cell->SetCdmaParam(baseId, latitude, longitude, networkId, systemId);
-        cellInfos_.emplace_back(cell);
+        cell->SetSignalIntensity(pilotStrength);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessCdma baseId:%{private}d psc:%{private}d slotId:%{public}d", baseId, systemId, slotId_);
         ret = true;
@@ -469,9 +480,12 @@ bool CellInfo::ProcessNeighboringCellTdscdma(CellNearbyInfo *cellInfo)
         int32_t &arfcn = cellInfo->ServiceCellParas.tdscdma.arfcn;
         int32_t &cpid = cellInfo->ServiceCellParas.tdscdma.cpid;
         int32_t &lac = cellInfo->ServiceCellParas.tdscdma.lac;
+        int32_t &rscp = cellInfo->ServiceCellParas.tdscdma.rscp;
+        rscp = ZERO_VALUE - rscp;
         cell->Init(0, 0, 0);
         cell->SetTdscdmaParam(cpid, lac, arfcn);
-        cellInfos_.emplace_back(cell);
+        cell->SetSignalIntensity(rscp);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI(
             "CellInfo::ProcessTdscdma arfcn:%{private}d psc:%{private}d slotId:%{public}d", arfcn, cpid, slotId_);
         ret = true;
@@ -492,9 +506,15 @@ bool CellInfo::ProcessNeighboringCellNr(CellNearbyInfo *cellInfo)
         int32_t &pci = cellInfo->ServiceCellParas.nr.pci;
         int32_t &tac = cellInfo->ServiceCellParas.nr.tac;
         int64_t &nci = cellInfo->ServiceCellParas.nr.nci;
+        int32_t &rsrp = cellInfo->ServiceCellParas.nr.rsrp;
+        int32_t &rsrq = cellInfo->ServiceCellParas.nr.rsrq;
+        rsrp = ZERO_VALUE - rsrp;
+        rsrq = ZERO_VALUE - rsrq;
         cell->Init(0, 0, 0);
         cell->SetNrParam(nrArfcn, pci, tac, nci);
-        cellInfos_.emplace_back(cell);
+        cell->SetNrSignalParam(rsrp, rsrq);
+        cell->SetSignalIntensity(rsrp);
+        neighboringCellInfos_.emplace_back(cell);
         TELEPHONY_LOGI("CellInfo::ProcessNeighboringCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d",
             nrArfcn, pci, slotId_);
         ret = true;
@@ -798,6 +818,19 @@ void CellInfo::GetCellInfoList(std::vector<sptr<CellInformation>> &cellInfo)
         }
     }
     TELEPHONY_LOGD("CellInfo::GetCellInfoList size:%{public}zu slotId:%{public}d", cellInfo.size(), slotId_);
+}
+
+void CellInfo::GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &cellInfo)
+{
+    cellInfo.clear();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (auto &cell : neighboringCellInfos_) {
+            AddCellInformation(cell, cellInfo);
+        }
+    }
+    TELEPHONY_LOGD("CellInfo::GetCellInfGetNeighboringCellInfoListoList size:%{public}zu slotId:%{public}d",
+        cellInfo.size(), slotId_);
 }
 
 void CellInfo::ClearCellInfoList()

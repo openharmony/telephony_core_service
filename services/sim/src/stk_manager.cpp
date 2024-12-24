@@ -17,6 +17,7 @@
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,6 +66,15 @@ int32_t StkManager::SendTerminalResponseCmd(int32_t slotId, const std::string &c
         TELEPHONY_LOGE("StkManager[%{public}d]::SendTerminalResponseCmd() stkController_ is nullptr", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    
+    if (cmd.substr(0, STK_CMD_TYPE_LEN) == STK_APP_CMD_TYPE_USER_CONFIRM) {
+        if (TELEPHONY_EXT_WRAPPER.sendEvent_ &&
+            TELEPHONY_EXT_WRAPPER.sendEvent_(std::make_shared<std::string>(cmd), slotId)) {
+            TELEPHONY_LOGI("SendTerminalResponseCmd user confirm slotId [%{public}d] ", slotId);
+        }
+        return TELEPHONY_SUCCESS;
+    }
+
     int32_t result = stkController_->SendTerminalResponseCmd(cmd);
     TELEPHONY_LOGI("StkManager[%{public}d]::SendTerminalResponseCmd() result:%{public}s",
         slotId, (result ? "true" : "false"));

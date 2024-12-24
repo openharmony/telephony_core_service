@@ -76,6 +76,8 @@ void CoreServiceStub::AddHandlerNetWorkToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetIsoCountryCodeForNetwork(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_INFO_LIST)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetCellInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_NEIGHBORING_CELL_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetNeighboringCellInfoList(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_CELL_LOCATION)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetCellLocation(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_PREFERRED_NETWORK_MODE)] =
@@ -208,6 +210,8 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRefreshSimState(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetActiveSim(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE_SATELLITE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetActiveSimSatellite(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_PHONE_NUMBER)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimPhoneNumber(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_TELENUMBER_IDENTIFIER)] =
@@ -1288,6 +1292,20 @@ int32_t CoreServiceStub::OnSetActiveSim(MessageParcel &data, MessageParcel &repl
     return NO_ERROR;
 }
 
+int32_t CoreServiceStub::OnSetActiveSimSatellite(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t enable = data.ReadInt32();
+    TELEPHONY_LOGD("CoreServiceStub::OnSetActiveSimSatellite(), slotId = %{public}d", slotId);
+    int32_t result = SetActiveSimSatellite(slotId, enable);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("CoreServiceStub::OnSetActiveSimSatellite write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
 int32_t CoreServiceStub::OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply)
 {
     sptr<INetworkSearchCallback> callback = nullptr;
@@ -1803,6 +1821,24 @@ int32_t CoreServiceStub::OnGetCellInfoList(MessageParcel &data, MessageParcel &r
     auto slotId = data.ReadInt32();
     std::vector<sptr<CellInformation>> cellInfo;
     int32_t result = GetCellInfoList(slotId, cellInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        reply.WriteInt32(static_cast<int32_t>(cellInfo.size()));
+        for (const auto &v : cellInfo) {
+            v->Marshalling(reply);
+        }
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetNeighboringCellInfoList(MessageParcel &data, MessageParcel &reply)
+{
+    auto slotId = data.ReadInt32();
+    std::vector<sptr<CellInformation>> cellInfo;
+    int32_t result = GetNeighboringCellInfoList(slotId, cellInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnRemoteRequest::OnGetCellInfoList write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

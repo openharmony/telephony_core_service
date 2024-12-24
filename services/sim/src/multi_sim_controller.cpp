@@ -32,6 +32,8 @@
 
 namespace OHOS {
 namespace Telephony {
+const int64_t DELAY_TIME = 1000;
+const int SET_PRIMARY_RETRY_TIMES = 5;
 static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const int32_t MAIN_MODEM_ID = 0;
@@ -50,7 +52,7 @@ static const std::string PRIMARY_SLOTID = "0";
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager)
-    : simStateManager_(simStateManager), simFileManager_(simFileManager)
+    : TelEventHandler("MultiSimController"), simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
     TELEPHONY_LOGI("MultiSimController::MultiSimController");
     radioProtocolController_ = std::make_shared<RadioProtocolController>(std::weak_ptr<ITelRilManager>(telRilManager));
@@ -75,6 +77,7 @@ void MultiSimController::Init()
     }
     maxCount_ = SIM_SLOT_COUNT;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
+    setPrimarySlotRemainCount_.resize(maxCount_, SET_PRIMARY_RETRY_TIMES);
     TELEPHONY_LOGI("Create SimRdbHelper count = %{public}d", maxCount_);
 }
 
@@ -488,18 +491,8 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
     isSetActiveSimInProgress_[slotId] = 0;
 }
 
-int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
+int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
-    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
-    if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("invalid slotid or sim card absent.");
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    int curSimId = 0;
-    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("failed by out of range");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     isSetActiveSimInProgress_[slotId] = 1;
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
@@ -531,6 +524,80 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
     if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
         TELEPHONY_LOGE("failed by out of range");
         isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    localCacheInfo_[slotId].isActive = enable;
+    lock.unlock();
+    UpdateSubState(slotId, enable);
+    CheckIfNeedSwitchMainSlotId();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
+{
+    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
+#ifndef  CORE_SERVICE_SUPPORT_ESIM
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("invalid slotid or sim card absent.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("failed by out of range");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+#else
+    if ((!IsValidData(slotId)) && (!simFileManager_[slotId]->IsSupported())) {
+        TELEPHONY_LOGE("invalid slotid.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        if (!simFileManager_[slotId]->IsSupported()) {
+            TELEPHONY_LOGE("failed by out of range");
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
+        }
+    }
+#endif
+    return SetActiveCommonSim(slotId, enable, force, curSimId);
+}
+
+int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable, bool force)
+{
+    TELEPHONY_LOGI("SetActiveSimSatellite enable = %{public}d slotId = %{public}d", enable, slotId);
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("invalid slotid or sim card absent.");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    int curSimId = 0;
+    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("failed by out of range");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_IN_PROGRESS;
+    if (force) {
+        TELEPHONY_LOGD("no need to update cache");
+        UpdateSubState(slotId, enable);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(enable);
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
+    if (result == INVALID_VALUE) {
+        TELEPHONY_LOGE("failed by database");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    }
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+        TELEPHONY_LOGE("failed by out of range");
+        isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_NOT_IN_PROGRESS;
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].isActive = enable;
@@ -865,6 +932,8 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     if (radioProtocolController_->GetRadioProtocolModemId(slotId) == MAIN_MODEM_ID) {
         TELEPHONY_LOGI("The current slot is the main slot, no need to set primary slot");
         SavePrimarySlotIdInfo(slotId);
+        setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+        RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
         return TELEPHONY_ERR_SUCCESS;
     }
     // change protocol for default cellulardata slotId
@@ -874,12 +943,50 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("SetRadioProtocol failed");
         isSetPrimarySlotIdInProgress_ = false;
         PublishSetPrimaryEvent(true);
+        if (setPrimarySlotRemainCount_[slotId] > 0) {
+            SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
+            TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
+                setPrimarySlotRemainCount_[slotId], slotId);
+            setPrimarySlotRemainCount_[slotId]--;
+        }
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
     isSetPrimarySlotIdInProgress_ = false;
     PublishSetPrimaryEvent(true);
+    setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+    RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+void MultiSimController::ResetSetPrimarySlotRemain(int32_t slotId)
+{
+    if (slotId < DEFAULT_SIM_SLOT_ID || slotId >= SIM_SLOT_COUNT) {
+        TELEPHONY_LOGE("It is invalid slotId, slotId = %{public}d", slotId);
+        return;
+    }
+    TELEPHONY_LOGI("ResetSetPrimarySlotRemain, slotId = %{public}d", slotId);
+    setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+    RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
+}
+
+void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("MultiSimController ProcessEvent, but event is nullptr");
+        return;
+    }
+    auto eventCode = event->GetInnerEventId();
+    TELEPHONY_LOGI("MultiSimController ProcessEvent eventCode is %{public}d", eventCode);
+    switch (eventCode) {
+        case MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT: {
+            auto slotId = event->GetParam();
+            SetPrimarySlotId(slotId);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void MultiSimController::PublishSetPrimaryEvent(bool setDone)

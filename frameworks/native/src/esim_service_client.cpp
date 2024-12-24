@@ -145,14 +145,14 @@ void EsimServiceClient::RemoveDeathRecipient(const wptr<IRemoteObject> &remote, 
     TELEPHONY_LOGI("RemoveDeathRecipient success");
 }
 
-int32_t EsimServiceClient::GetEid(int32_t slotId, std::string &eId)
+int32_t EsimServiceClient::GetEid(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetEid(slotId, eId);
+    return proxy->GetEid(slotId, callback);
 }
 
 int32_t EsimServiceClient::GetOsuStatus(int32_t slotId, int32_t &osuStatus)
@@ -165,19 +165,19 @@ int32_t EsimServiceClient::GetOsuStatus(int32_t slotId, int32_t &osuStatus)
     return proxy->GetOsuStatus(slotId, osuStatus);
 }
 
-int32_t EsimServiceClient::StartOsu(int32_t slotId, int32_t &startOsuResult)
+int32_t EsimServiceClient::StartOsu(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->StartOsu(slotId, startOsuResult);
+    return proxy->StartOsu(slotId, callback);
 }
 
 int32_t EsimServiceClient::GetDownloadableProfileMetadata(
     int32_t slotId, int32_t portIndex, const DownloadableProfile &profile,
-    bool forceDisableProfile, GetDownloadableProfileMetadataResult &profileMetadataResult)
+    bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -185,91 +185,92 @@ int32_t EsimServiceClient::GetDownloadableProfileMetadata(
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetDownloadableProfileMetadata(
-        slotId, portIndex, profile, forceDisableProfile, profileMetadataResult);
+        slotId, portIndex, profile, forceDisableProfile, callback);
 }
 
 int32_t EsimServiceClient::GetDownloadableProfiles(
-    int32_t slotId, int32_t portIndex, bool forceDisableProfile, GetDownloadableProfilesResult &profileListResult)
+    int32_t slotId, int32_t portIndex, bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDownloadableProfiles(slotId, portIndex, forceDisableProfile, profileListResult);
+    return proxy->GetDownloadableProfiles(slotId, portIndex, forceDisableProfile, callback);
 }
 
 int32_t EsimServiceClient::DownloadProfile(int32_t slotId, DownloadProfileConfigInfo configInfo,
-    const DownloadableProfile &profile, DownloadProfileResult &downloadProfileResult)
+    const DownloadableProfile &profile, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->DownloadProfile(slotId, configInfo, profile, downloadProfileResult);
+    return proxy->DownloadProfile(slotId, configInfo, profile, callback);
 }
 
-int32_t EsimServiceClient::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+int32_t EsimServiceClient::GetEuiccProfileInfoList(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
+    return proxy->GetEuiccProfileInfoList(slotId, callback);
 }
 
-int32_t EsimServiceClient::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
+int32_t EsimServiceClient::GetEuiccInfo(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetEuiccInfo(slotId, eUiccInfo);
+    return proxy->GetEuiccInfo(slotId, callback);
 }
 
-int32_t EsimServiceClient::DeleteProfile(int32_t slotId, const std::string &iccId, int32_t &deleteProfileResult)
+int32_t EsimServiceClient::DeleteProfile(
+    int32_t slotId, const std::string &iccId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->DeleteProfile(slotId, iccId, deleteProfileResult);
+    return proxy->DeleteProfile(slotId, iccId, callback);
 }
 
 int32_t EsimServiceClient::SwitchToProfile(int32_t slotId, int32_t portIndex,
-    const std::string &iccId, bool forceDisableProfile, int32_t &switchToProfileResult)
+    const std::string &iccId, bool forceDisableProfile, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, switchToProfileResult);
+    return proxy->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, callback);
 }
 
 int32_t EsimServiceClient::SetProfileNickname(int32_t slotId, const std::string &iccId,
-    const std::string &nickname, int32_t &setProfileNicknameResult)
+    const std::string &nickname, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetProfileNickname(slotId, iccId, nickname, setProfileNicknameResult);
+    return proxy->SetProfileNickname(slotId, iccId, nickname, callback);
 }
 
-int32_t EsimServiceClient::ResetMemory(int32_t slotId, int32_t resetOption, int32_t &resetMemoryResult)
+int32_t EsimServiceClient::ResetMemory(int32_t slotId, int32_t resetOption, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->ResetMemory(slotId, resetOption, resetMemoryResult);
+    return proxy->ResetMemory(slotId, resetOption, callback);
 }
 
 int32_t EsimServiceClient::ReserveProfilesForFactoryRestore(int32_t slotId, int32_t &restoreResult)
@@ -283,43 +284,43 @@ int32_t EsimServiceClient::ReserveProfilesForFactoryRestore(int32_t slotId, int3
 }
 
 int32_t EsimServiceClient::SetDefaultSmdpAddress(
-    int32_t slotId, const std::string &defaultSmdpAddress, int32_t &setDefaultSmdpAddressResult)
+    int32_t slotId, const std::string &defaultSmdpAddress, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, setDefaultSmdpAddressResult);
+    return proxy->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, callback);
 }
 
-int32_t EsimServiceClient::GetDefaultSmdpAddress(int32_t slotId, std::string &defaultSmdpAddress)
+int32_t EsimServiceClient::GetDefaultSmdpAddress(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
+    return proxy->GetDefaultSmdpAddress(slotId, callback);
 }
 
 int32_t EsimServiceClient::CancelSession(
-    int32_t slotId, const std::string &transactionId, int32_t cancelReason, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::string &transactionId, int32_t cancelReason, const sptr<IEsimServiceCallback> &callback)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->CancelSession(slotId, transactionId, cancelReason, responseResult);
+    return proxy->CancelSession(slotId, transactionId, cancelReason, callback);
 }
 
-bool EsimServiceClient::IsSupported(int32_t slotId)
+int32_t EsimServiceClient::IsSupported(int32_t slotId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->IsSupported(slotId);
 }

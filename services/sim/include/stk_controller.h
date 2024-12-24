@@ -41,6 +41,9 @@
 #define STK_BIP_CMD_RECEVIE_DATA "42"
 #define STK_BIP_CMD_GET_CHANNEL_STATUS "44"
 #define STK_BIP_CMD_CLOSE_CHANNEL "41"
+#define STK_BIP_CMD_SET_UP_EVENT_LIST "05"
+#define STK_APP_CMD_TYPE_TAG_LEN 2
+#define STK_APP_CMD_TYPE_USER_CONFIRM "00"
 
 namespace OHOS {
 namespace Telephony {
@@ -78,7 +81,7 @@ private:
     void OnSendEnvelopeCmdResult(const AppExecFwk::InnerEvent::Pointer &event);
     void OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::Pointer &event);
     bool CheckIsSystemApp(const std::string &bundleName);
-    bool CheckIsBipCmd(const std::string &cmdData);
+    void HandleStkBipCmd(const std::string &cmdData);
     sptr<OHOS::IRemoteObject> GetBundleMgr();
     void RetrySendRilProactiveCommand();
     void UnSubscribeListeners();

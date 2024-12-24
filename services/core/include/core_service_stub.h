@@ -67,6 +67,7 @@ private:
     int32_t OnGetUniqueDeviceId(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsNrSupported(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCellInfoList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetNeighboringCellInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCellLocation(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetNrOptionMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNrOptionMode(MessageParcel &data, MessageParcel &reply);
@@ -112,6 +113,7 @@ private:
     int32_t OnGetLockState(MessageParcel &data, MessageParcel &reply);
     int32_t OnRefreshSimState(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetActiveSim(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetActiveSimSatellite(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPreferredNetwork(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetNetworkCapability(MessageParcel &data, MessageParcel &reply);

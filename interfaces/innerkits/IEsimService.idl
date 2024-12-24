@@ -20,50 +20,50 @@ sequenceable get_downloadable_profiles_result_parcel..OHOS.Telephony.GetDownload
 sequenceable profile_info_list_parcel..OHOS.Telephony.GetDownloadableProfilesResult;
 sequenceable profile_metadata_result_parcel..OHOS.Telephony.GetEuiccProfileInfoListResult;
 sequenceable response_esim_result..OHOS.Telephony.ResponseEsimResult;
-
+interface OHOS.Telephony.IEsimServiceCallback;
 interface OHOS.Telephony.IEsimService {
-    void GetEid([in] int slotId, [out] String eId);
+    void GetEid([in] int slotId, [in] IEsimServiceCallback listener);
     void GetOsuStatus([in] int slotId, [out] int osuStatus);
-    void StartOsu([in] int slotId, [out] int startOsuResult);
+    void StartOsu([in] int slotId, [in] IEsimServiceCallback listener);
     void GetDownloadableProfileMetadata(
         [in] int slotId,
         [in] int portIndex,
         [in] DownloadableProfile profile,
         [in] boolean forceDisableProfile,
-        [out] GetDownloadableProfileMetadataResult profileMetadataResult);
+        [in] IEsimServiceCallback listener);
     void GetDownloadableProfiles(
         [in] int slotId,
         [in] int portIndex,
         [in] boolean forceDisableProfile,
-        [out] GetDownloadableProfilesResult profileListResult);
+        [in] IEsimServiceCallback listener);
     void DownloadProfile(
         [in] int slotId,
         [in] DownloadProfileConfigInfo configInfo,
         [in] DownloadableProfile profile,
-        [out] DownloadProfileResult downloadProfileResult);
-    void GetEuiccProfileInfoList([in] int slotId, [out] GetEuiccProfileInfoListResult euiccProfileInfoList);
-    void GetEuiccInfo([in] int slotId, [out] EuiccInfo eUiccInfo);
-    void DeleteProfile([in] int slotId, [in] String iccId, [out] int deleteProfileResult);
+        [in] IEsimServiceCallback listener);
+    void GetEuiccProfileInfoList([in] int slotId, [in] IEsimServiceCallback listener);
+    void GetEuiccInfo([in] int slotId, [in] IEsimServiceCallback listener);
+    void DeleteProfile([in] int slotId, [in] String iccId, [in] IEsimServiceCallback listener);
     void SwitchToProfile(
         [in] int slotId,
         [in] int portIndex,
         [in] String iccId,
         [in] boolean forceDisableProfile,
-        [out] int switchToProfileResult);
+        [in] IEsimServiceCallback listener);
     void SetProfileNickname(
         [in] int slotId,
         [in] String iccId,
         [in] String nickname,
-        [out] int setProfileNicknameResult);
-    void ResetMemory([in] int slotId, [in] int resetOption, [out] int resetMemoryResult);
+        [in] IEsimServiceCallback listener);
+    void ResetMemory([in] int slotId, [in] int resetOption, [in] IEsimServiceCallback listener);
     void ReserveProfilesForFactoryRestore([in] int slotId, [out] int restoreResult);
     void SetDefaultSmdpAddress(
         [in] int slotId,
         [in] String defaultSmdpAddress,
-        [out] int setDefaultSmdpAddressResult);
-    void GetDefaultSmdpAddress([in] int slotId, [out] String defaultSmdpAddress);
+        [in] IEsimServiceCallback listener);
+    void GetDefaultSmdpAddress([in] int slotId, [in] IEsimServiceCallback listener);
     void CancelSession([in] int slotId, [in] String transactionId, [in] int cancelReason,
-        [out] ResponseEsimResult responseResult);
+        [in] IEsimServiceCallback listener);
     void IsSupported([in] int slotId);
     void AddProfile([in] int slotId, [in] DownloadableProfile profile);
 }

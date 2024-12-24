@@ -59,6 +59,7 @@ const std::string PARAM_TIME_ZONE = "time-zone";
 int64_t NitzUpdate::lastSystemTime_ = 0;
 int32_t NitzUpdate::offset_ = 0;
 int64_t NitzUpdate::lastNetworkTime_ = 0;
+int64_t NitzUpdate::lastOffsetTime_ = 0;
 std::string NitzUpdate::timeZone_;
 
 NitzUpdate::NitzUpdate(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
@@ -212,10 +213,9 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime offset invalid, slotId:%{public}d", slotId_);
         return;
     }
-    nitzTime += offset;
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
         slotId_, static_cast<long long>(currentTime), static_cast<long long>(offset), static_cast<long long>(nitzTime));
-    if (!IsValidTime(nitzTime)) {
+    if (!IsValidTime(nitzTime, offset)) {
         TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
         return;
     }
@@ -224,7 +224,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
         return;
     }
-    SaveTime(nitzTime);
+    SaveTime(nitzTime, offset);
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
@@ -232,7 +232,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 #endif
 }
 
-bool NitzUpdate::IsValidTime(int64_t networkTime)
+bool NitzUpdate::IsValidTime(int64_t networkTime, int64_t offset)
 {
     int64_t currentSystemTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     if (currentSystemTime <= 0) {
@@ -243,6 +243,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
     if (lastSystemTime_ == 0 && lastNetworkTime_ == 0) {
         lastSystemTime_ = currentSystemTime;
         lastNetworkTime_ = networkTime;
+        lastOffsetTime_ = offset;
         return true;
     }
 
@@ -258,7 +259,7 @@ bool NitzUpdate::IsValidTime(int64_t networkTime)
 
     lastSystemTime_ = currentSystemTime;
     lastNetworkTime_ = networkTime;
-
+    lastOffsetTime_ = offset;
     return true;
 }
 
@@ -340,9 +341,10 @@ void NitzUpdate::SaveTimeZone(std::string &timeZone)
     PublishCommonEvent(want);
 }
 
-void NitzUpdate::SaveTime(int64_t networkTime)
+void NitzUpdate::SaveTime(int64_t networkTime, int64_t offset)
 {
-    TELEPHONY_LOGI("NitzUpdate::SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d", networkTime, slotId_);
+    TELEPHONY_LOGI("SaveTime networkTime:(%{public}" PRId64 ") slotId:%{public}d, offset:(%{public}" PRId64 ")",
+        networkTime, slotId_, offset);
 #ifdef ABILITY_POWER_SUPPORT
     auto &powerMgrClient = PowerMgrClient::GetInstance();
     auto runningLock = powerMgrClient.CreateRunningLock("runninglock", RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
@@ -350,7 +352,7 @@ void NitzUpdate::SaveTime(int64_t networkTime)
         runningLock->Lock();
     }
 #endif
-    bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE);
+    bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE + offset);
     TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
@@ -434,7 +436,7 @@ void NitzUpdate::AutoTimeChange()
     if (lastNetworkTime_ == 0 || lastSystemTime_ == 0 || time < lastSystemTime_) {
         return;
     }
-    SaveTime(lastNetworkTime_ + (time - lastSystemTime_));
+    SaveTime(lastNetworkTime_ + (time - lastSystemTime_), lastOffsetTime_);
 }
 
 void NitzUpdate::AutoTimeZoneChange()

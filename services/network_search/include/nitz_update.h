@@ -45,9 +45,9 @@ public:
 
 private:
     void ProcessTime(NetworkTime &networkTime);
-    bool IsValidTime(int64_t networkTime);
+    bool IsValidTime(int64_t networkTime, int64_t offset);
     void SaveTimeZone(std::string &timeZone);
-    void SaveTime(int64_t networkTime);
+    void SaveTime(int64_t networkTime, int64_t offset);
     bool IsAutoTimeZone();
     bool IsAutoTime();
     bool NitzParse(std::string &nitzStr, NetworkTime &networkTime);
@@ -60,6 +60,7 @@ private:
     int32_t slotId_ = 0;
     static int32_t offset_;
     static int64_t lastNetworkTime_;
+    static int64_t lastOffsetTime_;
     static std::string timeZone_;
     int64_t nitzRecvTime_ = 0;
 };

@@ -67,7 +67,9 @@ public:
     // SimAccount
     bool IsSimActive(int32_t slotId) override;
     int32_t SetActiveSim(int32_t slotId, int32_t enable) override;
+    int32_t SetActiveSimSatellite(int32_t slotId, int32_t enable) override;
     int32_t GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info) override;
+    int32_t ResetSimLoadAccount(int32_t slotId) override;
     int32_t SetDefaultVoiceSlotId(int32_t slotId) override;
     int32_t SetDefaultSmsSlotId(int32_t slotId) override;
     int32_t SetDefaultCellularDataSlotId(int32_t slotId) override;
@@ -155,6 +157,8 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t SavePrimarySlotId(int32_t slotId) override;
+    bool IsDataShareError() override;
+    void ResetDataShareError() override;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetEid(int32_t slotId, std::u16string &eId) override;
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList) override;

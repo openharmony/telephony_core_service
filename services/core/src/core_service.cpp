@@ -127,6 +127,9 @@ void CoreService::OnStop()
     registerToService_ = false;
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
     telRilManager_->DeInit();
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
+#endif
     TELEPHONY_LOGI("CoreService Stop success");
 }
 
@@ -1010,6 +1013,24 @@ int32_t CoreService::SetActiveSim(int32_t slotId, int32_t enable)
     return simManager_->SetActiveSim(slotId, enable);
 }
 
+int32_t CoreService::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    TELEPHONY_LOGD("CoreService::SetActiveSimSatellite(), slotId = %{public}d", slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetActiveSimSatellite(slotId, enable);
+}
+
 int32_t CoreService::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
@@ -1430,6 +1451,22 @@ int32_t CoreService::GetCellInfoList(int32_t slotId, std::vector<sptr<CellInform
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return networkSearchManager_->GetCellInfoList(slotId, cellInfo);
+}
+
+int32_t CoreService::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::CELL_LOCATION)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetNeighboringCellInfoList(slotId, cellInfo);
 }
 
 int32_t CoreService::SendUpdateCellLocationRequest(int32_t slotId)

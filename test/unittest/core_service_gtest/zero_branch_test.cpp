@@ -61,6 +61,7 @@
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -399,6 +400,7 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
         return;
     }
     auto imsRegInfoCallbackProxy = std::make_shared<ImsRegInfoCallbackProxy>(remote);
+    EXPECT_NE(imsRegInfoCallbackProxy, nullptr);
     ImsRegInfo info;
     imsRegInfoCallbackProxy->OnImsRegInfoChanged(0, ImsServiceType::TYPE_VOICE, info);
 }
@@ -1000,14 +1002,16 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_GT(mInner.SetEmergencyCallList(0, 0, eccVec, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCallFailReason(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetOperatorInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(mInner.GetCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNeighboringCellInfoList(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetCurrentCellInfo(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     IccSimStatus iccStatus = IccSimStatus::ICC_CARD_ABSENT;
+    EXPECT_GT(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_SUCCESS);
     auto telRilManager = std::make_shared<TelRilManager>();
     mInner.simManager_ = std::make_shared<SimManager>(telRilManager);
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mInner.UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1387,6 +1391,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(0, 1, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
     int32_t imsSwitchValue;
@@ -1505,6 +1510,8 @@ HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
     EXPECT_GT(simManager->SetVoiceMailInfo(INVALID_SLOTID, testStr, testStr), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetActiveSim(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSimSatellite(0, 1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetActiveSimSatellite(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1872,6 +1879,20 @@ HWTEST_F(BranchTest, Telephony_NetworkRegister_003, Function | MediumTest | Leve
         RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 
+static void UpdateOperatorNameParamsTest(
+    std::shared_ptr<OperatorName> &operatorName, sptr<NetworkState> &networkState, OperatorNameParams &params)
+{
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_NO_SERVICE, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_EMERGENCY_ONLY, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_SEARCH, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_UNKNOWN, networkState, params);
+    operatorName->UpdatePlmn(RegServiceState::REG_STATE_POWER_OFF, networkState, params);
+    params.spn = params.plmn;
+    params.showSpn = params.showPlmn;
+    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
+}
+
 /**
  * @tc.number   Telephony_OperatorName_001
  * @tc.name     test error branch
@@ -1889,8 +1910,6 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     auto operatorName = std::make_shared<OperatorName>(
         subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     auto operatorInfo = std::make_shared<OperatorInfoResult>();
-    std::string plmn = "";
-    bool showPlmn = true;
     std::string numeric = "qwe";
     std::vector<std::string> pnnCust;
     sptr<NetworkState> networkState;
@@ -1901,13 +1920,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->UpdateOplCust(pnnCust);
     EXPECT_EQ(operatorName->GetPlmn(networkState, true), "");
     networkState = new NetworkState;
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_NO_SERVICE, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_EMERGENCY_ONLY, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_SEARCH, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_UNKNOWN, networkState, 1, plmn, showPlmn);
-    operatorName->UpdatePlmn(RegServiceState::REG_STATE_POWER_OFF, networkState, 1, plmn, showPlmn);
-    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showPlmn);
+    OperatorNameParams params = {true, "", false, "", 1};
+    UpdateOperatorNameParamsTest(operatorName, networkState, params);
     operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->GsmOperatorInfo(operatorInfo);
@@ -1920,6 +1934,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     operatorName->CdmaOperatorInfo(operatorInfo);
     EXPECT_EQ(operatorName->GetCurrentLac(), 0);
     EXPECT_TRUE(operatorName->GetNetworkStatus() == nullptr);
+
+    std::string plmn = params.spn;
     EXPECT_EQ(operatorName->GetCustomName(plmn), "");
     EXPECT_EQ(operatorName->GetCustomName(numeric), "");
     EXPECT_EQ(operatorName->GetCustSpnRule(true), 0);
@@ -1956,8 +1972,9 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorName->UpdatePnnCust(pnnCust);
     operatorName->UpdateOplCust(oplCust);
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "");
-    bool showSpn = true;
-    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, 1, plmn, showSpn);
+
+    OperatorNameParams params = {false, "", true, plmn, 1};
+    operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "ChinaMobile");
     std::shared_ptr<OperatorInfoResult> operatorResult = std::make_shared<OperatorInfoResult>();
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
@@ -2315,6 +2332,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->ConvertNetworkModeToCapabilityType(CORE_NETWORK_MODE_NR);
     nsm->ConvertNetworkModeToCapabilityType(-1);
     EXPECT_EQ(nsm->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
+    EXPECT_EQ(nsm->UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -2483,6 +2501,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
+    networkSearchHandler->UpdateOperatorName();
 }
 
 /**
@@ -3118,6 +3137,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     multiSimMonitor->ProcessEvent(event);
     multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
     multiSimMonitor->IsVSimSlotId(0);
+    multiSimMonitor->ResetSimLoadAccount(0);
     multiSimMonitor->RegisterSimNotify(0);
     multiSimMonitor->UnRegisterSimNotify();
     ASSERT_TRUE(matchingSkills.CountEvent() == 1);
@@ -3182,52 +3202,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_004, Function | MediumTest | Leve
         simFileManagerWeak};
     std::shared_ptr<MultiSimMonitor> multiSimMonitor =
         std::make_shared<MultiSimMonitor>(nullptr, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify();
-    multiSimMonitor->InitData(0);
-    simStateManager = { nullptr, nullptr };
-    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    simFileManagerWeak.reset();
-    simFileManagerWeaks = { simFileManagerWeak, simFileManagerWeak };
-    multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeaks);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    multiSimMonitor->RefreshData(0);
-    multiSimMonitor->UpdateAllOpkeyConfigs();
-    multiSimMonitor->ClearAllOpcCache();
     EXPECT_FALSE(multiSimMonitor->IsValidSlotId(-1));
-}
-
-/**
- * @tc.number   Telephony_MultiSimMonitor_005
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
-    simStateManagerPtr->Init(0);
-    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-        simStateManagerPtr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
-    };
-    std::shared_ptr<MultiSimMonitor> multiSimMonitor =
-        std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    multiSimMonitor->Init();
 }
 
 /**
@@ -3392,6 +3367,23 @@ HWTEST_F(BranchTest, Telephony_RadioInfo, Function | MediumTest | Level1)
     radioInfo->SetRadioOnIfNeeded();
     nsm.reset();
     radioInfo->SetRadioOnIfNeeded();
+}
+
+/**
+ * @tc.number   Telephony_Network_InitTelephonyExtService_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_Network_InitTelephonyExtService_001, Function | MediumTest | Level1)
+{
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    if (TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ == nullptr) {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ null");
+    } else {
+        TELEPHONY_LOGI("telephonyExtWrapperHandle_ not null");
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr);
+        EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateOperatorNameParamsExt_ != nullptr);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

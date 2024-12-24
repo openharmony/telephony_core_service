@@ -1073,7 +1073,7 @@ static napi_value GetISOCountryCodeForNetworkSync(napi_env env, napi_callback_in
         NAPI_CALL(env, napi_create_string_utf8(env, code.c_str(), code.length(), &value));
         return value;
     }
-    if (IsValidSlotId(slotId)) {
+    if (IsValidSlotIdEx(slotId)) {
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIsoCountryCodeForNetwork(slotId, countryCode);
     }
     std::string code = NapiUtil::ToUtf8(countryCode);

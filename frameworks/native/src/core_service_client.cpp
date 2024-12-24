@@ -31,6 +31,9 @@ CoreServiceClient::CoreServiceClient() = default;
 CoreServiceClient::~CoreServiceClient()
 {
     RemoveDeathRecipient(nullptr, false);
+    if (deathRecipient_ != nullptr) {
+        reinterpret_cast<CoreServiceDeathRecipient*>(deathRecipient_.GetRefPtr())->SetValid(false);
+    }
 }
 
 sptr<ICoreService> CoreServiceClient::GetProxy()
@@ -666,6 +669,16 @@ int32_t CoreServiceClient::SetActiveSim(const int32_t slotId, int32_t enable)
     return proxy->SetActiveSim(slotId, enable);
 }
 
+int32_t CoreServiceClient::SetActiveSimSatellite(const int32_t slotId, int32_t enable)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->SetActiveSimSatellite(slotId, enable);
+}
+
 int32_t CoreServiceClient::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     auto proxy = GetProxy();
@@ -975,6 +988,16 @@ int32_t CoreServiceClient::GetCellInfoList(int32_t slotId, std::vector<sptr<Cell
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetCellInfoList(slotId, cellInfo);
+}
+
+int32_t CoreServiceClient::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetNeighboringCellInfoList(slotId, cellInfo);
 }
 
 int32_t CoreServiceClient::SendUpdateCellLocationRequest(int32_t slotId)

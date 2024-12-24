@@ -662,9 +662,10 @@ int32_t TelRilManager::SetPreferredNetwork(
         response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::SetPreferredNetwork, preferredNetworkType);
 }
 
-int32_t TelRilManager::GetCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+int32_t TelRilManager::GetNeighboringCellInfoList(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    return TaskSchedule(response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetCellInfoList);
+    return TaskSchedule(
+        response, "TelRilNetwork", GetTelRilNetwork(slotId), &TelRilNetwork::GetNeighboringCellInfoList);
 }
 
 int32_t TelRilManager::GetCurrentCellInfo(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

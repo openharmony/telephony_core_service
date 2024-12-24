@@ -764,6 +764,112 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0200, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_Sim_SetActiveSimSatellite_0100
+ * @tc.name     Set current sim active state
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetActiveSimSatelliteTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetActiveSimSatellite_0200
+ * @tc.name     Set current sim active state
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0200, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetActiveSimSatelliteTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_SetActiveSimSatellite_0300
+ * @tc.name     Set current sim active state
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0300, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(SetActiveSimSatelliteTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            bool result = helper.GetBoolResult();
+            EXPECT_FALSE(result);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_ReSetActiveSimSatellite_0100
+ * @tc.name     Reset current sim active state
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0100, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(ReSetActiveSimSatelliteTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
+/**
+ * @tc.number   Telephony_Sim_ReSetActiveSimSatellite_0200
+ * @tc.name     Reset current sim active state
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0200, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(ReSetActiveSimSatelliteTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+            EXPECT_TRUE(true);
+        } else {
+            int32_t result = helper.GetIntResult();
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        }
+    }
+}
+
+/**
  * @tc.number   Telephony_Sim_GetMaxSimCount_0100
  * @tc.name     Get max sim count for device supported
  * @tc.desc     Function test

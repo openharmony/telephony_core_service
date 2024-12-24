@@ -1874,6 +1874,39 @@ int32_t CoreServiceProxy::SetActiveSim(int32_t slotId, int32_t enable)
     return result;
 }
 
+int32_t CoreServiceProxy::SetActiveSimSatellite(int32_t slotId, int32_t enable)
+{
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("CoreServiceProxy::SetActiveSimSatellite invalid simId");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    if (enable != DISABLE && enable != ENABLE) {
+        TELEPHONY_LOGE("CoreServiceProxy::SetActiveSimSatellite invalid enable status");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetActiveSimSatellite WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    data.WriteInt32(enable);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetActiveSimSatellite Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::SET_SIM_ACTIVE_SATELLITE), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("SetActiveSimSatellite failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    return result;
+}
+
 int32_t CoreServiceProxy::GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     TELEPHONY_LOGI("CoreServiceProxy GetPreferredNetwork");
@@ -2719,6 +2752,38 @@ int32_t CoreServiceProxy::GetCellInfoList(int32_t slotId, std::vector<sptr<CellI
         ProcessCellInfo(reply, cellInfo);
     }
     TELEPHONY_LOGD("CoreServiceProxy::GetCellInfoList cell size:%{public}zu\n", cellInfo.size());
+    return result;
+}
+
+int32_t CoreServiceProxy::GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList WriteInt32 imsSrvType is false");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetNeighboringCellInfoList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_NEIGHBORING_CELL_INFO_LIST),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GET_NEIGHBORING_CELL_INFO_LIST failed, error code is %{public}d\n", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ProcessCellInfo(reply, cellInfo);
+    }
+    TELEPHONY_LOGD("CoreServiceProxy::GetNeighboringCellInfoList cell size:%{public}zu\n", cellInfo.size());
     return result;
 }
 

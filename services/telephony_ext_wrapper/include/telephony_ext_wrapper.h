@@ -27,6 +27,7 @@
 #include "want.h"
 #include "i_icc_file.h"
 #include "tel_ril_types.h"
+#include "operator_name_params.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,6 +43,7 @@ DECLARE_DELAYED_REF_SINGLETON(TelephonyExtWrapper);
 public:
     DISALLOW_COPY_AND_MOVE(TelephonyExtWrapper);
     void InitTelephonyExtWrapper();
+    void DeInitTelephonyExtWrapper();
 
     typedef bool (*CHECK_OPC_VERSION_IS_UPDATE)(void);
     typedef void (*UPDATE_OPC_VERSION)(void);
@@ -75,6 +77,8 @@ public:
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
     typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
+    typedef void (*UPDATE_OPERATOR_NAME_PARAMS)(
+        int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState, OperatorNameParams &params);
     typedef int32_t (*UPDATE_NSA_STATE_EXT)(
         int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
     typedef void (*PUBLISH_SPN_INFO_CHANGED_EXT)(OHOS::AAFwk::Want &want);
@@ -105,6 +109,9 @@ public:
 
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
+    typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
+    typedef void (*DynamicLoadInit)(void);
+    typedef void (*DynamicLoadDeInit)(void);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -132,6 +139,7 @@ public:
     ON_GET_NETWORK_SEARCH_INFORMATION_EXT onGetNetworkSearchInformationExt_ = nullptr;
     CREATE_ICC_FILE_EXT createIccFileExt_ = nullptr;
     UPDATE_NETWORK_STATE_EXT updateNetworkStateExt_ = nullptr;
+    UPDATE_OPERATOR_NAME_PARAMS updateOperatorNameParamsExt_ = nullptr;
     UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
     PUBLISH_SPN_INFO_CHANGED_EXT publishSpnInfoChangedExt_ = nullptr;
 
@@ -163,11 +171,16 @@ public:
     GET_ROAMINGBROKER_IMSI getRoamingBrokerImsi_ = nullptr;
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
+    PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
+    DynamicLoadInit dynamicLoadInit_ = nullptr;
+    DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
+    void* telephonyDynamicLoadWrapperHandle_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
+    void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
     void InitTelephonyExtWrapperForCust();
     void InitTelephonyExtWrapperForVSim();
@@ -175,6 +188,7 @@ private:
     void InitTelephonyExtWrapperForSim();
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
+    void InitTelephonyExtWrapperForDynamicLoad();
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
