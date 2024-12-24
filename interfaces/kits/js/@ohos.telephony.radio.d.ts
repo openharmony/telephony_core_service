@@ -141,6 +141,25 @@ declare namespace radio {
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @returns { Promise<NetworkRadioTech> } Returns the RAT of PS domain and CS domain of registered network.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
+   * 2. Incorrect parameter types.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CoreService
+   * @since 11
+   */
+  function getRadioTech(slotId: number): Promise<NetworkRadioTech>;
+
+  /**
+   * Obtains radio access technology (RAT) of the registered network.
+   *
+   * @permission ohos.permission.GET_NETWORK_INFO
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { NetworkRadioTech } Returns the RAT of PS domain and CS domain of registered network.
    * The values of RAT are as follows:
    * <ul>
    * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_UNKNOWN}
@@ -165,10 +184,9 @@ declare namespace radio {
    * @throws { BusinessError } 8300003 - System internal error.
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CoreService
-   * @since 11
+   * @since 16
    */
-  function getRadioTech(slotId: number): Promise<NetworkRadioTech>;
-
+  function getRadioTechSync(slotId: number): NetworkRadioTech;
   /**
    * Obtains the network state of the registered network.
    *
