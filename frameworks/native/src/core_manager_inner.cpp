@@ -2524,6 +2524,14 @@ void CoreManagerInner::ResetDataShareError()
     simManager_->ResetDataShareError();
 }
 
+void CoreManagerInner::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    return simManager_->UpdateImsCapFromChip(slotId, imsCapFromChip);
+}
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
 {

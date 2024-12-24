@@ -21,6 +21,7 @@
 #include "core_service_client.h"
 #include "core_service_test_helper.h"
 #include "token_setproc.h"
+#include "operator_config_cache.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -227,6 +228,7 @@ private:
     static void SendCallSetupRequestResultTestFunc1(CoreServiceTestHelper &helper);
     static void SetVoiceMailInfoTestFunc(CoreServiceTestHelper &helper);
     static void SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper);
+    static std::shared_ptr<OperatorConfigCache> CreateOperatorConfigCache(int32_t slotId);
 };
 } // namespace Telephony
 } // namespace OHOS
