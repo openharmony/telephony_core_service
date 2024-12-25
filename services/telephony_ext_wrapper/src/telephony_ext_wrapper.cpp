@@ -251,7 +251,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
         TELEPHONY_LOGE("[DynamicLoad] libtel_dynamic_load_service.z.so was not loaded, error: %{public}s", dlerror());
         return;
     }
-    dynamicLoadInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "InitDynamicLoadHandle");
+    dynamicLoadInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "InitDynamicLoadHandler");
     if (dynamicLoadInit_ == nullptr) {
         TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
@@ -265,7 +265,7 @@ void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
     if (telephonyDynamicLoadWrapperHandle_ == nullptr) {
         return;
     }
-    dynamicLoadDeInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "DeInitDynamicLoadHandle");
+    dynamicLoadDeInit_ = (DynamicLoadInit)dlsym(telephonyDynamicLoadWrapperHandle_, "DeInitDynamicLoadHandler");
     if (dynamicLoadDeInit_ == nullptr) {
         TELEPHONY_LOGE("[DynamicLoad] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;
