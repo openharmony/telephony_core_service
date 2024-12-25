@@ -67,14 +67,14 @@
                 "samgr",
                 "telephony_data",
                 "time_service",
-                "huks"
+                "huks",
+                "openssl"
             ],
             "third_party": [
                 "libphonenumber",
                 "libpng",
                 "libxml2",
                 "node",
-                "openssl",
                 "glib"
             ]
         },

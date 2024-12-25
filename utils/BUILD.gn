@@ -64,6 +64,7 @@ ohos_shared_library("libtel_common") {
 
   sources = [
     "../frameworks/js/napi/napi_util.cpp",
+    "common/src/base64.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
     "common/src/tel_aes_crypto_util.cpp",
@@ -126,6 +127,7 @@ ohos_shared_library("libtel_common") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "openssl:libcrypto_shared",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
   ]
