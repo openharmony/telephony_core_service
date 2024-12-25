@@ -30,7 +30,6 @@
 #include "telephony_log_wrapper.h"
 #include "vcard_configuration.h"
 #include "vcard_constant.h"
-#include "base64.h"
 
 namespace OHOS {
 namespace Telephony {
