@@ -35,6 +35,7 @@
       "OHOS::Telephony::GetCellularDataFlow(int)";
       "OHOS::Telephony::GetLockReason(int)";
       "OHOS::Telephony::GetSimState(int)";
+      OHOS::Telephony::Base64*;
     };
   local:
     *;
