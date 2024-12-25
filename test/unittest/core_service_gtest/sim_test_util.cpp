@@ -579,7 +579,7 @@ void SimTest::SetVoiceMailInfoTestFunc1(CoreServiceTestHelper &helper)
     helper.SetIntResult(result);
     helper.NotifyAll();
 }
-std::shared_ptr<OperatorConfigCache> CreateOperatorConfigCache(int32_t slotId)
+std::shared_ptr<OperatorConfigCache> SimTest::CreateOperatorConfigCache(int32_t slotId)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
