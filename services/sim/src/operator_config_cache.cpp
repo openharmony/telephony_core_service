@@ -82,12 +82,12 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
 void OperatorConfigCache::UpdateCurrentOpc(
     int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
     bool isUseCloudImsNV = system::GetBoolParameter(KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV, true);
     TELEPHONY_LOGI("[slot%{public}d], isUseCloudImsNV = %{public}d", slotId, isUseCloudImsNV);
     if (isUseCloudImsNV) {
         UpdatevolteCap(slotId, poc);
     }
+    std::unique_lock<std::mutex> lock(mutex_);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
     AnnounceOperatorConfigChanged(slotId, state);
@@ -118,6 +118,8 @@ void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
     std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
     int32_t volteCapInChip = GetIntParameter(volteCapKey.c_str(), -1);
     TELEPHONY_LOGI("volteCapInChip = %{public}d", volteCapInChip);
+
+    std::unique_lock<std::mutex> lock(mutex_);
     switch (volteCapInChip) {
         case IMS_SWITCH_OFF:
             UpdateOpcBoolValue(opc, "volte_supported_bool", false);
@@ -137,6 +139,7 @@ void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
             TELEPHONY_LOGE("Invalid volte para!");
             break;
     }
+    lock.unlock();
 }
 
 int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state)
@@ -423,7 +426,7 @@ void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromC
     std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
     std::string strvolteCap = std::to_string(volteCap);
     SetParameter(volteCapKey.c_str(), strvolteCap.c_str());
-    UpdateOperatorConfigs(slotId);
+    UpdatevolteCap(slotId, opc_);
 }
 } // namespace Telephony
 } // namespace OHOS
