@@ -74,7 +74,7 @@ ohos_shared_library("libtel_common") {
     "common/src/telephony_ext_utils_wrapper.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
-    "common/src/bass64.cpp"
+    "common/src/base64.cpp",
   ]
 
   if (core_service_support_esim) {
