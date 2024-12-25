@@ -1,6 +1,6 @@
 {
     "voice_mail_number_string": "",
-    "ims_switch_on_by_default_bool": true,
+    "ims_switch_on_by_default_bool": false,
     "hide_ims_switch_bool": false,
     "volte_supported_bool": true,
     "nr_mode_supported_list_int_array": [ 1, 2 ],
