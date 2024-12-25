@@ -236,8 +236,9 @@ static napi_value GetRadioTechSync(napi_env env, napi_callback_info info)
     int32_t psRadioTechPre = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     int32_t csRadioTechPre = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
     if (IsValidSlotIdEx(slotId)) {
-        int32_t psResult = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId, &psRadioTechPre);
-        int32_t csResult = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetPsRadioTech(slotId, &csRadioTechPre);
+        auto client = DelayedRefSingleton<CoreServiceClient>::GetInstance();
+        int32_t psResult = client.GetPsRadioTech(slotId, psRadioTechPre);
+        int32_t csResult = client.GetCsRadioTech(slotId, csRadioTechPre);
         if (psResult == TELEPHONY_SUCCESS && csResult == TELEPHONY_SUCCESS) {
             psRadioTech = WrapRadioTech(psRadioTechPre);
             csRadioTech = WrapRadioTech(csRadioTechPre);
