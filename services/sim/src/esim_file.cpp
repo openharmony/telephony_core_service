@@ -1902,7 +1902,7 @@ bool EsimFile::RealProcessPrepareDownloadDone(std::string &combineHexStr)
             int32_t protocolErr = errCodeNode->Asn1AsInteger();
             if (protocolErr != TELEPHONY_ERR_ARGUMENT_INVALID) {
                 TELEPHONY_LOGE("Prepare download error, es10x errcode: %{public}d", protocolErr);
-                preDownloadResult_.resultCode_ =static_cast<ResultCode>(protocolErr);
+                preDownloadResult_.resultCode_ = static_cast<ResultCode>(protocolErr);
                 preDownloadResult_.response_ = u"";
                 NotifyReady(prepareDownloadMutex_, isPrepareDownloadReady_, prepareDownloadCv_);
                 return false;
