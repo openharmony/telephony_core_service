@@ -1771,7 +1771,6 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
     if (hexStrLen == 0) {
         return false;
-
     }
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
