@@ -214,7 +214,7 @@ static napi_value GetRadioTech(napi_env env, napi_callback_info info)
         env, asyncContext.release(), "GetRadioTech", NativeGetRadioTech, GetRadioTechCallback);
 }
 
-static napi_value GetRadioTechSync(napi_env env, napi_callback_info)
+static napi_value GetRadioTechSync(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = 1;
     napi_value parameters[] = { 0 };

@@ -141,6 +141,22 @@ declare namespace radio {
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @returns { Promise<NetworkRadioTech> } Returns the RAT of PS domain and CS domain of registered network.
+   * The values of RAT are as follows:
+   * <ul>
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_UNKNOWN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_GSM}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_1XRTT}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_WCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_HSPAP}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_TD_SCDMA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EVDO}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_EHRPD}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_LTE_CA}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_IWLAN}
+   * <li>{@code RadioTechnology#RADIO_TECHNOLOGY_NR}
+   * </ul>
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified.
    * 2. Incorrect parameter types.
