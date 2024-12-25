@@ -200,11 +200,11 @@ ohos_shared_library("tel_core_service") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
+    "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
-    "openssl:libcrypto_shared",
   ]
 
   if (defined(global_parts_info) &&
