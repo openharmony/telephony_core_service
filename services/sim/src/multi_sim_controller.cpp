@@ -980,8 +980,11 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
     TELEPHONY_LOGI("MultiSimController ProcessEvent eventCode is %{public}d", eventCode);
     switch (eventCode) {
         case MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT: {
-            auto slotId = event->GetParam();
-            SetPrimarySlotId(slotId);
+            auto primarySlotId = event->GetParam();
+            std::thread initDataTask([&, primarySlotId = primarySlotId]() {
+                pthread_setname_np(pthread_self(), "SetPrimarySlotId");
+                CoreManagerInner::GetInstance().SetPrimarySlotId(primarySlotId);
+            });
             break;
         }
         default:
