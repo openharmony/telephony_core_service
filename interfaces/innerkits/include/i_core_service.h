@@ -160,6 +160,7 @@ public:
     virtual bool IsAllowedInsertApn(std::string &value) = 0;
     virtual int32_t GetTargetOpkey(int32_t slotId, std::u16string &opkey) = 0;
     virtual int32_t GetOpkeyVersion(std::string &versionInfo) = 0;
+    virtual int32_t GetOpnameVersion(std::string &versionInfo) = 0;
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM

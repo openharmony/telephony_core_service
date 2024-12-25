@@ -924,6 +924,14 @@ public:
     int32_t GetOpkeyVersion(std::string &versionInfo);
 
     /**
+     * @brief get opname param version
+     *
+     * @param versionInfo[out], opname param version info
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetOpnameVersion(std::string &versionInfo);
+
+    /**
      * @brief Get data from sim io
      *
      * @param slotId[in], sim slot id
