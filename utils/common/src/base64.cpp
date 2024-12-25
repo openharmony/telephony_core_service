@@ -37,8 +37,8 @@ std::shared_ptr<std::vector<unsigned char>> Base64::Decode(const std::string &in
     auto size = input.size();
     size_t bufLen = size / 4 * 3;
     auto outBuffer = std::make_shared<std::vector<unsigned char>>(bufLen, 0);
-    auto outLen = EVP_DecodeBlock(reinterpret_cast<unsigned char *>(outBuffer->data()), 
-                reinterpret_cast<const unsigned char *>(input.c_str()), size);
+    auto outLen = EVP_DecodeBlock(reinterpret_cast<unsigned char *>(outBuffer->data()),
+                  reinterpret_cast<const unsigned char *>(input.c_str()), size);
     if (outLen < 0) {
         return nullptr;
     }
