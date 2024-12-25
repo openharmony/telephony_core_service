@@ -64,6 +64,7 @@ ohos_shared_library("libtel_common") {
 
   sources = [
     "../frameworks/js/napi/napi_util.cpp",
+    "common/src/base64.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
     "common/src/tel_aes_crypto_util.cpp",
@@ -74,7 +75,6 @@ ohos_shared_library("libtel_common") {
     "common/src/telephony_ext_utils_wrapper.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
-    "common/src/base64.cpp",
   ]
 
   if (core_service_support_esim) {
@@ -126,8 +126,8 @@ ohos_shared_library("libtel_common") {
     "huks:libhukssdk",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "openssl:libcrypto_shared",
     "napi:ace_napi",
+    "openssl:libcrypto_shared",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
   ]
