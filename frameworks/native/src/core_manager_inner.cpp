@@ -1593,6 +1593,15 @@ int32_t CoreManagerInner::SetPreferredNetwork(
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+bool CoreManagerInner::SetPreferredNetwork(
+    int32_t slotId, int32_t networkMode)
+{
+    if (networkSearchManager_ != nullptr) {
+        return networkSearchManager_->SetPreferredNetwork(slotId, networkMode);
+    }
+    return false;
+}
+
 bool CoreManagerInner::IsNrSupported(int32_t slotId)
 {
     if (networkSearchManager_ != nullptr) {

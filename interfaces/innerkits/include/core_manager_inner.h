@@ -221,6 +221,7 @@ public:
     int32_t SendUpdateCellLocationRequest(int32_t slotId);
     int32_t GetPreferredNetwork(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, const sptr<INetworkSearchCallback> &callback);
+    bool SetPreferredNetwork(int32_t slotId, int32_t networkMode);
     int32_t GetAirplaneMode(bool &airplaneMode);
     int32_t UpdateRadioOn(int32_t slotId);
 

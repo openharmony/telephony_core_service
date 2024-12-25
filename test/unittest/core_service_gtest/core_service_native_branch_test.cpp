@@ -387,6 +387,9 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_004, Function |
     ImsRegInfo info;
     EXPECT_EQ(mInner.GetImsRegStatus(-1, ImsServiceType::TYPE_VOICE, info), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.UpdateRadioOn(-1), TELEPHONY_ERROR);
+
+    int32_t networkMode = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA);
+    EXPECT_FALSE(mInner.SetPreferredNetwork(-1, networkMode));
 }
 
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Level1)

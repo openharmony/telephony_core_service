@@ -119,6 +119,10 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     if (processOperatorName_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    setNrOptionModeExt_ = (SET_NR_OPTION_MODE_EXT)dlsym(telephonyExtWrapperHandle_, "SetNrOptionModeExt");
+    if (setNrOptionModeExt_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
