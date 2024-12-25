@@ -1671,6 +1671,15 @@ int32_t CoreService::GetOpkeyVersion(std::string &versionInfo)
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
+int32_t CoreService::GetOpnameVersion(std::string &versionInfo)
+{
+    if (TELEPHONY_EXT_WRAPPER.getOpnameVersion_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.getOpnameVersion_(versionInfo);
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response)
 {
