@@ -162,7 +162,6 @@ ohos_shared_library("tel_core_service") {
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
     "//third_party/libxml2:libxml2",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   if (core_service_support_esim) {
@@ -205,6 +204,7 @@ ohos_shared_library("tel_core_service") {
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
+    "openssl:libcrypto_shared",
   ]
 
   if (defined(global_parts_info) &&

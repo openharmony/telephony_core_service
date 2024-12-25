@@ -74,6 +74,7 @@ ohos_shared_library("libtel_common") {
     "common/src/telephony_ext_utils_wrapper.cpp",
     "common/src/telephony_permission.cpp",
     "preferences/src/tel_profile_util.cpp",
+    "common/src/bass64.cpp"
   ]
 
   if (core_service_support_esim) {
@@ -125,6 +126,7 @@ ohos_shared_library("libtel_common") {
     "huks:libhukssdk",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "openssl:libcrypto_shared",
     "napi:ace_napi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
