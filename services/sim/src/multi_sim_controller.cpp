@@ -985,6 +985,7 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
                 CoreManagerInner::GetInstance().SetPrimarySlotId(primarySlotId);
             });
+            initDataTask.detach();
             break;
         }
         default:
