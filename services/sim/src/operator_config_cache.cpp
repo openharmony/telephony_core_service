@@ -25,6 +25,7 @@
 #include "core_manager_inner.h"
 #include "pdp_profile_rdb_helper.h"
 #include "radio_event.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -81,6 +82,11 @@ void OperatorConfigCache::ClearMemoryCache(int32_t slotId)
 void OperatorConfigCache::UpdateCurrentOpc(
     int32_t slotId, OperatorConfig &poc, int32_t state, bool needUpdateLoading)
 {
+    bool isUseCloudImsNV = system::GetBoolParameter(KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV, true);
+    TELEPHONY_LOGI("[slot%{public}d], isUseCloudImsNV = %{public}d", slotId, isUseCloudImsNV);
+    if (isUseCloudImsNV) {
+        UpdatevolteCap(slotId, poc);
+    }
     std::unique_lock<std::mutex> lock(mutex_);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
@@ -88,6 +94,52 @@ void OperatorConfigCache::UpdateCurrentOpc(
     if (needUpdateLoading) {
         isLoadingConfig = false;
     }
+}
+
+void OperatorConfigCache::UpdateOpcBoolValue(OperatorConfig &opc, const std::string &key, const bool value)
+{
+    std::map<std::string, bool>::iterator it = opc.boolValue.find(key);
+    bool result;
+    if (it != opc.boolValue.end()) {
+        result = it->second && value;
+        it->second = result;
+    } else {
+        TELEPHONY_LOGI("Not find in opc");
+        result = value;
+        opc.boolValue.emplace(key, value);
+    }
+
+    std::string sResult = result ? "true" : "false";
+    opc.configValue[Str8ToStr16(key)] = Str8ToStr16(sResult);
+}
+
+void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
+{
+    std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
+    int32_t volteCapInChip = GetIntParameter(volteCapKey.c_str(), -1);
+    TELEPHONY_LOGI("volteCapInChip = %{public}d", volteCapInChip);
+
+    std::unique_lock<std::mutex> lock(mutex_);
+    switch (volteCapInChip) {
+        case IMS_SWITCH_OFF:
+            UpdateOpcBoolValue(opc, "volte_supported_bool", false);
+            break;
+        case IMS_SWITCH_ON:
+            UpdateOpcBoolValue(opc, "volte_supported_bool", true);
+            break;
+        case IMS_SWITCH_DEFAULT:
+            opc.boolValue["volte_supported_bool"] = true;
+            opc.boolValue["hide_ims_switch_bool"] = false;
+            opc.boolValue["ims_switch_on_by_default_bool"] = false;
+            opc.configValue[Str8ToStr16("volte_supported_bool")] = Str8ToStr16("true");
+            opc.configValue[Str8ToStr16("hide_ims_switch_bool")] = Str8ToStr16("false");
+            opc.configValue[Str8ToStr16("ims_switch_on_by_default_bool")] = Str8ToStr16("false");
+            break;
+        default:
+            TELEPHONY_LOGE("Invalid volte para!");
+            break;
+    }
+    lock.unlock();
 }
 
 int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state)
@@ -359,6 +411,22 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
     std::string path = parser_.GetOperatorConfigFilePath(filename);
     std::ifstream f(path.c_str());
     return !f.good();
+}
+
+void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
+{
+    TELEPHONY_LOGI("[slot%{public}d] imsCapFromChip = %{public}d, %{public}d, %{public}d, %{public}d",
+        slotId,
+        imsCapFromChip.volteCap,
+        imsCapFromChip.vowifiCap,
+        imsCapFromChip.vonrCap,
+        imsCapFromChip.vtCap);
+
+    int32_t volteCap = imsCapFromChip.volteCap;
+    std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
+    std::string strvolteCap = std::to_string(volteCap);
+    SetParameter(volteCapKey.c_str(), strvolteCap.c_str());
+    UpdatevolteCap(slotId, opc_);
 }
 } // namespace Telephony
 } // namespace OHOS

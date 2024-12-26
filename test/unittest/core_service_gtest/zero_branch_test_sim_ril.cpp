@@ -156,6 +156,44 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_001, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_SimAccountManager_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
+    simAccountManager->Init(0);
+    simAccountManager->UpdateImsCapFromChip(0, {0, 0, 0, 0});
+    EXPECT_NE(simAccountManager->operatorConfigCache_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_SimAccountManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
+    simAccountManager->operatorConfigCache_ = nullptr;
+    simAccountManager->UpdateImsCapFromChip(0, {0, 0, 0, 0});
+    EXPECT_EQ(simAccountManager->operatorConfigCache_, nullptr);
+}
+
+/**
  * @tc.number   Telephony_OperatorConfigLoader_001
  * @tc.name     test error branch
  * @tc.desc     Function test

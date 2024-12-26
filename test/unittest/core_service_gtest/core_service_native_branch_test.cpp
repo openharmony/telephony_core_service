@@ -766,5 +766,25 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0015, Function 
     EXPECT_NE(mInner.telRilManager_, nullptr);
     EXPECT_EQ(core3, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0016, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+
+    mInner.simManager_ = simManager;
+    mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
+    EXPECT_NE(mInner.simManager_, nullptr);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0017, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+
+    mInner.simManager_ = nullptr;
+    mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
+    EXPECT_EQ(mInner.simManager_, nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS

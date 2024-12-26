@@ -127,5 +127,48 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | L
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
 }
 
+/**
+ * @tc.number   Telephony_Sim_SimManager_006
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_006, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->UpdateImsCapFromChip(slotId, {0, 0, 0, 0});
+    EXPECT_EQ(slotId, 0);
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_007
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_007, Function | MediumTest | Level1)
+{
+    int32_t slotId = -1;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->UpdateImsCapFromChip(slotId, {0, 0, 0, 0});
+    EXPECT_EQ(slotId, -1);
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_008
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_008, Function | MediumTest | Level1)
+{
+    int32_t slotId = -1;
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->UpdateImsCapFromChip(slotId, {0, 0, 0, 0});
+    EXPECT_EQ(simManager->simFileManager_[slotId], nullptr);
+}
 }
 }
