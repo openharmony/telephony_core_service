@@ -36,6 +36,16 @@ struct ResponseEsimResult : public Parcelable {
     virtual bool Marshalling(Parcel &parcel) const override;
     static ResponseEsimResult *Unmarshalling(Parcel &parcel);
 };
+
+/**
+ * @brief Result of a operation.
+ */
+struct ResponseEsimInnerResult {
+    int32_t resultCode_;
+    std::u16string response_ = u"";
+    int32_t sw1_ = 0;
+    int32_t sw2_ = 0;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_RESPONSE_ESIM_RESULT_H

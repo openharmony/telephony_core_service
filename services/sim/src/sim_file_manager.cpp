@@ -1006,11 +1006,11 @@ std::u16string SimFileManager::GetEid()
     return Str8ToStr16(result);
 }
 
-GetEuiccProfileInfoListResult SimFileManager::GetEuiccProfileInfoList()
+GetEuiccProfileInfoListInnerResult SimFileManager::GetEuiccProfileInfoList()
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return GetEuiccProfileInfoListResult();
+        return GetEuiccProfileInfoListInnerResult();
     }
     return eSimFile_->GetEuiccProfileInfoList();
 }
@@ -1024,13 +1024,13 @@ EuiccInfo SimFileManager::GetEuiccInfo()
     return eSimFile_->GetEuiccInfo();
 }
 
-ResultCode SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &iccId)
+int32_t SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode enumResult = eSimFile_->DisableProfile(portIndex, iccId);
+    int32_t enumResult = eSimFile_->DisableProfile(portIndex, iccId);
     return enumResult;
 }
 
@@ -1054,13 +1054,13 @@ EuiccRulesAuthTable SimFileManager::GetRulesAuthTable(int32_t portIndex)
     return result;
 }
 
-ResponseEsimResult SimFileManager::GetEuiccChallenge(int32_t portIndex)
+ResponseEsimInnerResult SimFileManager::GetEuiccChallenge(int32_t portIndex)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResponseEsimResult();
+        return ResponseEsimInnerResult();
     }
-    ResponseEsimResult result = eSimFile_->ObtainEuiccChallenge(portIndex);
+    ResponseEsimInnerResult result = eSimFile_->ObtainEuiccChallenge(portIndex);
     return result;
 }
 
@@ -1074,13 +1074,13 @@ std::u16string SimFileManager::GetDefaultSmdpAddress()
     return Str8ToStr16(result);
 }
 
-ResponseEsimResult SimFileManager::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
+ResponseEsimInnerResult SimFileManager::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResponseEsimResult();
+        return ResponseEsimInnerResult();
     }
-    ResponseEsimResult result = eSimFile_->CancelSession(transactionId, cancelReason);
+    ResponseEsimInnerResult result = eSimFile_->CancelSession(transactionId, cancelReason);
     return result;
 }
 
@@ -1094,23 +1094,23 @@ EuiccProfile SimFileManager::GetProfile(int32_t portIndex, const std::u16string 
     return result;
 }
 
-ResultCode SimFileManager::ResetMemory(ResetOption resetOption)
+int32_t SimFileManager::ResetMemory(ResetOption resetOption)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode result = eSimFile_->ResetMemory(resetOption);
+    int32_t result = eSimFile_->ResetMemory(resetOption);
     return result;
 }
 
-ResultCode SimFileManager::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
+int32_t SimFileManager::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode result = eSimFile_->SetDefaultSmdpAddress(defaultSmdpAddress);
+    int32_t result = eSimFile_->SetDefaultSmdpAddress(defaultSmdpAddress);
     return result;
 }
 
@@ -1124,23 +1124,23 @@ bool SimFileManager::IsSupported()
     return result;
 }
 
-ResponseEsimResult SimFileManager::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
+ResponseEsimInnerResult SimFileManager::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResponseEsimResult();
+        return ResponseEsimInnerResult();
     }
-    ResponseEsimResult result = eSimFile_->SendApduData(aid, apduData);
+    ResponseEsimInnerResult result = eSimFile_->SendApduData(aid, apduData);
     return result;
 }
 
-ResponseEsimResult SimFileManager::PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
+ResponseEsimInnerResult SimFileManager::PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("eSimFile is nullptr");
-        return ResponseEsimResult();
+        return ResponseEsimInnerResult();
     }
-    ResponseEsimResult result = eSimFile_->ObtainPrepareDownload(downLoadConfigInfo);
+    ResponseEsimInnerResult result = eSimFile_->ObtainPrepareDownload(downLoadConfigInfo);
     return result;
 }
 
@@ -1183,42 +1183,42 @@ EuiccNotification SimFileManager::RetrieveNotification(int32_t portIndex, int32_
     return eSimFile_->ObtainRetrieveNotification(portIndex, seqNumber);
 }
 
-ResultCode SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
+int32_t SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("RemoveNotificationFromList eSimFile_ is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     return eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
 }
 
-ResultCode SimFileManager::DeleteProfile(const std::u16string &iccId)
+int32_t SimFileManager::DeleteProfile(const std::u16string &iccId)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode result = eSimFile_->DeleteProfile(iccId);
+    int32_t result = eSimFile_->DeleteProfile(iccId);
     return result;
 }
 
-ResultCode SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
+int32_t SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
+    int32_t result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return result;
 }
 
-ResultCode SimFileManager::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
+int32_t SimFileManager::SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResultCode::RESULT_SGP_22_OTHER;
+       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
-    ResultCode result = eSimFile_->SetProfileNickname(iccId, nickname);
+    int32_t result = eSimFile_->SetProfileNickname(iccId, nickname);
     return result;
 }
 
@@ -1232,13 +1232,13 @@ EuiccInfo2 SimFileManager::GetEuiccInfo2(int32_t portIndex)
     return result;
 }
 
-ResponseEsimResult SimFileManager::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
+ResponseEsimInnerResult SimFileManager::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-        return ResponseEsimResult();
+        return ResponseEsimInnerResult();
     }
-    ResponseEsimResult result = eSimFile_->AuthenticateServer(authenticateConfigInfo);
+    ResponseEsimInnerResult result = eSimFile_->AuthenticateServer(authenticateConfigInfo);
     return result;
 }
 #endif
