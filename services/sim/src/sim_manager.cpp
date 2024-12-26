@@ -1576,5 +1576,14 @@ int32_t SimManager::AuthenticateServer(
     return TELEPHONY_ERR_SUCCESS;
 }
 #endif
+
+void SimManager::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId %{public}d is invalid or simFileManager is null!", slotId);
+        return;
+    }
+    simAccountManager_[slotId]->UpdateImsCapFromChip(slotId, imsCapFromChip);
+}
 } // namespace Telephony
 } // namespace OHOS
