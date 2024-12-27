@@ -63,7 +63,7 @@ private:
     VCardManager();
     void Decode(const std::string &path, int32_t &errorCode);
     void InsertContactDbAbility(int32_t accountId, int32_t &errorCode);
-    int32_t InsertRawContact(int32_t accountId);
+    int32_t InsertRawContact(int32_t accountId, std::shared_ptr<VCardContact> contact);
     bool IsAccountIdExit(int32_t accountId);
     int32_t InsertContactData(int32_t rawId, std::shared_ptr<VCardContact> contact);
     bool IsContactsIdExit(int32_t accountId);
@@ -72,7 +72,8 @@ private:
     std::vector<std::vector<std::shared_ptr<VCardContact>>> SplitContactsVector(
         std::vector<std::shared_ptr<VCardContact>> list, size_t step);
     void BatchInsertContactDbAbility(int32_t accountId, int32_t &errorCode);
-    void BatchInsertRawContact(int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode);
+    void BatchInsertRawContact(int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode,
+        const std::vector<std::shared_ptr<VCardContact>> &contactList);
     void BatchInsertContactData(std::vector<int32_t> &rawIds,
         const std::vector<std::shared_ptr<VCardContact>> &contactList, int32_t &errorCode);
 

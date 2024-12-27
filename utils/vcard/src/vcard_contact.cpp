@@ -113,6 +113,8 @@ void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::v
         AddIms(name, rawValue, propValue, values, parasMap);
     } else if (name == VCARD_TYPE_X_GROUP) {
         AddGroups(rawValue);
+    } else if (name == VCARD_PARAM_TYPE_UID) {
+        AddUID(rawValue);
     }
 }
 
@@ -1174,6 +1176,18 @@ void VCardContact::AddGroups(std::string rawValue)
     groups_.push_back(object);
 }
 
+void VCardContact::AddUID(std::string rawValue)
+{
+    std::shared_ptr<VCardUidData> object = std::make_shared<VCardUidData>();
+    object->SetUid(rawValue);
+    uid_ = object;
+}
+ 
+std::string VCardContact::GetUid()
+{
+    return (uid_ != nullptr) ? uid_->GetUid() : "";
+}
+ 
 std::vector<std::string> VCardContact::GetValueListFromParasMap(
     std::string rawValue, std::string propValue, std::map<std::string, std::vector<std::string>> parasMap)
 {

@@ -116,6 +116,8 @@ constexpr const char *VCARD_PARAM_TYPE_MSG = "MSG";
 constexpr const char *VCARD_PARAM_TYPE_BBS = "BBS";
 constexpr const char *VCARD_PARAM_TYPE_VIDEO = "VIDEO";
 
+constexpr const char *VCARD_PARAM_TYPE_UID = "UID";
+
 constexpr const char *VCARD_PARAM_ENCODING_7BIT = "7BIT";
 constexpr const char *VCARD_PARAM_ENCODING_8BIT = "8BIT";
 constexpr const char *VCARD_PARAM_ENCODING_QP = "QUOTED-PRINTABLE";
@@ -230,6 +232,7 @@ public:
     static constexpr const char *CONTACT_ID = "contact_id";
     static constexpr const char *IS_DELETED = "is_deleted";
     static constexpr const char *PRIMARY_CONTACT = "primary_contact";
+    static constexpr const char *UUID = "uuid";
 };
 
 // contact_data
