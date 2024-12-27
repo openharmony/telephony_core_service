@@ -440,8 +440,8 @@ void NetworkSearchState::NotifyStateChange()
         ns->ReadFromParcel(data);
         if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
             if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns)) {
-                networkState_->Marshalling(data);
-                networkStateOld_->ReadFromParcel(data);
+                networkStateOld_->Marshalling(data);
+                networkState_->ReadFromParcel(data);
                 processNetworkState_ = true;
                 return;
             }
