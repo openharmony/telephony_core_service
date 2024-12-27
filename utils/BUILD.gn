@@ -155,6 +155,7 @@ ohos_shared_library("libtel_vcard") {
     "vcard/src/contact_data/vcard_postal_data.cpp",
     "vcard/src/contact_data/vcard_relation_data.cpp",
     "vcard/src/contact_data/vcard_sip_data.cpp",
+    "vcard/src/contact_data/vcard_uid_data.cpp",
     "vcard/src/contact_data/vcard_website_data.cpp",
     "vcard/src/vcard_configuration.cpp",
     "vcard/src/vcard_constructor.cpp",
