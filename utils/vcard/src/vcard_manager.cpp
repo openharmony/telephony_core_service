@@ -125,7 +125,7 @@ void VCardManager::InsertContactDbAbility(int32_t accountId, int32_t &errorCode)
         return;
     }
     for (std::shared_ptr<VCardContact> contact : listener_->GetContacts()) {
-        auto rawId = InsertRawContact(accountId);
+        auto rawId = InsertRawContact(accountId, contact);
         if (rawId <= 0) {
             TELEPHONY_LOGE("Failed to insert raw contact");
             errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -160,7 +160,7 @@ void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &error
     for (std::vector<std::shared_ptr<VCardContact>> list : splitList) {
         TELEPHONY_LOGI("List size %{public}d", static_cast<int32_t>(list.size()));
         std::vector<int32_t> rawIds;
-        BatchInsertRawContact(accountId, list.size(), rawIds, errorCode);
+        BatchInsertRawContact(accountId, list.size(), rawIds, errorCode, list);
         if (errorCode == TELEPHONY_ERROR) {
             TELEPHONY_LOGE("Failed to batch insert raw contact");
             continue;
@@ -174,12 +174,18 @@ void VCardManager::BatchInsertContactDbAbility(int32_t accountId, int32_t &error
 }
 
 void VCardManager::BatchInsertRawContact(
-    int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode)
+    int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode,
+    const std::vector<std::shared_ptr<VCardContact>> &contactList)
 {
     int32_t rawContactMaxId = VCardRdbHelper::GetInstance().QueryRawContactMaxId(static_cast<int32_t>(size));
     std::vector<DataShare::DataShareValuesBucket> rawContactValues;
     for (uint32_t i = 0; i < size; i++) {
         OHOS::DataShare::DataShareValuesBucket valuesBucket;
+        auto contact = contactList[i];
+        std::string uid = contact->GetUid();
+        if (!uid.empty()) {
+            valuesBucket.Put(RawContact::UUID, uid);
+        }
         valuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
         if (IsContactsIdExit(accountId)) {
             valuesBucket.Put(RawContact::CONTACT_ID, accountId);
@@ -238,12 +244,16 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
     return result;
 }
 
-int32_t VCardManager::InsertRawContact(int32_t accountId)
+int32_t VCardManager::InsertRawContact(int32_t accountId, std::shared_ptr<VCardContact> contact)
 {
     OHOS::DataShare::DataShareValuesBucket ValuesBucket;
     ValuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
     if (IsContactsIdExit(accountId)) {
         ValuesBucket.Put(RawContact::CONTACT_ID, accountId);
+    }
+    std::string uid = contact->GetUid();
+    if (!uid.empty()) {
+        ValuesBucket.Put(RawContact::UUID, uid);
     }
     return VCardRdbHelper::GetInstance().InsertRawContact(ValuesBucket);
 }

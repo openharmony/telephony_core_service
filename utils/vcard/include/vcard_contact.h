@@ -40,6 +40,7 @@
 #include "vcard_sip_data.h"
 #include "vcard_website_data.h"
 #include "vcard_group_data.h"
+#include "vcard_uid_data.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,6 +74,7 @@ public:
     std::vector<std::shared_ptr<VCardNoteData>> GetNotes();
     std::shared_ptr<VCardBirthdayData> GetBirthdays();
     std::vector<std::shared_ptr<VCardGroupData>> GetGroups();
+    std::string GetUid();
 
 private:
     void BuildValuesBucket(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues,
@@ -144,6 +146,7 @@ private:
     void AddGroups(std::string rawValue);
     void AddRemainDatas(std::string name, std::string rawValue, std::vector<std::string> values,
         std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
+    void AddUID(std::string rawValue);
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;
@@ -175,6 +178,7 @@ private:
     std::vector<std::shared_ptr<VCardNoteData>> notes_;
     std::vector<std::shared_ptr<VCardEventData>> events_;
     std::vector<std::shared_ptr<VCardGroupData>> groups_;
+    std::shared_ptr<VCardUidData> uid_;
 };
 } // namespace Telephony
 } // namespace OHOS
