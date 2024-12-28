@@ -3279,6 +3279,43 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+bool CoreServiceProxy::WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData)
+{
+    if (!data.WriteBool(apduData.closeChannelFlag_)) {
+        TELEPHONY_LOGE("WriteBool closeChannelFlag is failed");
+        return false;
+    }
+    if (!data.WriteBool(apduData.unusedDefaultReqHeadFlag_)) {
+        TELEPHONY_LOGE("WriteBool unusedDefaultReqHeadFlag is failed");
+        return false;
+    }
+    if (!data.WriteString16(apduData.data_)) {
+        TELEPHONY_LOGE("WriteString16 data is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.instructionType_)) {
+        TELEPHONY_LOGE("WriteInt32 instructionType_ is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.instruction_)) {
+        TELEPHONY_LOGE("WriteInt32 instruction_ is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p1_)) {
+        TELEPHONY_LOGE("WriteInt32 p1 is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p2_)) {
+        TELEPHONY_LOGE("WriteInt32 p2 is failed");
+        return false;
+    }
+    if (!data.WriteInt32(apduData.p3_)) {
+        TELEPHONY_LOGE("WriteInt32 p3 is failed");
+        return false;
+    }
+    return true;
+}
+
 int32_t CoreServiceProxy::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {

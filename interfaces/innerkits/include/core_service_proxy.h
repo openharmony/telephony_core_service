@@ -169,11 +169,7 @@ private:
     void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    void ReadEuiccProfileFromReply(MessageParcel &reply, EuiccProfile &euiccProfile);
-    int32_t RealAuthenticateServer(
-        MessageParcel &data, MessageParcel &reply, MessageOption &option, ResponseEsimResult &responseResult);
     bool WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData);
-    void ReadEuiccInfo2FromReply(MessageParcel &reply, EuiccInfo2 &euiccInfo2);
 #endif
 
 private:

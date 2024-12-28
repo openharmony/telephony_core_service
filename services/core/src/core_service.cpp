@@ -1711,7 +1711,14 @@ int32_t CoreService::SendApduData(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SendApduData(slotId, aid, apduData, responseResult);
+    OHOS::Telephony::ResponseEsimInnerResult result;
+    int32_t res = simManager_->SendApduData(slotId, aid, apduData, result);
+    responseResult.resultCode_ = static_cast<ResultCode>(result.resultCode_);
+    responseResult.response_ = result.response_;
+    responseResult.sw1_ = result.sw1_;
+    responseResult.sw2_ = result.sw2_;
+
+    return res;
 }
 #endif
 } // namespace Telephony
