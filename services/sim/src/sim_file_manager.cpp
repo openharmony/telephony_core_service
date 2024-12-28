@@ -1028,7 +1028,7 @@ int32_t SimFileManager::DisableProfile(int32_t portIndex, const std::u16string &
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     int32_t enumResult = eSimFile_->DisableProfile(portIndex, iccId);
     return enumResult;
@@ -1187,7 +1187,7 @@ int32_t SimFileManager::RemoveNotificationFromList(int32_t portIndex, int32_t se
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("RemoveNotificationFromList eSimFile_ is nullptr");
-       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     return eSimFile_->RemoveNotificationFromList(portIndex, seqNumber);
 }
@@ -1196,7 +1196,7 @@ int32_t SimFileManager::DeleteProfile(const std::u16string &iccId)
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     int32_t result = eSimFile_->DeleteProfile(iccId);
     return result;
@@ -1206,7 +1206,7 @@ int32_t SimFileManager::SwitchToProfile(int32_t portIndex, const std::u16string 
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     int32_t result = eSimFile_->SwitchToProfile(portIndex, iccId, forceDisableProfile);
     return result;
@@ -1216,7 +1216,7 @@ int32_t SimFileManager::SetProfileNickname(const std::u16string &iccId, const st
 {
     if (eSimFile_ == nullptr) {
         TELEPHONY_LOGE("esimFile is nullptr");
-       return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
+        return static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     }
     int32_t result = eSimFile_->SetProfileNickname(iccId, nickname);
     return result;
