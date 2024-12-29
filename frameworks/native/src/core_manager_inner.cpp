@@ -2551,7 +2551,8 @@ int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
     return simManager_->GetEid(slotId, eId);
 }
 
-int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListInnerResult &euiccProfileInfoList)
+int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId,
+    GetEuiccProfileInfoListInnerResult &euiccProfileInfoList)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2615,8 +2616,8 @@ int32_t CoreManagerInner::GetDefaultSmdpAddress(int32_t slotId, std::u16string &
     return simManager_->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
 }
 
-int32_t CoreManagerInner::CancelSession(
-    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
+int32_t CoreManagerInner::CancelSession(int32_t slotId, const std::u16string &transactionId,
+    CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");

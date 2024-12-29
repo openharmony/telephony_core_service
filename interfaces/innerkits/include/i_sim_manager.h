@@ -159,7 +159,8 @@ public:
     virtual void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
-    virtual int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListInnerResult &euiccProfileInfoList) = 0;
+    virtual int32_t GetEuiccProfileInfoList(int32_t slotId,
+        GetEuiccProfileInfoListInnerResult &euiccProfileInfoList) = 0;
     virtual int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo) = 0;
     virtual int32_t DisableProfile(
         int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult) = 0;

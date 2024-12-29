@@ -477,7 +477,7 @@ void GetEidCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("GetEidCallback context is nullptr");
         return;
     }
-    if (!context->isCallbackEnd) {
+    if ((!context->isCallbackEnd) && (context->context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetEidCallback get result timeout.");
         context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -535,6 +535,8 @@ void NativeAddProfile(napi_env env, void *data)
     int32_t slotId = GetDefaultEsimSlotId<int32_t>();
     DownloadableProfile profile = GetProfileInfo(addProfileContext->profile);
     int32_t errcode = DelayedRefSingleton<EsimServiceClient>::GetInstance().AddProfile(slotId, profile);
+    TELEPHONY_LOGI("NAPI NativeAddProfile %{public}d", errcode);
+    addProfileContext->asyncContext.context.errorCode = errcode;
     if (errcode == ERROR_NONE) {
         addProfileContext->asyncContext.context.resolved = true;
         addProfileContext->asyncContext.callbackVal = true;
@@ -615,7 +617,7 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = EuiccInfoConversion(env, context->result);
     }
-    if (!asyncContext.isCallbackEnd) {
+    if ((!asyncContext.isCallbackEnd) && (asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetEuiccInfoCallback get result timeout.");
         asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -678,7 +680,7 @@ void GetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("GetDefaultSmdpAddressCallback context is nullptr");
         return;
     }
-    if (!context->isCallbackEnd) {
+    if ((!context->isCallbackEnd) && (context->context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetDefaultSmdpAddressCallback get result timeout.");
         context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -724,7 +726,7 @@ void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("SetDefaultSmdpAddressCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("SetDefaultSmdpAddressCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -790,7 +792,7 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("SwitchToProfileCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("SwitchToProfileCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -856,7 +858,7 @@ void DeleteProfileCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("DeleteProfileCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("DeleteProfileCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -923,7 +925,7 @@ void ResetMemoryCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("ResetMemoryCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("ResetMemoryCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1007,7 +1009,7 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal =  DownloadProfileResultConversion(env, context->result);
     }
-    if (!asyncContext.isCallbackEnd) {
+    if ((!asyncContext.isCallbackEnd) && (asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("DownloadProfileCallback get result timeout.");
         asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1080,7 +1082,7 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = ProfileResultListConversion(env, context->result);
     }
-    if (!asyncContext.isCallbackEnd) {
+    if ((!asyncContext.isCallbackEnd) && (asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetDownloadableProfilesCallback get result timeout.");
         asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1187,7 +1189,7 @@ void StartOsuCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("StartOsuCallback context is nullptr");
         return;
     }
-    if (!context->isCallbackEnd) {
+    if ((!context->isCallbackEnd) && (context->context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("StartOsuCallback get result timeout.");
         context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1234,7 +1236,7 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("SetProfileNicknameCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("SetProfileNicknameCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1302,7 +1304,7 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
         TELEPHONY_LOGE("CancelSessionCallback context is nullptr");
         return;
     }
-    if (!context->asyncContext.isCallbackEnd) {
+    if ((!context->asyncContext.isCallbackEnd) && (context->asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("CancelSessionCallback get result timeout.");
         context->asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1374,7 +1376,7 @@ void GetDownloadableProfileMetadataCallback(napi_env env, napi_status status, vo
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = MetadataResultConversion(env, context->result);
     }
-    if (!asyncContext.isCallbackEnd) {
+    if ((!asyncContext.isCallbackEnd) && (asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetDownloadableProfileMetadataCallback get result timeout.");
         asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
@@ -1444,7 +1446,7 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = EuiccProfileListConversion(env, context->result);
     }
-    if (!asyncContext.isCallbackEnd) {
+    if ((!asyncContext.isCallbackEnd) && (asyncContext.context.errorCode == TELEPHONY_SUCCESS)) {
         TELEPHONY_LOGE("GetEuiccProfileInfoListCallback get result timeout.");
         asyncContext.context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
     }
