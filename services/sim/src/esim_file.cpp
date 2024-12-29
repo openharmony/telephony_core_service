@@ -1515,7 +1515,8 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
             return ResponseEsimInnerResult();
         } else {
             TELEPHONY_LOGE("SendApduData Close Channel failed");
-            transApduDataResponse_.resultCode_ = static_cast<int32_t>(ResultCode::RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED);
+            transApduDataResponse_.resultCode_ =
+                static_cast<int32_t>(ResultCode::RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED);
             return transApduDataResponse_;
         }
     }

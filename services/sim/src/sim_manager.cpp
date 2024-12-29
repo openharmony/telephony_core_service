@@ -1388,8 +1388,8 @@ int32_t SimManager::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaul
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::CancelSession(
-    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
+int32_t SimManager::CancelSession(int32_t slotId, const std::u16string &transactionId,
+    CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
