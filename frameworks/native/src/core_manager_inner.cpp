@@ -2551,7 +2551,8 @@ int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
     return simManager_->GetEid(slotId, eId);
 }
 
-int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult &euiccProfileInfoList)
+int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId,
+    GetEuiccProfileInfoListInnerResult &euiccProfileInfoList)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2570,7 +2571,7 @@ int32_t CoreManagerInner::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 }
 
 int32_t CoreManagerInner::DisableProfile(
-    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, ResultCode &enumResult)
+    int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2597,7 +2598,7 @@ int32_t CoreManagerInner::GetRulesAuthTable(int32_t slotId, int32_t portIndex, E
     return simManager_->GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
 }
 
-int32_t CoreManagerInner::GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimResult &responseResult)
+int32_t CoreManagerInner::GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2615,8 +2616,8 @@ int32_t CoreManagerInner::GetDefaultSmdpAddress(int32_t slotId, std::u16string &
     return simManager_->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
 }
 
-int32_t CoreManagerInner::CancelSession(
-    int32_t slotId, const std::u16string &transactionId, CancelReason cancelReason, ResponseEsimResult &responseResult)
+int32_t CoreManagerInner::CancelSession(int32_t slotId, const std::u16string &transactionId,
+    CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2635,7 +2636,7 @@ int32_t CoreManagerInner::GetProfile(
     return simManager_->GetProfile(slotId, portIndex, iccId, eUiccProfile);
 }
 
-int32_t CoreManagerInner::ResetMemory(int32_t slotId, ResetOption resetOption, ResultCode &enumResult)
+int32_t CoreManagerInner::ResetMemory(int32_t slotId, ResetOption resetOption, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2645,7 +2646,7 @@ int32_t CoreManagerInner::ResetMemory(int32_t slotId, ResetOption resetOption, R
 }
 
 int32_t CoreManagerInner::SetDefaultSmdpAddress(
-    int32_t slotId, const std::u16string &defaultSmdpAddress, ResultCode &enumResult)
+    int32_t slotId, const std::u16string &defaultSmdpAddress, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2664,7 +2665,7 @@ bool CoreManagerInner::IsSupported(int32_t slotId)
 }
 
 int32_t CoreManagerInner::SendApduData(
-    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
+    int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2674,7 +2675,7 @@ int32_t CoreManagerInner::SendApduData(
 }
 
 int32_t CoreManagerInner::PrepareDownload(
-    int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo, ResponseEsimResult &responseResult)
+    int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2724,7 +2725,7 @@ int32_t CoreManagerInner::RetrieveNotification(
 }
 
 int32_t CoreManagerInner::RemoveNotificationFromList(
-    int32_t slotId, int32_t portIndex, int32_t seqNumber, ResultCode &enumResult)
+    int32_t slotId, int32_t portIndex, int32_t seqNumber, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2743,7 +2744,7 @@ int32_t CoreManagerInner::GetEuiccInfo2(int32_t slotId, int32_t portIndex, Euicc
 }
 
 int32_t CoreManagerInner::AuthenticateServer(
-    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimResult &responseResult)
+    int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimInnerResult &responseResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2752,7 +2753,7 @@ int32_t CoreManagerInner::AuthenticateServer(
     return simManager_->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
 }
 
-int32_t CoreManagerInner::DeleteProfile(int32_t slotId, const std::u16string &iccId, ResultCode &enumResult)
+int32_t CoreManagerInner::DeleteProfile(int32_t slotId, const std::u16string &iccId, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2762,7 +2763,7 @@ int32_t CoreManagerInner::DeleteProfile(int32_t slotId, const std::u16string &ic
 }
 
 int32_t CoreManagerInner::SwitchToProfile(int32_t slotId, int32_t portIndex, const std::u16string &iccId,
-    bool forceDisableProfile, ResultCode &enumResult)
+    bool forceDisableProfile, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
@@ -2772,7 +2773,7 @@ int32_t CoreManagerInner::SwitchToProfile(int32_t slotId, int32_t portIndex, con
 }
 
 int32_t CoreManagerInner::SetProfileNickname(
-    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, ResultCode &enumResult)
+    int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, int32_t &enumResult)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");

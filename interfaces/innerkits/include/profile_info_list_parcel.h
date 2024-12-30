@@ -37,6 +37,15 @@ struct GetEuiccProfileInfoListResult : public Parcelable {
     virtual bool Marshalling(Parcel &parcel) const override;
     static GetEuiccProfileInfoListResult *Unmarshalling(Parcel &parcel);
 };
+
+/**
+ * @brief Result of a operation.
+ */
+struct GetEuiccProfileInfoListInnerResult {
+    int32_t result_;
+    std::vector<EuiccProfile> profiles_{};
+    bool isRemovable_ = false;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_PROFILE_INFO_LIST_PARCEL_H
