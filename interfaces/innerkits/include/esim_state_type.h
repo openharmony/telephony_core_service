@@ -77,7 +77,7 @@ enum class ResultInnerCode {
     RESULT_EUICC_CARD_CHANNEL_OTHER_AID = 10003,
     RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED = 10004,
     RESULT_EUICC_CARD_CHANNEL_AID_EMPTY = 10005,
-}
+};
 
 /**
  * @brief Euicc OTA update status.
