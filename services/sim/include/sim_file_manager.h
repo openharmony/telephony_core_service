@@ -94,30 +94,30 @@ public:
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     std::shared_ptr<EsimFile> GetEsimfile();
     std::u16string GetEid();
-    GetEuiccProfileInfoListResult GetEuiccProfileInfoList();
+    GetEuiccProfileInfoListInnerResult GetEuiccProfileInfoList();
     EuiccInfo GetEuiccInfo();
-    ResultCode DisableProfile(int32_t portIndex, const std::u16string &iccId);
+    int32_t DisableProfile(int32_t portIndex, const std::u16string &iccId);
     std::u16string GetSmdsAddress(int32_t portIndex);
     EuiccRulesAuthTable GetRulesAuthTable(int32_t portIndex);
-    ResponseEsimResult GetEuiccChallenge(int32_t portIndex);
+    ResponseEsimInnerResult GetEuiccChallenge(int32_t portIndex);
     std::u16string GetDefaultSmdpAddress();
-    ResponseEsimResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
+    ResponseEsimInnerResult CancelSession(const std::u16string &transactionId, CancelReason cancelReason);
     EuiccProfile GetProfile(int32_t portIndex, const std::u16string &iccId);
-    ResultCode ResetMemory(ResetOption resetOption);
-    ResultCode SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
+    int32_t ResetMemory(ResetOption resetOption);
+    int32_t SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress);
     bool IsSupported();
-    ResponseEsimResult SendApduData(const std::u16string &aid, const EsimApduData &apduData);
-    ResponseEsimResult PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
+    ResponseEsimInnerResult SendApduData(const std::u16string &aid, const EsimApduData &apduData);
+    ResponseEsimInnerResult PrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
     ResponseEsimBppResult LoadBoundProfilePackage(int32_t portIndex, const std::u16string &boundProfilePackage);
     EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
     EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
     EuiccNotification RetrieveNotification(int32_t portIndex, int32_t seqNumber);
-    ResultCode RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
-    ResultCode DeleteProfile(const std::u16string &iccId);
-    ResultCode SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
-    ResultCode SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
+    int32_t RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
+    int32_t DeleteProfile(const std::u16string &iccId);
+    int32_t SwitchToProfile(int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile);
+    int32_t SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
     EuiccInfo2 GetEuiccInfo2(int32_t portIndex);
-    ResponseEsimResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
+    ResponseEsimInnerResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
 #endif
 
 protected:
