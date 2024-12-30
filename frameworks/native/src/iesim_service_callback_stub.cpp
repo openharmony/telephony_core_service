@@ -229,7 +229,7 @@ void IEsimServiceCallbackStub::OnDeleteProfile(MessageParcel &data)
 }
 void IEsimServiceCallbackStub::OnStartOsu(MessageParcel &data)
 {
-    int32_t errCode = data.ReadInt32();
+    ErrCode errCode = data.ReadInt32();
     if (FAILED(errCode)) {
         TELEPHONY_LOGE("Read Int32 failed!");
         return;

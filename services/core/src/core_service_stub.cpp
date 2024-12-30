@@ -41,7 +41,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    AddHandlerEsimEidToMap();
+    AddHandlerEsimToMap();
 #endif
 }
 
@@ -282,7 +282,7 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
 }
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-void CoreServiceStub::AddHandlerEsimEidToMap()
+void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };

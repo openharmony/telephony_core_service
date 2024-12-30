@@ -39,7 +39,7 @@ private:
     void AddHandlerPdpProfileToMap();
     void AddHandlerOpkeyVersionToMap();
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-    void AddHandlerEsimEidToMap();
+    void AddHandlerEsimToMap();
 #endif
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);

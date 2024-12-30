@@ -64,14 +64,20 @@ enum class ResultCode {
     RESULT_PROFILE_EID_INVALID = 284,
     RESULT_DOWNLOAD_TIMEOUT = 287,
     RESULT_SGP_22_OTHER = 400,
-    // card error for lpa
+};
+
+/**
+ * @brief Inner result code.
+ */
+enum class ResultInnerCode {
+	RESULT_EUICC_CARD_OK = 0,
     RESULT_EUICC_CARD_DEFALUT_ERROR = 10000,
     RESULT_EUICC_CARD_CHANNEL_IN_USE = 10001,
     RESULT_EUICC_CARD_CHANNEL_OPEN_FAILED = 10002,
     RESULT_EUICC_CARD_CHANNEL_OTHER_AID = 10003,
     RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED = 10004,
     RESULT_EUICC_CARD_CHANNEL_AID_EMPTY = 10005,
-};
+}
 
 /**
  * @brief Euicc OTA update status.
@@ -322,7 +328,7 @@ struct EuiccInfo2 {
     std::string ppVersion_ = "";
     std::string sasAccreditationNumber_ = "";
     std::string response_ = "";
-    ResultCode resultCode_;
+    int32_t resultCode_;
 };
 } // namespace Telephony
 } // namespace OHOS
