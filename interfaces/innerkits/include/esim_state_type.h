@@ -70,7 +70,7 @@ enum class ResultCode {
  * @brief Inner result code.
  */
 enum class ResultInnerCode {
-	RESULT_EUICC_CARD_OK = 0,
+    RESULT_EUICC_CARD_OK = 0,
     RESULT_EUICC_CARD_DEFALUT_ERROR = 10000,
     RESULT_EUICC_CARD_CHANNEL_IN_USE = 10001,
     RESULT_EUICC_CARD_CHANNEL_OPEN_FAILED = 10002,
