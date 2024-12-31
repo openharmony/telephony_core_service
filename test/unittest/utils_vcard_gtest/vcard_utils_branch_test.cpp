@@ -30,12 +30,12 @@ void UtilsVcardTest::TearDown() {}
 HWTEST_F(UtilsVcardTest, Telephony_VCard_EncodeBase64_001, Function | MediumTest | Level3)
 {
     std::string testStr = "testStr";
-    std::vector<unsigned char> copy1(testStr.begin(),testStr.end());
+    std::vector<unsigned char> copy1(testStr.begin(), testStr.end());
     std::shared_ptr<std::string> enCodeData_string = Base64::Encode(copy1);
     std::sting resultBase64(*enCodeData_string);
     EXPECT_EQ(resultBase64, "dGVzdFN0==");
-    std::string EncodeBase64Result = VcardUtils::EncodeBase64(testStr);
-    EXPECT_EQ(EncodeBase64Result, "dGVzdFN0==");
+    std::string encodeBase64Result = VcardUtils::EncodeBase64(testStr);
+    EXPECT_EQ(encodeBase64Result, "dGVzdFN0==");
 }
 
 HWTEST_F(UtilsVcardTest, Telephony_VCard_DecodeBase64_001, Function | MediumTest | Level3)
@@ -45,8 +45,8 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_DecodeBase64_001, Function | MediumTest
     const std::vector<unsigned char> &vectorRef = *deCodeData_string;
     resultBase64.assign(vectorRef.begin(), vectorRef.end());
     EXPECT_EQ(resultBase64, "testStr");
-    std::string DecodeBase64Result = VcardUtils::DecodeBase64(testStr);
-    EXPECT_EQ(DecodeBase64Result, "testStr==");
+    std::string decodeBase64Result = VcardUtils::DecodeBase64(testStr);
+    EXPECT_EQ(decodeBase64Result, "testStr==");
 }
 
 HWTEST_F(UtilsVcardTest, Telephony_VCard_ConverCharset_001, Function | MediumTest | Level3)

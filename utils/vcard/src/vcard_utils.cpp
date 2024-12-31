@@ -158,7 +158,6 @@ std::string VCardUtils::ConvertCharset(
     const char *charToCharSet = toCharset.c_str();
     const char *charFromCharset = fromCharset.c_str();
     iconv_t converter = iconv_open(charToCharSet, charFromCharset);
-
     if (converter == (iconv_t)(-1)) {
         TELEPHONY_LOGE("ConvertCharset_old open fail");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
@@ -170,7 +169,6 @@ std::string VCardUtils::ConvertCharset(
     char *inBuf = const_cast<char *>(input.c_str());
     char *outBuf = new char[outBytes];
     char *outBufPtr = outBuf;
-
     if (iconv(converter, &inBuf, &inBytes, &outBufPtr, &outBytes) == (size_t)(-1)) {
         TELEPHONY_LOGE("ConvertCharset open fail");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
