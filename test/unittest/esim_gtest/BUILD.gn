@@ -109,8 +109,8 @@ ohos_unittest("tel_esim_gtest") {
     "esim_core_service_test.cpp",
     "esim_file_manager_test.cpp",
     "esim_manager_test.cpp",
-    "esim_test.cpp",
     "esim_part_one_test.cpp",
+    "esim_test.cpp",
   ]
 
   include_dirs = [

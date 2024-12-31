@@ -191,34 +191,35 @@ HWTEST_F(EsimServiceClientBranchTest, ResetMemory_0001, Function | MediumTest | 
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-HWTEST_F(EsimServiceClientBranchTest, CancelSession_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimServiceClientBranchTest, ReserveProfilesForFactoryRestore_0001, Function | MediumTest | Level1)
 {
-    std::string transactionId = "A1B2C3";
-    const int32_t cancelReason = static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED);
+    int32_t reserveProfilesForFactoryRestoreResult;
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    int32_t result = EsimServiceClient::GetInstance().ReserveProfilesForFactoryRestore(
+        SLOT_ID, reserveProfilesForFactoryRestoreResult);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, SetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
+{
+    std::string defaultSmdpAddress = "smdp.gsma.com";
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     sptr<IEsimServiceCallback> callback = nullptr;
-    int32_t result = EsimServiceClient::GetInstance().CancelSession(
-        SLOT_ID, transactionId, cancelReason, callback);
+    int32_t result = EsimServiceClient::GetInstance().SetDefaultSmdpAddress(
+        SLOT_ID, defaultSmdpAddress, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-HWTEST_F(EsimServiceClientBranchTest, IsSupported_0001, Function | MediumTest | Level1)
+HWTEST_F(EsimServiceClientBranchTest, GetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
-    EXPECT_EQ(result, false);
-}
-
-HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | Level1)
-{
-    DownloadableProfile profile;
-    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
-        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID, profile);
-    EXPECT_EQ(result, false);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetDefaultSmdpAddress(SLOT_ID, callback);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, CancelSession_0001, Function | MediumTest | Level1)

@@ -63,6 +63,5 @@ HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
-}
 } // namespace Telephony
 } // namespace OHOS
