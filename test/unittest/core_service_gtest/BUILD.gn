@@ -13,6 +13,7 @@
 
 import("//build/test.gni")
 SOURCE_DIR = "../../../"
+import("$SOURCE_DIR/telephony_core_service.gni")
 
 ohos_unittest("tel_core_service_gtest") {
   install_enable = true
@@ -875,6 +876,8 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/utils/codec/include",
+    "$SOURCE_DIR/interfaces/innerkits/include",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
@@ -929,6 +932,7 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     ]
     defines += [ "ABILITY_LOCATION_SUPPORT" ]
   }
+  defines += telephony_extra_defines
 
   cflags = [
     "-flto",
