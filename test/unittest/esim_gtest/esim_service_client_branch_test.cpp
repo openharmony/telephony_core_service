@@ -59,10 +59,10 @@ void EsimServiceClientBranchTest::TearDown() {}
 
 HWTEST_F(EsimServiceClientBranchTest, GetEid_0001, Function | MediumTest | Level1)
 {
-    std::string eId;
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().GetEid(SLOT_ID, eId);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetEid(SLOT_ID, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -77,11 +77,10 @@ HWTEST_F(EsimServiceClientBranchTest, GetOsuStatus_0001, Function | MediumTest |
 
 HWTEST_F(EsimServiceClientBranchTest, StartOsu_0001, Function | MediumTest | Level1)
 {
-    int32_t startOsuResult;
-    
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().StartOsu(SLOT_ID, startOsuResult);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().StartOsu(SLOT_ID, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -89,13 +88,13 @@ HWTEST_F(EsimServiceClientBranchTest, GetDownloadableProfileMetadata_0001, Funct
 {
     int32_t portIndex = 0;
     DownloadableProfile profile;
-    bool forceDisableProfile = false;
-    GetDownloadableProfileMetadataResult profileMetadataResult;
-    
+    bool forceDisableProfile = true;
+
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().GetDownloadableProfileMetadata(
-        SLOT_ID, portIndex, profile, forceDisableProfile, profileMetadataResult);
+        SLOT_ID, portIndex, profile, forceDisableProfile, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -103,12 +102,12 @@ HWTEST_F(EsimServiceClientBranchTest, GetDownloadableProfiles_0001, Function | M
 {
     bool forceDisableProfile = false;
     int32_t portIndex = 0;
-    GetDownloadableProfilesResult profileListResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().GetDownloadableProfiles(
-        SLOT_ID, portIndex, forceDisableProfile, profileListResult);
+        SLOT_ID, portIndex, forceDisableProfile, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -116,43 +115,41 @@ HWTEST_F(EsimServiceClientBranchTest, DownloadProfile_0001, Function | MediumTes
 {
     DownloadProfileConfigInfo configInfo;
     DownloadableProfile profile;
-    DownloadProfileResult downloadProfileResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().DownloadProfile(
-        SLOT_ID, configInfo, profile, downloadProfileResult);
+        SLOT_ID, configInfo, profile, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, GetEuiccProfileInfoList_0001, Function | MediumTest | Level1)
 {
-    GetEuiccProfileInfoListResult euiccProfileInfoList;
-    
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().GetEuiccProfileInfoList(SLOT_ID, euiccProfileInfoList);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetEuiccProfileInfoList(SLOT_ID, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, GetEuiccInfo_0001, Function | MediumTest | Level1)
 {
-    EuiccInfo eUiccInfo;
-    
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().GetEuiccInfo(SLOT_ID, eUiccInfo);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetEuiccInfo(SLOT_ID, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, DeleteProfile_0001, Function | MediumTest | Level1)
 {
     std::string iccId = "98760000000000543210";
-    int32_t deleteProfileResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().DeleteProfile(SLOT_ID, iccId, deleteProfileResult);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().DeleteProfile(SLOT_ID, iccId, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -161,12 +158,12 @@ HWTEST_F(EsimServiceClientBranchTest, SwitchToProfile_0001, Function | MediumTes
     int32_t portIndex = 0;
     std::string iccId = "98760000000000543210";
     bool forceDisableProfile = true;
-    int32_t switchToProfileResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().SwitchToProfile(
-        SLOT_ID, portIndex, iccId, forceDisableProfile, switchToProfileResult);
+        SLOT_ID, portIndex, iccId, forceDisableProfile, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -174,56 +171,23 @@ HWTEST_F(EsimServiceClientBranchTest, SetProfileNickname_0001, Function | Medium
 {
     std::string iccId = "98760000000000543210";
     std::string nickname = "nick";
-    int32_t setProfileNicknameResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().SetProfileNickname(
-        SLOT_ID, iccId, nickname, setProfileNicknameResult);
+        SLOT_ID, iccId, nickname, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, ResetMemory_0001, Function | MediumTest | Level1)
 {
     int32_t resetOption = static_cast<int32_t>(ResetOption::DELETE_FIELD_LOADED_TEST_PROFILES);
-    int32_t resetMemoryResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().ResetMemory(SLOT_ID, resetOption, resetMemoryResult);
-    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-}
-
-HWTEST_F(EsimServiceClientBranchTest, ReserveProfilesForFactoryRestore_0001, Function | MediumTest | Level1)
-{
-    int32_t reserveProfilesForFactoryRestoreResult;
-    
-    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
-        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().ReserveProfilesForFactoryRestore(
-        SLOT_ID, reserveProfilesForFactoryRestoreResult);
-    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-}
-
-HWTEST_F(EsimServiceClientBranchTest, SetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
-{
-    std::string defaultSmdpAddress = "smdp.gsma.com";
-    int32_t setAddressResult;
-    
-    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
-        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().SetDefaultSmdpAddress(
-        SLOT_ID, defaultSmdpAddress, setAddressResult);
-    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-}
-
-HWTEST_F(EsimServiceClientBranchTest, GetDefaultSmdpAddress_0001, Function | MediumTest | Level1)
-{
-    std::string defaultSmdpAddress;
-    
-    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
-        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    int32_t result = EsimServiceClient::GetInstance().GetDefaultSmdpAddress(SLOT_ID, defaultSmdpAddress);
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().ResetMemory(SLOT_ID, resetOption, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -231,12 +195,12 @@ HWTEST_F(EsimServiceClientBranchTest, CancelSession_0001, Function | MediumTest 
 {
     std::string transactionId = "A1B2C3";
     const int32_t cancelReason = static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED);
-    ResponseEsimResult responseResult;
     
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
     int32_t result = EsimServiceClient::GetInstance().CancelSession(
-        SLOT_ID, transactionId, cancelReason, responseResult);
+        SLOT_ID, transactionId, cancelReason, callback);
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
@@ -245,6 +209,45 @@ HWTEST_F(EsimServiceClientBranchTest, IsSupported_0001, Function | MediumTest | 
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | Level1)
+{
+    DownloadableProfile profile;
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID , profile);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, CancelSession_0001, Function | MediumTest | Level1)
+{
+    std::string transactionId = "A1B2C3";
+    const int32_t cancelReason = static_cast<int32_t>(CancelReason::CANCEL_REASON_POSTPONED);
+    
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().CancelSession(
+        SLOT_ID, transactionId, cancelReason, callback);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, IsSupported_0001, Function | MediumTest | Level1)
+{
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | Level1)
+{
+    DownloadableProfile profile;
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID , profile);
     EXPECT_EQ(result, false);
 }
 
@@ -311,5 +314,6 @@ HWTEST_F(EsimServiceClientBranchTest, OnRemoteDied_0001, Function | MediumTest |
     EsimServiceClient::GetInstance().OnRemoteDied(remote);
     EXPECT_EQ(EsimServiceClient::GetInstance().proxy_, nullptr);
 }
+
 } // namespace Telephony
 } // namespace OHOS
