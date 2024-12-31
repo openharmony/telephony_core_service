@@ -863,7 +863,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0019, Function 
     EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);  
+    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccInfo(slotId, eUiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccChallenge(slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
