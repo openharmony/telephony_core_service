@@ -75,6 +75,7 @@
                 "libpng",
                 "libxml2",
                 "node",
+                "openssl",
             ]
         },
         "build": {
