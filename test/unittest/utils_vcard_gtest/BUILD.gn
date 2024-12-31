@@ -21,16 +21,21 @@ ohos_unittest("utils_vcard_gtest") {
   test_module = "utils_vcard_gtest"
   module_out_path = part_name + "/" + test_module
 
-  sources = [ "contact_data_test.cpp" ]
+  sources = [
+    "contact_data_test.cpp",
+    "vcard_utils_branch_test.cpp"
+  ]
 
   include_dirs = [
     "$SOURCE_DIR/interfaces/innerkits/include",
+    "$SOURCE_DIR/utils/common/include",
     "$SOURCE_DIR/utils/vcard/include",
     "$SOURCE_DIR/utils/vcard/include/contact_data",
   ]
 
   deps = [
     "$SOURCE_DIR/utils:libtel_vcard",
+    "$SOURCE_DIR/utils:libtel_common",
     "//third_party/googletest:gtest_main",
   ]
 
