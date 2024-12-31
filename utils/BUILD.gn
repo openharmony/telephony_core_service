@@ -197,13 +197,10 @@ ohos_shared_library("libtel_vcard") {
   include_dirs = [
     ":tel_contact_config",
     "../interfaces/innerkits/include/",
-    "//third_party/glib/glib",
-    "//third_party/glib",
   ]
 
   deps = [
     ":libtel_common",
-    "//third_party/glib:glib_packages",
   ]
 
   external_deps = [
