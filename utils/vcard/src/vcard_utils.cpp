@@ -63,18 +63,20 @@ std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR
 
 std::string VCardUtils::EncodeBase64(const std::string &input)
 {
-    gchar *encodedData = g_base64_encode(reinterpret_cast<const guchar *>(input.c_str()), input.length());
-    std::string result(encodedData);
-    g_free(encodedData);
+    std::vector<unsigned char> copy1(input.begin(), input.end());
+    std::shared_ptr<std::string> encodedData_string = OHOS::Telephony::Base64::Encode(copy1);
+    std::string result(*encodedData_string);
+    TELEPHONY_LOGE("VCardUtils::EncodeBase64 result  %{public}s", result.c_str());
     return result;
 }
 
 std::string VCardUtils::DecodeBase64(const std::string &input)
 {
-    gsize outputLength;
-    guchar *decodedData = g_base64_decode(input.c_str(), &outputLength);
-    std::string result(reinterpret_cast<char *>(decodedData), outputLength);
-    g_free(decodedData);
+    std::string result;
+    auto decodedData_string = OHOS::Telephony::Base64::Decode(input);
+    const std::vector <unsigned char> &vectorRef = *decodedData_string;
+    result.assign(vectorRef.begin(), vectorRef.end());
+    TELEPHONY_LOGE("VCardUtils::DecodeBase64 result  %{public}s", result.c_str());
     return result;
 }
 
@@ -153,30 +155,33 @@ bool VCardUtils::EndWith(const std::string &fullString, const std::string &endin
 std::string VCardUtils::ConvertCharset(
     const std::string &input, const std::string &fromCharset, const std::string &toCharset, int32_t &errorCode)
 {
-    GIConv converter = g_iconv_open(toCharset.c_str(), fromCharset.c_str());
-    if (converter == nullptr) {
-        TELEPHONY_LOGE("ConvertCharset open fail");
+    const char *charToCharSet = toCharset.c_str();
+    const char *charFromCharset = fromCharset.c_str();
+    iconv_t converter = iconv_open(charToCharSet, charFromCharset);
+
+    if (converter == (iconv_t)(-1)) {
+        TELEPHONY_LOGE("ConvertCharset_old open fail");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return "";
     }
-
+ 
     size_t inBytes = input.size();
     size_t outBytes = inBytes * 4; // Allocate enough space for the worst-case scenario
     char *inBuf = const_cast<char *>(input.c_str());
     char *outBuf = new char[outBytes];
     char *outBufPtr = outBuf;
 
-    if (g_iconv(converter, &inBuf, &inBytes, &outBufPtr, &outBytes) == (size_t)(-1)) {
+    if (iconv(converter, &inBuf, &inBytes, &outBufPtr, &outBytes) == (size_t)(-1)) {
         TELEPHONY_LOGE("ConvertCharset open fail");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         delete[] outBuf;
-        g_iconv_close(converter);
+        iconv_close(converter);
         return "";
     }
-
     std::string output(outBuf, outBufPtr - outBuf);
     delete[] outBuf;
-    g_iconv_close(converter);
+    iconv_close(converter);
+    TELEPHONY_LOGE("VCardUtils::ConvertCharset output  %{public}s", output.c_str());
     return output;
 }
 
