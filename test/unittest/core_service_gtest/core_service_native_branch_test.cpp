@@ -797,7 +797,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0017, Function 
     mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
     EXPECT_EQ(mInner.simManager_, nullptr);
 }
-
+#ifdef CORE_SERVICE_SUPPORT_ESIM
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
@@ -976,7 +976,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-
+#endif
 
 } // namespace Telephony
 } // namespace OHOS
