@@ -75,7 +75,6 @@
                 "libpng",
                 "libxml2",
                 "node",
-                "glib"
             ]
         },
         "build": {
