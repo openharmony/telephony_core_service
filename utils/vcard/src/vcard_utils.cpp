@@ -20,11 +20,12 @@
 #include <cctype>
 #include <ctime>
 #include <fstream>
+#include <iconv.h>
 #include <iomanip>
 #include <numeric>
 #include <sstream>
 
-#include "glib.h"
+#include "base64.h"
 #include "map"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
