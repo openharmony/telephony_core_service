@@ -247,7 +247,7 @@ HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | L
     DownloadableProfile profile;
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID , profile);
+    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID, profile);
     EXPECT_EQ(result, false);
 }
 
