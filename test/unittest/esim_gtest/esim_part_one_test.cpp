@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #define private public
-#define protected public
 
 #include <string>
 #include <unistd.h>
@@ -118,7 +117,6 @@ HWTEST_F(EsimPartOneTest, ProcessRetrieveNotificationDone_001, Function | Medium
     rcvMsg = nullptr;
     event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
     EXPECT_FALSE(esimFile->ProcessRetrieveNotificationDone(event));
-
 }
 
 HWTEST_F(EsimPartOneTest, RealProcessLoadBoundProfilePackageDone_003, Function | MediumTest | Level2)

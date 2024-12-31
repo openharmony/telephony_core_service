@@ -860,12 +860,10 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0019, Function 
     const std::u16string nickname = u"test profile";
     EuiccProfile eUiccProfile;
     std::u16string transactionId = u"12232312";
-
     EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    
+    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);  
     EXPECT_EQ(mInner.GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccInfo(slotId, eUiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccChallenge(slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -889,7 +887,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     auto simManager = std::make_shared<SimManager>(telRilManager);
     std::u16string resultstr;
     AuthenticateConfigInfo authenticateConfigInfo;
-   
     EuiccInfo eUiccInfo;
     ResponseEsimResult responseResult;
     ResponseEsimBppResult responseBppResult;
@@ -910,14 +907,11 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EuiccRulesAuthTable eUiccRulesAuthTable;
     bool forceDisableProfile = true;
-
     EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.SetDefaultSmdpAddress(
-        slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.PrepareDownload(
-        slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.LoadBoundProfilePackage(slotId,  portIndex,
         boundProfilePackage, responseBppResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.ListNotifications(
@@ -930,10 +924,8 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     EXPECT_EQ(mInner.DeleteProfile(slotId, iccId, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.SwitchToProfile(slotId, portIndex, iccId,
         forceDisableProfile, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.AuthenticateServer(
-        slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.AuthenticateServer(
-        slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -944,7 +936,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     auto simManager = std::make_shared<SimManager>(telRilManager);
     std::u16string resultstr;
     AuthenticateConfigInfo authenticateConfigInfo;
-   
     EuiccInfo eUiccInfo;
     ResponseEsimResult responseResult;
     ResponseEsimBppResult responseBppResult;
@@ -965,18 +956,14 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EuiccRulesAuthTable eUiccRulesAuthTable;
     bool forceDisableProfile = true;
-
     EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.SetDefaultSmdpAddress(
-        slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.PrepareDownload(
-        slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.LoadBoundProfilePackage(slotId,  portIndex,
         boundProfilePackage, responseBppResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.ListNotifications(
-        slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ListNotifications(slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RetrieveNotificationList(
         slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RemoveNotificationFromList(
@@ -985,10 +972,8 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     EXPECT_EQ(mInner.DeleteProfile(slotId, iccId, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.SwitchToProfile(slotId, portIndex, iccId,
         forceDisableProfile, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.AuthenticateServer(
-        slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.AuthenticateServer(
-        slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
