@@ -550,7 +550,15 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     } else {
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, error = %{public}d", slotId, error);
-        return;
+        // 双猫设备场景下，可能由于SCICHG等卡槽切换命令导致卡槽不处于任何modem上，导致卡状态获取错误
+        // 因此获取卡状态错误需要视为卡不在位，否则会因为卡槽不处于任何modem导致卡状态不会正常更新
+        if (VSIM_MODEM_COUNT == DUAL_SLOT_COUNT) {
+            iccState.simType_ = oldSimType_;
+            iccState.simStatus_ = ICC_CARD_ABSENT;
+            iccState.iccid_ = iccid_;
+        } else {
+            return;
+        }
     }
     ProcessIccCardState(iccState, slotId);
 }
