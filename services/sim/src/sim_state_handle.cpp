@@ -550,8 +550,13 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     } else {
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, error = %{public}d", slotId, error);
-        // 双猫设备场景下，天际通使能时，可能由于SCICHG等卡槽切换命令导致卡槽不处于任何modem上，导致卡状态获取错误
-        // 因此获取卡状态错误需要视为卡不在位，否则会因为卡槽不处于任何modem导致卡状态不会正常更新
+        
+        /* In the dual-modem scenario, when SkyTone is enabled,
+         * the card slot may not be on any modem due to the card slot switchover command such as SCICHG.
+         * As a result, the card status is incorrectly obtained.
+         * Therefore, if the card status is incorrectly obtained, the card cannot be detected.
+         * Otherwise, the card status cannot be updated because the card slot is not in any modem.
+         */
         if (VSIM_MODEM_COUNT != DUAL_SLOT_COUNT) {
             return;
         }
