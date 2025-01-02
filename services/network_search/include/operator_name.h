@@ -97,6 +97,7 @@ private:
     int32_t displayConditionCust_ = SPN_INVALID;
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnCust_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplCust_;
+    std::string longName_ = "";
 };
 } // namespace Telephony
 } // namespace OHOS
