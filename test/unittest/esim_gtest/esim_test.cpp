@@ -593,7 +593,7 @@ HWTEST_F(EsimTest, ObtainEuiccChallenge_001, Function | MediumTest | Level2)
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(static_cast<int32_t>(responseChallengeResult.resultCode_), 
+    EXPECT_EQ(static_cast<int32_t>(responseChallengeResult.resultCode_),
         (esimFile->ObtainEuiccChallenge(portIndex)).resultCode_);
 }
 
