@@ -23,7 +23,7 @@ ohos_unittest("utils_vcard_gtest") {
 
   sources = [
     "contact_data_test.cpp",
-    "vcard_utils_branch_test.cpp"
+    "vcard_utils_branch_test.cpp",
   ]
 
   include_dirs = [
@@ -34,8 +34,8 @@ ohos_unittest("utils_vcard_gtest") {
   ]
 
   deps = [
-    "$SOURCE_DIR/utils:libtel_vcard",
     "$SOURCE_DIR/utils:libtel_common",
+    "$SOURCE_DIR/utils:libtel_vcard",
     "//third_party/googletest:gtest_main",
   ]
 
