@@ -566,6 +566,8 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
             iccState.simType_ = oldSimType_;
             iccState.simStatus_ = ICC_CARD_ABSENT;
             iccState.iccid_ = iccid_;
+        } else {
+            return;
         }
     }
     ProcessIccCardState(iccState, slotId);
