@@ -550,7 +550,25 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     } else {
         error = static_cast<int32_t>(response->error);
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, error = %{public}d", slotId, error);
-        return;
+        
+        /* In the dual-modem scenario, when SkyTone is enabled,
+         * the card slot may not be on any modem due to the card slot switchover command such as SCICHG.
+         * As a result, the card status is incorrectly obtained.
+         * Therefore, if the card status is incorrectly obtained, the card cannot be detected.
+         * Otherwise, the card status cannot be updated because the card slot is not in any modem.
+         */
+        if (VSIM_MODEM_COUNT != DUAL_SLOT_COUNT) {
+            return;
+        }
+        if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ &&
+            TELEPHONY_EXT_WRAPPER.isVSimEnabled_() &&
+            slotId != static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
+            iccState.simType_ = oldSimType_;
+            iccState.simStatus_ = ICC_CARD_ABSENT;
+            iccState.iccid_ = iccid_;
+        } else {
+            return;
+        }
     }
     ProcessIccCardState(iccState, slotId);
 }
