@@ -608,6 +608,10 @@ int32_t CoreService::GetSimGid1(int32_t slotId, std::u16string &gid1)
 
 std::u16string CoreService::GetSimGid2(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return std::u16string();
+    }
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("CoreService::GetSimGid2, Permission denied!");
         return std::u16string();
@@ -623,6 +627,10 @@ std::u16string CoreService::GetSimGid2(int32_t slotId)
 std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     TELEPHONY_LOGD("CoreService::GetSimEons(), slotId = %{public}d", slotId);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return std::u16string();
+    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("CoreService::GetSimEons, Permission denied!");
         return std::u16string();
@@ -988,6 +996,10 @@ int32_t CoreService::GetLockState(int32_t slotId, LockType lockType, LockState &
 int32_t CoreService::RefreshSimState(int32_t slotId)
 {
     TELEPHONY_LOGD("CoreService::RefreshSimState(), slotId = %{public}d", slotId);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERROR;
