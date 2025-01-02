@@ -24,6 +24,17 @@
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
 
+#include "download_profile_config_info_parcel.h"
+#include "download_profile_result_parcel.h"
+#include "downloadable_profile_parcel.h"
+#include "esim_state_type.h"
+#include "euicc_info_parcel.h"
+#include "get_downloadable_profiles_result_parcel.h"
+#include "profile_info_list_parcel.h"
+#include "profile_metadata_result_parcel.h"
+#include "response_esim_result.h"
+#include "tel_ril_sim_parcel.h"
+
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
@@ -786,5 +797,186 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0017, Function 
     mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
     EXPECT_EQ(mInner.simManager_, nullptr);
 }
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::u16string resultstr;
+    GetEuiccProfileInfoListInnerResult euiccProfileInfoList;
+    EuiccInfo eUiccInfo;
+    ResponseEsimInnerResult responseResult;
+    CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTION;
+    int32_t enumResult;
+    int32_t portIndex = 0;
+    int32_t slotId = -1;
+    mInner.simManager_ = nullptr;
+    const std::u16string iccId = u"122323123123122312";
+    EsimApduData apduData {};
+    const std::u16string aid = u"12232312";
+    const std::u16string nickname = u"test profile";
+    EuiccProfile eUiccProfile;
+    std::u16string transactionId = u"12232312";
+    
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    
+    EXPECT_EQ(mInner.GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccInfo(slotId, eUiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccChallenge(slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.CancelSession(
+        slotId, transactionId, cancelReason, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.DisableProfile(
+        slotId, portIndex, iccId, true, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SendApduData(
+        slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_FALSE(mInner.IsSupported(slotId));
+    EXPECT_EQ(mInner.SetProfileNickname(
+        slotId, iccId, nickname, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetProfile(
+        slotId,  portIndex, iccId, eUiccProfile), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0019, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::u16string resultstr;
+    GetEuiccProfileInfoListInnerResult euiccProfileInfoList;
+    EuiccInfo eUiccInfo;
+    ResponseEsimInnerResult responseResult;
+    CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTION;
+    int32_t enumResult;
+    int32_t portIndex = 0;
+    int32_t slotId = -1;
+    mInner.simManager_ = nullptr;
+    const std::u16string iccId = u"122323123123122312";
+    EsimApduData apduData {};
+    const std::u16string aid = u"12232312";
+    const std::u16string nickname = u"test profile";
+    EuiccProfile eUiccProfile;
+    std::u16string transactionId = u"12232312";
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccInfo(slotId, eUiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccChallenge(slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.CancelSession(
+        slotId, transactionId, cancelReason, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.DisableProfile(
+        slotId, portIndex, iccId, true, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SendApduData(
+        slotId, aid, apduData, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_FALSE(mInner.IsSupported(slotId));
+    EXPECT_EQ(mInner.SetProfileNickname(
+        slotId, iccId, nickname, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetProfile(
+        slotId,  portIndex, iccId, eUiccProfile), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::u16string resultstr;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    EuiccInfo eUiccInfo;
+    ResponseEsimInnerResult responseResult;
+    ResponseEsimBppResult responseBppResult;
+    int32_t enumResult;
+    int32_t portIndex = 0;
+    int32_t slotId = -1;
+    mInner.simManager_ = nullptr;
+    Event events = Event::EVENT_ALL;
+    EuiccNotification notification;
+    EuiccNotificationList notificationList;
+    const std::u16string iccId = u"122323123123122312";
+    const std::u16string nickname = u"test profile";
+    DownLoadConfigInfo downLoadConfigInfo;
+    const std::u16string defaultSmdpAddress = u"xxx.xxx.xxx";
+    const std::u16string boundProfilePackage = u"12232312";
+    int32_t seqNumber = 122356;
+    EuiccInfo2 euiccInfo2;
+    ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    bool forceDisableProfile = true;
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.LoadBoundProfilePackage(slotId,  portIndex,
+        boundProfilePackage, responseBppResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ListNotifications(
+        slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RetrieveNotificationList(
+        slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RemoveNotificationFromList(
+        slotId, portIndex, seqNumber, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccInfo2(slotId, portIndex, euiccInfo2), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.DeleteProfile(slotId, iccId, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SwitchToProfile(slotId, portIndex, iccId,
+        forceDisableProfile, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::u16string resultstr;
+    AuthenticateConfigInfo authenticateConfigInfo;
+    EuiccInfo eUiccInfo;
+    ResponseEsimInnerResult responseResult;
+    ResponseEsimBppResult responseBppResult;
+    int32_t enumResult;
+    int32_t portIndex = 0;
+    int32_t slotId = -1;
+    mInner.simManager_ = simManager;
+    Event events = Event::EVENT_ALL;
+    EuiccNotification notification;
+    EuiccNotificationList notificationList;
+    const std::u16string iccId = u"122323123123122312";
+    const std::u16string nickname = u"test profile";
+    DownLoadConfigInfo downLoadConfigInfo;
+    const std::u16string defaultSmdpAddress = u"xxx.xxx.xxx";
+    const std::u16string boundProfilePackage = u"12232312";
+    int32_t seqNumber = 122356;
+    EuiccInfo2 euiccInfo2;
+    ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
+    EuiccRulesAuthTable eUiccRulesAuthTable;
+    bool forceDisableProfile = true;
+    EXPECT_EQ(mInner.simManager_, nullptr);
+    EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.PrepareDownload(slotId, downLoadConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.LoadBoundProfilePackage(slotId,  portIndex,
+        boundProfilePackage, responseBppResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.ListNotifications(slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RetrieveNotificationList(
+        slotId, portIndex, events, notificationList), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RemoveNotificationFromList(
+        slotId, portIndex, seqNumber, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.GetEuiccInfo2(slotId, portIndex, euiccInfo2), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.DeleteProfile(slotId, iccId, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.SwitchToProfile(slotId, portIndex, iccId,
+        forceDisableProfile, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+#endif
+
 } // namespace Telephony
 } // namespace OHOS
