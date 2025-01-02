@@ -162,7 +162,6 @@ ohos_shared_library("tel_core_service") {
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
     "//third_party/libxml2:libxml2",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   if (core_service_support_esim) {
