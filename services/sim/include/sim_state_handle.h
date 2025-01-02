@@ -146,6 +146,8 @@ public:
 
 public:
     bool modemInitDone_ = false;
+    int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
+    int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
 
 private:
     void ObtainIccStatus(int32_t slotId);
@@ -174,8 +176,6 @@ private:
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
-    int32_t oldSimType_ = ICC_UNKNOWN_TYPE;
-    int32_t oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     int32_t slotId_ = DEFAULT_SIM_SLOT_ID;
     UnlockData unlockRespon_ = { UNLOCK_FAIL, TELEPHONY_ERROR, static_cast<int32_t>(LockState::LOCK_ERROR) };
     SimAuthenticationResponse simAuthRespon_ = { 0 };
