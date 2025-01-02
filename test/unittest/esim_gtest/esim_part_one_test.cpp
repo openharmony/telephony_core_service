@@ -126,7 +126,7 @@ HWTEST_F(EsimPartOneTest, RealProcessLoadBoundProfilePackageDone_003, Function |
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::string combineHexStr = "1222333";
-    ResponseEsimResult dst;
+    ResponseEsimInnerResult dst;
     AuthServerResponse src;
     esimFile->CovertAuthToApiStruct(dst, src);
     

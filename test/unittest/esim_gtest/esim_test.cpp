@@ -218,13 +218,13 @@ HWTEST_F(EsimTest, GetEuiccProfileInfoList_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     esimFile->currentChannelId_ = 0;
     GetEuiccProfileInfoListResult euiccProfileInfoList_;
-    EXPECT_EQ(euiccProfileInfoList_.result_, esimFile->GetEuiccProfileInfoList().result_);
+    EXPECT_EQ(static_cast<int32_t>(euiccProfileInfoList_.result_), esimFile->GetEuiccProfileInfoList().result_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(euiccProfileInfoList_.result_, esimFile->GetEuiccProfileInfoList().result_);
+    EXPECT_EQ(static_cast<int32_t>(euiccProfileInfoList_.result_), esimFile->GetEuiccProfileInfoList().result_);
 }
 
 HWTEST_F(EsimTest, ProcessRequestAllProfiles_001, Function | MediumTest | Level2)
@@ -492,7 +492,7 @@ HWTEST_F(EsimTest, DisableProfile_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     std::u16string iccId = Str8ToStr16("5A0A89670000000000452301");
-    ResultCode disableProfileResult = ResultCode::RESULT_SGP_22_OTHER;
+    int32_t disableProfileResult = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(disableProfileResult, esimFile->DisableProfile(portIndex, iccId));
     int32_t slotId = 0;
@@ -586,13 +586,15 @@ HWTEST_F(EsimTest, ObtainEuiccChallenge_001, Function | MediumTest | Level2)
     int32_t portIndex = 0;
     ResponseEsimResult responseChallengeResult;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(responseChallengeResult.resultCode_, (esimFile->ObtainEuiccChallenge(portIndex)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(responseChallengeResult.resultCode_), 
+        (esimFile->ObtainEuiccChallenge(portIndex)).resultCode_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(responseChallengeResult.resultCode_, (esimFile->ObtainEuiccChallenge(portIndex)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(responseChallengeResult.resultCode_), 
+        (esimFile->ObtainEuiccChallenge(portIndex)).resultCode_);
 }
 
 HWTEST_F(EsimTest, RequestRulesAuthTableParseTagCtxComp0_001, Function | MediumTest | Level2)
@@ -768,13 +770,15 @@ HWTEST_F(EsimTest, CancelSession_001, Function | MediumTest | Level2)
     const CancelReason cancelReason = CancelReason::CANCEL_REASON_POSTPONED;
     ResponseEsimResult responseResult;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(responseResult.resultCode_, (esimFile->CancelSession(transactionId, cancelReason)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(responseResult.resultCode_),
+        (esimFile->CancelSession(transactionId, cancelReason)).resultCode_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(responseResult.resultCode_, (esimFile->CancelSession(transactionId, cancelReason)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(responseResult.resultCode_),
+        (esimFile->CancelSession(transactionId, cancelReason)).resultCode_);
 }
 
 HWTEST_F(EsimTest, ObtainProfile_001, Function | MediumTest | Level2)
@@ -912,15 +916,15 @@ HWTEST_F(EsimTest, ResetMemory_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     ResetOption resetOption = ResetOption::DELETE_FIELD_LOADED_TEST_PROFILES;
-    ResultCode resetResult_ = ResultCode::RESULT_SGP_22_OTHER;
+    int32_t resetResult = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
-    EXPECT_NE(resetResult_, esimFile->ResetMemory(resetOption));
+    EXPECT_NE(resetResult, esimFile->ResetMemory(resetOption));
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_NE(resetResult_, esimFile->ResetMemory(resetOption));
+    EXPECT_NE(resetResult, esimFile->ResetMemory(resetOption));
 }
 
 HWTEST_F(EsimTest, ProcessResetMemory_001, Function | MediumTest | Level2)
@@ -999,13 +1003,15 @@ HWTEST_F(EsimTest, ObtainPrepareDownload_001, Function | MediumTest | Level2)
     DownLoadConfigInfo downLoadConfigInfo;
     ResponseEsimResult preDownloadResult;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(preDownloadResult.resultCode_, (esimFile->ObtainPrepareDownload(downLoadConfigInfo)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(preDownloadResult.resultCode_),
+        (esimFile->ObtainPrepareDownload(downLoadConfigInfo)).resultCode_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(preDownloadResult.resultCode_, (esimFile->ObtainPrepareDownload(downLoadConfigInfo)).resultCode_);
+    EXPECT_EQ(static_cast<int32_t>(preDownloadResult.resultCode_),
+        (esimFile->ObtainPrepareDownload(downLoadConfigInfo)).resultCode_);
 }
 
 HWTEST_F(EsimTest, ObtainLoadBoundProfilePackage_001, Function | MediumTest | Level2)
@@ -1017,14 +1023,14 @@ HWTEST_F(EsimTest, ObtainLoadBoundProfilePackage_001, Function | MediumTest | Le
     std::u16string boundProfilePackageStr;
     ResponseEsimBppResult loadBPPResult;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(loadBPPResult.resultCode_, (esimFile->ObtainLoadBoundProfilePackage(
+    EXPECT_EQ(static_cast<int32_t>(loadBPPResult.resultCode_), (esimFile->ObtainLoadBoundProfilePackage(
         portIndex, boundProfilePackageStr)).resultCode_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(loadBPPResult.resultCode_, (esimFile->ObtainLoadBoundProfilePackage(
+    EXPECT_EQ(static_cast<int32_t>(loadBPPResult.resultCode_), (esimFile->ObtainLoadBoundProfilePackage(
         portIndex, boundProfilePackageStr)).resultCode_);
 }
 
@@ -1350,7 +1356,7 @@ HWTEST_F(EsimTest, RemoveNotificationFromList_001, Function | MediumTest | Level
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     int32_t seqNumber = 5;
-    ResultCode removeNotifResult = ResultCode::RESULT_OK;
+    int32_t removeNotifResult = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
     EXPECT_EQ(removeNotifResult, esimFile->RemoveNotificationFromList(portIndex, seqNumber));
     int32_t slotId = 0;
@@ -1475,7 +1481,7 @@ HWTEST_F(EsimTest, DeleteProfile_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
 
     std::u16string iccId;
-    ResultCode disableProfileResult_ = ResultCode::RESULT_SGP_22_OTHER;
+    int32_t disableProfileResult_ = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(disableProfileResult_, esimFile->DeleteProfile(iccId));
 
@@ -1496,7 +1502,7 @@ HWTEST_F(EsimTest, SwitchToProfile_001, Function | MediumTest | Level2)
     int32_t portIndex = 0;
     std::u16string iccId;
     bool forceDisableProfile = false;
-    ResultCode switchResult_ = ResultCode::RESULT_SGP_22_OTHER;
+    int32_t switchResult_ = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(switchResult_, esimFile->SwitchToProfile(portIndex, iccId, forceDisableProfile));
 
@@ -1516,7 +1522,7 @@ HWTEST_F(EsimTest, SetProfileNickname_001, Function | MediumTest | Level2)
 
     std::u16string iccId = Str8ToStr16("98760000000000543210");
     std::u16string nickname = Str8ToStr16("nick");
-    ResultCode updateNicknameResult_ = ResultCode::RESULT_SGP_22_OTHER;
+    int32_t updateNicknameResult_ = static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER);
     esimFile->currentChannelId_ = 0;
     EXPECT_NE(updateNicknameResult_, esimFile->SetProfileNickname(iccId, nickname));
 
@@ -1950,14 +1956,14 @@ HWTEST_F(EsimTest, AuthenticateServer_001, Function | MediumTest | Level2)
     AuthenticateConfigInfo authenticateConfigInfo;
     ResponseEsimResult responseAuthenticateResult;
     esimFile->currentChannelId_ = 0;
-    EXPECT_EQ(responseAuthenticateResult.resultCode_,
+    EXPECT_EQ(static_cast<int32_t>(responseAuthenticateResult.resultCode_),
         (esimFile->AuthenticateServer(authenticateConfigInfo)).resultCode_);
     int32_t slotId = 0;
     esimFile->currentChannelId_ = 2;
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
-    EXPECT_EQ(responseAuthenticateResult.resultCode_,
+    EXPECT_EQ(static_cast<int32_t>(responseAuthenticateResult.resultCode_),
         (esimFile->AuthenticateServer(authenticateConfigInfo)).resultCode_);
 }
 } // namespace Telephony
