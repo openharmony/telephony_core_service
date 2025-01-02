@@ -71,11 +71,11 @@ HWTEST_F(EsimFileManagerTest, GetEuiccProfileInfoList_001, Function | MediumTest
     SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
-    GetEuiccProfileInfoListResult eUiccRes = simFileManager.GetEuiccProfileInfoList();
-    EXPECT_EQ(eUiccRes.result_, ResultCode::RESULT_OK);
+    GetEuiccProfileInfoListInnerResult eUiccRes = simFileManager.GetEuiccProfileInfoList();
+    EXPECT_EQ(eUiccRes.result_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     eUiccRes = simFileManager.GetEuiccProfileInfoList();
-    EXPECT_EQ(eUiccRes.result_, ResultCode::RESULT_OK);
+    EXPECT_EQ(eUiccRes.result_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 
 HWTEST_F(EsimFileManagerTest, GetEuiccInfo_001, Function | MediumTest | Level2)
@@ -109,11 +109,11 @@ HWTEST_F(EsimFileManagerTest, DisableProfile_001, Function | MediumTest | Level2
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     std::u16string iccId = u"";
-    ResultCode res = simFileManager.DisableProfile(portIndex, iccId);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.DisableProfile(portIndex, iccId);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.DisableProfile(portIndex, iccId);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, GetSmdsAddress_001, Function | MediumTest | Level2)
@@ -166,11 +166,11 @@ HWTEST_F(EsimFileManagerTest, GetEuiccChallenge_001, Function | MediumTest | Lev
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
-    ResponseEsimResult res = simFileManager.GetEuiccChallenge(portIndex);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    ResponseEsimInnerResult res = simFileManager.GetEuiccChallenge(portIndex);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetEuiccChallenge(portIndex);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 
 HWTEST_F(EsimFileManagerTest, RequestDefaultSmdpAddress_001, Function | MediumTest | Level2)
@@ -204,11 +204,11 @@ HWTEST_F(EsimFileManagerTest, CancelSession_001, Function | MediumTest | Level2)
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string transactionId = u"";
     CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTION;
-    ResponseEsimResult res = simFileManager.CancelSession(transactionId, cancelReason);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    ResponseEsimInnerResult res = simFileManager.CancelSession(transactionId, cancelReason);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.CancelSession(transactionId, cancelReason);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 
 HWTEST_F(EsimFileManagerTest, GetProfile_001, Function | MediumTest | Level2)
@@ -243,11 +243,11 @@ HWTEST_F(EsimFileManagerTest, ResetMemory_001, Function | MediumTest | Level2)
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
-    ResultCode res = simFileManager.ResetMemory(resetOption);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.ResetMemory(resetOption);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.ResetMemory(resetOption);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, SetDefaultSmdpAddress_001, Function | MediumTest | Level2)
@@ -262,11 +262,11 @@ HWTEST_F(EsimFileManagerTest, SetDefaultSmdpAddress_001, Function | MediumTest |
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string defaultSmdpAddress = u"";
-    ResultCode res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetDefaultSmdpAddress(defaultSmdpAddress);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, IsSupported_001, Function | MediumTest | Level2)
@@ -300,11 +300,11 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string aid = u"";
     EsimApduData apduData;
-    ResponseEsimResult res = simFileManager.SendApduData(aid, apduData);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    ResponseEsimInnerResult res = simFileManager.SendApduData(aid, apduData);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SendApduData(aid, apduData);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 
 HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level2)
@@ -321,12 +321,12 @@ HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level
     DownLoadConfigInfo downLoadConfigInfo;
     downLoadConfigInfo.portIndex_ = 0;
     downLoadConfigInfo.hashCc_ = u"";
-    ResponseEsimResult res = simFileManager.PrepareDownload(downLoadConfigInfo);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    ResponseEsimInnerResult res = simFileManager.PrepareDownload(downLoadConfigInfo);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.PrepareDownload(downLoadConfigInfo);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 
 HWTEST_F(EsimFileManagerTest, LoadBoundProfilePackage_001, Function | MediumTest | Level2)
@@ -422,11 +422,11 @@ HWTEST_F(EsimFileManagerTest, RemoveNotificationFromList_001, Function | MediumT
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     int32_t seqNumber = 0;
-    ResultCode res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.RemoveNotificationFromList(portIndex, seqNumber);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, DeleteProfile_001, Function | MediumTest | Level2)
@@ -441,11 +441,11 @@ HWTEST_F(EsimFileManagerTest, DeleteProfile_001, Function | MediumTest | Level2)
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string iccId = u"";
-    ResultCode res = simFileManager.DeleteProfile(iccId);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.DeleteProfile(iccId);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.DeleteProfile(iccId);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level2)
@@ -462,11 +462,11 @@ HWTEST_F(EsimFileManagerTest, SwitchToProfile_001, Function | MediumTest | Level
     int32_t portIndex = 0;
     std::u16string iccId = u"";
     bool forceDisableProfile = false;
-    ResultCode res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SwitchToProfile(portIndex, iccId, forceDisableProfile);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Level2)
@@ -482,11 +482,11 @@ HWTEST_F(EsimFileManagerTest, SetProfileNickname_001, Function | MediumTest | Le
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     std::u16string iccId = u"";
     std::u16string nickname = u"";
-    ResultCode res = simFileManager.SetProfileNickname(iccId, nickname);
-    EXPECT_NE(res, ResultCode::RESULT_SGP_22_OTHER);
+    int32_t res = simFileManager.SetProfileNickname(iccId, nickname);
+    EXPECT_NE(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SetProfileNickname(iccId, nickname);
-    EXPECT_EQ(res, ResultCode::RESULT_SGP_22_OTHER);
+    EXPECT_EQ(res, static_cast<int32_t>(ResultCode::RESULT_SGP_22_OTHER));
 }
 
 HWTEST_F(EsimFileManagerTest, GetEuiccInfo2_001, Function | MediumTest | Level2)
@@ -520,11 +520,11 @@ HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Le
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     AuthenticateConfigInfo authenticateConfigInfo;
-    ResponseEsimResult res = simFileManager.AuthenticateServer(authenticateConfigInfo);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    ResponseEsimInnerResult res = simFileManager.AuthenticateServer(authenticateConfigInfo);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.AuthenticateServer(authenticateConfigInfo);
-    EXPECT_EQ(res.resultCode_, ResultCode::RESULT_OK);
+    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
 }
 } // namespace Telephony
 } // namespace OHOS
