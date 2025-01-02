@@ -151,6 +151,11 @@ int32_t SimStateManager::SetModemInit(bool state)
     if (simStateHandle_ != nullptr) {
         TELEPHONY_LOGI("state: %{public}d", state);
         simStateHandle_->modemInitDone_ = state;
+        if (!state) {
+            TELEPHONY_LOGI("SetModemInit to false, it should set simstate to init state");
+            simStateHandle_->oldSimType_ = ICC_UNKNOWN_TYPE;
+            simStateHandle_->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
+        }
         return TELEPHONY_ERR_SUCCESS;
     }
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
