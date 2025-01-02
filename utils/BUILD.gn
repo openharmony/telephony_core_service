@@ -199,9 +199,7 @@ ohos_shared_library("libtel_vcard") {
     "../interfaces/innerkits/include/",
   ]
 
-  deps = [
-    ":libtel_common",
-  ]
+  deps = [ ":libtel_common" ]
 
   external_deps = [
     "ability_base:want",
