@@ -389,6 +389,21 @@ enum class CellularDataErrorCode {
      * Indicates radio response info error.
      */
     DATA_ERROR_RADIO_RESPONSEINFO_ERROR,
+
+    /**
+     * Indicates create apn helper db fail.
+     */
+    DATA_ERROR_APN_CREATE_HELPER_FAIL,
+ 
+    /**
+     * Indicates query apn fail.
+     */
+    DATA_ERROR_APN_QUERY_FAIL,
+ 
+    /**
+     * Indicates found apn empty.
+     */
+    DATA_ERROR_APN_FOUND_EMPTY,
 };
 
 /**
