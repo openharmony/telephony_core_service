@@ -63,21 +63,21 @@ std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR
 
 std::string VCardUtils::EncodeBase64(const std::string &input)
 {
-    std::vector<unsigned char> copy1(input.begin(), input.end());
-    std::shared_ptr<std::string> encodedData_string = OHOS::Telephony::Base64::Encode(copy1);
-    std::string result(*encodedData_string);
-    TELEPHONY_LOGE("VCardUtils::EncodeBase64 result  %{public}s", result.c_str());
-    return result;
+    std::vector<unsigned char> tempInput(input.begin(), input.end());
+    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    if (encodedDataString == nullptr){
+        return "";
+    }
+    return *encodedDataString;
 }
 
 std::string VCardUtils::DecodeBase64(const std::string &input)
 {
-    std::string result;
-    auto decodedData_string = OHOS::Telephony::Base64::Decode(input);
-    const std::vector <unsigned char> &vectorRef = *decodedData_string;
-    result.assign(vectorRef.begin(), vectorRef.end());
-    TELEPHONY_LOGE("VCardUtils::DecodeBase64 result  %{public}s", result.c_str());
-    return result;
+    auto decodedDataString = OHOS::Telephony::Base64::Decode(input);
+    if (decodedDataString == nullptr){
+        return "";
+    }
+    return {*decodedDataString->begin(), *decodedDataString->end()}
 }
 
 bool VCardUtils::EqualsIgnoreCase(const std::string &str1, const std::string &str2)
@@ -155,9 +155,7 @@ bool VCardUtils::EndWith(const std::string &fullString, const std::string &endin
 std::string VCardUtils::ConvertCharset(
     const std::string &input, const std::string &fromCharset, const std::string &toCharset, int32_t &errorCode)
 {
-    const char *charToCharSet = toCharset.c_str();
-    const char *charFromCharset = fromCharset.c_str();
-    iconv_t converter = iconv_open(charToCharSet, charFromCharset);
+    iconv_t converter = iconv_open(toCharset.c_str(), fromCharset.c_str());
     if (converter == (iconv_t)(-1)) {
         TELEPHONY_LOGE("ConvertCharset_old open fail");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
@@ -179,7 +177,6 @@ std::string VCardUtils::ConvertCharset(
     std::string output(outBuf, outBufPtr - outBuf);
     delete[] outBuf;
     iconv_close(converter);
-    TELEPHONY_LOGE("VCardUtils::ConvertCharset output  %{public}s", output.c_str());
     return output;
 }
 
