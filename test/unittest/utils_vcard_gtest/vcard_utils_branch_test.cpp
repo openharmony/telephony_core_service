@@ -46,8 +46,7 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_EncodeBase64_001, Function | MediumTest
     std::string testStr = "testStr";
     std::vector<unsigned char> copy1(testStr.begin(), testStr.end());
     std::shared_ptr<std::string> enCodeData_string = Base64::Encode(copy1);
-    std::string resultBase64;
-    resultBase64(*enCodeData_string);
+    std::string resultBase64 = *enCodeData_string
     EXPECT_EQ(resultBase64, "dGVzdFN0==");
     std::string encodeBase64Result = VCardUtils::EncodeBase64(testStr);
     EXPECT_EQ(encodeBase64Result, "dGVzdFN0==");
