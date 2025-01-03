@@ -14,8 +14,8 @@
  */
 #define private public
 #define protected public
-#incldue "base64.h"
-#incldue "vcard_utils.h"
+#include "base64.h"
+#include "vcard_utils.h"
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
@@ -46,7 +46,7 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_EncodeBase64_001, Function | MediumTest
     std::string testStr = "testStr";
     std::vector<unsigned char> copy1(testStr.begin(), testStr.end());
     std::shared_ptr<std::string> enCodeData_string = Base64::Encode(copy1);
-    std::sting resultBase64(*enCodeData_string);
+    std::srting resultBase64(*enCodeData_string);
     EXPECT_EQ(resultBase64, "dGVzdFN0==");
     std::string encodeBase64Result = VcardUtils::EncodeBase64(testStr);
     EXPECT_EQ(encodeBase64Result, "dGVzdFN0==");
@@ -71,7 +71,7 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_ConverCharset_001, Function | MediumTes
     int32_t errorCode = 0;
     std::string converCharsetResult = VcardUtils::ConverCharset(
         testStr, fromCharset, toCharset, errorCode);
-    EXPECT_NE(converCharsetResult, testStr); 
+    EXPECT_NE(converCharsetResult, testStr);
 }
 
 } // namespace Telephony
