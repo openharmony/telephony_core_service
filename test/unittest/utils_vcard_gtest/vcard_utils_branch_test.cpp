@@ -46,9 +46,10 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_EncodeBase64_001, Function | MediumTest
     std::string testStr = "testStr";
     std::vector<unsigned char> copy1(testStr.begin(), testStr.end());
     std::shared_ptr<std::string> enCodeData_string = Base64::Encode(copy1);
-    std::srting resultBase64(*enCodeData_string);
+    std::string resultBase64;
+    resultBase64(*enCodeData_string);
     EXPECT_EQ(resultBase64, "dGVzdFN0==");
-    std::string encodeBase64Result = VcardUtils::EncodeBase64(testStr);
+    std::string encodeBase64Result = VCardUtils::EncodeBase64(testStr);
     EXPECT_EQ(encodeBase64Result, "dGVzdFN0==");
 }
 
@@ -57,21 +58,22 @@ HWTEST_F(UtilsVcardTest, Telephony_VCard_DecodeBase64_001, Function | MediumTest
     const std::string testStr = "dGVzdFN0==";
     auto deCodeData_string = Base64::Decode(testStr);
     const std::vector<unsigned char> &vectorRef = *deCodeData_string;
+    std::string resultBase64;
     resultBase64.assign(vectorRef.begin(), vectorRef.end());
     EXPECT_EQ(resultBase64, "testStr");
-    std::string decodeBase64Result = VcardUtils::DecodeBase64(testStr);
+    std::string decodeBase64Result = VCardUtils::DecodeBase64(testStr);
     EXPECT_EQ(decodeBase64Result, "testStr==");
 }
 
-HWTEST_F(UtilsVcardTest, Telephony_VCard_ConverCharset_001, Function | MediumTest | Level3)
+HWTEST_F(UtilsVcardTest, Telephony_VCard_ConvertCharset_001, Function | MediumTest | Level3)
 {
     const std::string testStr = "hello,Str";
     std::string fromCharset = "UTF-8";
     std::string toCharset = "EUC-KR";
     int32_t errorCode = 0;
-    std::string converCharsetResult = VcardUtils::ConverCharset(
+    std::string convertCharsetResult = VCardUtils::ConvertCharset(
         testStr, fromCharset, toCharset, errorCode);
-    EXPECT_NE(converCharsetResult, testStr);
+    EXPECT_NE(convertCharsetResult, testStr);
 }
 
 } // namespace Telephony
