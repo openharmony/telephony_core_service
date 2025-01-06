@@ -75,7 +75,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
 }
 
 HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTest | Level3)
-{     
+{
     std::string resultBase64;
     std::string testStr = "dGVzdFN0cg==";
     std::string answerStr = "testStr";
@@ -86,8 +86,8 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTes
     std::string decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
     EXPECT_EQ(decodeBase64testStr, decodeBase64testStr_new);
 
-    answerStr =  "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你\
-              好🌟🚀";
+    answerStr =  "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12\
+                890你好🌟🚀";
     testStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ\
                 zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
     decodedData_string = Base64::Decode(testStr);
@@ -112,7 +112,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumT
     std::cout<< "std::string ConvertCharseInput:" << ConvertCharseInput;
     std::string fromCharset = "UTF-8";
     std::string toCharset = "ISO-8859-1";
-    int32_t errorCode= 0;
+    int32_t errorCode = 0;
     std::string resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
     EXPECT_NE(resultConvert, convertCharseOutput);
     EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
@@ -124,7 +124,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumT
     resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
     EXPECT_NE(resultConvert, convertCharseOutput);
     EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
- }
+}
  
 }
 }
