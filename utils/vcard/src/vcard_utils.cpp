@@ -77,7 +77,7 @@ std::string VCardUtils::DecodeBase64(const std::string &input)
     if (decodedDataString == nullptr){
         return "";
     }
-    return std::string(decodedDataString->begin(), *decodedDataString->end());
+    return std::string(decodedDataString->begin(), decodedDataString->end());
 }
 
 bool VCardUtils::EqualsIgnoreCase(const std::string &str1, const std::string &str2)
