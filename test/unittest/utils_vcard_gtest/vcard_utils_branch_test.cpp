@@ -54,7 +54,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     EXPECT_EQ(encodeBase64Resuilt, answerStr);
 
     testStr = "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你\
-              好🌟🚀";
+                好🌟🚀";
     answerStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ\
                 zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
     tempInput.clear();
