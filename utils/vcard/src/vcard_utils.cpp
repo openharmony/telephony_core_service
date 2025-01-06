@@ -65,7 +65,8 @@ std::string VCardUtils::EncodeBase64(const std::string &input)
 {
     std::vector<unsigned char> tempInput(input.begin(), input.end());
     std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
-    if (encodedDataString == nullptr){
+    if (encodedDataString == nullptr)
+    {
         return "";
     }
     return *encodedDataString;
@@ -74,7 +75,8 @@ std::string VCardUtils::EncodeBase64(const std::string &input)
 std::string VCardUtils::DecodeBase64(const std::string &input)
 {
     auto decodedDataString = OHOS::Telephony::Base64::Decode(input);
-    if (decodedDataString == nullptr){
+    if (decodedDataString == nullptr)
+    {
         return "";
     }
     return std::string(decodedDataString->begin(), decodedDataString->end());
