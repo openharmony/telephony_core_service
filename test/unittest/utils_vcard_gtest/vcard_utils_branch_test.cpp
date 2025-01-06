@@ -69,7 +69,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     tempInput.clear();
     tempInput.assign(testStr.begin(), testStr.end());
     encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
-    EXPECT_EQ(encodedDataString, answerStr);
+    EXPECT_EQ(*encodedDataString, answerStr);
     encodeBase64Resuilt = VCardUtils::EncodeBase64(testStr);
     EXPECT_EQ(encodeBase64Resuilt, answerStr);
 }
@@ -109,21 +109,21 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumT
 {
     std::string convertCharseInput = "Hello, world! 你好，世界！";
     std::string convertCharseOutput = "Hello, world! ******";
-    std::cout<< "std::string ConvertCharseInput:" << ConvertCharseInput;
+    std::cout<< "std::string ConvertCharseInput:" << convertCharseInput;
     std::string fromCharset = "UTF-8";
     std::string toCharset = "ISO-8859-1";
     int32_t errorCode = 0;
-    std::string resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
-    EXPECT_NE(resultConvert, convertCharseOutput);
-    EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
+    std::string resultConvert = VCardUtils::ConvertCharset(convertCharseInput, fromCharset, toCharset, errorCode);
+    EXPECT_NE(resultConvert, convertCharseInput);
+    EXPECT_EQ(resultConvert, convertCharseOutput);
 
-    ConvertCharseInput = "Hello, world! こんにちは、世界!";
-    std::string convertCharseOutput = "Hello, world! ±ñÉ¿ÍAE!";
+    convertCharseInput = "Hello, world! こんにちは、世界!";
+    convertCharseOutput = "Hello, world! ±ñÉ¿ÍAE!";
     fromCharset = "UTF-8";
     toCharset = "SHIFT_JIS";
-    resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
-    EXPECT_NE(resultConvert, convertCharseOutput);
-    EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
+    resultConvert = VCardUtils::ConvertCharset(convertCharseInput, fromCharset, toCharset, errorCode);
+    EXPECT_NE(resultConvert, convertCharseInput);
+    EXPECT_EQ(resultConvert, convertCharseOutput);
 }
  
 }
