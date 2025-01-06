@@ -14,12 +14,14 @@
  */
 #define private public
 #define protected public
-#include "base64.h"
+
 #include "vcard_utils.h"
+#include "base64.h"
+
+#include <iconv.h>
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
-#include <string>
 
 namespace OHOS {
 namespace Telephony {
@@ -41,39 +43,88 @@ void UtilsVcardTest::SetUp() {}
 
 void UtilsVcardTest::TearDown() {}
 
-HWTEST_F(UtilsVcardTest, Telephony_VCard_EncodeBase64_001, Function | MediumTest | Level3)
+HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTest | Level3)
 {
     std::string testStr = "testStr";
-    std::vector<unsigned char> copy1(testStr.begin(), testStr.end());
-    std::shared_ptr<std::string> enCodeData_string = Base64::Encode(copy1);
-    std::string resultBase64 = *enCodeData_string
-    EXPECT_EQ(resultBase64, "dGVzdFN0==");
-    std::string encodeBase64Result = VCardUtils::EncodeBase64(testStr);
-    EXPECT_EQ(encodeBase64Result, "dGVzdFN0==");
+    std::string answerStr = "dGVzdFN0cg==";
+    std::vector<unsigned char> tempInput(testStr.begin(), testStr.end());
+    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    EXPECT_EQ(*encodedDataString, answerStr);
+    std::string encodeBase64Resuilt = VCardUtils::EncodeBase64(testStr);
+    EXPECT_EQ(encodeBase64Resuilt, answerStr);
+
+    testStr = "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你\
+              好🌟🚀";
+    answerStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ\
+                zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
+    tempInput.clear();
+    tempInput.assign(testStr.begin(), testStr.end());
+    encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    EXPECT_EQ(*encodedDataString, answerStr);
+    encodeBase64Resuilt = VCardUtils::EncodeBase64(testStr);
+    EXPECT_EQ(encodeBase64Resuilt, answerStr);
+
+    testStr = "你好，世界";   //非ASCII码
+    answerStr = "5L2g5aW977yM5LiW55WM";
+    tempInput.clear();
+    tempInput.assign(testStr.begin(), testStr.end());
+    encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    EXPECT_EQ(encodedDataString, answerStr);
+    encodeBase64Resuilt = VCardUtils::EncodeBase64(testStr);
+    EXPECT_EQ(encodeBase64Resuilt, answerStr);
 }
 
-HWTEST_F(UtilsVcardTest, Telephony_VCard_DecodeBase64_001, Function | MediumTest | Level3)
-{
-    const std::string testStr = "dGVzdFN0==";
-    auto deCodeData_string = Base64::Decode(testStr);
-    const std::vector<unsigned char> &vectorRef = *deCodeData_string;
+HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTest | Level3)
+{     
     std::string resultBase64;
+    std::string testStr = "dGVzdFN0cg==";
+    std::string answerStr = "testStr";
+    auto decodedData_string = Base64::Decode(testStr);
+    std::vector <unsigned char> &vectorRef = *decodedData_string;
     resultBase64.assign(vectorRef.begin(), vectorRef.end());
-    EXPECT_EQ(resultBase64, "testStr");
-    std::string decodeBase64Result = VCardUtils::DecodeBase64(testStr);
-    EXPECT_EQ(decodeBase64Result, "testStr==");
+    EXPECT_EQ(resultBase64, answerStr);
+    std::string decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
+    EXPECT_EQ(decodeBase64testStr, decodeBase64testStr_new);
+
+    answerStr =  "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你\
+              好🌟🚀";
+    testStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ\
+                zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
+    decodedData_string = Base64::Decode(testStr);
+    resultBase64.assign(vectorRef.begin(), vectorRef.end());
+    EXPECT_EQ(resultBase64, answerStr);
+    decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
+    EXPECT_EQ(decodeBase64testStr, answerStr);
+
+    testStr = "dGV==dFN0c=";
+    answerStr = "";
+    decodedData_string = Base64::Decode(testStr);
+    resultBase64.assign(vectorRef.begin(), vectorRef.end());
+    EXPECT_EQ(decodedData_string, nullptr);
+    decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
+    EXPECT_EQ(decodeBase64testStr, answerStr);
 }
 
-HWTEST_F(UtilsVcardTest, Telephony_VCard_ConvertCharset_001, Function | MediumTest | Level3)
+HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumTest | Level3)
 {
-    const std::string testStr = "hello,Str";
+    std::string convertCharseInput = "Hello, world! 你好，世界！";
+    std::string convertCharseOutput = "Hello, world! ******";
+    std::cout<< "std::string ConvertCharseInput:" << ConvertCharseInput;
     std::string fromCharset = "UTF-8";
-    std::string toCharset = "EUC-KR";
-    int32_t errorCode = 0;
-    std::string convertCharsetResult = VCardUtils::ConvertCharset(
-        testStr, fromCharset, toCharset, errorCode);
-    EXPECT_NE(convertCharsetResult, testStr);
-}
+    std::string toCharset = "ISO-8859-1";
+    int32_t errorCode= 0;
+    std::string resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
+    EXPECT_NE(resultConvert, convertCharseOutput);
+    EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
 
-} // namespace Telephony
-} // namespace OHOS
+    ConvertCharseInput = "Hello, world! こんにちは、世界!";
+    std::string convertCharseOutput = "Hello, world! ±ñÉ¿ÍAE!";
+    fromCharset = "UTF-8";
+    toCharset = "SHIFT_JIS";
+    resultConvert = VCardUtils::ConvertCharset(ConvertCharseInput, fromCharset, toCharset, errorCode);
+    EXPECT_NE(resultConvert, convertCharseOutput);
+    EXPECT_EQ(DecodeBase64testStr, convertCharseOutput);
+ }
+ 
+}
+}
