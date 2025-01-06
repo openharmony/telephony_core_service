@@ -48,7 +48,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     std::string testStr = "testStr";
     std::string answerStr = "dGVzdFN0cg==";
     std::vector<unsigned char> tempInput(testStr.begin(), testStr.end());
-    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    std::shared_ptr<string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
     EXPECT_EQ(*encodedDataString, answerStr);
     std::string encodeBase64Resuilt = VCardUtils::EncodeBase64(testStr);
     EXPECT_EQ(encodeBase64Resuilt, answerStr);
