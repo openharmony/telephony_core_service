@@ -33,6 +33,7 @@ namespace Telephony {
 namespace {
 constexpr const char *CHINA_TELECOM_CARD = "china_telecom_card";
 constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
+std::mutex mtx;
 const int32_t PARAMETER_COUNT_ZERO = 0;
 const int32_t PARAMETER_COUNT_ONE = 1;
 const int32_t PARAMETER_COUNT_TWO = 2;
@@ -2196,6 +2197,7 @@ void NativeQueryIccDiallingNumbers(napi_env env, void *data)
     }
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersResult;
     diallingNumbersResult.clear();
+    std::lock_guard<std::mutex> mtxlock(mtx);
     int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(
         diallingNumbers->asyncContext.slotId, diallingNumbers->type, diallingNumbersResult);
     TELEPHONY_LOGI("NAPI NativeQueryIccDiallingNumbers %{public}zu", diallingNumbersResult.size());
