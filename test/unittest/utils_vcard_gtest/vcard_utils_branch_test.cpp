@@ -86,9 +86,9 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTes
     std::string decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
     EXPECT_EQ(decodeBase64testStr, answerStr);
 
-    answerStr =  "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12"
+    answerStr =  "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12";
     answerStr += "890你好🌟🚀";
-    testStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ"
+    testStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ";
     testStr = "zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
     decodedData_string = Base64::Decode(testStr);
     resultBase64.assign(vectorRef.begin(), vectorRef.end());
