@@ -51,7 +51,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     std::shared_ptr<string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
     EXPECT_EQ(*encodedDataString, answerStr);
     std::string encodeBase64Result = VCardUtils::EncodeBase64(testStr);
-    EXPECT_EQ(encodeBase64Resuilt, answerStr);
+    EXPECT_EQ(encodeBase64Result, answerStr);
 
     testStr = "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你";
     testStr += "好🌟🚀";
@@ -62,7 +62,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
     EXPECT_EQ(*encodedDataString, answerStr);
     encodeBase64Result = VCardUtils::EncodeBase64(testStr);
-    EXPECT_EQ(encodeBase64Resuilt, answerStr);
+    EXPECT_EQ(encodeBase64Result, answerStr);
 
     testStr = "你好，世界";
     answerStr = "5L2g5aW977yM5LiW55WM";
