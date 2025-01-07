@@ -168,7 +168,7 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_008, Function | MediumTest | L
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     simManager->UpdateImsCapFromChip(slotId, {0, 0, 0, 0});
-    EXPECT_EQ(simManager->simFileManager_[slotId], nullptr);
+    EXPECT_TRUE(simManager->simFileManager_.empty());
 }
 }
 }
