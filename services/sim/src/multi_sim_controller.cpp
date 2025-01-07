@@ -352,6 +352,9 @@ bool MultiSimController::InitShowNumber(int slotId)
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     int32_t result = TELEPHONY_ERROR;
     result = SetShowNumberToDB(slotId, showNumber);
+    if (!showNumber.empty()) {
+        result = SetShowNumberToDB(slotId, showNumber);
+    }
     return result == TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1099,7 +1102,8 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     if (!showNumber.empty()) {
-        TELEPHONY_LOGI("get phone number from sim");
+        int32_t result = SetShowNumberToDB(slotId, showNumber)
+        TELEPHONY_LOGI("slotId: %{public}d get phone number from sim and save result: %{public}d", slotId, result);
         return TELEPHONY_ERR_SUCCESS;
     }
     int curSimId;
@@ -1229,6 +1233,11 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     telephoneNumber = Str8ToStr16(result);
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
+    if (!telephoneNumber.empty()) {
+        int32_t result;
+        result = SetShowNumberToDB(slotId, telephoneNumber);
+        TELEPHONY_LOGI("slotId: %{public}d save impu phone number result: %{public}d", slotId, result);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
