@@ -12,7 +12,7 @@
     -   [SIM Card Management](#section402mcpsimp)
 
 -   [Repositories Involved](#section409mcpsimp)
-
+a
 ## Introduction<a name="section117mcpsimp"></a>
 
 The telephony core service initializes the SimManager, NetworkSearchManager, and TelRilManager modules, and provides access to the RIL Adapter service.
