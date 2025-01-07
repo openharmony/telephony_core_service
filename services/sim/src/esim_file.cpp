@@ -2542,14 +2542,6 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
         }
     }
 
-    if (compNode->Asn1GetChildren(TAG_ESIM_SEQUENCE, nodes) != 0) {
-        TELEPHONY_LOGE("Asn1GetChildren err");
-        return false;
-    }
-    if (nodes.empty()) {
-        TELEPHONY_LOGE("node is empty");
-        return false;
-    }
     EuiccNotification notification;
     std::shared_ptr<Asn1Node> firstNode = nodes.front();
     createNotification(firstNode, notification);
