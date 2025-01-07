@@ -107,17 +107,22 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTes
 HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumTest | Level3)
 {
     std::string convertCharseInput = "Hello, world! 你好，世界！";
+    std::string convertCharseOutput = "Hello, world! ******";
     std::cout<< "std::string ConvertCharseInput:" << convertCharseInput;
     std::string fromCharset = "UTF-8";
     std::string toCharset = "ISO-8859-1";
     int32_t errorCode = 0;
     std::string resultConvert = VCardUtils::ConvertCharset(convertCharseInput, fromCharset, toCharset, errorCode);
     EXPECT_NE(resultConvert, convertCharseInput);
+    EXPECT_EQ(resultConvert, convertCharseOutput);
+
     convertCharseInput = "Hello, world! こんにちは、世界!";
+    convertCharseOutput = "Hello, world! ±ñÉ¿ÍAE!";
     fromCharset = "UTF-8";
     toCharset = "SHIFT_JIS";
     resultConvert = VCardUtils::ConvertCharset(convertCharseInput, fromCharset, toCharset, errorCode);
     EXPECT_NE(resultConvert, convertCharseInput);
+    EXPECT_EQ(resultConvert, convertCharseOutput);
 }
  
 }
