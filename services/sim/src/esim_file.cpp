@@ -168,7 +168,7 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         euiccProfileInfoList_.result_ = static_cast<int32_t>(resultFlag);
-        euiccProfileInfoList_.profiles.clear();
+        euiccProfileInfoList_.profiles_.clear();
         return euiccProfileInfoList_;
     }
     AppExecFwk::InnerEvent::Pointer eventRequestAllProfiles = BuildCallerInfo(MSG_ESIM_REQUEST_ALL_PROFILES);
