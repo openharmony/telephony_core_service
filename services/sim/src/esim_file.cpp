@@ -2536,7 +2536,7 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
 
     int32_t ret = compNode->Asn1GetChildren(TAG_ESIM_SEQUENCE, nodes);
     if ((ret != TELEPHONY_ERR_SUCCESS) || nodes.empty()) {
-        ret = compNode->Asn1GetChildren(TAG_ESIM_PROFILE_INSTALLATION_RESULT, nodes)
+        ret = compNode->Asn1GetChildren(TAG_ESIM_PROFILE_INSTALLATION_RESULT, nodes);
         if ((ret != TELEPHONY_ERR_SUCCESS) || nodes.empty()) {
             TELEPHONY_LOGE("Asn1GetChildren error");
             return false;
