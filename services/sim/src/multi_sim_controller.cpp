@@ -1102,7 +1102,7 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     if (!showNumber.empty()) {
-        int32_t result = SetShowNumberToDB(slotId, showNumber)
+        int32_t result = SetShowNumberToDB(slotId, showNumber);
         TELEPHONY_LOGI("slotId: %{public}d get phone number from sim and save result: %{public}d", slotId, result);
         return TELEPHONY_ERR_SUCCESS;
     }
