@@ -1892,7 +1892,7 @@ int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
     }
     if (roaming) {
         cond = SPN_CONDITION_DISPLAY_PLMN;
-        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND)) == SPN_COND) {
+        if ((static_cast<unsigned int>(displayConditionOfSpn_) & static_cast<unsigned int>(SPN_COND)) == 0) {
             cond |= static_cast<unsigned int>(SPN_CONDITION_DISPLAY_SPN);
         }
     } else {
