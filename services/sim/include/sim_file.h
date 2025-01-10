@@ -49,6 +49,7 @@ public:
 public:
     enum {
         RELOAD_ICCID_EVENT = 0,
+        RELOAD_IMSI_EVENT = 1,
     };
 
 protected:
@@ -137,6 +138,8 @@ private:
     bool ProcessObtainLiLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessObtainPlLanguage(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessReloadImsi(const AppExecFwk::InnerEvent::Pointer &event);
+    void DelayGetImsi();
     void StartObtainSpn();
     void LoadSimOtherFile();
 
@@ -158,6 +161,7 @@ private:
     const int SPN_CHAR_POS = 0;
     const int MAIL_DELAY_TIME = 50 * 1000;
     const int RELOAD_ICCID_COUNT = 3;
+    bool hasRetryGetImsi_ = false;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
     static const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
