@@ -1101,7 +1101,7 @@ bool SimFile::ProcessReloadImsi(const AppExecFwk::InnerEvent::Pointer &event)
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
     telRilManager_->GetImsi(slotId_, eventIMSI);
     hasRetryGetImsi_ = true;
-    return isFileProcessResponse; 
+    return isFileProcessResponse;
 }
 
 bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event)
