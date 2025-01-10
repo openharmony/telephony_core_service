@@ -1134,7 +1134,7 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
 
 void SimFile::DelayGetImsi()
 {
-    if (!hasRetryGetImsi_) {
+    if (hasRetryGetImsi_) {
         TELEPHONY_LOGI("DelayGetImsi has retried, slotId = %{public}d", slotId_);
         return;
     }
