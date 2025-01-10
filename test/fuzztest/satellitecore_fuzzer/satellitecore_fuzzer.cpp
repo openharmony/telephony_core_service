@@ -45,7 +45,7 @@ bool IsServiceInited()
         static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
         service->OnStart();
     }
-    if (!g_isInited && service->GetServiceRunningState() == 
+    if (!g_isInited && service->GetServiceRunningState() ==
         static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
         g_isInited = true;
     }
