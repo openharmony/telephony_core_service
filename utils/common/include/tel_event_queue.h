@@ -35,7 +35,23 @@ private:
     struct EventList {
         std::list<AppExecFwk::InnerEvent::Pointer> events;
     };
-
+    class EventStats {
+    public:
+        EventStats() = default;
+        ~EventStats() = default;
+        void CalculationInsertQueueEvents();
+        void CalculationSubmitToFFRTEvents();
+        void CalculationExecutedEvents();
+        void CalculationRemovedEvents(int count);
+        void PrintEventStats(std::string &name);
+    private:
+        std::atomic_uint64_t totalHandledEvents { 0 };
+        std::atomic_uint64_t currentQueueEvents { 0 };
+        std::atomic_uint64_t submitedToFFRTEvents { 0 };
+        std::atomic_uint64_t executedEvents { 0 };
+        std::atomic_uint64_t removedEvents { 0 };
+        AppExecFwk::InnerEvent::TimePoint lastPrintTime_ { AppExecFwk::InnerEvent::Clock::now() };
+    };
 private:
     void InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, AppExecFwk::EventQueue::Priority priority);
     bool HasEvent();
@@ -62,6 +78,7 @@ private:
     std::atomic_int queueId_ { 0 };
     std::shared_ptr<ffrt::queue> queue_ = nullptr;
     AppExecFwk::InnerEvent::Pointer nullPointer_ = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    EventStats eventStats_;
 };
 } // namespace Telephony
 } // namespace OHOS
