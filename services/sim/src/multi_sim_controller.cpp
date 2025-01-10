@@ -351,7 +351,6 @@ bool MultiSimController::InitShowNumber(int slotId)
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     int32_t result = TELEPHONY_ERROR;
-    result = SetShowNumberToDB(slotId, showNumber);
     if (!showNumber.empty()) {
         result = SetShowNumberToDB(slotId, showNumber);
     }
