@@ -37,12 +37,17 @@ constexpr int32_t SATELLITE_CORE = 4;
 
 bool IsServiceInited()
 {
-    if (!g_isInited) {
-        DelayedSingleton<CoreService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
+    auto service = DelayedSingleton<CoreService>::GetInstance();
+    if (service == nullptr) {
+        return g_isInited;
+    }
+    if (service->GetServiceRunningState() !=
+        static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+        service->OnStart();
+    }
+    if (!g_isInited && service->GetServiceRunningState() ==
+        static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+        g_isInited = true;
     }
     return g_isInited;
 }
