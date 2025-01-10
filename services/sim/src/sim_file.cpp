@@ -36,6 +36,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 const int64_t DELAY_TIME = 500;
+const int64_t GET_IMSI_DELAY_TIME = 2000;
 std::mutex IccFile::mtx_;
 std::vector<std::string> SimFile::indiaMcc_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
@@ -1090,6 +1091,19 @@ bool SimFile::ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event)
     return isFileProcessResponse;
 }
 
+bool SimFile::ProcessReloadImsi(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    bool isFileProcessResponse = false;
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ProcessReloadImsi event is nullptr");
+        return isFileProcessResponse;
+    }
+    AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
+    telRilManager_->GetImsi(slotId_, eventIMSI);
+    hasRetryGetImsi_ = true;
+    return isFileProcessResponse; 
+}
+
 bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
@@ -1111,9 +1125,21 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
             CheckMncLengthForImsiDone();
             imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             FileChangeToExt(imsi_, FileChangeType::G_IMSI_FILE_LOAD);
+        } else {
+            DelayGetImsi();
         }
     }
     return isFileProcessResponse;
+}
+
+void SimFile::DelayGetImsi()
+{
+    if (!hasRetryGetImsi_) {
+        TELEPHONY_LOGI("DelayGetImsi has retried, slotId = %{public}d", slotId_);
+        return;
+    }
+    fileToGet_++;
+    SendEvent(SimFile::RELOAD_IMSI_EVENT, 0, GET_IMSI_DELAY_TIME);
 }
 
 bool SimFile::ProcessGetCffDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1802,6 +1828,8 @@ void SimFile::InitBaseMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
     memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadIccid(event); };
+    memberFuncMap_[SimFile::RELOAD_IMSI_EVENT] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadImsi(event); };
     memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMsisdnDone(event); };
     memberFuncMap_[MSG_SIM_UPDATE_DONE] =
@@ -2119,6 +2147,7 @@ void SimFile::ClearData()
 {
     spnStatus_ = OBTAIN_SPN_NONE;
     reloadIccidCount_ = RELOAD_ICCID_COUNT;
+    hasRetryGetImsi_ = false;
     IccFile::ClearData();
 }
 } // namespace Telephony
