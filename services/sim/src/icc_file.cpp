@@ -754,6 +754,9 @@ void IccFile::ClearData()
     gid2_ = "";
     msisdnTag_ = "";
     fileQueried_ = false;
+    pnnFiles_.clear();
+    oplFiles_.clear();
+    opl5gFiles_.clear();
     ResetVoiceMailVariable();
     auto iccFileExt = iccFile_.lock();
     if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
