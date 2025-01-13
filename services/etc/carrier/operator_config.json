@@ -21,5 +21,6 @@
     "bandwidth_source_use_modem_bool": true,
     "uplink_bandwidth_nr_nsa_use_lte_value_bool": false,
     "bandwidth_string_array": [],
-    "single_pdp_radio_type_int_array": [ 2, 7 ]
+    "single_pdp_radio_type_int_array": [ 2, 7 ],
+    "video_call_waiting_on_bool": false
 }

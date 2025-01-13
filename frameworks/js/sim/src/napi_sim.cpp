@@ -3090,6 +3090,8 @@ napi_status InitEnumOperatorConfigKey(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("KEY_OPL_CUST_STRING_ARRAY", GetNapiValue(env, "opl_cust_string_array")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_EMERGENCY_CALL_STRING_ARRAY",
             GetNapiValue(env, "emergency_call_string_array")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_VIDEO_CALL_WAITING_ON_BOOL",
+            GetNapiValue(env, "video_call_waiting_on_bool")),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);

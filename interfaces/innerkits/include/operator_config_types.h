@@ -43,6 +43,7 @@ constexpr const char *KEY_CALL_WAITING_SERVICE_CLASS_INT = "call_waiting_service
 constexpr const char *KEY_IMS_CALL_DISCONNECT_REASONINFO_MAPPING_STRING_ARRAY =
     "ims_call_disconnect_reasoninfo_mapping_string_array";
 constexpr const char *KEY_FORCE_VOLTE_SWITCH_ON_BOOL = "force_volte_switch_on_bool";
+constexpr const char *KEY_VIDEO_CALL_WAITING_ON_BOOL = "video_call_waiting_on_bool";
 /**
  * If true, customize the items related to operator name.
  */
