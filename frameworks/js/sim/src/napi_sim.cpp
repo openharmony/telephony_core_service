@@ -3063,6 +3063,7 @@ napi_status InitEnumOperatorConfigKey(napi_env env, napi_value exports)
             GetNapiValue(env, "ims_switch_on_by_default_bool")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_HIDE_IMS_SWITCH_BOOL", GetNapiValue(env, "hide_ims_switch_bool")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_VOLTE_SUPPORTED_BOOL", GetNapiValue(env, "volte_supported_bool")),
+        DECLARE_NAPI_STATIC_PROPERTY("KEY_CARRIER_VT_AVAILABLE_BOOL", GetNapiValue(env, "carrier_vt_available_bool")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY",
             GetNapiValue(env, "nr_mode_supported_list_int_array")),
         DECLARE_NAPI_STATIC_PROPERTY("KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL",
