@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Telephony {
 static const int64_t COMMUNICATION_TIMEOUT = 45 * 1000; // Set the timeout millisecond for radio protocol communication
-static const int64_t SET_ACTIVE_OUT_TIME = 7 * 1000;
+static const int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
 std::mutex RadioProtocolController::ctx_;
 std::condition_variable RadioProtocolController::cv_;
 
