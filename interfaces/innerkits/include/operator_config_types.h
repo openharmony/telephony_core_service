@@ -35,6 +35,7 @@ constexpr const char *KEY_HIDE_IMS_SWITCH_BOOL = "hide_ims_switch_bool";
 constexpr const char *KEY_VOLTE_SUPPORTED_BOOL = "volte_supported_bool";
 constexpr const char *KEY_NR_MODE_SUPPORTED_LIST_INT_ARRAY = "nr_mode_supported_list_int_array";
 constexpr const char *KEY_VOLTE_PROVISIONING_SUPPORTED_BOOL = "volte_provisioning_supported_bool";
+constexpr const char *KEY_CARRIER_VT_AVAILABLE_BOOL = "carrier_vt_available_bool";
 constexpr const char *KEY_SS_OVER_UT_SUPPORTED_BOOL = "ss_over_ut_supported_bool";
 constexpr const char *KEY_IMS_GBA_REQUIRED_BOOL = "ims_gba_required_bool";
 constexpr const char *KEY_UT_PROVISIONING_SUPPORTED_BOOL = "ut_provisioning_supported_bool";
