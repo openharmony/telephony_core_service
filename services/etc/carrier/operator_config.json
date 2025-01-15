@@ -5,6 +5,7 @@
     "volte_supported_bool": true,
     "nr_mode_supported_list_int_array": [ 1, 2 ],
     "volte_provisioning_supported_bool": false,
+    "carrier_vt_available_bool": false,
     "ss_over_ut_supported_bool": false,
     "ims_gba_required_bool": false,
     "ut_provisioning_supported_bool": false,
