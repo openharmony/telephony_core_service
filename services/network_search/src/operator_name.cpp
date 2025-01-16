@@ -294,6 +294,7 @@ void OperatorName::NotifyGsmSpnChanged(
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
+        SetOperatorName(params.plmn);
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.plmn = domesticSpn;
@@ -350,6 +351,7 @@ void OperatorName::NotifyCdmaSpnChanged(
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
+        SetOperatorName(params.plmn);
         PublishEvent(params, regStatus, domesticSpn);
     } else {
         TELEPHONY_LOGI(
@@ -357,6 +359,13 @@ void OperatorName::NotifyCdmaSpnChanged(
     }
 }
 
+void OperatorName::SetOperatorName(const std::string &operatorName)
+{
+    if (networkSearchState != nullptr) {
+        networkSearchState_->SetLongOperatorName(operatorName, DomainType::DOMAIN_TYPE_CS);
+        networkSearchState_->SetLongOperatorName(operatorName, DomainType::DOMAIN_TYPE_PS);
+    }
+}
 void OperatorName::PublishEvent(OperatorNameParams params, const RegServiceState state, const std::string &domesticSpn)
 {
     Want want;
@@ -777,8 +786,7 @@ void OperatorName::TrySetLongOperatorNameWithTranslation()
         std::string longOperatorName = networkState->GetLongOperatorName();
         std::string numeric = networkState->GetPlmnNumeric();
         UpdateOperatorLongName(longOperatorName, numeric);
-        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_CS);
-        networkSearchState_->SetLongOperatorName(longOperatorName, DomainType::DOMAIN_TYPE_PS);
+        SetOperatorName(longOperatorName);
     }
     NotifySpnChanged();
 }
