@@ -361,7 +361,7 @@ void OperatorName::NotifyCdmaSpnChanged(
 
 void OperatorName::SetOperatorName(const std::string &operatorName)
 {
-    if (networkSearchState != nullptr) {
+    if (networkSearchState_ != nullptr) {
         networkSearchState_->SetLongOperatorName(operatorName, DomainType::DOMAIN_TYPE_CS);
         networkSearchState_->SetLongOperatorName(operatorName, DomainType::DOMAIN_TYPE_PS);
     }
