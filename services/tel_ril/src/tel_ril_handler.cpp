@@ -57,8 +57,11 @@ void TelRilHandler::OnInit(void)
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
     ackRunningLock_ = powerMgrClient.CreateRunningLock(
         "telRilAckRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
-    reqRunningLock_ = powerMgrClient.CreateRunningLock(
-        "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    if (reqRunningLock_ == nullptr) {
+        reqRunningLock_ = powerMgrClient.CreateRunningLock(
+            "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    }
 #endif
     reqRunningLockCount_ = 0;
     reqLockSerialNum_ = 0;
@@ -75,11 +78,14 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
         ackLockSerialNum_ = 0;
     }
     if (reqRunningLock_ == nullptr) {
-        auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-        reqRunningLock_ = powerMgrClient.CreateRunningLock(
-            "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
-        reqRunningLockCount_ = 0;
-        reqLockSerialNum_ = 0;
+        std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+        if (reqRunningLock_ == nullptr) {
+            auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+            reqRunningLock_ = powerMgrClient.CreateRunningLock(
+                "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+            reqRunningLockCount_ = 0;
+            reqLockSerialNum_ = 0;
+        }
     }
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
