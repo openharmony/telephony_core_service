@@ -356,8 +356,8 @@ private:
     }
 
 private:
-    std::mutex mutex_;
-    std::mutex telRilMutex_;
+    std::shared_mutex mutex_;
+    std::shared_mutex telRilMutex_;
     std::vector<std::shared_ptr<TelRilSim>> telRilSim_;
     std::vector<std::shared_ptr<TelRilSms>> telRilSms_;
     std::vector<std::shared_ptr<TelRilCall>> telRilCall_;
