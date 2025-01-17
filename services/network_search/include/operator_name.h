@@ -74,6 +74,7 @@ private:
     bool isCBDomestic(const std::string &numeric);
     void UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric);
     void UpdateVSimSpn(OperatorNameParams &params);
+    void SetOperatorName(const std::string &operatorName);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
