@@ -163,7 +163,7 @@ int32_t TelRilManager::GetTelRilSimSize()
 
 std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 {
-    std::lock_guard<std::mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilCall_.size()) {
         TELEPHONY_LOGE("telRilCall_ slotId is valid");
         return nullptr;
@@ -230,7 +230,7 @@ bool TelRilManager::ResetRilInterface(void)
 
 void TelRilManager::ResetRilInterfaceBySlotId(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> lock<mutex_>;
+    std::shared_lock<shared_mutex> lock(mutex_);
     if (GetTelRilSms(slotId) != nullptr) {
         GetTelRilSms(slotId)->ResetRilInterface(rilInterface_);
     }
