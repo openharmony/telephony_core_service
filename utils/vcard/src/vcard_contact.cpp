@@ -118,29 +118,46 @@ void VCardContact::AddRemainDatas(std::string name, std::string rawValue, std::v
     }
 }
 
+bool VCardContact::HasValidNameData()
+{
+    return !nameData_->GetPrefix().empty() ||
+           !nameData_->GetFamily().empty() ||
+           !nameData_->GetMiddle().empty() ||
+           !nameData_->GetSuffix().empty() ||
+           !nameData_->GetFormatted().empty() ||
+           !nameData_->GetSort().empty() ||
+           !nameData_->GetPhoneticFamily().empty() ||
+           !nameData_->GetPhoneticGiven().empty() ||
+           !nameData_->GetPhoneticMiddle().empty() ||
+           !nameData_->GetDisplayName().empty();
+}
+
 void VCardContact::CheckNameExist()
 {
     if (nameData_ == nullptr) {
         return;
     }
-    if (!nameData_->GetPrefix().empty() || !nameData_->GetFamily().empty() || !nameData_->GetMiddle().empty() ||
-        !nameData_->GetSuffix().empty() || !nameData_->GetFormatted().empty() || !nameData_->GetSort().empty() ||
-        !nameData_->GetFormatted().empty() || !nameData_->GetPhoneticFamily().empty() ||
-        !nameData_->GetPhoneticGiven().empty() || !nameData_->GetPhoneticMiddle().empty() ||
-        !nameData_->GetDisplayName().empty()) {
+    if (HasValidNameData()) {
         return;
     }
     for (auto data : phones_) {
         if (data != nullptr && !data->GetNumber().empty()) {
-            TELEPHONY_LOGI("replace phone as name: %{public}s", data->GetNumber().c_str());
+            TELEPHONY_LOGW("no name, replace phone as name");
             nameData_->setDispalyName(data->GetNumber());
             return;
         }
     }
     for (auto data : emails_) {
         if (data != nullptr && !data->GetAddress().empty()) {
-            TELEPHONY_LOGI("replace email as name: %{public}s", data->GetAddress().c_str());
+            TELEPHONY_LOGW("no name, replace email as name");
             nameData_->setDispalyName(data->GetAddress());
+            return;
+        }
+    }
+    for (auto data : organizations_) {
+        if (data != nullptr && !data->GetCompany().empty()) {
+            TELEPHONY_LOGW("no name, replace company as name");
+            nameData_->setDispalyName(data->GetCompany());
             return;
         }
     }
@@ -718,6 +735,9 @@ void VCardContact::AddIms(std::string name, std::string rawValue, std::string pr
     std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
     for (std::string value : valueList) {
         object->SetAddress(value);
+    }
+    if (object->GetAddress().empty()) {
+        object->SetAddress(rawValue);
     }
     object->SetLabelId(std::to_string(labeId));
     ims_.push_back(object);
