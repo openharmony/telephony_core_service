@@ -26,6 +26,7 @@
 #include "cell_information.h"
 #include "want.h"
 #include "i_icc_file.h"
+#include "sim_state_type.h"
 #include "tel_ril_types.h"
 #include "operator_name_params.h"
 
@@ -113,6 +114,7 @@ public:
     typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
     typedef void (*DynamicLoadInit)(void);
     typedef void (*DynamicLoadDeInit)(void);
+    typedef void (*UpdateHotplugCardState)(int32_t slotId, OHOS::Telephony::SimState state);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -176,6 +178,7 @@ public:
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
+    UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;

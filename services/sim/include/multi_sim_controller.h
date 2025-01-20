@@ -80,6 +80,7 @@ public:
     bool IsSetActiveSimInProgress(int32_t slotId);
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
+    int32_t GetDefaultMainSlotByIccId();
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -107,7 +108,6 @@ private:
     bool RefreshActiveIccAccountInfoList();
     std::string EncryptIccId(const std::string iccid);
     void CheckIfNeedSwitchMainSlotId();
-    int32_t getDefaultMainSlotByIccId();
     bool IsValidSlotId(int32_t slotId);
     bool InitPrimary();
     bool IsAllCardsReady();
