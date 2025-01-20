@@ -143,6 +143,8 @@ ohos_shared_library("libtel_vcard") {
     "vcard/src/vcard_utils.cpp",
   ]
 
+  branch_protector_ret = "pac_ret"
+
   defines = [
     "TELEPHONY_LOG_TAG = \"TelephonyVCard\"",
     "LOG_DOMAIN = 0xD001F04",
