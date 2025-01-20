@@ -147,6 +147,7 @@ private:
     void AddRemainDatas(std::string name, std::string rawValue, std::vector<std::string> values,
         std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
     void AddUID(std::string rawValue);
+    bool HasValidNameData();
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;
