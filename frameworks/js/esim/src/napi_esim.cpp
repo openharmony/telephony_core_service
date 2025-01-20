@@ -999,7 +999,9 @@ void NativeDownloadProfile(napi_env env, void *data)
     TELEPHONY_LOGI("NAPI NativeDownloadProfile %{public}d", errorCode);
     profileContext->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
-        profileContext->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+        profileContext->asyncContext.cv.wait_for(
+            callbackLock,
+            std::chrono::seconds(WAIT_LONG_TERM_TASK_SECOND),
             [profileContext] { return profileContext->asyncContext.isCallbackEnd; });
     }
 }
@@ -1369,7 +1371,7 @@ void NativeGetDownloadableProfileMetadata(napi_env env, void *data)
     TELEPHONY_LOGI("NAPI NativeGetDownloadableProfileMetadata %{public}d", errorCode);
     metadata->asyncContext.context.errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
-        metadata->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+        metadata->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_LONG_TERM_TASK_SECOND),
             [metadata] { return metadata->asyncContext.isCallbackEnd; });
     }
 }
