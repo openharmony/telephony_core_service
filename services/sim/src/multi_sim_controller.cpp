@@ -617,7 +617,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
         TELEPHONY_LOGI("CheckIfNeedSwitchMainSlotId satelliteStatusOn");
         return;
     }
-    int32_t defaultSlotId = getDefaultMainSlotByIccId();
+    int32_t defaultSlotId = GetDefaultMainSlotByIccId();
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
@@ -652,7 +652,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
     }
 }
 
-int32_t MultiSimController::getDefaultMainSlotByIccId()
+int32_t MultiSimController::GetDefaultMainSlotByIccId()
 {
     if (SIM_SLOT_COUNT == std::atoi(DEFAULT_SLOT_COUNT)) {
         TELEPHONY_LOGI("default slotId is 0 for single card version");
@@ -678,7 +678,7 @@ int32_t MultiSimController::getDefaultMainSlotByIccId()
     } else if (lastMainCardIccId == encryptIccIdSub2) {
         mainSlot = SIM_SLOT_1;
     }
-    TELEPHONY_LOGI("getDefaultMainSlotByIccId is %{public}d", mainSlot);
+    TELEPHONY_LOGI("GetDefaultMainSlotByIccId is %{public}d", mainSlot);
     return mainSlot;
 }
 

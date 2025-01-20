@@ -157,6 +157,7 @@ public:
     virtual bool IsDataShareError() = 0;
     virtual void ResetDataShareError() = 0;
     virtual void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) = 0;
+    virtual int32_t GetDefaultMainSlotByIccId() = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
     virtual int32_t GetEuiccProfileInfoList(int32_t slotId,
