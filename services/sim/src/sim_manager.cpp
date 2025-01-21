@@ -1585,5 +1585,15 @@ void SimManager::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsC
     }
     simAccountManager_[slotId]->UpdateImsCapFromChip(slotId, imsCapFromChip);
 }
+
+int32_t SimManager::GetDefaultMainSlotByIccId()
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return INVALID_VALUE;
+    }
+    return multiSimController_->GetDefaultMainSlotByIccId();
+}
+
 } // namespace Telephony
 } // namespace OHOS
