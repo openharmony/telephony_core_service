@@ -25,12 +25,13 @@ namespace Telephony {
 class VCardEncoder {
 public:
     explicit VCardEncoder(int32_t cardType = VCardConfiguration::VER_21, const std::string &charset = "UTF-8");
-    std::string ContructVCard(std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t &errorCode);
+    std::string ContructVCard(std::vector<std::vector<int>> contactIdList, int32_t &errorCode);
     void SetPhoneNumberEncodedCallback(std::shared_ptr<PhoneNumberEncodedCallback> PhoneNumberEncodedCallback);
 
 private:
     void ContructContact(std::shared_ptr<VCardContact> contact,
-        std::shared_ptr<DataShare::DataShareResultSet> rawResultSet, int32_t &errorCode);
+        int32_t rawContactId, int32_t &errorCode);
+    std::shared_ptr<DataShare::DataShareResultSet> GetRawContactResultSet(std::vector<int> contactIdList);
 
 private:
     std::shared_ptr<PhoneNumberEncodedCallback> phoneNumberEncodedCallback_ = nullptr;
