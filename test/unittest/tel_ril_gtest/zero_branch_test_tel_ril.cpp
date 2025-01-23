@@ -225,6 +225,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sms_001, Function | MediumTest | Le
     telRilSms->SmsStatusReportNotify(iSmsMessageInfo);
     HDI::Ril::V1_1::CBConfigReportInfo iCellBroadConfigReportInfo;
     telRilSms->CBConfigNotify(iCellBroadConfigReportInfo);
+    EXPECT_FALSE(telRilSms == nullptr);
 }
 
 /**
