@@ -161,6 +161,9 @@ private:
     const int SPN_CHAR_POS = 0;
     const int MAIL_DELAY_TIME = 50 * 1000;
     const int RELOAD_ICCID_COUNT = 3;
+    const int BYTE_TO_BIT_LEN = 8;
+    const int HEX_TO_BYTE_LEN = 2;
+    const int HEX_TYPE = 16;
     bool hasRetryGetImsi_ = false;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
@@ -178,6 +181,8 @@ private:
     void ParseOpl5g(const std::vector<std::string> &records);
     bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
     bool VoiceMailNotEditToSim();
+    bool IsServiceAvailable(UsimService service);
+    std::string serviceTable_;
 };
 } // namespace Telephony
 } // namespace OHOS
