@@ -68,7 +68,6 @@
                 "telephony_data",
                 "time_service",
                 "huks",
-                "googletest",
                 "libphonenumber",
                 "libpng",
                 "libxml2",
