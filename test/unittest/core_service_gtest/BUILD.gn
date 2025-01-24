@@ -44,7 +44,6 @@ ohos_unittest("tel_core_service_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -65,6 +64,7 @@ ohos_unittest("tel_core_service_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -140,7 +140,6 @@ ohos_unittest("tel_network_search_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -161,6 +160,7 @@ ohos_unittest("tel_network_search_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -235,7 +235,6 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -256,6 +255,7 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -335,7 +335,6 @@ ohos_unittest("tel_sim_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -356,6 +355,7 @@ ohos_unittest("tel_sim_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -429,7 +429,6 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -450,6 +449,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -523,7 +523,6 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -544,6 +543,7 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -608,7 +608,6 @@ ohos_unittest("tel_core_service_test") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -629,6 +628,7 @@ ohos_unittest("tel_core_service_test") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -696,7 +696,6 @@ ohos_unittest("tel_core_service_common_test") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -717,6 +716,7 @@ ohos_unittest("tel_core_service_common_test") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "huks:libhukssdk",
@@ -791,7 +791,6 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -812,6 +811,7 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -887,7 +887,6 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -908,6 +907,7 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -972,7 +972,6 @@ ohos_unittest("tel_sim_file_manager_branch_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -993,6 +992,7 @@ ohos_unittest("tel_sim_file_manager_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
