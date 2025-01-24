@@ -72,7 +72,8 @@ HWTEST_F(EsimPartOneTest, ResetEuiccNotification_001, Function | MediumTest | Le
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     std::shared_ptr<Asn1Builder> devCapsBuilder = nullptr;
     esimFile->ResetEuiccNotification();
-    EXPECT_EQ(devCapsBuilder, nullptr);
+    const std::u16string aid = u"112223334444555";
+    EXPECT_FALSE(esimFile->IsSameAid(aid));
 }
 
 HWTEST_F(EsimPartOneTest, ProcessObtainEuiccInfo2Done_001, Function | MediumTest | Level2)
