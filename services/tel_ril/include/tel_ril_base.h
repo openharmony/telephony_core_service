@@ -95,6 +95,7 @@ protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
     sptr<HDI::Ril::V1_3::IRil> rilInterface_;
     int32_t slotId_;
+    std::list<std::string> whiteReqList_;
 
 private:
     static int32_t GetNextSerialId(void);
@@ -120,6 +121,13 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
         TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
+    if (GetDynamicPowerOffModeSwitch()
+        && std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end()) {
+            TELEPHONY_LOGE("%{public}s() not in white list req", funcName);
+            return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
     if (telRilRequest == nullptr) {
         TELEPHONY_LOGE("%{public}s() telRilRequest is null", funcName);
