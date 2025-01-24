@@ -1240,7 +1240,7 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
     if (!telephoneNumber.empty() && telephoneNumber != Str8ToStr16(localCacheInfo_[slotId].phoneNumber)) {
-         TelFFRTUtils::Submit([=]() {
+        TelFFRTUtils::Submit([=]() {
             int32_t ret = SetShowNumberToDB(slotId, telephoneNumber);
             TELEPHONY_LOGI("slotId: %{public}d save impu phone number result: %{public}d", slotId, ret);
         });
