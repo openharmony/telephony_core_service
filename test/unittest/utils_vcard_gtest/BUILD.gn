@@ -81,9 +81,7 @@ ohos_unittest("utils_vcard_branch_gtest") {
     "$SOURCE_DIR/utils/vcard/include",
   ]
 
-  deps = [
-    "$SOURCE_DIR/utils:libtel_vcard",
-  ]
+  deps = [ "$SOURCE_DIR/utils:libtel_vcard" ]
 
   external_deps = [
     "ability_base:want",
