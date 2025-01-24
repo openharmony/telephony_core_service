@@ -45,7 +45,6 @@ ohos_unittest("tel_ril_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -58,6 +57,7 @@ ohos_unittest("tel_ril_gtest") {
     "drivers_interface_ril:libril_proxy_1.3",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
