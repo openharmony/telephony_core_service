@@ -159,9 +159,6 @@ ohos_shared_library("tel_core_service") {
   deps = [
     "interfaces/innerkits:tel_core_service_api",
     "utils:libtel_common",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
-    "//third_party/libxml2:libxml2",
   ]
 
   if (core_service_support_esim) {
@@ -199,6 +196,9 @@ ohos_shared_library("tel_core_service") {
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "libphonenumber::phonenumber_standard",
+    "libpng:libpng",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",

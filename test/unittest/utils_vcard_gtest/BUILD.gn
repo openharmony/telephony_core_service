@@ -36,7 +36,6 @@ ohos_unittest("utils_vcard_gtest") {
   deps = [
     "$SOURCE_DIR/utils:libtel_common",
     "$SOURCE_DIR/utils:libtel_vcard",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -51,6 +50,7 @@ ohos_unittest("utils_vcard_gtest") {
     "drivers_interface_ril:libril_proxy_1.3",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -83,7 +83,6 @@ ohos_unittest("utils_vcard_branch_gtest") {
 
   deps = [
     "$SOURCE_DIR/utils:libtel_vcard",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -98,6 +97,7 @@ ohos_unittest("utils_vcard_branch_gtest") {
     "drivers_interface_ril:libril_proxy_1.3",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",

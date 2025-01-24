@@ -34,11 +34,11 @@ ohos_unittest("utils_codec_gtest") {
 
   deps = [
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "googletest:gtest_main",
     "hilog:libhilog",
   ]
 

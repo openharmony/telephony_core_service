@@ -68,12 +68,12 @@
                 "telephony_data",
                 "time_service",
                 "huks",
-                "openssl"
-            ],
-            "third_party": [
                 "libphonenumber",
                 "libpng",
                 "libxml2",
+                "openssl"
+            ],
+            "third_party": [
                 "node"
             ]
         },
