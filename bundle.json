@@ -72,9 +72,6 @@
                 "libpng",
                 "libxml2",
                 "openssl"
-            ],
-            "third_party": [
-                "node"
             ]
         },
         "build": {
