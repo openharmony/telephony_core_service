@@ -1572,7 +1572,7 @@ bool SimFile::IsServiceAvailable(UsimService service)
     }
     uint32_t offset = static_cast<uint32_t>(service) / BYTE_TO_BIT_LEN;
     uint32_t mask = static_cast<uint32_t>(service) % BYTE_TO_BIT_LEN;
-    if (mask == 0) {
+    if (mask == 0 && offset!=0) {
         offset--;
         mask = 7; // 7 means max index in one byte
     } else {
@@ -1583,7 +1583,7 @@ bool SimFile::IsServiceAvailable(UsimService service)
         return false;
     }
     std::istringstream istr(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN));
-    int num = 0;
+    uint32_t num = 0;
     istr >> std::hex >> num;
     return (num & (1 << mask)) != 0;
 }
