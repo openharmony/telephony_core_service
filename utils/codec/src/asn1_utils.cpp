@@ -118,7 +118,7 @@ void Asn1Utils::BcdToBytes(const std::string &bcd, std::vector<uint8_t> &bytes)
 std::string Asn1Utils::BytesToHexStr(const std::vector<uint8_t> &bytes)
 {
     if (bytes.size() > MAX_BPP_LENGTH) {
-        TELEPHONY_LOGE("bytes length(%{public}u) is more than max byte", bytes.size());
+        TELEPHONY_LOGE("bytes length(%{public}lu) is more than max byte", bytes.size());
         return "";
     }
     std::ostringstream oss;
@@ -140,7 +140,7 @@ std::vector<uint8_t> Asn1Utils::HexStrToBytes(const std::string& hexStr)
 {
     std::vector<uint8_t> ret = {};
     if (hexStr.length() > (MAX_BPP_LENGTH * BYTE_TO_HEX_LEN)) {
-        TELEPHONY_LOGE("hexStr length(%{public}u) is more than max byte", hexStr.lenght());
+        TELEPHONY_LOGE("hexStr length(%{public}lu) is more than max byte", hexStr.length());
         return ret;
     }
 
