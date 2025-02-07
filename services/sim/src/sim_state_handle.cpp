@@ -398,6 +398,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         }
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
             slotId, externalType_, externalState_, reason);
+        if (TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_(slotId, externalState_);
+        }
     }
 }
 

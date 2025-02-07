@@ -365,16 +365,10 @@ int32_t VCardManager::Export(
         TELEPHONY_LOGE("QueryContact failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t resultSetNum = resultSet->GoToFirstRow();
     std::string result = "";
-    VCardEncoder encoder { cardType, charset };
-    while (resultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
-        result += encoder.ContructVCard(resultSet, errorCode);
-        resultSetNum = resultSet->GoToNextRow();
-    }
+    result = ConstructVCardString(resultSet, cardType, charset, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Export data failed");
-        resultSet->Close();
         return errorCode;
     }
     if (path.empty()) {
@@ -385,9 +379,7 @@ int32_t VCardManager::Export(
     }
     if (!result.empty()) {
         VCardUtils::SaveFile(result, path);
-        resultSet->Close();
     } else {
-        resultSet->Close();
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -402,21 +394,48 @@ int32_t VCardManager::ExportToStr(
         TELEPHONY_LOGE("QueryContact failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t resultSetNum = resultSet->GoToFirstRow();
-    VCardEncoder encoder { cardType, charset };
     int32_t errorCode = TELEPHONY_SUCCESS;
-    str = "";
-    while (resultSetNum == 0 && errorCode == TELEPHONY_SUCCESS) {
-        str += encoder.ContructVCard(resultSet, errorCode);
-        resultSetNum = resultSet->GoToNextRow();
-    }
+    str = ConstructVCardString(resultSet, cardType, charset, errorCode);
     if (errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Export data failed");
-        resultSet->Close();
         return errorCode;
     }
-    resultSet->Close();
     return TELEPHONY_SUCCESS;
+}
+
+std::string VCardManager::ConstructVCardString(
+    std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int32_t cardType, const std::string &charset,
+    int32_t &errorCode)
+{
+    int32_t resultSetNum = resultSet->GoToFirstRow();
+    if (resultSetNum != TELEPHONY_SUCCESS) {
+        errorCode = resultSetNum;
+        return "";
+    }
+    std::string result = "";
+    VCardEncoder encoder { cardType, charset };
+    int32_t contactCount = 0;
+    std::vector<int> contactIdList;
+    std::vector<std::vector<int>> contactIdLists;
+    while (resultSetNum == 0) {
+        int32_t index = 0;
+        int32_t contactId = 0;
+        resultSet->GetColumnIndex(Contact::ID, index);
+        resultSet->GetInt(index, contactId);
+        contactIdList.push_back(contactId);
+        resultSetNum = resultSet->GoToNextRow();
+        contactCount++;
+        if (contactCount % BATCH_INSERT_MAX_SIZE == 0) {
+            TELEPHONY_LOGI("pushBack contactid : %{public}d", contactId);
+            contactIdLists.push_back(contactIdList);
+            contactIdList.clear();
+        }
+    }
+    contactIdLists.push_back(contactIdList);
+    TELEPHONY_LOGI("before contstructVCard, contactIdList size : %{public}d", (int32_t)contactIdLists.size());
+    resultSet->Close();
+    result += encoder.ContructVCard(contactIdLists, errorCode);
+    return result;
 }
 
 void VCardManager::SetDataHelper(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper)

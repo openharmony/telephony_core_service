@@ -353,6 +353,8 @@ bool MultiSimController::InitShowNumber(int slotId)
     int32_t result = TELEPHONY_ERROR;
     if (!showNumber.empty()) {
         result = SetShowNumberToDB(slotId, showNumber);
+        TELEPHONY_LOGI(
+            "Init slotId: %{public}d get phone number from sim and save result: %{public}d", slotId, result);
     }
     return result == TELEPHONY_ERR_SUCCESS;
 }
@@ -617,7 +619,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
         TELEPHONY_LOGI("CheckIfNeedSwitchMainSlotId satelliteStatusOn");
         return;
     }
-    int32_t defaultSlotId = getDefaultMainSlotByIccId();
+    int32_t defaultSlotId = GetDefaultMainSlotByIccId();
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
@@ -652,7 +654,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
     }
 }
 
-int32_t MultiSimController::getDefaultMainSlotByIccId()
+int32_t MultiSimController::GetDefaultMainSlotByIccId()
 {
     if (SIM_SLOT_COUNT == std::atoi(DEFAULT_SLOT_COUNT)) {
         TELEPHONY_LOGI("default slotId is 0 for single card version");
@@ -678,7 +680,7 @@ int32_t MultiSimController::getDefaultMainSlotByIccId()
     } else if (lastMainCardIccId == encryptIccIdSub2) {
         mainSlot = SIM_SLOT_1;
     }
-    TELEPHONY_LOGI("getDefaultMainSlotByIccId is %{public}d", mainSlot);
+    TELEPHONY_LOGI("GetDefaultMainSlotByIccId is %{public}d", mainSlot);
     return mainSlot;
 }
 
@@ -1101,8 +1103,13 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
     }
     showNumber = simFileManager_[slotId]->GetSimTelephoneNumber();
     if (!showNumber.empty()) {
-        int32_t result = SetShowNumberToDB(slotId, showNumber);
-        TELEPHONY_LOGI("slotId: %{public}d get phone number from sim and save result: %{public}d", slotId, result);
+        if (showNumber != Str8ToStr16(localCacheInfo_[slotId].phoneNumber)) {
+            TelFFRTUtils::Submit([=]() {
+                int32_t result = SetShowNumberToDB(slotId, showNumber);
+                TELEPHONY_LOGI(
+                    "slotId: %{public}d get phone number from sim and save result: %{public}d", slotId, result);
+            });
+        }
         return TELEPHONY_ERR_SUCCESS;
     }
     int curSimId;
@@ -1232,10 +1239,11 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     telephoneNumber = Str8ToStr16(result);
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
-    if (!telephoneNumber.empty()) {
-        int32_t result = TELEPHONY_ERROR;
-        result = SetShowNumberToDB(slotId, telephoneNumber);
-        TELEPHONY_LOGI("slotId: %{public}d save impu phone number result: %{public}d", slotId, result);
+    if (!telephoneNumber.empty() && telephoneNumber != Str8ToStr16(localCacheInfo_[slotId].phoneNumber)) {
+        TelFFRTUtils::Submit([=]() {
+            int32_t ret = SetShowNumberToDB(slotId, telephoneNumber);
+            TELEPHONY_LOGI("slotId: %{public}d save impu phone number result: %{public}d", slotId, ret);
+        });
     }
     return TELEPHONY_ERR_SUCCESS;
 }

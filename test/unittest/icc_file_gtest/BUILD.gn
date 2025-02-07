@@ -39,7 +39,6 @@ ohos_unittest("icc_file_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -60,6 +59,7 @@ ohos_unittest("icc_file_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",

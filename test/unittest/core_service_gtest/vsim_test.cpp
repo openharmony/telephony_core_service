@@ -196,6 +196,7 @@ HWTEST_F(SimTest, SavePrimarySlotId_0100, Function | MediumTest | Level1)
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     CoreManagerInner::GetInstance().OnInit(nullptr, simManager, telRilManager);
+    CoreManagerInner::GetInstance().GetDefaultMainSlotByIccId();
     int32_t result = CoreManagerInner::GetInstance().SavePrimarySlotId(0);
     EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, result);
 }
