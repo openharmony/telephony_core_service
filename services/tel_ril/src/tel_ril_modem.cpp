@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t STATE_NV_REFRESH_FINNISHED = 1;
 
-TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
+TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}

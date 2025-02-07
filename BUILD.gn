@@ -188,6 +188,7 @@ ohos_shared_library("tel_core_service") {
     "drivers_interface_ril:libril_proxy_1.1",
     "drivers_interface_ril:libril_proxy_1.2",
     "drivers_interface_ril:libril_proxy_1.3",
+    "drivers_interface_ril:libril_proxy_1.4",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "hdf_core:libhdi",

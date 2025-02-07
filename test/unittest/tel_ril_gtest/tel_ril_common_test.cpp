@@ -48,7 +48,7 @@ void TelRilCommonTest::TearDown() {}
  */
 HWTEST_F(TelRilCommonTest, TelRilModem_BuildVoiceRadioTechnology_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilModem = std::make_shared<TelRilModem>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::VoiceRadioTechnology voiceRadioTechnology;
@@ -84,7 +84,7 @@ HWTEST_F(TelRilCommonTest, TelRilManager_InitTelExtraModule_001, Function | Medi
     auto result = telRilManager->InitTelExtraModule(0);
     ASSERT_EQ(result, TELEPHONY_ERROR);
     telRilManager->telRilCall_.clear();
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     for (int i = 0; i < SIM_SLOT_3; i++) {
         std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
         auto telRilCall = std::make_shared<TelRilCall>(i, rilInterface, observerHandler, telRilManager->handler_);
@@ -117,7 +117,7 @@ HWTEST_F(TelRilCommonTest, TelRilManager_GetObserverHandler_001, Function | Medi
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     uint8_t ch = 'a';
@@ -133,7 +133,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_001, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_002, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     uint8_t ch = 'A';
@@ -149,7 +149,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_002, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_003, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     uint8_t ch = '5';
@@ -165,7 +165,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_003, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_004, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     uint8_t ch = 'g';
@@ -181,7 +181,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_ConvertHexCharToInt_004, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_GetSmscAddrResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -197,7 +197,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_GetSmscAddrResponse_001, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_GetCBConfigResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -213,7 +213,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_GetCBConfigResponse_001, Function | MediumT
  */
 HWTEST_F(TelRilCommonTest, TelRilSms_GetCdmaCBConfigResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSms = std::make_shared<TelRilSms>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -229,7 +229,7 @@ HWTEST_F(TelRilCommonTest, TelRilSms_GetCdmaCBConfigResponse_001, Function | Med
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_ErrorIccIoResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSim = std::make_shared<TelRilSim>(0, rilInterface, observerHandler, nullptr);
     RadioResponseInfo responseInfo;
@@ -256,7 +256,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ErrorIccIoResponse_001, Function | MediumTe
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_ProcessIccIoInfo_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSim = std::make_shared<TelRilSim>(0, rilInterface, observerHandler, nullptr);
     std::shared_ptr<IccIoResultInfo> iccIoResult = std::make_shared<IccIoResultInfo>();;
@@ -275,7 +275,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ProcessIccIoInfo_001, Function | MediumTest
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_ProcessIccIoInfo_002, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilSim = std::make_shared<TelRilSim>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::IccIoResultInfo iccIoResultInfo;
@@ -300,7 +300,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ProcessIccIoInfo_002, Function | MediumTest
  */
 HWTEST_F(TelRilCommonTest, TelRilData_GetPdpContextListResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::SetupDataCallResultInfo setupDataCallResultInfo;
@@ -319,7 +319,7 @@ HWTEST_F(TelRilCommonTest, TelRilData_GetPdpContextListResponse_001, Function | 
  */
 HWTEST_F(TelRilCommonTest, TelRilData_PdpContextListUpdated_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::SetupDataCallResultInfo setupDataCallResultInfo;
@@ -337,7 +337,7 @@ HWTEST_F(TelRilCommonTest, TelRilData_PdpContextListUpdated_001, Function | Medi
  */
 HWTEST_F(TelRilCommonTest, TelRilData_GetLinkBandwidthInfoResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::DataLinkBandwidthInfo dataLinkBandwidthInfo;
@@ -366,7 +366,7 @@ HWTEST_F(TelRilCommonTest, TelRilCallback_CommonErrorResponse_001, Function | Me
  */
 HWTEST_F(TelRilCommonTest, TelRilCall_GetCallListResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -383,7 +383,7 @@ HWTEST_F(TelRilCommonTest, TelRilCall_GetCallListResponse_001, Function | Medium
  */
 HWTEST_F(TelRilCommonTest, TelRilCall_GetCallWaitingResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -400,7 +400,7 @@ HWTEST_F(TelRilCommonTest, TelRilCall_GetCallWaitingResponse_001, Function | Med
  */
 HWTEST_F(TelRilCommonTest, TelRilCall_GetCallTransferInfoResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -417,7 +417,7 @@ HWTEST_F(TelRilCommonTest, TelRilCall_GetCallTransferInfoResponse_001, Function 
  */
 HWTEST_F(TelRilCommonTest, TelRilCall_GetClipResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -434,7 +434,7 @@ HWTEST_F(TelRilCommonTest, TelRilCall_GetClipResponse_001, Function | MediumTest
  */
 HWTEST_F(TelRilCommonTest, TelRilCall_GetCallRestrictionResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
@@ -451,7 +451,7 @@ HWTEST_F(TelRilCommonTest, TelRilCall_GetCallRestrictionResponse_001, Function |
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_SendDtmfResponse_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     auto event = AppExecFwk::InnerEvent::Get(1, 1);
@@ -473,7 +473,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_SendDtmfResponse_001, Function | MediumTest
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_CallUssdNotice_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::UssdNoticeInfo ussdNoticeInfo;
@@ -488,7 +488,7 @@ HWTEST_F(TelRilCommonTest, TelRilSim_CallUssdNotice_001, Function | MediumTest |
  */
 HWTEST_F(TelRilCommonTest, TelRilSim_ResponseSupplement_001, Function | MediumTest | Level1)
 {
-    auto rilInterface = HDI::Ril::V1_3::IRil::Get();
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     auto telRilCall = std::make_shared<TelRilCall>(0, rilInterface, observerHandler, nullptr);
     HDI::Ril::V1_1::RilRadioResponseInfo rilRadioResponseInfo;
