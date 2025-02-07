@@ -504,29 +504,48 @@ bool EsimFile::ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root)
 
 bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::shared_ptr<Asn1Node> root = ParseEvent(event);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr");
+        NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
+        return false;
+    }
+
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
+        return false;
+    }
+
+    newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_,
+        MSG_ESIM_REQUEST_ALL_PROFILES, isHandleFinish);
+    if (isHandleFinish) {
+        return retValue;
+    }
+
+    return RealProcessRequestAllProfilesDone();
+}
+
+bool EsimFile::RealProcessRequestAllProfilesDone()
+{
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
+    uint32_t byteLen = responseByte.size();
+    std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
         NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
         return false;
     }
 
-    if (!RequestAllProfilesParseProfileInfo(root)) {
-        TELEPHONY_LOGE("RequestAllProfilesParseProfileInfo error!");
-        NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
-        return false;
-    }
-    NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
-    return true;
-}
-
-bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root)
-{
     std::shared_ptr<Asn1Node> profileRoot = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     if (profileRoot == nullptr) {
         TELEPHONY_LOGE("profileRoot is nullptr");
+        NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
         return false;
     }
+
     std::list<std::shared_ptr<Asn1Node>> profileNodes;
     profileRoot->Asn1GetChildren(TAG_ESIM_PROFILE_INFO, profileNodes);
     std::shared_ptr<Asn1Node> curNode = nullptr;
@@ -543,7 +562,9 @@ bool EsimFile::RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &roo
         ConvertProfileInfoToApiStruct(euiccProfile, euiccProfileInfo);
         euiccProfileInfoList_.profiles_.push_back(euiccProfile);
     }
+
     euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_OK);
+    NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
     return true;
 }
 
@@ -1884,10 +1905,10 @@ bool EsimFile::ProcessPrepareDownloadDone(const AppExecFwk::InnerEvent::Pointer 
     if (isHandleFinish) {
         return retValue;
     }
-    return RealProcessPrepareDownloadDone(recvCombineStr_);
+    return RealProcessPrepareDownloadDone();
 }
 
-bool EsimFile::RealProcessPrepareDownloadDone(std::string &combineHexStr)
+bool EsimFile::RealProcessPrepareDownloadDone()
 {
     std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
@@ -2060,13 +2081,13 @@ bool EsimFile::ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::
     if (isHandleFinish) {
         return retValue;
     }
-    return RealProcessLoadBoundProfilePackageDone(recvCombineStr_);
+    return RealProcessLoadBoundProfilePackageDone();
 }
-bool EsimFile::RealProcessLoadBoundProfilePackageDone(std::string combineHexStr)
+bool EsimFile::RealProcessLoadBoundProfilePackageDone()
 {
-    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     uint32_t byteLen = responseByte.size();
-    loadBPPResult_.response_ = OHOS::Telephony::ToUtf16(combineHexStr);
+    loadBPPResult_.response_ = OHOS::Telephony::ToUtf16(recvCombineStr_);
     std::shared_ptr<Asn1Node> root = Asn1ParseResponse(responseByte, byteLen);
     if (root == nullptr) {
         TELEPHONY_LOGE("root is nullptr");
@@ -3238,9 +3259,9 @@ void EsimFile::EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<
     euiccInfo2.ppVersion_ = MakeVersionString(ppVersionNodeRaw);
 }
 
-bool EsimFile::RealProcsessAuthenticateServerDone(std::string combineHexStr)
+bool EsimFile::RealProcessAuthenticateServerDone()
 {
-    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(combineHexStr);
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(recvCombineStr_);
     std::shared_ptr<Asn1Node> responseNode = Asn1ParseResponse(responseByte, responseByte.size());
     if (responseNode == nullptr) {
         TELEPHONY_LOGE("Asn1ParseResponse failed");
@@ -3305,7 +3326,7 @@ bool EsimFile::ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Point
     if (isHandleFinish) {
         return retValue;
     }
-    return RealProcsessAuthenticateServerDone(recvCombineStr_);
+    return RealProcessAuthenticateServerDone();
 }
 
 void EsimFile::CovertAuthToApiStruct(ResponseEsimInnerResult &dst, AuthServerResponse &src)

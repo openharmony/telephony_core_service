@@ -133,7 +133,6 @@ private:
     bool ObtainEuiccInfo1ParseTagCtx2(std::shared_ptr<Asn1Node> &root);
     bool ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool RequestAllProfilesParseProfileInfo(std::shared_ptr<Asn1Node> &root);
     bool SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::string &mnc);
     void BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
     void BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode);
@@ -170,7 +169,7 @@ private:
     bool ProcessLoadBoundProfilePackageDone(const AppExecFwk::InnerEvent::Pointer &event);
     std::shared_ptr<Asn1Node> LoadBoundProfilePackageParseProfileInstallResult(std::shared_ptr<Asn1Node> &root);
     bool LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<Asn1Node> &notificationMetadata);
-    bool RealProcessLoadBoundProfilePackageDone(std::string combineHexStr);
+    bool RealProcessLoadBoundProfilePackageDone();
     bool ProcessListNotifications(
         int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
@@ -213,7 +212,7 @@ private:
     void EuiccInfo2ParsePpVersion(EuiccInfo2 &euiccInfo2, std::shared_ptr<Asn1Node> &root);
     bool ProcessAuthenticateServer(int32_t slotId);
     bool ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool RealProcsessAuthenticateServerDone(std::string combineHexStr);
+    bool RealProcessAuthenticateServerDone();
     void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
     void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes);
     void GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei);
@@ -222,11 +221,12 @@ private:
     bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
     void ResetEuiccNotification();
     void NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv);
-    bool RealProcessPrepareDownloadDone(std::string &combineHexStr);
+    bool RealProcessPrepareDownloadDone();
     bool CommMergeRecvData(
         std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish);
     bool IsSameAid(const std::u16string &aid);
     bool IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid);
+    bool RealProcessRequestAllProfilesDone();
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
