@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -88,6 +88,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_SIM_ROOT/src/sim_char_decode.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_controller.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_file_init_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_number_decode.cpp",
@@ -159,9 +160,6 @@ ohos_shared_library("tel_core_service") {
   deps = [
     "interfaces/innerkits:tel_core_service_api",
     "utils:libtel_common",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/libpng:libpng",
-    "//third_party/libxml2:libxml2",
   ]
 
   if (core_service_support_esim) {
@@ -200,6 +198,9 @@ ohos_shared_library("tel_core_service") {
     "i18n:zone_util",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "libphonenumber:phonenumber_standard",
+    "libpng:libpng",
+    "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",

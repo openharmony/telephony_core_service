@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -285,32 +285,42 @@ void SimFile::ObtainCallForwardFiles()
 
 void SimFile::LoadSimOtherFile()
 {
-    AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
-    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventOpl = BuildCallerInfo(MSG_SIM_OBTAIN_OPL_DONE);
-    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventOpl5g = BuildCallerInfo(MSG_SIM_OBTAIN_OPL5G_DONE);
-    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL5G, eventOpl5g);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
-        CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
-    diallingNumberHandler_->GetDiallingNumbers(
-        ELEMENTARY_FILE_MSISDN, ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
-    fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
-    fileToGet_++;
-
-    AppExecFwk::InnerEvent::Pointer eventMWIS = BuildCallerInfo(MSG_SIM_OBTAIN_MWIS_DONE);
-    fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MWIS, 1, eventMWIS);
-    fileToGet_++;
-
+    if (serviceTable_.empty()) {
+        TELEPHONY_LOGE("get sst fail, serviceTable_ is null");
+        return;
+    }
+    if (IsServiceAvailable(UsimService::PLMN_NETWORK_NAME)) {
+        AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
+        fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
+        fileToGet_++;
+    }
+    if (IsServiceAvailable(UsimService::OPERATOR_PLMN_LIST)) {
+        AppExecFwk::InnerEvent::Pointer eventOpl = BuildCallerInfo(MSG_SIM_OBTAIN_OPL_DONE);
+        fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
+        fileToGet_++;
+    }
+    if (IsServiceAvailable(UsimService::FOR_5GS_OPERATOR_PLMN_LIST)) {
+        AppExecFwk::InnerEvent::Pointer eventOpl5g = BuildCallerInfo(MSG_SIM_OBTAIN_OPL5G_DONE);
+        fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL5G, eventOpl5g);
+        fileToGet_++;
+    }
+    if (IsServiceAvailable(UsimService::MSISDN)) {
+        AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
+            CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
+        diallingNumberHandler_->GetDiallingNumbers(
+            ELEMENTARY_FILE_MSISDN, ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
+        fileToGet_++;
+    }
+    if (IsServiceAvailable(UsimService::MBDN)) {
+        AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
+        fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
+        fileToGet_++;
+    }
+    if (IsServiceAvailable(UsimService::MWI_STATUS)) {
+        AppExecFwk::InnerEvent::Pointer eventMWIS = BuildCallerInfo(MSG_SIM_OBTAIN_MWIS_DONE);
+        fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MWIS, 1, eventMWIS);
+        fileToGet_++;
+    }
     AppExecFwk::InnerEvent::Pointer eventCPHS = BuildCallerInfo(MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE);
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS, eventCPHS);
     fileToGet_++;
@@ -333,20 +343,23 @@ void SimFile::LoadSimFiles()
         AppExecFwk::InnerEvent::Pointer eventIccId = BuildCallerInfo(MSG_SIM_OBTAIN_ICCID_DONE);
         fileController_->ObtainBinaryFile(ELEMENTARY_FILE_ICCID, eventIccId);
         fileToGet_++;
+        AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_AD, eventAD);
+        fileToGet_++;
+        AppExecFwk::InnerEvent::Pointer eventSST = BuildCallerInfo(MSG_SIM_OBTAIN_SST_DONE);
+        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_SST, eventSST);
+        fileToGet_++;
         AppExecFwk::InnerEvent::Pointer eventGid1 = BuildCallerInfo(MSG_SIM_OBTAIN_GID1_DONE);
         fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID1, eventGid1);
         fileToGet_++;
         AppExecFwk::InnerEvent::Pointer eventGid2 = BuildCallerInfo(MSG_SIM_OBTAIN_GID2_DONE);
         fileController_->ObtainBinaryFile(ELEMENTARY_FILE_GID2, eventGid2);
         fileToGet_++;
-        AppExecFwk::InnerEvent::Pointer eventAD = BuildCallerInfo(MSG_SIM_OBTAIN_AD_DONE);
-        fileController_->ObtainBinaryFile(ELEMENTARY_FILE_AD, eventAD);
-        fileToGet_++;
     }
-    AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    ObtainSpnPhase(true, eventSpn);
-    LoadSimOtherFile();
     ObtainCallForwardFiles();
+    AppExecFwk::InnerEvent::Pointer eventCPHS = BuildCallerInfo(MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE);
+    fileController_->ObtainBinaryFile(ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS, eventCPHS);
+    fileToGet_++;
 }
 
 void SimFile::ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event)
@@ -1505,6 +1518,7 @@ bool SimFile::ProcessGetInfoCphs(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
+    std::string tempStr;
     if (event == nullptr) {
         TELEPHONY_LOGE("get Sst event is nullptr!");
         return isFileProcessResponse;
@@ -1515,14 +1529,63 @@ bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     std::string iccData = fd->resultData;
-    char *rawData = const_cast<char *>(iccData.c_str());
-    unsigned char *fileData = reinterpret_cast<unsigned char *>(rawData);
 
     if (fd->exception != nullptr) {
+        FileChangeToExt(tempStr, FileChangeType::SPN_FILE_LOAD);
         return isFileProcessResponse;
     }
-    TELEPHONY_LOGI("SimFile MSG_SIM_OBTAIN_SST_DONE data:%{public}s", fileData);
+    if (iccData.empty()) {
+        TELEPHONY_LOGE("sst data is nullptr");
+        return false;
+    }
+    serviceTable_ = iccData;
+    if (IsServiceAvailable(UsimService::SPN)) {
+        AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+        ObtainSpnPhase(true, eventSpn);
+    } else {
+        FileChangeToExt(tempStr, FileChangeType::SPN_FILE_LOAD);
+    }
+    TELEPHONY_LOGI("SimFile MSG_SIM_OBTAIN_SST_DONE data:%{public}s", serviceTable_.c_str());
+    LoadSimOtherFile();
     return isFileProcessResponse;
+}
+
+bool SimFile::IsServiceAvailable(UsimService service)
+{
+    if (serviceTable_.empty()) {
+        TELEPHONY_LOGE("serviceTable_ is unavailable");
+        return false;
+    }
+    CardType cardType = CardType::UNKNOWN_CARD;
+    if (stateManager_ != nullptr) {
+        cardType = stateManager_->GetCardType();
+    } else {
+        TELEPHONY_LOGE("stateManager_ is unavailable");
+        return false;
+    }
+    if (cardType == CardType::SINGLE_MODE_SIM_CARD) {
+        return true;
+    }
+    if (service < UsimService::PHONEBOOK || service > UsimService::FOR_5G_SECURITY_PARAMETERS_EXTENDED) {
+        TELEPHONY_LOGE("service %{public}d is unavailable", service);
+        return false;
+    }
+    uint32_t offset = static_cast<uint32_t>(service) / BYTE_TO_BIT_LEN;
+    uint32_t mask = static_cast<uint32_t>(service) % BYTE_TO_BIT_LEN;
+    if (mask == 0 && offset!=0) {
+        offset--;
+        mask = 7; // 7 means max index in one byte
+    } else {
+        mask--;
+    }
+    if (offset * HEX_TO_BYTE_LEN >= serviceTable_.length()) {
+        TELEPHONY_LOGE("offset exceeds serviceTable_ length");
+        return false;
+    }
+    std::istringstream istr(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN));
+    uint32_t num = 0;
+    istr >> std::hex >> num;
+    return (num & (1 << mask)) != 0;
 }
 
 bool SimFile::ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1809,107 +1872,6 @@ bool SimFile::IsContinueGetSpn(bool start, SpnStatus curStatus, SpnStatus &newSt
     } else {
         return true;
     }
-}
-
-void SimFile::InitMemberFunc()
-{
-    InitBaseMemberFunc();
-    InitObtainMemberFunc();
-    InitPlmnMemberFunc();
-}
-
-void SimFile::InitBaseMemberFunc()
-{
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_READY] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccReady(event); };
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_LOCKED] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
-    memberFuncMap_[RadioEvent::RADIO_SIM_STATE_SIMLOCK] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessIccLocked(event); };
-    memberFuncMap_[SimFile::RELOAD_ICCID_EVENT] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadIccid(event); };
-    memberFuncMap_[SimFile::RELOAD_IMSI_EVENT] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessReloadImsi(event); };
-    memberFuncMap_[MSG_SIM_SET_MSISDN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMsisdnDone(event); };
-    memberFuncMap_[MSG_SIM_UPDATE_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessUpdateDone(event); };
-    memberFuncMap_[MSG_SIM_MARK_SMS_READ_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessMarkSms(event); };
-    memberFuncMap_[MSG_SIM_SMS_ON_SIM] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSmsOnSim(event); };
-    memberFuncMap_[MSG_SIM_SET_MBDN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetMbdn(event); };
-    memberFuncMap_[MSG_SIM_SET_CPHS_MAILBOX_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSetCphsMailbox(event); };
-}
-
-void SimFile::InitObtainMemberFunc()
-{
-    memberFuncMap_[MSG_SIM_OBTAIN_IMSI_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainIMSIDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_ICCID_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetIccIdDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_MBI_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbiDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCphsMailBoxDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_MBDN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMbdnDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_MSISDN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMsisdnDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_MWIS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetMwisDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessVoiceMailCphs(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_AD_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAdDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_LI_LANGUAGE_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainLiLanguage(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_PL_LANGUAGE_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainPlLanguage(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_CFF_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCffDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_SPDI_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSpdiDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_PNN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPnnDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_OPL5G_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOpl5gDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_ALL_SMS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetAllSmsDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_SMS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSmsDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_SST_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetSstDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_INFO_CPHS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetInfoCphs(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_CFIS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCfisDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetCspCphs(event); };
-}
-
-void SimFile::InitPlmnMemberFunc()
-{
-    memberFuncMap_[MSG_SIM_OBTAIN_SPN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainSpnPhase(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_GID1_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid1Done(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_GID2_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainGid2Done(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_PLMN_W_ACT_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetPlmnActDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetOplmnActDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetHplmActDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_EHPLMN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetEhplmnDone(event); };
-    memberFuncMap_[MSG_SIM_OBTAIN_FPLMN_DONE] =
-        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetFplmnDone(event); };
 }
 
 int SimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)

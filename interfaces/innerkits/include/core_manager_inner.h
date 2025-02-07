@@ -331,6 +331,7 @@ public:
     bool IsDataShareError();
     void ResetDataShareError();
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
+    int32_t GetDefaultMainSlotByIccId();
     /******************** simManager end *****************************/
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t GetEid(int32_t slotId, std::u16string &eId);

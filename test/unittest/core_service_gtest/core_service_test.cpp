@@ -611,6 +611,19 @@ HWTEST_F(CoreServiceTest, CoreService_DelIccDiallingNumbers_001, Function | Medi
 }
 
 /**
+ * @tc.number   CoreService_GetSimTelephoneNumber_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceTest, CoreService_GetSimTelephoneNumber_002, Function | MediumTest | Level1)
+{
+    SecurityToken token;
+    std::u16string telephoneNumber = u"";
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetSimTelephoneNumber(1, telephoneNumber);
+    EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
  * @tc.number   CoreService_UpdateIccDiallingNumbers_001
  * @tc.name     test normal branch
  * @tc.desc     Function test

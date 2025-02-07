@@ -2541,6 +2541,16 @@ void CoreManagerInner::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip
     }
     return simManager_->UpdateImsCapFromChip(slotId, imsCapFromChip);
 }
+
+int32_t CoreManagerInner::GetDefaultMainSlotByIccId()
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return INVALID_VALUE;
+    }
+    return simManager_->GetDefaultMainSlotByIccId();
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
 {
