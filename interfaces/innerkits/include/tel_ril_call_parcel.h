@@ -120,6 +120,20 @@ struct CallInfo {
      * select TE character set +CSCS.
      */
     std::string alpha = "";
+
+    /**
+     * Indicates remote party name.
+     */
+    std::string name = "";
+ 
+    /**
+     * Identifies the CNAP display name;
+     * - 0：Allowed
+     * - 1：Restricted
+     * - 2：Not Specified/Unknown
+     * - 3：Payphone
+     */
+    int32_t namePresentation = 0;
 };
 
 /**

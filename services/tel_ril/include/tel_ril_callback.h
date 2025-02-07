@@ -16,13 +16,13 @@
 #ifndef TEL_RIL_CALLBACK_H
 #define TEL_RIL_CALLBACK_H
 
-#include <v1_3/iril.h>
+#include <v1_4/iril.h>
 
 #include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilCallback : public HDI::Ril::V1_3::IRilCallback {
+class TelRilCallback : public HDI::Ril::V1_4::IRilCallback {
 public:
     explicit TelRilCallback(std::shared_ptr<TelRilManager> telRilManager);
     ~TelRilCallback() = default;
@@ -46,6 +46,8 @@ public:
         const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList) override;
     int32_t GetCallListResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::CallInfoList &callList) override;
+    int32_t GetCallListResponseExt(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::CallInfoExtList &callList) override;
     int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;

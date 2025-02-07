@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilCall : public TelRilBase {
 public:
-    TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
+    TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     ~TelRilCall() = default;
 
@@ -71,6 +71,8 @@ public:
     int32_t AnswerResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t GetCallListResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CallInfoList &callList);
+    int32_t GetCallListResponseExt(
+        const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_4::CallInfoExtList &callList);
     int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
@@ -125,6 +127,8 @@ private:
         const HDI::Ril::V1_1::EmergencyInfoList &emergencyInfoList);
     void BuildCallInfoList(std::shared_ptr<CallInfoList> callInfoList,
         const HDI::Ril::V1_1::CallInfoList &iCallInfoList);
+    void BuildCallInfoExtList(std::shared_ptr<CallInfoList> callInfoList,
+        const HDI::Ril::V1_4::CallInfoExtList &iCallInfoList);
     void BuildCFQueryInfoList(std::shared_ptr<CallForwardQueryInfoList> cFQueryInfoList,
         const HDI::Ril::V1_1::CallForwardQueryInfoList &cFQueryList);
     int32_t ResponseSupplement(const char *funcName, const HDI::Ril::V1_1::RilRadioResponseInfo &iResponseInfo);
