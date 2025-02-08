@@ -1945,6 +1945,19 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     EXPECT_NE(operatorName->GetCustSpnRule(true), 0);
     operatorName->simManager_ = nullptr;
     EXPECT_EQ(operatorName->GetEons(plmn, 1, true), "");
+
+    if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
+        return;
+    }
+    params = {true, "plmn", false, "spn", 1};
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.plmn);
+    params.showPlmn = false;
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
+    params.showSpn = true;
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.spn);
 }
 
 /**

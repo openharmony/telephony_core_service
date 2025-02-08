@@ -294,7 +294,7 @@ void OperatorName::NotifyGsmSpnChanged(
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
-        SetOperatorName(params.plmn);
+        SetOperatorNameByParams(params);
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.plmn = domesticSpn;
@@ -351,11 +351,24 @@ void OperatorName::NotifyCdmaSpnChanged(
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
-        SetOperatorName(params.plmn);
+        SetOperatorNameByParams(params);
         PublishEvent(params, regStatus, domesticSpn);
     } else {
         TELEPHONY_LOGI(
             "OperatorName::NotifyCdmaSpnChanged spn no changed, not need to update slotId:%{public}d", slotId_);
+    }
+}
+
+void OperatorName::SetOperatorNameByParams(OperatorNameParams &params)
+{
+    std::string showName;
+    if (params.showPlmn) {
+        showName = params.plmn;
+    } else if (params.showSpn) {
+        showName = params.spn;
+    }
+    if (!showName.empty()) {
+        SetOperatorName(showName);
     }
 }
 
