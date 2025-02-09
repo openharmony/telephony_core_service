@@ -418,11 +418,6 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
 
 void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
 {
-    int32_t volteCap = imsCapFromChip.volteCap;
-    std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(slotId);
-    std::string strvolteCap = std::to_string(volteCap);
-    SetParameter(volteCapKey.c_str(), strvolteCap.c_str());
-
     std::unique_lock<std::mutex> lock(mutex_);
     ClearMemoryCache(slotId);
     lock.unlock();
