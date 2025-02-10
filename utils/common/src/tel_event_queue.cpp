@@ -220,7 +220,7 @@ void TelEventQueue::RemoveAllEvents()
     std::lock_guard<std::mutex> lock(eventCtx_);
     int removeCount = 0;
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
-        removeCount += eventLists_[i].events.size();
+        static_cast<unsigned int>removeCount += eventLists_[i].events.size();
         eventLists_[i].events.clear();
     }
     SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
