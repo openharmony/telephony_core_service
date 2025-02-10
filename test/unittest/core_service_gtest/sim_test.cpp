@@ -1826,11 +1826,12 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0100, Function | MediumTest
         const int32_t volteCap = -1;
         ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
         std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        SetParameter(volteCapKey.c_str(), "-1");
         opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
         OperatorConfig opc;
         opcc->UpdatevolteCap(SimTest::slotId_, opc);
 
-        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_EQ(volteCapValue, volteCap);
     }
@@ -1849,11 +1850,12 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0200, Function | MediumTest
         const int32_t volteCap = 0;
         ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
         std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        SetParameter(volteCapKey.c_str(), "0");
         opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
         OperatorConfig opc;
         opcc->UpdatevolteCap(SimTest::slotId_, opc);
 
-        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_EQ(volteCapValue, volteCap);
         ASSERT_TRUE(opc.boolValue["volte_supported_bool"] == false);
@@ -1874,11 +1876,12 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0300, Function | MediumTest
         const int32_t volteCap = 1;
         ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
         std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        SetParameter(volteCapKey.c_str(), "1");
         opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
         OperatorConfig opc;
         opcc->UpdatevolteCap(SimTest::slotId_, opc);
 
-        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_EQ(volteCapValue, volteCap);
     }
@@ -1897,11 +1900,12 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0400, Function | MediumTest
         const int32_t volteCap = 2;
         ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
         std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId_);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
+        SetParameter(volteCapKey.c_str(), "2");
         opcc->UpdateImsCapFromChip(SimTest::slotId_, imsCapFromChip);
         OperatorConfig opc;
         opcc->UpdatevolteCap(SimTest::slotId_, opc);
 
-        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId_);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_EQ(volteCapValue, volteCap);
         ASSERT_TRUE(opc.boolValue["volte_supported_bool"] == true);
@@ -1922,11 +1926,12 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0500, Function | MediumTest
         const int32_t volteCap = 2;
         ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
         std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId1_);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId1_);
+        SetParameter(volteCapKey.c_str(), "2");
         opcc->UpdateImsCapFromChip(SimTest::slotId1_, imsCapFromChip);
         OperatorConfig opc;
         opcc->UpdatevolteCap(SimTest::slotId1_, opc);
 
-        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId1_);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_EQ(volteCapValue, volteCap);
     }
