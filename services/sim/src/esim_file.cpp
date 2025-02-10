@@ -171,6 +171,7 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
         euiccProfileInfoList_.profiles_.clear();
         return euiccProfileInfoList_;
     }
+    recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRequestAllProfiles = BuildCallerInfo(MSG_ESIM_REQUEST_ALL_PROFILES);
     if (!ProcessRequestAllProfiles(slotId_, eventRequestAllProfiles)) {
         TELEPHONY_LOGE("ProcessRequestAllProfiles encode failed");
@@ -522,6 +523,7 @@ bool EsimFile::ProcessRequestAllProfilesDone(const AppExecFwk::InnerEvent::Point
     bool retValue = CommMergeRecvData(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_,
         MSG_ESIM_REQUEST_ALL_PROFILES, isHandleFinish);
     if (isHandleFinish) {
+        TELEPHONY_LOGI("waits for continuing data...");
         return retValue;
     }
 
@@ -565,6 +567,7 @@ bool EsimFile::RealProcessRequestAllProfilesDone()
 
     euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_OK);
     NotifyReady(allProfileInfoMutex_, isAllProfileInfoReady_, allProfileInfoCv_);
+    TELEPHONY_LOGI("asn decode success");
     return true;
 }
 
