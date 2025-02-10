@@ -218,7 +218,7 @@ bool TelEventQueue::HasInnerEvent(uint32_t innerEventId)
 void TelEventQueue::RemoveAllEvents()
 {
     std::lock_guard<std::mutex> lock(eventCtx_);
-    unsigned int removeCount = 0;
+    uint32_t removeCount = 0;
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
         removeCount += eventLists_[i].events.size();
         eventLists_[i].events.clear();
