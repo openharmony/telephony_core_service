@@ -171,6 +171,7 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
         euiccProfileInfoList_.profiles_.clear();
         return euiccProfileInfoList_;
     }
+    recvCombineStr_ = "";
     AppExecFwk::InnerEvent::Pointer eventRequestAllProfiles = BuildCallerInfo(MSG_ESIM_REQUEST_ALL_PROFILES);
     if (!ProcessRequestAllProfiles(slotId_, eventRequestAllProfiles)) {
         TELEPHONY_LOGE("ProcessRequestAllProfiles encode failed");
