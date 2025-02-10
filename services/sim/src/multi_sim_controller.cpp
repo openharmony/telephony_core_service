@@ -1239,6 +1239,11 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     telephoneNumber = Str8ToStr16(result);
     TELEPHONY_LOGI("impu result is empty:%{public}s, slotId:%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
+    std::unique_lock<std::mutex> lock(mutex_);
+    if ((static_cast<uint32_t>(slotId) >= localCacheInfo_.size())) {
+        TELEPHONY_LOGE("localCacheInfo_ is empty");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
     if (!telephoneNumber.empty() && telephoneNumber != Str8ToStr16(localCacheInfo_[slotId].phoneNumber)) {
         TelFFRTUtils::Submit([=]() {
             int32_t ret = SetShowNumberToDB(slotId, telephoneNumber);
