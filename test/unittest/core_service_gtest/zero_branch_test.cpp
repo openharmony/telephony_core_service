@@ -1984,6 +1984,19 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorName->TrySetLongOperatorNameWithTranslation();
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "ChinaMobile");
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, true, false), "CMCC");
+
+    if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
+        return;
+    }
+    params = {true, "plmn", false, "spn", 1};
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.plmn);
+    params.showPlmn = false;
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
+    params.showSpn = true;
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.spn);
 }
 
 /**
