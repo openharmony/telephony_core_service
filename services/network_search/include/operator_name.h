@@ -75,6 +75,7 @@ private:
     void UpdateOperatorLongName(std::string &operatorLongName, const std::string &numeric);
     void UpdateVSimSpn(OperatorNameParams &params);
     void SetOperatorName(const std::string &operatorName);
+    void SetOperatorNameByParams(OperatorNameParams &params);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
