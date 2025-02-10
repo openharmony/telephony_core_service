@@ -65,6 +65,7 @@ public:
         std::vector<SaExtensionInfo>& infoList));
     MOCK_METHOD3(GetCommonEventExtraDataIdlist, int32_t(int32_t systemAbilityId,
         std::vector<int64_t>& extraDataIdList, const std::string& eventName));
+    MOCK_METHOD1(GetLocalAbilityManagerProxy, sptr<IRemoteObject>(int32_t));
 };
 } // namespace OHOS
 #endif // CORE_SERVICE_CLIENT_IF_SYSTEM_ABILITY_MANAGER_MOCK_H
