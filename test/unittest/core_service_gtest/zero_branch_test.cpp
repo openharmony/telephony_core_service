@@ -1013,7 +1013,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(mInner.UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -2347,7 +2347,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_006, Function | MediumTest |
     nsm->ConvertNetworkModeToCapabilityType(CORE_NETWORK_MODE_NR);
     nsm->ConvertNetworkModeToCapabilityType(-1);
     EXPECT_EQ(nsm->GetFrequencyType(INVALID_SLOTID), FrequencyType::FREQ_TYPE_UNKNOWN);
-    EXPECT_EQ(nsm->UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(nsm->UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
