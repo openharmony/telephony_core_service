@@ -127,7 +127,7 @@ typedef struct TagAuthServerResponse {
     int32_t errCode = 0;
     std::string transactionId;
     std::vector<uint8_t> respStr;
-    int32_t respLength = 0;
+    size_t respLength = 0;
 } AuthServerResponse;
 
 typedef struct TagOperatorId {
