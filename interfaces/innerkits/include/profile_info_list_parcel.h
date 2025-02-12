@@ -42,7 +42,7 @@ struct GetEuiccProfileInfoListResult : public Parcelable {
  * @brief Result of a operation.
  */
 struct GetEuiccProfileInfoListInnerResult {
-    int32_t result_;
+    int32_t result_ = 0;
     std::vector<EuiccProfile> profiles_{};
     bool isRemovable_ = false;
 };

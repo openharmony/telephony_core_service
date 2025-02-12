@@ -366,16 +366,16 @@ void AccessRuleInfoAnalyze(napi_env env, napi_value arg, AsyncAccessRule &access
 {
     napi_value hashState = NapiUtil::GetNamedProperty(env, arg, "certificateHashHexStr");
     if (hashState) {
-        char hashHexStr[ARRAY_SIZE] = {0};
-        NapiValueToCppValue(env, hashState, napi_string, hashHexStr);
-        accessType.certificateHashHexStr = std::string(hashHexStr);
+        std::array<char, ARRAY_SIZE> hashHexStr = {0};
+        NapiValueToCppValue(env, hashState, napi_string, std::data(hashHexStr));
+        accessType.certificateHashHexStr = std::string(hashHexStr.begin(), hashHexStr.end());
     }
 
     napi_value nameState = NapiUtil::GetNamedProperty(env, arg, "packageName");
     if (nameState) {
-        char nameStr[ARRAY_SIZE] = {0};
-        NapiValueToCppValue(env, nameState, napi_string, nameStr);
-        accessType.packageName = std::string(nameStr);
+        std::array<char, ARRAY_SIZE> nameStr = {0};
+        NapiValueToCppValue(env, nameState, napi_string, std::data(nameStr));
+        accessType.packageName = std::string(nameStr.begin(), nameStr.end());
     }
 
     napi_value type = NapiUtil::GetNamedProperty(env, arg, "accessType");
@@ -388,23 +388,23 @@ void ProfileInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadableProfile &
 {
     napi_value activateState = NapiUtil::GetNamedProperty(env, arg, "activationCode");
     if (activateState) {
-        char activationStr[ARRAY_SIZE] = {0};
-        NapiValueToCppValue(env, activateState, napi_string, activationStr);
-        profileInfo.activationCode = std::string(activationStr);
+        std::array<char, ARRAY_SIZE> activationStr = {0};
+        NapiValueToCppValue(env, activateState, napi_string, std::data(activationStr));
+        profileInfo.activationCode = std::string(activationStr.begin(), activationStr.end());
     }
 
     napi_value confirmState = NapiUtil::GetNamedProperty(env, arg, "confirmationCode");
     if (confirmState) {
-        char confirmationStr[ARRAY_SIZE] = {0};
-        NapiValueToCppValue(env, confirmState, napi_string, confirmationStr);
-        profileInfo.confirmationCode = std::string(confirmationStr);
+        std::array<char, ARRAY_SIZE> confirmationStr = {0};
+        NapiValueToCppValue(env, confirmState, napi_string, std::data(confirmationStr));
+        profileInfo.confirmationCode = std::string(confirmationStr.begin(), confirmationStr.end());
     }
 
     napi_value nameState = NapiUtil::GetNamedProperty(env, arg, "carrierName");
     if (nameState) {
-        char carrierStr[ARRAY_SIZE] = {0};
-        NapiValueToCppValue(env, nameState, napi_string, carrierStr);
-        profileInfo.carrierName = std::string(carrierStr);
+        std::array<char, ARRAY_SIZE> carrierStr = {0};
+        NapiValueToCppValue(env, nameState, napi_string, std::data(carrierStr));
+        profileInfo.carrierName = std::string(carrierStr.begin(), carrierStr.end());
     }
 
     napi_value ruleState = NapiUtil::GetNamedProperty(env, arg, "accessRules");
@@ -560,7 +560,7 @@ void AddProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value AddProfile(napi_env env, napi_callback_info info)
 {
-    auto addProfile = new (std::nothrow) AsyncAddProfileInfo();
+    auto addProfile = std::make_unique<AsyncAddProfileInfo>();
     if (addProfile == nullptr) {
         return nullptr;
     }
@@ -574,7 +574,7 @@ napi_value AddProfile(napi_env env, napi_callback_info info)
         .execute = NativeAddProfile,
         .complete = AddProfileCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncAddProfileInfo>(para, addProfile, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncAddProfileInfo>(para, addProfile.get(), initPara);
     if (result) {
         ProfileInfoAnalyze(env, object, addProfile->profile);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
@@ -628,7 +628,7 @@ void GetEuiccInfoCallback(napi_env env, napi_status status, void *data)
 
 napi_value GetEuiccInfo(napi_env env, napi_callback_info info)
 {
-    auto euiccInfo = new (std::nothrow) AsyncEuiccInfo();
+    auto euiccInfo = std::make_unique<AsyncEuiccInfo>();
     if (euiccInfo == nullptr) {
         return nullptr;
     }
@@ -642,7 +642,7 @@ napi_value GetEuiccInfo(napi_env env, napi_callback_info info)
         .execute = NativeGetEuiccInfo,
         .complete = GetEuiccInfoCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncEuiccInfo>(para, euiccInfo, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncEuiccInfo>(para, euiccInfo.get(), initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
@@ -739,14 +739,14 @@ void SetDefaultSmdpAddressCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
 {
-    auto asyncContext = new (std::nothrow) AsyncContextInfo();
+    auto asyncContext = std::make_unique<AsyncContextInfo>();
     if (asyncContext == nullptr) {
         return nullptr;
     }
     BaseContext &context = asyncContext->asyncContext.context;
 
-    char inputTepStr[ARRAY_SIZE] = {0};
-    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, inputTepStr, &context.callbackRef);
+    std::array<char, ARRAY_SIZE> inputTepStr = {0};
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, std::data(inputTepStr), &context.callbackRef);
     AsyncPara para {
         .funcName = "SetDefaultSmdpAddress",
         .env = env,
@@ -754,9 +754,9 @@ napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
         .execute = NativeSetDefaultSmdpAddress,
         .complete = SetDefaultSmdpAddressCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext.get(), initPara);
     if (result) {
-        asyncContext->inputStr = std::string(inputTepStr);
+        asyncContext->inputStr = std::string(inputTepStr.begin(), inputTepStr.end());
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -806,15 +806,15 @@ void SwitchToProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value SwitchToProfile(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new (std::nothrow) AsyncSwitchProfileInfo();
+    auto profileContext = std::make_unique<AsyncSwitchProfileInfo>();
     if (profileContext == nullptr) {
         return nullptr;
     }
     BaseContext &context = profileContext->asyncContext.context;
 
-    char iccIdStr[ARRAY_SIZE] = {0};
+    std::array<char, ARRAY_SIZE> iccIdStr = {0};
     auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, &profileContext->portIndex,
-        iccIdStr, &profileContext->forceDisableProfile, &context.callbackRef);
+        std::data(iccIdStr), &profileContext->forceDisableProfile, &context.callbackRef);
 
     AsyncPara para {
         .funcName = "SwitchToProfile",
@@ -823,9 +823,9 @@ napi_value SwitchToProfile(napi_env env, napi_callback_info info)
         .execute = NativeSwitchToProfile,
         .complete = SwitchToProfileCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncSwitchProfileInfo>(para, profileContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncSwitchProfileInfo>(para, profileContext.get(), initPara);
     if (result) {
-        profileContext->iccid = std::string(iccIdStr);
+        profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -873,14 +873,14 @@ void DeleteProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DeleteProfile(napi_env env, napi_callback_info info)
 {
-    auto asyncContext = new (std::nothrow) AsyncContextInfo();
+    auto asyncContext = std::make_unique<AsyncContextInfo>();
     if (asyncContext == nullptr) {
         return nullptr;
     }
     BaseContext &context = asyncContext->asyncContext.context;
 
-    char inputTmpStr[ARRAY_SIZE] = {0};
-    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, inputTmpStr, &context.callbackRef);
+    std::array<char, ARRAY_SIZE> inputTmpStr = {0};
+    auto initPara = std::make_tuple(&asyncContext->asyncContext.slotId, std::data(inputTmpStr), &context.callbackRef);
     AsyncPara para {
         .funcName = "DeleteProfile",
         .env = env,
@@ -888,9 +888,9 @@ napi_value DeleteProfile(napi_env env, napi_callback_info info)
         .execute = NativeDeleteProfile,
         .complete = DeleteProfileCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext.get(), initPara);
     if (result) {
-        asyncContext->inputStr = std::string(inputTmpStr);
+        asyncContext->inputStr = std::string(inputTmpStr.begin(), inputTmpStr.end());
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -950,7 +950,7 @@ napi_value ResetMemory(napi_env env, napi_callback_info info)
         return NapiCreateAsyncWork<int32_t, NativeResetMemory, ResetMemoryCallback>(env, info, "ResetMemory");
     }
 
-    auto profileContext = new (std::nothrow) AsyncResetMemory();
+    auto profileContext = std::make_unique<AsyncResetMemory>();
     if (profileContext == nullptr) {
         return nullptr;
     }
@@ -965,7 +965,7 @@ napi_value ResetMemory(napi_env env, napi_callback_info info)
         .execute = NativeResetMemory,
         .complete = ResetMemoryCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncResetMemory>(para, profileContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncResetMemory>(para, profileContext.get(), initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
@@ -1028,7 +1028,7 @@ void DownloadProfileCallback(napi_env env, napi_status status, void *data)
 
 napi_value DownloadProfile(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new (std::nothrow) AsyncDownloadProfileInfo();
+    auto profileContext = std::make_unique<AsyncDownloadProfileInfo>();
     if (profileContext == nullptr) {
         return nullptr;
     }
@@ -1045,7 +1045,7 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
         .execute = NativeDownloadProfile,
         .complete = DownloadProfileCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncDownloadProfileInfo>(para, profileContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDownloadProfileInfo>(para, profileContext.get(), initPara);
     if (result) {
         ProfileInfoAnalyze(env, profileObject, profileContext->profile);
         ConfigurationInfoAnalyze(env, configurationObject, profileContext->configuration);
@@ -1102,7 +1102,7 @@ void GetDownloadableProfilesCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new (std::nothrow) AsyncDefaultProfileList();
+    auto profileContext = std::make_unique<AsyncDefaultProfileList>();
     if (profileContext == nullptr) {
         return nullptr;
     }
@@ -1118,7 +1118,7 @@ napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
         .execute = NativeGetDownloadableProfiles,
         .complete = GetDownloadableProfilesCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncDefaultProfileList>(para, profileContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncDefaultProfileList>(para, profileContext.get(), initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
@@ -1258,15 +1258,16 @@ void SetProfileNicknameCallback(napi_env env, napi_status status, void *data)
 
 napi_value SetProfileNickname(napi_env env, napi_callback_info info)
 {
-    auto profileContext = new (std::nothrow) AsyncProfileNickname();
+    auto profileContext = std::make_unique<AsyncProfileNickname>();
     if (profileContext == nullptr) {
         return nullptr;
     }
     BaseContext &context = profileContext->asyncContext.context;
 
-    char iccIdStr[ARRAY_SIZE] = {0};
-    char nicknameStr[ARRAY_SIZE] = {0};
-    auto initPara = std::make_tuple(&profileContext->asyncContext.slotId, iccIdStr, nicknameStr, &context.callbackRef);
+    std::array<char, ARRAY_SIZE> iccIdStr = {0};
+    std::array<char, ARRAY_SIZE> nicknameStr = {0};
+    auto initPara = std::make_tuple(&profileContext->asyncContext.slotId,
+        std::data(iccIdStr), std::data(nicknameStr), &context.callbackRef);
 
     AsyncPara para {
         .funcName = "SetProfileNickname",
@@ -1275,10 +1276,10 @@ napi_value SetProfileNickname(napi_env env, napi_callback_info info)
         .execute = NativeSetProfileNickname,
         .complete = SetProfileNicknameCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncProfileNickname>(para, profileContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncProfileNickname>(para, profileContext.get(), initPara);
     if (result) {
-        profileContext->iccid = std::string(iccIdStr);
-        profileContext->nickname = std::string(nicknameStr);
+        profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
+        profileContext->nickname = std::string(nicknameStr.begin(), nicknameStr.end());
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -1326,14 +1327,14 @@ void CancelSessionCallback(napi_env env, napi_status status, void *data)
 
 napi_value CancelSession(napi_env env, napi_callback_info info)
 {
-    auto sessionContext = new (std::nothrow) AsyncCancelSession();
+    auto sessionContext = std::make_unique<AsyncCancelSession>();
     if (sessionContext == nullptr) {
         return nullptr;
     }
     BaseContext &context = sessionContext->asyncContext.context;
 
-    char transactionIdStr[ARRAY_SIZE] = {0};
-    auto initPara = std::make_tuple(&sessionContext->asyncContext.slotId, transactionIdStr,
+    std::array<char, ARRAY_SIZE> transactionIdStr = {0};
+    auto initPara = std::make_tuple(&sessionContext->asyncContext.slotId, std::data(transactionIdStr),
         &sessionContext->cancelReason, &context.callbackRef);
 
     AsyncPara para {
@@ -1343,9 +1344,9 @@ napi_value CancelSession(napi_env env, napi_callback_info info)
         .execute = NativeCancelSession,
         .complete = CancelSessionCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncCancelSession>(para, sessionContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncCancelSession>(para, sessionContext.get(), initPara);
     if (result) {
-        sessionContext->transactionId = std::string(transactionIdStr);
+        sessionContext->transactionId = std::string(transactionIdStr.begin(), transactionIdStr.end());
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
@@ -1398,7 +1399,7 @@ void GetDownloadableProfileMetadataCallback(napi_env env, napi_status status, vo
 
 napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
 {
-    auto metadata = new (std::nothrow) AsyncProfileMetadataInfo();
+    auto metadata = std::make_unique<AsyncProfileMetadataInfo>();
     if (metadata == nullptr) {
         return nullptr;
     }
@@ -1414,7 +1415,7 @@ napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
         .execute = NativeGetDownloadableProfileMetadata,
         .complete = GetDownloadableProfileMetadataCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncProfileMetadataInfo>(para, metadata, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncProfileMetadataInfo>(para, metadata.get(), initPara);
     if (result) {
         ProfileInfoAnalyze(env, object, metadata->profile);
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
@@ -1468,7 +1469,7 @@ void GetEuiccProfileInfoListCallback(napi_env env, napi_status status, void *dat
 
 napi_value GetEuiccProfileInfoList(napi_env env, napi_callback_info info)
 {
-    auto euiccInfo = new (std::nothrow) AsyncEuiccProfileInfoList();
+    auto euiccInfo = std::make_unique<AsyncEuiccProfileInfoList>();
     if (euiccInfo == nullptr) {
         return nullptr;
     }
@@ -1482,7 +1483,7 @@ napi_value GetEuiccProfileInfoList(napi_env env, napi_callback_info info)
         .execute = NativeGetEuiccProfileInfoList,
         .complete = GetEuiccProfileInfoListCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncEuiccProfileInfoList>(para, euiccInfo, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncEuiccProfileInfoList>(para, euiccInfo.get(), initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
@@ -1530,7 +1531,7 @@ void ReserveProfilesForFactoryRestoreCallback(napi_env env, napi_status status, 
 
 napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info info)
 {
-    auto asyncContext = new (std::nothrow) AsyncCommonInfo();
+    auto asyncContext = std::make_unique<AsyncCommonInfo>();
     if (asyncContext == nullptr) {
         return nullptr;
     }
@@ -1544,7 +1545,7 @@ napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info inf
         .execute = NativeReserveProfilesForFactoryRestore,
         .complete = ReserveProfilesForFactoryRestoreCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncCommonInfo>(para, asyncContext, initPara);
+    napi_value result = NapiCreateAsyncWork2<AsyncCommonInfo>(para, asyncContext.get(), initPara);
     if (result) {
         NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }

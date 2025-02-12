@@ -77,6 +77,8 @@ enum class ResultInnerCode {
     RESULT_EUICC_CARD_CHANNEL_OTHER_AID = 10003,
     RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED = 10004,
     RESULT_EUICC_CARD_CHANNEL_AID_EMPTY = 10005,
+    RESULT_EUICC_CARD_DATA_PROCESS_ERROR = 10006,
+    RESULT_EUICC_CARD_WAIT_TIMEOUT = 10007,
 };
 
 /**
@@ -135,6 +137,7 @@ enum class ProfileClass {
  * @brief The policy rules of the profile.
  */
 enum class PolicyRules {
+    POLICY_RULE_UNSPECIFIED = -1,
     POLICY_RULE_DISABLE_NOT_ALLOWED = 1,
     POLICY_RULE_DELETE_NOT_ALLOWED = 1 << 1,
     POLICY_RULE_DISABLE_AND_DELETE = 1 << 2,
@@ -175,10 +178,10 @@ struct EuiccProfile {
     std::u16string nickName_ = u"";
     std::u16string serviceProviderName_ = u"";
     std::u16string profileName_ = u"";
-    ProfileState state_;
-    ProfileClass profileClass_;
+    ProfileState state_ = ProfileState::PROFILE_STATE_UNSPECIFIED;
+    ProfileClass profileClass_ = ProfileClass::PROFILE_CLASS_UNSPECIFIED;
     OperatorId carrierId_;
-    PolicyRules policyRules_;
+    PolicyRules policyRules_ = PolicyRules::POLICY_RULE_UNSPECIFIED;
     std::vector<AccessRule> accessRules_{};
 };
 
@@ -258,9 +261,9 @@ enum class Event {
  * @brief A signed notification which is defined in SGP.22.
  */
 struct EuiccNotification {
-    int32_t seq_;
+    int32_t seq_ = 0;
     std::u16string targetAddr_ = u"";
-    int32_t event_;
+    int32_t event_ = 0;
     std::u16string data_ = u"";
 };
 
@@ -331,7 +334,7 @@ struct EuiccInfo2 {
     std::string ppVersion_ = "";
     std::string sasAccreditationNumber_ = "";
     std::string response_ = "";
-    int32_t resultCode_;
+    int32_t resultCode_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
