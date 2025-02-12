@@ -32,7 +32,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "v1_3/iril.h"
+#include "v1_4/iril.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,13 +51,13 @@ private:
 
 class TelRilBase {
 public:
-    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
+    TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
         std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler);
     virtual ~TelRilBase() = default;
 
     static std::shared_ptr<TelRilRequest> CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result);
-    void ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface);
-    sptr<HDI::Ril::V1_3::IRil> GetRilInterface();
+    void ResetRilInterface(sptr<HDI::Ril::V1_4::IRil> rilInterface);
+    sptr<HDI::Ril::V1_4::IRil> GetRilInterface();
     static std::shared_ptr<TelRilRequest> FindTelRilRequest(const RadioResponseInfo &responseInfo);
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo);
 
@@ -93,7 +93,7 @@ protected:
 
 protected:
     std::shared_ptr<ObserverHandler> observerHandler_;
-    sptr<HDI::Ril::V1_3::IRil> rilInterface_;
+    sptr<HDI::Ril::V1_4::IRil> rilInterface_;
     int32_t slotId_;
     std::list<std::string> whiteReqList_;
 
@@ -116,7 +116,7 @@ template<typename FuncType, typename... ParamTypes>
 inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
     FuncType &&_func, ParamTypes &&... _args)
 {
-    sptr<HDI::Ril::V1_3::IRil> rilInterface = GetRilInterface();
+    sptr<HDI::Ril::V1_4::IRil> rilInterface = GetRilInterface();
     if (rilInterface == nullptr) {
         TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

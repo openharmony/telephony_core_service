@@ -25,20 +25,20 @@ std::mutex TelRilBase::requestLock_;
 std::mutex dealLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
-TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
+TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : observerHandler_(observerHandler), rilInterface_(rilInterface), slotId_(slotId)
 {
     handler_ = handler;
 }
 
-void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_3::IRil> rilInterface)
+void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_4::IRil> rilInterface)
 {
     std::lock_guard<std::mutex> lock(dealLock_);
     rilInterface_ = rilInterface;
 }
 
-sptr<HDI::Ril::V1_3::IRil> TelRilBase::GetRilInterface()
+sptr<HDI::Ril::V1_4::IRil> TelRilBase::GetRilInterface()
 {
     std::lock_guard<std::mutex> lock(dealLock_);
     return rilInterface_;
