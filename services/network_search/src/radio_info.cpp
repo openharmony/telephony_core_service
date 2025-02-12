@@ -231,6 +231,10 @@ void RadioInfo::UpdatePhone(RadioTech csRadioTech, const RadioTech &psRadioTech)
         std::u16string imei = u"";
         std::u16string imeiSv = u"";
         std::string basebandVersion = "";
+        networkSearchManager->SetImei(slotId_, imei);
+        networkSearchManager->SetImeiSv(slotId_, imeiSv);
+        networkSearchManager->SetMeid(slotId_, meid);
+        networkSearchManager->SetBasebandVersion(slotId_, basebandVersion);
         networkSearchManager->GetImei(slotId_, imei);
         networkSearchManager->GetImeiSv(slotId_, imeiSv);
         networkSearchManager->GetMeid(slotId_, meid);
