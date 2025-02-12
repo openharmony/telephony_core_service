@@ -164,11 +164,11 @@ std::string EsimFile::ObtainEid()
 
 GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
 {
+    euiccProfileInfoList_ = GetEuiccProfileInfoListInnerResult();
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
         euiccProfileInfoList_.result_ = static_cast<int32_t>(resultFlag);
-        euiccProfileInfoList_.profiles_.clear();
         return euiccProfileInfoList_;
     }
     recvCombineStr_ = "";
@@ -176,14 +176,16 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
     if (!ProcessRequestAllProfiles(slotId_, eventRequestAllProfiles)) {
         TELEPHONY_LOGE("ProcessRequestAllProfiles encode failed");
         SyncCloseChannel();
-        return GetEuiccProfileInfoListInnerResult();
+        euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return euiccProfileInfoList_;
     }
     isAllProfileInfoReady_ = false;
     std::unique_lock<std::mutex> lock(allProfileInfoMutex_);
     if (!allProfileInfoCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isAllProfileInfoReady_; })) {
         SyncCloseChannel();
-        return GetEuiccProfileInfoListInnerResult();
+        euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_WAIT_TIMEOUT);
+        return euiccProfileInfoList_;
     }
     SyncCloseChannel();
     return euiccProfileInfoList_;
@@ -224,12 +226,12 @@ void EsimFile::CopyApdCmdToReqInfo(ApduSimIORequestInfo &requestInfo, ApduComman
     if (nextSerialId_ >= INT32_MAX) {
         nextSerialId_ = 0;
     }
-    requestInfo.channelId = apduCommand->channel;
-    requestInfo.type = apduCommand->data.cla;
-    requestInfo.instruction = apduCommand->data.ins;
-    requestInfo.p1 = apduCommand->data.p1;
-    requestInfo.p2 = apduCommand->data.p2;
-    requestInfo.p3 = apduCommand->data.p3;
+    requestInfo.channelId = static_cast<int32_t>(apduCommand->channel);
+    requestInfo.type = static_cast<int32_t>(apduCommand->data.cla);
+    requestInfo.instruction = static_cast<int32_t>(apduCommand->data.ins);
+    requestInfo.p1 = static_cast<int32_t>(apduCommand->data.p1);
+    requestInfo.p2 = static_cast<int32_t>(apduCommand->data.p2);
+    requestInfo.p3 = static_cast<int32_t>(apduCommand->data.p3);
     requestInfo.data = apduCommand->data.cmdHex;
     TELEPHONY_LOGI("SEND_DATA reqInfo.serial=%{public}d, \
         reqInfo.channelId=%{public}d, reqInfo.type=%{public}d, reqInfo.instruction=%{public}d, \
@@ -826,8 +828,8 @@ EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
 
 ResponseEsimInnerResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
 {
+    responseChallengeResult_ = ResponseEsimInnerResult();
     esimProfile_.portIndex = portIndex;
-
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -838,14 +840,17 @@ ResponseEsimInnerResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
     if (!ProcessObtainEuiccChallenge(slotId_, eventEUICCChanllenge)) {
         TELEPHONY_LOGE("ProcessObtainEuiccChallenge encode failed");
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        responseChallengeResult_.resultCode_ =
+            static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return responseChallengeResult_;
     }
     isEuiccChallengeReady_ = false;
     std::unique_lock<std::mutex> lock(euiccChallengeMutex_);
     if (!euiccChallengeCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccChallengeReady_; })) {
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        responseChallengeResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_WAIT_TIMEOUT);
+        return responseChallengeResult_;
     }
     SyncCloseChannel();
     return responseChallengeResult_;
@@ -1158,6 +1163,7 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
 
 ResponseEsimInnerResult EsimFile::CancelSession(const std::u16string &transactionId, CancelReason cancelReason)
 {
+    cancelSessionResult_ = ResponseEsimInnerResult();
     esimProfile_.transactionId = transactionId;
     esimProfile_.cancelReason = cancelReason;
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
@@ -1170,14 +1176,16 @@ ResponseEsimInnerResult EsimFile::CancelSession(const std::u16string &transactio
     if (!ProcessCancelSession(slotId_, eventCancelSession)) {
         TELEPHONY_LOGE("ProcessCancelSession encode failed");
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        cancelSessionResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return cancelSessionResult_;
     }
     isCancelSessionReady_ = false;
     std::unique_lock<std::mutex> lock(cancelSessionMutex_);
     if (!cancelSessionCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isCancelSessionReady_; })) {
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        cancelSessionResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_WAIT_TIMEOUT);
+        return cancelSessionResult_;
     }
     SyncCloseChannel();
     return cancelSessionResult_;
@@ -1185,25 +1193,26 @@ ResponseEsimInnerResult EsimFile::CancelSession(const std::u16string &transactio
 
 EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &iccId)
 {
+    eUiccProfile_ = EuiccProfile();
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
-        return EuiccProfile();
+        return eUiccProfile_;
     }
     AppExecFwk::InnerEvent::Pointer eventGetProfile = BuildCallerInfo(MSG_ESIM_GET_PROFILE);
     if (!ProcessGetProfile(slotId_, eventGetProfile)) {
         TELEPHONY_LOGE("ProcessGetProfile encode failed");
         SyncCloseChannel();
-        return EuiccProfile();
+        return eUiccProfile_;
     }
     isObtainProfileReady_ = false;
     std::unique_lock<std::mutex> lock(obtainProfileMutex_);
     if (!obtainProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainProfileReady_; })) {
         SyncCloseChannel();
-        return EuiccProfile();
+        return eUiccProfile_;
     }
     SyncCloseChannel();
     return eUiccProfile_;
@@ -1525,10 +1534,7 @@ bool EsimFile::IsSupported()
 
 ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
-    transApduDataResponse_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
-    transApduDataResponse_.response_ = u"";
-    transApduDataResponse_.sw1_ = 0;
-    transApduDataResponse_.sw2_ = 0;
+    transApduDataResponse_ = ResponseEsimInnerResult();
     if (aid.empty()) {
         TELEPHONY_LOGE("Aid is empty");
         transApduDataResponse_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_AID_EMPTY);
@@ -1538,12 +1544,12 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
         if (IsSameAid(aid)) {
             SyncCloseChannel();
             return ResponseEsimInnerResult();
-        } else {
-            TELEPHONY_LOGE("SendApduData Close Channel failed");
-            transApduDataResponse_.resultCode_ =
-                static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED);
-            return transApduDataResponse_;
         }
+
+        TELEPHONY_LOGE("SendApduData Close Channel failed");
+        transApduDataResponse_.resultCode_ =
+            static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_CLOSE_FAILED);
+        return transApduDataResponse_;
     }
 
     esimProfile_.apduData = apduData;
@@ -1557,6 +1563,8 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
     if (!ProcessSendApduData(slotId_, eventSendApduData)) {
         TELEPHONY_LOGE("ProcessSendApduData encode failed");
         SyncCloseChannel();
+        transApduDataResponse_.resultCode_ =
+            static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return transApduDataResponse_;
     }
     isSendApduDataReady_ = false;
@@ -1564,6 +1572,8 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
     if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel();
+        transApduDataResponse_.resultCode_ =
+            static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_WAIT_TIMEOUT);
         return transApduDataResponse_;
     }
     return transApduDataResponse_;
@@ -1679,6 +1689,7 @@ bool EsimFile::ProcessSendApduDataDone(const AppExecFwk::InnerEvent::Pointer &ev
 
 ResponseEsimInnerResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo)
 {
+    preDownloadResult_ = ResponseEsimInnerResult();
     esimProfile_.portIndex = downLoadConfigInfo.portIndex_;
     esimProfile_.hashCc = downLoadConfigInfo.hashCc_;
     esimProfile_.smdpSigned2 = downLoadConfigInfo.smdpSigned2_;
@@ -1695,7 +1706,8 @@ ResponseEsimInnerResult EsimFile::ObtainPrepareDownload(const DownLoadConfigInfo
     if (!ProcessPrepareDownload(slotId_)) {
         TELEPHONY_LOGE("ProcessPrepareDownload encode failed");
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        preDownloadResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return preDownloadResult_;
     }
     SyncCloseChannel();
     return preDownloadResult_;
@@ -2858,6 +2870,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
 
 EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
+    euiccInfo2Result_ = EuiccInfo2();
     esimProfile_.portIndex = portIndex;
 
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
@@ -2871,14 +2884,16 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
     if (!ProcessObtainEuiccInfo2(slotId_, eventEUICCInfo2)) {
         TELEPHONY_LOGE("ProcessObtainEuiccInfo2 encode failed");
         SyncCloseChannel();
-        return EuiccInfo2();
+        euiccInfo2Result_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return euiccInfo2Result_;
     }
     isEuiccInfo2Ready_ = false;
     std::unique_lock<std::mutex> lock(euiccInfo2Mutex_);
     if (!euiccInfo2Cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccInfo2Ready_; })) {
         SyncCloseChannel();
-        return EuiccInfo2();
+        euiccInfo2Result_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_WAIT_TIMEOUT);
+        return euiccInfo2Result_;
     }
     SyncCloseChannel();
     return euiccInfo2Result_;
@@ -2886,6 +2901,7 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 
 ResponseEsimInnerResult EsimFile::AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo)
 {
+    responseAuthenticateResult_ = ResponseEsimInnerResult();
     esimProfile_.portIndex = authenticateConfigInfo.portIndex_;
     esimProfile_.matchingId = authenticateConfigInfo.matchingId_;
     esimProfile_.serverSigned1 = authenticateConfigInfo.serverSigned1_;
@@ -2906,7 +2922,9 @@ ResponseEsimInnerResult EsimFile::AuthenticateServer(const AuthenticateConfigInf
     if (!ProcessAuthenticateServer(slotId_)) {
         TELEPHONY_LOGE("ProcessAuthenticateServer encode failed");
         SyncCloseChannel();
-        return ResponseEsimInnerResult();
+        responseAuthenticateResult_.resultCode_ =
+            static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
+        return responseAuthenticateResult_;
     }
     SyncCloseChannel();
     return responseAuthenticateResult_;

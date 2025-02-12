@@ -41,7 +41,7 @@ struct ResponseEsimResult : public Parcelable {
  * @brief Result of a operation.
  */
 struct ResponseEsimInnerResult {
-    int32_t resultCode_;
+    int32_t resultCode_ = 0;
     std::u16string response_ = u"";
     int32_t sw1_ = 0;
     int32_t sw2_ = 0;
