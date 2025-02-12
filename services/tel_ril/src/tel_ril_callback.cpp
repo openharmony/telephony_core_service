@@ -78,6 +78,12 @@ int32_t TelRilCallback::GetCallListResponse(
     return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::GetCallListResponse, callList);
 }
 
+int32_t TelRilCallback::GetCallListResponseExt(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_4::CallInfoExtList &callList)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::GetCallListResponseExt, callList);
+}
+
 int32_t TelRilCallback::DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     return Response(responseInfo, &TelRilManager::GetTelRilCall, &TelRilCall::DialResponse);

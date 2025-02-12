@@ -26,7 +26,7 @@ static const int32_t DTMF_ON_LENGTH = 150;
 static const int32_t DTMF_OFF_LENGTH = 70;
 static const int32_t DTMF_STRING_LENGTH = 1;
 
-TelRilCall::TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_3::IRil> rilInterface,
+TelRilCall::TelRilCall(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {}
@@ -60,6 +60,18 @@ int32_t TelRilCall::GetCallListResponse(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     BuildCallInfoList(callInfo, callInfoList);
+    return Response<CallInfoList>(TELEPHONY_LOG_FUNC_NAME, responseInfo, callInfo);
+}
+
+int32_t TelRilCall::GetCallListResponseExt(
+    const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_4::CallInfoExtList &callInfoList)
+{
+    std::shared_ptr<CallInfoList> callInfo = std::make_shared<CallInfoList>();
+    if (callInfo == nullptr) {
+        TELEPHONY_LOGE("ERROR : callInfo == nullptr !!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    BuildCallInfoExtList(callInfo, callInfoList);
     return Response<CallInfoList>(TELEPHONY_LOG_FUNC_NAME, responseInfo, callInfo);
 }
 
@@ -696,6 +708,28 @@ void TelRilCall::BuildCallInfoList(
         call.number = info.number;
         call.type = info.type;
         call.alpha = info.alpha;
+        callInfoList->calls.push_back(call);
+    }
+}
+
+void TelRilCall::BuildCallInfoExtList(
+    std::shared_ptr<CallInfoList> callInfoList, const HDI::Ril::V1_4::CallInfoExtList &iCallInfoList)
+{
+    callInfoList->callSize = iCallInfoList.callSize;
+    for (auto info : iCallInfoList.calls) {
+        CallInfo call;
+        call.index = info.index;
+        call.dir = info.dir;
+        call.state = info.state;
+        call.mode = info.mode;
+        call.mpty = info.mpty;
+        call.voiceDomain = info.voiceDomain;
+        call.callType = info.callType;
+        call.number = info.number;
+        call.type = info.type;
+        call.alpha = info.alpha;
+        call.name = info.name;
+        call.namePresentation = info.namePresentation;
         callInfoList->calls.push_back(call);
     }
 }

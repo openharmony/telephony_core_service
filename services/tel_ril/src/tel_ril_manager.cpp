@@ -58,12 +58,12 @@ bool TelRilManager::DeInit()
 bool TelRilManager::ConnectRilInterface()
 {
     std::lock_guard<shared_mutex> lock(mutex_);
-    rilInterface_ = HDI::Ril::V1_3::IRil::Get();
+    rilInterface_ = HDI::Ril::V1_4::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
         return false;
     }
-    rilInterface_->SetCallback1_3(new TelRilCallback(shared_from_this()));
+    rilInterface_->SetCallback1_4(new TelRilCallback(shared_from_this()));
     return true;
 }
 
