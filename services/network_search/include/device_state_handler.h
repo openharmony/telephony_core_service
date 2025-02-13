@@ -34,6 +34,7 @@ public:
     void ProcessChargingState(bool isCharging);
     void ProcessNetSharingState(bool isNetSharingOn);
     void ProcessRadioState();
+    void ProcessShutDown();
 
 private:
     uint32_t GetCellRequestMinInterval() const;
