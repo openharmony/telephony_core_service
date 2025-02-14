@@ -151,6 +151,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | Medi
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SHUTDOWN);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     deviceStateObserver->subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
