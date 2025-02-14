@@ -48,6 +48,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SHUTDOWN);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
@@ -125,6 +126,9 @@ void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         case COMMON_EVENT_DISCHARGING:
             deviceStateHandler_->ProcessChargingState(false);
             break;
+        case COMMON_EVENT_SHUTDOWN:
+            deviceStateHandler_->ProcessShutDown();
+            break;
         default:
             TELEPHONY_LOGE("DeviceStateEventSubscriber::OnReceiveEvent: invalid event");
             break;
@@ -197,6 +201,7 @@ void DeviceStateEventSubscriber::InitEventMap()
         {CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED, COMMON_EVENT_POWER_SAVE_MODE_CHANGED},
         {CommonEventSupport::COMMON_EVENT_CHARGING, COMMON_EVENT_CHARGING},
         {CommonEventSupport::COMMON_EVENT_DISCHARGING, COMMON_EVENT_DISCHARGING},
+        {CommonEventSupport::COMMON_EVENT_SHUTDOWN, COMMON_EVENT_SHUTDOWN},
     };
 }
 

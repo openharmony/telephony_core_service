@@ -20,12 +20,14 @@
 #include "power_mgr_client.h"
 #endif
 #include "telephony_log_wrapper.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
 namespace {
 const uint32_t CELL_REQUEST_SHORT_INTERVAL = 2; // This is the minimum interval in seconds for cell requests
 const uint32_t CELL_REQUEST_LONG_INTERVAL = 10; // This is the maximum interval in seconds for cell requests
+const std::string SHUTDOWN_PARAM = "sys.shutdown.requested";
 } // namespace
 
 DeviceStateHandler::DeviceStateHandler(
@@ -81,6 +83,17 @@ void DeviceStateHandler::ProcessNetSharingState(bool isNetSharingOn)
 void DeviceStateHandler::ProcessRadioState()
 {
     SyncSettings();
+}
+
+void DeviceStateHandler::ProcessShutDown()
+{
+    system::SetParameter(SHUTDOWN_PARAM.c_str(), "1"); // 1 means shutdown only use in this
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("DeviceStateHandler::ProcessShutDown nsm is null");
+        return;
+    }
+    nsm->SetRadioState(slotId_, false, 0);
 }
 
 void DeviceStateHandler::ProcessDeviceState()
