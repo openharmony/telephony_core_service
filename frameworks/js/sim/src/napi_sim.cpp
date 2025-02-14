@@ -575,7 +575,7 @@ napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultSlotId>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_user_initiated));
     }
     return result;
 }
@@ -2246,7 +2246,7 @@ napi_value QueryIccDiallingNumbers(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<napi_value>>(para, diallingNumbers, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_user_initiated));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
