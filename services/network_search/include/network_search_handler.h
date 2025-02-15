@@ -157,6 +157,8 @@ private:
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
     void UpdateNetworkState();
     void GetDeviceId();
+    void HandleRetryActiveSim(int radioState);
+    bool HandleSlotRadioChange(int radioState);
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
@@ -188,6 +190,12 @@ private:
     const int32_t INVALID_SLOT_ID = -1;
     bool isCsCapable_ = true;
     std::mutex mutex_;
+    const int32_t INIT_RADIO_STATE = -2;
+    struct slotRadioStateChange {
+        int32_t oldRadioState_;
+        int32_t newRadioState_;
+    };
+    std::map<int32_t, slotRadioStateChange> slotRadioStateChangeMap_;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

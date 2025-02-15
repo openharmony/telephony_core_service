@@ -81,6 +81,8 @@ public:
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
+    void SetRetryActiveSimInfo(int32_t slotId, int32_t errorType);
+    bool GetRetryActiveSimInfo(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -148,6 +150,7 @@ private:
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
+    std::map<int32_t, bool> simActiveMap_;
 };
 } // namespace Telephony
 } // namespace OHOS
