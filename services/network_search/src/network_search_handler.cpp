@@ -553,6 +553,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
     }
+    HandleRetryActiveSim(radioState);
     if (radioState == CORE_SERVICE_POWER_ON || radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
         auto inner = networkSearchManager->FindManagerInner(slotId_);
@@ -566,6 +567,46 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     }
     if (operatorName_ != nullptr) {
         operatorName_->NotifySpnChanged();
+    }
+}
+
+void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
+{    
+    auto it = slotRadioStateChangeMap_.find(slotId_);
+    if (it == slotRadioStateChangeMap_.end()) {
+        slotRadioStateChange defaultState = {INIT_RADIO_STATE, currentRadioState};
+        slotRadioStateChangeMap_[slotId_] = defaultState;
+        it = slotRadioStateChangeMap_.find(slotId_);
+    }
+    auto& entry = it->second;
+    entry.newRadioState_ = currentRadioState;
+ 
+    if (currentRadioState == CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        entry.oldRadioState_ = CORE_SERVICE_POWER_NOT_AVAILABLE;
+        return;
+    }
+ 
+    if (entry.oldRadioState_ != CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        return;
+    }
+ 
+    TELEPHONY_LOGI("Slot %{public}d: oldRadioState=%{public}d newRadioState=%{public}d",
+        slotId_, entry.oldRadioState_, entry.newRadioState_);
+ 
+    std::shared_ptr<ISimManager> simManager = simManager_.lock();
+    if (simManager == nullptr) {
+        TELEPHONY_LOGE("Failed to lock simManager");
+        return;
+    }
+    bool isNeedResetActive = simManager->GetRetryActiveSimInfo(slotId_);
+    bool isSimActive = simManager->IsSimActive(slotId_);
+    TELEPHONY_LOGI("Slot %{public}d: isNeedResetActive=%{public}d isSimActive=%{public}d",
+        slotId_, isNeedResetActive, isSimActive);
+    if (isNeedResetActive && !isSimActive) {
+        if (simManager->SetActiveSim(slotId_, ModemPowerState::CORE_SERVICE_POWER_ON) == TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGI("Slot %{public}d: is success active", slotId_);
+            entry.oldRadioState_ = INIT_RADIO_STATE;
+        }
     }
 }
 
