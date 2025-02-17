@@ -158,7 +158,6 @@ private:
     void UpdateNetworkState();
     void GetDeviceId();
     void HandleRetryActiveSim(int radioState);
-    bool HandleSlotRadioChange(int radioState);
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
@@ -195,7 +194,8 @@ private:
         int32_t oldRadioState_;
         int32_t newRadioState_;
     };
-    std::map<int32_t, slotRadioStateChange> slotRadioStateChangeMap_;
+    std::map<int32_t, slotRadioStateChange> slotRadioStateChangeMap_ =
+        { { 0, {INIT_RADIO_STATE, INIT_RADIO_STATE} }, { 1, {INIT_RADIO_STATE, INIT_RADIO_STATE} } };
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
