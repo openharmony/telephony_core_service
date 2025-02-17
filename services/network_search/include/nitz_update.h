@@ -45,7 +45,6 @@ public:
 
 private:
     void ProcessTime(NetworkTime &networkTime);
-    bool IsValidTime(int64_t networkTime, int64_t offset);
     void SaveTimeZone(std::string &timeZone);
     void SaveTime(int64_t networkTime, int64_t offset);
     bool IsAutoTimeZone();
