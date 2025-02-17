@@ -20,6 +20,7 @@ using namespace std;
 namespace OHOS {
 namespace Telephony {
 std::mutex mccMutex_;
+std::mutex initMutex_;
 std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
 std::vector<std::string> MccPool::indiaMccMnc_;
@@ -378,6 +379,7 @@ bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 
 void MccPool::InitSpecialMccMncTables()
 {
+    std::lock_guard<std::mutex> lck(initMutex_);
     if (specialMccMnc_.size() == 0) {
         AddMccMncForCa();
         AddMccMncForInAirtel();
