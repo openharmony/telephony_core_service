@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
+class SimFileInit;
 class SimFile : public IccFile {
 public:
     explicit SimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -87,10 +88,6 @@ protected:
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, FileProcessFunc> memberFuncMap_;
-    void InitMemberFunc();
-    void InitBaseMemberFunc();
-    void InitObtainMemberFunc();
-    void InitPlmnMemberFunc();
     void ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event);
     std::string AnalysisBcdPlmn(std::string data, std::string description);
     void ProcessElementaryFileCsp(std::string data);
@@ -161,9 +158,6 @@ private:
     const int SPN_CHAR_POS = 0;
     const int MAIL_DELAY_TIME = 50 * 1000;
     const int RELOAD_ICCID_COUNT = 3;
-    const int BYTE_TO_BIT_LEN = 8;
-    const int HEX_TO_BYTE_LEN = 2;
-    const int HEX_TYPE = 16;
     bool hasRetryGetImsi_ = false;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
@@ -182,6 +176,8 @@ private:
     bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
     bool VoiceMailNotEditToSim();
     bool IsServiceAvailable(UsimService service);
+    friend class SimFileInit;
+    std::shared_ptr<SimFileInit> simFileInit_;
     std::string serviceTable_;
 };
 } // namespace Telephony
