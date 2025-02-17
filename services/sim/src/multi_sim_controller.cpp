@@ -719,13 +719,8 @@ void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType
         TELEPHONY_LOGE("SlotId: %{public}d is valid", slotId);
         return;
     }
-
-    if (errorType == static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE)
-        || errorType == static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER)) {
-        simActiveMap_[slotId] = true;
-    } else {
-        simActiveMap_[slotId] = false;
-    }
+    simActiveMap_[slotId] = (errorType == static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE) ||
+        errorType == static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER));
 }
 
 bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId) const
