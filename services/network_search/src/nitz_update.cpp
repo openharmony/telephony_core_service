@@ -215,10 +215,6 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
     }
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
         slotId_, static_cast<long long>(currentTime), static_cast<long long>(offset), static_cast<long long>(nitzTime));
-    if (!IsValidTime(nitzTime, offset)) {
-        TELEPHONY_LOGE("NitzUpdate::ProcessTime invalid time, slotId:%{public}d", slotId_);
-        return;
-    }
     bool autoTime = IsAutoTime();
     if (!autoTime) {
         TELEPHONY_LOGI("NitzUpdate::ProcessTime not auto udpate time slotId:%{public}d", slotId_);
@@ -230,37 +226,6 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         runningLock->UnLock();
     }
 #endif
-}
-
-bool NitzUpdate::IsValidTime(int64_t networkTime, int64_t offset)
-{
-    int64_t currentSystemTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
-    if (currentSystemTime <= 0) {
-        TELEPHONY_LOGE("NitzUpdate::IsInvalidTime current system time is invalid");
-        return false;
-    }
-    currentSystemTime = currentSystemTime / MILLI_TO_BASE;
-    if (lastSystemTime_ == 0 && lastNetworkTime_ == 0) {
-        lastSystemTime_ = currentSystemTime;
-        lastNetworkTime_ = networkTime;
-        lastOffsetTime_ = offset;
-        return true;
-    }
-
-    // The difference between the two NITZ times and the elapsed time should be within the threshold
-    int64_t networkTimeInterval = networkTime - lastNetworkTime_;
-    int64_t systemElapsedTime = currentSystemTime - lastSystemTime_;
-    if (abs(networkTimeInterval - systemElapsedTime) > TIME_THRESHOLD) {
-        TELEPHONY_LOGE(
-            "NitzUpdate::IsInvalidTime The gap between the network time interval and the system elapsed time interval "
-            "is large and will not be processed, slotId:%{public}d", slotId_);
-        return false;
-    }
-
-    lastSystemTime_ = currentSystemTime;
-    lastNetworkTime_ = networkTime;
-    lastOffsetTime_ = offset;
-    return true;
 }
 
 void NitzUpdate::ProcessTimeZone()
