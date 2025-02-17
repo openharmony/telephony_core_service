@@ -728,13 +728,13 @@ void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType
     }
 }
 
-bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId)
+bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId) const
 {
     if (slotId >= SIM_SLOT_COUNT || slotId < 0) {
         TELEPHONY_LOGI("slotId: %{public}d is valid", slotId);
         return false;
     }
-    return simActiveMap_[slotId];
+    return simActiveMap_.at(slotId);
 }
 
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
