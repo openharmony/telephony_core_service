@@ -190,16 +190,8 @@ private:
     bool isCsCapable_ = true;
     std::mutex mutex_;
     static constexpr int32_t INIT_RADIO_STATE = -2;
-    static constexpr int32_t SLOT_COUNT = 2;
-    static constexpr int32_t SLOT_ID_ZERO = 0;
-    struct slotRadioStateChange {
-        int32_t oldRadioState_;
-        int32_t newRadioState_;
-    };
-    std::unordered_map<int32_t, slotRadioStateChange> slotRadioStateChangeMap_ = {
-        { 0, {INIT_RADIO_STATE, INIT_RADIO_STATE} },
-        { 1, {INIT_RADIO_STATE, INIT_RADIO_STATE} }
-    };
+    int32_t oldRadioState_;
+    int32_t newRadioState_;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
