@@ -596,11 +596,11 @@ void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
         TELEPHONY_LOGE("Failed to lock simManager");
         return;
     }
-    bool isNeedResetActive = simManager->GetRetryActiveSimInfo(slotId_);
+    bool isNeedRetryActive = simManager->GetRetryActiveSimInfo(slotId_);
     bool isSimActive = simManager->IsSimActive(slotId_);
-    TELEPHONY_LOGI("Slot %{public}d: isNeedResetActive=%{public}d isSimActive=%{public}d",
-        slotId_, isNeedResetActive, isSimActive);
-    if (isNeedResetActive && !isSimActive) {
+    TELEPHONY_LOGI("Slot %{public}d: isNeedRetryActive=%{public}d isSimActive=%{public}d",
+        slotId_, isNeedRetryActive, isSimActive);
+    if (isNeedRetryActive && !isSimActive) {
         if (simManager->SetActiveSim(slotId_, ModemPowerState::CORE_SERVICE_POWER_ON) == TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGI("Slot %{public}d: is success active", slotId_);
             entry.oldRadioState_ = currentRadioState;
