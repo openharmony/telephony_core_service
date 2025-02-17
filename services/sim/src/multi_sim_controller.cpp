@@ -715,29 +715,28 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
  
 void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType)
 {
-    auto iter = simActiveMap_.find(slotId);
-    TELEPHONY_LOGI("slotId: %{public}d type: %{public}d", slotId, errorType);
- 
-    if (iter != simActiveMap_.end()) {
-        if (errorType == static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE)
-            || errorType == static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER)) {
-            iter->second = true;
-        } else {
-            iter->second = false;
-        }
+    if (slotId >= 2 || slotId < 0) {
+        TELEPHONY_LOGI("slotId: %{public}d is valid", slotId);
+        return;
+    }
+    bool& iter = simActiveMap_[slotId];
+    TELEPHONY_LOGI("Need retry slotId: %{public}d type: %{public}d", slotId, errorType);
+
+    if (errorType == static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE)
+        || errorType == static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER)) {
+        iter = true;
     } else {
-        simActiveMap_.insert({slotId, false});
+        iter = false;
     }
 }
- 
+
 bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId)
 {
-    auto iter = simActiveMap_.find(slotId);
-    if (iter != simActiveMap_.end()) {
-        bool needResetActive = iter->second;
-        return needResetActive;
+    if ( slotId >= 2) {
+        TELEPHONY_LOGI("slotId: %{public}d is valid", slotId);
+        return false;
     }
-    return false;
+    return simActiveMap_[slotId];
 }
 
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
