@@ -2580,17 +2580,18 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_HandleRetryActiveSim_001, Fu
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, SLOT_ID_0);
 
-    int32_t slotId_ = 1;
+    networkSearchHandler->slotId_ = 1;
     auto currentRadioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-    networkSearchHandler->slotRadioStateChangeMap_[slotId_] = {-2, currentRadioState};
+    networkSearchHandler->oldRadioState_ = -2;
+    networkSearchHandler->newRadioState_ = currentRadioState;
     currentRadioState = ModemPowerState::CORE_SERVICE_POWER_OFF;
-    networkSearchHandler->slotRadioStateChangeMap_[slotId_] = {-2, currentRadioState};
+    networkSearchHandler->newRadioState_ = currentRadioState;
     networkSearchHandler->HandleRetryActiveSim(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
 
     currentRadioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-    networkSearchHandler->slotRadioStateChangeMap_[slotId_] = {-2, currentRadioState};
+    networkSearchHandler->newRadioState_ = currentRadioState;
     networkSearchHandler->HandleRetryActiveSim(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
-    EXPECT_NE(networkSearchHandler->slotRadioStateChangeMap_[slotId_].newRadioState_, 0);
+    EXPECT_NE(networkSearchHandler->newRadioState_, 0);
 }
 
 /**
