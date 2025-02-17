@@ -82,7 +82,7 @@ public:
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
     void SetRetryActiveSimInfo(int32_t slotId, int32_t errorType);
-    bool GetRetryActiveSimInfo(int32_t slotId);
+    bool GetRetryActiveSimInfo(int32_t slotId) const;
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
