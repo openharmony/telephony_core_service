@@ -118,8 +118,6 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverEsimErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-        delete asyncContext;
-        asyncContext = nullptr;
         return nullptr;
     }
 
@@ -575,9 +573,13 @@ napi_value AddProfile(napi_env env, napi_callback_info info)
         .complete = AddProfileCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncAddProfileInfo>(para, addProfile.get(), initPara);
-    if (result) {
-        ProfileInfoAnalyze(env, object, addProfile->profile);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    ProfileInfoAnalyze(env, object, addProfile->profile);
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        addProfile.release();
     }
     return result;
 }
@@ -643,8 +645,12 @@ napi_value GetEuiccInfo(napi_env env, napi_callback_info info)
         .complete = GetEuiccInfoCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncEuiccInfo>(para, euiccInfo.get(), initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        euiccInfo.release();
     }
     return result;
 }
@@ -755,9 +761,13 @@ napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
         .complete = SetDefaultSmdpAddressCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext.get(), initPara);
-    if (result) {
-        asyncContext->inputStr = std::string(inputTepStr.begin(), inputTepStr.end());
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    asyncContext->inputStr = std::string(inputTepStr.begin(), inputTepStr.end());
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        asyncContext.release();
     }
     return result;
 }
@@ -824,9 +834,13 @@ napi_value SwitchToProfile(napi_env env, napi_callback_info info)
         .complete = SwitchToProfileCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSwitchProfileInfo>(para, profileContext.get(), initPara);
-    if (result) {
-        profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        profileContext.release();
     }
     return result;
 }
@@ -889,9 +903,13 @@ napi_value DeleteProfile(napi_env env, napi_callback_info info)
         .complete = DeleteProfileCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContextInfo>(para, asyncContext.get(), initPara);
-    if (result) {
-        asyncContext->inputStr = std::string(inputTmpStr.begin(), inputTmpStr.end());
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    asyncContext->inputStr = std::string(inputTmpStr.begin(), inputTmpStr.end());
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        asyncContext.release();
     }
     return result;
 }
@@ -966,8 +984,12 @@ napi_value ResetMemory(napi_env env, napi_callback_info info)
         .complete = ResetMemoryCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncResetMemory>(para, profileContext.get(), initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        profileContext.release();
     }
     return result;
 }
@@ -1046,10 +1068,14 @@ napi_value DownloadProfile(napi_env env, napi_callback_info info)
         .complete = DownloadProfileCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDownloadProfileInfo>(para, profileContext.get(), initPara);
-    if (result) {
-        ProfileInfoAnalyze(env, profileObject, profileContext->profile);
-        ConfigurationInfoAnalyze(env, configurationObject, profileContext->configuration);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    ProfileInfoAnalyze(env, profileObject, profileContext->profile);
+    ConfigurationInfoAnalyze(env, configurationObject, profileContext->configuration);
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        profileContext.release();
     }
     return result;
 }
@@ -1119,8 +1145,12 @@ napi_value GetDownloadableProfiles(napi_env env, napi_callback_info info)
         .complete = GetDownloadableProfilesCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultProfileList>(para, profileContext.get(), initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        profileContext.release();
     }
     return result;
 }
@@ -1277,10 +1307,14 @@ napi_value SetProfileNickname(napi_env env, napi_callback_info info)
         .complete = SetProfileNicknameCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncProfileNickname>(para, profileContext.get(), initPara);
-    if (result) {
-        profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
-        profileContext->nickname = std::string(nicknameStr.begin(), nicknameStr.end());
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
+    profileContext->nickname = std::string(nicknameStr.begin(), nicknameStr.end());
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        profileContext.release();
     }
     return result;
 }
@@ -1345,9 +1379,13 @@ napi_value CancelSession(napi_env env, napi_callback_info info)
         .complete = CancelSessionCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncCancelSession>(para, sessionContext.get(), initPara);
-    if (result) {
-        sessionContext->transactionId = std::string(transactionIdStr.begin(), transactionIdStr.end());
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    sessionContext->transactionId = std::string(transactionIdStr.begin(), transactionIdStr.end());
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        sessionContext.release();
     }
     return result;
 }
@@ -1416,9 +1454,13 @@ napi_value GetDownloadableProfileMetadata(napi_env env, napi_callback_info info)
         .complete = GetDownloadableProfileMetadataCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncProfileMetadataInfo>(para, metadata.get(), initPara);
-    if (result) {
-        ProfileInfoAnalyze(env, object, metadata->profile);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    ProfileInfoAnalyze(env, object, metadata->profile);
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        metadata.release();
     }
     return result;
 }
@@ -1484,8 +1526,12 @@ napi_value GetEuiccProfileInfoList(napi_env env, napi_callback_info info)
         .complete = GetEuiccProfileInfoListCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncEuiccProfileInfoList>(para, euiccInfo.get(), initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        euiccInfo.release();
     }
     return result;
 }
@@ -1546,8 +1592,12 @@ napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info inf
         .complete = ReserveProfilesForFactoryRestoreCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncCommonInfo>(para, asyncContext.get(), initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        asyncContext.release();
     }
     return result;
 }
