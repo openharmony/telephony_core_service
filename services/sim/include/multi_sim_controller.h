@@ -150,7 +150,7 @@ private:
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
-    std::unordered_map<int32_t, bool> simActiveMap_ = { { 0, false }, { 1, false }};
+    std::unordered_map<int32_t, bool> simActiveMap_ = { { 0, false }, { 1, false } };
 };
 } // namespace Telephony
 } // namespace OHOS
