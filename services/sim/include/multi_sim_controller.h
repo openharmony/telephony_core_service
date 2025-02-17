@@ -151,6 +151,8 @@ private:
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
     std::unordered_map<int32_t, bool> simActiveMap_ = { { 0, false }, { 1, false }};
+    static constexpr int32_t SLOT_COUNT = 2;
+    static constexpr int32_t SLOT_ID_ZERO = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
