@@ -572,7 +572,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
 
 void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
 {
-    if (slotId_ >= 2 || slotId_ < 0) {
+    if (slotId_ >= SLOT_COUNT || slotId_ < SLOT_ID_ZERO) {
         TELEPHONY_LOGI("slotId: %{public}d is virtual card not need retry", slotId_);
         return;
     }
