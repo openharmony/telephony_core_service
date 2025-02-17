@@ -715,7 +715,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
  
 void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType)
 {
-    if (slotId >= 2 || slotId < 0) {
+    if (slotId >= SLOT_COUNT || slotId < SLOT_ID_ZERO) {
         TELEPHONY_LOGI("slotId: %{public}d is valid", slotId);
         return;
     }
@@ -732,7 +732,7 @@ void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType
 
 bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId)
 {
-    if ( slotId >= 2) {
+    if (slotId >= SLOT_COUNT || slotId < SLOT_ID_ZERO) {
         TELEPHONY_LOGI("slotId: %{public}d is valid", slotId);
         return false;
     }
