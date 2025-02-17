@@ -571,7 +571,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
 }
 
 void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
-{    
+{
     auto it = slotRadioStateChangeMap_.find(slotId_);
     if (it == slotRadioStateChangeMap_.end()) {
         slotRadioStateChange defaultState = {INIT_RADIO_STATE, currentRadioState};
