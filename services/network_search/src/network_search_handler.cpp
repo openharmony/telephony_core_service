@@ -603,7 +603,7 @@ void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
             oldRadioState_ = INIT_RADIO_STATE;
         }
     } else {
-        oldRadioState_ = currentRadioState;
+        oldRadioState_ = INIT_RADIO_STATE;
     }
 }
 
