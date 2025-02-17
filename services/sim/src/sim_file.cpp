@@ -21,6 +21,7 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "radio_event.h"
+#include "sim_file_init.h"
 #include "sim_number_decode.h"
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
@@ -37,13 +38,23 @@ namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 const int64_t DELAY_TIME = 500;
 const int64_t GET_IMSI_DELAY_TIME = 2000;
+const int BYTE_TO_BIT_LEN = 8;
+const int HEX_TO_BYTE_LEN = 2;
+const int HEX_TYPE = 16;
+const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
+const int CFIS_TON_NPI_OFFSET = 3;
+const int SST_SPN_OFFSET = 4;
+const int SST_PNN_OFFSET = 12;
+const int CFIS_ADN_CAPABILITY_ID_OFFSET = 14;
+const int CFIS_ADN_EXTENSION_ID_OFFSET = 15;
 std::mutex IccFile::mtx_;
 std::vector<std::string> SimFile::indiaMcc_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
 {
     fileQueried_ = false;
     displayConditionOfSpn_ = SPN_INVALID;
-    InitMemberFunc();
+    simFileInit_ = std::make_shared<SimFileInit>();
+    simFileInit_->InitMemberFunc(*this);
 }
 
 void SimFile::StartLoad()
@@ -289,34 +300,34 @@ void SimFile::LoadSimOtherFile()
         TELEPHONY_LOGE("get sst fail, serviceTable_ is null");
         return;
     }
-    if (IsServiceAvailable(UsimService::PLMN_NETWORK_NAME)) {
+    if (IsServiceAvailable(UsimService::USIM_PLMN_NETWORK_NAME)) {
         AppExecFwk::InnerEvent::Pointer eventPnn = BuildCallerInfo(MSG_SIM_OBTAIN_PNN_DONE);
         fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PNN, eventPnn);
         fileToGet_++;
     }
-    if (IsServiceAvailable(UsimService::OPERATOR_PLMN_LIST)) {
+    if (IsServiceAvailable(UsimService::USIM_OPERATOR_PLMN_LIST)) {
         AppExecFwk::InnerEvent::Pointer eventOpl = BuildCallerInfo(MSG_SIM_OBTAIN_OPL_DONE);
         fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
         fileToGet_++;
     }
-    if (IsServiceAvailable(UsimService::FOR_5GS_OPERATOR_PLMN_LIST)) {
+    if (IsServiceAvailable(UsimService::USIM_FOR_5GS_OPERATOR_PLMN_LIST)) {
         AppExecFwk::InnerEvent::Pointer eventOpl5g = BuildCallerInfo(MSG_SIM_OBTAIN_OPL5G_DONE);
         fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL5G, eventOpl5g);
         fileToGet_++;
     }
-    if (IsServiceAvailable(UsimService::MSISDN)) {
+    if (IsServiceAvailable(UsimService::USIM_MSISDN)) {
         AppExecFwk::InnerEvent::Pointer phoneNumberEvent =
             CreateDiallingNumberPointer(MSG_SIM_OBTAIN_MSISDN_DONE, 0, 0, nullptr);
         diallingNumberHandler_->GetDiallingNumbers(
             ELEMENTARY_FILE_MSISDN, ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN), 1, phoneNumberEvent);
         fileToGet_++;
     }
-    if (IsServiceAvailable(UsimService::MBDN)) {
+    if (IsServiceAvailable(UsimService::USIM_MBDN)) {
         AppExecFwk::InnerEvent::Pointer eventMBI = BuildCallerInfo(MSG_SIM_OBTAIN_MBI_DONE);
         fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MBI, 1, eventMBI);
         fileToGet_++;
     }
-    if (IsServiceAvailable(UsimService::MWI_STATUS)) {
+    if (IsServiceAvailable(UsimService::USIM_MWI_STATUS)) {
         AppExecFwk::InnerEvent::Pointer eventMWIS = BuildCallerInfo(MSG_SIM_OBTAIN_MWIS_DONE);
         fileController_->ObtainLinearFixedFile(ELEMENTARY_FILE_MWIS, 1, eventMWIS);
         fileToGet_++;
@@ -1539,7 +1550,7 @@ bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
         return false;
     }
     serviceTable_ = iccData;
-    if (IsServiceAvailable(UsimService::SPN)) {
+    if (IsServiceAvailable(UsimService::USIM_SPN)) {
         AppExecFwk::InnerEvent::Pointer eventSpn = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
         ObtainSpnPhase(true, eventSpn);
     } else {
@@ -1566,13 +1577,13 @@ bool SimFile::IsServiceAvailable(UsimService service)
     if (cardType == CardType::SINGLE_MODE_SIM_CARD) {
         return true;
     }
-    if (service < UsimService::PHONEBOOK || service > UsimService::FOR_5G_SECURITY_PARAMETERS_EXTENDED) {
+    if (service < UsimService::USIM_PHONEBOOK || service > UsimService::USIM_FOR_5G_SECURITY_PARAMETERS_EXTENDED) {
         TELEPHONY_LOGE("service %{public}d is unavailable", service);
         return false;
     }
     uint32_t offset = static_cast<uint32_t>(service) / BYTE_TO_BIT_LEN;
     uint32_t mask = static_cast<uint32_t>(service) % BYTE_TO_BIT_LEN;
-    if (mask == 0 && offset!=0) {
+    if (mask == 0 && offset != 0) {
         offset--;
         mask = 7; // 7 means max index in one byte
     } else {

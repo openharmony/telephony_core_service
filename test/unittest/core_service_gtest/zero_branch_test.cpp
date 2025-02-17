@@ -41,6 +41,7 @@
 #include "radio_protocol_controller.h"
 #include "ruim_file_controller.h"
 #include "sim_file_controller.h"
+#include "sim_file_init.h"
 #include "sim_file_manager.h"
 #include "sim_manager.h"
 #include "sim_number_decode.h"
@@ -555,6 +556,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
+    std::shared_ptr<SimFileInit> simFileInit = std::make_shared<SimFileInit>();
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     simFile->ProcessEvent(event);
@@ -562,7 +564,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     simFile->ProcessSpnGeneral(event);
     simFile->ProcessSpnCphs(event);
     simFile->ProcessSpnShortCphs(event);
-    simFile->InitMemberFunc();
+    simFileInit->InitMemberFunc(*simFile.get());
     simFile->ProcessFileLoaded(false);
     simFile->ProcessFileLoaded(true);
     simFile->ProcessIccRefresh(ELEMENTARY_FILE_MBDN);
@@ -588,7 +590,7 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessGetMwisDone(event));
     EXPECT_TRUE(simFile->ProcessGetMbdnDone(event));
     simFile->serviceTable_ = "867F1F1C234E0000400050";
-    EXPECT_TRUE(simFile->IsServiceAvailable(UsimService::FDN));
+    EXPECT_TRUE(simFile->IsServiceAvailable(UsimService::USIM_FDN));
 }
 
 /**
