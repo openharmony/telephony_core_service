@@ -190,8 +190,8 @@ private:
     bool isCsCapable_ = true;
     std::mutex mutex_;
     static constexpr int32_t INIT_RADIO_STATE = -2;
-    int32_t oldRadioState_;
-    int32_t newRadioState_;
+    int32_t oldRadioState_ = INIT_RADIO_STATE;
+    int32_t newRadioState_ = INIT_RADIO_STATE;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
