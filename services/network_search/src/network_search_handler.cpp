@@ -572,8 +572,8 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
 
 void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
 {
-    if (slotId_ >= SIM_SLOT_COUNT || slotId_ < 0) {
-        TELEPHONY_LOGI("slotId: %{public}d is virtual card not need retry", slotId_);
+    if (slotId_ < 0 || slotId_ >= SIM_SLOT_COUNT) {
+        TELEPHONY_LOGE("slotId: %{public}d is virtual card not need retry", slotId_);
         return;
     }
     newRadioState_ = currentRadioState;
@@ -587,21 +587,19 @@ void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
         return;
     }
 
-    TELEPHONY_LOGI("Slot %{public}d: oldRadioState=%{public}d newRadioState=%{public}d",
-        slotId_, oldRadioState_, newRadioState_);
-
     std::shared_ptr<ISimManager> simManager = simManager_.lock();
     if (simManager == nullptr) {
         TELEPHONY_LOGE("Failed to lock simManager");
         return;
     }
+
     bool isNeedRetryActive = simManager->GetRetryActiveSimInfo(slotId_);
     bool isSimActive = simManager->IsSimActive(slotId_);
-    TELEPHONY_LOGI("Slot %{public}d: isNeedRetryActive=%{public}d isSimActive=%{public}d",
-        slotId_, isNeedRetryActive, isSimActive);
+    TELEPHONY_LOGI("Slot %{public}d: isNeedRetryActive=%{public}d isSimActive=%{public}d oldRadioState=%{public}d "
+        "newRadioState=%{public}d", slotId_, isNeedRetryActive, isSimActive, oldRadioState_, newRadioState_);
     if (isNeedRetryActive && !isSimActive) {
         if (simManager->SetActiveSim(slotId_, ModemPowerState::CORE_SERVICE_POWER_ON) == TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGI("Slot %{public}d: is success active", slotId_);
+            TELEPHONY_LOGI("Slot %{public}d is successfully activated", slotId_);
             oldRadioState_ = INIT_RADIO_STATE;
         }
     } else {
