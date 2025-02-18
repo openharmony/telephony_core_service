@@ -553,6 +553,7 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
             TELEPHONY_LOGI("Unhandled message with number: %{public}d", radioState);
             break;
     }
+    HandleRetryActiveSim(radioState);
     if (radioState == CORE_SERVICE_POWER_ON || radioState == CORE_SERVICE_POWER_OFF) {
         networkSearchManager->SetRadioStateValue(slotId_, (ModemPowerState)radioState);
         auto inner = networkSearchManager->FindManagerInner(slotId_);
@@ -566,6 +567,43 @@ void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointe
     }
     if (operatorName_ != nullptr) {
         operatorName_->NotifySpnChanged();
+    }
+}
+
+void NetworkSearchHandler::HandleRetryActiveSim(int32_t currentRadioState)
+{
+    if (slotId_ < 0 || slotId_ >= SIM_SLOT_COUNT) {
+        TELEPHONY_LOGE("slotId: %{public}d is valid", slotId_);
+        return;
+    }
+    newRadioState_ = currentRadioState;
+
+    if (currentRadioState == CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        oldRadioState_ = CORE_SERVICE_POWER_NOT_AVAILABLE;
+        return;
+    }
+
+    if (oldRadioState_ != CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        return;
+    }
+
+    std::shared_ptr<ISimManager> simManager = simManager_.lock();
+    if (simManager == nullptr) {
+        TELEPHONY_LOGE("Failed to lock simManager");
+        return;
+    }
+
+    bool isNeedRetryActive = simManager->GetRetryActiveSimInfo(slotId_);
+    bool isSimActive = simManager->IsSimActive(slotId_);
+    TELEPHONY_LOGI("Slot %{public}d: isNeedRetryActive=%{public}d isSimActive=%{public}d oldRadioState=%{public}d "
+        "newRadioState=%{public}d", slotId_, isNeedRetryActive, isSimActive, oldRadioState_, newRadioState_);
+    if (isNeedRetryActive && !isSimActive) {
+        if (simManager->SetActiveSim(slotId_, ModemPowerState::CORE_SERVICE_POWER_ON) == TELEPHONY_ERR_SUCCESS) {
+            TELEPHONY_LOGI("Slot %{public}d is successfully activated", slotId_);
+            oldRadioState_ = INIT_RADIO_STATE;
+        }
+    } else {
+        oldRadioState_ = INIT_RADIO_STATE;
     }
 }
 
