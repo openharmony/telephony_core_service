@@ -498,6 +498,15 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
 int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
     isSetActiveSimInProgress_[slotId] = 1;
+    if (isSetPrimarySlotIdInProgress_ == true) {
+        TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, wait 3s");
+        std::unique_lock<std::mutex> lock(activeSimMutex_);
+        if (isSetPrimarySlotIdInProgress_ == true) {
+            activeSimConn_.wait_for(lock, std::chrono::seconds(WAIT_REMOTE_TIME_SEC));
+        }
+    } else {
+        TELEPHONY_LOGI("isSetSimSlotInProgress_ is false, go on");
+    }
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
             slotId, SimCardErrorCode::SET_ACTIVESIM_ERROR, "SetActiveSimToRil failure");
@@ -945,6 +954,14 @@ int32_t MultiSimController::GetPrimarySlotId()
     return lastPrimarySlotId_;
 }
 
+void MultiSimController::SetPrimarySlotIdDone()
+{
+    isSetPrimarySlotIdInProgress_ = false;
+    PublishSetPrimaryEvent(true);
+    std::unique_lock<std::mutex> lock(activeSimMutex_);
+    activeSimConn_.notify_all();
+}
+
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
 {
     TELEPHONY_LOGD("slotId = %{public}d", slotId);
@@ -969,8 +986,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     PublishSetPrimaryEvent(false);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
-        isSetPrimarySlotIdInProgress_ = false;
-        PublishSetPrimaryEvent(true);
+        SetPrimarySlotIdDone();
         if (setPrimarySlotRemainCount_[slotId] > 0) {
             SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
             TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
@@ -980,8 +996,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
-    isSetPrimarySlotIdInProgress_ = false;
-    PublishSetPrimaryEvent(true);
+    SetPrimarySlotIdDone();
     setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;

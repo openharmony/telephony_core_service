@@ -127,6 +127,7 @@ private:
     int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetPrimarySlotIdDone();
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -150,6 +151,10 @@ private:
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
+    std::condition_variable activeSimConn_;
+    std::mutex activeSimMutex_;
+    static constexpr const uint32_t WAIT_REMOTE_TIME_SEC = 3; // second
+
     std::unordered_map<int32_t, bool> simActiveMap_ = { { 0, false }, { 1, false } };
 };
 } // namespace Telephony
