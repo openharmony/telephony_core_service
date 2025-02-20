@@ -100,7 +100,7 @@ std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::GetRawContactResult
     columns.push_back(RawContact::ID);
     DataShare::DataSharePredicates predicates;
     predicates.BeginWrap();
-    for (int i = 0; i < (int32_t)contactIdList.size(); i++) {
+    for (size_t i = 0; i < contactIdList.size(); i++) {
         predicates.EqualTo(RawContact::CONTACT_ID, contactIdList[i]);
         if (i != contactIdList.size() - 1) {
             predicates.Or();
