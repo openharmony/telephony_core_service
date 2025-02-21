@@ -326,15 +326,6 @@ int32_t SimManager::SetActiveSimSatellite(int32_t slotId, int32_t enable)
     return ret;
 }
 
-bool SimManager::GetRetryActiveSimInfo(int32_t slotId)
-{
-    if ((!IsValidSlotId(slotId)) || (multiSimController_ == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
-        return false;
-    }
-    return multiSimController_->GetRetryActiveSimInfo(slotId);
-}
-
 int32_t SimManager::ResetSimLoadAccount(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId)) || (multiSimMonitor_ == nullptr)) {

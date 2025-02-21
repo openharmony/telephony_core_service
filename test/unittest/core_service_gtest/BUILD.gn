@@ -421,7 +421,6 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
-    "$SOURCE_DIR/interfaces/innerkits/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
