@@ -366,14 +366,14 @@ void AccessRuleInfoAnalyze(napi_env env, napi_value arg, AsyncAccessRule &access
     if (hashState) {
         std::array<char, ARRAY_SIZE> hashHexStr = {0};
         NapiValueToCppValue(env, hashState, napi_string, std::data(hashHexStr));
-        accessType.certificateHashHexStr = std::string(hashHexStr.begin(), hashHexStr.end());
+        accessType.certificateHashHexStr = std::string(hashHexStr.data());
     }
 
     napi_value nameState = NapiUtil::GetNamedProperty(env, arg, "packageName");
     if (nameState) {
         std::array<char, ARRAY_SIZE> nameStr = {0};
         NapiValueToCppValue(env, nameState, napi_string, std::data(nameStr));
-        accessType.packageName = std::string(nameStr.begin(), nameStr.end());
+        accessType.packageName = std::string(nameStr.data());
     }
 
     napi_value type = NapiUtil::GetNamedProperty(env, arg, "accessType");
@@ -388,21 +388,21 @@ void ProfileInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadableProfile &
     if (activateState) {
         std::array<char, ARRAY_SIZE> activationStr = {0};
         NapiValueToCppValue(env, activateState, napi_string, std::data(activationStr));
-        profileInfo.activationCode = std::string(activationStr.begin(), activationStr.end());
+        profileInfo.activationCode = std::string(activationStr.data());
     }
 
     napi_value confirmState = NapiUtil::GetNamedProperty(env, arg, "confirmationCode");
     if (confirmState) {
         std::array<char, ARRAY_SIZE> confirmationStr = {0};
         NapiValueToCppValue(env, confirmState, napi_string, std::data(confirmationStr));
-        profileInfo.confirmationCode = std::string(confirmationStr.begin(), confirmationStr.end());
+        profileInfo.confirmationCode = std::string(confirmationStr.data());
     }
 
     napi_value nameState = NapiUtil::GetNamedProperty(env, arg, "carrierName");
     if (nameState) {
         std::array<char, ARRAY_SIZE> carrierStr = {0};
         NapiValueToCppValue(env, nameState, napi_string, std::data(carrierStr));
-        profileInfo.carrierName = std::string(carrierStr.begin(), carrierStr.end());
+        profileInfo.carrierName = std::string(carrierStr.data());
     }
 
     napi_value ruleState = NapiUtil::GetNamedProperty(env, arg, "accessRules");
@@ -765,7 +765,7 @@ napi_value SetDefaultSmdpAddress(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("creat asyncwork failed!");
         return nullptr;
     }
-    asyncContext->inputStr = std::string(inputTepStr.begin(), inputTepStr.end());
+    asyncContext->inputStr = std::string(inputTepStr.data());
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         asyncContext.release();
     }
@@ -838,7 +838,7 @@ napi_value SwitchToProfile(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("creat asyncwork failed!");
         return nullptr;
     }
-    profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
+    profileContext->iccid = std::string(iccIdStr.data());
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         profileContext.release();
     }
@@ -907,7 +907,7 @@ napi_value DeleteProfile(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("creat asyncwork failed!");
         return nullptr;
     }
-    asyncContext->inputStr = std::string(inputTmpStr.begin(), inputTmpStr.end());
+    asyncContext->inputStr = std::string(inputTmpStr.data());
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         asyncContext.release();
     }
@@ -1311,8 +1311,8 @@ napi_value SetProfileNickname(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("creat asyncwork failed!");
         return nullptr;
     }
-    profileContext->iccid = std::string(iccIdStr.begin(), iccIdStr.end());
-    profileContext->nickname = std::string(nicknameStr.begin(), nicknameStr.end());
+    profileContext->iccid = std::string(iccIdStr.data());
+    profileContext->nickname = std::string(nicknameStr.data());
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         profileContext.release();
     }
@@ -1383,7 +1383,7 @@ napi_value CancelSession(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("creat asyncwork failed!");
         return nullptr;
     }
-    sessionContext->transactionId = std::string(transactionIdStr.begin(), transactionIdStr.end());
+    sessionContext->transactionId = std::string(transactionIdStr.data());
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         sessionContext.release();
     }
