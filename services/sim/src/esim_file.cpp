@@ -1047,7 +1047,7 @@ struct CarrierIdentifier buildCarrierIdentifiers(std::shared_ptr<Asn1Node> &root
     }
 
     std::vector<uint8_t> mccMnc;
-    std::shared_ptr<Asn1Node> ctx0Node = root->Asn1GetChild(TAG_ESIM_CTX_0);
+    std::shared_ptr<Asn1Node> ctx0Node = root->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     if (ctx0Node == nullptr) {
         return defaultCarrier;
     }
