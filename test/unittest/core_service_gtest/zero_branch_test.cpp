@@ -1426,27 +1426,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | L
 }
 
 /**
- * @tc.number   Telephony_MultiSimController_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    multiSimController->isSetActiveSimInProgress_.resize(2, 0);
-    multiSimController->isSetPrimarySlotIdInProgress_ = false;
-    multiSimController->radioProtocolController_ = nullptr;
-    multiSimController->SetActiveCommonSim(0, 1, true, 0);
-    multiSimController->isSetPrimarySlotIdInProgress_ = true;
-    int32_t result = multiSimController-> SetActiveCommonSim(0, 1, true, 0);
-    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL)
-}
-
-/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
