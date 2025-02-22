@@ -381,7 +381,8 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
     {
         std::lock_guard<std::mutex> lock(openChannelMutex_);
         currentChannelId_ = resultPtr->channelId;
-        TELEPHONY_LOGI("Logical channel %{public}d open successfully. Notifying waiting thread.", currentChannelId_.load());
+        TELEPHONY_LOGI("Logical channel %{public}d open successfully. Notifying waiting thread.",
+            currentChannelId_.load());
     }
     openChannelCv_.notify_one();
     return true;
