@@ -492,7 +492,7 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     }
     std::string responseHexStr = rawData.resultData;
     eUiccInfo_.response_ = Str8ToStr16(responseHexStr);
-    TELEPHONY_LOGI("obtain eUiccInfo_ len:%{public}u", eUiccInfo_.response_.length());
+    TELEPHONY_LOGI("obtain eUiccInfo_ len:%{public}lu", eUiccInfo_.response_.length());
     NotifyReady(euiccInfo1Mutex_, isEuiccInfo1Ready_, euiccInfo1Cv_);
     return true;
 }
