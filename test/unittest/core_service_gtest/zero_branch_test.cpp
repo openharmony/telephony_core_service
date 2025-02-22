@@ -1447,7 +1447,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_004, Function | MediumTest | L
     multiSimController->SetActiveCommonSim(0, 1, true, 0);
     multiSimController->isSetPrimarySlotIdInProgress_ = true;
     int32_t result = multiSimController-> SetActiveCommonSim(0, 1, true, 0);
-    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL)
+    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
 }
 
 /**
