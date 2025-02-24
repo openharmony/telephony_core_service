@@ -498,10 +498,10 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
 int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
     isSetActiveSimInProgress_[slotId] = 1;
-    if (isSetPrimarySlotIdInProgress_ == true) {
+    if (isSetPrimarySlotIdInProgress_) {
         TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, wait 3s");
         std::unique_lock<std::mutex> lock(activeSimMutex_);
-        if (isSetPrimarySlotIdInProgress_ == true) {
+        if (isSetPrimarySlotIdInProgress_) {
             activeSimConn_.wait_for(lock, std::chrono::seconds(WAIT_REMOTE_TIME_SEC));
         }
     } else {
