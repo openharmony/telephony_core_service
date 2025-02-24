@@ -99,7 +99,6 @@ public:
     int32_t SetDsdsMode(int32_t dsdsMode) override;
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey) override;
-    bool GetRetryActiveSimInfo(int32_t slotId) override;
     // STK
     int32_t SendEnvelopeCmd(int32_t slotId, const std::string &cmd) override;
     int32_t SendTerminalResponseCmd(int32_t slotId, const std::string &cmd) override;
