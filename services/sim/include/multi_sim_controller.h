@@ -81,8 +81,6 @@ public:
     bool IsSetPrimarySlotIdInProgress();
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
-    void SetRetryActiveSimInfo(int32_t slotId, int32_t errorType);
-    bool GetRetryActiveSimInfo(int32_t slotId) const;
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -154,8 +152,6 @@ private:
     std::condition_variable activeSimConn_;
     std::mutex activeSimMutex_;
     static constexpr const uint32_t WAIT_REMOTE_TIME_SEC = 3; // second
-
-    std::unordered_map<int32_t, bool> simActiveMap_ = { { 0, false }, { 1, false } };
 };
 } // namespace Telephony
 } // namespace OHOS

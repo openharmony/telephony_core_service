@@ -714,31 +714,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
         TELEPHONY_LOGI("MultiSimController SetActiveSimToRil wait");
         radioProtocolController_->cv_.wait(lck);
     }
-    int32_t errorType = radioProtocolController_->GetActiveSimToRilResult();
-    TELEPHONY_LOGI("SlotId: %{public}d errorType: %{public}d, type: %{public}d", slotId, errorType, type);
-    if (type == ENTITY_CARD) {
-        SetRetryActiveSimInfo(slotId, errorType);
-    }
-    return errorType == static_cast<int32_t>(ErrType::NONE);
-}
-
-void MultiSimController::SetRetryActiveSimInfo(int32_t slotId, int32_t errorType)
-{
-    if (slotId < 0 || slotId >= SIM_SLOT_COUNT) {
-        TELEPHONY_LOGE("SlotId: %{public}d is valid", slotId);
-        return;
-    }
-    simActiveMap_[slotId] = (errorType == static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE) ||
-        errorType == static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER));
-}
-
-bool MultiSimController::GetRetryActiveSimInfo(int32_t slotId) const
-{
-    if (slotId < 0 || slotId >= SIM_SLOT_COUNT) {
-        TELEPHONY_LOGE("SlotId: %{public}d is valid", slotId);
-        return false;
-    }
-    return simActiveMap_.at(slotId);
+    return radioProtocolController_->GetActiveSimToRilResult() == static_cast<int32_t>(ErrType::NONE);
 }
 
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)

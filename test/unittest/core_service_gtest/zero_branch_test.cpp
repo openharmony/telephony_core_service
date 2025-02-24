@@ -63,8 +63,6 @@
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
 #include "telephony_ext_wrapper.h"
-#include "telephony_types.h"
-#include "tel_ril_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -95,8 +93,6 @@ static const int32_t SLEEP_TIME = 3;
 
 class BranchTest : public testing::Test {
 public:
-    const int32_t ENABLE = 1;
-    const int32_t DISABLE = 0;
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
@@ -1430,49 +1426,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_003, Function | MediumTest | L
 }
 
 /**
- * @tc.number   Telephony_MultiSimController_SetActiveSimToRil_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimController_SetActiveSimToRil_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    multiSimController->radioProtocolController_->activeResponse_ = static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE);
-    multiSimController->radioProtocolController_->responseReady_ = true;
-    multiSimController->SetActiveSimToRil(SLOT_ID_0, ENTITY_CARD, ENABLE);
-    multiSimController->radioProtocolController_->activeResponse_ = static_cast<int32_t>(ErrType::NONE);
-    multiSimController->SetActiveSimToRil(SLOT_ID_0, ENTITY_CARD, ENABLE);
-    multiSimController->radioProtocolController_ = nullptr;
-    multiSimController->SetActiveSimToRil(SLOT_ID_0, ENTITY_CARD, ENABLE);
-    telRilManager->DeInit();
-    EXPECT_EQ(multiSimController->radioProtocolController_, nullptr);
-}
-
-/**
- * @tc.number   Telephony_MultiSimController_SetRetryActiveSimInfo_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimController_SetRetryActiveSimInfo_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    multiSimController->simActiveMap_[SLOT_ID_0] = true;
-    multiSimController->SetRetryActiveSimInfo(SLOT_ID_0, static_cast<int32_t>(ErrType::ERR_GENERIC_FAILURE));
-    multiSimController->SetRetryActiveSimInfo(SLOT_ID_0, static_cast<int32_t>(ErrType::NONE));
-    multiSimController->simActiveMap_.clear();
-    multiSimController->SetRetryActiveSimInfo(SLOT_ID_0, static_cast<int32_t>(ErrType::NONE));
-    EXPECT_NE(multiSimController->radioProtocolController_, nullptr);
-}
-
-/**
  * @tc.number   Telephony_SimManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2566,34 +2519,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
     networkSearchHandler->UpdateOperatorName();
-}
-
-/**
- * @tc.number   Telephony_NetworkSearchHandler_HandleRetryActiveSim_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_HandleRetryActiveSim_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = nullptr;
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, SLOT_ID_0);
-    auto networkSearchHandler =
-        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, SLOT_ID_0);
-
-    networkSearchHandler->slotId_ = 1;
-    auto currentRadioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-    networkSearchHandler->oldRadioState_ = -2;
-    networkSearchHandler->newRadioState_ = currentRadioState;
-    currentRadioState = ModemPowerState::CORE_SERVICE_POWER_OFF;
-    networkSearchHandler->newRadioState_ = currentRadioState;
-    networkSearchHandler->HandleRetryActiveSim(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
-
-    currentRadioState = ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE;
-    networkSearchHandler->newRadioState_ = currentRadioState;
-    networkSearchHandler->HandleRetryActiveSim(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
-    EXPECT_NE(networkSearchHandler->newRadioState_, 0);
 }
 
 /**
