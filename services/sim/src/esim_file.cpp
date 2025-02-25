@@ -195,6 +195,7 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
 
 EuiccInfo EsimFile::GetEuiccInfo()
 {
+    eUiccInfo_ = EuiccInfo();
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -212,7 +213,7 @@ EuiccInfo EsimFile::GetEuiccInfo()
         [this]() { return isEuiccInfo1Ready_; })) {
         TELEPHONY_LOGE("close channal due to timeout");
         SyncCloseChannel();
-        return EuiccInfo();
+        return eUiccInfo_;
     }
     SyncCloseChannel();
     return eUiccInfo_;
@@ -343,7 +344,7 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
 bool EsimFile::IsLogicChannelOpen()
 {
     if (currentChannelId_ > 0) {
-        TELEPHONY_LOGI("opened channel id:%d", currentChannelId_.load());
+        TELEPHONY_LOGI("opened channel id:%{public}d", currentChannelId_.load());
         return true;
     }
     return false;
@@ -356,7 +357,7 @@ void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid)
     if (telRilManager_ == nullptr) {
         return;
     }
-    TELEPHONY_LOGI("set req to open channel:%d", currentChannelId_.load());
+    TELEPHONY_LOGI("set req to open channel:%{public}d", currentChannelId_.load());
     telRilManager_->SimOpenLogicalChannel(slotId_, appId, PARAMETER_TWO, response);
     return;
 }
@@ -380,7 +381,8 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
     {
         std::lock_guard<std::mutex> lock(openChannelMutex_);
         currentChannelId_ = resultPtr->channelId;
-        TELEPHONY_LOGI("Logical channel %d open successfully. Notifying waiting thread.", currentChannelId_.load());
+        TELEPHONY_LOGI("Logical channel %{public}d open successfully. Notifying waiting thread.",
+            currentChannelId_.load());
     }
     openChannelCv_.notify_one();
     return true;
@@ -392,7 +394,7 @@ void EsimFile::ProcessEsimCloseChannel()
     if (telRilManager_ == nullptr) {
         return;
     }
-    TELEPHONY_LOGI("set req to close channel:%d", currentChannelId_.load());
+    TELEPHONY_LOGI("set req to close channel:%{public}d", currentChannelId_.load());
     telRilManager_->SimCloseLogicalChannel(slotId_, currentChannelId_, response);
     return;
 }
@@ -490,6 +492,7 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     }
     std::string responseHexStr = rawData.resultData;
     eUiccInfo_.response_ = Str8ToStr16(responseHexStr);
+    TELEPHONY_LOGI("obtain eUiccInfo_ len:%{public}lu", eUiccInfo_.response_.length());
     NotifyReady(euiccInfo1Mutex_, isEuiccInfo1Ready_, euiccInfo1Cv_);
     return true;
 }
