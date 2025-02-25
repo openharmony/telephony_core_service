@@ -310,6 +310,8 @@ private:
     static void AddMccMncForInHutch();
     static void AddMccMncForMy();
     static void InitIndiaTables();
+
+    static std::mutex mccMutex_
 };
 } // namespace Telephony
 } // namespace OHOS
