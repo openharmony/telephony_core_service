@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Telephony {
 std::mutex SimStateManager::mtx_;
+constexpr static const int32_t WAIT_TIME_ONE_SECOND = 1;
 constexpr static const int32_t WAIT_TIME_SECOND = 3;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
@@ -187,25 +188,43 @@ void SimStateManager::SyncUnlockPinResponse()
     unlockPinCv_.notify_one();
 }
 
+void SimStateManager::SyncSimStateResponse()
+{
+    std::unique_lock<std::mutex> lck(simStateCtx_);
+    responseSimStateReady_ = true;
+    TELEPHONY_LOGI("SimStateManager::SyncSimStateResponse(), responseSimStateReady = %{public}d",
+                   responseSimStateReady_);
+    simStateCv_.notify_one();
+}
+
 int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response)
 {
     if (simStateHandle_ == nullptr) {
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(unlockPinCtx_);
+    std::unique_lock<std::mutex> unlockPinLck(unlockPinCtx_);
     TELEPHONY_LOGD("SimStateManager::UnlockPin slotId = %{public}d", slotId);
     responseUnlockPinReady_ = false;
     simStateHandle_->UnlockPin(slotId, pin);
     while (!responseUnlockPinReady_) {
         TELEPHONY_LOGI("UnlockPin::wait(), response = false");
-        if (unlockPinCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
+        if (unlockPinCv_.wait_for(unlockPinLck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) ==
+            std::cv_status::timeout) {
             break;
         }
     }
     if (!responseUnlockPinReady_) {
         TELEPHONY_LOGE("unlock pin sim update failed");
         return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
+    std::unique_lock<std::mutex> simStateLck(simStateCtx_);
+    responseSimStateReady_ = false;
+    while (!responseSimStateReady_) {
+        TELEPHONY_LOGI("UnlockPin::wait sim state changed, response = false");
+        if (simStateCv_.wait_for(simStateLck, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+            break;
+        }
     }
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
