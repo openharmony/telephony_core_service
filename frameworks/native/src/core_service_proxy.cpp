@@ -2923,7 +2923,7 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
     data.WriteInt32(slotId);
     if (remote == nullptr) {
         TELEPHONY_LOGE("SimAuthentication Remote is null");
-        return ERROR;
+        return false;
     }
     int32_t st = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::IS_NR_SUPPORTED), data,
         reply, option);
