@@ -643,16 +643,20 @@ HWTEST_F(ContactDataTest, VCardEncoder, Function | MediumTest | Level3)
 {
     VCardEncoder encoder;
     int32_t errorCode = 0;
-    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    std::vector<std::vector<int>> contactIdLists;
+    std::vector<int> contactIdList;
 
-    EXPECT_STREQ((encoder.ContructVCard(nullptr, errorCode).c_str()), "");
-    EXPECT_STREQ((encoder.ContructVCard(resultSet, errorCode).c_str()), "");
+    EXPECT_STREQ((encoder.ContructVCard(contactIdLists, errorCode).c_str()), "");
+    contactIdList.push_back(1);
+    contactIdLists.push_back(contactIdList);
+    
+    EXPECT_STREQ((encoder.ContructVCard(contactIdLists, errorCode).c_str()), "");
     EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
 
     errorCode = 0;
     std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
-    encoder.ContructContact(contact, nullptr, errorCode);
-    EXPECT_EQ(errorCode, 0);
+    encoder.ContructContact(contact, 0, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(ContactDataTest, VCardFileUtils_Create, Function | MediumTest | Level3)
