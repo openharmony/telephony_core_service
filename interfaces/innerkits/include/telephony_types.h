@@ -70,6 +70,7 @@ constexpr const char *VSIM_MODEM_COUNT_STR = "const.telephony.vsimModemCount";
 constexpr const char *TEL_ESIM_SUPPORT = "persist.telephony.esim.supported";
 constexpr const char *TEL_DEFAULT_ESIM_SLOT_ID = "const.telephony.esim.slotID";
 constexpr const char *DYNAMIC_POWEROFF_MODEM = "telephony.dynamic_poweroff_modem";
+constexpr const char *DYNAMIC_POWEROFF_MODEM_WITH_STR = "telephony.dynamic_poweroff_modem_with_str";
 }
 
 template<typename T>
@@ -142,6 +143,11 @@ inline T GetPreferredNetworkType()
 inline bool GetDynamicPowerOffModeSwitch()
 {
     return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM, false);
+}
+
+inline bool GetDynamicPowerOffModeSwitchWithStr()
+{
+    return system::GetBoolParameter(DYNAMIC_POWEROFF_MODEM_WITH_STR, false);
 }
 
 enum SatelliteValue {
