@@ -815,8 +815,7 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     bool hasSimAndActive =
         (hasSim && (!simManager->IsSetActiveSimInProgress(slotId_) && simManager->IsSimActive(slotId_)));
     bool primarySimNoSim = (!hasSim && IsPowerOnPrimaryRadioWhenNoSim());
-    if (!isAirplaneMode && (!GetDynamicPowerOffModeSwitch()) && (!GetDynamicPowerOffModeSwitchWithStr())
-        && (hasSimAndActive || primarySimNoSim) && radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn()) {
+    if (!isAirplaneMode && (!GetDynamicPowerOffModeSwitch()) && (hasSimAndActive || primarySimNoSim) && radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn()) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
 }
