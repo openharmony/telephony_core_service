@@ -75,6 +75,8 @@ private:
     void BatchInsertRawContact(int32_t accountId, uint32_t size, std::vector<int32_t> &rawIds, int32_t &errorCode);
     void BatchInsertContactData(std::vector<int32_t> &rawIds,
         const std::vector<std::shared_ptr<VCardContact>> &contactList, int32_t &errorCode);
+    std::string ConstructVCardString(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int32_t cardType,
+        const std::string &charset, int32_t &errorCode);
 
 private:
     std::shared_ptr<VCardManager::DecodeListener> listener_;
