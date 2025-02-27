@@ -270,6 +270,7 @@ public:
     int32_t StartRadioOnState(int32_t slotId) override;
     int32_t StartGetRilSignalIntensity(int32_t slotId) override;
     int32_t UpdateOperatorName(int32_t slotId) override;
+    void UpdateDeviceId(int32_t slotId);
 
     inline void InitMsgNum(int32_t slotId)
     {

@@ -2021,5 +2021,17 @@ int32_t NetworkSearchManager::UpdateOperatorName(int32_t slotId)
     inner->networkSearchHandler_->UpdateOperatorName();
     return TELEPHONY_ERR_SUCCESS;
 }
+
+void NetworkSearchManager::UpdateDeviceId(int32_t slotId)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::UpdateOperatorName slotId:%{public}d inner is null", slotId);
+    }
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEISV);
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
+    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_BASEBAND_VERSION);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -504,18 +504,7 @@ void NetworkSearchHandler::GetDeviceId()
         TELEPHONY_LOGE("NetworkSearchHandler::GetDeviceId failed to get NetworkSearchManager");
         return;
     }
-    std::u16string meid = u"";
-    std::u16string imei = u"";
-    std::u16string imeiSv = u"";
-    std::string basebandVersion = "";
-    networkSearchManager->SetImei(slotId_, imei);
-    networkSearchManager->SetImeiSv(slotId_, imeiSv);
-    networkSearchManager->SetMeid(slotId_, meid);
-    networkSearchManager->SetBasebandVersion(slotId_, basebandVersion);
-    networkSearchManager->GetImei(slotId_, imei);
-    networkSearchManager->GetImeiSv(slotId_, imeiSv);
-    networkSearchManager->GetMeid(slotId_, meid);
-    networkSearchManager->GetBasebandVersion(slotId_, basebandVersion);
+    networkSearchManager->UpdateDeviceId(slotId_);
 }
 
 void NetworkSearchHandler::RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event)

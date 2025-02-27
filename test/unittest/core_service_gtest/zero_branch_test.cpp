@@ -2012,13 +2012,13 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
         return;
     }
+    params = {false, "plmn", false, "spn", 1};
+    operatorName->SetOperatorNameByParams(params);
+    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
     params = {true, "plmn", false, "spn", 1};
     operatorName->SetOperatorNameByParams(params);
     EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.plmn);
-    params.showPlmn = false;
-    operatorName->SetOperatorNameByParams(params);
-    EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
-    params.showSpn = true;
+    params = {false, "plmn", true, "spn", 1};
     operatorName->SetOperatorNameByParams(params);
     EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.spn);
 }
@@ -2112,6 +2112,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     std::u16string result = u"";
     EXPECT_NE(networkSearchManager->GetIsoCountryCodeForNetwork(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
+    networkSearchManager->UpdateDeviceId(INVALID_SLOTID);
     EXPECT_NE(networkSearchManager->GetImei(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetImeiSv(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
