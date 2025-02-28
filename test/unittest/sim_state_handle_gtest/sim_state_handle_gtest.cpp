@@ -70,10 +70,11 @@ std::shared_ptr<SimStateManager> SimStateHandleTest::simStateManager_;
 
 void SimStateHandleTest::SetUpTestCase()
 {
+    int32_t slotId = 10;
     telRilManager_ = new MockTelRilManager();
     std::shared_ptr<MockTelRilManager> telRilManager(telRilManager_);
     simStateManager_ = std::make_shared<SimStateManager>(telRilManager);
-    simStateManager_->Init(10);
+    simStateManager_->Init(slotId);
     EXPECT_CALL(*telRilManager_, UnRegisterCoreNotify(_, _, _))
         .WillRepeatedly(Return(0));
 }
