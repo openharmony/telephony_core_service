@@ -65,7 +65,7 @@ public:
     MOCK_METHOD2(GetClir, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD3(SetClir, int32_t(int32_t, const int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD3(GetCallRestriction, int32_t(
-        int32_t, std::string , const AppExecFwk::InnerEvent::Pointer &));
+        int32_t, std::string, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD3(SetCallRestriction, int32_t(
         int32_t, const CallRestrictionParam &, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD5(SetBarringPassword, int32_t(int32_t, const char *, const char *,
