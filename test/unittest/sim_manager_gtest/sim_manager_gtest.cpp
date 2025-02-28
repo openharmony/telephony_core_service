@@ -42,8 +42,8 @@ class SimManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUp();
+    static void TearDown();
     static MockTelRilManager *telRilManager_;
     static std::shared_ptr<SimManager> simManager_;
 };
