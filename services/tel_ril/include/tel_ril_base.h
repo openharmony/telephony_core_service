@@ -122,7 +122,7 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    if (GetDynamicPowerOffModeSwitch()
+    if (GetDynamicPowerOffModeSwitchWithStr()
         && std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end()) {
             TELEPHONY_LOGE("%{public}s() not in white list req", funcName);
             return TELEPHONY_ERR_PERMISSION_ERR;
