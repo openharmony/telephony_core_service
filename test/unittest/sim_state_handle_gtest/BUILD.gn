@@ -31,6 +31,7 @@ ohos_unittest("sim_state_handle_gtest") {
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+    "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -60,6 +61,7 @@ ohos_unittest("sim_state_handle_gtest") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "googletest:gtest_main",
+    "googletest:gmock_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
