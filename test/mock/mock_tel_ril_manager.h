@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-+
+
 #ifndef MOCK_TEL_RIL_MANAGER_H
 #define MOCK_TEL_RIL_MANAGER_H
-+
+
 #include "event_runner.h"
 #include "tel_ril_network_parcel.h"
 #include "tel_ril_sim_parcel.h"
@@ -23,7 +23,7 @@
 #include "tel_ril_types.h"
 #include "telephony_types.h"
 #include <gmock/gmock.h>
-+
+
 namespace OHOS {
 namespace Telephony {
 class MockTelRilManager : public ITelRilManager {
