@@ -51,7 +51,6 @@ public:
     explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
     virtual ~DemoHandler() {}
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
-
 };
 
 class SimStateHandleTest : public testing::Test {
