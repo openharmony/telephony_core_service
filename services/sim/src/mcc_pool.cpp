@@ -19,8 +19,7 @@ using namespace std;
 
 namespace OHOS {
 namespace Telephony {
-std::mutex mccMutex_;
-std::mutex initMutex_;
+std::mutex MccPool::mccMutex_;
 std::vector<std::shared_ptr<MccAccess>> MccPool::mccAccessTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
 std::vector<std::string> MccPool::indiaMccMnc_;
@@ -344,6 +343,7 @@ bool MccPool::MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std
 
 bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
 {
+    std::lock_guard<std::mutex> lock(mccMutex_);
     InitIndiaTables();
     std::vector<std::string>::iterator obj = std::find(indiaMccMnc_.begin(), indiaMccMnc_.end(), mccMncCode);
     return (obj == indiaMccMnc_.end()) ? false : true;
@@ -372,6 +372,7 @@ void MccPool::InitIndiaTables()
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 {
+    std::lock_guard<std::mutex> lock(mccMutex_);
     InitSpecialMccMncTables();
     std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccMncCode);
     return (obj == specialMccMnc_.end()) ? false : true;
@@ -379,7 +380,6 @@ bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 
 void MccPool::InitSpecialMccMncTables()
 {
-    std::lock_guard<std::mutex> lck(initMutex_);
     if (specialMccMnc_.size() == 0) {
         AddMccMncForCa();
         AddMccMncForInAirtel();
