@@ -1954,7 +1954,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0600, Function | MediumTest
         std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId1_);
         SetParameter(volteCapKey.c_str(), "2");
         OperatorConfig opc;
-        opcc->UpdateCurrentOpc(SimTest::slotId1_, opc)
+        opcc->UpdateCurrentOpc(SimTest::slotId1_, opc);
         int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
         ASSERT_NE(volteCapValue, volteCap);
         opcc->UpdateImsCapFromChip(SimTest::slotId1_, imsCapFromChip);
