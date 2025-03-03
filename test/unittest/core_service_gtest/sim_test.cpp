@@ -1937,6 +1937,34 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0500, Function | MediumTest
     }
 }
 
+/**
+ * @tc.number   Telephony_Sim_UpdateImsCapFromChip_0600
+ * @tc.name     Update ims capabilities from chip data
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_UpdateImsCapFromChip_0600, Function | MediumTest | Level2)
+{
+    if (!SimTest::HasSimCard(SimTest::slotId1_)) {
+        TELEPHONY_LOGE("Telephony_Sim_UpdateImsCapFromChip_0600 has no sim card");
+    } else {
+        const int32_t volteCap = 1;
+        ImsCapFromChip imsCapFromChip = {volteCap, 0, 0, 0};
+        std::shared_ptr<OperatorConfigCache> opcc = SimTest::CreateOperatorConfigCache(SimTest::slotId1_);
+        ASSERT_EQ(opcc->isUpdateImsCapFromChipDone_, false);
+        std::string volteCapKey = KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP + std::to_string(SimTest::slotId1_);
+        SetParameter(volteCapKey.c_str(), "2");
+        OperatorConfig opc;
+        opcc->UpdateCurrentOpc(SimTest::slotId1_, opc)
+        int32_t volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_NE(volteCapValue, volteCap);
+        opcc->UpdateImsCapFromChip(SimTest::slotId1_, imsCapFromChip);
+        ASSERT_EQ(opcc->isUpdateImsCapFromChipDone_, true);
+        opcc->UpdatevolteCap(SimTest::slotId1_, opc);
+        volteCapValue = GetIntParameter(volteCapKey.c_str(), -1);
+        ASSERT_EQ(volteCapValue, volteCap);
+    }
+}
+
 #else // TEL_TEST_UNSUPPORT
 /**
  * @tc.number   Telephony_Sim_MockTest_0100

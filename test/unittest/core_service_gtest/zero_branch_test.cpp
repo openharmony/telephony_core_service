@@ -2395,6 +2395,24 @@ HWTEST_F(BranchTest, Telephony_TelRilModem_001, Function | MediumTest | Level1)
 }
 
 /**
+ * @tc.number   Telephony_TelRilModem_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_TelRilModem_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    std::vector<std::shared_ptr<ObserverHandler>> observerHandlers;
+    observerHandlers.push_back(observerHandler);
+    std::shared_ptr<TelRilModem> telRilModem =
+        std::make_shared<TelRilModem>(SLOT_ID_0, nullptr, observerHandlers[SLOT_ID_0], nullptr);
+    if (telRilModem != nullptr) {
+        int32_t state = 1;
+        EXPECT_EQ(telRilModem->NcfgFinishedResult(state), TELEPHONY_ERR_SUCCESS);
+    }
+}
+
+/**
  * @tc.number   Telephony_NetworkSearchHandler_001
  * @tc.name     test error branch
  * @tc.desc     Function test
