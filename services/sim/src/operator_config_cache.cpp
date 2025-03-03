@@ -83,10 +83,11 @@ void OperatorConfigCache::UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc)
 {
     bool isUseCloudImsNV = system::GetBoolParameter(KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV, true);
     TELEPHONY_LOGI("[slot%{public}d], isUseCloudImsNV = %{public}d", slotId, isUseCloudImsNV);
-    if (isUseCloudImsNV) {
+    if (isUseCloudImsNV && isUpdateImsCapFromChipDone_) {
         UpdatevolteCap(slotId, poc);
     }
     std::unique_lock<std::mutex> lock(mutex_);
+    ClearMemoryCache(slotId);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
 }
@@ -123,10 +124,9 @@ void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
             UpdateOpcBoolValue(opc, "volte_supported_bool", true);
             break;
         case IMS_SWITCH_DEFAULT:
-            opc.boolValue["volte_supported_bool"] = true;
+            UpdateOpcBoolValue(opc, "volte_supported_bool", true);
             opc.boolValue["hide_ims_switch_bool"] = false;
             opc.boolValue["ims_switch_on_by_default_bool"] = false;
-            opc.configValue[u"volte_supported_bool"] = u"true";
             opc.configValue[u"hide_ims_switch_bool"] = u"false";
             opc.configValue[u"ims_switch_on_by_default_bool"] = u"false";
             break;
@@ -300,6 +300,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
             modemSimMatchedOpNameCache_ = "";
+            isUpdateImsCapFromChipDone_ = false;
             lock.unlock();
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
@@ -418,9 +419,7 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
 
 void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    ClearMemoryCache(slotId);
-    lock.unlock();
+    isUpdateImsCapFromChipDone_ = true;
     OperatorConfig opc;
     int32_t ret = LoadOperatorConfigFile(slotId, opc);
     TELEPHONY_LOGI("[slot%{public}d] imsCapFromChip = %{public}d, %{public}d, %{public}d, %{public}d, ret = %{public}d",

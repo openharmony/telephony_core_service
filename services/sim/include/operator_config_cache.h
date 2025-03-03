@@ -69,6 +69,7 @@ private:
     std::string modemSimMatchedOpNameCache_ = "";
     bool isLoadingConfig_ = false;
     std::mutex mutex_;
+    bool isUpdateImsCapFromChipDone_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
