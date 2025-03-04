@@ -386,6 +386,7 @@ ohos_unittest("tel_sim_gtest") {
     "-fsanitize=cfi",
     "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
+    "-fno-access-control",
   ]
 
   ldflags = [
