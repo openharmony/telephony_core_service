@@ -55,7 +55,6 @@ SimFileManager::~SimFileManager()
     if (simFile_ != nullptr) {
         simFile_->UnInit();
     }
-    UnSubscribeListeners();
 }
 
 void SimFileManager::OnReceiveEvent(const EventFwk::CommonEventData &data)
