@@ -21,7 +21,6 @@
 #include "parameters.h"
 #include "radio_event.h"
 #include "system_ability_definition.h"
-#include "iservice_registry.h"
 #include "telephony_ext_wrapper.h"
 
 namespace OHOS {
@@ -773,68 +772,6 @@ bool SimFileManager::IsCTIccId(std::string iccId)
     return isCTIccId;
 }
 
-void SimFileManager::AddSubscribeListener(std::shared_ptr<SimFileManager> simFileManager)
-{
-    if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager null pointer");
-        return;
-    }
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(simFileManager);
-    if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
-        TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
-        return;
-    }
-    auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
-}
- 
-void SimFileManager::UnSubscribeListeners()
-{
-    if (statusChangeListener_ != nullptr) {
-        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(OHOS::COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-            statusChangeListener_ = nullptr;
-            TELEPHONY_LOGI("UnSubscribeSystemAbility COMMON_EVENT_SERVICE_ID success");
-        }
-    }
-}
- 
-SimFileManager::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
-    std::shared_ptr<SimFileManager> &simFileManager) : simFileManager_(simFileManager)
-{}
- 
-void SimFileManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
-    const std::string &deviceId)
-{
-    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
-        return;
-    }
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID simFileManager_ is nullptr");
-        return;
-    }
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(simFileManager_);
-    TELEPHONY_LOGI("SimFileManager::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
-}
- 
-void SimFileManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int32_t systemAbilityId,
-    const std::string &deviceId)
-{
-    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
-        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
-        return;
-    }
-    if (simFileManager_ == nullptr) {
-        TELEPHONY_LOGE("OnRemoveSystemAbility COMMON_EVENT_SERVICE_ID simFileManager_ is nullptr");
-        return;
-    }
-    bool subscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(simFileManager_);
-    TELEPHONY_LOGI("SimFileManager::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
-}
-
 std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberHandler()
 {
     return diallingNumberHandler_;
@@ -875,6 +812,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("SimFileManager::ProcessEvent id %{public}d", id);
+    ProcessEventEx(event);
     auto simStateManager = simStateManager_.lock();
     if (simStateManager == nullptr) {
         TELEPHONY_LOGE("simStateManager is nullptr");
@@ -905,19 +843,33 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             HandleSimRecordsLoaded();
             break;
         }
-        case RadioEvent::RADIO_ICC_REFRESH: {
-            TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
-            if (simFile_ == nullptr) {
-                TELEPHONY_LOGE("simFile_ is null");
-                return;
-            }
-            simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
-            break;
-        }
         case RadioEvent::RADIO_SIM_ICCID_LOADED: {
             TELEPHONY_LOGI("handle sim iccid load event, slotId: %{public}d", slotId_);
             std::string iccid = simStateManager->GetIccid();
             HandleSimIccidLoaded(iccid);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void SimFileManager::ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    uint32_t id = event->GetInnerEventId();
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+    switch (id) {
+        case RadioEvent::RADIO_ICC_REFRESH: {
+            TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
+            simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
+            break;
+        }
+        case RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED: {
+            TELEPHONY_LOGI("handle operator config change event, slotId: %{public}d", slotId_);
+            simFile_->LoadVoiceMail();
             break;
         }
         default:
@@ -947,8 +899,7 @@ std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
         TELEPHONY_LOGE("manager create nullptr.");
         return nullptr;
     }
-    bool subRet = EventFwk::CommonEventManager::SubscribeCommonEvent(manager);
-    TELEPHONY_LOGI("SimFileManager::CreateInstance, subscribe user switched subRet is %{public}d", subRet);
+    TELEPHONY_LOGI("SimFileManager::CreateInstance success");
     return manager;
 }
 
