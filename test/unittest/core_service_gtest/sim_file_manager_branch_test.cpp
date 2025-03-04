@@ -201,5 +201,25 @@ HWTEST_F(SimFileManagerBranchTest, Telephony_SimFileManager_004, Function | Medi
     simFileManager.simFile_ = std::make_shared<IsimFile>(simStateManager);
     EXPECT_EQ(simFileManager.GetSimIst(), u"");
 }
+
+HWTEST_F(SimFileManagerBranchTest, Telephony_SimFileManager_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<SimFileManager> simFileManager = SimFileManager::CreateInstance(
+        std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
+    EXPECT_NE(simFileManager, nullptr);
+    if (simFileManager != nullptr) {
+        AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ICC_REFRESH, 1);
+        simFileManager->ProcessEvent(event);
+        int slotId = 1;
+        simFileManager->Init(slotId);
+        EXPECT_NE(simFileManager->simFile_, nullptr);
+        simFileManager->ProcessEvent(event);
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED, 1);
+        simFileManager->ProcessEvent(event);
+        EXPECT_EQ(simFileManager->GetVoiceMailCount(), DEFAULT_VOICE_MAIL_COUNT);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
