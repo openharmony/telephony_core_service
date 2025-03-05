@@ -33,7 +33,6 @@ ohos_unittest("sim_gtest") {
     "sim_file_gtest.cpp",
     "sim_sms_controller_gtest.cpp",
     "stk_controller_gtest.cpp",
-    "sim_rdb_helper_gtest.cpp",
     "sim_utils_gtest.cpp",
     "usim_dialling_numbers_service_gtest.cpp",
   ]
