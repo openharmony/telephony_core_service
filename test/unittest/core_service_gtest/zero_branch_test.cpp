@@ -2529,12 +2529,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_001, Function | MediumTest |
     networkSearchHandler->SetRadioStateResponse(event);
     networkSearchHandler->GetNetworkSelectionModeResponse(event);
     networkSearchHandler->SetNetworkSelectionModeResponse(event);
-    networkSearchHandler->RegisterSatelliteCallback();
     EXPECT_TRUE(networkSearchHandler->Init());
     networkSearchHandler->UnregisterEvents();
-    networkSearchHandler->UnregisterSatelliteCallback();
-    networkSearchHandler->SyncGetSsbInfoResponse();
-    networkSearchHandler->ImsiLoadedReady(event);
     networkSearchHandler->DcPhysicalLinkActiveUpdate(event);
     networkSearchHandler->ProcessEvent(event);
     networkSearchHandler->RadioStateChange(event);
@@ -2548,7 +2544,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_001, Function | MediumTest |
     networkSearchHandler->RadioGetImei(event);
     networkSearchHandler->RadioGetImeiSv(event);
     networkSearchHandler->RadioGetMeid(event);
-    networkSearchHandler->GetNrSsbIdResponse(event);
     event = nullptr;
     networkSearchHandler->ProcessEvent(event);
     networkSearchHandler->DcPhysicalLinkActiveUpdate(event);
@@ -2570,9 +2565,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_001, Function | MediumTest |
     networkSearchHandler->RadioNitzUpdate(event);
     networkSearchHandler->RadioGetImei(event);
     networkSearchHandler->RadioGetMeid(event);
-    networkSearchHandler->GetNrSsbIdResponse(event);
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
-    networkSearchHandler->GetNrSsbId(nrCellSsbIdsInfo);
     EXPECT_TRUE(networkSearchHandler->GetCellLocation() == nullptr);
 }
 
@@ -2645,6 +2637,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    networkSearchHandler->RegisterSatelliteCallback();
+    networkSearchHandler->UnregisterSatelliteCallback();
+    networkSearchHandler->SyncGetSsbInfoResponse();
+
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
     event = nullptr;
     int32_t status = RRC_IDLE_STATUS;
@@ -2652,9 +2648,15 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchHandler_003, Function | MediumTest |
     networkSearchHandler->NetworkSearchResult(event);
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetImeiSv(event);
+    networkSearchHandler->GetNrSsbIdResponse(event);
+    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+    networkSearchHandler->GetNrSsbId(nrCellSsbIdsInfo);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    networkSearchHandler->ImsiLoadedReady(event);
+    networkSearchHandler->GetNrSsbIdResponse(event);
     EXPECT_TRUE(networkSearchHandler->Init());
     event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
     networkSearchHandler->HandleDelayNotifyEvent(event);
