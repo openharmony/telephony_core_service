@@ -46,28 +46,21 @@ void EsimFile::StartLoad() {}
 
 ResultInnerCode EsimFile::ObtainChannelSuccessExclusive()
 {
-    uint32_t tryCnt = 0;
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
     std::lock_guard<std::mutex> lck(occupyChannelMutex_);
-
     // The channel is in use.
     if (IsLogicChannelOpen()) {
         TELEPHONY_LOGE("The channel is in use");
         return ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_IN_USE;
     }
-    while (!IsLogicChannelOpen()) {
+
+    if (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
+        if (!openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
-            break;
+            TELEPHONY_LOGE("wait cv failed!");
         }
-        tryCnt++;
-        if (tryCnt >= NUMBER_TWO) {
-            TELEPHONY_LOGE("failed to open the channel");
-            break;
-        }
-        TELEPHONY_LOGW("wait cv failed, retry to to open channel at %u", tryCnt);
     }
 
     bool isOpenChannelSuccess = IsLogicChannelOpen();
@@ -76,6 +69,7 @@ ResultInnerCode EsimFile::ObtainChannelSuccessExclusive()
         return ResultInnerCode::RESULT_EUICC_CARD_OK;
     }
 
+    TELEPHONY_LOGE("failed to open the channel");
     return ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_OPEN_FAILED;
 }
 
@@ -84,27 +78,21 @@ ResultInnerCode EsimFile::ObtainChannelSuccessExclusive()
  */
 ResultInnerCode EsimFile::ObtainChannelSuccessAlllowSameAidReuse(const std::u16string &aid)
 {
-    uint32_t tryCnt = 0;
     std::lock_guard<std::mutex> lck(occupyChannelMutex_);
-
     if (!IsValidAidForAllowSameAidReuseChannel(aid)) {
         TELEPHONY_LOGE("Aid invalid");
         return ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_OTHER_AID;
     }
-    while (!IsLogicChannelOpen()) {
+
+    if (!IsLogicChannelOpen()) {
         ProcessEsimOpenChannel(aid);
         std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
+        if (!openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
             [this]() { return IsLogicChannelOpen(); })) {
-            break;
+            TELEPHONY_LOGE("wait cv failed!");
         }
-        tryCnt++;
-        if (tryCnt >= NUMBER_TWO) {
-            TELEPHONY_LOGE("failed to open the channel:2 times");
-            break;
-        }
-        TELEPHONY_LOGW("wait cv failed, retry to to open channel at %u", tryCnt);
     }
+
     bool isOpenChannelSuccess = IsLogicChannelOpen();
     if (isOpenChannelSuccess) {
         aidStr_ = aid;
@@ -130,7 +118,7 @@ void EsimFile::SyncCloseChannel()
             TELEPHONY_LOGE("failed to close the channel");
             break;
         }
-        TELEPHONY_LOGW("wait cv failed, retry to to close channel at %u", tryCnt);
+        TELEPHONY_LOGW("wait cv failed, retry close channel at %{public}u", tryCnt);
     }
     currentChannelId_ = 0;
     aidStr_ = u"";
@@ -380,11 +368,19 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
 
     {
         std::lock_guard<std::mutex> lock(openChannelMutex_);
+        TELEPHONY_LOGI("Logical channel %{public}d->%{public}d open successfully. Notifying waiting thread.",
+            currentChannelId_.load(), resultPtr->channelId);
         currentChannelId_ = resultPtr->channelId;
-        TELEPHONY_LOGI("Logical channel %{public}d open successfully. Notifying waiting thread.",
-            currentChannelId_.load());
     }
-    openChannelCv_.notify_one();
+
+    if (occupyChannelMutex_.try_lock()) {
+        // caller exits waiting, thus lock is obtained and the channel needs released
+        ProcessEsimCloseSpareChannel();
+        occupyChannelMutex_.unlock();
+        return false;
+    }
+
+    openChannelCv_.notify_all();
     return true;
 }
 
@@ -407,7 +403,27 @@ bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer
         aidStr_ = u"";
         TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     }
-    closeChannelCv_.notify_one();
+    closeChannelCv_.notify_all();
+    return true;
+}
+
+void EsimFile::ProcessEsimCloseSpareChannel()
+{
+    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_CLOSE_SPARE_CHANNEL_DONE);
+    if (telRilManager_ == nullptr) {
+        return;
+    }
+
+    TELEPHONY_LOGI("set req to close spare channel:%{public}d", currentChannelId_.load());
+    telRilManager_->SimCloseLogicalChannel(slotId_, currentChannelId_, response);
+}
+
+bool EsimFile::ProcessEsimCloseSpareChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::lock_guard<std::mutex> lock(closeChannelMutex_);
+    TELEPHONY_LOGI("Spare channel %{public}d closed successfully.", currentChannelId_.load());
+    aidStr_ = u"";
+    currentChannelId_ = 0;
     return true;
 }
 
@@ -3368,10 +3384,11 @@ void EsimFile::CovertAuthToApiStruct(ResponseEsimInnerResult &dst, AuthServerRes
 
 void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv)
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    flag = true;
-    cv.notify_one();
-    TELEPHONY_LOGI("notify_one end.");
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        flag = true;
+    }
+    cv.notify_all();
 }
 
 bool EsimFile::CommMergeRecvData(
@@ -3404,6 +3421,8 @@ void EsimFile::InitChanneMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessEsimCloseChannelDone(event); };
     memberFuncMap_[MSG_ESIM_SEND_APUD_DATA] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessSendApduDataDone(event); };
+    memberFuncMap_[MSG_ESIM_CLOSE_SPARE_CHANNEL_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessEsimCloseSpareChannelDone(event); };
 }
 
 void EsimFile::InitMemberFunc()
