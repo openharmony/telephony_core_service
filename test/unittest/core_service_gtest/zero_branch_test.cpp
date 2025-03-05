@@ -2419,7 +2419,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_007, Function | MediumTest |
     EXPECT_EQ(nsm->GetImsRegStatus(INVALID_SLOTID, ImsServiceType::TYPE_SMS, info), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(nsm->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(nsm->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(nsm->GetResidentNetworkNumeric(INVALID_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(nsm->GetResidentNetworkNumeric(INVALID_SLOTID), "");
 }
 
 /**
