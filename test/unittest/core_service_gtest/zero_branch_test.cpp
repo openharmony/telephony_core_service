@@ -2405,7 +2405,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_007, Function | MediumTest |
     nsm->mapManagerInner_.clear();
     EXPECT_EQ(nsm->GetRadioState(INVALID_SLOTID), ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     EXPECT_EQ(nsm->GetNetworkSearchInformation(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true);
+    nsm->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true);
     EXPECT_EQ(nsm->GetPreferredNetwork(INVALID_SLOTID, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
     int32_t networkMode = 0;
     nsm->SetCachePreferredNetworkValue(INVALID_SLOTID, networkMode);
@@ -2437,6 +2437,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_008, Function | MediumTest |
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(nsm, telRilManager, simManager, INVALID_SLOTID);
     nsm->mapManagerInner_.clear();
+    std::shared_ptr<NetworkSearchManagerInner> innerNull = nullptr;
 
     nsm->SetLocateUpdate(INVALID_SLOTID);
     nsm->GetVoiceTech(INVALID_SLOTID);
