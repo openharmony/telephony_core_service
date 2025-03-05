@@ -14,14 +14,28 @@
 import("//build/test.gni")
 SOURCE_DIR = "../../../"
 
-ohos_unittest("sim_manager_gtest") {
+ohos_unittest("sim_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "sim_manager_gtest"
+  test_module = "sim_gtest"
   module_out_path = part_name + "/" + test_module
 
-  sources = [ "sim_manager_gtest.cpp" ]
+  sources = [
+    "csim_file_controller_gtest.cpp",
+    "isim_file_gtest.cpp",
+    "multi_sim_controller_gtest.cpp",
+    "operator_config_loader_gtest.cpp",
+    "operator_matching_rule_test.cpp",
+    "pdp_profile_rdb_helper_test.cpp",
+    "ruim_file_gtest.cpp",
+    "sim_manager_gtest.cpp",
+    "sim_file_gtest.cpp",
+    "sim_sms_controller_gtest.cpp",
+    "stk_controller_gtest.cpp",
+    "sim_utils_gtest.cpp",
+    "usim_dialling_numbers_service_gtest.cpp",
+  ]
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
@@ -103,5 +117,5 @@ ohos_unittest("sim_manager_gtest") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":sim_manager_gtest" ]
+  deps = [ ":sim_gtest" ]
 }
