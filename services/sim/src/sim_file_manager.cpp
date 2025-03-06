@@ -776,24 +776,6 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
     return diallingNumberHandler_;
 }
 
-void SimFileManager::HandleSimRecordsLoaded()
-{
-    if (simFile_ == nullptr) {
-        TELEPHONY_LOGE("simFile_ is null");
-        return;
-    }
-
-    std::string imsiFromSim = simFile_->ObtainIMSI();
-    std::string encryptImsiFromSim = EncryptImsi(imsiFromSim);
-    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
-    if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
-        !encryptImsiFromSim.empty() && imsiFromParam != encryptImsiFromSim) {
-        std::string nullStr = "";
-        StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
-        SetVoiceMailSimImsiParam(nullStr);
-    }
-}
-
 void SimFileManager::HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology> tech)
 {
     TELEPHONY_LOGD("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
@@ -833,6 +815,24 @@ void SimFileManager::HandleOperatorConfigChanged()
         return;
     }
     simFile_->LoadVoiceMail();
+}
+
+void SimFileManager::HandleSimRecordsLoaded()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+
+    std::string imsiFromSim = simFile_->ObtainIMSI();
+    std::string encryptImsiFromSim = EncryptImsi(imsiFromSim);
+    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
+    if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
+        !encryptImsiFromSim.empty() && imsiFromParam != encryptImsiFromSim) {
+        std::string nullStr = "";
+        StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
+        SetVoiceMailSimImsiParam(nullStr);
+    }
 }
 
 void SimFileManager::HandleSimIccidLoaded(std::string iccid)
