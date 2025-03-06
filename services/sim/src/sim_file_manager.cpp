@@ -859,6 +859,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     switch (id) {
         case RadioEvent::RADIO_VOICE_TECH_CHANGED: {
+            std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
             HandleVoiceTechChanged(tech);
             break;
         }
