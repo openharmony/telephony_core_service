@@ -941,7 +941,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ContactDataTest, VCardGroupData_PostProcessNameData, Function | MediumTest | Level3)
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
     std::string family = "蕾";
@@ -949,7 +949,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_PostProcessNameData, Function | MediumT
     std::string given = "狗";
     std::string displayName = "狗雷";
     SetNameData(family, given, middle, displayName);
-    vCardContact.PostProcessNameData();
+    vCardContact.UpdateDisplayName();
     EXPECT_EQ(nameData_->GetDisplayName(), "雷狗");
 }
 
