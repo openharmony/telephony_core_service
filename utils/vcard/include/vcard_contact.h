@@ -148,6 +148,7 @@ private:
         std::string propValue, std::map<std::string, std::vector<std::string>> parasMap);
     void AddUID(std::string rawValue);
     bool HasValidNameData();
+    void PostProcessNameData();
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;
