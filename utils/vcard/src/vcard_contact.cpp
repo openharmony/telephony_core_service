@@ -16,7 +16,6 @@
 
 #include <numeric>
 #include <regex>
-#include <sstream>
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -774,7 +773,7 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else {
         TELEPHONY_LOGI("No need to do anything");
     }
-    PostProcessNameData();
+    UpdateDisplayName();
 }
 
 void VCardContact::AddCustom(
@@ -1217,7 +1216,7 @@ std::vector<std::string> VCardContact::GetValueListFromParasMap(
     return VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
 }
 
-void VCardContact::PostProcessNameData()
+void VCardContact::UpdateDisplayName()
 {
     if (nameData_ == nullptr) {
         return;
@@ -1230,15 +1229,13 @@ void VCardContact::PostProcessNameData()
     if (!std::regex_search(displayName, chineseRegex)) {
         return;
     }
-    std::ostringstream fullName;
-    fullName << nameData_->GetFamily();
+    std::string fullName = nameData_->GetFamily();
     if (!(nameData_->GetMiddle().empty())) {
-        fullName << nameData_->GetMiddle();
+        fullName += nameData_->GetMiddle();
     }
-    fullName << nameData_->GetGiven();
-    std::string formatName = fullName.str();
-    if (formatName != displayName) {
-        nameData_->setDispalyName(formatName);
+    fullName += nameData_->GetGiven();
+    if (fullName != displayName) {
+        nameData_->setDispalyName(fullName);
         TELEPHONY_LOGE("update display name use format name");
     }
 }
