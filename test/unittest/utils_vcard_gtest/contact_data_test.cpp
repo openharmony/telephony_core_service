@@ -944,7 +944,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
-    std::string family = "蕾";
+    std::string family = "雷";
     std::string middle = "";
     std::string given = "狗";
     std::string displayName = "狗雷";
