@@ -776,6 +776,48 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
     return diallingNumberHandler_;
 }
 
+void SimFileManager::HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology> tech)
+{
+    TELEPHONY_LOGD("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
+    if (tech == nullptr) {
+        TELEPHONY_LOGE("tech is nullptr!");
+        return;
+    }
+    auto simStateManager = simStateManager_.lock();
+    if (simStateManager == nullptr) {
+        TELEPHONY_LOGE("simStateManager is nullptr");
+        return;
+    }
+    SimFileManager::IccType iccType = GetIccTypeByTech(tech);
+    if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
+        simStateManager->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
+        iccType = SimFileManager::IccType::ICC_TYPE_USIM;
+        TELEPHONY_LOGI("change iccType to USIM, slotId: %{public}d", slotId_);
+    }
+    ChangeSimFileByCardType(iccType);
+}
+ 
+void SimFileManager::HandleIccRefresh()
+{
+    TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+    simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
+}
+ 
+ 
+void SimFileManager::HandleOperatorConfigChanged()
+{
+    TELEPHONY_LOGI("handle operator config change event, slotId: %{public}d", slotId_);
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+    simFile_->LoadVoiceMail();
+}
+
 void SimFileManager::HandleSimRecordsLoaded()
 {
     if (simFile_ == nullptr) {
@@ -811,7 +853,6 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("SimFileManager::ProcessEvent id %{public}d", id);
-    ProcessEventEx(event);
     auto simStateManager = simStateManager_.lock();
     if (simStateManager == nullptr) {
         TELEPHONY_LOGE("simStateManager is nullptr");
@@ -819,15 +860,7 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     switch (id) {
         case RadioEvent::RADIO_VOICE_TECH_CHANGED: {
-            TELEPHONY_LOGD("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
-            std::shared_ptr<VoiceRadioTechnology> tech = event->GetSharedObject<VoiceRadioTechnology>();
-            SimFileManager::IccType iccType = GetIccTypeByTech(tech);
-            if (iccType == SimFileManager::IccType::ICC_TYPE_CDMA &&
-                simStateManager->GetCardType() == CardType::SINGLE_MODE_USIM_CARD) {
-                iccType = SimFileManager::IccType::ICC_TYPE_USIM;
-                TELEPHONY_LOGI("change iccType to USIM, slotId: %{public}d", slotId_);
-            }
-            ChangeSimFileByCardType(iccType);
+            HandleVoiceTechChanged(tech);
             break;
         }
         case RadioEvent::RADIO_CARD_TYPE_CHANGE: {
@@ -842,33 +875,18 @@ void SimFileManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             HandleSimRecordsLoaded();
             break;
         }
+        case RadioEvent::RADIO_ICC_REFRESH: {
+            HandleIccRefresh();
+            break;
+        }
         case RadioEvent::RADIO_SIM_ICCID_LOADED: {
             TELEPHONY_LOGI("handle sim iccid load event, slotId: %{public}d", slotId_);
             std::string iccid = simStateManager->GetIccid();
             HandleSimIccidLoaded(iccid);
             break;
         }
-        default:
-            break;
-    }
-}
-
-void SimFileManager::ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    uint32_t id = event->GetInnerEventId();
-    if (simFile_ == nullptr) {
-        TELEPHONY_LOGE("simFile_ is null");
-        return;
-    }
-    switch (id) {
-        case RadioEvent::RADIO_ICC_REFRESH: {
-            TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
-            simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
-            break;
-        }
         case RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED: {
-            TELEPHONY_LOGI("handle operator config change event, slotId: %{public}d", slotId_);
-            simFile_->LoadVoiceMail();
+            HandleOperatorConfigChanged();
             break;
         }
         default:
