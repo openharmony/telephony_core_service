@@ -29,11 +29,11 @@ ohos_unittest("sim_gtest") {
     "operator_matching_rule_test.cpp",
     "pdp_profile_rdb_helper_test.cpp",
     "ruim_file_gtest.cpp",
-    "sim_manager_gtest.cpp",
     "sim_file_gtest.cpp",
+    "sim_manager_gtest.cpp",
     "sim_sms_controller_gtest.cpp",
-    "stk_controller_gtest.cpp",
     "sim_utils_gtest.cpp",
+    "stk_controller_gtest.cpp",
     "usim_dialling_numbers_service_gtest.cpp",
   ]
 
@@ -106,9 +106,7 @@ ohos_unittest("sim_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 group("unittest") {
