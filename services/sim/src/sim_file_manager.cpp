@@ -776,6 +776,24 @@ std::shared_ptr<IccDiallingNumbersHandler> SimFileManager::ObtainDiallingNumberH
     return diallingNumberHandler_;
 }
 
+void SimFileManager::HandleSimRecordsLoaded()
+{
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("simFile_ is null");
+        return;
+    }
+
+    std::string imsiFromSim = simFile_->ObtainIMSI();
+    std::string encryptImsiFromSim = EncryptImsi(imsiFromSim);
+    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
+    if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
+        !encryptImsiFromSim.empty() && imsiFromParam != encryptImsiFromSim) {
+        std::string nullStr = "";
+        StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
+        SetVoiceMailSimImsiParam(nullStr);
+    }
+}
+
 void SimFileManager::HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology> tech)
 {
     TELEPHONY_LOGD("SimFileManager receive RADIO_VOICE_TECH_CHANGED");
@@ -796,7 +814,7 @@ void SimFileManager::HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology
     }
     ChangeSimFileByCardType(iccType);
 }
- 
+
 void SimFileManager::HandleIccRefresh()
 {
     TELEPHONY_LOGI("handle sim refresh event, slotId: %{public}d", slotId_);
@@ -806,8 +824,7 @@ void SimFileManager::HandleIccRefresh()
     }
     simFile_->ProcessIccRefresh(MSG_ID_DEFAULT);
 }
- 
- 
+
 void SimFileManager::HandleOperatorConfigChanged()
 {
     TELEPHONY_LOGI("handle operator config change event, slotId: %{public}d", slotId_);
@@ -816,24 +833,6 @@ void SimFileManager::HandleOperatorConfigChanged()
         return;
     }
     simFile_->LoadVoiceMail();
-}
-
-void SimFileManager::HandleSimRecordsLoaded()
-{
-    if (simFile_ == nullptr) {
-        TELEPHONY_LOGE("simFile_ is null");
-        return;
-    }
-
-    std::string imsiFromSim = simFile_->ObtainIMSI();
-    std::string encryptImsiFromSim = EncryptImsi(imsiFromSim);
-    std::string imsiFromParam = GetVoiceMailSimImsiFromParam();
-    if ((!IsPhoneTypeGsm(slotId_) || !imsiFromParam.empty()) &&
-        !encryptImsiFromSim.empty() && imsiFromParam != encryptImsiFromSim) {
-        std::string nullStr = "";
-        StoreVoiceMailNumber(Str8ToStr16(nullStr), false);
-        SetVoiceMailSimImsiParam(nullStr);
-    }
 }
 
 void SimFileManager::HandleSimIccidLoaded(std::string iccid)
