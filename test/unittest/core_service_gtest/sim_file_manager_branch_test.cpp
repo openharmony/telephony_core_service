@@ -210,13 +210,21 @@ HWTEST_F(SimFileManagerBranchTest, Telephony_SimFileManager_005, Function | Medi
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
     EXPECT_NE(simFileManager, nullptr);
     if (simFileManager != nullptr) {
-        AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ICC_REFRESH, 1);
+        AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_VOICE_TECH_CHANGED);
+        simFileManager->ProcessEvent(event);
+        std::shared_ptr<VoiceRadioTechnology> voiceRadioTechnology = std::make_shared<VoiceRadioTechnology>();
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_VOICE_TECH_CHANGED, voiceRadioTechnology);
+        simFileManager->ProcessEvent(event);
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ICC_REFRESH);
+        simFileManager->ProcessEvent(event);
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED);
         simFileManager->ProcessEvent(event);
         int slotId = 1;
         simFileManager->Init(slotId);
         EXPECT_NE(simFileManager->simFile_, nullptr);
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ICC_REFRESH);
         simFileManager->ProcessEvent(event);
-        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED, 1);
+        event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED);
         simFileManager->ProcessEvent(event);
         EXPECT_EQ(simFileManager->GetVoiceMailCount(), DEFAULT_VOICE_MAIL_COUNT);
     }
