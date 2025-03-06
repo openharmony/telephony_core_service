@@ -1797,6 +1797,11 @@ void EsimFile::ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimP
 
 void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::string &base64Src)
 {
+    std::string::size_type pos;
+    while ((pos = base64Src.find(LF_SIGN)) != std::string::npos) {
+        TELEPHONY_LOGI("replace LF_SIGN at %{public}lu", pos);
+        base64Src.erase(pos, LF_SIGN.length());
+    }
     std::string destString = VCardUtils::DecodeBase64(base64Src);
     std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
     std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
