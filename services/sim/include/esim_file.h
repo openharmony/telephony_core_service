@@ -49,7 +49,7 @@ constexpr static const int32_t NUMBER_ELEVEN = 11;
 constexpr static const int32_t PARAMETER_TWO = -1;
 constexpr static const int32_t PROFILE_DEFAULT_NUMBER = 256;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND_FOR_ESIM = 20;
-constexpr static const int32_t WAIT_TIME_SHORT_SECOND_FOR_ESIM = 2;
+constexpr static const int32_t WAIT_TIME_SHORT_SECOND_FOR_ESIM = 4;
 constexpr static const int32_t SW1_MORE_RESPONSE = 0x61;
 constexpr static const int32_t INS_GET_MORE_RESPONSE = 0xC0;
 constexpr static const int32_t SW1_VALUE_90 = 0x90;
@@ -227,6 +227,8 @@ private:
     bool IsSameAid(const std::u16string &aid);
     bool IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid);
     bool RealProcessRequestAllProfilesDone();
+    void ProcessEsimCloseSpareChannel();
+    bool ProcessEsimCloseSpareChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
