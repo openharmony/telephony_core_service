@@ -47,20 +47,18 @@ void EsimFile::StartLoad() {}
 ResultInnerCode EsimFile::ObtainChannelSuccessExclusive()
 {
     std::u16string aid = OHOS::Telephony::ToUtf16(ISDR_AID);
-    std::lock_guard<std::mutex> lck(occupyChannelMutex_);
+    std::lock_guard<std::mutex> occupyLck(occupyChannelMutex_);
     // The channel is in use.
     if (IsLogicChannelOpen()) {
         TELEPHONY_LOGE("The channel is in use");
         return ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_IN_USE;
     }
 
-    if (!IsLogicChannelOpen()) {
-        ProcessEsimOpenChannel(aid);
-        std::unique_lock<std::mutex> lck(openChannelMutex_);
-        if (!openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
-            [this]() { return IsLogicChannelOpen(); })) {
-            TELEPHONY_LOGE("wait cv failed!");
-        }
+    ProcessEsimOpenChannel(aid);
+    std::unique_lock<std::mutex> lck(openChannelMutex_);
+    if (!openChannelCv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SHORT_SECOND_FOR_ESIM),
+        [this]() { return IsLogicChannelOpen(); })) {
+        TELEPHONY_LOGE("wait cv failed!");
     }
 
     bool isOpenChannelSuccess = IsLogicChannelOpen();
@@ -397,12 +395,10 @@ void EsimFile::ProcessEsimCloseChannel()
 
 bool EsimFile::ProcessEsimCloseChannelDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    {
-        std::lock_guard<std::mutex> lock(closeChannelMutex_);
-        currentChannelId_ = 0;
-        aidStr_ = u"";
-        TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
-    }
+    std::lock_guard<std::mutex> lock(closeChannelMutex_);
+    currentChannelId_ = 0;
+    aidStr_ = u"";
+    TELEPHONY_LOGI("Logical channel closed successfully. Notifying waiting thread.");
     closeChannelCv_.notify_all();
     return true;
 }
@@ -1797,12 +1793,7 @@ void EsimFile::ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimP
 
 void EsimFile::Asn1AddChildAsBase64(std::shared_ptr<Asn1Builder> &builder, std::string &base64Src)
 {
-    std::string::size_type pos;
-    while ((pos = base64Src.find(LF_SIGN)) != std::string::npos) {
-        TELEPHONY_LOGI("replace LF_SIGN at %{public}lu", pos);
-        base64Src.erase(pos, LF_SIGN.length());
-    }
-    std::string destString = VCardUtils::DecodeBase64(base64Src);
+    std::string destString = VCardUtils::DecodeBase64NoWrap(base64Src);
     std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
     std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
     if (decoder == nullptr) {
@@ -1831,7 +1822,7 @@ bool EsimFile::ProcessPrepareDownload(int32_t slotId)
     Asn1AddChildAsBase64(builder, dst.smdpSigned2);
     Asn1AddChildAsBase64(builder, dst.smdpSignature2);
     if (dst.hashCc.size() != 0) {
-        std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64(dst.hashCc));
+        std::vector<uint8_t> bytes = Asn1Utils::StringToBytes(VCardUtils::DecodeBase64NoWrap(dst.hashCc));
         builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, bytes, bytes.size());
     }
     Asn1AddChildAsBase64(builder, dst.smdpCertificate);
@@ -1987,7 +1978,7 @@ bool EsimFile::RealProcessPrepareDownloadDone()
 
 bool EsimFile::DecodeBoundProfilePackage(const std::string &boundProfilePackageStr, std::shared_ptr<Asn1Node> &bppNode)
 {
-    std::string destString = VCardUtils::DecodeBase64(boundProfilePackageStr);
+    std::string destString = VCardUtils::DecodeBase64NoWrap(boundProfilePackageStr);
     std::vector<uint8_t> dest = Asn1Utils::StringToBytes(destString);
     std::shared_ptr<Asn1Decoder> decoder = std::make_shared<Asn1Decoder>(dest, 0, dest.size());
     if (decoder == nullptr) {
@@ -3389,10 +3380,8 @@ void EsimFile::CovertAuthToApiStruct(ResponseEsimInnerResult &dst, AuthServerRes
 
 void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv)
 {
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        flag = true;
-    }
+    std::lock_guard<std::mutex> lock(mtx);
+    flag = true;
     cv.notify_all();
 }
 
