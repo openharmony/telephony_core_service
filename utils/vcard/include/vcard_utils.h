@@ -31,6 +31,7 @@ public:
     static bool EndWith(const std::string &fullString, const std::string &ending);
     static std::string EncodeBase64(const std::string &from);
     static std::string DecodeBase64(const std::string &encoded);
+    static std::string DecodeBase64NoWrap(const std::string &input);
     static std::string ConvertCharset(
         const std::string &input, const std::string &fromCharset, const std::string &toCharset, int32_t &errorCode);
     static std::string ConvertCharset(

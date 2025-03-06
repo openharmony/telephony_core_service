@@ -80,6 +80,17 @@ std::string VCardUtils::DecodeBase64(const std::string &input)
     return std::string(decodedDataString->begin(), decodedDataString->end());
 }
 
+std::string VCardUtils::DecodeBase64NoWrap(const std::string &input)
+{
+    const std::string LF_SIGN = "\n";
+    std::string::size_type pos;
+    std::string rawStr = input;
+    while ((pos = rawStr.find(LF_SIGN)) != std::string::npos) {
+        rawStr.erase(pos, LF_SIGN.length());
+    }
+    return DecodeBase64(rawStr);
+}
+
 bool VCardUtils::EqualsIgnoreCase(const std::string &str1, const std::string &str2)
 {
     std::string copy1 = str1;
