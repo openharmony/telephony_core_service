@@ -146,7 +146,6 @@ private:
     bool IsValidType(IccType type);
     bool IsCTCardType(CardType type);
     bool IsCTIccId(std::string iccId);
-    void ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event);
     std::string opName_;
     std::string opKey_;
     std::string opKeyExt_;
@@ -161,6 +160,9 @@ private:
     void SetVoiceMailSimImsiParam(std::string imsi);
     void StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecoeds);
     std::string GetVoiceMailSimImsiFromParam();
+    void HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology> tech);
+    void HandleIccRefresh();
+    void HandleOperatorConfigChanged();
     void HandleSimRecordsLoaded();
     void HandleSimIccidLoaded(std::string iccid);
     bool IsPhoneTypeGsm(int32_t slotId);
