@@ -18,6 +18,7 @@
 
 #include <list>
 
+#include <ffrt.h>
 #include "if_system_ability_manager.h"
 #include "radio_protocol_controller.h"
 #include "sim_constant.h"
@@ -131,6 +132,8 @@ private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     const int ACTIVE_SIM_IN_PROGRESS = 1;
     const int ACTIVE_SIM_NOT_IN_PROGRESS = 0;
+    ffrt::condition_variable activeSimConn_;
+    ffrt::mutex activeSimMutex_;
     int32_t maxCount_ = 0;
     int32_t primarySimId_ = 0;
     int32_t defaultSmsSimId_ = 0;
@@ -138,6 +141,7 @@ private:
     int32_t defaultVoiceSimId_ = 0;
     int32_t lastPrimarySlotId_ = 0;
     int32_t lastCellularDataSlotId_ = 0;
+    static constexpr int32_t WAIT_REMOTE_TIME_SEC = 4;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
@@ -149,9 +153,6 @@ private:
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
-    std::condition_variable activeSimConn_;
-    std::mutex activeSimMutex_;
-    static constexpr const uint32_t WAIT_REMOTE_TIME_SEC = 3; // second
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -498,14 +498,13 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
 int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
     isSetActiveSimInProgress_[slotId] = 1;
-    if (isSetPrimarySlotIdInProgress_) {
-        TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, wait 3s");
-        std::unique_lock<std::mutex> lock(activeSimMutex_);
-        if (isSetPrimarySlotIdInProgress_) {
-            activeSimConn_.wait_for(lock, std::chrono::seconds(WAIT_REMOTE_TIME_SEC));
+    std::unique_lock<ffrt::mutex> lck(activeSimMutex_);
+    while (isSetPrimarySlotIdInProgress_) {
+		TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, waiting");
+        if (activeSimConn_.wait_for(lck, std::chrono::seconds(WAIT_REMOTE_TIME_SEC)) == ffrt::cv_status::timeout) {
+            TELEPHONY_LOGI("SetPrimarySlotIdDone() wait timeout");
+            break;
         }
-    } else {
-        TELEPHONY_LOGI("isSetSimSlotInProgress_ is false, go on");
     }
     if (!SetActiveSimToRil(slotId, ENTITY_CARD, enable)) {
         CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
@@ -932,9 +931,9 @@ int32_t MultiSimController::GetPrimarySlotId()
 
 void MultiSimController::SetPrimarySlotIdDone()
 {
-    isSetPrimarySlotIdInProgress_ = false;
     PublishSetPrimaryEvent(true);
-    std::unique_lock<std::mutex> lock(activeSimMutex_);
+    std::unique_lock<ffrt::mutex> lock(activeSimMutex_);
+    isSetPrimarySlotIdInProgress_ = false;
     activeSimConn_.notify_all();
 }
 
