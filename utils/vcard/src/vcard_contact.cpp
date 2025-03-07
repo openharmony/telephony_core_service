@@ -1236,7 +1236,7 @@ void VCardContact::UpdateDisplayName()
     fullName += nameData_->GetGiven();
     if (fullName != displayName) {
         nameData_->setDispalyName(fullName);
-        TELEPHONY_LOGE("update display name use format name");
+        TELEPHONY_LOGI("update display name use format name");
     }
 }
 
