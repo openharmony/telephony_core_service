@@ -45,6 +45,9 @@ void SimManager::InitMultiSimObject()
 {
     // Program memory
     std::lock_guard<std::shared_mutex> lck(mtx_);
+    if (slotCount_ <0 || slotCount_ > MAX_SLOT_COUNT){
+        return TELEPHONY_ERROR;
+    }
     simStateManager_.resize(slotCount_);
     simFileManager_.resize(slotCount_);
     simSmsManager_.resize(slotCount_);
