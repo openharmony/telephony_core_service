@@ -15,6 +15,7 @@
 #include "vcard_contact.h"
 
 #include <numeric>
+#include <regex>
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -772,6 +773,7 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else {
         TELEPHONY_LOGI("No need to do anything");
     }
+    UpdateDisplayName();
 }
 
 void VCardContact::AddCustom(
@@ -1212,6 +1214,30 @@ std::vector<std::string> VCardContact::GetValueListFromParasMap(
     std::string rawValue, std::string propValue, std::map<std::string, std::vector<std::string>> parasMap)
 {
     return VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
+}
+
+void VCardContact::UpdateDisplayName()
+{
+    if (nameData_ == nullptr) {
+        return;
+    }
+    if (nameData_->GetFamily().empty() || nameData_->GetGiven().empty() || nameData_->GetDisplayName().empty()) {
+        return;
+    }
+    std::string displayName = nameData_->GetDisplayName();
+    std::regex chineseRegex("[\u4e00-\u9fa5]");
+    if (!std::regex_search(displayName, chineseRegex)) {
+        return;
+    }
+    std::string fullName = nameData_->GetFamily();
+    if (!(nameData_->GetMiddle().empty())) {
+        fullName += nameData_->GetMiddle();
+    }
+    fullName += nameData_->GetGiven();
+    if (fullName != displayName) {
+        nameData_->setDispalyName(fullName);
+        TELEPHONY_LOGI("update display name use format name");
+    }
 }
 
 } // namespace Telephony

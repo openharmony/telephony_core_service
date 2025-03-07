@@ -55,6 +55,8 @@ public:
     void TearDown();
     void SetNameData(const std::string &family, const std::string &given, const std::string &middle,
         const std::string &prefix, const std::string &suffix);
+    void SetNameData(const std::string &family, const std::string &given, const std::string &middle,
+        const std::string &displayName);
     void SetNameDataInfo(const std::string &phoneticFamily, const std::string &phoneticGiven,
         const std::string &phoneticMiddle);
 };
@@ -78,6 +80,15 @@ void ContactDataTest::SetNameData(const std::string &family, const std::string &
     nameData_->SetMiddle(middle);
     nameData_->SetPrefix(prefix);
     nameData_->SetSuffix(suffix);
+}
+
+void ContactDataTest::SetNameData(const std::string &family, const std::string &given, const std::string &middle,
+    const std::string &displayName)
+{
+    nameData_->SetFamily(family);
+    nameData_->SetGiven(given);
+    nameData_->SetMiddle(middle);
+    nameData_->SetPrefix(displayName);
 }
 
 void ContactDataTest::SetNameDataInfo(const std::string &phoneticFamily, const std::string &phoneticGiven,
@@ -928,6 +939,18 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     groupData.SetGroupId(groupId);
     groupData.SetGroupName(groupName);
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    std::string family = "雷";
+    std::string middle = "";
+    std::string given = "狗";
+    std::string displayName = "狗雷";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(nameData_->GetDisplayName(), "雷狗");
 }
 
 #endif // TEL_TEST_UNSUPPORT
