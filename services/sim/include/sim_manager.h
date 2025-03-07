@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace Telephony {
-const int32_t MAX_SLOT_COUNT = 3;
 const int32_t SLOT_ID_ZERO = 0;
 const int32_t SIM_IO_DATA_MIN_LEN = 6;
 const int32_t SIM_IO_DATA_STR_LEN = 2;
