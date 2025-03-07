@@ -102,6 +102,9 @@ const int32_t TAG_ESIM_REMOVE_NOTIFICATION_FROM_LIST = 0xBF30;
 const int32_t TAG_ESIM_AUTHENTICATE_SERVER = 0xBF38;
 const int32_t TAG_ESIM_PREPARE_DOWNLOAD = 0xBF21;
 const int32_t TAG_ESIM_INITIALISE_SECURE_CHANNEL = 0xBF23;
+
+// unknown bpp segment tag
+const int32_t TAG_ESIM_UNKNOWN_BPP_SEGMENT = 0xC9;
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_TAG_DEF_H
