@@ -92,9 +92,7 @@ ohos_unittest("sim_state_handle_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 group("unittest") {
