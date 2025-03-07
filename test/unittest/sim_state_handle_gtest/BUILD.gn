@@ -89,16 +89,10 @@ ohos_unittest("sim_state_handle_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 group("unittest") {
