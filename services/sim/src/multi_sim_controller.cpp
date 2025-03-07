@@ -500,7 +500,7 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
     isSetActiveSimInProgress_[slotId] = 1;
     std::unique_lock<ffrt::mutex> lck(activeSimMutex_);
     while (isSetPrimarySlotIdInProgress_) {
-		TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, waiting");
+        TELEPHONY_LOGI("isSetSimSlotInProgress_ is true, waiting");
         if (activeSimConn_.wait_for(lck, std::chrono::seconds(WAIT_REMOTE_TIME_SEC)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGI("SetPrimarySlotIdDone() wait timeout");
             break;
