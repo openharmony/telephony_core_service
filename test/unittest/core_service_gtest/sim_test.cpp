@@ -117,6 +117,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0200, Function | MediumTest | Le
         CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, poc);
         CoreManagerInner::GetInstance().GetOperatorConfigs(SimTest::slotId_, poc);
         CompareOperatorConfProcess(poc);
+        EXPECT_EQ(poc.configValue.size(), 0);
     }
 }
 
@@ -172,6 +173,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConf_0400, Function | MediumTest | Le
         CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId1_, poc);
         CoreManagerInner::GetInstance().GetOperatorConfigs(SimTest::slotId1_, poc);
         CompareOperatorConfProcess(poc);
+        EXPECT_EQ(poc.configValue.size(), 0);
     }
 }
 
