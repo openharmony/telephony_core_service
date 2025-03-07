@@ -1382,21 +1382,14 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
         NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
         return false;
     }
-    std::shared_ptr<Asn1Node> root = ParseEvent(event);
-    if (root == nullptr) {
-        TELEPHONY_LOGE("root is nullptr");
-        NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
-        return false;
-    }
-    std::string responseResult;
-    uint32_t byteLen = root->Asn1AsString(responseResult);
-    if (byteLen == 0) {
-        TELEPHONY_LOGE("byteLen is zero");
+    IccFileData rawData;
+    if (!GetRawDataFromEvent(event, rawData)) {
+        TELEPHONY_LOGE("rawData is nullptr within rcvMsg");
         NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
         return false;
     }
     cancelSessionResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_OK);
-    cancelSessionResult_.response_ = OHOS::Telephony::ToUtf16(responseResult);
+    cancelSessionResult_.response_ = OHOS::Telephony::ToUtf16(rawData.resultData);
     NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
     return true;
 }
@@ -2090,6 +2083,15 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     if (initSecureChannelReq != nullptr) {
         BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
     }
+    // 1. The BPP came with extraneous tags other than what the spec
+    // mandates. We keep track of the total length of the BPP and compare it
+    // to the length of the segments we care about. If they're different,
+    // we'll throw an exception to indicate this.
+    std::shared_ptr<Asn1Node> unknownBppSegment = bppNode->Asn1GetChild(TAG_ESIM_UNKNOWN_BPP_SEGMENT);
+    if (unknownBppSegment != nullptr) {
+        TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR_UNKNOWN_TAG");
+        return false;
+    }
     std::shared_ptr<Asn1Node> firstSequenceOf87 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_0);
     if (firstSequenceOf87 != nullptr) {
         BuildApduForFirstSequenceOf87(codec, firstSequenceOf87);
@@ -2099,9 +2101,15 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
         BuildApduForSequenceOf88(codec, sequenceOf88);
     }
     std::shared_ptr<Asn1Node> sequenceOf86 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_3);
-    if (sequenceOf86 != nullptr) {
-        BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
+    if (sequenceOf86 == nullptr) {
+        // 2. The BPP is missing a required tag. Upon calling bppNode.getChild,
+        // an exception will occur if the expected tag is missing, though we
+        // should make sure that the sequences are non-empty when appropriate as
+        // well. A profile with no profile elements is invalid.
+        TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR");
+        return false;
     }
+    BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
     SplitSendLongData(codec, MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE, loadBppMutex_, isLoadBppReady_, loadBppCv_);
     return true;
 }
