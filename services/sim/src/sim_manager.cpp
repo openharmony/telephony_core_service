@@ -45,7 +45,8 @@ void SimManager::InitMultiSimObject()
 {
     // Program memory
     std::lock_guard<std::shared_mutex> lck(mtx_);
-    if (slotCount_ <0 || slotCount_ > MAX_SLOT_COUNT){
+    if (slotCount_ < 0 || slotCount_ > MAX_SLOT_COUNT)
+    {
         TELEPHONY_LOGI("SimManager InitMultiSimObject, slotCount = %{public}d is out of range", slotCount_);
         return;
     }
