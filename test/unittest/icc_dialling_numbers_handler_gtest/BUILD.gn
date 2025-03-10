@@ -59,6 +59,7 @@ ohos_unittest("icc_dialling_numbers_handler_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
