@@ -387,6 +387,10 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
         TELEPHONY_LOGI("OperatorConfigCache:AnnounceOperatorConfigChanged end. result = %{public}d, opkey: %{public}s,"
             "slotId: %{public}d, state: %{public}d", publishResult, opkey.data(), slotId, state);
+        auto simFileManager = simFileManager_.lock();
+        if (simFileManager != nullptr) {
+            TelEventHandler::SendTelEvent(simFileManager, RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED);
+        }
         return publishResult;
     }
     TELEPHONY_LOGI("AnnounceOperatorConfigChanged dont publish OPERATOR_CONFIG_CHANGED opkey is %{public}s,"

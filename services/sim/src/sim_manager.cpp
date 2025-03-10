@@ -108,7 +108,6 @@ void SimManager::InitBaseManager(int32_t slotId)
         std::weak_ptr<SimStateManager>(simStateManager_[slotId]));
     if (simFileManager_[slotId] != nullptr) {
         simFileManager_[slotId]->Init(slotId);
-        simFileManager_[slotId]->AddSubscribeListener(simFileManager_[slotId]);
     }
     simAccountManager_[slotId] =
         std::make_shared<SimAccountManager>(telRilManager_, simStateManager_[slotId], simFileManager_[slotId]);
