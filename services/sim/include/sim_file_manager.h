@@ -89,7 +89,6 @@ public:
     bool IsCTSimCard();
     static std::shared_ptr<SimFileManager> CreateInstance(
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
-    void AddSubscribeListener(std::shared_ptr<SimFileManager> simFileManager);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
     enum class IccType { ICC_TYPE_CDMA, ICC_TYPE_GSM, ICC_TYPE_IMS, ICC_TYPE_USIM };
 #ifdef CORE_SERVICE_SUPPORT_ESIM
@@ -138,19 +137,6 @@ protected:
     std::map<IccType, std::shared_ptr<IccFileController>> iccFileControllerCache_;
 
 private:
-    class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
-    public:
-        SystemAbilityStatusChangeListener() = default;
-        explicit SystemAbilityStatusChangeListener(std::shared_ptr<SimFileManager> &simFileManager);
-        ~SystemAbilityStatusChangeListener() = default;
-        virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-        virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
- 
-    private:
-        std::shared_ptr<SimFileManager> simFileManager_ = nullptr;
-    };
-
-private:
     bool InitDiallingNumberHandler();
     IccType GetIccTypeByCardType(CardType type);
     IccType GetIccTypeByTech(const std::shared_ptr<VoiceRadioTechnology> &tech);
@@ -160,7 +146,6 @@ private:
     bool IsValidType(IccType type);
     bool IsCTCardType(CardType type);
     bool IsCTIccId(std::string iccId);
-    void UnSubscribeListeners();
     std::string opName_;
     std::string opKey_;
     std::string opKeyExt_;
@@ -175,6 +160,9 @@ private:
     void SetVoiceMailSimImsiParam(std::string imsi);
     void StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecoeds);
     std::string GetVoiceMailSimImsiFromParam();
+    void HandleVoiceTechChanged(std::shared_ptr<VoiceRadioTechnology> tech);
+    void HandleIccRefresh();
+    void HandleOperatorConfigChanged();
     void HandleSimRecordsLoaded();
     void HandleSimIccidLoaded(std::string iccid);
     bool IsPhoneTypeGsm(int32_t slotId);
