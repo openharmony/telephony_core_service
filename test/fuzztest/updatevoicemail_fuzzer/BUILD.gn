@@ -57,6 +57,7 @@ ohos_fuzztest("UpdateVoiceMailFuzzTest") {
     "config_policy:configpolicy_util",
     "drivers_interface_ril:libril_proxy_1.1",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
