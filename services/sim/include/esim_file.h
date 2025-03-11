@@ -61,7 +61,6 @@ constexpr static const uint32_t VERSION_NUMBER = 11;
 constexpr static const uint32_t RESPONS_DATA_FINISH = 0;
 constexpr static const uint32_t RESPONS_DATA_NOT_FINISH = 1;
 constexpr static const uint32_t RESPONS_DATA_ERROR = 2;
-static const std::string LF_SIGN = "\n";
 class EsimFile : public IccFile {
 public:
     explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
