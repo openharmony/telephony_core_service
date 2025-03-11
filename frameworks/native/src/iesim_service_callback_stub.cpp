@@ -27,7 +27,6 @@ namespace OHOS {
 namespace Telephony {
 int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
-    TELEPHONY_LOGI("recv callback reqId:%{public}d", requestId);
     auto callbackType = requestId;
     switch (callbackType) {
         case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
@@ -80,6 +79,7 @@ int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requ
 
 void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
 {
+    TELEPHONY_LOGI("OnGetEuiccInfo");
     int32_t errorCode = data.ReadInt32();
     if (FAILED(errorCode)) {
         TELEPHONY_LOGE("Read Int32 failed!");
