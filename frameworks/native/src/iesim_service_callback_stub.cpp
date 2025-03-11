@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Telephony {
 int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
+    TELEPHONY_LOGI("recv callback reqId:%{public}d", requestId);
     auto callbackType = requestId;
     switch (callbackType) {
         case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
