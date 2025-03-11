@@ -38,8 +38,8 @@ void GetEuiccInformationCallback::OnGetEuiccInfo(const EuiccInfo &result, const 
         asyncContext_->result = result;
     } else {
         asyncContext_->asyncContext.context.errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
-        TELEPHONY_LOGE("errorCode = %{public}d", errorCode);
     }
+    TELEPHONY_LOGI("OnGetEuiccInfo errorCode = %{public}d", errorCode);
     asyncContext_->asyncContext.isCallbackEnd = true;
     asyncContext_->asyncContext.cv.notify_all();
 }
