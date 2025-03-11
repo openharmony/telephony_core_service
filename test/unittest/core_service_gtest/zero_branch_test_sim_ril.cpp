@@ -15,10 +15,12 @@
 #define private public
 #define protected public
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <string_ex.h>
 
 #include "core_manager_inner.h"
 #include "core_service.h"
+#include "mock_datashare_helper.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_dialling_numbers_manager.h"
 #include "icc_file_controller.h"
@@ -42,6 +44,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 
 namespace {
@@ -1596,5 +1599,26 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorFileParser, Function | MediumTest |
     value = nullptr;
 }
 
+/**
+ * @tc.number   Telephony_OperatorConfigLoader_003
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    auto dataShareHelper = std::make_shared<MockDataShareHelper>();
+    EXPECT_CALL(*dataShareHelper, Creator(_, _, _, _)).WillRepeatedly(DoAll(Return(nullptr)));
+    operatorConfigLoader->LoadOpKeyOnMccMnc(0);
+    bool isDataShareError = CoreManagerInner::GetInstance().IsDataShareError();
+    EXPECT_TRUE(isDataShareError);
+}
 } // namespace Telephony
 } // namespace OHOS
