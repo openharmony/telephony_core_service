@@ -28,7 +28,8 @@ public:
     MOCK_METHOD(int, OpenFile, (Uri &uri, const std::string &mode), (override));
     MOCK_METHOD(int, OpenRawFile, (Uri &uri, const std::string &mode), (override));
     MOCK_METHOD(int, Insert, (Uri &uri, const DataShare::DataShareValuesBucket &value), (override));
-    MOCK_METHOD(int, InsertExt, (Uri &uri, const DataShare::DataShareValuesBucket &value, std::string &result), (override));
+    MOCK_METHOD(int, InsertExt, (Uri &uri, const DataShare::DataShareValuesBucket &value,
+        std::string &result), (override));
     MOCK_METHOD(int, Update, (Uri &uri, const DataShare::DataSharePredicates &predicates,
         const DataShare::DataShareValuesBucket &value), (override));
     MOCK_METHOD(int, BatchUpdate, (const DataShare::UpdateOperations &operations,
