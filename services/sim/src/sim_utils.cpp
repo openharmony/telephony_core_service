@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <string>
+#include <sstream>
 #include "sim_utils.h"
 
 #include "str_convert.h"
@@ -21,6 +23,9 @@ using namespace std;
 
 namespace OHOS {
 namespace Telephony {
+
+static const uint8_t WORD_LEN = 2;
+
 unsigned char SIMUtils::HexCharConvertToInt(char c)
 {
     if (c >= '0' && c <= '9') {
@@ -197,6 +202,68 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
     return ToUtf8(wide_str);
 }
 
+std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
+{
+    const char *bytes = rawData.c_str();
+    if (bytes == nullptr) {
+        return "";
+    }
+    std::wstring wide_str = L"";
+    int high = 0;
+    int low = 0;
+    int gsmVal = 0;
+    int byteLen = strlen(bytes);
+    bool escTag = false;
+    wchar_t c;
+    for (int i = 0; i < byteLen; i++) {
+        low = (int)HexCharConvertToInt(bytes[i]);
+        if (i + 1 < byteLen) {
+            high = (int)HexCharConvertToInt(bytes[i + 1]);
+        } else {
+            break;
+        }
+        gsmVal = low * 16 + high; // 16 is the hex val max
+        i++;
+        if (gsmVal < 0 || gsmVal >= 129) { // 129 is gsm val index max
+            continue;
+        }
+        if (!escTag && gsmVal == 0x1B) { // 1B is the ESC tag refer to GSM 03.38;
+            escTag = true;
+            continue;
+        } else if (escTag && gsmVal == 0x1B) { // Two escape chars in a row We treat this as a space
+                                               // See Note 1 in table 6.2.1 of TS 23.038 v7.00
+            escTag = false;
+            c = ' ';
+            wide_str += c;
+            continue;
+        }
+        if (escTag == true) {
+            if (LANGUAGE_EXT_TABLE_MAP.find(gsmVal) != LANGUAGE_EXT_TABLE_MAP.end()) {
+                c = LANGUAGE_EXT_TABLE_MAP.at(gsmVal);
+                wide_str += c;
+            } else {
+                c = LANGUAGE_TABLE[gsmVal];
+                wide_str += c;
+            }
+            escTag = false;
+        } else {
+            c = LANGUAGE_TABLE[gsmVal];
+            wide_str += c;
+        }
+    }
+    TELEPHONY_LOGI("Cphs7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
+    return ToUtf8(wide_str);
+}
+
+std::string SIMUtils::HexVecToHexStr(const std::vector<uint8_t> &arr)
+{
+    std::stringstream ss;
+    for (auto it = arr.begin(); it != arr.end(); it++) {
+        ss << std::setiosflags(std::ios::uppercase) << std::hex << std::setw(WORD_LEN) << std::setfill('0') << int(*it);
+    }
+    return ss.str();
+}
+
 std::string SIMUtils::DiallingNumberStringFieldConvertToString(
     std::shared_ptr<unsigned char> array, int offset, int length, int offPos)
 {
@@ -229,7 +296,8 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
         std::string ns = Str16ToStr8(rtl);
         return ns;
     }
-    return Decode8BitConvertToString(data, length, offset);
+    std::string tempData = SIMUtils::BytesConvertToHexString(data, length);
+    return Cphs7bitConvertToString(tempData);
 }
 
 std::u16string SIMUtils::UcsConvertToString(unsigned char *data, int length, int offset)

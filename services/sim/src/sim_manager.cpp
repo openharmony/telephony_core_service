@@ -831,6 +831,34 @@ int32_t SimManager::GetIMSI(int32_t slotId, std::u16string &imsi)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimManager::GetEhPlmns(int32_t slotId, std::unordered_set<std::string> &ehPlmns)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetEhPlmns has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ehPlmns = simFileManager_[slotId]->GetEhPlmns();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t SimManager::GetSpdiPlmns(int32_t slotId, std::unordered_set<std::string> &spdiPlmns)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("GetSpdiPlmns has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    spdiPlmns = simFileManager_[slotId]->GetSpdiPlmns();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 std::u16string SimManager::GetLocaleFromDefaultSim(int32_t slotId)
 {
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {

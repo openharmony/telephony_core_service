@@ -39,6 +39,7 @@
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
 #include "sim_constant.h"
+#include "sim_file_parse.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1072,7 +1073,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_002, Function | MediumTest | Level1
     std::string number = "00000000000";
     simFile->SetVoiceCallForwarding(enable, number);
     std::vector<std::string> records = { "460000", "01AABBCCDD" };
-    simFile->ParsePnn(records);
+    simFile->simFileParse_->ParsePnn(records, *simFile);
     ASSERT_FALSE(simFile->EfCfisAvailable(0));
 }
 
