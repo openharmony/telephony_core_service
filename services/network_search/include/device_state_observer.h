@@ -16,6 +16,7 @@
 #ifndef NETWORK_SEARCH_DEVICE_STATE_OBSERVER_H
 #define NETWORK_SEARCH_DEVICE_STATE_OBSERVER_H
 
+#include "ffrt.h"
 #include "common_event_subscriber.h"
 #include "common_event_support.h"
 #include "common_event_manager.h"
@@ -96,6 +97,7 @@ private:
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
 #endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    ffrt::mutex callbackMutex_;
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 private:
