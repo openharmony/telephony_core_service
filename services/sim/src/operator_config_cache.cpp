@@ -371,7 +371,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
     std::string opkey = GetOpKey(slotId);
     notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId, state);
-    if ((opkey != std::string(INITIAL_OPKEY) && !isDataShareError) ||
+    if ((opkey != std::string(INITIAL_OPKEY) && !isDataShareError && state >= STATE_PARA_LOADED) ||
         (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
             simState == SimState::SIM_STATE_UNKNOWN)) {
         AAFwk::Want want;
