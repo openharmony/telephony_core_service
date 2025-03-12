@@ -425,5 +425,26 @@ HWTEST_F(IccFileTest, Telephony_IccFile_020, Function | MediumTest | Level1)
     ASSERT_NE(iccFile->opkeyLoadObser_, nullptr);
 }
 
+HWTEST_F(IccFileTest, Telephony_IccFile_021, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+    iccFile->ProcessEvent(event);
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->imsi_ = "46070";
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    std::string eons = "";
+    std::string plmn = "";
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles = {};
+    EXPECT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, false, eons, true, plmn));
+    std::string plmn1 = "46001";
+    EXPECT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, false, eons, true, plmn1));
+}
+
 }
 }
