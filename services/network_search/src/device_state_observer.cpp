@@ -55,6 +55,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     subscriber_->SetEventHandler(deviceStateHandler);
     subscriber_->InitEventMap();
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+    std::unique_lock<ffrt::mutex> lck(callbackMutex_);
     sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
 
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -85,6 +86,7 @@ void DeviceStateObserver::StopEventSubscriber()
     }
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+    std::unique_lock<ffrt::mutex> lck(callbackMutex_);
     if (sharingEventCallback_ == nullptr) {
         TELEPHONY_LOGE("DeviceStateObserver::StopEventSubscriber sharingEventCallback_ is nullptr");
         return;
