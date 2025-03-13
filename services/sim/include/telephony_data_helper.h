@@ -49,7 +49,7 @@ private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const std::string &strUri, const std::string &extUri,
         const int waitTime = 2);
     std::mutex lock_;
-    bool mIsDataShareError = false;
+    bool isOpkeyDbError_ = false;
 };
 }  // namespace Telephony
 }  // namespace OHOS
