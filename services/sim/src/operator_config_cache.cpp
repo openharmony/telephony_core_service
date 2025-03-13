@@ -365,13 +365,13 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     CoreManagerInner::GetInstance().GetSimState(slotId, simState);
-    bool isDataShareError = CoreManagerInner::GetInstance().IsDataShareError();
-    TELEPHONY_LOGI("AnnounceOperatorConfigChanged isDataShareError = %{public}d, state = %{public}d",
-        isDataShareError, state);
+    bool isOpkeyDbError = CoreManagerInner::GetInstance().IsDataShareError();
+    TELEPHONY_LOGI("AnnounceOperatorConfigChanged isOpkeyDbError = %{public}d, state = %{public}d",
+        isOpkeyDbError, state);
     std::string opkey = GetOpKey(slotId);
     notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId, state);
-    if ((opkey != std::string(INITIAL_OPKEY) && !isDataShareError && state >= STATE_PARA_LOADED) ||
+    if ((opkey != std::string(INITIAL_OPKEY) && !isOpkeyDbError && state >= STATE_PARA_LOADED) ||
         (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
             simState == SimState::SIM_STATE_UNKNOWN)) {
         AAFwk::Want want;
