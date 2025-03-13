@@ -154,7 +154,9 @@ public:
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t SavePrimarySlotId(int32_t slotId) = 0;
+    // Get OpkeyDb connect error
     virtual bool IsDataShareError() = 0;
+    // Reset OpkeyDb connect error
     virtual void ResetDataShareError() = 0;
     virtual void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) = 0;
     virtual int32_t GetDefaultMainSlotByIccId() = 0;
