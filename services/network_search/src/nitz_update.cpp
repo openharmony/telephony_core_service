@@ -320,7 +320,8 @@ void NitzUpdate::SaveTime(int64_t networkTime, int64_t offset)
     int64_t ntpTime = 0;
     auto ret = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetNtpTimeMs(ntpTime);
     if (ret != ERR_OK || ntpTime == 0) {
-        bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE + offset);
+        bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(
+            networkTime * MILLI_TO_BASE + offset);
         TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
         std::string param = "time";
         AAFwk::Want want;
