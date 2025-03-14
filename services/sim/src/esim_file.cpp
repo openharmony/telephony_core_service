@@ -1378,9 +1378,9 @@ bool EsimFile::ProcessCancelSessionDone(const AppExecFwk::InnerEvent::Pointer &e
         NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
         return false;
     }
+
     IccFileData rawData;
     if (!GetRawDataFromEvent(event, rawData)) {
-        TELEPHONY_LOGE("rawData is nullptr within rcvMsg");
         NotifyReady(cancelSessionMutex_, isCancelSessionReady_, cancelSessionCv_);
         return false;
     }
@@ -2074,10 +2074,7 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     if (initSecureChannelReq != nullptr) {
         BuildApduForInitSecureChannel(codec, bppNode, initSecureChannelReq);
     }
-    // 1. The BPP came with extraneous tags other than what the spec
-    // mandates. We keep track of the total length of the BPP and compare it
-    // to the length of the segments we care about. If they're different,
-    // we'll throw an exception to indicate this.
+    // check unknown tag error
     std::shared_ptr<Asn1Node> unknownBppSegment = bppNode->Asn1GetChild(TAG_ESIM_UNKNOWN_BPP_SEGMENT);
     if (unknownBppSegment != nullptr) {
         TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR_UNKNOWN_TAG");
@@ -2093,10 +2090,6 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
     }
     std::shared_ptr<Asn1Node> sequenceOf86 = bppNode->Asn1GetChild(TAG_ESIM_CTX_COMP_3);
     if (sequenceOf86 == nullptr) {
-        // 2. The BPP is missing a required tag. Upon calling bppNode.getChild,
-        // an exception will occur if the expected tag is missing, though we
-        // should make sure that the sequences are non-empty when appropriate as
-        // well. A profile with no profile elements is invalid.
         TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR");
         return false;
     }
