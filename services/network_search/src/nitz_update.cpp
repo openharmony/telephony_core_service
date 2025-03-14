@@ -318,7 +318,7 @@ void NitzUpdate::SaveTime(int64_t networkTime, int64_t offset)
     }
 #endif
     int64_t ntpTime = 0;
-    auto ret = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetNtpTimeMs(ntpTime);
+    auto ret = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetRealTimeMs(ntpTime);
     if (ret != ERR_OK || ntpTime == 0) {
         bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(
             networkTime * MILLI_TO_BASE + offset);
