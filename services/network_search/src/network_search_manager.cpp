@@ -364,10 +364,10 @@ void NetworkSearchManager::NotifyPsRatChanged(int32_t slotId)
 
 void NetworkSearchManager::NotifyPsConnectionAttachedChanged(int32_t slotId)
 {
-    TELEPHONY_LOGD("NetworkSearchManager::NotifyPsConnectionAttachedChanged slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->observerHandler_ != nullptr) {
+            TELEPHONY_LOGI("NetworkSearchManager::NotifyPsConnectionAttachedChanged slotId:%{public}d", slotId);
             inner->observerHandler_->NotifyObserver(RadioEvent::RADIO_PS_CONNECTION_ATTACHED);
         }
     }
@@ -375,10 +375,10 @@ void NetworkSearchManager::NotifyPsConnectionAttachedChanged(int32_t slotId)
 
 void NetworkSearchManager::NotifyPsConnectionDetachedChanged(int32_t slotId)
 {
-    TELEPHONY_LOGD("NetworkSearchManager::NotifyPsConnectionDetachedChanged slotId:%{public}d", slotId);
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
         if (inner->observerHandler_ != nullptr) {
+            TELEPHONY_LOGI("NetworkSearchManager::NotifyPsConnectionDetachedChanged slotId:%{public}d", slotId);
             inner->observerHandler_->NotifyObserver(RadioEvent::RADIO_PS_CONNECTION_DETACHED);
         }
     }
