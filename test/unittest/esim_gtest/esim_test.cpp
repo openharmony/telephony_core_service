@@ -121,6 +121,38 @@ static const std::string boundProfilePackage = "vzaCFPW/I4GjggEBgAiX"
     "aZNW6UFYPg/BK6SuCJTMxL9OkDmh7II/n7vOnOum3xMwLGO5Ls/JXje5stKLdBBrdGf1AZx2OFo04O96AuXtM+wwUgPIHmLsg8ftOz/oBPhfgc"
     "F6N9SucIgpUkjlxdM61S5KyvxEVgFKyb1tWfc8QaMq5hSwjtD/Rdg1KHei5aWNxLFovBcwk3JDLH5I3TZrlBGcJYxE16AkvXz4G3";
 
+static const std::string boundProfilePackageUnknownBpp =
+    "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";
+
 HWTEST_F(EsimTest, SyncOpenChannel_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -385,18 +417,6 @@ HWTEST_F(EsimTest, ObtainEuiccInfo1ParseTagCtx2_001, Function | MediumTest | Lev
     asn1Node->constructed_ = false;
     bool ret = esimFile->ObtainEuiccInfo1ParseTagCtx2(asn1Node);
     EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(EsimTest, RequestAllProfilesParseProfileInfo_001, Function | MediumTest | Level2)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    std::string resultData =
-        "BF282BA029BF2F118001010C08736D64702E636F6081020410BF2F128001020C09736D6470322E636F60810204209000";
-    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(resultData);
-    std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, responseByte.size());
-    EXPECT_EQ(esimFile->RequestAllProfilesParseProfileInfo(root), true);
 }
 
 HWTEST_F(EsimTest, ProcessEvent_001, Function | MediumTest | Level2)
@@ -1165,6 +1185,25 @@ HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_001, Function | MediumTest | L
     EXPECT_TRUE(esimFile->ProcessLoadBoundProfilePackage(slotId));
 }
 
+HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_002, Function | MediumTest | Level2)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    int slotId = 0;
+    std::shared_ptr<Telephony::IccFile> iccFile = std::make_shared<EsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer eventGetProfile = iccFile->BuildCallerInfo(MSG_ESIM_GET_PROFILE);
+    esimFile->currentChannelId_ = 0;
+    EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
+    esimFile->currentChannelId_ = 2;
+    EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
+    esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(boundProfilePackageUnknownBpp);
+    std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
+    std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
+    esimFile->SetRilAndFileController(telRilManager, file, handler);
+    EXPECT_TRUE(esimFile->ProcessLoadBoundProfilePackage(slotId));
+}
+
 HWTEST_F(EsimTest, ProcessLoadBoundProfilePackageDone_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -1203,7 +1242,7 @@ HWTEST_F(EsimTest, RealProcessLoadBoundProfilePackageDone_001, Function | Medium
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    EXPECT_TRUE(esimFile->RealProcessLoadBoundProfilePackageDone(bppCombineHexStr));
+    EXPECT_TRUE(esimFile->RealProcessLoadBoundProfilePackageDone());
 }
 
 HWTEST_F(EsimTest, ProcessListNotifications_001, Function | MediumTest | Level2)
