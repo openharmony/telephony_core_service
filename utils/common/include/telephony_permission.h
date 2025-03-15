@@ -114,6 +114,10 @@ static constexpr const char *SET_TELEPHONY_ESIM_STATE_OPEN = "ohos.permission.SE
  * on the device chip when the eSIM is activated.
  */
 static constexpr const char *GET_TELEPHONY_ESIM_STATE = "ohos.permission.GET_TELEPHONY_ESIM_STATE";
+/**
+ * This permission allows a application to obtain apn info and set apn.
+ */
+static constexpr const char *MANAGE_APN_SETTING = "ohos.permission.MANAGE_APN_SETTING";
 } // namespace Permission
 
 class TelephonyPermission {
