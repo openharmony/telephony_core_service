@@ -1,7 +1,5 @@
-#ifndef MOCK_TEL_RIL_MANAGER_H
-#define MOCK_TEL_RIL_MANAGER_H
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef MOCK_TEL_RIL_MANAGER_H
+#define MOCK_TEL_RIL_MANAGER_H
 
 #include "event_runner.h"
 #include "tel_ril_network_parcel.h"
