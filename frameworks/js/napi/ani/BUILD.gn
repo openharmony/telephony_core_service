@@ -17,6 +17,6 @@ SUBSYSTEM_DIR = "../../../../../"
 group("ani_sim_packages") {
   deps = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/ani/sim:ani_sim",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/ani/sim:ani_sim_abc",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/ani/sim:ani_sim_abc_etc",
   ]
 }
