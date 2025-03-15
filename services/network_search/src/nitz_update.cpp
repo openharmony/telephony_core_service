@@ -317,18 +317,25 @@ void NitzUpdate::SaveTime(int64_t networkTime, int64_t offset)
         runningLock->Lock();
     }
 #endif
-    bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(networkTime * MILLI_TO_BASE + offset);
-    TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
+    int64_t ntpTime = 0;
+    auto ret = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetRealTimeMs(ntpTime);
+    if (ret != ERR_OK || ntpTime == 0) {
+        bool result = OHOS::MiscServices::TimeServiceClient::GetInstance()->SetTime(
+            networkTime * MILLI_TO_BASE + offset);
+        TELEPHONY_LOGI("NitzUpdate::ProcessTime result:%{public}d slotId:%{public}d", result, slotId_);
+        std::string param = "time";
+        AAFwk::Want want;
+        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIME_CHANGED);
+        want.SetParam(param, static_cast<int64_t>(networkTime));
+        PublishCommonEvent(want);
+    } else {
+        TELEPHONY_LOGI("NitzUpdate::ProcessTime ntp time valid! slotId:%{public}d", slotId_);
+    }
 #ifdef ABILITY_POWER_SUPPORT
     if (runningLock != nullptr) {
         runningLock->UnLock();
     }
 #endif
-    std::string param = "time";
-    AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_NITZ_TIME_CHANGED);
-    want.SetParam(param, static_cast<int64_t>(networkTime));
-    PublishCommonEvent(want);
 }
 
 bool NitzUpdate::IsAutoTimeZone()
