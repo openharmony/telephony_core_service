@@ -71,13 +71,13 @@ generate_static_abc("ani_sim_abc") {
   dst_file = "$target_out_dir/@ohos.sim.d.abc"
   out_puts = [ "$target_out_dir/@ohos.sim.d.abc" ]
 
-  # is_boot_abc = "True"
-  # device_dst_file = "system/lib64/@ohos.sim.d.abc"
+  is_boot_abc = "True"
+  device_dst_file = "system/framework/@ohos.sim.d.abc"
 }
 
 ohos_prebuilt_etc("ani_sim_abc_etc") {
   source = "$target_out_dir/@ohos.sim.d.abc"
-  relative_install_dir = "module/telephony"
+  module_install_dir = "framework"
   part_name = "core_service"
   subsystem_name = "telephony"
   deps = [ ":ani_sim_abc" ]
