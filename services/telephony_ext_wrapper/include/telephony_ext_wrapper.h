@@ -115,6 +115,8 @@ public:
     typedef void (*DynamicLoadInit)(void);
     typedef void (*DynamicLoadDeInit)(void);
     typedef void (*UpdateHotplugCardState)(int32_t slotId, OHOS::Telephony::SimState state);
+    typedef void (*CacheAssetPinForUpgrade)(
+        int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -179,6 +181,7 @@ public:
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
+    CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;

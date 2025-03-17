@@ -287,6 +287,13 @@ struct LockStatusResponse {
     int32_t remain = 0;
 };
 
+enum class PinOperationType {
+    SIM_ABSENT,
+    PIN_ENABLE,
+    PIN_DISABLE,
+    PIN_ALTER,
+};
+
 /**
  * @brief SIM card Authentication response
  */
