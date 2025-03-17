@@ -18,6 +18,7 @@
 #include "core_service_errors.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -229,6 +230,10 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
+        if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ENABLE, pin);
+        }
     } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
@@ -263,6 +268,10 @@ int32_t SimStateManager::UnlockPuk(
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
+        if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ALTER, newPin);
+        }
     } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
@@ -297,6 +306,10 @@ int32_t SimStateManager::AlterPin(
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
+        if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ALTER, newPin);
+        }
     } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
@@ -324,7 +337,6 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::SetLockState slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->SetLockState(slotId, options);
     while (!responseReady_) {
@@ -340,6 +352,15 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
+        if (options.lockType == LockType::PIN_LOCK && TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+            if (options.lockState == LockState::LOCK_OFF) {
+                TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                    slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_DISABLE, Str16ToStr8(options.password));
+            } else if (options.lockState == LockState::LOCK_ON) {
+                TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                    slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ENABLE, Str16ToStr8(options.password));
+            }
+        }
     } else if (unlockResult == UNLOCK_PASSWORD_ERR) {
         response.result = UNLOCK_INCORRECT;
     } else {
