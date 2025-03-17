@@ -391,6 +391,10 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         if (newSimStatus == ICC_CARD_ABSENT) {
             TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
             CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
+            if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+                TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
+                    slotId, GetIccid(), PinOperationType::SIM_ABSENT, "");
+            }
         }
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);

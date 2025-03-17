@@ -226,11 +226,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     createIccFileExt_ = (CREATE_ICC_FILE_EXT)dlsym(telephonyExtWrapperHandle_, "CreateIccFileExt");
     getRoamingBrokerNumeric_ = (GET_ROAMINGBROKER_NUMERIC)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerNumeric");
     getRoamingBrokerImsi_ = (GET_ROAMINGBROKER_IMSI)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerImsi");
-    sendEvent_ = (SEND_EVENT) dlsym(telephonyExtWrapperHandle_, "SendEvent");
-    initBip_ = (INIT_BIP) dlsym(telephonyExtWrapperHandle_, "InitBip");
+    sendEvent_ = (SEND_EVENT)dlsym(telephonyExtWrapperHandle_, "SendEvent");
+    initBip_ = (INIT_BIP)dlsym(telephonyExtWrapperHandle_, "InitBip");
     updateHotPlugCardState_ = (UpdateHotplugCardState)dlsym(telephonyExtWrapperHandle_, "UpdateHotPlugCardState");
+    cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
-        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr || updateHotPlugCardState_ == nullptr);
+                        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
+                        updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
