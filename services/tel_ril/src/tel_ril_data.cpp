@@ -54,6 +54,24 @@ HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes TelRilData::ChangeDPToHalDataPro
     return dataProfileInfoWithApnTypes;
 }
 
+HDI::Ril::V1_4::DataProfileDataInfoWithApnTypesforSlice TelRilData::ChangeDPToHalDataProfileWithApnTypesforSlice(
+    DataProfile dataProfile)
+{
+    HDI::Ril::V1_4::DataProfileDataInfoWithApnTypesforSlice dataProfileInfoWithApnTypesforSlice;
+    dataProfileInfoWithApnTypesforSlice.profileId = dataProfile.profileId;
+    dataProfileInfoWithApnTypesforSlice.password = dataProfile.password;
+    dataProfileInfoWithApnTypesforSlice.authenticationType = dataProfile.verType;
+    dataProfileInfoWithApnTypesforSlice.userName = dataProfile.userName;
+    dataProfileInfoWithApnTypesforSlice.apn = dataProfile.apn;
+    dataProfileInfoWithApnTypesforSlice.protocol = dataProfile.protocol;
+    dataProfileInfoWithApnTypesforSlice.roamingProtocol = dataProfile.roamingProtocol;
+    dataProfileInfoWithApnTypesforSlice.supportedApnTypesBitmap =
+        static_cast<uint64_t>(dataProfile.supportedApnTypesBitmap);
+    dataProfileInfoWithApnTypesforSlice.snssai = dataProfile.snssai;
+    dataProfileInfoWithApnTypesforSlice.sscMode = dataProfile.sscMode;
+    return dataProfileInfoWithApnTypesforSlice;
+}
+
 int32_t TelRilData::DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response)
 {
     HDI::Ril::V1_1::UniInfo uniInfo;
@@ -70,13 +88,23 @@ int32_t TelRilData::DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioR
 int32_t TelRilData::ActivatePdpContext(int32_t radioTechnology, DataProfile dataProfile, bool isRoaming,
     bool allowRoaming, const AppExecFwk::InnerEvent::Pointer &response)
 {
-    HDI::Ril::V1_3::DataCallInfoWithApnTypes dataCallInfoWithApnTypes;
-    dataCallInfoWithApnTypes.radioTechnology = radioTechnology;
-    dataCallInfoWithApnTypes.dataProfileInfo = ChangeDPToHalDataProfileWithApnTypes(dataProfile);
-    dataCallInfoWithApnTypes.roamingAllowed = allowRoaming;
-    dataCallInfoWithApnTypes.isRoaming = isRoaming;
-    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_3::IRil::ActivatePdpContextWithApnTypes,
-        dataCallInfoWithApnTypes);
+    if (!dataProfile.snssai.empty() || dataProfile.sscMode != 0) {
+        HDI::Ril::V1_4::DataCallInfoWithApnTypesforSlice dataCallInfoWithApnTypesforSlice;
+        dataCallInfoWithApnTypesforSlice.radioTechnology = radioTechnology;
+        dataCallInfoWithApnTypesforSlice.dataProfileInfo = ChangeDPToHalDataProfileWithApnTypesforSlice(dataProfile);
+        dataCallInfoWithApnTypesforSlice.roamingAllowed = allowRoaming;
+        dataCallInfoWithApnTypesforSlice.isRoaming = isRoaming;
+        return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_4::IRil::ActivatePdpContextWithApnTypesforSlice,
+            dataCallInfoWithApnTypesforSlice);
+    } else {
+        HDI::Ril::V1_3::DataCallInfoWithApnTypes dataCallInfoWithApnTypes;
+        dataCallInfoWithApnTypes.radioTechnology = radioTechnology;
+        dataCallInfoWithApnTypes.dataProfileInfo = ChangeDPToHalDataProfileWithApnTypes(dataProfile);
+        dataCallInfoWithApnTypes.roamingAllowed = allowRoaming;
+        dataCallInfoWithApnTypes.isRoaming = isRoaming;
+        return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_3::IRil::ActivatePdpContextWithApnTypes,
+            dataCallInfoWithApnTypes);
+    }
 }
 
 int32_t TelRilData::ActivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
@@ -298,5 +326,81 @@ void TelRilData::BuildDataLinkBandwidthInfo(std::shared_ptr<DataLinkBandwidthInf
     dataLinkBandwidthInfo->dlSambr = iDataLinkBandwidthInfo.dlSambr;
     dataLinkBandwidthInfo->averagingWindow = iDataLinkBandwidthInfo.averagingWindow;
 }
+
+int32_t TelRilData::NetworkSliceUrspRpt(const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo)
+{
+    std::shared_ptr<NetworkSliceUrspInfo> urspinfo = std::make_shared<NetworkSliceUrspInfo>();
+    if (urspinfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d urspinfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    urspinfo->urspInfo = networksliceUrspInfo.urspInfo;
+    return Notify<NetworkSliceUrspInfo>(TELEPHONY_LOG_FUNC_NAME, urspinfo, RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
+}
+
+int32_t TelRilData::NetworkSliceAllowedNssaiRpt(
+    const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo)
+{
+    std::shared_ptr<NetworkSliceAllowedNssaiInfo> allowednssaiinfo = std::make_shared<NetworkSliceAllowedNssaiInfo>();
+    if (allowednssaiinfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d nssniinfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    allowednssaiinfo->allowednssaiInfo = networksliceAllowedNssaiInfo.allowednssaiInfo;
+    return Notify<NetworkSliceAllowedNssaiInfo>(
+        TELEPHONY_LOG_FUNC_NAME, allowednssaiinfo, RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT);
+}
+
+int32_t TelRilData::NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo)
+{
+    std::shared_ptr<NetworkSliceEhplmnInfo> ehplmninfo = std::make_shared<NetworkSliceEhplmnInfo>();
+    if (ehplmninfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d Ehplmninfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ehplmninfo->ehplmnInfo = networksliceEhplmnInfo.ehplmnInfo;
+    return Notify<NetworkSliceEhplmnInfo>(TELEPHONY_LOG_FUNC_NAME, ehplmninfo,
+        RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
+}
+
+int32_t TelRilData::SendUrspDecodeResult(const std::vector<uint8_t> buffer,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    HDI::Ril::V1_4::UePolicyDecodeResult dUePolicyDecodeResult;
+    dUePolicyDecodeResult.uePolicyDecodeResultInfo = buffer;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response,
+        &HDI::Ril::V1_4::IRil::SendUrspDecodeResult, dUePolicyDecodeResult);
+}
+ 
+int32_t TelRilData::SendUePolicySectionIdentifier(const std::vector<uint8_t> buffer,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    HDI::Ril::V1_4::UePolicySectionIdentifier dUePolicySectionIdentifier;
+    dUePolicySectionIdentifier.uePolicySectionIdentifierInfo = buffer;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response,
+        &HDI::Ril::V1_4::IRil::SendUePolicySectionIdentifier, dUePolicySectionIdentifier);
+}
+
+int32_t TelRilData::SendImsRsdList(const std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    HDI::Ril::V1_4::ImsRsdList dimsrsdlist;
+    dimsrsdlist.imsRsdListInfo = buffer;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_4::IRil::SendImsRsdList, dimsrsdlist);
+}
+
+int32_t TelRilData::GetNetworkSliceAllowedNssai(const std::vector<uint8_t> buffer,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    HDI::Ril::V1_4::SyncAllowedNssaiInfo dsyncAllowedNssai;
+    dsyncAllowedNssai.syncAllowedNssaiInfo = buffer;
+    return Request(TELEPHONY_LOG_FUNC_NAME, response,
+        &HDI::Ril::V1_4::IRil::GetNetworkSliceAllowedNssai, dsyncAllowedNssai);
+}
+
+int32_t TelRilData::GetNetworkSliceEhplmn(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_4::IRil::GetNetworkSliceEhplmn);
+}
+
 } // namespace Telephony
 } // namespace OHOS

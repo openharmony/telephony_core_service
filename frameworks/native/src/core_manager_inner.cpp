@@ -1354,6 +1354,77 @@ int32_t CoreManagerInner::GetPsRegStatus(
     response->SetOwner(handler);
     return telRilManager_->GetPsRegStatus(slotId, response);
 }
+
+int32_t CoreManagerInner::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SendUrspDecodeResult response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->SendUrspDecodeResult(slotId, buffer, response);
+}
+ 
+int32_t CoreManagerInner::SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SendUePolicySectionIdentifier response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->SendUePolicySectionIdentifier(slotId, buffer, response);
+}
+
+int32_t CoreManagerInner::SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("SendImsRsdList response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->SendImsRsdList(slotId, buffer, response);
+}
+
+int32_t CoreManagerInner::GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSliceAllowedNssai response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->GetNetworkSliceAllowedNssai(slotId, buffer, response);
+}
+
+int32_t CoreManagerInner::GetNetworkSliceEhplmn(int32_t slotId, int32_t eventId)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("GetNetworkSliceEhplmn response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return telRilManager_->GetNetworkSliceEhplmn(slotId, response);
+}
+
 /******************** telRilManager end *******************/
 /******************** networkSearchManager start *******************/
 int32_t CoreManagerInner::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)

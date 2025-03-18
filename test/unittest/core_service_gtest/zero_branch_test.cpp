@@ -978,6 +978,12 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetAirplaneMode(airplaneMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.UpdateRadioOn(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetLinkCapability(0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    std::vector<uint8_t> buffer = {};
+    EXPECT_GT(mInner.SendUrspDecodeResult(0, buffer, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendUePolicySectionIdentifier(0, buffer, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendImsRsdList(0, buffer, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, 0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1274,6 +1280,35 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Lev
     EXPECT_NE(mInner.SetModemInit(-1, 0), TELEPHONY_ERR_SUCCESS);
 }
 
+/**
+ * @tc.number   Telephony_CoreManagerInner_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_008, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    mInner.OnInit(nullptr, nullptr, nullptr);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    mInner.SetTelRilMangerObj(telRilManager);
+    std::vector<uint8_t> buffer = {1};
+    EXPECT_GT(mInner.SendUrspDecodeResult(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendUePolicySectionIdentifier(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendImsRsdList(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, -1), TELEPHONY_ERR_SUCCESS);
+    int32_t BASE = 0x00040000;
+    int32_t event1 = BASE + 48;
+    int32_t event2 = BASE + 49;
+    int32_t event3 = BASE + 50;
+    int32_t event4 = BASE + 51;
+    int32_t event5 = BASE + 52;
+    EXPECT_GT(mInner.SendUrspDecodeResult(0, buffer, event1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendUePolicySectionIdentifier(0, buffer, event2), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.SendImsRsdList(0, buffer, event3), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, event4), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, event5), TELEPHONY_ERR_SUCCESS);
+}
 /**
  * @tc.number   Telephony_TagService_001
  * @tc.name     test error branch

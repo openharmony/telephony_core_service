@@ -191,7 +191,15 @@ public:
         int32_t slotId, int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t GetLinkCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t CleanAllConnections(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
-
+    virtual int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer,
+        const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t GetNetworkSliceEhplmn(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     /* PDP end */
 
     virtual int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) = 0;

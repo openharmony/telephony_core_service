@@ -60,7 +60,13 @@ void TelRilTest::OnInitInterface()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY] = &TelRilTest::OnRequestGetLinkCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST] =
         &TelRilTest::OnRequestCleanAllConnectionsTest;
-
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT] = &TelRilTest::OnRequestSendUrspDecodeResult;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER] =
+        &TelRilTest::OnRequestSendUePolicySectionIdentifier;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST] = &TelRilTest::OnRequestSendImsRsdList;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI] =
+        &TelRilTest::OnRequestGetNetworkSliceAllowedNssai;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN] = &TelRilTest::OnRequestGetNetworkSliceEhplmn;
     OnInitCall();
 
     OnInitSms();
@@ -1346,6 +1352,74 @@ void TelRilTest::OnRequestSetLinkBandwidthReportingRuleTest(
     }
 }
 
+void TelRilTest::OnRequestSendUrspDecodeResult(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSendUrspDecodeResult -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendUrspDecodeResult(slotId, buffer, event);
+        TELEPHONY_LOGI("OnRequestSendUrspDecodeResult finished");
+    }
+}
+
+void TelRilTest::OnRequestSendUePolicySectionIdentifier(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSendUePolicySectionIdentifier -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendUePolicySectionIdentifier(slotId, buffer, event);
+        TELEPHONY_LOGI("OnRequestSendUePolicySectionIdentifier finished");
+    }
+}
+
+void TelRilTest::OnRequestSendImsRsdList(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestSendImsRsdList -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendImsRsdList(slotId, buffer, event);
+        TELEPHONY_LOGI("OnRequestSendImsRsdList finished");
+    }
+}
+
+void TelRilTest::OnRequestGetNetworkSliceAllowedNssai(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNetworkSliceAllowedNssai -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->GetNetworkSliceAllowedNssai(slotId, buffer, event);
+        TELEPHONY_LOGI("OnRequestGetNetworkSliceAllowedNssai finished");
+    }
+}
+
+void TelRilTest::OnRequestGetNetworkSliceEhplmn(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::OnRequestGetNetworkSliceEhplmn -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->GetNetworkSliceEhplmn(slotId, buffer, event);
+        TELEPHONY_LOGI("OnRequestGetNetworkSliceEhplmn finished");
+    }
+}
+
 void TelRilTest::OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST);
@@ -2235,6 +2309,16 @@ void DataTest()
          << "--> OnRequestGetLinkCapabilityTest" << endl;
     cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST)
          << "--> OnRequestCleanAllConnectionsTest" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT)
+         << "--> OnRequestSendUrspDecodeResult" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER)
+         << "--> OnRequestSendUePolicySectionIdentifier" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST)
+         << "--> OnRequestSendImsRsdList" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI)
+         << "--> OnRequestGetNetworkSliceAllowedNssai" << endl;
+    cout << static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN)
+         << "--> OnRequestGetNetworkSliceEhplmn" << endl;
     cout << "=========== Cellular Data End =============" << endl;
 }
 
