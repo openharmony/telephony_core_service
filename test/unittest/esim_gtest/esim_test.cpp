@@ -121,7 +121,7 @@ static const std::string boundProfilePackage = "vzaCFPW/I4GjggEBgAiX"
     "aZNW6UFYPg/BK6SuCJTMxL9OkDmh7II/n7vOnOum3xMwLGO5Ls/JXje5stKLdBBrdGf1AZx2OFo04O96AuXtM+wwUgPIHmLsg8ftOz/oBPhfgc"
     "F6N9SucIgpUkjlxdM61S5KyvxEVgFKyb1tWfc8QaMq5hSwjtD/Rdg1KHei5aWNxLFovBcwk3JDLH5I3TZrlBGcJYxE16AkvXz4G3";
 
-static const std::string boundProfilePackageUnknownBpp =
+static const std::string BOUND_PROFILE_PACKAGE_UNKNOWN_BPP =
     "vzaCCZy/I4GwggEBgBCZslpiqDueT9tDnrK3b8nmphKAAYiBARCECkdTTUEgU00tWFhfSUEEw+jHpFpoLUXUZKLaUw+Dfoa73XVugcQwdCdm7c"
     "vi0piGtg/9kK/rVP9C5SpRNxaxaKaCyUFlDbmtXx6AvYmfC183QEazehw7F13p7yP7btqRYc0ALWUtcHLu8VCW+7vzgGO9NiD1Mf+dUSRznMAH"
     "2zWxzvLfcuVxYXj2um8BwY2hbMnJBQECAwQFoBqHGP8tvv2QSklG3Z+f+xp5riGNZqat3FATb6GCAwWIggMBvyWCAvRaCpiSCQEhQ2WHCfWRCV"
@@ -1197,7 +1197,7 @@ HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_002, Function | MediumTest | L
     EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
     esimFile->currentChannelId_ = 2;
     EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
-    esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(boundProfilePackageUnknownBpp);
+    esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(BOUND_PROFILE_PACKAGE_UNKNOWN_BPP);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
