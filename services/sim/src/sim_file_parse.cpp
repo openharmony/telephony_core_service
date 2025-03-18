@@ -182,10 +182,6 @@ void SimFileParse::ParseSpdi(std::string data, SimFile &simFile)
     }
     const std::string &rawData = data;
     std::shared_ptr<TagService> recTlv = std::make_shared<TagService>(rawData);
-    if (recTlv == nullptr) {
-        TELEPHONY_LOGE("ParseSpdi: recTlv is nullptr!");
-        return;
-    }
     int tag = 0;
     std::vector<uint8_t> datav;
     while (recTlv->Next()) {
@@ -194,10 +190,6 @@ void SimFileParse::ParseSpdi(std::string data, SimFile &simFile)
         if (tag == TAG_SPDI) {
             recTlv->GetValue(datav);
             recTlv = std::make_shared<TagService>(datav);
-            if (recTlv == nullptr) {
-                TELEPHONY_LOGE("ParseSpdi: recTlv is nullptr again!");
-                return;
-            }
         }
         if (tag == TAG_SPDI_PLMN_LIST) {
             recTlv->GetValue(datav);
