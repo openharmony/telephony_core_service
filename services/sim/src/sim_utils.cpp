@@ -204,10 +204,10 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
 
 std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
 {
-    const char *bytes = rawData.c_str();
-    if (bytes == nullptr) {
+    if (rawData.empty()) {
         return "";
     }
+    const char *bytes = rawData.c_str();
     std::wstring wide_str = L"";
     int high = 0;
     int low = 0;
