@@ -137,6 +137,13 @@ public:
         int32_t, int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD2(GetLinkCapability, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD2(CleanAllConnections, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD3(SendUrspDecodeResult, int32_t(int32_t, std::vector<uint8_t>, const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD3(SendUePolicySectionIdentifier, int32_t(int32_t, std::vector<uint8_t>,
+        const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD3(SendImsRsdList, int32_t(int32_t, std::vector<uint8_t>, const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD3(GetNetworkSliceAllowedNssai, int32_t(int32_t, std::vector<uint8_t>,
+        const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD2(GetNetworkSliceEhplmn, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     /* PDP end */
     MOCK_METHOD2(GetSimStatus, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD3(GetSimIO, int32_t(
