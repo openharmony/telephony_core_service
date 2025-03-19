@@ -102,9 +102,14 @@ void SimFileParse::ParseOpl(const std::vector<std::string> &records, SimFile &si
         TELEPHONY_LOGI("ParseOpl records is empty");
         return;
     }
+    std::regex express("[0-9a-fA-F]+");
     for (const auto &dataOpl : records) {
         TELEPHONY_LOGD("ParseOpl: %{public}s", dataOpl.c_str());
         if (dataOpl.size() != (BYTE_LENGTH + BYTE_LENGTH)) {
+            continue;
+        }
+        if (!regex_match(dataOpl, express)) {
+            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
             continue;
         }
         std::string plmn = SIMUtils::BcdPlmnConvertToString(dataOpl, 0);
@@ -113,10 +118,7 @@ void SimFileParse::ParseOpl(const std::vector<std::string> &records, SimFile &si
         }
         std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
         file->plmnNumeric = plmn;
-        if (!regex_match(dataOpl, std::regex("[0-9a-fA-F]+"))) {
-            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
-            continue;
-        }
+
         file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
         file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
         file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN), 0, HEXADECIMAL);
@@ -133,9 +135,14 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
         TELEPHONY_LOGE("ParseOpl5g records is empty");
         return;
     }
+    std::regex express("[0-9a-fA-F]+");
     for (const auto &dataOpl : records) {
         TELEPHONY_LOGD("ParseOpl5g: %{public}s", dataOpl.c_str());
         if (dataOpl.size() != (OPL_5G_LENGTH + OPL_5G_LENGTH)) {
+            continue;
+        }
+        if (!regex_match(dataOpl, express)) {
+            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
             continue;
         }
         std::string plmn = SIMUtils::BcdPlmnConvertToString(dataOpl, 0);
@@ -144,10 +151,6 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
         }
         std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
         file->plmnNumeric = plmn;
-        if (!regex_match(dataOpl, std::regex("[0-9a-fA-F]+"))) {
-            TELEPHONY_LOGI("InputValue is not a hexadecimal number");
-            continue;
-        }
         file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
         file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
         file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN + LAC_RANGE_LEN, HALF_LEN), 0, HEXADECIMAL);
