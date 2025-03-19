@@ -82,7 +82,7 @@ std::string UsimFileController::ObtainUsimElementFilePath(int efId)
             return ObtainUsimElementFilePathExt(efId);
 }
 
-std::string UsimFileController::ObtainUsimElementFilePathExt(int efId)
+static std::string UsimFileController::ObtainUsimElementFilePathExt(int efId)
 {
     std::string mf = MASTER_FILE_SIM;
     switch (efId) {
