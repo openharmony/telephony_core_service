@@ -72,7 +72,7 @@ void SimFileParse::ParsePnn(const std::vector<std::string> &records, SimFile &si
         }
         unsigned char *tlv = data.get();
         std::shared_ptr<PlmnNetworkName> file = std::make_shared<PlmnNetworkName>();
-        int tagAndLength = NETWORK_NAME_LENGTH + 1;
+        const int tagAndLength = NETWORK_NAME_LENGTH + 1;
         if (recordLen <= tagAndLength) {
             TELEPHONY_LOGD("recordLen <= tagAndLength");
             continue;
