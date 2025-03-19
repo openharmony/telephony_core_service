@@ -2215,8 +2215,7 @@ declare namespace sim {
    * @systemapi Hide this for inner system use.
    * @since 12
    */
-  function getSimAuthentication(slotId: number, authType: AuthType,
-      authData: string): Promise<SimAuthenticationResponse>;
+  function getSimAuthentication(slotId: number, authType: AuthType, authData: string): Promise<SimAuthenticationResponse>;
 
   /**
    * Defines the carrier configuration.
