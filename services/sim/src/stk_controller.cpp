@@ -246,7 +246,6 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGD("StkController[%{public}d] event Id: %{public}u", slotId_, id);
     switch (id) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             OnIccStateChanged(event);
@@ -285,6 +284,15 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND:
             RetrySendRilProactiveCommand();
             break;
+        default:
+            ProcessEventExt(id, event);
+            break;
+    }
+}
+
+void StkController::ProcessEventExt(uint32_t id, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    switch (id) {
         case RadioEvent::RADIO_STATE_CHANGED:
             OnRadioStateChanged(event);
             break;
