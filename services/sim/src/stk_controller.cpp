@@ -214,6 +214,7 @@ void StkController::RegisterEvents()
     telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_EVENT_NOTIFY, nullptr);
     telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_CALL_SETUP, nullptr);
     telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_ICC_REFRESH, nullptr);
+    telRilManager->RegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED, nullptr);
 }
 
 void StkController::UnRegisterEvents()
@@ -235,6 +236,7 @@ void StkController::UnRegisterEvents()
     telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_EVENT_NOTIFY);
     telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STK_CALL_SETUP);
     telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_ICC_REFRESH);
+    telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
 }
 
 void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -244,6 +246,7 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     uint32_t id = event->GetInnerEventId();
+    TELEPHONY_LOGD("StkController[%{public}d] event Id: %{public}u", slotId_, id);
     switch (id) {
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             OnIccStateChanged(event);
@@ -281,6 +284,9 @@ void StkController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         case StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND:
             RetrySendRilProactiveCommand();
+            break;
+        case RadioEvent::RADIO_STATE_CHANGED:
+            OnRadioStateChanged(event);
             break;
         default:
             TELEPHONY_LOGE("StkController[%{public}d]::ProcessEvent() unknown event", slotId_);
@@ -671,5 +677,27 @@ void StkController::OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::P
     responseFinished_ = true;
     stkCv_.notify_one();
 }
+
+void StkController::OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("StkController[%{public}d]::OnRadioStateChanged event is nullptr", slotId_);
+        return;
+    }
+
+    std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("StkController[%{public}d]::OnRadioStateChanged object is nullptr", slotId_);
+        return;
+    }
+
+    int32_t radioState = object->data;
+    if (radioState == CORE_SERVICE_POWER_NOT_AVAILABLE) {
+        TELEPHONY_LOGI("StkController[%{public}d]::RadioStateChange radioState: -1, iccCardState: %{public}d "
+            "set to absent", slotId_, iccCardState_);
+        iccCardState_ = ICC_CARD_STATE_ABSENT;
+    }
+}
+
 } // namespace Telephony
 } // namespace OHOS

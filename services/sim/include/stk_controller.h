@@ -64,7 +64,7 @@ public:
 
 public:
     enum {
-        RETRY_SEND_RIL_PROACTIVE_COMMAND = 0,
+        RETRY_SEND_RIL_PROACTIVE_COMMAND = 10000,
     };
 
 private:
@@ -88,6 +88,7 @@ private:
     void InitListener();
     void SubscribeBundleScanFinished();
     void OnReceiveBms();
+    void OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
     class BundleScanFinishedEventSubscriber : public CommonEventSubscriber {
