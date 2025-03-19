@@ -2028,6 +2028,10 @@ void NetworkSearchManager::UpdateDeviceId(int32_t slotId)
     if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
         TELEPHONY_LOGE("NetworkSearchManager::UpdateOperatorName slotId:%{public}d inner is null", slotId);
     }
+    if(eventSender_==nullptr){
+    TELEPHONY_LOGE(NetworSearchManager::UpdateDeviceId eventSender_ is null);
+    reeturn;
+    }
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEISV);
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
