@@ -1573,7 +1573,6 @@ bool SimFile::ProcessGetSpnCphsDone(const AppExecFwk::InnerEvent::Pointer &event
 
 bool SimFile::ProcessGetSpnShortCphsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("ProcessGetSpnShortCphsDone: start");
     bool isFileProcessResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
