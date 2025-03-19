@@ -323,8 +323,7 @@ std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longN
     TELEPHONY_LOGI("ObtainEons roaming:%{public}d", roaming);
     std::string eons = "";
 
-    bool eonsExternRules = ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn);
-    if (eonsExternRules) {
+    if (eonsExternRules = ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn)) {
         return eons;
     }
     int pnnIndex = 1;
