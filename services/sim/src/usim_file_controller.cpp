@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,46 +21,6 @@ UsimFileController::UsimFileController(int slotId) : IccFileController("UsimFile
 
 const std::string DEDICATED_FILE_TELE = "7F10";
 
-const std::map<int, std::string> usimElementFilePathMap = {
-    {ELEMENTARY_FILE_SMS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_EXT5, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_EXT6, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_MWIS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_MBI, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SPN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_AD, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_MBDN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_PNN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_OPL, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SPDI, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SST, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_CFIS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_MAILBOX_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_CFF_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SPN_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SPN_SHORT_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_FDN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_SDN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_EXT3, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_MSISDN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_EXT2, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_INFO_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_CSP_CPHS, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_GID1, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_GID2, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_LI, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_PLMN_W_ACT, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_OPLMN_W_ACT, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_HPLMN_W_ACT, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_EHPLMN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_FPLMN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_LRPLMNSI, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_HPPLMN, DEDICATED_FILE_ADF},
-    {ELEMENTARY_FILE_PBR, DEDICATED_FILE_TELE + DEDICATED_FILE_DIALLING_NUMBERS},
-    {ELEMENTARY_FILE_OPL5G, DEDICATED_FILE_ADF + DEDICATED_FILE_DF5GS}
-};
-
 std::string UsimFileController::ObtainElementFilePath(int efId)
 {
     std::string path = ObtainUsimElementFilePath(efId);
@@ -80,12 +40,62 @@ std::string UsimFileController::ObtainElementFilePath(int efId)
 std::string UsimFileController::ObtainUsimElementFilePath(int efId)
 {
     std::string mf = MASTER_FILE_SIM;
-    auto it = usimElementFilePathMap.find(efId);
-    if (it != usimElementFilePathMap.end()) {
-        return mf.append(it->second);
-    } else {
-        return "";
-    }
+    switch (efId) {
+        case ELEMENTARY_FILE_SMS:
+        case ELEMENTARY_FILE_EXT5:
+        case ELEMENTARY_FILE_EXT6:
+        case ELEMENTARY_FILE_MWIS:
+        case ELEMENTARY_FILE_MBI:
+        case ELEMENTARY_FILE_SPN:
+        case ELEMENTARY_FILE_AD:
+        case ELEMENTARY_FILE_MBDN:
+        case ELEMENTARY_FILE_PNN:
+        case ELEMENTARY_FILE_OPL:
+        case ELEMENTARY_FILE_SPDI:
+        case ELEMENTARY_FILE_SST:
+        case ELEMENTARY_FILE_CFIS:
+        case ELEMENTARY_FILE_MAILBOX_CPHS:
+        case ELEMENTARY_FILE_VOICE_MAIL_INDICATOR_CPHS:
+        case ELEMENTARY_FILE_CFF_CPHS:
+        case ELEMENTARY_FILE_SPN_CPHS:
+        case ELEMENTARY_FILE_SPN_SHORT_CPHS:
+        case ELEMENTARY_FILE_FDN:
+        case ELEMENTARY_FILE_SDN:
+        case ELEMENTARY_FILE_EXT3:
+        case ELEMENTARY_FILE_MSISDN:
+        case ELEMENTARY_FILE_EXT2:
+        case ELEMENTARY_FILE_INFO_CPHS:
+        case ELEMENTARY_FILE_CSP_CPHS:
+        case ELEMENTARY_FILE_GID1:
+        case ELEMENTARY_FILE_GID2:
+        case ELEMENTARY_FILE_LI:
+        case ELEMENTARY_FILE_PLMN_W_ACT:
+        case ELEMENTARY_FILE_OPLMN_W_ACT:
+        case ELEMENTARY_FILE_HPLMN_W_ACT:
+        case ELEMENTARY_FILE_EHPLMN:
+        case ELEMENTARY_FILE_FPLMN:
+        case ELEMENTARY_FILE_LRPLMNSI:
+        case ELEMENTARY_FILE_HPPLMN:
+            mf.append(DEDICATED_FILE_ADF);
+            return mf;
+        default:
+            return ObtainUsimElementFilePathExt(efId);
+}
+
+std::string UsimFileController::ObtainUsimElementFilePathExt(int efId)
+{
+    std::string mf = MASTER_FILE_SIM;
+    switch (efId) {
+        case ELEMENTARY_FILE_PBR:
+            mf.append(DEDICATED_FILE_TELE);
+            mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
+            return mf;
+        case ELEMENTARY_FILE_OPL5G:
+            mf.append(DEDICATED_FILE_ADF);
+            mf.append(DEDICATED_FILE_DF5GS);
+            return mf;
+        default:
+            return "";
 }
 
 UsimFileController::~UsimFileController() {}
