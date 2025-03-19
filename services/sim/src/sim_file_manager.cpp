@@ -319,7 +319,7 @@ std::unordered_set<std::string> SimFileManager::GetEhPlmns()
     }
 
     result = simFile_->ObtainEhPlmns();
-    TELEPHONY_LOGD("SimFileManager::ObtainEhPlmns result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::ObtainEhPlmns result:%{public}d ", (result.empty() ? 0 : 1));
     return result;
 }
 
