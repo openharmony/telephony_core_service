@@ -332,7 +332,7 @@ std::unordered_set<std::string> SimFileManager::GetSpdiPlmns()
     }
 
     result = simFile_->ObtainSpdiPlmns();
-    TELEPHONY_LOGD("SimFileManager::ObtainSpdiPlmns result:%{public}s ", (result.empty() ? "false" : "true"));
+    TELEPHONY_LOGD("SimFileManager::ObtainSpdiPlmns result:%{public}d ", (result.empty() ? 0 : 1));
     return result;
 }
 
