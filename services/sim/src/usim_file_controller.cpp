@@ -80,6 +80,7 @@ std::string UsimFileController::ObtainUsimElementFilePath(int efId)
             return mf;
         default:
             return ObtainUsimElementFilePathExt(efId);
+    }
 }
 
 static std::string UsimFileController::ObtainUsimElementFilePathExt(int efId)
@@ -96,6 +97,7 @@ static std::string UsimFileController::ObtainUsimElementFilePathExt(int efId)
             return mf;
         default:
             return "";
+    }
 }
 
 UsimFileController::~UsimFileController() {}
