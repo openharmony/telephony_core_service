@@ -1553,18 +1553,17 @@ bool SimFile::ProcessGetOplDone(const AppExecFwk::InnerEvent::Pointer &event)
 
 bool SimFile::ProcessGetSpnCphsDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("ProcessGetSpnCphsDone: start");
     bool isFileProcessResponse = true;
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return isFileProcessResponse;
     }
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    if (fd == nullptr) {
-        TELEPHONY_LOGE("fd is nullptr!");
+    std::unique_ptr<ControllerToFileMsg> msgData = event->GetUniqueObject<ControllerToFileMsg>();
+    if (msgData == nullptr) {
+        TELEPHONY_LOGE("ProcessGetSpnCphsDone is nullptr!");
         return isFileProcessResponse;
     }
-    std::string iccData = fd->resultData;
+    std::string iccData = msgData->resultData;
     std::string ret = SIMUtils::Cphs7bitConvertToString(iccData);
     TELEPHONY_LOGI("ProcessGetSpnCphsDone ret: %{public}s", ret.c_str());
     spnCphs_ = ret;
@@ -1578,12 +1577,12 @@ bool SimFile::ProcessGetSpnShortCphsDone(const AppExecFwk::InnerEvent::Pointer &
         TELEPHONY_LOGE("event is nullptr!");
         return isFileProcessResponse;
     }
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    if (fd == nullptr) {
-        TELEPHONY_LOGE("fd is nullptr!");
+    std::unique_ptr<ControllerToFileMsg> msgData = event->GetUniqueObject<ControllerToFileMsg>();
+    if (msgData == nullptr) {
+        TELEPHONY_LOGE("msgData is nullptr!");
         return isFileProcessResponse;
     }
-    std::string iccData = fd->resultData;
+    std::string iccData = msgData->resultData;
     std::string ret = SIMUtils::Cphs7bitConvertToString(iccData);
     TELEPHONY_LOGI("ProcessGetSpnShortCphsDone ret: %{public}s", ret.c_str());
     spnShortCphs_ = ret;
@@ -1599,10 +1598,10 @@ bool SimFile::ProcessGetOpl5gDone(const AppExecFwk::InnerEvent::Pointer &event)
         isOpl5gFileResponsed_ = true;
         return isFileProcessResponse;
     }
-    std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
-    if (fd != nullptr) {
+    std::unique_ptr<ControllerToFileMsg> ProcessGetSpnCphsDone = event->GetUniqueObject<ControllerToFileMsg>();
+    if (ProcessGetSpnCphsDone != nullptr) {
         isOpl5gFilesPresent_ = true;
-        if (fd->exception != nullptr) {
+        if (ProcessGetSpnCphsDone->exception != nullptr) {
             isOpl5gFilesPresent_ = false;
             TELEPHONY_LOGE("ProcessGetOpl5gDone: get error result");
             isOpl5gFileResponsed_ = true;
