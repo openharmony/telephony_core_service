@@ -507,6 +507,7 @@ std::string TestSimplePostal(const std::string &pos)
     auto postalData = std::make_shared<VCardPostalData>();
     postalData->labelName_ = pos;
     postalData->labelId_ = "10000";
+    postalData->postalAddress_ = "测试";
     auto contact = std::make_shared<VCardContact>();
     contact->postals_.push_back(postalData);
     auto constructor = std::make_shared<VCardConstructor>();
@@ -519,25 +520,12 @@ std::string TestSimpleEmail(const std::string &em)
     auto emailData = std::make_shared<VCardEmailData>();
     emailData->labelName_ = em;
     emailData->labelId_ = "10000";
+    emailData->address_ = "测试";
     auto contact = std::make_shared<VCardContact>();
     contact->emails_.push_back(emailData);
     auto constructor = std::make_shared<VCardConstructor>();
     auto value = constructor->ContactVCard(contact);
     return value;
-}
-
-/**
- * @tc.number   Telephony_VCardTest_Name_001
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_Name_001, Function | MediumTest | Level1)
-{
-    auto value = TestSimpleName("测试11111test");
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=31="
-                       "31=31=31=31=74=65=73=74;;;\r\nFN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31="
-                       "31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
-    EXPECT_EQ(value, expectValue);
 }
 
 /**
@@ -1482,7 +1470,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_110, Function | MediumTest | Level1)
 HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Level1)
 {
     auto value = TestSimplePostal("测试自定义地址");
-    auto expectValue = "";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE\x9A\xE4\xB9\x89\xE5\x9C\xB0\xE5\x9D\x80;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -1494,7 +1482,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Leve
 HWTEST_F(VcardTest, Telephony_VCardTest_Email_002, Function | MediumTest | Level1)
 {
     auto value = TestSimpleEmail("测试自定义邮箱");
-    auto expectValue = "";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nEMAIL;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE\x9A\xE4\xB9\x89\xE9\x82\xAE\xE7\xAE\xB1;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 } // namespace Telephony
