@@ -211,7 +211,7 @@ std::string Cphs7bitConvertToString(const std::string &rawData)
     int gsmVal = 0;
     bool escTag = false;
     wchar_t c;
-    for (int i = 0; i < strlen(bytes); i++) {
+    for (size_t i = 0; i < strlen(bytes); i++) {
         if (escTag) {
             if (LANGUAGE_EXT_TABLE_MAP.find(gsmVal) != LANGUAGE_EXT_TABLE_MAP.end()) {
                 c = LANGUAGE_EXT_TABLE_MAP.at(gsmVal);
@@ -222,7 +222,7 @@ std::string Cphs7bitConvertToString(const std::string &rawData)
             }
             escTag = false;
         } else {
-            gsmVal = HexCharConvertToInt(bytes[i]) * 16 + HexCharConvertToInt(bytes[i + 1]);
+            gsmVal = SIMUtils::HexCharConvertToInt(bytes[i]) * 16 + SIMUtils::HexCharConvertToInt(bytes[i + 1]);
             i++;
             if (gsmVal < 0 || gsmVal >= 129) { // 129 is gsm val index max
                 continue;
