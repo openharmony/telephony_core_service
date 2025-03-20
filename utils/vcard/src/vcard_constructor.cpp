@@ -534,7 +534,8 @@ void VCardConstructor::AddPostalLine(
     if (postalType == static_cast<int32_t>(PostalType::ADDR_WORK)) {
         postalTypeStr = VCARD_PARAM_TYPE_WORK;
     }
-    if (postalType == static_cast<int32_t>(PostalType::CUSTOM_LABEL) && VCardUtils::IsPrintableAscii(labelName)) {
+    if (postalType == static_cast<int32_t>(PostalType::CUSTOM_LABEL) &&
+        !VCardUtils::IsContainsInvisibleChar(labelName)) {
         postalTypeStr = "X-" + labelName;
     }
     if (postalType == static_cast<int32_t>(PostalType::ADDR_OTHER)) {
@@ -822,7 +823,8 @@ void VCardConstructor::AddEmailLine(
     if (emailType == static_cast<int32_t>(EmailType::EMAIL_WORK)) {
         postalTypeStr = VCARD_PARAM_TYPE_WORK;
     }
-    if (emailType == static_cast<int32_t>(EmailType::CUSTOM_LABEL) && VCardUtils::IsPrintableAscii(labelName)) {
+    if (emailType == static_cast<int32_t>(EmailType::CUSTOM_LABEL) &&
+        !VCardUtils::IsContainsInvisibleChar(labelName)) {
         postalTypeStr = "X-" + labelName;
     }
     if (emailType == static_cast<int32_t>(EmailType::EMAIL_OTHER)) {
