@@ -953,6 +953,15 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     EXPECT_EQ(nameData_->GetDisplayName(), "雷狗");
 }
 
+HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)
+{
+    VCardPostalData postalData;
+    std::vector<std::string> propValueList =
+        {"pobox", "", "street", "city", "region", "postCode", "country"};
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
+    EXPECT_EQ((postalData.GetPostalAddress()), "pobox street city region postCode country");
+}
+
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
