@@ -831,7 +831,7 @@ int32_t SimManager::GetIMSI(int32_t slotId, std::u16string &imsi)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::GetEhPlmns(int32_t slotId, std::unordered_set<std::string> &ehPlmns)
+int32_t SimManager::GetEhPlmns(int32_t slotId, std::set<std::string> &ehPlmns)
 {
     if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetEhPlmns has no sim card!");
@@ -845,7 +845,7 @@ int32_t SimManager::GetEhPlmns(int32_t slotId, std::unordered_set<std::string> &
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t SimManager::GetSpdiPlmns(int32_t slotId, std::unordered_set<std::string> &spdiPlmns)
+int32_t SimManager::GetSpdiPlmns(int32_t slotId, std::set<std::string> &spdiPlmns)
 {
     if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("GetSpdiPlmns has no sim card!");
