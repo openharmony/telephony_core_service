@@ -83,15 +83,22 @@ void VCardPostalData::InitPostalData(std::vector<std::string> propValueList, int
         dataArray[i++] = "";
     }
     pobox_ = dataArray[POBOX_VALUE_INDEX];
-    postalAddress_ = dataArray[POSTAL_ADDRESS_VALUE_INDEX];
+    extendedAddress_ = dataArray[POSTAL_ADDRESS_VALUE_INDEX];
     street_ = dataArray[STREET_VALUE_INDEX];
-    if (!street_.empty() && postalAddress_.empty()) {
-        postalAddress_ = street_;
-    }
     city_ = dataArray[CITY_VALUE_INDEX];
     region_ = dataArray[REGION_VALUE_INDEX];
     postCode_ = dataArray[POSTCODE_VALUE_INDEX];
     country_ = dataArray[COUNTRY_VALUE_INDEX];
+    for (std::string value : dataArray) {
+        if (value.empty()) {
+            continue;
+        }
+        if (!postalAddress_.empty()) {
+            postalAddress_.append(" ");
+        }
+        postalAddress_.append(value);
+    }
+    postalAddress_ = VCardUtils::Trim(postalAddress_);
     labelId_ = std::to_string(type);
     labelName_ = label;
 }
