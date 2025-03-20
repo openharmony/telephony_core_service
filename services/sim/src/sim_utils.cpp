@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <string>
 #include <sstream>
 #include "sim_utils.h"
 
