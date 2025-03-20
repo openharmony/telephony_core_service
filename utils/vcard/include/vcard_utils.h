@@ -58,6 +58,7 @@ public:
     static int32_t GetLabelIdFromImType(std::string type);
     static std::string HandleCh(char nextCh, std::string vcardType);
     static void HandleTypeAndLabel(int32_t &type, std::string &label, std::string number, std::string typeStringOrg);
+    static bool IsContainsInvisibleChar(const std::string& value);
 };
 } // namespace Telephony
 } // namespace OHOS
