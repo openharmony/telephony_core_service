@@ -16,7 +16,7 @@
 #ifndef OHOS_ICC_FILE_H
 #define OHOS_ICC_FILE_H
 #include <shared_mutex>
-#include <unordered_set>
+#include <set>
 
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -44,8 +44,8 @@ public:
     void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
-    std::unordered_set<std::string> ObtainEhPlmns();
-    std::unordered_set<std::string> ObtainSpdiPlmns();
+    std::set<std::string> ObtainEhPlmns();
+    std::set<std::string> ObtainSpdiPlmns();
     virtual std::string ObtainMCC();
     virtual std::string ObtainMNC();
     void UpdateImsi(std::string imsi);
@@ -152,8 +152,8 @@ protected:
     PlmnFile *oplmnRAT_ = nullptr;
     PlmnFile *plmnRAT_ = nullptr;
     std::string fplmns_ = "";
-    std::unordered_set<std::string> spdiPlmns_;
-    std::unordered_set<std::string> ehplmns_;
+    std::set<std::string> spdiPlmns_;
+    std::set<std::string> ehplmns_;
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> opl5gFiles_;
