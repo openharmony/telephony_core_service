@@ -108,6 +108,10 @@ ohos_shared_library("libtel_common") {
     ":tel_utils_config",
   ]
 
+  if (core_service_support_esim) {
+    public_configs += [ ":telephony_codec_config" ]
+  }
+
   if (is_double_framework) {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
   }
