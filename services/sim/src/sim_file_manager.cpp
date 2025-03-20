@@ -310,9 +310,9 @@ std::u16string SimFileManager::GetIMSI()
     return Str8ToStr16(result);
 }
 
-std::unordered_set<std::string> SimFileManager::GetEhPlmns()
+std::set<std::string> SimFileManager::GetEhPlmns()
 {
-    std::unordered_set<std::string> result;
+    std::set<std::string> result;
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetEhPlmns simFile nullptr");
         return result;
@@ -323,9 +323,9 @@ std::unordered_set<std::string> SimFileManager::GetEhPlmns()
     return result;
 }
 
-std::unordered_set<std::string> SimFileManager::GetSpdiPlmns()
+std::set<std::string> SimFileManager::GetSpdiPlmns()
 {
-    std::unordered_set<std::string> result;
+    std::set<std::string> result;
     if (simFile_ == nullptr) {
         TELEPHONY_LOGE("SimFileManager::GetSpdiPlmns simFile nullptr");
         return result;
