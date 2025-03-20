@@ -15,6 +15,7 @@
 
 #include "vcard_utils.h"
 
+#include <regex>
 #include <algorithm>
 #include <array>
 #include <cctype>
