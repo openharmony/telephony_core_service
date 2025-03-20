@@ -101,6 +101,7 @@ void VCardDecoderV21::NotifyRawDataCreated(std::shared_ptr<VCardRawData> rawData
 void VCardDecoderV21::Decode(int32_t &errorCode)
 {
     NotifyStarted();
+    TELEPHONY_LOGI("Decode vcffile start");
     while (!IsEnd() && DecodeOne(errorCode)) {
         if (errorCode != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("Failed to decode");
@@ -179,7 +180,6 @@ bool VCardDecoderV21::ParseItem(int32_t &errorCode)
     std::string name = VCardUtils::ToUpper(rawData->GetName());
     std::string rawDataValue = rawData->GetRawValue();
     if (name == VCARD_TYPE_END && VCardUtils::EqualsIgnoreCase(rawDataValue, DATA_VCARD)) {
-        TELEPHONY_LOGI("Vcard parse end");
         return false;
     }
     if (name == VCARD_TYPE_AGENT) {
