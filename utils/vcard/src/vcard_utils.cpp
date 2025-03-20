@@ -551,5 +551,11 @@ bool VCardUtils::IsAllEmpty(std::vector<std::string> values)
     return true;
 }
 
+bool VCardUtils::IsContainsInvisibleChar(const std::string& value)
+{
+    std::regex regexPattern("(\\t|\\n|\\r|\\v|\\f|\\0|\\x00-\\x1F|\\x7F|\\u0000-\\u001F|\\u007F)");
+    return std::regex_search(value, regexPattern);
+}
+
 } // namespace Telephony
 } // namespace OHOS
