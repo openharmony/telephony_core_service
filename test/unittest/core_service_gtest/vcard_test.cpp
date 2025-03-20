@@ -502,6 +502,30 @@ std::string TestSimpleName(const std::string &name)
     return value;
 }
 
+std::string TestSimplePostal(const std::string &pos)
+{
+    auto postalData = std::make_shared<VCardPostalData>();
+    postalData->labelName_ = pos;
+    postalData->labelId_ = "10000";
+    auto contact = std::make_shared<VCardContact>();
+    contact->postals_.push_back(postalData);
+    auto constructor = std::make_shared<VCardConstructor>();
+    auto value = constructor->ContactVCard(contact);
+    return value;
+}
+
+std::string TestSimpleEmail(const std::string &em)
+{
+    auto emailData = std::make_shared<VCardEmailData>();
+    emailData->labelName_ = em;
+    emailData->labelId_ = "10000";
+    auto contact = std::make_shared<VCardContact>();
+    contact->emails_.push_back(emailData);
+    auto constructor = std::make_shared<VCardConstructor>();
+    auto value = constructor->ContactVCard(contact);
+    return value;
+}
+
 /**
  * @tc.number   Telephony_VCardTest_Name_001
  * @tc.name     test simple vcard
@@ -1448,6 +1472,30 @@ HWTEST_F(VcardTest, Telephony_VCardTest_110, Function | MediumTest | Level1)
     size_t step = 10;
     VCardManager::GetInstance().SplitContactsVector(contacts, step);
     EXPECT_TRUE(step > contacts.size());
+}
+
+/**
+ * @tc.number   Telephony_VCardTest_Postal_001
+ * @tc.name     test simple vcard
+ * @tc.desc     Function test
+ */
+HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Level1)
+{
+    auto value = TestSimplePostal("测试自定义地址");
+    auto expectValue = "";
+    EXPECT_EQ(value, expectValue);
+}
+
+/**
+ * @tc.number   Telephony_VCardTest_Email_001
+ * @tc.name     test simple vcard
+ * @tc.desc     Function test
+ */
+HWTEST_F(VcardTest, Telephony_VCardTest_Email_002, Function | MediumTest | Level1)
+{
+    auto value = TestSimpleEmail("测试自定义邮箱");
+    auto expectValue = "";
+    EXPECT_EQ(value, expectValue);
 }
 } // namespace Telephony
 } // namespace OHOS
