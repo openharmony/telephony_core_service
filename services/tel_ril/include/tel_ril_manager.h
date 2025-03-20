@@ -220,7 +220,15 @@ public:
         int32_t slotId, int32_t dataPermitted, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetLinkCapability(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t CleanAllConnections(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
-
+    int32_t SendUrspDecodeResult(int32_t slotId,
+        std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendUePolicySectionIdentifier(int32_t slotId,
+        std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SendImsRsdList(int32_t slotId,
+        std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId,
+        std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetNetworkSliceEhplmn(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetSimStatus(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo data, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t GetImsi(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -283,7 +291,6 @@ public:
         const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t CloseUnFinishedUssd(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t InitTelExtraModule(int32_t slotId) override;
-
     /**
      * Register hdf status listener
      *

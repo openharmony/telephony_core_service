@@ -111,6 +111,11 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t CleanAllConnections(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId);
+    int32_t SendUePolicySectionIdentifier(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId);
+    int32_t SendImsRsdList(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId);
+    int32_t GetNetworkSliceAllowedNssai(int32_t slotId, std::vector<uint8_t> buffer, int32_t eventId);
+    int32_t GetNetworkSliceEhplmn(int32_t slotId, int32_t eventId);
     /* PDP end */
     int32_t StopDTMF(
         int32_t slotId, int32_t eventId, int32_t index, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -190,7 +195,6 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetPreferredNetworkPara(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
-
     /******************** telRilManager end *******************/
     /******************** networkSearchManager start *******************/
     int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech);

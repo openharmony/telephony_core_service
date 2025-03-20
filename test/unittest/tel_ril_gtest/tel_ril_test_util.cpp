@@ -213,6 +213,13 @@ void TelRilTest::InitData()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST] = &TelRilTest::SetDataPermittedTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_LINK_CAPABILITY_TEST] = &TelRilTest::GetLinkCapabilityTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST] = &TelRilTest::CleanAllConnectionsTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT] = &TelRilTest::SendUrspDecodeResultTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER] =
+        &TelRilTest::SendUePolicySectionIdentifierTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST] = &TelRilTest::SendImsRsdListTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI] =
+        &TelRilTest::GetNetworkSliceAllowedNssaiTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN] = &TelRilTest::GetNetworkSliceEhplmnTest;
 }
 
 void TelRilTest::InitSim()
@@ -1561,6 +1568,110 @@ void TelRilTest::CleanAllConnectionsTest(int32_t slotId, std::shared_ptr<AppExec
         sleep(WAIT_TIME_SECOND);
         telRilManager_->CleanAllConnections(slotId, event);
         TELEPHONY_LOGI("TelRilTest::CleanAllConnectionsTest --> finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send Ursp decode Result
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::SendUrspDecodeResultTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendUrspDecodeResultTest -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendUrspDecodeResult(slotId, buffer, event);
+        TELEPHONY_LOGI("SendUrspDecodeResultTest finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send Ue Policy Section Identifier
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::SendUePolicySectionIdentifierTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendUePolicySectionIdentifierTest -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendUePolicySectionIdentifier(slotId, buffer, event);
+        TELEPHONY_LOGI("SendUePolicySectionIdentifierTest finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Send Ims RsdList
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::SendImsRsdListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::SendImsRsdListTest -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->SendImsRsdList(slotId, buffer, event);
+        TELEPHONY_LOGI("SendImsRsdListTest finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get NetworkSlice AllowedNssai
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::GetNetworkSliceAllowedNssaiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSliceAllowedNssaiTest -->");
+        std::vector<uint8_t> buffer = {0};
+        telRilManager_->GetNetworkSliceAllowedNssai(slotId, buffer, event);
+        TELEPHONY_LOGI("GetNetworkSliceAllowedNssaiTest finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Get NetworkSlice Ehplmn
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::GetNetworkSliceEhplmnTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        TELEPHONY_LOGI("TelRilTest::GetNetworkSliceEhplmnTest -->");
+        telRilManager_->GetNetworkSliceEhplmn(slotId, event);
+        TELEPHONY_LOGI("GetNetworkSliceEhplmnTest finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

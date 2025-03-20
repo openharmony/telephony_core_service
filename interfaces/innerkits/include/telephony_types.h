@@ -256,6 +256,9 @@ struct DataProfile {
      * Supported apn types bitmap
      */
     int32_t supportedApnTypesBitmap = 0;
+
+    std::string snssai = "";
+    uint8_t sscMode = 0;
 };
 
 /**

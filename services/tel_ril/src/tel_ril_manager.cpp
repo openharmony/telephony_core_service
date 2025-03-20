@@ -611,6 +611,38 @@ int32_t TelRilManager::CleanAllConnections(int32_t slotId, const AppExecFwk::Inn
     return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::CleanAllConnections);
 }
 
+int32_t TelRilManager::SendUrspDecodeResult(int32_t slotId, std::vector<uint8_t> buffer,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId),
+        &TelRilData::SendUrspDecodeResult, buffer);
+}
+ 
+int32_t TelRilManager::SendUePolicySectionIdentifier(int32_t slotId,
+    std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId),
+        &TelRilData::SendUePolicySectionIdentifier, buffer);
+}
+
+int32_t TelRilManager::SendImsRsdList(int32_t slotId,
+    std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::SendImsRsdList, buffer);
+}
+
+int32_t TelRilManager::GetNetworkSliceAllowedNssai(int32_t slotId,
+    std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId),
+        &TelRilData::GetNetworkSliceAllowedNssai, buffer);
+}
+
+int32_t TelRilManager::GetNetworkSliceEhplmn(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return TaskSchedule(response, "TelRilData", GetTelRilData(slotId), &TelRilData::GetNetworkSliceEhplmn);
+}
+
 /*********************** TelRilData end ****************************/
 /*********************** TelRilNetwork start ***********************/
 int32_t TelRilManager::GetSignalStrength(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response)

@@ -60,6 +60,11 @@ enum class DiffInterfaceId {
     TEST_RILCM_SET_DATA_PERMITTED_TEST,
     TEST_RILCM_GET_LINK_CAPABILITY,
     TEST_RILCM_CLEAN_ALL_DATA_CONNECTIONS_TEST,
+    TEST_RILCM_SEND_URSP_DECODE_RESULT,
+    TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER,
+    TEST_RILCM_SEND_IMS_RSD_LIST,
+    TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI,
+    TEST_RILCM_GET_NETWORKSLICE_EHPLMN,
     /* =========== Cellular Data End ============= */
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
@@ -362,6 +367,12 @@ public:
     void OnRequestSetDataPermittedTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestGetLinkCapabilityTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void OnRequestCleanAllConnectionsTest(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSendUePolicySectionIdentifier(int32_t slotId,
+        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSendUrspDecodeResult(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestSendImsRsdList(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetNetworkSliceAllowedNssai(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void OnRequestGetNetworkSliceEhplmn(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
 
     void OnRequestGetNetworkSearchInformationTest(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
