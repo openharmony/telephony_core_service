@@ -201,42 +201,18 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
     return ToUtf8(wide_str);
 }
 
-std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
+std::string Cphs7bitConvertToString(const std::string &rawData)
 {
     if (rawData.empty()) {
         return "";
     }
     const char *bytes = rawData.c_str();
     std::wstring wide_str = L"";
-    int high = 0;
-    int low = 0;
     int gsmVal = 0;
-    int byteLen = strlen(bytes);
     bool escTag = false;
     wchar_t c;
-    for (int i = 0; i < byteLen; i++) {
-        low = (int)HexCharConvertToInt(bytes[i]);
-        if (i + 1 < byteLen) {
-            high = (int)HexCharConvertToInt(bytes[i + 1]);
-        } else {
-            break;
-        }
-        gsmVal = low * 16 + high; // 16 is the hex val max
-        i++;
-        if (gsmVal < 0 || gsmVal >= 129) { // 129 is gsm val index max
-            continue;
-        }
-        if (!escTag && gsmVal == 0x1B) { // 1B is the ESC tag refer to GSM 03.38;
-            escTag = true;
-            continue;
-        } else if (escTag && gsmVal == 0x1B) { // Two escape chars in a row We treat this as a space
-                                               // See Note 1 in table 6.2.1 of TS 23.038 v7.00
-            escTag = false;
-            c = ' ';
-            wide_str += c;
-            continue;
-        }
-        if (escTag == true) {
+    for (int i = 0; i < strlen(bytes); i++) {
+        if (escTag) {
             if (LANGUAGE_EXT_TABLE_MAP.find(gsmVal) != LANGUAGE_EXT_TABLE_MAP.end()) {
                 c = LANGUAGE_EXT_TABLE_MAP.at(gsmVal);
                 wide_str += c;
@@ -246,6 +222,15 @@ std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
             }
             escTag = false;
         } else {
+            gsmVal = HexCharConvertToInt(bytes[i]) * 16 + HexCharConvertToInt(bytes[i + 1]);
+            i++;
+            if (gsmVal < 0 || gsmVal >= 129) { // 129 is gsm val index max
+                continue;
+            }
+            if (gsmVal == 0x1B) { // 1B is the ESC tag refer to GSM 03.38;
+                escTag = true;
+                continue;
+            }
             c = LANGUAGE_TABLE[gsmVal];
             wide_str += c;
         }
