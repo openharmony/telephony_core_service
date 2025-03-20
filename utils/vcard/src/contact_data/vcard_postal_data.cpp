@@ -14,6 +14,7 @@
  */
 #include "vcard_postal_data.h"
 
+#include "vcard_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
