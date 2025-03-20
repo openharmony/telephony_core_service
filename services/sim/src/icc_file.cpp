@@ -138,7 +138,7 @@ std::string IccFile::ObtainIMSI()
     return imsi_;
 }
 
-std::unordered_set<std::string> IccFile::ObtainEhPlmns()
+std::set<std::string> IccFile::ObtainEhPlmns()
 {
     if (ehplmns_.empty()) {
         TELEPHONY_LOGD("IccFile::ObtainEhPlmns is null:");
@@ -146,7 +146,7 @@ std::unordered_set<std::string> IccFile::ObtainEhPlmns()
     return ehplmns_;
 }
 
-std::unordered_set<std::string> IccFile::ObtainSpdiPlmns()
+std::set<std::string> IccFile::ObtainSpdiPlmns()
 {
     if (spdiPlmns_.empty()) {
         TELEPHONY_LOGD("IccFile::ObtainSpdiPlmns is null:");
