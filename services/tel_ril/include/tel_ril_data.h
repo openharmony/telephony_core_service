@@ -30,6 +30,8 @@ public:
 
     HDI::Ril::V1_1::DataProfileDataInfo ChangeDPToHalDataProfile(DataProfile dataProfile);
     HDI::Ril::V1_3::DataProfileDataInfoWithApnTypes ChangeDPToHalDataProfileWithApnTypes(DataProfile dataProfile);
+    HDI::Ril::V1_4::DataProfileDataInfoWithApnTypesforSlice ChangeDPToHalDataProfileWithApnTypesforSlice(
+        DataProfile dataProfile);
     int32_t DeactivatePdpContext(int32_t cid, int32_t reason, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t DeactivatePdpContextResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
     int32_t SetInitApnInfo(const DataProfile &dataProfile, const AppExecFwk::InnerEvent::Pointer &response);
@@ -57,6 +59,17 @@ public:
         const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability);
     int32_t CleanAllConnections(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo);
+    int32_t NetworkSliceAllowedNssaiRpt(
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo);
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo);
+    int32_t SendUrspDecodeResult(const std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendUePolicySectionIdentifier(
+        const std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SendImsRsdList(const std::vector<uint8_t> buffer, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNetworkSliceAllowedNssai(const std::vector<uint8_t> buffer,
+        const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetNetworkSliceEhplmn(const AppExecFwk::InnerEvent::Pointer &response);
 
 private:
     bool IsDataResponse(uint32_t code);
