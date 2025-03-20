@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <string>
-#include <map>
 
 #include "event_handler.h"
 #include "event_runner.h"
