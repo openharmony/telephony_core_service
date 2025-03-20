@@ -36,6 +36,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
+    
 std::map<ImType, std::string> imLabelIdToType = { { ImType::IM_AIM, VCARD_TYPE_X_AIM },
     { ImType::IM_MSN, VCARD_TYPE_X_MSN }, { ImType::IM_YAHOO, VCARD_TYPE_X_YAHOO },
     { ImType::IM_ICQ, VCARD_TYPE_X_ICQ }, { ImType::IM_JABBER, VCARD_TYPE_X_JABBER },
