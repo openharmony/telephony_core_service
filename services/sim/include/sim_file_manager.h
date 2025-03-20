@@ -63,6 +63,8 @@ public:
     std::u16string GetSimIst();
     std::u16string GetVoiceMailIdentifier();
     std::u16string GetVoiceMailNumber();
+    std::unordered_set<std::string> GetEhPlmns();
+    std::unordered_set<std::string> GetSpdiPlmns();
     int32_t GetVoiceMailCount();
     bool SetVoiceMailCount(int32_t voiceMailCount);
     bool SetVoiceCallForwarding(bool enable, const std::string &number);
