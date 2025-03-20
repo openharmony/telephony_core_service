@@ -1470,7 +1470,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_110, Function | MediumTest | Level1)
 HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Level1)
 {
     auto value = TestSimplePostal("测试自定义地址");
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE\x9A\xE4\xB9\x89\xE5\x9C\xB0\xE5\x9D\x80;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE"
+    "\x9A\xE4\xB9\x89\xE5\x9C\xB0\xE5\x9D\x80;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
+    ";=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 
@@ -1482,7 +1484,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Leve
 HWTEST_F(VcardTest, Telephony_VCardTest_Email_002, Function | MediumTest | Level1)
 {
     auto value = TestSimpleEmail("测试自定义邮箱");
-    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nEMAIL;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE\x9A\xE4\xB9\x89\xE9\x82\xAE\xE7\xAE\xB1;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nEMAIL;X-\xE6\xB5\x8B\xE8\xAF\x95\xE8\x87\xAA\xE5\xAE"
+    "\x9A\xE4\xB9\x89\xE9\x82\xAE\xE7\xAE\xB1;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
+    "=E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
 }
 } // namespace Telephony
