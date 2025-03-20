@@ -749,12 +749,12 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
-            if (IsRadioStateUnavailable(event)) {
-                break;
-            }
 #ifdef CORE_SERVICE_SUPPORT_ESIM
             UpdateEsimOSVersion(slotId_);
 #endif
+            if (IsRadioStateUnavailable(event)) {
+                break;
+            }
             [[fallthrough]]; // fall_through
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
             ObtainIccStatus(slotId_);
