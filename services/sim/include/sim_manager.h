@@ -110,8 +110,8 @@ public:
     std::u16string GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) override;
     int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) override;
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
-    int32_t GetEhPlmns(int32_t slotId, std::unordered_set<std::string> &ehPlmns);
-    int32_t GetSpdiPlmns(int32_t slotId, std::unordered_set<std::string> &spdiPlmns);
+    int32_t GetEhPlmns(int32_t slotId, std::set<std::string> &ehPlmns);
+    int32_t GetSpdiPlmns(int32_t slotId, std::set<std::string> &spdiPlmns);
     std::u16string GetLocaleFromDefaultSim(int32_t slotId) override;
     int32_t GetSimGid1(int32_t slotId, std::u16string &gid1) override;
     std::u16string GetSimGid2(int32_t slotId) override;
