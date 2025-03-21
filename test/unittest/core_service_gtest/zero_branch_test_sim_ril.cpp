@@ -42,6 +42,7 @@
 #include "want.h"
 #include "sim_constant.h"
 #include "sim_file_parse.h"
+#include "usim_file_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1024,6 +1025,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_001, Function | MediumTest | Level1
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
     std::shared_ptr<SimStateManager> simStateManager = nullptr;
     auto simFile = std::make_shared<SimFile>(simStateManager);
+    simFile->fileController_ = std::make_shared<UsimFileController>(0);
     std::vector<int> testCase1 = { MSG_SIM_OBTAIN_GID1_DONE, MSG_SIM_OBTAIN_GID2_DONE, MSG_SIM_SET_MSISDN_DONE,
         MSG_SIM_OBTAIN_SPDI_DONE, MSG_SIM_OBTAIN_CFIS_DONE, MSG_SIM_OBTAIN_MWIS_DONE,
         MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE, MSG_SIM_OBTAIN_ICCID_DONE, MSG_SIM_OBTAIN_CFF_DONE,
