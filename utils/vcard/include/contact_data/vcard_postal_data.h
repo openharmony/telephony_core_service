@@ -50,7 +50,7 @@ public:
 
 private:
     const int32_t POBOX_VALUE_INDEX = 0;
-    const int32_t POSTAL_ADDRESS_VALUE_INDEX = 1;
+    const int32_t EXTENDE_ADDRESS_VALUE_INDEX = 1;
     const int32_t STREET_VALUE_INDEX = 2;
     const int32_t CITY_VALUE_INDEX = 3;
     const int32_t REGION_VALUE_INDEX = 4;
