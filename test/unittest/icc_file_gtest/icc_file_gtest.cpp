@@ -459,7 +459,6 @@ HWTEST_F(IccFileTest, Telephony_IccFile_022, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles;
-    // std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
     auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
     bool roaming = false;
     std::string eons = "";
