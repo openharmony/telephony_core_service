@@ -265,24 +265,6 @@ bool VCardManager::IsContactsIdExit(int32_t accountId)
     return result;
 }
 
-int32_t VCardManager::GetAccountId()
-{
-    std::vector<std::string> columns;
-    OHOS::DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(Account::ACCOUNT_TYPE, "com.ohos.contacts");
-    auto resultSet = VCardRdbHelper::GetInstance().QueryAccount(columns, predicates);
-    if (resultSet == nullptr) {
-        return -1;
-    }
-    resultSet->GoToFirstRow();
-    int32_t index = 0;
-    int32_t id = 0;
-    resultSet->GetColumnIndex(Account::ID, index);
-    resultSet->GetInt(index, id);
-    resultSet->Close();
-    return id;
-}
-
 bool VCardManager::IsAccountIdExit(int32_t accountId)
 {
     std::vector<std::string> columns;
