@@ -229,5 +229,25 @@ HWTEST_F(SimFileManagerBranchTest, Telephony_SimFileManager_005, Function | Medi
         EXPECT_EQ(simFileManager->GetVoiceMailCount(), DEFAULT_VOICE_MAIL_COUNT);
     }
 }
+
+HWTEST_F(SimFileManagerBranchTest, Telephony_SimFileManager_006, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    SimFileManager simFileManager { subcribeInfo, std::weak_ptr<ITelRilManager>(telRilManager),
+        std::weak_ptr<SimStateManager>(simStateManager) };
+
+    std::string name = "123";
+    simFileManager.simFile_ = std::make_shared<SimFile>(simFileManager.simStateManager_.lock());
+    simFileManager.GetEhPlmns();
+    simFileManager.GetSpdiPlmns();
+    simFileManager.simFile_ = nullptr;
+    EXPECT_TRUE(simFileManager.GetEhPlmns().empty());
+    EXPECT_TRUE(simFileManager.GetSpdiPlmns().empty());
+}
+
 } // namespace Telephony
 } // namespace OHOS
