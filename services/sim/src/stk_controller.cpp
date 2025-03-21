@@ -381,7 +381,7 @@ void StkController::HandleStkBipCmd(const std::string &cmdData)
     } else {
         typeOffset = STK_CMD_TYPE_80_INDEX;
     }
- 
+
     std::string commandType = SafeSubstr(cmdData, typeOffset, STK_CMD_TYPE_LEN);
     if (commandType == STK_BIP_CMD_OPEN_CHANNEL || commandType == STK_BIP_CMD_SEND_DATA ||
         commandType == STK_BIP_CMD_RECEVIE_DATA || commandType == STK_BIP_CMD_GET_CHANNEL_STATUS ||
@@ -688,11 +688,6 @@ void StkController::OnSendCallSetupRequestResult(const AppExecFwk::InnerEvent::P
 
 void StkController::OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("StkController[%{public}d]::OnRadioStateChanged event is nullptr", slotId_);
-        return;
-    }
-
     std::shared_ptr<Int32Parcel> object = event->GetSharedObject<Int32Parcel>();
     if (object == nullptr) {
         TELEPHONY_LOGE("StkController[%{public}d]::OnRadioStateChanged object is nullptr", slotId_);
@@ -701,7 +696,7 @@ void StkController::OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &e
 
     int32_t radioState = object->data;
     if (radioState == CORE_SERVICE_POWER_NOT_AVAILABLE) {
-        TELEPHONY_LOGI("StkController[%{public}d]::RadioStateChange radioState: -1, iccCardState: %{public}d "
+        TELEPHONY_LOGI("StkController[%{public}d]::OnRadioStateChanged radioState: -1, iccCardState: %{public}d "
             "set to absent", slotId_, iccCardState_);
         iccCardState_ = ICC_CARD_STATE_ABSENT;
     }

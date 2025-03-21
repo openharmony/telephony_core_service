@@ -108,7 +108,7 @@ private:
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-    
+
     private:
         StkController &handler_;
     };
