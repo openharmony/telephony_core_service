@@ -19,7 +19,7 @@ ohos_unittest("tel_core_service_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_core_service_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -109,7 +109,7 @@ ohos_unittest("tel_network_search_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -206,7 +206,7 @@ ohos_unittest("tel_network_search_manager_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_manager_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -302,7 +302,7 @@ ohos_unittest("tel_sim_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -404,7 +404,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -499,7 +499,7 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -596,7 +596,7 @@ ohos_unittest("tel_core_service_test") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [ "core_service_test.cpp" ]
@@ -682,7 +682,7 @@ ohos_unittest("tel_core_service_common_test") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -772,7 +772,7 @@ ohos_unittest("tel_network_search_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -867,7 +867,7 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
@@ -965,7 +965,7 @@ ohos_unittest("tel_sim_file_manager_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_network_search_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [ "sim_file_manager_branch_test.cpp" ]
