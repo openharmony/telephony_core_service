@@ -18,7 +18,7 @@ ohos_unittest("tel_ril_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
-  test_module = "tel_ril_gtest"
+  test_module = "core_service"
   module_out_path = part_name + "/" + test_module
 
   sources = [
