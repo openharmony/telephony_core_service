@@ -23,6 +23,7 @@
 #include "sim_file.h"
 #include "sim_file_init.h"
 #include "string_ex.h"
+#include "usim_file_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -186,9 +187,9 @@ HWTEST_F(SimFileTest, Telephony_sim_file_006, Function | MediumTest | Level1)
 {
     std::weak_ptr<Telephony::SimStateManager> simStateManager_;
     auto simFile_ = std::make_shared<SimFile>(simStateManager_.lock());
+    simFile_->fileController_ = std::make_shared<UsimFileController>(0);
     simFile_->serviceTable_ = "not null";
     simFile_->LoadSimOtherFile();
-    simFile_->LoadSimOtherFileExt();
 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     simFile_->ProcessGetOpl5gDone(event);
