@@ -14,9 +14,9 @@
  */
 #include "vcard_postal_data.h"
 
-#include "vcard_utils.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "vcard_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -90,7 +90,7 @@ void VCardPostalData::InitPostalData(std::vector<std::string> propValueList, int
     region_ = dataArray[REGION_VALUE_INDEX];
     postCode_ = dataArray[POSTCODE_VALUE_INDEX];
     country_ = dataArray[COUNTRY_VALUE_INDEX];
-    for (std::string value : dataArray) {
+    for (const std::string& value : dataArray) {
         if (value.empty()) {
             continue;
         }
