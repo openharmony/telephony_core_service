@@ -84,7 +84,7 @@ void VCardPostalData::InitPostalData(std::vector<std::string> propValueList, int
         dataArray[i++] = "";
     }
     pobox_ = dataArray[POBOX_VALUE_INDEX];
-    extendedAddress_ = dataArray[POSTAL_ADDRESS_VALUE_INDEX];
+    extendedAddress_ = dataArray[EXTENDE_ADDRESS_VALUE_INDEX];
     street_ = dataArray[STREET_VALUE_INDEX];
     city_ = dataArray[CITY_VALUE_INDEX];
     region_ = dataArray[REGION_VALUE_INDEX];
