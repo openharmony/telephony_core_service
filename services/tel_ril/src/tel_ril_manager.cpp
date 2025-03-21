@@ -1050,8 +1050,13 @@ bool TelRilManager::RegisterHdfStatusListener()
     }
 
     hdfListener_ = new HdfServiceStatusListener(
-        HdfServiceStatusListener::StatusCallback([&](const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status) {
-            HandleRilInterfaceStatusCallback(status);
+        HdfServiceStatusListener::StatusCallback([wp = std::weak_ptr<TelRilManager>(shared_from_this())]
+            (const OHOS::HDI::ServiceManager::V1_0::ServiceStatus &status) {
+            auto telRilManager = wp.lock();
+            if (telRilManager == nullptr) {
+                return;
+            }
+            telRilManager->HandleRilInterfaceStatusCallback(status);
         }));
 
     int status = servMgr_->RegisterServiceStatusListener(hdfListener_, DEVICE_CLASS_DEFAULT);
