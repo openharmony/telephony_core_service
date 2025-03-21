@@ -14,10 +14,11 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 SOURCE_DIR = "../../../../../.."
-module_output_path = "$SOURCE_DIR/core_service/utils/telephonydfx"
 
 ohos_unittest("TelephonySALogTest") {
-  module_out_path = module_output_path
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
 
   sources =
       [ "$SOURCE_DIR/core_service/utils/log/src/telephony_log_wrapper.cpp" ]
@@ -35,7 +36,6 @@ ohos_unittest("TelephonySALogTest") {
     "LOG_DOMAIN = 0xD000F00",
   ]
 
-  part_name = "core_service"
 }
 
 group("unittest") {
