@@ -35,7 +35,6 @@ ohos_unittest("TelephonySALogTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceSALogTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
 }
 
 group("unittest") {
