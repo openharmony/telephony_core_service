@@ -24,7 +24,9 @@ namespace Telephony {
 TelRilData::TelRilData(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
-{}
+{
+    whiteReqList_ = {"DeactivatePdpContext"};
+}
 
 HDI::Ril::V1_1::DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile)
 {
