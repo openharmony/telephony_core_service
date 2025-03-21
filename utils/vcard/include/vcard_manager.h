@@ -67,7 +67,6 @@ private:
     bool IsAccountIdExit(int32_t accountId);
     int32_t InsertContactData(int32_t rawId, std::shared_ptr<VCardContact> contact);
     bool IsContactsIdExit(int32_t accountId);
-    int32_t GetAccountId();
     bool ParameterTypeAndCharsetCheck(int32_t cardType, std::string charset, int32_t &errorCode);
     std::vector<std::vector<std::shared_ptr<VCardContact>>> SplitContactsVector(
         std::vector<std::shared_ptr<VCardContact>> list, size_t step);

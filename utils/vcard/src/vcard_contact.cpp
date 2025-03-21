@@ -439,7 +439,6 @@ void VCardContact::HandleSortAsName(std::map<std::string, std::vector<std::strin
     std::vector<std::string> sortAsList;
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_SORT_AS);
     if (it == parasMap.end()) {
-        TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_SORT_AS);
         return;
     } else {
         sortAsList = it->second;

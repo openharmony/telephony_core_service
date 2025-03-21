@@ -48,7 +48,6 @@ void VCardManager::DecodeListener::OnEnded()
 
 void VCardManager::DecodeListener::OnOneContactStarted()
 {
-    TELEPHONY_LOGI("OnOneContactStarted index %{public}d", static_cast<int32_t>(contacts_.size()));
     currentContact_ = std::make_shared<VCardContact>();
 }
 
@@ -186,10 +185,7 @@ void VCardManager::BatchInsertRawContact(
         if (!uid.empty()) {
             valuesBucket.Put(RawContact::UUID, uid);
         }
-        valuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
-        if (IsContactsIdExit(accountId)) {
-            valuesBucket.Put(RawContact::CONTACT_ID, accountId);
-        }
+        valuesBucket.Put(RawContact::ACCOUNT_ID, accountId);
         int32_t newRawId = rawContactMaxId + static_cast<int32_t>(i) + 1;
         valuesBucket.Put(RawContact::ID, newRawId);
         rawContactValues.push_back(valuesBucket);
@@ -247,10 +243,7 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
 int32_t VCardManager::InsertRawContact(int32_t accountId, std::shared_ptr<VCardContact> contact)
 {
     OHOS::DataShare::DataShareValuesBucket ValuesBucket;
-    ValuesBucket.Put(RawContact::ACCOUNT_ID, GetAccountId());
-    if (IsContactsIdExit(accountId)) {
-        ValuesBucket.Put(RawContact::CONTACT_ID, accountId);
-    }
+    ValuesBucket.Put(RawContact::ACCOUNT_ID, accountId);
     std::string uid = contact->GetUid();
     if (!uid.empty()) {
         ValuesBucket.Put(RawContact::UUID, uid);
@@ -270,24 +263,6 @@ bool VCardManager::IsContactsIdExit(int32_t accountId)
     bool result = (resultSet->GoToFirstRow() == DataShare::E_OK);
     resultSet->Close();
     return result;
-}
-
-int32_t VCardManager::GetAccountId()
-{
-    std::vector<std::string> columns;
-    OHOS::DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(Account::ACCOUNT_TYPE, "com.ohos.contacts");
-    auto resultSet = VCardRdbHelper::GetInstance().QueryAccount(columns, predicates);
-    if (resultSet == nullptr) {
-        return -1;
-    }
-    resultSet->GoToFirstRow();
-    int32_t index = 0;
-    int32_t id = 0;
-    resultSet->GetColumnIndex(Account::ID, index);
-    resultSet->GetInt(index, id);
-    resultSet->Close();
-    return id;
 }
 
 bool VCardManager::IsAccountIdExit(int32_t accountId)
