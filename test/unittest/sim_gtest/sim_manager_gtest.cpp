@@ -16,6 +16,7 @@
 #define protected public
 
 #include <string>
+#include <set>
 #include <unistd.h>
 #include "sim_manager.h"
 #include "core_manager_inner.h"
@@ -172,6 +173,11 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_008, Function | MediumTest | L
     EXPECT_TRUE(simManager_->simFileManager_.empty());
 }
 
+/**
+ * @tc.number   Telephony_Sim_SimManager_009
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_009, Function | MediumTest | Level1)
 {
     int32_t slotId = -1;
@@ -181,6 +187,5 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_009, Function | MediumTest | L
     simManager_->GetSpdiPlmns(slotId, spdiPlmns);
     EXPECT_TRUE(simManager_->simFileManager_.empty());
 }
-
 }
 }
