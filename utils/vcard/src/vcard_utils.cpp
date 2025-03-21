@@ -15,7 +15,6 @@
 
 #include "vcard_utils.h"
 
-#include <regex>
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -25,6 +24,7 @@
 #include <iomanip>
 #include <numeric>
 #include <sstream>
+#include <regex>
 
 #include "base64.h"
 #include "map"
