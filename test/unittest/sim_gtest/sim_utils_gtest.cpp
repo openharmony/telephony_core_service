@@ -178,5 +178,18 @@ HWTEST_F(SimUtilsTest, Telephony_UcsWideConvertToString_001, Function | MediumTe
     EXPECT_EQ(result, u"");
 }
 
+/**
+ * @tc.number   Telephony_UcsWideConvertToString_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimUtilsTest, Telephony_Normal_Method_Test_001, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    std::string rawData = "";
+    auto res = simUtils->Cphs7bitConvertToString(rawData);
+    EXPECT_EQ(res, "");
+}
+
 } // namespace Telephony
 } // namespace OHOS
