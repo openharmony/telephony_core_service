@@ -503,6 +503,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_023, Function | MediumTest | Level1)
     iccFile->isOpl5gFileResponsed_ = true;
     iccFile->isOpl5gFilesPresent_ = true;
     iccFile->ObtainEons(plmn, lac, longNameRequired);
+    EXPECT_NE(iccFile, nullptr);
 }
 
 }
