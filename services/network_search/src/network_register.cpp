@@ -103,8 +103,8 @@ void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> c
     UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
     auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
     if (iter != rilRegisterStateMap_.end()) {
-    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
+        TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+            iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     }
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
