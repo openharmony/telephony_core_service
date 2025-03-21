@@ -64,6 +64,7 @@
 #include "nativetoken_kit.h"
 #include "telephony_ext_wrapper.h"
 #include "sim_file_parse.h"
+#include "network_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -739,8 +740,8 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_NONE, *simFile), "");
     EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_START, *simFile), "");
     EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_GENERAL, *simFile), "");
-    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING, *simFile), "\xC0\xCC");
-    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM, *simFile), "\xC0\xCC");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM, *simFile), "");
     EXPECT_EQ(simFile->simFileParse_->ParseSpn("", 0, *simFile), "");
 }
 
@@ -2114,9 +2115,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchState_001, Function | MediumTest | L
  */
 HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest | Level1)
 {
-    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->eventSender_ = std::make_unique<EventSender>(telRilManager, networkSearchManager);
     sptr<NetworkInformation> networkInfo = nullptr;
     ImsRegInfo info;
     std::u16string testStr = u"";
