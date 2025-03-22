@@ -1474,10 +1474,10 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Postal_001, Function | MediumTest | Leve
     "\x9A\xE4\xB9\x89\xE5\x9C\xB0\xE5\x9D\x80;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
     ";=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
-    auto value_01 = TestSimplePostal("测试\x7F自定义地址");
-    auto expectValue_01 = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
+    auto value01 = TestSimplePostal("测试\x7F自定义地址");
+    auto expectValue01 = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
     ";=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
-    EXPECT_EQ(value_01, expectValue_01);
+    EXPECT_EQ(value01, expectValue01);
 }
 
 /**
@@ -1492,10 +1492,10 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Email_002, Function | MediumTest | Level
     "\x9A\xE4\xB9\x89\xE9\x82\xAE\xE7\xAE\xB1;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
     "=E6=B5=8B=E8=AF=95\r\nEND:VCARD\r\n";
     EXPECT_EQ(value, expectValue);
-    auto value_01 = TestSimplePostal("测试\x7F自定义地址");
-    auto expectValue_01 = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
+    auto value01 = TestSimplePostal("测试\x7F自定义地址");
+    auto expectValue01 = "BEGIN:VCARD\r\nVERSION:2.1\r\nADR;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:"
     ";=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
-    EXPECT_EQ(value_01, expectValue_01);
+    EXPECT_EQ(value01, expectValue01);
 }
 } // namespace Telephony
 } // namespace OHOS
