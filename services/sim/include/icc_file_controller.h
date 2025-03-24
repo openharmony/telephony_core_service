@@ -29,14 +29,14 @@
 namespace OHOS {
 namespace Telephony {
 // 3GPP TS 51.011 V4.1.0 section 10.7 files of gsm
-const std::string MASTER_FILE_SIM = "3F00";
-const std::string DEDICATED_FILE_TELECOM = "7F10";
-const std::string DEDICATED_FILE_GSM = "7F20";
-const std::string DEDICATED_FILE_GRAPHICS = "5F50";
+constexpr const char* MASTER_FILE_SIM = "3F00";
+constexpr const char* DEDICATED_FILE_TELECOM = "7F10";
+constexpr const char* DEDICATED_FILE_GSM = "7F20";
+constexpr const char* DEDICATED_FILE_GRAPHICS = "5F50";
 // ETSI TS 102 221 V3.3.0 section 8.6 reservation of file IDs
-const std::string DEDICATED_FILE_DIALLING_NUMBERS = "5F3A";
-const std::string DEDICATED_FILE_DF5GS = "5FC0"; // TS 131 102 DF5GS
-const std::string DEDICATED_FILE_ADF = "7FFF";
+constexpr const char* DEDICATED_FILE_DIALLING_NUMBERS = "5F3A";
+constexpr const char* DEDICATED_FILE_DF5GS = "5FC0"; // TS 131 102 DF5GS
+constexpr const char* DEDICATED_FILE_ADF = "7FFF";
 
 class IccFileController : public TelEventHandler {
 public:
