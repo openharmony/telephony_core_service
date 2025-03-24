@@ -83,7 +83,7 @@ private:
     bool isCommunicating_ = false;
     bool communicationResponseResult_ = false;
     ffrt::mutex radioProtocolMutex_;
-    std::condition_variable radioProtocolCv_;
+    ffrt::condition_variable radioProtocolCv_;
     bool responseReady_ = false;
     int32_t activeResponse_ = 0;
 };
