@@ -17,6 +17,7 @@
 #include "sim_utils.h"
 #include "icc_file.h"
 #include "tag_service.h"
+#include "telephony_common_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -102,13 +103,12 @@ void SimFileParse::ParseOpl(const std::vector<std::string> &records, SimFile &si
         TELEPHONY_LOGI("ParseOpl records is empty");
         return;
     }
-    std::regex express("[0-9a-fA-F]+");
     for (const auto &dataOpl : records) {
         TELEPHONY_LOGD("ParseOpl: %{public}s", dataOpl.c_str());
         if (dataOpl.size() != (BYTE_LENGTH + BYTE_LENGTH)) {
             continue;
         }
-        if (!regex_match(dataOpl, express)) {
+        if (!IsValidHexValue(dataOpl)) {
             TELEPHONY_LOGI("InputValue is not a hexadecimal number");
             continue;
         }
