@@ -23,6 +23,7 @@
 #include <iconv.h>
 #include <iomanip>
 #include <numeric>
+#include <regex>
 #include <sstream>
 
 #include "base64.h"
@@ -549,6 +550,12 @@ bool VCardUtils::IsAllEmpty(std::vector<std::string> values)
         }
     }
     return true;
+}
+
+bool VCardUtils::IsContainsInvisibleChar(const std::string& value)
+{
+    std::regex regexPattern("(\\x00-\\x1F|\\x7F|\\u0000-\\u001F|\\u007F)");
+    return std::regex_search(value, regexPattern);
 }
 
 } // namespace Telephony
