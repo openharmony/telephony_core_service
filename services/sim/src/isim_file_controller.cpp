@@ -23,7 +23,7 @@ std::string IsimFileController::ObtainElementFilePath(int efId)
 {
     if (efId == ELEMENTARY_FILE_IMPI || efId == ELEMENTARY_FILE_IMPU || efId == ELEMENTARY_FILE_DOMAIN ||
         efId == ELEMENTARY_FILE_IST || efId == ELEMENTARY_FILE_PCSCF) {
-        return MASTER_FILE_SIM + DEDICATED_FILE_ADF;
+        return std::string(MASTER_FILE_SIM) + std::string(DEDICATED_FILE_ADF);
     }
     std::string path = ObtainElementFileForPublic(efId);
     if (path.empty()) {
