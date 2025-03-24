@@ -126,20 +126,18 @@ HWTEST_F(EsimPartOneTest, RealProcessLoadBoundProfilePackageDone_003, Function |
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    std::string combineHexStr = "1222333";
     ResponseEsimInnerResult dst;
     AuthServerResponse src;
     esimFile->CovertAuthToApiStruct(dst, src);
     
-    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone(combineHexStr));
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
 }
 HWTEST_F(EsimPartOneTest, RealProcessPrepareDownloadDone_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    std::string combineHexStr = "1222333";
-    EXPECT_FALSE(esimFile->RealProcessPrepareDownloadDone(combineHexStr));
+    EXPECT_FALSE(esimFile->RealProcessPrepareDownloadDone());
 }
 
 HWTEST_F(EsimPartOneTest, AddCtxParams1_001, Function | MediumTest | Level2)
