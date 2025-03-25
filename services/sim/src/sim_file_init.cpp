@@ -100,6 +100,10 @@ void SimFileInit::InitObtainMemberFunc(SimFile &simFile)
         [&](const AppExecFwk::InnerEvent::Pointer &event) { return simFile.ProcessGetCfisDone(event); };
     simFile.memberFuncMap_[MSG_SIM_OBTAIN_CSP_CPHS_DONE] =
         [&](const AppExecFwk::InnerEvent::Pointer &event) { return simFile.ProcessGetCspCphs(event); };
+    simFile.memberFuncMap_[MSG_SIM_OBTAIN_SPN_CPHS_DONE] =
+        [&](const AppExecFwk::InnerEvent::Pointer &event) { return simFile.ProcessGetSpnCphsDone(event); };
+    simFile.memberFuncMap_[MSG_SIM_OBTAIN_SPN_SHORT_CPHS_DONE] =
+        [&](const AppExecFwk::InnerEvent::Pointer &event) { return simFile.ProcessGetSpnShortCphsDone(event); };
 }
 
 void SimFileInit::InitPlmnMemberFunc(SimFile &simFile)

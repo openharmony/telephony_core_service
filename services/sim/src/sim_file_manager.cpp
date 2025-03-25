@@ -310,6 +310,32 @@ std::u16string SimFileManager::GetIMSI()
     return Str8ToStr16(result);
 }
 
+std::set<std::string> SimFileManager::GetEhPlmns()
+{
+    std::set<std::string> result;
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetEhPlmns simFile nullptr");
+        return result;
+    }
+
+    result = simFile_->ObtainEhPlmns();
+    TELEPHONY_LOGD("SimFileManager::ObtainEhPlmns result:%{public}d ", (result.empty() ? 0 : 1));
+    return result;
+}
+
+std::set<std::string> SimFileManager::GetSpdiPlmns()
+{
+    std::set<std::string> result;
+    if (simFile_ == nullptr) {
+        TELEPHONY_LOGE("SimFileManager::GetSpdiPlmns simFile nullptr");
+        return result;
+    }
+
+    result = simFile_->ObtainSpdiPlmns();
+    TELEPHONY_LOGD("SimFileManager::ObtainSpdiPlmns result:%{public}d ", (result.empty() ? 0 : 1));
+    return result;
+}
+
 std::u16string SimFileManager::GetLocaleFromDefaultSim()
 {
     if (simFile_ == nullptr) {
