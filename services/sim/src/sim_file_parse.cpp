@@ -172,7 +172,7 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
 void SimFileParse::ParseEhplmn(std::string data, SimFile &simFile)
 {
     simFile.ehplmns_.clear();
-    if (data.size() < 6) { // 6 is the length of one record of PLMN
+    if (data.size() < 6 || data.size() > 65535) { // 6 is the length of one record of PLMN, 65535 is the max length
         TELEPHONY_LOGE("ParseEhplmn invalid data");
         return;
     }
