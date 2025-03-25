@@ -529,6 +529,20 @@ std::string TestSimpleEmail(const std::string &em)
 }
 
 /**
+ * @tc.number   Telephony_VCardTest_Name_001
+ * @tc.name     test simple vcard
+ * @tc.desc     Function test
+ */
+HWTEST_F(VcardTest, Telephony_VCardTest_Name_001, Function | MediumTest | Level1)
+{
+    auto value = TestSimpleName("测试11111test");
+    auto expectValue = "BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:;=E6=B5=8B=E8=AF=95=31="
+                       "31=31=31=31=74=65=73=74;;;\r\nFN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31="
+                       "31=31=31=31=74=65=73=74\r\nEND:VCARD\r\n";
+    EXPECT_EQ(value, expectValue);
+}
+
+/**
  * @tc.number   Telephony_VCardTest_Name_002
  * @tc.name     test simple vcard
  * @tc.desc     Function test
