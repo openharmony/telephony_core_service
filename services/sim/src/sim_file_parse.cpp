@@ -64,7 +64,7 @@ void SimFileParse::ParsePnn(const std::vector<std::string> &records, SimFile &si
         return;
     }
     for (const auto &dataPnn : records) {
-        if (dataPnn == nullptr) {
+        if (dataPnn.empty()) {
             continue;
         }
         TELEPHONY_LOGD("ParsePnn: %{public}s", dataPnn.c_str());
@@ -108,7 +108,7 @@ void SimFileParse::ParseOpl(const std::vector<std::string> &records, SimFile &si
     }
     std::regex express("[0-9a-fA-F]+");
     for (const auto &dataOpl : records) {
-        if (dataOpl == nullptr) {
+        if (dataOpl.empty()) {
             continue;
         }
         TELEPHONY_LOGD("ParseOpl: %{public}s", dataOpl.c_str());
@@ -144,7 +144,7 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
     }
     std::regex express("[0-9a-fA-F]+");
     for (const auto &dataOpl : records) {
-        if (dataOpl == nullptr) {
+        if (dataOpl.empty()) {
             continue;
         }
         TELEPHONY_LOGD("ParseOpl5g: %{public}s", dataOpl.c_str());
