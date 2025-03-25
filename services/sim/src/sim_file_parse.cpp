@@ -25,6 +25,7 @@ const int HEXADECIMAL = 16;
 const size_t OPL_5G_LENGTH = 10;
 const int TAG_SPDI = 0xA3;
 const int TAG_SPDI_PLMN_LIST = 0x80;
+const size_t MCC_MNC_LEN = 6;
 
 std::string SimFileParse::ParseSpn(const std::string &rawData, int spnStatus, SimFile &simFile)
 {
@@ -172,11 +173,11 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
 void SimFileParse::ParseEhplmn(std::string data, SimFile &simFile)
 {
     simFile.ehplmns_.clear();
-    if (data.size() < 6 || data.size() > 65535) { // 6 is the length of one record of PLMN, 65535 is the max length
+    if (data.size() < MCC_MNC_LEN || data.size() > 65535) { // 65535 is the max length
         TELEPHONY_LOGE("ParseEhplmn invalid data");
         return;
     }
-    for (size_t i = 0; i + 6 <= data.size(); i += 6) { // EFEHPLMN, 6 is the length of one record of PLMN
+    for (size_t i = 0; i + MCC_MNC_LEN <= data.size(); i += MCC_MNC_LEN) {
         std::string plmnCode = SIMUtils::BcdPlmnConvertToString(data, i);
         if (!plmnCode.empty()) {
             simFile.ehplmns_.insert(plmnCode);
