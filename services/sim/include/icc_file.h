@@ -16,6 +16,7 @@
 #ifndef OHOS_ICC_FILE_H
 #define OHOS_ICC_FILE_H
 #include <shared_mutex>
+#include <set>
 
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -43,6 +44,8 @@ public:
     void Init();
     virtual void StartLoad();
     std::string ObtainIMSI();
+    std::set<std::string> ObtainEhPlmns();
+    std::set<std::string> ObtainSpdiPlmns();
     virtual std::string ObtainMCC();
     virtual std::string ObtainMNC();
     void UpdateImsi(std::string imsi);
@@ -120,6 +123,8 @@ protected:
     std::string iccId_ = "";
     std::string decIccId_ = "";
     std::string spn_ = "";
+    std::string spnCphs_ = "";
+    std::string spnShortCphs_ = "";
     std::string gid1_ = "";
     std::string gid2_ = "";
     std::string msisdn_ = "";
@@ -146,11 +151,15 @@ protected:
     PlmnFile *hplmnRAT_ = nullptr;
     PlmnFile *oplmnRAT_ = nullptr;
     PlmnFile *plmnRAT_ = nullptr;
-    std::string ehplmns_ = "";
     std::string fplmns_ = "";
+    std::set<std::string> spdiPlmns_;
+    std::set<std::string> ehplmns_;
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> opl5gFiles_;
+    bool isOplFileResponsed_ = false;
+    bool isOpl5gFileResponsed_ = false;
+    bool isOpl5gFilesPresent_ = false;
     int lengthOfMnc_ = UNINITIALIZED_MNC;
     int indexOfMailbox_ = 1;
     int fileToGet_ = 0;
@@ -217,6 +226,8 @@ private:
     void AddOpkeyLoadObser();
     void AddOperatorCacheDelObser();
     void AddIccidLoadObser();
+    bool ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
+        std::string &eons, bool longNameRequired, const std::string &plmn);
 };
 } // namespace Telephony
 } // namespace OHOS

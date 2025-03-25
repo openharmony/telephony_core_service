@@ -425,5 +425,86 @@ HWTEST_F(IccFileTest, Telephony_IccFile_020, Function | MediumTest | Level1)
     ASSERT_NE(iccFile->opkeyLoadObser_, nullptr);
 }
 
+HWTEST_F(IccFileTest, Telephony_IccFile_021, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+    iccFile->ProcessEvent(event);
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
+    iccFile->imsi_ = "46070";
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    std::string eons = "";
+    std::string plmn = "";
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles = {};
+    EXPECT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, false, eons, true, plmn));
+    std::string plmn1 = "46001";
+    EXPECT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, false, eons, true, plmn1));
+}
+
+/**
+ * @tc.number   Telephony_IccFile_021
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_022, Function | MediumTest | Level1)
+{
+    std::string opkey = "";
+    std::string opName = "";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles;
+    auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
+    bool roaming = false;
+    std::string eons = "";
+    bool longNameRequired = true;
+    std::string plmn = "";
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+    ASSERT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn));
+    longNameRequired = false;
+    ASSERT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn));
+
+    iccFile->spnCphs_ = "not null";
+    iccFile->pnnFiles_.clear();
+    roaming = false;
+    ASSERT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn));
+
+    iccFile->spnCphs_ = "";
+    ASSERT_TRUE(iccFile->ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn));
+
+    auto plmnInfo = std::make_shared<OperatorPlmnInfo>();
+    oplFiles.push_back(plmnInfo);
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+    plmn = "not null";
+    ASSERT_FALSE(iccFile->ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn));
+}
+
+/**
+ * @tc.number   Telephony_IccFile_022
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_023, Function | MediumTest | Level1)
+{
+    std::string opkey = "";
+    std::string opName = "";
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    int32_t lac = 123;
+    std::string plmn = "";
+    bool longNameRequired = true;
+    iccFile->isOplFileResponsed_ = true;
+    iccFile->isOpl5gFileResponsed_ = true;
+    iccFile->isOpl5gFilesPresent_ = true;
+    iccFile->ObtainEons(plmn, lac, longNameRequired);
+    EXPECT_NE(iccFile, nullptr);
+}
+
 }
 }

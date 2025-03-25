@@ -138,6 +138,22 @@ std::string IccFile::ObtainIMSI()
     return imsi_;
 }
 
+std::set<std::string> IccFile::ObtainEhPlmns()
+{
+    if (ehplmns_.empty()) {
+        TELEPHONY_LOGD("IccFile::ObtainEhPlmns is null:");
+    }
+    return ehplmns_;
+}
+
+std::set<std::string> IccFile::ObtainSpdiPlmns()
+{
+    if (spdiPlmns_.empty()) {
+        TELEPHONY_LOGD("IccFile::ObtainSpdiPlmns is null:");
+    }
+    return spdiPlmns_;
+}
+
 std::string IccFile::ObtainMCC()
 {
     if (imsi_.empty()) {
@@ -259,12 +275,45 @@ std::string IccFile::ObtainSPN()
     return spn_;
 }
 
+bool IccFile::ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
+    std::string &eons, bool longNameRequired, const std::string &plmn)
+{
+    if ((oplFiles.empty() && !pnnFiles_.empty()) && pnnFiles_.at(0) != nullptr && !roaming) {
+        TELEPHONY_LOGI("get PNN");
+        if (longNameRequired) {
+            eons = pnnFiles_.at(0)->longName; // 0 means the first record
+        } else {
+            eons = pnnFiles_.at(0)->shortName;
+        }
+        return true;
+    }
+    if (pnnFiles_.empty() && !roaming) {
+        TELEPHONY_LOGI("get CPHS");
+        if (!spnCphs_.empty()) {
+            eons = spnCphs_;
+            return true;
+        } else if (!spnShortCphs_.empty()) {
+            eons = spnShortCphs_;
+            return true;
+        }
+    }
+    if (plmn.empty() || pnnFiles_.empty() || (oplFiles.empty() && roaming)) {
+        TELEPHONY_LOGE("ObtainEons is empty");
+        eons = "";
+        return true;
+    }
+    return false;
+}
+
 std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longNameRequired)
 {
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles = oplFiles_;
     sptr<NetworkState> networkState = nullptr;
     CoreManagerInner::GetInstance().GetNetworkStatus(slotId_, networkState);
-    if (networkState != nullptr && !(opl5gFiles_.empty())) {
+    if (!isOplFileResponsed_ || !isOpl5gFileResponsed_) {
+        return "";
+    }
+    if (networkState != nullptr && isOpl5gFilesPresent_) {
         NrState nrState = networkState->GetNrState();
         if (nrState == NrState::NR_NSA_STATE_SA_ATTACHED) {
             oplFiles = opl5gFiles_;
@@ -272,9 +321,10 @@ std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longN
     }
     bool roaming = (plmn.compare(operatorNumeric_) == 0 ? false : true);
     TELEPHONY_LOGI("ObtainEons roaming:%{public}d", roaming);
-    if (plmn.empty() || pnnFiles_.empty() || (oplFiles.empty() && roaming)) {
-        TELEPHONY_LOGE("ObtainEons is empty");
-        return "";
+    std::string eons = "";
+
+    if (ObtainEonsExternRules(oplFiles, roaming, eons, longNameRequired, plmn)) {
+        return eons;
     }
     int pnnIndex = 1;
     for (std::shared_ptr<OperatorPlmnInfo> opl : oplFiles) {
@@ -282,16 +332,17 @@ std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longN
             continue;
         }
         pnnIndex = -1;
-        TELEPHONY_LOGD("ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
+        TELEPHONY_LOGI("ObtainEons plmn:%{public}s, opl->plmnNumeric:%{public}s, lac:%{public}d, "
                        "opl->lacStart:%{public}d, opl->lacEnd:%{public}d, opl->pnnRecordId:%{public}d",
             plmn.c_str(), opl->plmnNumeric.c_str(), lac, opl->lacStart, opl->lacEnd, opl->pnnRecordId);
         if (plmn.compare(opl->plmnNumeric) == 0 &&
             ((opl->lacStart == 0 && opl->lacEnd == 0xfffe) || (opl->lacStart <= lac && opl->lacEnd >= lac))) {
             pnnIndex = opl->pnnRecordId;
+            TELEPHONY_LOGI("ObtainEons pnnIndex:%{public}d", pnnIndex);
             break;
         }
     }
-    std::string eons = "";
+
     if (pnnIndex >= 1 && pnnIndex <= static_cast<int>(pnnFiles_.size())) {
         TELEPHONY_LOGI("ObtainEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
             longNameRequired, pnnFiles_.at(pnnIndex - 1)->longName.c_str(),
@@ -753,10 +804,18 @@ void IccFile::ClearData()
     gid1_ = "";
     gid2_ = "";
     msisdnTag_ = "";
+    spnCphs_ = "";
+    spnShortCphs_ = "";
+    isOpl5gFilesPresent_ = false;
+    isOplFileResponsed_ = false;
+    isOpl5gFileResponsed_ = false;
     fileQueried_ = false;
     pnnFiles_.clear();
     oplFiles_.clear();
     opl5gFiles_.clear();
+    spdiPlmns_.clear();
+    ehplmns_.clear();
+
     ResetVoiceMailVariable();
     auto iccFileExt = iccFile_.lock();
     if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
