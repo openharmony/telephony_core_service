@@ -64,7 +64,10 @@ void SimFileParse::ParsePnn(const std::vector<std::string> &records, SimFile &si
         return;
     }
     for (const auto &dataPnn : records) {
-        TELEPHONY_LOGI("ParsePnn: %{public}s", dataPnn.c_str());
+        if (dataPnn == nullptr) {
+            continue;
+        }
+        TELEPHONY_LOGD("ParsePnn: %{public}s", dataPnn.c_str());
         int recordLen = 0;
         std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(dataPnn, recordLen);
         if (data == nullptr) {
