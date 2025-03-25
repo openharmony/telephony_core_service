@@ -88,7 +88,7 @@ void ContactDataTest::SetNameData(const std::string &family, const std::string &
     nameData_->SetFamily(family);
     nameData_->SetGiven(given);
     nameData_->SetMiddle(middle);
-    nameData_->SetPrefix(displayName);
+    nameData_->setDispalyName(displayName);
 }
 
 void ContactDataTest::SetNameDataInfo(const std::string &phoneticFamily, const std::string &phoneticGiven,
@@ -949,8 +949,22 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     std::string given = "狗";
     std::string displayName = "狗雷";
     SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(nameData_->GetDisplayName(), "雷狗");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "雷狗");
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    std::string family = "雷";
+    std::string middle = "";
+    std::string given = "狗";
+    std::string displayName = "test1";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "test1");
 }
 
 HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)
