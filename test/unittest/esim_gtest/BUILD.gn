@@ -41,11 +41,7 @@ ohos_unittest("esim_service_client_branch_gtest") {
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
-  deps = [
-    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api" ]
 
   external_deps = [
     "ability_base:want",
@@ -65,6 +61,9 @@ ohos_unittest("esim_service_client_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt::libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -108,6 +107,7 @@ ohos_unittest("tel_esim_gtest") {
     "esim_core_service_stub_test.cpp",
     "esim_core_service_test.cpp",
     "esim_file_manager_test.cpp",
+    "esim_file_test.cpp",
     "esim_manager_test.cpp",
     "esim_part_one_test.cpp",
     "esim_test.cpp",
@@ -132,8 +132,6 @@ ohos_unittest("tel_esim_gtest") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -154,6 +152,9 @@ ohos_unittest("tel_esim_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt::libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -223,8 +224,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/utils:libtel_common",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -245,6 +244,9 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt::libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
