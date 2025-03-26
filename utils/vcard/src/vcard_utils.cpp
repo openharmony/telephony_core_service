@@ -561,7 +561,7 @@ bool VCardUtils::IsContainsInvisibleChar(const std::string& value)
 bool VCardUtils::IsChineseString(const std::string& value)
 {
     std::regex chineseRegex("[\u4e00-\u9fa5]");
-    return std::regex_search(value, chineseRegex);  
+    return std::regex_search(value, chineseRegex);
 }
 
 } // namespace Telephony
