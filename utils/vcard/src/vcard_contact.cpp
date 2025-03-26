@@ -15,7 +15,6 @@
 #include "vcard_contact.h"
 
 #include <numeric>
-#include <regex>
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
@@ -1224,8 +1223,7 @@ void VCardContact::UpdateDisplayName()
         return;
     }
     std::string displayName = nameData_->GetDisplayName();
-    std::regex chineseRegex("[\u4e00-\u9fa5]");
-    if (!std::regex_search(displayName, chineseRegex)) {
+    if (!VCardUtils::IsChineseString(displayName)) {
         return;
     }
     std::string fullName = nameData_->GetFamily();
