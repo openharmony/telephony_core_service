@@ -121,8 +121,12 @@ public:
     MOCK_METHOD1(IsSetActiveSimInProgress, bool(int32_t));
     MOCK_METHOD0(IsSetPrimarySlotIdInProgress, bool(void));
 <<<<<<< HEAD
+<<<<<<< HEAD
     MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &,
                                    SimAuthenticationResponse &));
+=======
+    MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &, SimAuthenticationResponse &));
+>>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
 =======
     MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &, SimAuthenticationResponse &));
 >>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
@@ -133,7 +137,11 @@ public:
     MOCK_METHOD0(GetDefaultMainSlotByIccId, int32_t(void));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+=======
+    #ifdef CORE_SERVICE_SUPPORT_ESIM
+>>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
 =======
     #ifdef CORE_SERVICE_SUPPORT_ESIM
 >>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
@@ -151,8 +159,12 @@ public:
     MOCK_METHOD3(SetDefaultSmdpAddress, int32_t(int32_t, const std::u16string &, int32_t &));
     MOCK_METHOD1(IsSupported, bool(int32_t));
 <<<<<<< HEAD
+<<<<<<< HEAD
     MOCK_METHOD4(SendApduData,
                  int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
+=======
+    MOCK_METHOD4(SendApduData, int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
+>>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
 =======
     MOCK_METHOD4(SendApduData, int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
 >>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
@@ -168,7 +180,11 @@ public:
     MOCK_METHOD3(GetEuiccInfo2, int32_t(int32_t, int32_t, EuiccInfo2 &));
     MOCK_METHOD3(AuthenticateServer, int32_t(int32_t, const AuthenticateConfigInfo &, ResponseEsimInnerResult &));
 <<<<<<< HEAD
+<<<<<<< HEAD
 #endif
+=======
+    #endif
+>>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
 =======
     #endif
 >>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
