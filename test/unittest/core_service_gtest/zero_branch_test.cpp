@@ -22,6 +22,7 @@
 #include "core_service_client.h"
 #include "csim_file_controller.h"
 #include "gtest/gtest.h"
+#include <gmock/gmock.h>
 #include "tel_ril_base_parcel.h"
 #include "icc_file.h"
 #include "icc_file_controller.h"
