@@ -65,6 +65,8 @@
 #include "telephony_ext_wrapper.h"
 #include "sim_file_parse.h"
 #include "network_utils.h"
+#include "mock_sim_manager.h"
+#include <set>
 
 namespace OHOS {
 namespace Telephony {
@@ -2005,6 +2007,7 @@ HWTEST_F(BranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
     std::string numeric = "qwe";
     std::vector<std::string> pnnCust;
     sptr<NetworkState> networkState;
+    system::SetParameter("persist.radio.cfg.display_rule_use_roaming_from_network_state", "true");
     operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->NotifyCdmaSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
     operatorName->UpdateOperatorConfig();
@@ -2089,8 +2092,9 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), params.spn);
 }
 
-static void MockSimManagerFuc(MockSimManager *simManager)
+static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
 {
+    using ::testing::_;
     EXPECT_CALL(*simManager, GetSimOperatorNumeric(_, _))
         .WillOnce([=](int32_t arg1, std::u16string &outParam) { return -1; })
         .WillOnce([=](int32_t arg1, std::u16string &outParam) { return -1; })
@@ -2137,9 +2141,8 @@ static void MockSimManagerFuc(MockSimManager *simManager)
  */
 HWTEST_F(BranchTest, Telephony_OperatorName_003, Function | MediumTest | Level1)
 {
-    using ::testing::_;
     auto simManager = std::make_shared<MockSimManager>();
-    MockSimManagerFuc(simManager);
+    MockSimManagerFucTest(simManager);
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -2244,7 +2247,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1, networkSearchCallback);
     EXPECT_EQ(networkSearchManager->GetRadioState(INVALID_SLOTID), ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
     EXPECT_NE(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, networkSearchCallback),
-              TELEPHONY_ERR_SUCCESS);
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 1, networkInfo, true));
     int32_t slotId = 0;
     EXPECT_FALSE(networkSearchManager->SetNetworkSelectionMode(slotId, 1, networkInfo, true));
@@ -2256,8 +2259,8 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     int32_t networkMode = 0;
     EXPECT_NE(networkSearchManager->SetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->GetCachePreferredNetworkValue(INVALID_SLOTID, networkMode), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->SetPreferredNetwork(INVALID_SLOTID, 1, networkSearchCallback),
-              TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(
+        networkSearchManager->SetPreferredNetwork(INVALID_SLOTID, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
     std::u16string result = u"";
     EXPECT_NE(networkSearchManager->GetIsoCountryCodeForNetwork(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
@@ -2267,7 +2270,7 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     EXPECT_NE(networkSearchManager->GetImeiSv(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
     EXPECT_EQ(networkSearchManager->GetImsRegStatus(INVALID_SLOTID, ImsServiceType::TYPE_SMS, info),
-              TELEPHONY_ERR_LOCAL_PTR_NULL);
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetMeid(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
@@ -2326,11 +2329,11 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest |
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchInformationValue(INVALID_SLOTID) == nullptr);
     EXPECT_TRUE(networkSearchManager->GetNetworkSearchState(INVALID_SLOTID) != nullptr);
     EXPECT_TRUE(networkSearchManager->IsRadioFirstPowerOn(INVALID_SLOTID));
-    EXPECT_EQ(
-        networkSearchManager->RegisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId, callback),
+    EXPECT_EQ(networkSearchManager->RegisterImsRegInfoCallback(
+                  INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId, callback),
         TELEPHONY_ERR_ARGUMENT_NULL);
     EXPECT_EQ(networkSearchManager->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId),
-              TELEPHONY_SUCCESS);
+        TELEPHONY_SUCCESS);
 }
 
 /**
