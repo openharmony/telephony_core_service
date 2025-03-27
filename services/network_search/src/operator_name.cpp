@@ -487,7 +487,8 @@ unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
 {
     int32_t spnRule = 0;
     bool roaming = false;
-    bool useRoamingFromNetworkState = system::GetBoolParameter(CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL, false);
+    bool useRoamingFromNetworkState =
+        system::GetBoolParameter(CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL, false);
     if (useRoamingFromNetworkState) {
         roaming = networkState->IsRoaming();
     } else {
