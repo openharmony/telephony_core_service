@@ -367,7 +367,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
 
     event = nullptr;
     responseInfo.serial = 2;
-    EXPECT_NE(telRilCall->CreateTelRilRequest(event),nullptr);
+    EXPECT_NE(telRilCall->CreateTelRilRequest(event), nullptr);
     ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 }
 } // namespace Telephony
