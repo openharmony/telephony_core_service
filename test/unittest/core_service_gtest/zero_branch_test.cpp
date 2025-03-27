@@ -66,7 +66,6 @@
 #include "sim_file_parse.h"
 #include "network_utils.h"
 #include "mock_sim_manager.h"
-#include <set>
 
 namespace OHOS {
 namespace Telephony {

@@ -15,7 +15,6 @@
 #ifndef MOCK_SIM_MANAGER_H
 #define MOCK_SIM_MANAGER_H
 
-#include "event_runner.h"
 #include "i_sim_manager.h"
 #include <gmock/gmock.h>
 namespace OHOS {
@@ -127,6 +126,35 @@ public:
     MOCK_METHOD0(ResetDataShareError, void(void));
     MOCK_METHOD2(UpdateImsCapFromChip, void(int32_t, const ImsCapFromChip &));
     MOCK_METHOD0(GetDefaultMainSlotByIccId, int32_t(void));
+
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    MOCK_METHOD2(GetEid, int32_t(int32_t, std::u16string &));
+    MOCK_METHOD2(GetEuiccProfileInfoList, int32_t(int32_t, GetEuiccProfileInfoListInnerResult &));
+    MOCK_METHOD2(GetEuiccInfo, int32_t(int32_t, EuiccInfo &));
+    MOCK_METHOD5(DisableProfile, int32_t(int32_t, int32_t, const std::u16string &, bool, int32_t &));
+    MOCK_METHOD3(GetSmdsAddress, int32_t(int32_t, int32_t, std::u16string &));
+    MOCK_METHOD3(GetRulesAuthTable, int32_t(int32_t, int32_t, EuiccRulesAuthTable &));
+    MOCK_METHOD3(GetEuiccChallenge, int32_t(int32_t, int32_t, ResponseEsimInnerResult &));
+    MOCK_METHOD2(GetDefaultSmdpAddress, int32_t(int32_t, std::u16string &));
+    MOCK_METHOD4(CancelSession, int32_t(int32_t, const std::u16string &, CancelReason, ResponseEsimInnerResult &));
+    MOCK_METHOD4(GetProfile, int32_t(int32_t, int32_t, const std::u16string &, EuiccProfile &));
+    MOCK_METHOD3(ResetMemory, int32_t(int32_t, ResetOption, int32_t &));
+    MOCK_METHOD3(SetDefaultSmdpAddress, int32_t(int32_t, const std::u16string &, int32_t &));
+    MOCK_METHOD1(IsSupported, bool(int32_t));
+    MOCK_METHOD4(SendApduData,
+                 int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
+    MOCK_METHOD3(PrepareDownload, int32_t(int32_t, const DownLoadConfigInfo &, ResponseEsimInnerResult &));
+    MOCK_METHOD4(LoadBoundProfilePackage, int32_t(int32_t, int32_t, const std::u16string &, ResponseEsimBppResult &));
+    MOCK_METHOD4(ListNotifications, int32_t(int32_t, int32_t, Event, EuiccNotificationList &));
+    MOCK_METHOD4(RetrieveNotificationList, int32_t(int32_t, int32_t, Event, EuiccNotificationList &));
+    MOCK_METHOD4(RetrieveNotification, int32_t(int32_t, int32_t, int32_t, EuiccNotification &));
+    MOCK_METHOD4(RemoveNotificationFromList, int32_t(int32_t, int32_t, int32_t, int32_t &));
+    MOCK_METHOD3(DeleteProfile, int32_t(int32_t, const std::u16string &, int32_t &));
+    MOCK_METHOD5(SwitchToProfile, int32_t(int32_t, int32_t, const std::u16string &, bool, int32_t &));
+    MOCK_METHOD4(SetProfileNickname, int32_t(int32_t, const std::u16string &, const std::u16string &, int32_t &));
+    MOCK_METHOD3(GetEuiccInfo2, int32_t(int32_t, int32_t, EuiccInfo2 &));
+    MOCK_METHOD3(AuthenticateServer, int32_t(int32_t, const AuthenticateConfigInfo &, ResponseEsimInnerResult &));
+#endif
 };
 }
 }
