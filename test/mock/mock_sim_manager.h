@@ -120,23 +120,15 @@ public:
     MOCK_METHOD2(QueryImsSwitch, int32_t(int32_t, int32_t &));
     MOCK_METHOD1(IsSetActiveSimInProgress, bool(int32_t));
     MOCK_METHOD0(IsSetPrimarySlotIdInProgress, bool(void));
-<<<<<<< HEAD
     MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &,
                                    SimAuthenticationResponse &));
-=======
-    MOCK_METHOD6(GetSimIO, int32_t(int32_t, int32_t, int32_t, const std::string &, const std::string &, SimAuthenticationResponse &));
->>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
     MOCK_METHOD1(SavePrimarySlotId, int32_t(int32_t));
     MOCK_METHOD0(IsDataShareError, bool(void));
     MOCK_METHOD0(ResetDataShareError, void(void));
     MOCK_METHOD2(UpdateImsCapFromChip, void(int32_t, const ImsCapFromChip &));
     MOCK_METHOD0(GetDefaultMainSlotByIccId, int32_t(void));
 
-<<<<<<< HEAD
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-=======
-    #ifdef CORE_SERVICE_SUPPORT_ESIM
->>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
     MOCK_METHOD2(GetEid, int32_t(int32_t, std::u16string &));
     MOCK_METHOD2(GetEuiccProfileInfoList, int32_t(int32_t, GetEuiccProfileInfoListInnerResult &));
     MOCK_METHOD2(GetEuiccInfo, int32_t(int32_t, EuiccInfo &));
@@ -150,12 +142,8 @@ public:
     MOCK_METHOD3(ResetMemory, int32_t(int32_t, ResetOption, int32_t &));
     MOCK_METHOD3(SetDefaultSmdpAddress, int32_t(int32_t, const std::u16string &, int32_t &));
     MOCK_METHOD1(IsSupported, bool(int32_t));
-<<<<<<< HEAD
     MOCK_METHOD4(SendApduData,
                  int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
-=======
-    MOCK_METHOD4(SendApduData, int32_t(int32_t, const std::u16string &, const EsimApduData &, ResponseEsimInnerResult &));
->>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
     MOCK_METHOD3(PrepareDownload, int32_t(int32_t, const DownLoadConfigInfo &, ResponseEsimInnerResult &));
     MOCK_METHOD4(LoadBoundProfilePackage, int32_t(int32_t, int32_t, const std::u16string &, ResponseEsimBppResult &));
     MOCK_METHOD4(ListNotifications, int32_t(int32_t, int32_t, Event, EuiccNotificationList &));
@@ -167,11 +155,7 @@ public:
     MOCK_METHOD4(SetProfileNickname, int32_t(int32_t, const std::u16string &, const std::u16string &, int32_t &));
     MOCK_METHOD3(GetEuiccInfo2, int32_t(int32_t, int32_t, EuiccInfo2 &));
     MOCK_METHOD3(AuthenticateServer, int32_t(int32_t, const AuthenticateConfigInfo &, ResponseEsimInnerResult &));
-<<<<<<< HEAD
 #endif
-=======
-    #endif
->>>>>>> 98778a59ff7b6122d7186fa29c30af2a10d908a2
 };
 }
 }
