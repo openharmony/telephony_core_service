@@ -54,6 +54,7 @@ private:
     void UpdateSpn(RegServiceState regStatus, sptr<NetworkState> &networkState, OperatorNameParams &params);
     int32_t GetCurrentLac();
     std::string GetCustomName(const std::string &numeric);
+    bool GetRoamStateBySimFile(const std::string &netPlmn);
     unsigned int GetSpnRule(sptr<NetworkState> &networkState);
     unsigned int GetCustSpnRule(bool roaming);
     std::string GetEons(const std::string &numeric, int32_t lac, bool longNameRequired);
