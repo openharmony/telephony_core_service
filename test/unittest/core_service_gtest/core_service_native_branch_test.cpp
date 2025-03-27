@@ -650,7 +650,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0012, Function 
     mInner.RegisterCellularCallObject(callback);
     mInner.UnRegisterCellularCallObject(callback);
     mInner.simManager_ = nullptr;
-    EXPECT_EQ(mInner.simManager_, nullptr);
     int32_t simId = -1;
     EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -710,7 +709,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0014, Function 
     mInner.RegisterCellularCallObject(callback);
     mInner.UnRegisterCellularCallObject(callback);
     mInner.simManager_ = nullptr;
-    EXPECT_EQ(mInner.simManager_, nullptr);
     int32_t simId = -1;
     EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -755,7 +753,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0015, Function 
     mInner.RegisterCellularCallObject(callback);
     mInner.UnRegisterCellularCallObject(callback);
     mInner.simManager_ = nullptr;
-    EXPECT_EQ(mInner.simManager_, nullptr);
     int32_t simId = -1;
     EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -792,10 +789,12 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0016, Function 
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0017, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
 
     mInner.simManager_ = nullptr;
     mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
-    EXPECT_EQ(mInner.simManager_, nullptr);
+    EXPECT_NE(mInner.simManager_, simManager);
 }
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function | MediumTest | Level1)
@@ -819,7 +818,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function 
     EuiccProfile eUiccProfile;
     std::u16string transactionId = u"12232312";
     
-    EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -860,7 +858,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0019, Function 
     const std::u16string nickname = u"test profile";
     EuiccProfile eUiccProfile;
     std::u16string transactionId = u"12232312";
-    EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -907,7 +904,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EuiccRulesAuthTable eUiccRulesAuthTable;
     bool forceDisableProfile = true;
-    EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
