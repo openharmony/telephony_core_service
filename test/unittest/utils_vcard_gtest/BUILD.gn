@@ -33,6 +33,7 @@ ohos_unittest("utils_vcard_gtest") {
     "$SOURCE_DIR/utils/vcard/include/contact_data",
   ]
 
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
   deps = [
     "$SOURCE_DIR/utils:libtel_common",
     "$SOURCE_DIR/utils:libtel_vcard",
