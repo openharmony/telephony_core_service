@@ -278,7 +278,6 @@ std::string OperatorConfigCache::EncryptIccId(const std::string iccid)
 
 bool OperatorConfigCache::RegisterForIccChange()
 {
-    TELEPHONY_LOGI("OperatorConfigCache::RegisterForIccLoaded");
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
@@ -315,7 +314,6 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
 
 bool OperatorConfigCache::UnRegisterForIccChange()
 {
-    TELEPHONY_LOGI("OperatorConfigCache::UnRegisterForIccLoaded");
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
