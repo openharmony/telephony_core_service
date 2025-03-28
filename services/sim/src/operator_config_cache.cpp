@@ -334,7 +334,6 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
     if (operKey == "") {
         operName = "NULL";
-        modemSimMatchedOpNameCache_ = "";
     } else {
         if (modemSimMatchedOpNameCache_ == "" || (iccid != iccidCache_)) {
             modemSimMatchedOpNameCache_ = operName;
