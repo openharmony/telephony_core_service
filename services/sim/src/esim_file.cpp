@@ -2093,6 +2093,10 @@ bool EsimFile::ProcessLoadBoundProfilePackage(int32_t slotId)
         TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR");
         return false;
     }
+    if (sequenceOf86->GetEncodedLength() == GET_BPP_LOAD_ERROR_LENGTH) {
+        TELEPHONY_LOGE("recv GET_BPP_LOAD_ERROR");
+        return false;
+    }
     BuildApduForSequenceOf86(codec, bppNode, sequenceOf86);
     SplitSendLongData(codec, MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE, loadBppMutex_, isLoadBppReady_, loadBppCv_);
     return true;
