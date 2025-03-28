@@ -255,7 +255,6 @@ void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
     ErrCode errCode = data.ReadInt32();
     if (FAILED(errCode)) {
         TELEPHONY_LOGE("Read Int32 failed!");
-        return;
     }
 
     int32_t resetMemoryResult = data.ReadInt32();
