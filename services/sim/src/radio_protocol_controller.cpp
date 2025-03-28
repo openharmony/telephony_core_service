@@ -40,6 +40,7 @@ void RadioProtocolController::Init()
     InitMemberFunc();
     // make sure communication is in the initial state
     CleanUpCommunication();
+    std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
     for (int32_t i = 0; i < slotCount_; i++) {
         RadioProtocol protocol;
         protocol.slotId = i;
