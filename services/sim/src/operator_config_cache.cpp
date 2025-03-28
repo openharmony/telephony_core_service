@@ -151,6 +151,9 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
         TELEPHONY_LOGI("load default operator config, slotId = %{public}d", slotId);
         filename = DEFAULT_OPERATOR_CONFIG;
     }
+    if (iccid != "" && iccid != iccidCache_) {
+        isUpdateImsCapFromChipDone_ = false;
+    }
     isLoadingConfig_ = true;
     TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d, opkey = %{public}s", slotId, opkey.data());
     cJSON *root = nullptr;
@@ -337,6 +340,9 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
     } else {
         if (modemSimMatchedOpNameCache_ == "" || (iccid != iccidCache_)) {
             modemSimMatchedOpNameCache_ = operName;
+            if (iccid != iccidCache_) {
+                iccidCache_ = iccid;
+            }
         } else {
             operName = modemSimMatchedOpNameCache_;
         }
