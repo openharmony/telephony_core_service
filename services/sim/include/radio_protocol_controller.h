@@ -17,6 +17,7 @@
 #define OHOS_RADIO_PROTOCOL_CONTROLLER_H
 
 #include <condition_variable>
+#include <ffrt.h>
 #include <mutex>
 
 #include "i_tel_ril_manager.h"
@@ -81,8 +82,8 @@ private:
     bool communicationFailed_ = false;
     bool isCommunicating_ = false;
     bool communicationResponseResult_ = false;
-    std::mutex radioProtocolMutex_;
-    std::condition_variable radioProtocolCv_;
+    ffrt::mutex radioProtocolMutex_;
+    ffrt::condition_variable radioProtocolCv_;
     bool responseReady_ = false;
     int32_t activeResponse_ = 0;
 };
