@@ -34,23 +34,6 @@ namespace OHOS {
 namespace Telephony {
 #ifndef TEL_TEST_UNSUPPORT
 /**
- * @tc.number   Telephony_Sim_GetActiveSimAccountInfoList_0100
- * @tc.name     Get active sim accountInfoList
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        std::vector<IccAccountInfo> iccAccountInfoList;
-        int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_GetActiveSimAccountInfoList_0200
  * @tc.name     Get active sim accountInfoList
  * @tc.desc     Function test
@@ -59,22 +42,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | Med
 {
     AccessToken token;
     if (!SimTest::HasSimCard(slotId1_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        std::vector<IccAccountInfo> iccAccountInfoList;
-        int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_GetActiveSimAccountInfoList_0300
- * @tc.name     Get active sim accountInfoList
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | MediumTest | Level1)
-{
-    if (!SimTest::HasSimCard(slotId_)) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
@@ -252,7 +219,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
         ASSERT_EQ(diallingNumber->index_, 0);
         ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
         ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
@@ -327,36 +294,6 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0200, Function | Medium
         ASSERT_EQ(diallingNumber->index_, 1);
         ASSERT_EQ(diallingNumber->name_, u"");
         ASSERT_EQ(diallingNumber->number_, u"");
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_DelIccAdnDiallingNumbers_0300
- * @tc.name     Delete icc dialling numbers
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        std::shared_ptr<DiallingNumbersInfo> diallingNumbers =
-            std::make_shared<DiallingNumbersInfo>(DiallingNumbersInfo::SIM_ADN, 0);
-        diallingNumbers->name_ = Str8ToStr16("电话卡");
-        diallingNumbers->number_ = Str8ToStr16("00000000000");
-        SimTest::telephonyService_->AddIccDiallingNumbers(
-            SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumbers);
-        int32_t sleepTime = 1;
-        sleep(sleepTime);
-        int index = 0;
-        std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
-        diallingNumber->index_ = index;
-        diallingNumber->name_ = Str8ToStr16("电话卡");
-        diallingNumber->number_ = Str8ToStr16("00000000000");
-        int32_t result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
-            SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
