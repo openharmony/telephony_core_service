@@ -121,5 +121,67 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_CreateSimHelper_001, Function | Med
     EXPECT_EQ(result, nullptr);
 }
 
+/**
+ * @tc.number   Telephony_UpdateIccidCache_001
+ * @tc.name     test UpdateIccidCache
+ * @tc.desc     Function test
+ */
+HWTEST_F(OperatorConfigLoaderTest, Telephony_UpdateIccidCache_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simStateManager->Init(0);
+    simStateManager->simStateHandle_->iccid_ = "86890000000000000001";
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    operatorConfigCache->iccidCache_ = "";
+    operatorConfigCache->UpdateIccidCache(0);
+    EXPECT_EQ(operatorConfigCache->iccidCache_, "");
+    operatorConfigCache->UpdateIccidCache(1);
+    EXPECT_EQ(operatorConfigCache->iccidCache_, "86890000000000000001");
+    operatorConfigCache->UpdateIccidCache(0);
+    simFileManager = nullptr;
+    operatorConfigCache->UpdateIccidCache(0);
+}
+ 
+/**
+ * @tc.number   Telephony_SendSimMatchedOperatorInfo_001
+ * @tc.name     test SendSimMatchedOperatorInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(OperatorConfigLoaderTest, Telephony_SendSimMatchedOperatorInfo_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    simStateManager->Init(0);
+    simStateManager->simStateHandle_->iccid_ = "86890000000000000001";
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    operatorConfigCache->iccidCache_ = "";
+    operatorConfigCache->UpdateIccidCache(1);
+    simFileManager->SetOpKey("");
+    operatorConfigCache->SendSimMatchedOperatorInfo(0, 1);
+    EXPECT_EQ(operatorConfigCache->modemSimMatchedOpNameCache_, "");
+    simFileManager->SetOpKey("46001");
+    simFileManager->SetOpName("CUCC_CN");
+    operatorConfigCache->SendSimMatchedOperatorInfo(0, 1);
+    EXPECT_EQ(operatorConfigCache->modemSimMatchedOpNameCache_, "CUCC_CN");
+    simFileManager->SetOpKey("20404F01");
+    simFileManager->SetOpName("VDF_NL");
+    operatorConfigCache->SendSimMatchedOperatorInfo(0, 1);
+    EXPECT_EQ(operatorConfigCache->modemSimMatchedOpNameCache_, "CUCC_CN");
+    simStateManager->simStateHandle_->iccid_ = "86890000000000000002";
+    operatorConfigCache->UpdateIccidCache(1);
+    operatorConfigCache->SendSimMatchedOperatorInfo(0, 1);
+    EXPECT_EQ(operatorConfigCache->modemSimMatchedOpNameCache_, "VDF_NL");
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -151,6 +151,9 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
         TELEPHONY_LOGI("load default operator config, slotId = %{public}d", slotId);
         filename = DEFAULT_OPERATOR_CONFIG;
     }
+    if (iccid != "" && iccid != iccidCache_) {
+        isUpdateImsCapFromChipDone_ = false;
+    }
     isLoadingConfig_ = true;
     TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d, opkey = %{public}s", slotId, opkey.data());
     cJSON *root = nullptr;
@@ -188,6 +191,7 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
 
 int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &poc, int32_t state)
 {
+    UpdateIccidCache(state);
     if (LoadOperatorConfigFile(slotId, poc) == TELEPHONY_ERR_SUCCESS) {
         AnnounceOperatorConfigChanged(slotId, state);
         return TELEPHONY_ERR_SUCCESS;
@@ -274,7 +278,6 @@ std::string OperatorConfigCache::EncryptIccId(const std::string iccid)
 
 bool OperatorConfigCache::RegisterForIccChange()
 {
-    TELEPHONY_LOGI("OperatorConfigCache::RegisterForIccLoaded");
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
@@ -300,6 +303,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             ClearOperatorValue(slotId_);
             ClearMemoryCache(slotId_);
             modemSimMatchedOpNameCache_ = "";
+            iccidCache_ = "";
             isUpdateImsCapFromChipDone_ = false;
             lock.unlock();
             OperatorConfig opc;
@@ -310,7 +314,6 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
 
 bool OperatorConfigCache::UnRegisterForIccChange()
 {
-    TELEPHONY_LOGI("OperatorConfigCache::UnRegisterForIccLoaded");
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
@@ -322,7 +325,6 @@ bool OperatorConfigCache::UnRegisterForIccChange()
 
 void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t state)
 {
-    TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo, slotId = %{public}d", slotId);
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
@@ -330,11 +332,15 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
     }
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
     std::string operKey = Str16ToStr8(simFileManager->GetOpKey());
+    std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
     if (operKey == "") {
         operName = "NULL";
     } else {
-        if (modemSimMatchedOpNameCache_ == "") {
+        if (modemSimMatchedOpNameCache_ == "" || (iccid != iccidCache_)) {
             modemSimMatchedOpNameCache_ = operName;
+            if (iccid != iccidCache_) {
+                iccidCache_ = iccid;
+            }
         } else {
             operName = modemSimMatchedOpNameCache_;
         }
@@ -393,8 +399,6 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         }
         return publishResult;
     }
-    TELEPHONY_LOGI("AnnounceOperatorConfigChanged dont publish OPERATOR_CONFIG_CHANGED opkey is %{public}s,"
-        "slotId: %{public}d, state: %{public}d", opkey.data(), slotId, state);
     return true;
 }
 
@@ -411,7 +415,6 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
     }
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGI("simFileManager is nullptr");
         return true;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
@@ -428,6 +431,21 @@ void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromC
     int32_t ret = LoadOperatorConfigFile(slotId, opc);
     TELEPHONY_LOGI("[slot%{public}d] imsCapFromChip = %{public}d, %{public}d, %{public}d, %{public}d, ret = %{public}d",
         slotId, imsCapFromChip.volteCap, imsCapFromChip.vowifiCap, imsCapFromChip.vonrCap, imsCapFromChip.vtCap, ret);
+}
+
+void OperatorConfigCache::UpdateIccidCache(int32_t state)
+{
+    if (iccidCache_ != "") {
+        return;
+    }
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        return;
+    }
+    if (state == STATE_PARA_LOADED || state == STATE_PARA_UPDATE) {
+        std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
+        iccidCache_ = iccid;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
