@@ -456,7 +456,7 @@ std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool 
 
 bool OperatorName::GetRoamStateBySimFile(const std::string &netPlmn)
 {
-    if (netPlmn.empty()) {
+    if (netPlmn.empty() || simManager_ == nullptr) {
         return false;
     }
     std::u16string operatorNumeric = u"";
