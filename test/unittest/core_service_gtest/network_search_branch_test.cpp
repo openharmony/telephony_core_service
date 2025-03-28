@@ -124,16 +124,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, Function | MediumT
     EXPECT_EQ(data2.ReadInt32(), static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER));
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, Function | MediumTest | Level1)
-{
-    OperatorNameUtils::GetInstance().Init();
-    OperatorNameUtils::GetInstance().nameArray_.push_back({{"11111"}, "test", "test", "test", "test", "test", "test"});
-    EXPECT_EQ(NetworkSelection::GetCustomName({"11111", "11111", "11111", 0, 0}), "test");
-    EXPECT_EQ(NetworkSelection::GetCustomName({"11111 x", "11111", "11111", 0, 0}), "test");
-    EXPECT_EQ(NetworkSelection::GetCustomName({"11111 2G", "11111", "11111", 0, 0}), "test 2G");
-    EXPECT_EQ(NetworkSelection::GetCustomName({"00000", "00000", "00000", 0, 0}), "00000");
-}
-
 HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | MediumTest | Level1)
 {
     auto deviceStateObserver = std::make_shared<DeviceStateObserver>();

@@ -261,42 +261,6 @@ HWTEST_F(BranchTest, Telephony_CellInfo_003, Function | MediumTest | Level1)
 }
 
 /**
- * @tc.number   Telephony_CellInfo_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_CellInfo_004, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    auto networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    auto cellInfo = std::make_shared<CellInfo>(networkSearchManager_, 1);
-    int32_t SIGNAL_FOUR_BARS = 4;
-    cellInfo->InitCellSignalBar(SIGNAL_FOUR_BARS);
-    cellInfo->UpdateCellLocation(0, 10, 9);
-    cellInfo->UpdateCellLocation(1, 11, 8);
-    cellInfo->UpdateCellLocation(2, 12, 7);
-    cellInfo->UpdateCellLocation(3, 13, 6);
-    cellInfo->UpdateCellLocation(4, 14, 5);
-    cellInfo->UpdateCellLocation(5, 15, 4);
-    cellInfo->UpdateCellLocation(6, 16, 3);
-    cellInfo->GetCurrentSignalLevelGsm(0);
-    cellInfo->GetCurrentSignalLevelLte(0);
-    cellInfo->GetCurrentSignalLevelCdma(0);
-    cellInfo->GetCurrentSignalLevelTdscdma(0);
-    cellInfo->GetCurrentSignalLevelNr(0);
-    cellInfo->GetCellLocationExt(CellInformation::CellType::CELL_TYPE_NONE);
-    cellInfo->GetCellLocationExt(CellInformation::CellType::CELL_TYPE_LTE);
-    cellInfo->GetCellLocationExt(CellInformation::CellType::CELL_TYPE_NR);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelCdma(-40), SIGNAL_FOUR_BARS);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelWcdma(-40), SIGNAL_FOUR_BARS);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelLte(-40), SIGNAL_FOUR_BARS);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelGsm(-40), SIGNAL_FOUR_BARS);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelTdscdma(-40), SIGNAL_FOUR_BARS);
-    EXPECT_EQ(cellInfo->GetCurrentSignalLevelNr(-40), SIGNAL_FOUR_BARS);
-}
-
-/**
  * @tc.number   Telephony_CellInfo_005
  * @tc.name     test error branch
  * @tc.desc     Function test

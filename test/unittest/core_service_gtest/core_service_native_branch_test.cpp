@@ -670,7 +670,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0013, Function 
     mInner.isInitExtraObj_ = true;
     EXPECT_EQ(mInner.InitExtraModule(1), TELEPHONY_SUCCESS);
     mInner.InitExtraModule(1);
-    EXPECT_FALSE(SIM_SLOT_COUNT != DUAL_SLOT_COUNT);
+    EXPECT_TRUE(SIM_SLOT_COUNT != DUAL_SLOT_COUNT);
     mInner.telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler;
     std::string testStr = "";

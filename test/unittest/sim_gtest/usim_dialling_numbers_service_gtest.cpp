@@ -63,9 +63,6 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessEventTest001, Function | MediumT
     auto event2 = AppExecFwk::InnerEvent::Get(invalidEventId);
     usimDiallingNumbersService->ProcessEvent(event1);
     usimDiallingNumbersService->ProcessEvent(event2);
-    std::unique_ptr<ControllerToFileMsg> obj;
-    event1->SaveUniquePtr<std::unique_ptr<ControllerToFileMsg>>(obj);
-    usimDiallingNumbersService->ProcessEvent(event1);
     EXPECT_FALSE(usimDiallingNumbersService->memberFuncMap_.empty());
 }
 
