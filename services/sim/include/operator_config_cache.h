@@ -58,6 +58,7 @@ private:
     bool AnnounceOperatorConfigChanged(int32_t slotId, int32_t state);
     void notifyInitApnConfigs(int32_t slotId);
     int32_t LoadOperatorConfigFile(int32_t slotId, OperatorConfig &poc);
+    void UpdateIccidCache(int32_t state);
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
     inline static const int32_t IMS_SWITCH_OFF = 0;
@@ -67,6 +68,7 @@ private:
     OperatorConfig opc_;
     int32_t slotId_;
     std::string modemSimMatchedOpNameCache_ = "";
+    std::string iccidCache_ = "";
     bool isLoadingConfig_ = false;
     std::mutex mutex_;
     bool isUpdateImsCapFromChipDone_ = false;
