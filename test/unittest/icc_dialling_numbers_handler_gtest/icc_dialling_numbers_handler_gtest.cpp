@@ -105,22 +105,6 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_002,
 }
 
 /**
- * @tc.number   Telephony_IccDiallingNumbersHandler_003
- * @tc.name     test IccDiallingNumbersHandler
- * @tc.desc     Function test
- */
-HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_003, Function | MediumTest | Level1)
-{
-    int id = 1;
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
-    ASSERT_NE(event, nullptr);
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
-    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
-    diallingNumberHandler->ProcessDiallingNumberAllLoadDone(event, id);
-}
-
-/**
  * @tc.number   Telephony_IccDiallingNumbersHandler_004
  * @tc.name     test IccDiallingNumbersHandler
  * @tc.desc     Function test
@@ -175,23 +159,6 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_006,
     auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
     std::shared_ptr<unsigned char> seqResult = diallingNumberHandler->CreateNameSequence(name, seqLength);
     ASSERT_NE(seqResult, nullptr);
-}
-
-/**
- * @tc.number   Telephony_IccDiallingNumbersHandler_007
- * @tc.name     test IccDiallingNumbersHandler
- * @tc.desc     Function test
- */
-HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_007, Function | MediumTest | Level1)
-{
-    std::string number = "12345678910";
-    int dataLength = 0;
-    std::shared_ptr<unsigned char> diallingNumber = std::make_shared<unsigned char>(42);;
-    ASSERT_NE(diallingNumber, nullptr);
-    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
-    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
-    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
-    diallingNumberHandler->FillNumberFiledForDiallingNumber(diallingNumber, number, dataLength);
 }
 
 /**

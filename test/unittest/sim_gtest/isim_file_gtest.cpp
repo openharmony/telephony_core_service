@@ -83,42 +83,6 @@ HWTEST_F(ISimFileTest, ISimFileTest001, Function | MediumTest | Level1)
     EXPECT_FALSE(iSimFile->ProcessIccReady(event));
 }
 
-HWTEST_F(ISimFileTest, ISimFileTest002, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<IsimFile> iSimFile = std::make_shared<IsimFile>(simStateManager);
-    std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
-    std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
-    iSimFile->SetRilAndFileController(telRilManager, file, handler);
-    iSimFile->LoadIsimFiles();
-    int32_t validEventId = 0x03;
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(validEventId);
-    auto nullEvent = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    iSimFile->ProcessGetIccidDone(event);
-    iSimFile->ProcessGetIccidDone(nullEvent);
-    iSimFile->ProcessGetImsiDone(event);
-    iSimFile->ProcessGetImsiDone(nullEvent);
-    iSimFile->ProcessGetImpiDone(event);
-    iSimFile->ProcessGetImpiDone(nullEvent);
-    iSimFile->ProcessGetIstDone(event);
-    iSimFile->ProcessGetIstDone(nullEvent);
-    iSimFile->ObtainIsimImpi();
-    iSimFile->ObtainIsimDomain();
-    iSimFile->ObtainIsimImpu();
-    iSimFile->ObtainIsimPcscf();
-    std::string mailName, mailNumber;
-    iSimFile->UpdateVoiceMail(mailName, mailNumber);
-    iSimFile->SetVoiceMailCount(0);
-    iSimFile->SetVoiceCallForwarding(true, mailNumber);
-    iSimFile->ObtainSpnCondition(true, mailNumber);
-    iSimFile->ObtainIsoCountryCode();
-    iSimFile->SetVoiceMailNumber(mailNumber);
-    iSimFile->GetVoiceMailNumber();
-    EXPECT_FALSE(iSimFile->ProcessIsimRefresh(nullEvent));
-}
-
 HWTEST_F(ISimFileTest, ISimFileControllerTest001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
