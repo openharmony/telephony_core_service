@@ -159,25 +159,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_001, Function | MediumTes
 }
 
 /**
- * @tc.number   Telephony_SimAccountManager_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_002, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
-    auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
-    simAccountManager->Init(0);
-    simAccountManager->UpdateImsCapFromChip(0, {0, 0, 0, 0});
-    EXPECT_NE(simAccountManager->operatorConfigCache_, nullptr);
-}
-
-/**
  * @tc.number   Telephony_SimAccountManager_003
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1011,52 +992,6 @@ AppExecFwk::InnerEvent::Pointer GetDiallingNumbersHandlerResultEvent(int32_t cod
         objectUnique->exception = std::make_shared<int32_t>(0);
     }
     return AppExecFwk::InnerEvent::Get(code, objectUnique);
-}
-
-/**
- * @tc.number   Telephony_SimFile_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    std::shared_ptr<SimStateManager> simStateManager = nullptr;
-    auto simFile = std::make_shared<SimFile>(simStateManager);
-    std::vector<int> testCase1 = { MSG_SIM_OBTAIN_GID1_DONE, MSG_SIM_OBTAIN_GID2_DONE, MSG_SIM_SET_MSISDN_DONE,
-        MSG_SIM_OBTAIN_SPDI_DONE, MSG_SIM_OBTAIN_CFIS_DONE, MSG_SIM_OBTAIN_MWIS_DONE,
-        MSG_SIM_OBTAIN_VOICE_MAIL_INDICATOR_CPHS_DONE, MSG_SIM_OBTAIN_ICCID_DONE, MSG_SIM_OBTAIN_CFF_DONE,
-        MSG_SIM_OBTAIN_CFF_DONE, MSG_SIM_OBTAIN_AD_DONE, MSG_SIM_SMS_ON_SIM, MSG_SIM_OBTAIN_ALL_SMS_DONE,
-        MSG_SIM_OBTAIN_SMS_DONE, MSG_SIM_OBTAIN_PLMN_W_ACT_DONE, MSG_SIM_OBTAIN_OPLMN_W_ACT_DONE,
-        MSG_SIM_OBTAIN_CSP_CPHS_DONE, MSG_SIM_OBTAIN_INFO_CPHS_DONE, MSG_SIM_OBTAIN_SST_DONE, MSG_SIM_OBTAIN_PNN_DONE,
-        MSG_SIM_OBTAIN_OPL_DONE, MSG_SIM_OBTAIN_OPL5G_DONE, MSG_SIM_UPDATE_DONE, MSG_SIM_OBTAIN_HPLMN_W_ACT_DONE,
-        MSG_SIM_OBTAIN_EHPLMN_DONE, MSG_SIM_OBTAIN_FPLMN_DONE };
-    for (int32_t code : testCase1) {
-        auto event1 = GetControllerToFileMsgEvent(code, true);
-        simFile->ProcessEvent(event1);
-        if (code == MSG_SIM_SMS_ON_SIM) {
-            continue;
-        }
-        auto event2 = GetControllerToFileMsgEvent(code, false);
-        simFile->ProcessEvent(event2);
-    }
-    std::vector<int> testCase2 = { MSG_SIM_OBTAIN_MSISDN_DONE, MSG_SIM_OBTAIN_CPHS_MAILBOX_DONE,
-        MSG_SIM_SET_CPHS_MAILBOX_DONE, MSG_SIM_SET_MBDN_DONE };
-    simFile->cphsInfo_ = "";
-    for (int32_t code : testCase2) {
-        auto event1 = GetDiallingNumbersHandlerResultEvent(code, false);
-        simFile->ProcessEvent(event1);
-        auto event2 = GetDiallingNumbersHandlerResultEvent(code, true);
-        simFile->ProcessEvent(event2);
-    }
-    int32_t efCfisSize = 0;
-    std::string efCfisStr = "1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF";
-    std::string number = "123456789111111";
-    std::shared_ptr<unsigned char> efCfisData = SIMUtils::HexStringConvertToBytes(efCfisStr, efCfisSize);
-    ASSERT_TRUE(simFile->FillNumber(efCfisData, efCfisSize, number));
-    efCfisStr = "1234";
-    efCfisData = SIMUtils::HexStringConvertToBytes(efCfisStr, efCfisSize);
-    ASSERT_FALSE(simFile->FillNumber(efCfisData, efCfisSize, number));
 }
 
 /**

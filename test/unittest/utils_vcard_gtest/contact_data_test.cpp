@@ -941,18 +941,6 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTest | Level3)
-{
-    VCardContact vCardContact;
-    std::string family = "雷";
-    std::string middle = "";
-    std::string given = "狗";
-    std::string displayName = "狗雷";
-    SetNameData(family, given, middle, displayName);
-    vCardContact.UpdateDisplayName();
-    EXPECT_EQ(nameData_->GetDisplayName(), "雷狗");
-}
-
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

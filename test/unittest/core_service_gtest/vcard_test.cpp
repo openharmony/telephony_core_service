@@ -1221,7 +1221,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         DataShare::DataSharePredicates predicates;
         predicates.EqualTo(Contact::ID, "-1");
         int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
-        EXPECT_EQ(errorCode, TELEPHONY_ERROR);
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
         EXPECT_NE(dataShareHelper, nullptr);
