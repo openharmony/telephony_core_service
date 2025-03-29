@@ -28,6 +28,7 @@
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
 #endif
+#include <set>
 #include "event_handler.h"
 #include "operator_config_types.h"
 #include "sim_account_callback.h"
@@ -107,6 +108,8 @@ public:
     virtual int32_t GetSimSpn(int32_t slotId, std::u16string &spn) = 0;
     virtual int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) = 0;
     virtual int32_t GetIMSI(int32_t slotId, std::u16string &imsi) = 0;
+    virtual int32_t GetSpdiPlmns(int32_t slotId, std::set<std::string> &spdiPlmns) = 0;
+    virtual int32_t GetEhPlmns(int32_t slotId, std::set<std::string> &ehPlmns) = 0;
     virtual std::u16string GetLocaleFromDefaultSim(int32_t slotId) = 0;
     virtual int32_t GetSlotId(int32_t simId) = 0;
     virtual int32_t GetSimId(int32_t slotId) = 0;

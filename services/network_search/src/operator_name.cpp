@@ -37,6 +37,8 @@ namespace {
 const int32_t FORMAT_IDX_SPN_CS = 0;
 const int32_t PNN_CUST_STRING_SIZE = 2;
 const int32_t OPL_CUST_STRING_SIZE = 4;
+constexpr const char *CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL =
+    "persist.radio.cfg.display_rule_use_roaming_from_network_state";
 } // namespace
 
 OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
@@ -452,10 +454,47 @@ std::string OperatorName::GetEons(const std::string &numeric, int32_t lac, bool 
     return Str16ToStr8(simManager_->GetSimEons(slotId_, numeric, lac, longNameRequired));
 }
 
+bool OperatorName::GetRoamStateBySimFile(const std::string &netPlmn)
+{
+    if (netPlmn.empty() || simManager_ == nullptr) {
+        return false;
+    }
+    std::u16string operatorNumeric = u"";
+    int32_t errorCode = simManager_->GetSimOperatorNumeric(slotId_, operatorNumeric);
+    if (errorCode != 0 || operatorNumeric.empty()) {
+        return false;
+    }
+    std::string simPlmn = Str16ToStr8(operatorNumeric);
+    if (simPlmn == netPlmn) {
+        return false;
+    }
+    std::set<std::string> ehPlmns;
+    simManager_->GetEhPlmns(slotId_, ehPlmns);
+    auto it = ehPlmns.find(netPlmn);
+    if (it != ehPlmns.end()) {
+        return false;
+    }
+    std::set<std::string> spdiPlmns;
+    simManager_->GetSpdiPlmns(slotId_, spdiPlmns);
+    it = spdiPlmns.find(netPlmn);
+    if (it != spdiPlmns.end()) {
+        return false;
+    }
+    return true;
+}
+
 unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
 {
     int32_t spnRule = 0;
-    bool roaming = networkState->IsRoaming();
+    bool roaming = false;
+    bool useRoamingFromNetworkState =
+        system::GetBoolParameter(CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL, false);
+    if (useRoamingFromNetworkState) {
+        roaming = networkState->IsRoaming();
+    } else {
+        std::string netPlmn = networkState->GetPlmnNumeric();
+        roaming = GetRoamStateBySimFile(netPlmn);
+    }
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
         spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
     } else if (!roaming && IsChinaCard()) {

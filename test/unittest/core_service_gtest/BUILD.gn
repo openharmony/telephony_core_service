@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (C) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -426,6 +426,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+    "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -455,6 +456,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
