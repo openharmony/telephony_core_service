@@ -35,6 +35,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+constexpr int32_t SLEEP_TIME = 100 * 1000; // 10ms
 
 class StkControllerTest : public testing::Test {
 public:
@@ -59,47 +60,74 @@ HWTEST_F(StkControllerTest, Telephony_Sim_ProcessEvent_001, Function | MediumTes
     auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, 0);
     AppExecFwk::InnerEvent::Pointer event1 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SESSION_END, 1);
     stkController->ProcessEvent(event1);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
-    AppExecFwk::InnerEvent::Pointer event2 = AppExecFwk::InnerEvent::Get(
-        RadioEvent::RADIO_STK_PROACTIVE_COMMAND, 1);
+    AppExecFwk::InnerEvent::Pointer event2 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_PROACTIVE_COMMAND, 1);
     stkController->ProcessEvent(event2);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event3 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_ALPHA_NOTIFY, 1);
     stkController->ProcessEvent(event3);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event4 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_EVENT_NOTIFY, 1);
     stkController->ProcessEvent(event4);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event5 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_CALL_SETUP, 1);
     stkController->ProcessEvent(event5);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event6 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_ICC_REFRESH, 1);
     stkController->ProcessEvent(event6);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event7 = AppExecFwk::InnerEvent::Get(
         RadioEvent::RADIO_STK_SEND_TERMINAL_RESPONSE, 1);
     stkController->ProcessEvent(event7);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     AppExecFwk::InnerEvent::Pointer event8 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_ENVELOPE, 1);
     stkController->ProcessEvent(event8);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
     stkController->remainTryCount_ = 1;
     AppExecFwk::InnerEvent::Pointer event9 = AppExecFwk::InnerEvent::Get(
         StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 1);
     stkController->ProcessEvent(event9);
+    usleep(SLEEP_TIME);
 
-    sleep(1);
-    AppExecFwk::InnerEvent::Pointer event10 = AppExecFwk::InnerEvent::Get(0, 1);
+    AppExecFwk::InnerEvent::Pointer event10 = AppExecFwk::InnerEvent::Get(
+        StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 1);
     stkController->ProcessEvent(event10);
     EXPECT_EQ(stkController->remainTryCount_, -1);
 }
+
+HWTEST_F(StkControllerTest, Telephony_Sim_ProcessEvent_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, 0);
+
+    stkController->iccCardState_ = 1;
+    std::shared_ptr<Int32Parcel> object = nullptr;
+    AppExecFwk::InnerEvent::Pointer event0 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, object);
+    stkController->ProcessEvent(event0);
+    usleep(SLEEP_TIME);
+    EXPECT_EQ(stkController->iccCardState_, 1);
+
+    object = std::make_shared<Int32Parcel>(1);
+    AppExecFwk::InnerEvent::Pointer event1 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, object);
+    stkController->ProcessEvent(event1);
+    usleep(SLEEP_TIME);
+    EXPECT_EQ(stkController->iccCardState_, 1);
+
+    object->data = -1;
+    AppExecFwk::InnerEvent::Pointer event2 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, object);
+    stkController->ProcessEvent(event2);
+    usleep(SLEEP_TIME);
+    EXPECT_EQ(stkController->iccCardState_, 0);
+}
+
 }
 }
