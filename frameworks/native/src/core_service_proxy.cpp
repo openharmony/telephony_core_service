@@ -717,7 +717,7 @@ int32_t CoreServiceProxy::GetISOCountryCodeForSim(int32_t slotId, std::u16string
 
 int32_t CoreServiceProxy::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdEx(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     MessageParcel data;
