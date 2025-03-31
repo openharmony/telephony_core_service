@@ -531,7 +531,8 @@ HWTEST_F(ContactDataTest, VCardDecoderV21_DealAdrOrgN, Function | MediumTest | L
 {
     VCardDecoderV21 decoder;
     int32_t errorCode = 0;
-    EXPECT_NO_THROW(decoder.DealAdrOrgN("RawValue", nullptr, DEFAULT_INTERMEDIATE_CHARSET, DEFAULT_IMPORT_CHARSET, errorCode));
+    EXPECT_NO_THROW(decoder.DealAdrOrgN("RawValue", nullptr, DEFAULT_INTERMEDIATE_CHARSET,
+        DEFAULT_IMPORT_CHARSET, errorCode));
     std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
     EXPECT_NO_THROW(decoder.DealEncodingParam(VCARD_PARAM_ENCODING_QP, rawData, errorCode));
 }
