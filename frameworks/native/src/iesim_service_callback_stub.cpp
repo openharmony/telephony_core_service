@@ -79,13 +79,7 @@ int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requ
 
 void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
 {
-    TELEPHONY_LOGI("OnGetEuiccInfo");
     int32_t errorCode = data.ReadInt32();
-    if (FAILED(errorCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<EuiccInfo> info(data.ReadParcelable<EuiccInfo>());
     EuiccInfo result;
     if (info != nullptr) {
@@ -97,11 +91,6 @@ void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
 void IEsimServiceCallbackStub::OnGetEid(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::string eId = Str16ToStr8(data.ReadString16());
     OnGetEid(eId, errCode);
 }
@@ -109,11 +98,6 @@ void IEsimServiceCallbackStub::OnGetEid(MessageParcel &data)
 void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<GetDownloadableProfileMetadataResult> info(
         data.ReadParcelable<GetDownloadableProfileMetadataResult>());
     GetDownloadableProfileMetadataResult profileMetadataResult;
@@ -126,11 +110,6 @@ void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(MessageParcel &d
 void IEsimServiceCallbackStub::OnGetDownloadableProfiles(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<GetDownloadableProfilesResult> info(data.ReadParcelable<GetDownloadableProfilesResult>());
     GetDownloadableProfilesResult profileListResult;
     if (info != nullptr) {
@@ -142,11 +121,6 @@ void IEsimServiceCallbackStub::OnGetDownloadableProfiles(MessageParcel &data)
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<GetEuiccProfileInfoListResult> info(data.ReadParcelable<GetEuiccProfileInfoListResult>());
     GetEuiccProfileInfoListResult euiccProfileInfoList;
     if (info != nullptr) {
@@ -168,33 +142,18 @@ void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(MessageParcel &data)
 void IEsimServiceCallbackStub::OnSetDefaultSmdpAddress(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     int32_t setDefaultSmdpAddressResult = data.ReadInt32();
     OnSetDefaultSmdpAddress(setDefaultSmdpAddressResult, errCode);
 }
 void IEsimServiceCallbackStub::OnSetProfileNickname(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     int32_t setProfileNicknameResult = data.ReadInt32();
     OnSetProfileNickName(setProfileNicknameResult, errCode);
 }
 void IEsimServiceCallbackStub::OnCancelSession(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<ResponseEsimResult> info(data.ReadParcelable<ResponseEsimResult>());
     ResponseEsimResult responseResult;
     if (info != nullptr) {
@@ -205,11 +164,6 @@ void IEsimServiceCallbackStub::OnCancelSession(MessageParcel &data)
 void IEsimServiceCallbackStub::OnDownloadProfile(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     std::unique_ptr<DownloadProfileResult> info(data.ReadParcelable<DownloadProfileResult>());
     DownloadProfileResult downloadProfileResult;
     if (info != nullptr) {
@@ -221,42 +175,24 @@ void IEsimServiceCallbackStub::OnDownloadProfile(MessageParcel &data)
 void IEsimServiceCallbackStub::OnDeleteProfile(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
     int32_t deleteProfileResult = data.ReadInt32();
     OnDeleteProfile(deleteProfileResult, errCode);
 }
 void IEsimServiceCallbackStub::OnStartOsu(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     OsuStatus osuStatus = (OsuStatus)data.ReadInt32();
     OnStartOsu(osuStatus, errCode);
 }
 void IEsimServiceCallbackStub::OnSwitchToProfile(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-        return;
-    }
-
     int32_t switchToProfileResult = data.ReadInt32();
     OnSwitchToProfile(switchToProfileResult, errCode);
 }
 void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
 {
     ErrCode errCode = data.ReadInt32();
-    if (FAILED(errCode)) {
-        TELEPHONY_LOGE("Read Int32 failed!");
-    }
-
     int32_t resetMemoryResult = data.ReadInt32();
     OnResetMemory(resetMemoryResult, errCode);
 }
@@ -274,49 +210,49 @@ int IEsimServiceCallbackStub::OnRemoteRequest(
     return OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
 }
 void IEsimServiceCallbackStub::OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnDeleteProfile(const int32_t &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnDownloadProfile(const DownloadProfileResult &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnGetDownloadableProfileMetadata(
     const GetDownloadableProfileMetadataResult &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnGetDownloadableProfiles(
     const GetDownloadableProfilesResult &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnResetMemory(const int32_t &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnStartOsu(const OsuStatus &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnSwitchToProfile(const int32_t &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnCancelSession(const ResponseEsimResult &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnGetDefaultSmdpAddress(const std::string &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnGetEid(const std::string &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnGetEuiccProfileInfoList(
     const GetEuiccProfileInfoListResult &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode)
-{
-}
+{}
+
 void IEsimServiceCallbackStub::OnSetProfileNickName(const int32_t &result, const int32_t errorCode)
-{
-}
+{}
+
 } // namespace Telephonyd
 } // namespace OHOS
