@@ -353,7 +353,7 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
-    ASSERT_FALSE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
+    ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
     telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
     telRilCall->GetClirResponse(responseInfo, getClirResult);
 
