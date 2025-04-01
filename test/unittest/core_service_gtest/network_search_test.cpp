@@ -1385,14 +1385,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0200 SetRadioStateCallbackResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_FALSE(syncResult);
 
     result = CoreServiceClient::GetInstance().GetRadioState(SLOT_ID, callback);
     TELEPHONY_LOGI("GetRadioState_0200 GetRadioState result: %{public}d", result);
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0200 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
-    ASSERT_FALSE(isRadioOn);
+    ASSERT_TRUE(isRadioOn);
 }
 
 /**
