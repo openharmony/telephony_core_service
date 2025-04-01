@@ -57,7 +57,7 @@ bool TelRilManager::DeInit()
 
 bool TelRilManager::ConnectRilInterface()
 {
-    std::lock_guard<shared_mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     rilInterface_ = HDI::Ril::V1_4::IRil::Get();
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("TelRilManager not find RilInterfaceService");
@@ -96,7 +96,7 @@ void TelRilManager::SendAckAndLock(void)
     if (handler_ != nullptr) {
         handler_->ApplyRunningLock(TelRilHandler::ACK_RUNNING_LOCK);
     }
-    std::shared_lock<shared_mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGE("rilInterface_ is null");
         return;
@@ -106,10 +106,10 @@ void TelRilManager::SendAckAndLock(void)
 
 void TelRilManager::InitTelModule(int32_t slotId)
 {
-    std::lock_guard<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
-    std::shared_lock<shared_mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     telRilSms_.push_back(std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
     telRilSim_.push_back(std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler_[slotId], handler_));
     telRilCall_.push_back(std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler_[slotId], handler_));
@@ -136,7 +136,7 @@ int32_t TelRilManager::InitTelExtraModule(int32_t slotId)
 
 std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSms_.size()) {
         TELEPHONY_LOGE("telRilSms_ slotId is valid");
         return nullptr;
@@ -146,7 +146,7 @@ std::shared_ptr<TelRilSms> TelRilManager::GetTelRilSms(int32_t slotId)
 
 std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilSim_.size()) {
         TELEPHONY_LOGE("telRilSim_ slotId is valid");
         return nullptr;
@@ -156,14 +156,14 @@ std::shared_ptr<TelRilSim> TelRilManager::GetTelRilSim(int32_t slotId)
 
 int32_t TelRilManager::GetTelRilSimSize()
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     int32_t size = static_cast<int32_t>(telRilSim_.size());
     return size;
 }
 
 std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilCall_.size()) {
         TELEPHONY_LOGE("telRilCall_ slotId is valid");
         return nullptr;
@@ -173,7 +173,7 @@ std::shared_ptr<TelRilCall> TelRilManager::GetTelRilCall(int32_t slotId)
 
 std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilData_.size()) {
         TELEPHONY_LOGE("telRilData_ slotId is valid");
         return nullptr;
@@ -183,7 +183,7 @@ std::shared_ptr<TelRilData> TelRilManager::GetTelRilData(int32_t slotId)
 
 std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilNetwork_.size()) {
         TELEPHONY_LOGE("telRilNetwork_ slotId is valid");
         return nullptr;
@@ -193,7 +193,7 @@ std::shared_ptr<TelRilNetwork> TelRilManager::GetTelRilNetwork(int32_t slotId)
 
 std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= telRilModem_.size()) {
         TELEPHONY_LOGE("telRilModem_ slotId is valid");
         return nullptr;
@@ -203,14 +203,13 @@ std::shared_ptr<TelRilModem> TelRilManager::GetTelRilModem(int32_t slotId)
 
 int32_t TelRilManager::GetTelRilModemSize()
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<ffrt::shared_mutex> telRilMutex(telRilMutex_);
     int32_t size = static_cast<int32_t>(telRilModem_.size());
     return size;
 }
 
 std::shared_ptr<ObserverHandler> TelRilManager::GetObserverHandler(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> telRilMutex(telRilMutex_);
     if (slotId < 0 || static_cast<size_t>(slotId) >= observerHandler_.size()) {
         TELEPHONY_LOGE("observerHandler_ slotId %{public}d is valid", slotId);
         return nullptr;
@@ -230,7 +229,7 @@ bool TelRilManager::ResetRilInterface(void)
 
 void TelRilManager::ResetRilInterfaceBySlotId(int32_t slotId)
 {
-    std::shared_lock<shared_mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if (GetTelRilSms(slotId) != nullptr) {
         GetTelRilSms(slotId)->ResetRilInterface(rilInterface_);
     }
@@ -254,7 +253,7 @@ void TelRilManager::ResetRilInterfaceBySlotId(int32_t slotId)
 int32_t TelRilManager::RegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what, int32_t *obj)
 {
-    std::lock_guard<shared_mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
     if (observerHandler != nullptr) {
         switch (what) {
@@ -296,7 +295,7 @@ int32_t TelRilManager::RegisterCoreNotify(
 int32_t TelRilManager::UnRegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what)
 {
-    std::lock_guard<shared_mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
     if (observerHandler != nullptr) {
         observerHandler->Remove(what, observerCallBack);

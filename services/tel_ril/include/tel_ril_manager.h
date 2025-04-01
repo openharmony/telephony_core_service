@@ -18,6 +18,7 @@
 
 #include <singleton.h>
 #include <v1_4/iril.h>
+#include <ffrt.h>
 
 #include "hdf_service_status_listener.h"
 #include "i_tel_ril_manager.h"
@@ -363,8 +364,8 @@ private:
     }
 
 private:
-    std::shared_mutex mutex_;
-    std::shared_mutex telRilMutex_;
+    ffrt::shared_mutex mutex_;
+    ffrt::shared_mutex telRilMutex_;
     std::vector<std::shared_ptr<TelRilSim>> telRilSim_;
     std::vector<std::shared_ptr<TelRilSms>> telRilSms_;
     std::vector<std::shared_ptr<TelRilCall>> telRilCall_;
