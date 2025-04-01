@@ -2077,7 +2077,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     std::u16string result = u"";
     EXPECT_NE(networkSearchManager->GetIsoCountryCodeForNetwork(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
-    networkSearchManager->UpdateDeviceId(INVALID_SLOTID);
     EXPECT_NE(networkSearchManager->GetImei(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetImeiSv(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);

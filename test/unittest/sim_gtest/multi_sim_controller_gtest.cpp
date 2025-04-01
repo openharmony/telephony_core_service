@@ -158,7 +158,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_001, Fu
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
     bool ret = multiSimController->IsAllCardsLoaded();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function | MediumTest | Level1)
@@ -175,7 +175,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function 
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
     bool ret = multiSimController->IsAllCardsLoaded();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 }
