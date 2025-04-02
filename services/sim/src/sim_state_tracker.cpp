@@ -25,6 +25,8 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t OPKEY_VMSG_LENTH = 3;
+inline constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
+inline constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 SimStateTracker::SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
     std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId)
     : TelEventHandler("SimStateTracker"), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),
@@ -50,20 +52,28 @@ SimStateTracker::~SimStateTracker()
 
 void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SimStateTracker::Refresh config");
     auto slotId = event->GetParam();
     if (slotId != slotId_) {
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
-    bool hasSimCard = false;
-    CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
-    if (!hasSimCard) {
-        TELEPHONY_LOGE("sim is not exist");
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+ 
         return;
     }
-    TELEPHONY_LOGI("ProcessSimRecordLoad, slotId: %{public}d need trigger LoadOperatorConfig", slotId_);
-    TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
+    if (operatorConfigLoader_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigLoader is null!");
+        return;
+    }
+    TELEPHONY_LOGI("slotId: %{public}d need trigger LoadOperatorConfig", slotId_);
+    if (IsNeedUpdateCarrierConfig()) {
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
+        ResetNeedUpdateCarrierConfig();
+    } else {
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_LOADED);
+    }
 }
 
 void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event)
