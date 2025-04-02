@@ -250,9 +250,9 @@ HWTEST_F(IccFileTest, Telephony_IccFile_008, Function | MediumTest | Level1)
     simStateManager = nullptr;
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
-    iccFile->imsiReadyObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterImsiLoaded(handler);
-    EXPECT_EQ(iccFile->imsiReadyObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -298,10 +298,10 @@ HWTEST_F(IccFileTest, Telephony_IccFile_011, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->opkeyLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterOpkeyLoaded(eventHandler);
-    EXPECT_EQ(iccFile->opkeyLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -314,10 +314,10 @@ HWTEST_F(IccFileTest, Telephony_IccFile_012, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->operatorCacheDelObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterOperatorCacheDel(eventHandler);
-    EXPECT_EQ(iccFile->operatorCacheDelObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -330,12 +330,12 @@ HWTEST_F(IccFileTest, Telephony_IccFile_013, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->iccidLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::string iccId = "ABCD";
     iccFile->iccId_ = iccId;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterIccidLoaded(eventHandler);
-    EXPECT_EQ(iccFile->iccidLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -349,15 +349,13 @@ HWTEST_F(IccFileTest, Telephony_IccFile_014, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->opkeyLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterOpkeyLoaded(eventHandler);
-    iccFile->operatorCacheDelObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterOperatorCacheDel(eventHandler);
-    iccFile->iccidLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterIccidLoaded(eventHandler);
-    EXPECT_EQ(iccFile->opkeyLoadObser_, nullptr);
-    EXPECT_EQ(iccFile->operatorCacheDelObser_, nullptr);
-    EXPECT_EQ(iccFile->iccidLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -466,7 +464,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_020, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     iccFile->OnOpkeyLoad(opkey, opName);
-    ASSERT_NE(iccFile->opkeyLoadObser_, nullptr);
+    ASSERT_NE(iccFile->filesFetchedObser_, nullptr);
 }
 
 HWTEST_F(IccFileTest, Telephony_IccFile_021, Function | MediumTest | Level1)
