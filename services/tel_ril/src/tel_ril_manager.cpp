@@ -1112,7 +1112,7 @@ bool TelRilManager::ReConnectRilInterface()
 
 bool TelRilManager::DisConnectRilInterface()
 {
-    std::unique_lock<shared_mutex> lock(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
     if (rilInterface_ == nullptr) {
         TELEPHONY_LOGD("TelRilManager::DisConnectRilInterface has been successfully disconnected!");
         return true;
