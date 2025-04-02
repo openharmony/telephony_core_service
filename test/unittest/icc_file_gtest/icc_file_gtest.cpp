@@ -606,5 +606,58 @@ HWTEST_F(IccFileTest, Telephony_IccFile_025, Function | MediumTest | Level1)
     simStateTracker_->operatorConfigLoader_ = nullptr;
     simStateTracker_->ProcessEvent(event);
 }
+
+/**
+ * @tc.number   Telephony_IccFile_026
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_026, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    std::vector<std::string> msg(2, "");
+    auto objMsg = std::make_shared<std::vector<std::string>>(msg);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, objMsg);
+    simStateTracker_->ProcessEvent(event);
+    std::vector<std::string> vMsg(3, "");
+    vMsg[0] = "slot";
+    vMsg[1] = "46099";
+    vMsg[2] = "TEST";
+    auto obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    simStateTracker_->ProcessEvent(event);
+    vMsg[0] = std::to_string(1);
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    simStateTracker_->ProcessEvent(event);
+    vMsg[0] = std::to_string(0);
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    std::string key = "";
+    SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "false");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(key.c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(key.c_str(), "", isNeedUpdateCarrierConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isNeedUpdateCarrierConfig, "false") == 0);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    vMsg[1] = "";
+    vMsg[2] = "";
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    SetParameter(key.c_str(), "false");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(key.c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigLoader_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
+    simStateTracker_->ProcessEvent(event); 
+}
 }
 }
