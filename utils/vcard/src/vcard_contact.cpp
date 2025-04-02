@@ -1250,13 +1250,13 @@ void VCardContact::UpdateDisplayName()
 
 void VCardContact::FillFullName(const std::string &name, const std::string &split, std::string &fullName)
 {
-	if (name.empty()) {
-		return;
-	}
-	if (!fullName.empty()) {
-		fullName.append(split);
-	}
-	fullName.append(name);
+    if (name.empty()) {
+	    return;
+    }
+    if (!fullName.empty()) {
+	    fullName.append(split);
+    }
+    fullName.append(name);
 }
  
 bool VCardContact::IsNameAllPrintableAscii()
