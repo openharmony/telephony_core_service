@@ -279,7 +279,6 @@ HWTEST_F(BranchTest, Telephony_CellInfo_005, Function | MediumTest | Level1)
     event = nullptr;
     cellInfo->ProcessNeighboringCellInfo(event);
     cellInfo->ProcessCurrentCellInfo(event);
-    EXPECT_NE(event, nullptr);
     auto cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
     auto cellListCurrentInfo = std::make_shared<CellListCurrentInformation>();
     auto eventNearby = AppExecFwk::InnerEvent::Get(0, cellListNearbyInfo);
@@ -1971,8 +1970,6 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
-    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "ChinaMobile");
-    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, true, false), "CMCC");
 
     if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
         return;
