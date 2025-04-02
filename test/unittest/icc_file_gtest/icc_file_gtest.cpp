@@ -659,5 +659,45 @@ HWTEST_F(IccFileTest, Telephony_IccFile_026, Function | MediumTest | Level1)
     simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
     simStateTracker_->ProcessEvent(event); 
 }
+
+/**
+ * @tc.number   Telephony_IccFile_027
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_027, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, 1);
+    simStateTracker_->ProcessEvent(event);
+    simFileManager_->SetOpKey("46099");
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_IMSI_LOADED_READY, 0);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    EXPECT_NE(simFileManager_->GetOpKey(), Str8ToStr16("46099"));
+}
+
+/**
+ * @tc.number   Telephony_IccFile_028
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_028, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 1);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 0);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+}
 }
 }
