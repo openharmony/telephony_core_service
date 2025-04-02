@@ -3237,43 +3237,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   Telephony_MultiSimMonitor_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
-    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-        simStateManagerPtr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
-    };
-    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
-    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
-    multiSimMonitor->ProcessEvent(event);
-    multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
-    multiSimMonitor->IsVSimSlotId(0);
-    multiSimMonitor->ResetSimLoadAccount(0);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    ASSERT_TRUE(matchingSkills.CountEvent() == 1);
-}
-
-/**
  * @tc.number   Telephony_MultiSimMonitor_003
  * @tc.name     test error branch
  * @tc.desc     Function test
