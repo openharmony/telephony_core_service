@@ -669,7 +669,7 @@ ohos_unittest("tel_core_service_test") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [ "-flto", ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_core_service_common_test") {
