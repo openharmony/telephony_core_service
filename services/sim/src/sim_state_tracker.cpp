@@ -60,7 +60,6 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
     GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
- 
         return;
     }
     if (operatorConfigLoader_ == nullptr) {
@@ -91,20 +90,22 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+        return;
+    }
     std::string opkey = (*msgObj)[1];
     std::string opName = (*msgObj)[2];
     TELEPHONY_LOGI("OnOpkeyLoad slotId, %{public}d opkey: %{public}s opName: %{public}s",
         slotId, opkey.data(), opName.data());
-    if (!opkey.empty()) {
+    if (!opkey.empty() && !opName.empty()) {
         auto simFileManager = simFileManager_.lock();
         if (simFileManager != nullptr) {
             simFileManager->SetOpKey(opkey);
             simFileManager->SetOpName(opName);
         }
-        TelFFRTUtils::Submit([&]() {
-            OperatorConfig opc;
-            operatorConfigCache_->LoadOperatorConfig(slotId_, opc, operatorConfigCache_->STATE_PARA_LOADED);
-        });
+        ReloadOperatorConfigCache();
     } else {
         bool hasSimCard = false;
         CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
@@ -112,13 +113,12 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
-        TelFFRTUtils::Submit([&]() { operatorConfigLoader_->LoadOperatorConfig(slotId_); });
+        ReloadOperatorConfig();
     }
 }
 
 void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("SimStateTracker::ProcessOperatorCacheDel");
     auto slotId = event->GetParam();
     if (slotId != slotId_) {
         TELEPHONY_LOGE("is not current slotId");
@@ -128,9 +128,8 @@ void SimStateTracker::ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Poin
         TELEPHONY_LOGE("operatorConfigCache is nullptr");
         return;
     }
-    TELEPHONY_LOGI("ProcessOperatorCacheDel, need Clear memory and opkey, slotId: %{public}d", slotId_);
-    operatorConfigCache_->ClearMemoryAndOpkey(slotId);
-    CoreManagerInner::GetInstance().ResetDataShareError();
+    TELEPHONY_LOGI("need Clear memory and opkey, slotId: %{public}d", slotId_);
+    operatorConfigCache_->ClearOperatorValue(slotId);
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
