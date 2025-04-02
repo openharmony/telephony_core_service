@@ -983,7 +983,7 @@ bool SimFile::ProcessGetIccIdDone(const AppExecFwk::InnerEvent::Pointer &event)
         FileChangeToExt(iccId_, FileChangeType::ICCID_FILE_LOAD);
         if (filesFetchedObser_ != nullptr) {
             TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
-            iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
+            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
         }
     } else {
         if (iccId_.empty() && reloadIccidCount_ > 0) {
@@ -1039,9 +1039,9 @@ bool SimFile::ProcessObtainIMSIDone(const AppExecFwk::InnerEvent::Pointer &event
         TELEPHONY_LOGI("SimFile::ProcessEvent IMSI received success");
         SaveCountryCode();
         TELEPHONY_LOGI("SimFile::ObtainIsoCountryCode result success");
-        if (!imsi_.empty()) {
+        if (!imsi_.empty() && filesFetchedObser_ != nullptr) {
             CheckMncLengthForImsiDone();
-            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
             FileChangeToExt(imsi_, FileChangeType::G_IMSI_FILE_LOAD);
         } else {
             DelayGetImsi();
