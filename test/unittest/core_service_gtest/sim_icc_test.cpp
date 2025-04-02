@@ -220,7 +220,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
-        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
         ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
         ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
     }

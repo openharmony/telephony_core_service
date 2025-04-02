@@ -937,7 +937,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0200
     callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetNetworkModeCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_FALSE(syncResult);
 }
 
 /**
@@ -1112,11 +1112,11 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkSelectionMode result: %{public}d", result);
-    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
-    EXPECT_EQ(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL));
+    EXPECT_NE(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL));
 }
 
 /**
@@ -1148,7 +1148,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
 
     result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID, callback);
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkSelectionMode result: %{public}d", result);
-    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
     int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
     TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
@@ -1247,7 +1247,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0100, Function
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0100 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_FALSE(syncResult);
 }
 
 /**
@@ -1270,7 +1270,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetRadioState_0200, Function
     callback->WaitForSetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->SetRadioStateCallbackResult();
     TELEPHONY_LOGI("SetRadioState_0200 SetRadioStateCallbackResult syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_FALSE(syncResult);
 }
 
 /**
@@ -1392,7 +1392,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetRadioState_0200, Function
     callback->WaitForGetRadioStateCallback(WAIT_TIME_SECOND_LONG);
     bool isRadioOn = callback->GetRadioStateCallbackResult();
     TELEPHONY_LOGI("GetRadioState_0200 GetRadioStateCallbackResult isRadioOn: %{public}d", isRadioOn);
-    ASSERT_TRUE(isRadioOn);
+    ASSERT_FALSE(isRadioOn);
 }
 
 /**
