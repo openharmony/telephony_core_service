@@ -548,5 +548,63 @@ HWTEST_F(IccFileTest, Telephony_IccFile_023, Function | MediumTest | Level1)
     EXPECT_NE(iccFile, nullptr);
 }
 
+/**
+ * @tc.number   Telephony_IccFile_024
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_024, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    simFile_->iccId_ = "86890000000000000001";
+    simFile_->imsi_ = "460990123456789";
+    simFile_->mcc_ = "460";
+    simFile_->mnc_ = "99";
+    simFile_->fileToGet_ = 0;
+    simFile_->fileQueried_ = false;
+    SetParameter(PREVIOUS_VERSION, " ");
+    multiSimMonitor_->CheckOpcNeedUpdata(true);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
+    multiSimMonitor_->ProcessEvent(event);
+    simFileManager_->UpdateOpkeyConfig();
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->ProcessOperatorConfigUpdate(event);
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
+    simFileManager_.reset();
+    event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
+    multiSimMonitor_->ProcessEvent(event);
+    simFile_->fileQueried_ = true;
+    simFile_->UpdateOpkeyConfig();
+    simFile_->filesFetchedObser_ = nullptr;
+    simFile_->UpdateOpkeyConfig();
+}
+ 
+/**
+ * @tc.number   Telephony_IccFile_025
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_025, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 0);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    std::string key = "";
+    SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(key.c_str(), "", isNeedUpdateCarrierConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isNeedUpdateCarrierConfig, "false") == 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigLoader_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+}
 }
 }
