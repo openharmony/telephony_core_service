@@ -173,7 +173,7 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         SaveCountryCode();
-        if (!imsi_.empty()) {
+        if (!imsi_.empty() && filesFetchedObser_ != nullptr) {
             filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
     }
