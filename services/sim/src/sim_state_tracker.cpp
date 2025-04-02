@@ -253,5 +253,61 @@ bool SimStateTracker::UnregisterOperatorCacheDel()
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
     return true;
 }
+
+bool SimStateTracker::UnRegisterOperatorConfigUpdate()
+{
+    auto simFileManager = simFileManager_.lock();
+    if (simFileManager == nullptr) {
+        TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
+        return false;
+    }
+    simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
+    return true;
+}
+ 
+bool SimStateTracker::IsNeedUpdateCarrierConfig()
+{
+    char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
+    std::string key = "";
+    GetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(),
+        "", isNeedUpdateCarrierConfig, SYSPARA_SIZE);
+    bool result = strcmp(isNeedUpdateCarrierConfig, "true") == 0;
+    return result;
+}
+ 
+void SimStateTracker::ResetNeedUpdateCarrierConfig()
+{
+    std::string key = "";
+    SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
+}
+ 
+void SimStateTracker::ReloadOperatorConfigCache()
+{
+    if (operatorConfigCache_ == nullptr) {
+       TELEPHONY_LOGE("operatorConfigCache is null!");
+       return;
+    }
+    OperatorConfig opc;
+    if (IsNeedUpdateCarrierConfig()) {
+        operatorConfigCache_->LoadOperatorConfig(slotId_, opc, operatorConfigCache_->STATE_PARA_UPDATE);
+        ResetNeedUpdateCarrierConfig();
+    } else {
+        operatorConfigCache_->LoadOperatorConfig(slotId_, opc, operatorConfigCache_->STATE_PARA_LOADED);
+    }
+}
+ 
+void SimStateTracker::ReloadOperatorConfig()
+{
+    if (operatorConfigLoader_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigLoader is null!");
+        return;
+    }
+    if (IsNeedUpdateCarrierConfig()) {
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
+        ResetNeedUpdateCarrierConfig();
+    } else {
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_LOADED);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
