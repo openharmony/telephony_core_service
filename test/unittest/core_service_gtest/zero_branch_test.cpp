@@ -3266,6 +3266,8 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     iccFile->imsi_ = "123";
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
     std::string plmn = "";
     EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
     plmn = "123";
