@@ -213,9 +213,9 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_001, Function | Medium
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
-    operatorConfigLoader->LoadOperatorConfig(0);
+    operatorConfigLoader->LoadOperatorConfig(0, 1);
     operatorConfigLoader->operatorConfigCache_ = nullptr;
-    operatorConfigLoader->LoadOperatorConfig(0);
+    operatorConfigLoader->LoadOperatorConfig(0, 1);
     operatorConfigLoader->LoadOpKeyOnMccMnc(0);
     simFileManager = nullptr;
     operatorConfigLoader->simFileManager_ = simFileManager;
