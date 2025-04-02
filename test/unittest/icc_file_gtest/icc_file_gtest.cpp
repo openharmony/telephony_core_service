@@ -67,6 +67,9 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+inline constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
+inline constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+inline constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
 
 class IccFileTest : public testing::Test {
 public:
@@ -74,7 +77,48 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    void InitCoreService();
+ 
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<Telephony::SimManager> simManager_ = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager_;
+    std::shared_ptr<Telephony::SimFileManager> simFileManager_;
+    std::shared_ptr<Telephony::SimSmsManager> simSmsManager_;
+    std::shared_ptr<Telephony::SimAccountManager> simAccountManager_;
+    std::shared_ptr<Telephony::IccDiallingNumbersManager> iccDiallingNumbersManager_;
+    std::shared_ptr<Telephony::StkManager> stkManager_;
+    std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
+    std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
+    std::shared_ptr<IccFile> simFile_ = nullptr;
+    std::shared_ptr<SimStateTracker> simStateTracker_ = nullptr;
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
+    std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
 };
+
+void IccFileTest::InitCoreService()
+{
+    #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    #endif
+    telRilManager_ = std::make_shared<TelRilManager>();
+    simManager_ = std::make_shared<SimManager>(telRilManager_);
+    simManager_->OnInit(2);
+    simStateManager_ = simManager_->simStateManager_[0];
+    simStateHandle_ = simStateManager_->simStateHandle_;
+    simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+    simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
+    simFileManager_ = simManager_->simFileManager_[0];
+    simAccountManager_ = simManager_->simAccountManager_[0];
+    multiSimController_ = simManager_->multiSimController_;
+    multiSimMonitor_ = simManager_->multiSimMonitor_;
+    simFile_ = simFileManager_->simFile_;
+    simStateTracker_ = simAccountManager_->simStateTracker_;
+    operatorConfigCache_ = simAccountManager_->operatorConfigCache_;
+    networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager_, simManager_);
+    CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+}
 
 void IccFileTest::TearDownTestCase() {}
 
