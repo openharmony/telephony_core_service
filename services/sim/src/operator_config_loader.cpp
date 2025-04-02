@@ -36,16 +36,6 @@ OperatorConfigLoader::OperatorConfigLoader(
 
 OperatorConfigLoader::~OperatorConfigLoader() {}
 
-OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId)
-{
-    OperatorConfig opc;
-    if (operatorConfigCache_ == nullptr) {
-        TELEPHONY_LOGE("operatorConfigCache_ is nullptr");
-        return opc;
-    }
-    return LoadOperatorConfig(slotId, operatorConfigCache_->STATE_PARA_LOADED);
-}
-
 OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId, int32_t state)
 {
     OperatorConfig opc;
