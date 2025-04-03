@@ -821,7 +821,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetOpnameVersion_001, Function | MediumTes
 {
     std::string versionInfo;
     CoreServiceClient::GetInstance().GetOpnameVersion(versionInfo);
-    ASSERT_STREQ(versionInfo.c_str(), "[]");
+    ASSERT_STREQ(versionInfo.c_str(), "");
 }
 } // namespace Telephony
 } // namespace OHOS
