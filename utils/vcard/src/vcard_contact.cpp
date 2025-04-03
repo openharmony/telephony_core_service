@@ -1223,18 +1223,49 @@ void VCardContact::UpdateDisplayName()
         return;
     }
     std::string displayName = nameData_->GetDisplayName();
-    if (!VCardUtils::IsChineseString(displayName)) {
+    if (VCardUtils::IsChineseString(displayName)) {
+        std::string fullName = nameData_->GetFamily();
+        if (!(nameData_->GetMiddle().empty())) {
+            fullName += nameData_->GetMiddle();
+        }
+        fullName += nameData_->GetGiven();
+        if (fullName != displayName) {
+            nameData_->setDispalyName(fullName);
+            TELEPHONY_LOGI("update display name use format name");
+        }
+    } else if (IsNameAllPrintableAscii()) {
+        std::string fullName = "";
+        FillFullName(nameData_->GetPrefix(), " ", fullName);
+        FillFullName(nameData_->GetGiven(), " ", fullName);
+        FillFullName(nameData_->GetMiddle(), " ", fullName);
+        FillFullName(nameData_->GetFamily(), " ", fullName);
+        FillFullName(nameData_->GetSuffix(), ", ", fullName);
+        VCardUtils::Trim(fullName);
+        if (displayName != fullName) {
+            nameData_->setDispalyName(fullName);
+            TELEPHONY_LOGI("update overseas display name use format name");
+        }
+    }
+}
+
+void VCardContact::FillFullName(const std::string &name, const std::string &split, std::string &fullName)
+{
+    if (name.empty()) {
         return;
     }
-    std::string fullName = nameData_->GetFamily();
-    if (!(nameData_->GetMiddle().empty())) {
-        fullName += nameData_->GetMiddle();
+    if (!fullName.empty()) {
+        fullName.append(split);
     }
-    fullName += nameData_->GetGiven();
-    if (fullName != displayName) {
-        nameData_->setDispalyName(fullName);
-        TELEPHONY_LOGI("update display name use format name");
-    }
+    fullName.append(name);
+}
+ 
+bool VCardContact::IsNameAllPrintableAscii()
+{
+    return VCardUtils::IsPrintableAscii(nameData_->GetPrefix()) &&
+        VCardUtils::IsPrintableAscii(nameData_->GetGiven()) &&
+        VCardUtils::IsPrintableAscii(nameData_->GetMiddle()) &&
+        VCardUtils::IsPrintableAscii(nameData_->GetFamily()) &&
+        VCardUtils::IsPrintableAscii(nameData_->GetSuffix());
 }
 
 } // namespace Telephony
