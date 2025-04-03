@@ -156,7 +156,7 @@ int32_t TelephonyStateRegistryProxy::UpdateCallStateForSlotId(
 int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
     int32_t slotId, const std::vector<sptr<SignalInformation>> &vec)
 {
-    MessageOption option;
+    MessageOption option = { MessageOption::TF_ASYNC };
     MessageParcel in;
     MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
@@ -186,9 +186,9 @@ int32_t TelephonyStateRegistryProxy::UpdateSignalInfo(
     }
     int result = remote->SendRequest(
         static_cast<uint32_t>(StateNotifyInterfaceCode::SIGNAL_INFO), in, out, option);
-    if (result == ERR_NONE) {
-        result = out.ReadInt32();
-        return result;
+    if (result != ERR_NONE) {
+        TELEPHONY_LOGE("SIGNAL_INFO SendRequest failed!");
+        return TELEPHONY_ERR_FAIL;;
     }
     return TELEPHONY_SUCCESS;
 }
