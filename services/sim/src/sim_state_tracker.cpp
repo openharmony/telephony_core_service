@@ -284,8 +284,8 @@ void SimStateTracker::ResetNeedUpdateCarrierConfig()
 void SimStateTracker::ReloadOperatorConfigCache()
 {
     if (operatorConfigCache_ == nullptr) {
-       TELEPHONY_LOGE("operatorConfigCache is null!");
-       return;
+        TELEPHONY_LOGE("operatorConfigCache is null!");
+        return;
     }
     OperatorConfig opc;
     if (IsNeedUpdateCarrierConfig()) {
