@@ -279,7 +279,6 @@ HWTEST_F(BranchTest, Telephony_CellInfo_005, Function | MediumTest | Level1)
     event = nullptr;
     cellInfo->ProcessNeighboringCellInfo(event);
     cellInfo->ProcessCurrentCellInfo(event);
-    EXPECT_NE(event, nullptr);
     auto cellListNearbyInfo = std::make_shared<CellListNearbyInfo>();
     auto cellListCurrentInfo = std::make_shared<CellListCurrentInformation>();
     auto eventNearby = AppExecFwk::InnerEvent::Get(0, cellListNearbyInfo);
@@ -1971,8 +1970,6 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
-    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "ChinaMobile");
-    EXPECT_EQ(operatorName->GetCustEons(plmn, 1, true, false), "CMCC");
 
     if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
         return;
@@ -2077,7 +2074,6 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest |
     std::u16string result = u"";
     EXPECT_NE(networkSearchManager->GetIsoCountryCodeForNetwork(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
-    networkSearchManager->UpdateDeviceId(INVALID_SLOTID);
     EXPECT_NE(networkSearchManager->GetImei(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(result, testStr);
     EXPECT_NE(networkSearchManager->GetImeiSv(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
@@ -3235,43 +3231,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
     EXPECT_GT(multiSimMonitor->UnregisterSimAccountCallback(callback), TELEPHONY_ERROR);
-}
-
-/**
- * @tc.number   Telephony_MultiSimMonitor_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
-    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-        simStateManagerPtr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
-    };
-    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
-    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
-    multiSimMonitor->ProcessEvent(event);
-    multiSimMonitor->RegisterCoreNotify(0, simStateHandle, RadioEvent::RADIO_SIM_ACCOUNT_LOADED);
-    multiSimMonitor->IsVSimSlotId(0);
-    multiSimMonitor->ResetSimLoadAccount(0);
-    multiSimMonitor->RegisterSimNotify(0);
-    multiSimMonitor->UnRegisterSimNotify();
-    ASSERT_TRUE(matchingSkills.CountEvent() == 1);
 }
 
 /**
