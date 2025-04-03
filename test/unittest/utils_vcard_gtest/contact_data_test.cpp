@@ -924,14 +924,17 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
-    std::string family = "张";
-    std::string middle = "";
-    std::string given = "三";
-    std::string displayName = "test";
-    SetNameData(family, given, middle, displayName);
+    std::string family = "b";
+    std::string middle = "c";
+    std::string given = "d";
+    std::string prefix = "a";
+    std::string suffix = "e";
+    std::string displayName = "db";
+    SetNameData(family, given, middle, prefix, suffix);
+    nameData_->setDispalyName(displayName);
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "test");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
 }
 
 HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)

@@ -149,6 +149,8 @@ private:
     void AddUID(std::string rawValue);
     bool HasValidNameData();
     void UpdateDisplayName();
+    bool IsNameAllPrintableAscii();
+    void FillFullName(const std::string &name, const std::string &split, std::string &fullName);
 
 private:
     const int32_t SORT_NAME_MAX_VALUE_SIZE = 3;
