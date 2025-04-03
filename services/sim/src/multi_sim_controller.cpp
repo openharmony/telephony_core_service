@@ -950,7 +950,8 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
-    if (radioProtocolController_->GetRadioProtocolModemId(slotId) == MAIN_MODEM_ID) {
+    if (radioProtocolController_ != nullptr &&
+        radioProtocolController_->GetRadioProtocolModemId(slotId) == MAIN_MODEM_ID) {
         TELEPHONY_LOGI("The current slot is the main slot, no need to set primary slot");
         SavePrimarySlotIdInfo(slotId);
         setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
