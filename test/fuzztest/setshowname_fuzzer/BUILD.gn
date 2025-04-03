@@ -52,6 +52,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "drivers_interface_ril:ril_idl_headers",
+    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
