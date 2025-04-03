@@ -58,6 +58,7 @@ ohos_unittest("tel_ril_gtest") {
     "drivers_interface_ril:libril_proxy_1.4",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
