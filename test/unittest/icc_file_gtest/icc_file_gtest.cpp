@@ -70,6 +70,7 @@ using namespace testing::ext;
 inline constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
 inline constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 inline constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
+const int32_t SIM_COUNT = 2;
 
 class IccFileTest : public testing::Test {
 public:
@@ -103,7 +104,7 @@ void IccFileTest::InitCoreService()
     #endif
     telRilManager_ = std::make_shared<TelRilManager>();
     simManager_ = std::make_shared<SimManager>(telRilManager_);
-    simManager_->OnInit(2);
+    simManager_->OnInit(SIM_COUNT);
     simStateManager_ = simManager_->simStateManager_[0];
     simStateHandle_ = simStateManager_->simStateHandle_;
     simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
@@ -657,7 +658,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_026, Function | MediumTest | Level1)
     simStateTracker_->operatorConfigLoader_ = nullptr;
     simStateTracker_->ProcessEvent(event);
     simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
-    simStateTracker_->ProcessEvent(event); 
+    simStateTracker_->ProcessEvent(event);
 }
 
 /**
