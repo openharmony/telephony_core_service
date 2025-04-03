@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t OPKEY_VMSG_LENTH = 3;
-inline constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
-inline constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
+constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 SimStateTracker::SimStateTracker(std::weak_ptr<SimFileManager> simFileManager,
     std::shared_ptr<OperatorConfigCache> operatorConfigCache, int32_t slotId)
     : TelEventHandler("SimStateTracker"), simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache),

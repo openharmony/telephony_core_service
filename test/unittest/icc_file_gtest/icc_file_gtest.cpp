@@ -67,9 +67,9 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-inline constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
-inline constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
-inline constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
+constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
+constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
 const int32_t SIM_COUNT = 2;
 
 class IccFileTest : public testing::Test {
