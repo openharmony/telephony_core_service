@@ -311,15 +311,11 @@ void SimFile::LoadSimOtherFile()
         AppExecFwk::InnerEvent::Pointer eventOpl = BuildCallerInfo(MSG_SIM_OBTAIN_OPL_DONE);
         fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL, eventOpl);
         fileToGet_++;
-    } else {
-        isOplFileResponsed_ = true;
     }
     if (IsServiceAvailable(UsimService::USIM_FOR_5GS_OPERATOR_PLMN_LIST)) {
         AppExecFwk::InnerEvent::Pointer eventOpl5g = BuildCallerInfo(MSG_SIM_OBTAIN_OPL5G_DONE);
         fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_OPL5G, eventOpl5g);
         fileToGet_++;
-    } else {
-        isOpl5gFileResponsed_ = true;
     }
     LoadSimOtherFileExt();
     AppExecFwk::InnerEvent::Pointer eventEhplmn = BuildCallerInfo(MSG_SIM_OBTAIN_EHPLMN_DONE);
