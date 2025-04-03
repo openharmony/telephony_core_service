@@ -53,6 +53,7 @@ ohos_fuzztest("SendEnvelopeCmdFuzzTest") {
     "core_service:libtel_common",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "init:libbegetutil",
