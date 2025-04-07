@@ -195,7 +195,7 @@ public:
     int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) override;
     int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) override;
     bool IsNeedDelayNotify(int32_t slotId);
-    int32_t SetNrOptionMode(int32_t slotId, int32_t mode);
+    int32_t SetNrOptionMode(int32_t slotId, int32_t mode) override;
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
     int32_t GetNrOptionMode(int32_t slotId, NSCALLBACK &callback) override;

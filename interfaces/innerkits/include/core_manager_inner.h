@@ -231,6 +231,7 @@ public:
 
     bool IsNrSupported(int32_t slotId);
     bool IsSatelliteEnabled();
+    int32_t SetNrOptionMode(int32_t slotId, NrMode mode);
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode);
     FrequencyType GetFrequencyType(int32_t slotId) const;
     NrState GetNrState(int32_t slotId) const;
