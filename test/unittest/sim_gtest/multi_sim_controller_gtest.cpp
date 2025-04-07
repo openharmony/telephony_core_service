@@ -178,5 +178,45 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function 
     EXPECT_FALSE(ret);
 }
 
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetShowNumber_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager0->Init(0);
+    simStateManager0->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+ 
+    auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager1->Init(1);
+    simStateManager1->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+ 
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_ = { simStateManager0, simStateManager1 };
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    simFileManager->simFile_->msisdn_ = "2164181618486135";
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_ = { simFileManager, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager_, simFileManager_);
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(1);
+    std::u16string showNumber = u"";
+    newCache[0].phoneNumber = "2164181618486135";
+    multiSimController->simStateManager_ = { simStateManager0, simStateManager1 };
+    multiSimController->localCacheInfo_ = newCache;
+    int32_t result = multiSimController->GetShowNumber(0, showNumber);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    result = multiSimController->GetShowNumber(1, showNumber);
+ 
+    newCache[0].phoneNumber = "2164181618486139";
+    multiSimController->localCacheInfo_ = newCache;
+    result = multiSimController->GetShowNumber(0, showNumber);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
 }
 }
