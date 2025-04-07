@@ -728,7 +728,7 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAc
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     if (localCacheInfo_[slotId].iccId.empty()) {
-        TELEPHONY_LOGE("slotId %{public}d no loaded", slotId);
+        TELEPHONY_LOGE("slotId %{public}d not loaded", slotId);
         return CORE_ERR_SIM_CARD_LOAD_FAILED;
     }
     info.slotIndex = localCacheInfo_[slotId].slotIndex;
