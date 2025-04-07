@@ -931,5 +931,27 @@ int32_t TelRilCallback::CommonErrorResponse(const HDI::Ril::V1_1::RilRadioRespon
     telRilManager_->ReduceRunningLock();
     return TELEPHONY_ERR_SUCCESS;
 }
+
+int32_t TelRilCallback::NetworkSliceUrspRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo)
+{
+    return Notify(
+        responseInfo, &TelRilManager::GetTelRilData, &TelRilData::NetworkSliceUrspRpt, networksliceUrspInfo);
+}
+
+int32_t TelRilCallback::NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilData, &TelRilData::NetworkSliceAllowedNssaiRpt,
+        networksliceAllowedNssaiInfo);
+}
+
+int32_t TelRilCallback::NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+    const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo)
+{
+    return Notify(responseInfo, &TelRilManager::GetTelRilData,
+        &TelRilData::NetworkSliceEhplmnRpt, networksliceEhplmnInfo);
+}
+
 } // namespace Telephony
 } // namespace OHOS

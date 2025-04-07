@@ -107,7 +107,12 @@ public:
     int32_t GetLinkCapabilityResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability) override;
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo) override;
+    int32_t NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo) override;
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::RilRadioResponseInfo &responseInfo,
+        const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo) override;
     // Modem
     int32_t RadioStateUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t state) override;
     int32_t VoiceRadioTechUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
