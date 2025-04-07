@@ -310,7 +310,8 @@ int32_t TelRilData::NetworkSliceUrspRpt(const HDI::Ril::V1_4::NetworkSliceUrspIn
     return Notify<NetworkSliceUrspInfo>(TELEPHONY_LOG_FUNC_NAME, urspinfo, RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
 }
 
-int32_t TelRilData::NetworkSliceAllowedNssaiRpt(const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo)
+int32_t TelRilData::NetworkSliceAllowedNssaiRpt(
+    const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo)
 {
     std::shared_ptr<NetworkSliceAllowedNssaiInfo> allowednssaiinfo = std::make_shared<NetworkSliceAllowedNssaiInfo>();
     if (allowednssaiinfo == nullptr) {
