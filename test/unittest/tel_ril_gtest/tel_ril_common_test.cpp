@@ -497,5 +497,99 @@ HWTEST_F(TelRilCommonTest, TelRilSim_ResponseSupplement_001, Function | MediumTe
     ASSERT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
+/**
+* @tc.number   TelRilCallback_NetworkSliceUrspRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceUrspRpt_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto telRilCallback = std::make_shared<TelRilCallback>(telRilManager);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_4::NetworkSliceUrspInfo networksliceUrspInfo;
+    networksliceUrspInfo.urspInfo.push_back(1);
+    EXPECT_EQ(telRilCallback->NetworkSliceUrspRpt(responseInfo, networksliceUrspInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+* @tc.number   TelRilCallback_NetworkSliceAllowedNssaiRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceAllowedNssaiRpt_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto telRilCallback = std::make_shared<TelRilCallback>(telRilManager);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo networksliceAllowedNssaiInfo;
+    networksliceAllowedNssaiInfo.allowednssaiInfo.push_back(1);
+    EXPECT_EQ(telRilCallback->NetworkSliceAllowedNssaiRpt(
+        responseInfo, networksliceAllowedNssaiInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+* @tc.number   TelRilCallback_NetworkSliceEhplmnRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceEhplmnRpt_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto telRilCallback = std::make_shared<TelRilCallback>(telRilManager);
+    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
+    HDI::Ril::V1_4::NetworkSliceEhplmnInfo networksliceEhplmnInfo;
+    networksliceEhplmnInfo.ehplmnInfo.push_back(1);
+    EXPECT_EQ(telRilCallback->NetworkSliceEhplmnRpt(responseInfo, networksliceEhplmnInfo),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+* @tc.number   TelRilData_NetworkSliceUrspRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilData_NetworkSliceUrspRpt_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_4::NetworkSliceUrspInfo networksliceUrspInfo;
+    networksliceUrspInfo.urspInfo.push_back(1);
+    auto result = telRilData->NetworkSliceUrspRpt(networksliceUrspInfo);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+* @tc.number   TelRilData_NetworkSliceAllowedNssaiRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilData_NetworkSliceAllowedNssaiRpt_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo networksliceAllowedNssaiInfo;
+    networksliceAllowedNssaiInfo.allowednssaiInfo.push_back(1);
+    auto result = telRilData->NetworkSliceAllowedNssaiRpt(networksliceAllowedNssaiInfo);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+* @tc.number   TelRilData_NetworkSliceEhplmnRpt_001
+* @tc.name     test error branch
+* @tc.desc     Function test
+*/
+HWTEST_F(TelRilCommonTest, TelRilData_NetworkSliceEhplmnRpt_001, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_4::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilData = std::make_unique<TelRilData>(0, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_4::NetworkSliceEhplmnInfo networksliceEhplmnInfo;
+    networksliceEhplmnInfo.ehplmnInfo.push_back(1);
+    auto result = telRilData->NetworkSliceEhplmnRpt(networksliceEhplmnInfo);
+    ASSERT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -369,6 +369,21 @@ struct DataLinkCapability {
     /** Secondary uplink capability in kbps. */
     int32_t secondaryUplinkKbps;
 };
+
+struct NetworkSliceUrspInfo {
+    /** urspInfo. */
+    std::vector<uint8_t> urspInfo {};
+};
+
+struct NetworkSliceAllowedNssaiInfo {
+    /** allowednssaiInfo. */
+    std::vector<uint8_t> allowednssaiInfo {};
+};
+
+struct NetworkSliceEhplmnInfo {
+    /** ehplmnInfo. */
+    std::vector<uint8_t> ehplmnInfo {};
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_TEL_RIL_DATA_PARCEL_H

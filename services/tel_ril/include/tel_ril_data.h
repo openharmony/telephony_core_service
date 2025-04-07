@@ -57,6 +57,10 @@ public:
         const HDI::Ril::V1_1::DataLinkCapability &dataLinkCapability);
     int32_t CleanAllConnections(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t CleanAllConnectionsResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t NetworkSliceUrspRpt(const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo);
+    int32_t NetworkSliceAllowedNssaiRpt(
+        const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo);
+    int32_t NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo);
 
 private:
     bool IsDataResponse(uint32_t code);
