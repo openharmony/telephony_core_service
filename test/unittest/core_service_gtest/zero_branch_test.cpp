@@ -1313,7 +1313,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_007, Function | MediumTest | Lev
 }
 
 /**
- * @tc.number   Telephony_CoreManagerInner_007
+ * @tc.number   Telephony_CoreManagerInner_008
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
@@ -1341,6 +1341,39 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_008, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, event4), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, event5), TELEPHONY_ERR_SUCCESS);
 }
+
+/**
+ * @tc.number   Telephony_CoreManagerInner_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_009, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    mInner.OnInit(nullptr, nullptr, nullptr);
+
+    int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
+    EXPECT_EQ(res, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Telephony_CoreManagerInner_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_010, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->OnInit();
+    CoreManagerInner mInner;
+    mInner.OnInit(networkSearchManager, simManager, telRilManager);
+
+    int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
+    EXPECT_EQ(res, TELEPHONY_ERR_SUCCESS);
+}
+
 /**
  * @tc.number   Telephony_TagService_001
  * @tc.name     test error branch
