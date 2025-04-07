@@ -333,5 +333,6 @@ int32_t TelRilData::NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::NetworkSliceEhpl
     ehplmninfo->ehplmnInfo = networksliceEhplmnInfo.ehplmnInfo;
     return Notify<NetworkSliceEhplmnInfo>(TELEPHONY_LOG_FUNC_NAME, ehplmninfo,
         RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
+}
 } // namespace Telephony
 } // namespace OHOS
