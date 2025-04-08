@@ -974,5 +974,27 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
 }
 #endif
 
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0022, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    mInner.OnInit(nullptr, nullptr, nullptr);
+
+    int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
+    EXPECT_EQ(res, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0023, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->OnInit();
+    CoreManagerInner mInner;
+    mInner.OnInit(networkSearchManager, simManager, telRilManager);
+
+    int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
+    EXPECT_EQ(res, TELEPHONY_ERR_SUCCESS);
+}
+
 } // namespace Telephony
 } // namespace OHOS
