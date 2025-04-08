@@ -271,10 +271,10 @@ bool MultiSimController::InitIccId(int slotId)
         return false;
     }
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
-        TELEPHONY_LOGI("old sim insert, slotId%{public}d", slotId);
+        TELEPHONY_LOGI("old sim insert");
         result = UpdateDataByIccId(slotId, newIccId);
     } else { // insert a new data for new IccId
-        TELEPHONY_LOGI("new sim insert, slotId%{public}d", slotId);
+        TELEPHONY_LOGI("new sim insert");
         result = InsertData(slotId, newIccId);
     }
     if (result == INVALID_VALUE) {
@@ -393,7 +393,7 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI(
+        TELEPHONY_LOGD(
             "index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
