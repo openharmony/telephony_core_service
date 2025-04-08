@@ -87,7 +87,6 @@ bool MultiSimController::ForgetAllData()
         TELEPHONY_LOGE("simDbHelper_ is nullptr failed");
         return false;
     }
-    TELEPHONY_LOGI("ForgetAllData");
     return (simDbHelper_->ForgetAllData() != INVALID_VALUE);
 }
 
