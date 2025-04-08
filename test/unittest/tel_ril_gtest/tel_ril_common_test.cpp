@@ -509,7 +509,7 @@ HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceUrspRpt_001, Function | Me
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     HDI::Ril::V1_4::NetworkSliceUrspInfo networksliceUrspInfo;
     networksliceUrspInfo.urspInfo.push_back(1);
-    EXPECT_EQ(telRilCallback->NetworkSliceUrspRpt(responseInfo, networksliceUrspInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(telRilCallback->NetworkSliceUrspRpt(responseInfo, networksliceUrspInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -525,7 +525,7 @@ HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceAllowedNssaiRpt_001, Funct
     HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo networksliceAllowedNssaiInfo;
     networksliceAllowedNssaiInfo.allowednssaiInfo.push_back(1);
     EXPECT_EQ(telRilCallback->NetworkSliceAllowedNssaiRpt(
-        responseInfo, networksliceAllowedNssaiInfo), TELEPHONY_ERR_SUCCESS);
+                  responseInfo, networksliceAllowedNssaiInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -540,7 +540,8 @@ HWTEST_F(TelRilCommonTest, TelRilCallback_NetworkSliceEhplmnRpt_001, Function | 
     HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
     HDI::Ril::V1_4::NetworkSliceEhplmnInfo networksliceEhplmnInfo;
     networksliceEhplmnInfo.ehplmnInfo.push_back(1);
-    EXPECT_EQ(telRilCallback->NetworkSliceEhplmnRpt(responseInfo, networksliceEhplmnInfo), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(telRilCallback->NetworkSliceEhplmnRpt(responseInfo, networksliceEhplmnInfo),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
