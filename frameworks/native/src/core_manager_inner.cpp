@@ -1705,6 +1705,14 @@ int32_t CoreManagerInner::NotifyCallStatusToNetworkSearch(int32_t slotId, int32_
     return networkSearchManager_->NotifyCallStatusToNetworkSearch(slotId, callStatus);
 }
 
+int32_t CoreManagerInner::SetNrOptionMode(int32_t slotId, NrMode mode)
+{
+    if (networkSearchManager_ != nullptr) {
+        return networkSearchManager_->SetNrOptionMode(slotId, static_cast<int32_t>(mode));
+    }
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
 int32_t CoreManagerInner::GetNrOptionMode(int32_t slotId, NrMode &mode)
 {
     if (networkSearchManager_ != nullptr) {
