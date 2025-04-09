@@ -184,7 +184,7 @@ declare namespace radio {
    * @throws { BusinessError } 8300003 - System internal error.
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CoreService
-   * @since 16
+   * @since 18
    */
   function getRadioTechSync(slotId: number): NetworkRadioTech;
 
