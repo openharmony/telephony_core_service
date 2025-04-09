@@ -515,7 +515,7 @@ void IccFile::UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandl
     }
 }
 
-void IccFile::UnRegisterOperatorConfigUpdate(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+void IccFile::UnregisterOperatorConfigUpdate(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
 {
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->Remove(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, handler);
@@ -567,7 +567,7 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
             UnregisterIccidLoaded(handler);
             break;
         case RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE:
-            UnRegisterOperatorConfigUpdate(handler);
+            UnregisterOperatorConfigUpdate(handler);
             break;
         default:
             TELEPHONY_LOGI("UnregisterCoreNotify default");
