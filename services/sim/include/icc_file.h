@@ -219,7 +219,7 @@ private:
     void RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterOperatorConfigUpdate(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
-    void UnRegisterOperatorConfigUpdate(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void UnregisterOperatorConfigUpdate(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void AddRecordsOverrideObser();
     bool ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
         std::string &eons, bool longNameRequired, const std::string &plmn);
