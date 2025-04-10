@@ -166,8 +166,8 @@ void VCardContact::CheckNameExist()
  
 int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues)
 {
-    CheckNameExist();
     UpdateDisplayName();
+    CheckNameExist();
     BuildValuesBucket(rawId, contactDataValues, nameData_);
     if (!birthday_->GetBirthday().empty()) {
         BuildValuesBucket(rawId, contactDataValues, birthday_);
