@@ -68,6 +68,7 @@ constexpr const char *VCARD_TYPE_X_SIP = "X-SIP";
 constexpr const char *VCARD_TYPE_X_PHONETIC_FIRST_NAME = "X-PHONETIC-FIRST-NAME";
 constexpr const char *VCARD_TYPE_X_PHONETIC_MIDDLE_NAME = "X-PHONETIC-MIDDLE-NAME";
 constexpr const char *VCARD_TYPE_X_PHONETIC_LAST_NAME = "X-PHONETIC-LAST-NAME";
+constexpr const char *VCARD_TYPE_X_PHONETIC = "X-PHONETIC";
 constexpr const char *VCARD_TYPE_X_AIM = "X-AIM";
 constexpr const char *VCARD_TYPE_X_MSN = "X-MSN";
 constexpr const char *VCARD_TYPE_X_YAHOO = "X-YAHOO";
