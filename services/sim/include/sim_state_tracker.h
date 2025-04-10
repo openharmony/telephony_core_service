@@ -17,6 +17,7 @@
 #define TELEPHONY_SIMSTATETRACKER_H
 
 #include <string>
+#include <telephony_types.h>
 
 #include "iservice_registry.h"
 #include "operator_config_cache.h"
@@ -35,22 +36,27 @@ public:
     bool RegisterForIccLoaded();
     bool RegisterOpkeyLoaded();
     bool RegisterOperatorCacheDel();
+    bool RegisterOperatorConfigUpdate();
     bool UnRegisterForIccLoaded();
     bool UnRegisterOpkeyLoaded();
     bool UnregisterOperatorCacheDel();
+    bool UnRegisterOperatorConfigUpdate();
 
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
 private:
-    inline static const std::string OPERATOR_CONFIG_CHANGED = "operatorConfigChanged";
     std::weak_ptr<SimFileManager> simFileManager_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     int32_t slotId_;
-    OperatorConfig config_;
     void ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    bool IsNeedUpdateCarrierConfig();
+    void ResetNeedUpdateCarrierConfig();
+    void ReloadOperatorConfigCache();
+    void ReloadOperatorConfig();
 };
 } // namespace Telephony
 } // namespace OHOS
