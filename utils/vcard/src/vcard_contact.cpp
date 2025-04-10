@@ -776,7 +776,6 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else {
         TELEPHONY_LOGI("No need to do anything");
     }
-    UpdateDisplayName();
 }
 
 void VCardContact::AddCustom(
