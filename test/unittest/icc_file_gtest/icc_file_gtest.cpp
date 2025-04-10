@@ -67,6 +67,10 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
+constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
+const int32_t SIM_COUNT = 2;
 
 class IccFileTest : public testing::Test {
 public:
@@ -74,7 +78,48 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    void InitCoreService();
+ 
+    std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<Telephony::SimManager> simManager_ = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager_;
+    std::shared_ptr<Telephony::SimFileManager> simFileManager_;
+    std::shared_ptr<Telephony::SimSmsManager> simSmsManager_;
+    std::shared_ptr<Telephony::SimAccountManager> simAccountManager_;
+    std::shared_ptr<Telephony::IccDiallingNumbersManager> iccDiallingNumbersManager_;
+    std::shared_ptr<Telephony::StkManager> stkManager_;
+    std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
+    std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
+    std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
+    std::shared_ptr<IccFile> simFile_ = nullptr;
+    std::shared_ptr<SimStateTracker> simStateTracker_ = nullptr;
+    std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
+    std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
 };
+
+void IccFileTest::InitCoreService()
+{
+    #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    #endif
+    telRilManager_ = std::make_shared<TelRilManager>();
+    simManager_ = std::make_shared<SimManager>(telRilManager_);
+    simManager_->OnInit(SIM_COUNT);
+    simStateManager_ = simManager_->simStateManager_[0];
+    simStateHandle_ = simStateManager_->simStateHandle_;
+    simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+    simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
+    simFileManager_ = simManager_->simFileManager_[0];
+    simAccountManager_ = simManager_->simAccountManager_[0];
+    multiSimController_ = simManager_->multiSimController_;
+    multiSimMonitor_ = simManager_->multiSimMonitor_;
+    simFile_ = simFileManager_->simFile_;
+    simStateTracker_ = simAccountManager_->simStateTracker_;
+    operatorConfigCache_ = simAccountManager_->operatorConfigCache_;
+    networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager_, simManager_);
+    CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+}
 
 void IccFileTest::TearDownTestCase() {}
 
@@ -206,9 +251,9 @@ HWTEST_F(IccFileTest, Telephony_IccFile_008, Function | MediumTest | Level1)
     simStateManager = nullptr;
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
-    iccFile->imsiReadyObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterImsiLoaded(handler);
-    EXPECT_EQ(iccFile->imsiReadyObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -254,10 +299,10 @@ HWTEST_F(IccFileTest, Telephony_IccFile_011, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->opkeyLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterOpkeyLoaded(eventHandler);
-    EXPECT_EQ(iccFile->opkeyLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -270,10 +315,10 @@ HWTEST_F(IccFileTest, Telephony_IccFile_012, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->operatorCacheDelObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterOperatorCacheDel(eventHandler);
-    EXPECT_EQ(iccFile->operatorCacheDelObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -286,12 +331,12 @@ HWTEST_F(IccFileTest, Telephony_IccFile_013, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->iccidLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     std::string iccId = "ABCD";
     iccFile->iccId_ = iccId;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     iccFile->RegisterIccidLoaded(eventHandler);
-    EXPECT_EQ(iccFile->iccidLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -305,15 +350,13 @@ HWTEST_F(IccFileTest, Telephony_IccFile_014, Function | MediumTest | Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
-    iccFile->opkeyLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterOpkeyLoaded(eventHandler);
-    iccFile->operatorCacheDelObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterOperatorCacheDel(eventHandler);
-    iccFile->iccidLoadObser_ = nullptr;
+    iccFile->filesFetchedObser_ = nullptr;
     iccFile->UnregisterIccidLoaded(eventHandler);
-    EXPECT_EQ(iccFile->opkeyLoadObser_, nullptr);
-    EXPECT_EQ(iccFile->operatorCacheDelObser_, nullptr);
-    EXPECT_EQ(iccFile->iccidLoadObser_, nullptr);
+    EXPECT_EQ(iccFile->filesFetchedObser_, nullptr);
 }
 
 /**
@@ -422,7 +465,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_020, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     iccFile->OnOpkeyLoad(opkey, opName);
-    ASSERT_NE(iccFile->opkeyLoadObser_, nullptr);
+    ASSERT_NE(iccFile->filesFetchedObser_, nullptr);
 }
 
 HWTEST_F(IccFileTest, Telephony_IccFile_021, Function | MediumTest | Level1)
@@ -506,5 +549,156 @@ HWTEST_F(IccFileTest, Telephony_IccFile_023, Function | MediumTest | Level1)
     EXPECT_NE(iccFile, nullptr);
 }
 
+/**
+ * @tc.number   Telephony_IccFile_024
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_024, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    simFile_->iccId_ = "86890000000000000001";
+    simFile_->imsi_ = "460990123456789";
+    simFile_->mcc_ = "460";
+    simFile_->mnc_ = "99";
+    simFile_->fileToGet_ = 0;
+    simFile_->fileQueried_ = false;
+    SetParameter(PREVIOUS_VERSION, " ");
+    multiSimMonitor_->CheckOpcNeedUpdata(true);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
+    multiSimMonitor_->ProcessEvent(event);
+    simFileManager_->UpdateOpkeyConfig();
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->ProcessOperatorConfigUpdate(event);
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
+    simFileManager_.reset();
+    event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
+    multiSimMonitor_->ProcessEvent(event);
+    simFile_->fileQueried_ = true;
+    simFile_->UpdateOpkeyConfig();
+    simFile_->filesFetchedObser_ = nullptr;
+    simFile_->UpdateOpkeyConfig();
+}
+ 
+/**
+ * @tc.number   Telephony_IccFile_025
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_025, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 0);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    std::string key = "";
+    SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(key.c_str(), "", isNeedUpdateCarrierConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isNeedUpdateCarrierConfig, "false") == 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigLoader_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_026
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_026, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    std::vector<std::string> msg(2, "");
+    auto objMsg = std::make_shared<std::vector<std::string>>(msg);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, objMsg);
+    simStateTracker_->ProcessEvent(event);
+    std::vector<std::string> vMsg(3, "");
+    vMsg[0] = "slot";
+    vMsg[1] = "46099";
+    vMsg[2] = "TEST";
+    auto obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    simStateTracker_->ProcessEvent(event);
+    vMsg[0] = std::to_string(1);
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    simStateTracker_->ProcessEvent(event);
+    vMsg[0] = std::to_string(0);
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    std::string key = "";
+    SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "false");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(key.c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(key.c_str(), "", isNeedUpdateCarrierConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isNeedUpdateCarrierConfig, "false") == 0);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    vMsg[1] = "";
+    vMsg[2] = "";
+    obj = std::make_shared<std::vector<std::string>>(vMsg);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+    SetParameter(key.c_str(), "false");
+    simStateTracker_->ProcessEvent(event);
+    SetParameter(key.c_str(), "true");
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigLoader_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    simStateHandle_->iccState_.simStatus_ = ICC_CARD_ABSENT;
+    simStateTracker_->ProcessEvent(event);
+}
+
+/**
+ * @tc.number   Telephony_IccFile_027
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_027, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, 1);
+    simStateTracker_->ProcessEvent(event);
+    simFileManager_->SetOpKey("46099");
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_IMSI_LOADED_READY, 0);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CACHE_DELETE, 0);
+    simStateTracker_->ProcessEvent(event);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+    EXPECT_NE(simFileManager_->GetOpKey(), Str8ToStr16("46099"));
+}
+
+/**
+ * @tc.number   Telephony_IccFile_028
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_028, Function | MediumTest | Level1)
+{
+    InitCoreService();
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 1);
+    simStateTracker_->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 0);
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    simStateTracker_->ProcessEvent(event);
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
+    simStateTracker_->operatorConfigCache_ = nullptr;
+    simStateTracker_->ProcessEvent(event);
+}
 }
 }

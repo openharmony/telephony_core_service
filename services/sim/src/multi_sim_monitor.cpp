@@ -30,9 +30,11 @@
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
+const int64_t RETRY_TIME = 3 * 60 * 1000;
 const int32_t ACTIVE_USER_ID = 100;
 const int INIT_TIMES = 15;
 const int INIT_DATA_TIMES = 5;
+constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
@@ -108,8 +110,14 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             break;
         }
         case MultiSimMonitor::RESET_OPKEY_CONFIG: {
-            ClearAllOpcCache();
+            RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             UpdateAllOpkeyConfigs();
+            break;
+        }
+        case MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG: {
+            RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
+            CheckDataShareError();
+            CheckSimNotifyRegister();
             break;
         }
         default:
@@ -139,6 +147,7 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
         std::lock_guard<std::mutex> lock(mutexForData_);
         if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
             TELEPHONY_LOGI("need update config");
+            SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
             if (controller_->UpdateOpKeyInfo() != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("UpdateOpKeyInfo error");
                 return TELEPHONY_ERROR;
@@ -149,18 +158,6 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
         }
     }
     return TELEPHONY_ERROR;
-}
-
-void MultiSimMonitor::ClearAllOpcCache()
-{
-    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
-        auto simFileManager = simFileManager_[slotId].lock();
-        if (simFileManager == nullptr) {
-            TELEPHONY_LOGE("simFileManager is nullptr, slotId : %{public}zu", slotId);
-            continue;
-        }
-        simFileManager->DeleteOperatorCache();
-    }
 }
 
 void MultiSimMonitor::UpdateAllOpkeyConfigs()
@@ -352,6 +349,7 @@ void MultiSimMonitor::SubscribeDataShareReady()
         dataShareSubscriber_ = nullptr;
         TELEPHONY_LOGE("Subscribe datashare ready fail");
     }
+    SendEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG, 0, RETRY_TIME);
 }
 
 void MultiSimMonitor::SubscribeUserSwitch()

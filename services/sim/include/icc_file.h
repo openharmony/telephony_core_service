@@ -183,14 +183,10 @@ protected:
     static std::unique_ptr<ObserverHandler> filesFetchedObser_;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;
-    std::unique_ptr<ObserverHandler> imsiReadyObser_ = nullptr;
     std::unique_ptr<ObserverHandler> recordsEventsObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkSelectionModeAutomaticObser_ = nullptr;
     std::unique_ptr<ObserverHandler> spnUpdatedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> recordsOverrideObser_ = nullptr;
-    std::unique_ptr<ObserverHandler> opkeyLoadObser_ = nullptr;
-    std::unique_ptr<ObserverHandler> iccidLoadObser_ = nullptr;
-    std::unique_ptr<ObserverHandler> operatorCacheDelObser_ = nullptr;
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, int arg1, int arg2);
     virtual AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<void> loader);
@@ -222,10 +218,9 @@ private:
     void UnregisterOperatorCacheDel(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void RegisterIccidLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void UnregisterIccidLoaded(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    void RegisterOperatorConfigUpdate(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void UnregisterOperatorConfigUpdate(const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     void AddRecordsOverrideObser();
-    void AddOpkeyLoadObser();
-    void AddOperatorCacheDelObser();
-    void AddIccidLoadObser();
     bool ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
         std::string &eons, bool longNameRequired, const std::string &plmn);
 };
