@@ -102,6 +102,11 @@ void VCardNameData::SetPhoneticMiddle(const std::string &phoneticMiddle)
     phoneticMiddle_ = phoneticMiddle;
 }
 
+void VCardNameData::SetPhoneticName(const std::string &phoneticName)
+{
+    phoneticName_ = phoneticName;
+}
+
 void VCardNameData::setSort(const std::string &sort)
 {
     sort_ = sort;
@@ -155,6 +160,11 @@ std::string VCardNameData::GetPhoneticGiven()
 std::string VCardNameData::GetPhoneticMiddle()
 {
     return phoneticMiddle_;
+}
+
+void VCardNameData::SetPhoneticName(const std::string &phoneticName)
+{
+    phoneticName_ = phoneticName;
 }
 
 std::string VCardNameData::GetSort()
