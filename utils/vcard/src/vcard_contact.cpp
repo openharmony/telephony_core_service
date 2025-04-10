@@ -58,7 +58,8 @@ void VCardContact::AddDatas(std::string name, std::string rawValue, std::string 
         vCardType_ = rawValue;
     } else if (name == VCARD_TYPE_FN || name == VCARD_TYPE_NAME || name == VCARD_TYPE_N ||
                name == VCARD_TYPE_SORT_STRING || name == VCARD_TYPE_X_PHONETIC_FIRST_NAME ||
-               name == VCARD_TYPE_X_PHONETIC_LAST_NAME || name == VCARD_TYPE_X_PHONETIC_MIDDLE_NAME) {
+               name == VCARD_TYPE_X_PHONETIC_LAST_NAME || name == VCARD_TYPE_X_PHONETIC_MIDDLE_NAME ||
+               name == VCARD_TYPE_X_PHONETIC) {
         AddNameData(name, rawValue, values, parasMap, propValue);
     } else if (name == VCARD_TYPE_NICKNAME) {
         HandleNickName(propValue);
@@ -166,6 +167,7 @@ void VCardContact::CheckNameExist()
 int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues)
 {
     CheckNameExist();
+    UpdateDisplayName();
     BuildValuesBucket(rawId, contactDataValues, nameData_);
     if (!birthday_->GetBirthday().empty()) {
         BuildValuesBucket(rawId, contactDataValues, birthday_);
@@ -768,6 +770,9 @@ void VCardContact::AddNameData(std::string name, std::string rawValue, std::vect
     } else if (name == VCARD_TYPE_X_PHONETIC_LAST_NAME) {
         std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
         nameData_->SetPhoneticFamily((valueList.size() != 0) ? valueList[0] : "");
+    } else if (name == VCARD_TYPE_X_PHONETIC) {
+        std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
+        nameData_->SetPhoneticName((valueList.size() != 0) ? valueList[0] : "");
     } else {
         TELEPHONY_LOGI("No need to do anything");
     }
@@ -1219,11 +1224,11 @@ void VCardContact::UpdateDisplayName()
     if (nameData_ == nullptr) {
         return;
     }
-    if (nameData_->GetFamily().empty() || nameData_->GetGiven().empty() || nameData_->GetDisplayName().empty()) {
-        return;
-    }
     std::string displayName = nameData_->GetDisplayName();
     if (VCardUtils::IsChineseString(displayName)) {
+        if (nameData_->GetFamily().empty() || nameData_->GetGiven().empty()) {
+            return;
+        }
         std::string fullName = nameData_->GetFamily();
         if (!(nameData_->GetMiddle().empty())) {
             fullName += nameData_->GetMiddle();
@@ -1241,9 +1246,17 @@ void VCardContact::UpdateDisplayName()
         FillFullName(nameData_->GetFamily(), " ", fullName);
         FillFullName(nameData_->GetSuffix(), ", ", fullName);
         VCardUtils::Trim(fullName);
-        if (displayName != fullName) {
-            nameData_->setDispalyName(fullName);
-            TELEPHONY_LOGI("update overseas display name use format name");
+        if (!fullName.empty()) {
+            if (displayName != fullName) {
+                nameData_->setDispalyName(fullName);
+                TELEPHONY_LOGI("update overseas display name use format name");
+            }
+        } else if (displayName.empty()) {
+            std::string phoneticName = nameData_->GetPhoneticName();
+            if (!phoneticName.empty()) {
+                nameData_->setDispalyName(phoneticName);
+                TELEPHONY_LOGI("update overseas display name use phonetic name");
+            }
         }
     }
 }
