@@ -71,8 +71,9 @@ std::shared_ptr<Asn1Node> Asn1Decoder::Asn1NextNode()
         TELEPHONY_LOGE("No bytes to parse.");
         return nullptr;
     }
-    int32_t tag = Asn1Utils::BytesToInt(srcData_, tagStart, offset - tagStart);
-    if (tag < 0) {
+    int32_t tag = -1;
+    bool ret = Asn1Utils::BytesToInt(srcData_, tagStart, offset - tagStart, tag);
+    if (!ret || tag < 0) {
         TELEPHONY_LOGE("Cannot parse tag at position: %{public}u", tagStart);
         return nullptr;
     }
@@ -97,7 +98,12 @@ std::shared_ptr<Asn1Node> Asn1Decoder::BuildAsn1Node(const uint32_t tag, uint32_
             TELEPHONY_LOGE("Cannot parse tag at position: %{public}u", tagStart);
             return nullptr;
         }
-        dataLen = static_cast<uint32_t>(Asn1Utils::BytesToInt(srcData_, offset, lenLen));
+        int32_t len = 0;
+        if (!Asn1Utils::BytesToInt(srcData_, offset, lenLen, len)) {
+            TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", offset);
+            return nullptr;
+        }
+        dataLen = static_cast<uint32_t>(len);
         offset += lenLen;
     }
     if (offset + dataLen > end_) {
