@@ -25,9 +25,9 @@
 #include "operator_config_types.h"
 #include "operator_name_utils.h"
 #include "resource_utils.h"
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
-#include "telephony_common_utils.h"
 
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;

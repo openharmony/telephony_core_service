@@ -28,7 +28,7 @@ namespace Telephony {
  * @param base
  * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
  */
-bool ConvertStrToInt(const std::string &str, int &value, const int &base);
+bool ConvertStrToInt(const std::string &str, int &value, const uint8_t &base);
 
 /**
  * @brief Indicates if the input value is a decimal number.
@@ -38,7 +38,7 @@ bool ConvertStrToInt(const std::string &str, int &value, const int &base);
  * @param base
  * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
  */
-bool ConvertStrToLong(const std::string &str, int64_t &value, const int &base);
+bool ConvertStrToLong(const std::string &str, int64_t &value, const uint8_t &base);
 
 /**
  * @brief Get bundle name by the calling uid.

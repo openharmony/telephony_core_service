@@ -29,13 +29,13 @@ namespace Telephony {
 constexpr uint32_t INPUT_VALUE_LENGTH = 10;
 constexpr uint8_t DEC_TYPE = 10;
 constexpr uint8_t HEX_TYPE = 16;
-bool ConvertStrToInt(const std::string &str, int &value, const int &base)
+bool ConvertStrToInt(const std::string &str, int &value, const uint8_t &base)
 {
     auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
     return ec == std::errc{} && ptr == str.data() + str.size();
 }
 
-bool ConvertStrToLong(const std::string &str, int64_t &value, const int &base)
+bool ConvertStrToLong(const std::string &str, int64_t &value, const uint8_t &base)
 {
     auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
     return ec == std::errc{} && ptr == str.data() + str.size();
