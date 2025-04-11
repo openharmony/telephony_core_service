@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <regex>
 #include <string>
+#include <charconv>
 
 #include "ipc_skeleton.h"
 #include "telephony_log_wrapper.h"
@@ -26,7 +27,20 @@
 namespace OHOS {
 namespace Telephony {
 constexpr uint32_t INPUT_VALUE_LENGTH = 10;
+constexpr uint8_t DEC_TYPE = 10;
 constexpr uint8_t HEX_TYPE = 16;
+bool ConvertStrToInt(const std::string &str, int &value, const int &base)
+{
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
+    return ec == std::errc{} && ptr == str.data() + str.size();
+}
+
+bool ConvertStrToLong(const std::string &str, int64_t &value, const int &base)
+{
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
+    return ec == std::errc{} && ptr == str.data() + str.size();
+}
+
 std::string GetBundleName()
 {
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -47,7 +61,8 @@ bool IsValidDecValue(const std::string &inputValue)
     }
     bool isValueNumber = regex_match(inputValue, std::regex("(-[\\d+]+)|(\\d+)"));
     if (isValueNumber) {
-        int64_t numberValue = std::stoll(inputValue);
+        int64_t numberValue = INT64_MAX;
+        ConvertStrToLong(inputValue, numberValue, DEC_TYPE);
         if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
             return true;
         }
@@ -64,7 +79,8 @@ bool IsValidHexValue(const std::string &inputValue)
     }
     bool isValueNumber = regex_match(inputValue, std::regex("(0[xX][0-9a-fA-F]+)|([0-9a-fA-F]+)"));
     if (isValueNumber) {
-        int64_t numberValue = std::stoll(inputValue, nullptr, HEX_TYPE);
+        int64_t numberValue = INT64_MAX;
+        ConvertStrToLong(inputValue, numberValue, HEX_TYPE);
         if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
             return true;
         }

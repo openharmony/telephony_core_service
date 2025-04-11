@@ -21,6 +21,26 @@
 namespace OHOS {
 namespace Telephony {
 /**
+ * @brief Indicates if the input value is a decimal number.
+ *
+ * @param str
+ * @param value
+ * @param base
+ * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
+ */
+bool ConvertStrToInt(const std::string &str, int &value, const int &base);
+
+/**
+ * @brief Indicates if the input value is a decimal number.
+ *
+ * @param str
+ * @param value
+ * @param base
+ * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
+ */
+bool ConvertStrToLong(const std::string &str, int64_t &value, const int &base);
+
+/**
  * @brief Get bundle name by the calling uid.
  *
  * @return Return bundle name of the caller.
