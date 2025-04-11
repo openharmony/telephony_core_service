@@ -27,6 +27,7 @@
 #include "resource_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
+#include "telephony_common_utils.h"
 
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
@@ -788,20 +789,21 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
         }
         std::shared_ptr<OperatorPlmnInfo> opl = std::make_shared<OperatorPlmnInfo>();
         int32_t base = 16; // convert to hexadecimal
-        opl->pnnRecordId = stoi(oplString.back(), 0, base);
+        bool isSuccess = false;
+        isSuccess = ConvertStrToInt(oplString.back(), opl->pnnRecordId, base);
         oplString.pop_back();
-        if (oplString.back().empty()) {
+        if (oplString.back().empty() || !isSuccess) {
             continue;
         }
-        opl->lacEnd = stoi(oplString.back(), 0, base);
+        isSuccess = ConvertStrToInt(oplString.back(), opl->lacEnd, base);
         oplString.pop_back();
-        if (oplString.back().empty()) {
+        if (oplString.back().empty() || !isSuccess) {
             continue;
         }
-        opl->lacStart = stoi(oplString.back(), 0, base);
+        isSuccess = ConvertStrToInt(oplString.back(), opl->lacStart, base);
         oplString.pop_back();
         opl->plmnNumeric = oplString.back();
-        if (!opl->plmnNumeric.empty()) {
+        if (!opl->plmnNumeric.empty() && isSuccess) {
             oplCust_.push_back(opl);
         }
     }
