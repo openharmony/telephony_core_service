@@ -35,6 +35,7 @@ public:
     void SetPhoneticFamily(const std::string &phoneticFamily);
     void SetPhoneticGiven(const std::string &phoneticGiven);
     void SetPhoneticMiddle(const std::string &phoneticMiddle);
+    void SetPhoneticName(const std::string &phoneticName);
     void setSort(const std::string &sort);
     void setDispalyName(const std::string &displayName);
     std::string GetFamily();
@@ -46,6 +47,7 @@ public:
     std::string GetPhoneticFamily();
     std::string GetPhoneticGiven();
     std::string GetPhoneticMiddle();
+    std::string GetPhoneticName();
     std::string GetSort();
     std::string GetDisplayName();
 
@@ -59,6 +61,7 @@ private:
     std::string phoneticFamily_ = "";
     std::string phoneticGiven_ = "";
     std::string phoneticMiddle_ = "";
+    std::string phoneticName_ = "";
     std::string sort_ = "";
     std::string displayName_ = "";
 };
