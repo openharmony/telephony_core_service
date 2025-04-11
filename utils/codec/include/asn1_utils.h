@@ -38,7 +38,7 @@ public:
     static std::string BytesToString(const std::vector<uint8_t> &src);
     static std::string HexStrToString(const std::string &hexStr);
     static std::vector<uint8_t> StringToBytes(const std::string &src);
-    static int32_t BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length);
+    static bool BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length, int32_t &valInt);
     static uint8_t CountTrailingZeros(const uint8_t value);
     static uint32_t ReverseInt(uint32_t value);
     static uint32_t ByteToHexStr(uint8_t src, std::string &dest);

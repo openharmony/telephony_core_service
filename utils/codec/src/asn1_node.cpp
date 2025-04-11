@@ -286,7 +286,12 @@ int32_t Asn1Node::Asn1AsInteger()
         TELEPHONY_LOGE("Data bytes cannot be nullptr.");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return Asn1Utils::BytesToInt(dataBytes_, dataOffset_, dataLength_);
+    int32_t dataLen = 0;
+    if (!Asn1Utils::BytesToInt(dataBytes_, dataOffset_, dataLength_, dataLen)) {
+        TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", dataOffset_);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return dataLen;
 }
 
 uint32_t Asn1Node::Asn1AsString(std::string &output)
@@ -324,9 +329,12 @@ int32_t Asn1Node::Asn1AsBits()
         return integerVal;
     }
 
-    uint32_t bits = 0;
-    bits = static_cast<uint32_t>(Asn1Utils::BytesToInt(dataBytes_, dataOffset_ + 1,
-        dataLength_ - 1));
+    uint32_t dataBits = 0;
+    if (!Asn1Utils::BytesToInt(dataBytes_, dataOffset_ + 1, dataLength_ - 1, dataBits)) {
+        TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", dataOffset_ + 1);
+        return integerVal;
+    }
+    uint32_t bits = static_cast<uint32_t>(dataBits);
     int32_t index = static_cast<int32_t>(dataLength_) - 1;
     for (index; index < sizeof(int32_t); index++) {
         bits <<= OFFSET_EIGHT_BIT;
