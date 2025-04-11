@@ -16,6 +16,7 @@
 #ifndef OHOS_SIM_STATE_MANAGER_H
 #define OHOS_SIM_STATE_MANAGER_H
 
+#include <ffrt.h>
 #include "i_tel_ril_manager.h"
 #include "sim_state_handle.h"
 #include "sim_state_type.h"
@@ -71,12 +72,12 @@ public:
     bool responseSimStateReady_ = false;
     std::mutex ctx_;
     std::mutex stx_;
-    std::mutex unlockPinCtx_;
-    std::mutex simStateCtx_;
+    ffrt::mutex unlockPinCtx_;
+    ffrt::mutex simStateCtx_;
     std::condition_variable cv_;
     std::condition_variable sv_;
-    std::condition_variable unlockPinCv_;
-    std::condition_variable simStateCv_;
+    ffrt::condition_variable unlockPinCv_;
+    ffrt::condition_variable simStateCv_;
 
 private:
     void RequestUnlock(UnlockCmd type);

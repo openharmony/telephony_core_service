@@ -1759,6 +1759,8 @@ HWTEST_F(BranchTest, Telephony_SimStateManager_001, Function | MediumTest | Leve
     EXPECT_FALSE(simStateManager->HasSimCard());
     std::string password = "1234";
     LockStatusResponse mLockStatusResponse;
+    simStateManager->UnlockPin(0, password, mLockStatusResponse);
+    simStateManager->SyncUnlockPinResponse();
     simStateManager->SyncSimStateResponse();
     EXPECT_GT(simStateManager->UnlockPin(0, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simStateManager->UnlockPuk(0, password, password, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
