@@ -298,5 +298,41 @@ void TelRilData::BuildDataLinkBandwidthInfo(std::shared_ptr<DataLinkBandwidthInf
     dataLinkBandwidthInfo->dlSambr = iDataLinkBandwidthInfo.dlSambr;
     dataLinkBandwidthInfo->averagingWindow = iDataLinkBandwidthInfo.averagingWindow;
 }
+
+int32_t TelRilData::NetworkSliceUrspRpt(const HDI::Ril::V1_4::NetworkSliceUrspInfo &networksliceUrspInfo)
+{
+    std::shared_ptr<NetworkSliceUrspInfo> urspinfo = std::make_shared<NetworkSliceUrspInfo>();
+    if (urspinfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d urspinfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    urspinfo->urspInfo = networksliceUrspInfo.urspInfo;
+    return Notify<NetworkSliceUrspInfo>(TELEPHONY_LOG_FUNC_NAME, urspinfo, RadioEvent::RADIO_NETWORKSLICE_URSP_RPT);
+}
+
+int32_t TelRilData::NetworkSliceAllowedNssaiRpt(
+    const HDI::Ril::V1_4::NetworkSliceAllowedNssaiInfo &networksliceAllowedNssaiInfo)
+{
+    std::shared_ptr<NetworkSliceAllowedNssaiInfo> allowednssaiinfo = std::make_shared<NetworkSliceAllowedNssaiInfo>();
+    if (allowednssaiinfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d nssniinfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    allowednssaiinfo->allowednssaiInfo = networksliceAllowedNssaiInfo.allowednssaiInfo;
+    return Notify<NetworkSliceAllowedNssaiInfo>(
+        TELEPHONY_LOG_FUNC_NAME, allowednssaiinfo, RadioEvent::RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT);
+}
+
+int32_t TelRilData::NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::NetworkSliceEhplmnInfo &networksliceEhplmnInfo)
+{
+    std::shared_ptr<NetworkSliceEhplmnInfo> ehplmninfo = std::make_shared<NetworkSliceEhplmnInfo>();
+    if (ehplmninfo == nullptr) {
+        TELEPHONY_LOGE("Slot%{public}d Ehplmninfo is nullptr", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ehplmninfo->ehplmnInfo = networksliceEhplmnInfo.ehplmnInfo;
+    return Notify<NetworkSliceEhplmnInfo>(TELEPHONY_LOG_FUNC_NAME, ehplmninfo,
+        RadioEvent::RADIO_NETWORKSLICE_EHPLMN_RPT);
+}
 } // namespace Telephony
 } // namespace OHOS
