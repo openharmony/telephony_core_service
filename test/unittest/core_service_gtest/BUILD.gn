@@ -93,15 +93,11 @@ ohos_unittest("tel_core_service_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -190,15 +186,11 @@ ohos_unittest("tel_network_search_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -286,15 +278,11 @@ ohos_unittest("tel_network_search_manager_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -388,16 +376,12 @@ ohos_unittest("tel_sim_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
     "-fno-access-control",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -486,15 +470,11 @@ ohos_unittest("tel_core_zero_branch_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -582,16 +562,12 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
   }
 
   cflags = [
-    "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
+    "-flto",    
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -669,15 +645,11 @@ ohos_unittest("tel_core_service_test") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -759,15 +731,11 @@ ohos_unittest("tel_core_service_common_test") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -854,15 +822,11 @@ ohos_unittest("tel_network_search_branch_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -952,15 +916,11 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -1037,15 +997,11 @@ ohos_unittest("tel_sim_file_manager_branch_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
