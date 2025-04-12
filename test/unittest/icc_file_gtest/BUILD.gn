@@ -88,15 +88,11 @@ ohos_unittest("icc_file_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
