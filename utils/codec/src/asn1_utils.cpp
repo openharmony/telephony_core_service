@@ -156,16 +156,16 @@ std::vector<uint8_t> Asn1Utils::HexStrToBytes(const std::string& hexStr)
     return ret;
 }
 
-int32_t Asn1Utils::BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length)
+bool Asn1Utils::BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length, int32_t &valInt)
 {
     if (length > HEX_STR_MAX_LENGTH || (offset + length) > src.size()) {
         TELEPHONY_LOGE("src length is more than four byte.");
-        return TELEPHONY_ERROR;
+        return false;
     }
     std::vector<uint8_t> subByteStream(src.begin() + offset, src.begin() + offset + length);
     std::string hexStr = BytesToHexStr(subByteStream);
-    int32_t valInt = static_cast<int32_t>(strtol(hexStr.c_str(), nullptr, HEX_DATA_LEN));
-    return valInt;
+    valInt = static_cast<int32_t>(strtol(hexStr.c_str(), nullptr, HEX_DATA_LEN));
+    return true;
 }
 
 uint32_t Asn1Utils::UintToBytes(const uint32_t value, std::vector<uint8_t> &bytes)
