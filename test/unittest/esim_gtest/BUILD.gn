@@ -82,15 +82,11 @@ ohos_unittest("esim_service_client_branch_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -185,15 +181,11 @@ ohos_unittest("tel_esim_gtest") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
@@ -277,15 +269,11 @@ ohos_unittest("esim_core_service_client_branch_test") {
 
   cflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
   ]
 
   ldflags = [
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 }
 
