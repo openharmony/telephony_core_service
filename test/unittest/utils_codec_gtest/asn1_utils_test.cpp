@@ -26,6 +26,7 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
+const uint32_t HEX_STR_MAX_LENGTH = 4;
 #ifndef TEL_TEST_UNSUPPORT
 class Asn1UtilsTest : public testing::Test {
 public:
@@ -192,14 +193,26 @@ HWTEST_F(Asn1UtilsTest, BytesToString_001, Function | MediumTest | Level3)
 
 HWTEST_F(Asn1UtilsTest, BytesToInt_001, Function | MediumTest | Level3)
 {
-    bool ret = false;
     const std::string resultData = "010000";
     std::vector<uint8_t> responseByte;
     int32_t offset = 0;
     responseByte = Asn1Utils::HexStrToBytes(resultData);
-    int32_t byteLen = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size());
-    ret = byteLen == 0 ? true : false;
-    EXPECT_EQ(ret, false);
+    int32_t byteLen = 0;
+    bool ret = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size(), byteLen);
+    EXPECT_TRUE(ret);
+    EXPECT_TRUE(byteLen != 0);
+}
+
+HWTEST_F(Asn1UtilsTest, BytesToInt_002, Function | MediumTest | Level3)
+{
+    std::vector<uint8_t> responseByte;
+    int32_t offset = 1;
+    int32_t byteLen = 1;
+    bool ret = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size(), byteLen);
+    EXPECT_FALSE(ret);
+    offset = HEX_STR_MAX_LENGTH + 1;
+    ret = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size(), byteLen);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(Asn1UtilsTest, StrToHexStr_001, Function | MediumTest | Level3)
