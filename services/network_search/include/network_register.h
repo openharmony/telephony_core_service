@@ -72,6 +72,7 @@ private:
     RadioTech GetTechnologyByNrConfig(RadioTech tech);
     int32_t GetSystemPropertiesConfig(std::string &config);
     void UpdateNetworkSearchState(RegServiceState regStatus, RadioTech tech, RoamingType roam, DomainType type);
+    void PrintCurrentRegistrationState(RilRegister regStatus, TelRilRadioTech tech, RoamingType roam, int32_t slotId);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
