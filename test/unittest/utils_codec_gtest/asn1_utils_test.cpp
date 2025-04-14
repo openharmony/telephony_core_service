@@ -210,7 +210,6 @@ HWTEST_F(Asn1UtilsTest, BytesToInt_002, Function | MediumTest | Level3)
     bool ret = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size(), byteLen);
     EXPECT_FALSE(ret);
     offset = HEX_STR_MAX_LENGTH + 1;
-    responseByte = Asn1Utils::HexStrToBytes(resultData);
     ret = Asn1Utils::BytesToInt(responseByte, offset, responseByte.size(), byteLen);
     EXPECT_FALSE(ret);
 }
