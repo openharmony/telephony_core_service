@@ -23,7 +23,6 @@
 #include "operator_config_types.h"
 #include "parameter.h"
 #include "parameters.h"
-#include "telephony_common_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -48,7 +47,6 @@ const int32_t DUAL_SLOT_COUNT = 2;
 const int32_t MAX_SLOT_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
-const uint8_t DEC_TYPE = 10;
 std::atomic<int32_t> maxRealSlotCount_ = 0;
 int32_t maxSlotCount_ = 0;
 int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
@@ -117,7 +115,7 @@ inline T GetDefaultEsimSlotId()
     if (esimDefaultSlotId_ == ESIM_DEFAULT_SLOTID) {
         char esimDefaultSlotId[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_DEFAULT_ESIM_SLOT_ID, DEFAULT_ESIM_SLOT_ID, esimDefaultSlotId, SYSPARA_SIZE);
-        ConvertStrToInt(esimDefaultSlotId, esimDefaultSlotId_, DEC_TYPE);
+        esimDefaultSlotId_ = std::atoi(esimDefaultSlotId);
     }
     return esimDefaultSlotId_;
 }
