@@ -329,7 +329,7 @@ int32_t Asn1Node::Asn1AsBits()
         return integerVal;
     }
 
-    uint32_t dataBits = 0;
+    int32_t dataBits = 0;
     if (!Asn1Utils::BytesToInt(dataBytes_, dataOffset_ + 1, dataLength_ - 1, dataBits)) {
         TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", dataOffset_ + 1);
         return integerVal;
