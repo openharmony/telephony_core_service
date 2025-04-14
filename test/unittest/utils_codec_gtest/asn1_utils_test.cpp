@@ -26,6 +26,7 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
+const uint32_t HEX_STR_MAX_LENGTH = 4;
 #ifndef TEL_TEST_UNSUPPORT
 class Asn1UtilsTest : public testing::Test {
 public:
