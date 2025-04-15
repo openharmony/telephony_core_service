@@ -20,6 +20,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint8_t DEC_TYPE = 10;
+constexpr uint8_t HEX_TYPE = 16;
 /**
  * @brief Indicates if the input value is a decimal number.
  *

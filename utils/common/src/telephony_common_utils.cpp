@@ -27,8 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr uint32_t INPUT_VALUE_LENGTH = 10;
-constexpr uint8_t DEC_TYPE = 10;
-constexpr uint8_t HEX_TYPE = 16;
+
 template<typename T>
 bool ConvertStrToNum(const std::string &str, T &value, uint8_t base)
 {
