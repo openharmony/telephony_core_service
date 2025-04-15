@@ -160,8 +160,6 @@ void NetworkRegister::ProcessPsRegister(const std::shared_ptr<PsRegStatusResultI
     UpdateNrState();
     UpdateCfgTech();
     PrintCurrentRegistrationState(registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
-    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        iter->second.c_str(), registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
