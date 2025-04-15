@@ -21,8 +21,8 @@ namespace OHOS {
 namespace Telephony {
 static const int64_t COMMUNICATION_TIMEOUT = 45 * 1000; // Set the timeout millisecond for radio protocol communication
 static const int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
-std::mutex RadioProtocolController::ctx_;
-std::condition_variable RadioProtocolController::cv_;
+ffrt::mutex RadioProtocolController::ctx_;
+ffrt::condition_variable RadioProtocolController::cv_;
 
 RadioProtocolController::RadioProtocolController(std::weak_ptr<Telephony::ITelRilManager> telRilManager)
     : TelEventHandler("RadioProtocolController"), telRilManager_(telRilManager)
@@ -57,12 +57,18 @@ void RadioProtocolController::Init()
 int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
+    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+        return 0;
+    }
     return static_cast<int32_t>(radioProtocol_[slotId].technology);
 }
 
 int32_t RadioProtocolController::GetRadioProtocolModemId(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
+    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+        return 0;
+    }
     return static_cast<int32_t>(radioProtocol_[slotId].modemId);
 }
 
@@ -70,12 +76,12 @@ void RadioProtocolController::GetRadioProtocol(int32_t slotId)
 {
     auto telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::GetRadioProtocol telRilManager is nullptr");
+        TELEPHONY_LOGE("telRilManager is nullptr");
         return;
     }
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RADIO_SIM_GET_RADIO_PROTOCOL);
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::GetRadioProtocol event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     event->SetOwner(shared_from_this());
@@ -85,7 +91,7 @@ void RadioProtocolController::GetRadioProtocol(int32_t slotId)
 bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
 {
     if (isCommunicating_) {
-        TELEPHONY_LOGE("RadioProtocolController::SetRadioProtocol protocol is communicating, can not set now");
+        TELEPHONY_LOGE("protocol is communicating, can not set now");
         return false;
     }
 
@@ -94,7 +100,7 @@ bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
     CleanUpCommunication();
     ExecuteCheckCommunication();
     while (isCommunicating_) {
-        TELEPHONY_LOGI("RadioProtocolController::SetRadioProtocol wait for the communication to finish");
+        TELEPHONY_LOGI("wait for the communication to finish");
         radioProtocolCv_.wait(radioProtocolLock);
     }
     return communicationResponseResult_;
@@ -123,16 +129,16 @@ void RadioProtocolController::InitMemberFunc()
 void RadioProtocolController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessEvent event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     auto id = event->GetInnerEventId();
-    TELEPHONY_LOGD("RadioProtocolController::ProcessEvent id = %{public}d", id);
+    TELEPHONY_LOGD("id = %{public}d", id);
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc == nullptr) {
-            TELEPHONY_LOGE("RadioProtocolController::ProcessEvent memberFunc is nullptr");
+            TELEPHONY_LOGE("memberFunc is nullptr");
             return;
         }
         memberFunc(event);
@@ -142,12 +148,12 @@ void RadioProtocolController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
 void RadioProtocolController::ProcessGetRadioProtocol(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessGetRadioProtocol event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     std::shared_ptr<RadioProtocol> radioProtocol = event->GetSharedObject<RadioProtocol>();
     if (radioProtocol == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessGetRadioProtocol radioProtocol is nullptr");
+        TELEPHONY_LOGE("radioProtocol is nullptr");
         return;
     }
     UpdateRadioProtocol(radioProtocol);
@@ -156,12 +162,12 @@ void RadioProtocolController::ProcessGetRadioProtocol(const AppExecFwk::InnerEve
 void RadioProtocolController::ProcessCheckRadioProtocol(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (!ProcessResponseInfoOfEvent(event)) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessCheckRadioProtocol failed due to invalid sessionId");
+        TELEPHONY_LOGE("failed due to invalid sessionId");
         return;
     }
 
     if (--communicatingSlotCount_ != 0) {
-        TELEPHONY_LOGI("RadioProtocolController::ProcessCheckRadioProtocol wait for all sim to complete check");
+        TELEPHONY_LOGI("wait for all sim to complete check");
         return;
     }
 
@@ -175,7 +181,7 @@ void RadioProtocolController::ProcessCheckRadioProtocol(const AppExecFwk::InnerE
 void RadioProtocolController::ProcessUpdateRadioProtocol(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (!ProcessResponseInfoOfEvent(event)) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessUpdateRadioProtocol failed due to invalid sessionId");
+        TELEPHONY_LOGE("failed due to invalid sessionId");
         return;
     }
 }
@@ -183,23 +189,23 @@ void RadioProtocolController::ProcessUpdateRadioProtocol(const AppExecFwk::Inner
 void RadioProtocolController::ProcessRadioProtocolNotify(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessRadioProtocolNotify event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     std::shared_ptr<RadioProtocol> radioProtocol = event->GetSharedObject<RadioProtocol>();
     if (radioProtocol == nullptr || radioProtocol->sessionId != sessionId_) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessRadioProtocolNotify failed due to invalid sessionId");
+        TELEPHONY_LOGE("failed due to invalid sessionId");
         return;
     }
 
     if (radioProtocol->status == RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessRadioProtocolNotify update failed");
+        TELEPHONY_LOGE("update failed");
         communicationFailed_ = true;
     } else {
         UpdateRadioProtocol(radioProtocol);
     }
     if (--communicatingSlotCount_ != 0) {
-        TELEPHONY_LOGI("RadioProtocolController::ProcessRadioProtocolNotify wait for all sim to complete update");
+        TELEPHONY_LOGI("wait for all sim to complete update");
         return;
     }
 
@@ -209,16 +215,16 @@ void RadioProtocolController::ProcessRadioProtocolNotify(const AppExecFwk::Inner
 void RadioProtocolController::ProcessSetRadioProtocolComplete(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolComplete event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     if (!ProcessResponseInfoOfEvent(event)) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolComplete failed due to invalid sessionId");
+        TELEPHONY_LOGE("failed due to invalid sessionId");
         return;
     }
 
     if (--communicatingSlotCount_ != 0) {
-        TELEPHONY_LOGI("RadioProtocolController::ProcessSetRadioProtocolComplete wait for all sim to complete");
+        TELEPHONY_LOGI("wait for all sim to complete");
         return;
     }
 
@@ -228,14 +234,14 @@ void RadioProtocolController::ProcessSetRadioProtocolComplete(const AppExecFwk::
 
 void RadioProtocolController::ProcessSetRadioProtocolTimeout(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("RadioProtocolController::ProcessSetRadioProtocolTimeout");
+    TELEPHONY_LOGI("ProcessSetRadioProtocolTimeout");
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolTimeout event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
     auto sessionId = event->GetParam();
     if (sessionId != sessionId_) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessSetRadioProtocolTimeout failed due to invalid sessionId");
+        TELEPHONY_LOGE("failed due to invalid sessionId");
         return;
     }
     ProcessCommunicationResponse(false);
@@ -248,7 +254,7 @@ void RadioProtocolController::ProcessSetRadioProtocolTimeout(const AppExecFwk::I
 
 void RadioProtocolController::ExecuteCheckCommunication()
 {
-    TELEPHONY_LOGI("RadioProtocolController::ExecuteCheckCommunication");
+    TELEPHONY_LOGI("ExecuteCheckCommunication");
     sessionId_++;
     isCommunicating_ = true;
     SendEvent(RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT, sessionId_, COMMUNICATION_TIMEOUT);
@@ -270,7 +276,7 @@ void RadioProtocolController::ExecuteUpdateCommunication()
 void RadioProtocolController::ExecuteCompleteCommunication()
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
-    TELEPHONY_LOGI("RadioProtocolController::ExecuteCompleteCommunication failed:%{public}d", communicationFailed_);
+    TELEPHONY_LOGI("failed:%{public}d", communicationFailed_);
     BuildRadioProtocolForCommunication(RadioProtocolPhase::RADIO_PROTOCOL_PHASE_COMPLETE,
         communicationFailed_ ? RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL :
         RadioProtocolStatus::RADIO_PROTOCOL_STATUS_SUCCESS);
@@ -330,7 +336,7 @@ void RadioProtocolController::BuildRadioProtocolForCommunication(RadioProtocolPh
             break;
         }
         default:
-            TELEPHONY_LOGE("RadioProtocolController::BuildRadioProtocolForCommunication invalid phase");
+            TELEPHONY_LOGE("BuildRadioProtocolForCommunication invalid phase");
             break;
     }
 }
@@ -339,7 +345,7 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
 {
     auto telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr || radioProtocol.empty()) {
-        TELEPHONY_LOGE("RadioProtocolController::SendRadioProtocol telRilManager or radioProtocol is nullptr");
+        TELEPHONY_LOGE("SendRadioProtocol telRilManager or radioProtocol is nullptr");
         ProcessCommunicationResponse(false);
         CleanUpCommunication();
         return;
@@ -353,7 +359,7 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
     for (int32_t i = 0; i < slotCount_; i++) {
         AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
         if (event == nullptr) {
-            TELEPHONY_LOGE("RadioProtocolController::SendRadioProtocol event is nullptr");
+            TELEPHONY_LOGE("SendRadioProtocol event is nullptr");
             ProcessCommunicationResponse(false);
             CleanUpCommunication();
             return;
@@ -379,12 +385,12 @@ void RadioProtocolController::UpdateRadioProtocol(std::shared_ptr<RadioProtocol>
 bool RadioProtocolController::ProcessResponseInfoOfEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessResponseInfoOfEvent event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return false;
     }
     std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr && responseInfo->error != ErrType::NONE) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessResponseInfoOfEvent error:%{public}d", responseInfo->error);
+        TELEPHONY_LOGE("error:%{public}d", responseInfo->error);
         communicationFailed_ = true;
         return true;
     }
@@ -395,7 +401,7 @@ bool RadioProtocolController::ProcessResponseInfoOfEvent(const AppExecFwk::Inner
 
 void RadioProtocolController::CleanUpCommunication()
 {
-    TELEPHONY_LOGI("RadioProtocolController::CleanUpCommunication");
+    TELEPHONY_LOGI("CleanUpCommunication");
     RemoveEvent(RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT);
     communicationFailed_ = false;
     std::vector<RadioProtocol>().swap(oldRadioProtocol_);
@@ -413,7 +419,7 @@ void RadioProtocolController::UnRegisterEvents()
 {
     auto telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::UnRegisterEvents telRilManager is nullptr");
+        TELEPHONY_LOGE("UnRegisterEvents telRilManager is nullptr");
         return;
     }
     for (int32_t i = 0; i < slotCount_; i++) {
@@ -428,7 +434,9 @@ void RadioProtocolController::RadioProtocolControllerWait()
 
 void RadioProtocolController::RadioProtocolControllerContinue()
 {
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = true;
+    cv_.notify_all();
 }
 
 bool RadioProtocolController::RadioProtocolControllerPoll()
@@ -438,17 +446,16 @@ bool RadioProtocolController::RadioProtocolControllerPoll()
 
 void RadioProtocolController::ProcessActiveSimTimeOutDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("RadioProtocolController::ProcessActiveSimTimeOutDone");
+    TELEPHONY_LOGI("ProcessActiveSimTimeOutDone");
     RadioProtocolControllerContinue();
-    cv_.notify_all();
 }
 
 bool RadioProtocolController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
 {
-    TELEPHONY_LOGI("RadioProtocolController::SetActiveSim(), enable=%{public}d", enable);
+    TELEPHONY_LOGI("SetActiveSim(), enable=%{public}d", enable);
     auto telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::SetActiveSim nullptr");
+        TELEPHONY_LOGE("SetActiveSim nullptr");
         return false;
     }
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_SET_ACTIVE);
@@ -458,6 +465,7 @@ bool RadioProtocolController::SetActiveSimToRil(int32_t slotId, int32_t type, in
     }
     activeResponse_ = 1;
     event->SetOwner(shared_from_this());
+    RemoveEvent(MSG_SIM_TIME_OUT_ACTIVE);
     SendEvent(MSG_SIM_TIME_OUT_ACTIVE, SET_ACTIVE_OUT_TIME, Priority::LOW);
     telRilManager->SetActiveSim(slotId, type, enable, event);
     return true;
@@ -466,17 +474,16 @@ bool RadioProtocolController::SetActiveSimToRil(int32_t slotId, int32_t type, in
 void RadioProtocolController::ProcessActiveSimToRilResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("RadioProtocolController::ProcessActiveSimToRilResponse event is nullptr");
+        TELEPHONY_LOGE("event is nullptr");
         return;
     }
-    TELEPHONY_LOGI("RadioProtocolController::GetSetActiveSimResult");
+    TELEPHONY_LOGI("ProcessActiveSimToRilResponse");
     int32_t result = 0;
     std::shared_ptr<ErrType> param = event->GetSharedObject<ErrType>();
     std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
-        TELEPHONY_LOGE("RadioProtocolController::GetSetActiveSimResult() fail");
+        TELEPHONY_LOGE("Get response fail");
         RadioProtocolControllerContinue();
-        cv_.notify_all();
         return;
     }
     if (param != nullptr) {
@@ -484,14 +491,14 @@ void RadioProtocolController::ProcessActiveSimToRilResponse(const AppExecFwk::In
     } else {
         result = static_cast<int32_t>(response->error);
     }
-    TELEPHONY_LOGI("RadioProtocolController::GetSetActiveSimResult(), activeResponse = %{public}d", result);
+    TELEPHONY_LOGI("activeResponse = %{public}d", result);
     activeResponse_ = result;
     RadioProtocolControllerContinue();
-    cv_.notify_all();
 }
 
 int32_t RadioProtocolController::GetActiveSimToRilResult()
 {
+    TELEPHONY_LOGI("Get active sim result");
     RemoveEvent(MSG_SIM_TIME_OUT_ACTIVE);
     return activeResponse_;
 }

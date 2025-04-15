@@ -43,8 +43,8 @@ public:
     int32_t GetActiveSimToRilResult();
 
 public:
-    static std::mutex ctx_;
-    static std::condition_variable cv_;
+    static ffrt::mutex ctx_;
+    static ffrt::condition_variable cv_;
 
 private:
     void InitMemberFunc();
