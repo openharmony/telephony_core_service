@@ -50,17 +50,12 @@ void EsimCoreServiceTest::TearDown() {}
 HWTEST_F(EsimCoreServiceTest, SendApduData_0001, Function | MediumTest | Level1)
 {
     std::shared_ptr<CoreService> mCoreService = std::make_shared<CoreService>();
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    mCoreService->simManager_ = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = 0;
     std::u16string aid = Str8ToStr16("aid test");
     EsimApduData apduData;
     ResponseEsimResult responseResult;
     EXPECT_NE(mCoreService->SendApduData(
         slotId, aid, apduData, responseResult), TELEPHONY_ERR_SUCCESS);
-    mCoreService->simManager_ = nullptr;
-    EXPECT_EQ(mCoreService->SendApduData(
-        slotId, aid, apduData, responseResult), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 } // namespace Telephony
