@@ -181,6 +181,7 @@ void VCardManager::BatchInsertRawContact(
     for (uint32_t i = 0; i < size; i++) {
         OHOS::DataShare::DataShareValuesBucket valuesBucket;
         auto contact = contactList[i];
+        contact->BuildRawContactDataDisplayName(valuesBucket);
         std::string uid = contact->GetUid();
         if (!uid.empty()) {
             valuesBucket.Put(RawContact::UUID, uid);
@@ -244,6 +245,7 @@ int32_t VCardManager::InsertRawContact(int32_t accountId, std::shared_ptr<VCardC
 {
     OHOS::DataShare::DataShareValuesBucket ValuesBucket;
     ValuesBucket.Put(RawContact::ACCOUNT_ID, accountId);
+    contact->BuildRawContactDataDisplayName(ValuesBucket);
     std::string uid = contact->GetUid();
     if (!uid.empty()) {
         ValuesBucket.Put(RawContact::UUID, uid);
