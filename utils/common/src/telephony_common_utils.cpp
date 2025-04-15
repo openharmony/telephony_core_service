@@ -15,10 +15,10 @@
 
 #include "telephony_common_utils.h"
 
+#include <charconv>
 #include <cstdint>
 #include <regex>
 #include <string>
-#include <charconv>
 
 #include "ipc_skeleton.h"
 #include "telephony_log_wrapper.h"
@@ -29,16 +29,21 @@ namespace Telephony {
 constexpr uint32_t INPUT_VALUE_LENGTH = 10;
 constexpr uint8_t DEC_TYPE = 10;
 constexpr uint8_t HEX_TYPE = 16;
-bool ConvertStrToInt(const std::string &str, int &value, const uint8_t &base)
+template<typename T>
+bool ConvertStrToNum(const std::string &str, T &value, uint8_t base)
 {
     auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
     return ec == std::errc{} && ptr == str.data() + str.size();
 }
 
-bool ConvertStrToLong(const std::string &str, int64_t &value, const uint8_t &base)
+bool ConvertStrToInt(const std::string &str, int &value, uint8_t base)
 {
-    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
-    return ec == std::errc{} && ptr == str.data() + str.size();
+    return ConvertStrToNum(str, value, base);
+}
+
+bool ConvertStrToLong(const std::string &str, int64_t &value, uint8_t base)
+{
+    return ConvertStrToNum(str, value, base);
 }
 
 std::string GetBundleName()
