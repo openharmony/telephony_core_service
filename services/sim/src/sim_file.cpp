@@ -41,7 +41,6 @@ const int64_t DELAY_TIME = 500;
 const int64_t GET_IMSI_DELAY_TIME = 2000;
 const int BYTE_TO_BIT_LEN = 8;
 const int HEX_TO_BYTE_LEN = 2;
-const int HEX_TYPE = 16;
 const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
 const int CFIS_TON_NPI_OFFSET = 3;
 const int SST_SPN_OFFSET = 4;

@@ -115,7 +115,7 @@ inline T GetDefaultEsimSlotId()
     if (esimDefaultSlotId_ == ESIM_DEFAULT_SLOTID) {
         char esimDefaultSlotId[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_DEFAULT_ESIM_SLOT_ID, DEFAULT_ESIM_SLOT_ID, esimDefaultSlotId, SYSPARA_SIZE);
-        esimDefaultSlotId_ = std::stoi(esimDefaultSlotId);
+        esimDefaultSlotId_ = std::atoi(esimDefaultSlotId);
     }
     return esimDefaultSlotId_;
 }
