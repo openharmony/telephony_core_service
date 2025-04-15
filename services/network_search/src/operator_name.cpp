@@ -788,22 +788,21 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
             continue;
         }
         std::shared_ptr<OperatorPlmnInfo> opl = std::make_shared<OperatorPlmnInfo>();
-        int32_t base = 16; // convert to hexadecimal
-        bool isSuccess = false;
-        isSuccess = ConvertStrToInt(oplString.back(), opl->pnnRecordId, base);
+        uint8_t base = 16; // convert to hexadecimal
+        bool isSuccess = ConvertStrToInt(oplString.back(), opl->pnnRecordId, base);
         oplString.pop_back();
-        if (oplString.back().empty() || !isSuccess) {
+        if (!isSuccess || oplString.back().empty()) {
             continue;
         }
         isSuccess = ConvertStrToInt(oplString.back(), opl->lacEnd, base);
         oplString.pop_back();
-        if (oplString.back().empty() || !isSuccess) {
+        if (!isSuccess || oplString.back().empty()) {
             continue;
         }
         isSuccess = ConvertStrToInt(oplString.back(), opl->lacStart, base);
         oplString.pop_back();
         opl->plmnNumeric = oplString.back();
-        if (!opl->plmnNumeric.empty() && isSuccess) {
+        if (isSuccess || !opl->plmnNumeric.empty()) {
             oplCust_.push_back(opl);
         }
     }
