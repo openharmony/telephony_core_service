@@ -20,6 +20,28 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint8_t DEC_TYPE = 10;
+constexpr uint8_t HEX_TYPE = 16;
+/**
+ * @brief Indicates if the input value is a decimal number.
+ *
+ * @param str
+ * @param value
+ * @param base
+ * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
+ */
+bool ConvertStrToInt(const std::string &str, int &value, uint8_t base);
+
+/**
+ * @brief Indicates if the input value is a decimal number.
+ *
+ * @param str
+ * @param value
+ * @param base
+ * @return Return {@code true} If the input str is a valid basedecimal number, return {@code false} otherwise.
+ */
+bool ConvertStrToLong(const std::string &str, int64_t &value, uint8_t base);
+
 /**
  * @brief Get bundle name by the calling uid.
  *

@@ -25,6 +25,7 @@
 #include "operator_config_types.h"
 #include "operator_name_utils.h"
 #include "resource_utils.h"
+#include "telephony_common_utils.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
 
@@ -787,21 +788,20 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
             continue;
         }
         std::shared_ptr<OperatorPlmnInfo> opl = std::make_shared<OperatorPlmnInfo>();
-        int32_t base = 16; // convert to hexadecimal
-        opl->pnnRecordId = stoi(oplString.back(), 0, base);
+        bool isSuccess = ConvertStrToInt(oplString.back(), opl->pnnRecordId, HEX_TYPE);
         oplString.pop_back();
-        if (oplString.back().empty()) {
+        if (!isSuccess || oplString.back().empty()) {
             continue;
         }
-        opl->lacEnd = stoi(oplString.back(), 0, base);
+        isSuccess = ConvertStrToInt(oplString.back(), opl->lacEnd, HEX_TYPE);
         oplString.pop_back();
-        if (oplString.back().empty()) {
+        if (!isSuccess || oplString.back().empty()) {
             continue;
         }
-        opl->lacStart = stoi(oplString.back(), 0, base);
+        isSuccess = ConvertStrToInt(oplString.back(), opl->lacStart, HEX_TYPE);
         oplString.pop_back();
         opl->plmnNumeric = oplString.back();
-        if (!opl->plmnNumeric.empty()) {
+        if (isSuccess && !opl->plmnNumeric.empty()) {
             oplCust_.push_back(opl);
         }
     }
