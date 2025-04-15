@@ -163,11 +163,13 @@ void VCardContact::CheckNameExist()
         }
     }
 }
- 
+
 int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues)
 {
-    UpdateDisplayName();
-    CheckNameExist();
+    if(nameData_->GetDisplayName().empty()) {
+        UpdateDisplayName();
+        CheckNameExist(); 
+    }
     BuildValuesBucket(rawId, contactDataValues, nameData_);
     if (!birthday_->GetBirthday().empty()) {
         BuildValuesBucket(rawId, contactDataValues, birthday_);
@@ -189,6 +191,16 @@ int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::Dat
     BuildValuesBuckets(rawId, contactDataValues, events_);
     BuildValuesBuckets(rawId, contactDataValues, groups_);
     return TELEPHONY_SUCCESS;
+}
+
+void VCardContact::BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &RawContactDataValue)
+{
+    UpdateDisplayName();
+    CheckNameExist();
+    if (nameData_ == nullptr) {
+        return;
+    }
+    RawContactDataValue.Put(RawContact::DISPLAY_NAME, nameData_->GetDisplayName());
 }
 
 void VCardContact::BuildValuesBucket(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues,
