@@ -952,6 +952,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumT
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
+    std::shared_ptr<VCardNameData> nameData_ = std::make_shared<VCardNameData>();
     nameData_->SetPhoneticName("liu");
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
