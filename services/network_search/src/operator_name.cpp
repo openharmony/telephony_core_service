@@ -801,7 +801,7 @@ void OperatorName::UpdateOplCust(const std::vector<std::string> &oplCust)
         isSuccess = ConvertStrToInt(oplString.back(), opl->lacStart, HEX_TYPE);
         oplString.pop_back();
         opl->plmnNumeric = oplString.back();
-        if (isSuccess || !opl->plmnNumeric.empty()) {
+        if (isSuccess && !opl->plmnNumeric.empty()) {
             oplCust_.push_back(opl);
         }
     }
