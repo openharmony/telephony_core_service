@@ -919,6 +919,18 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张三");
+    middle = "小";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张小三");
+    family = "";
+    given = "";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "三张");
+
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
@@ -937,6 +949,31 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumT
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
 }
 
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    nameData_->SetPhoneticName("liu");
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "liu");
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    std::string family = "b";
+    std::string middle = "c";
+    std::string given = "d";
+    std::string prefix = "a";
+    std::string suffix = "e";
+    std::string displayName = "";
+    SetNameData(family, given, middle, prefix, suffix);
+    nameData_->setDispalyName(displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
+}
+
 HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)
 {
     VCardPostalData postalData;
@@ -944,6 +981,18 @@ HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTes
         {"pobox", "", "street", "city", "region", "postCode", "country"};
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     EXPECT_EQ((postalData.GetPostalAddress()), "pobox street city region postCode country");
+}
+
+HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode = 0;
+    rawData->SetName(VCARD_TYPE_X_PHONETIC);
+    DataShare::DataShareValuesBucket contactDataValues;
+    contact_->AddRawData(rawData, errorCode);
+    contact_->BuildRawContactDataDisplayName(contactDataValues);
+    EXPECT_EQ(contact_->nameData_->GetDisplayName(), "");
 }
 
 #endif // TEL_TEST_UNSUPPORT
