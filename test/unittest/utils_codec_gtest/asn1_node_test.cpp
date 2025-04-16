@@ -30,6 +30,8 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
 #ifndef TEL_TEST_UNSUPPORT
+#define private public
+#define protected public
 class Asn1NodeTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -224,6 +226,11 @@ HWTEST_F(Asn1NodeTest, Asn1AsBytes_001, Function | MediumTest | Level3)
     res = asn1Node->Asn1AsBytes(responseByte);
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, true);
+
+    asn1Node->constructed_ = false;
+    res = asn1Node->Asn1BuildChildren();
+    ret = res == 0 ? true : false;
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(Asn1NodeTest, Asn1AsInteger_001, Function | MediumTest | Level3)
