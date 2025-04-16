@@ -57,12 +57,18 @@ void RadioProtocolController::Init()
 int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
+    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+        return 0;
+    }
     return static_cast<int32_t>(radioProtocol_[slotId].technology);
 }
 
 int32_t RadioProtocolController::GetRadioProtocolModemId(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
+    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+        return 0;
+    }
     return static_cast<int32_t>(radioProtocol_[slotId].modemId);
 }
 
