@@ -514,9 +514,7 @@ napi_value IsSupported(napi_env env, napi_callback_info info)
     }
     int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId);
     if (errorCode != TELEPHONY_SUCCESS) {
-        JsError error = NapiUtil::ConverEsimErrorMessageForJs(errorCode);
-        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-        return nullptr;
+        isSupported = false;
     } else {
         isSupported = true;
     }
