@@ -243,14 +243,14 @@ std::vector<std::vector<std::shared_ptr<VCardContact>>> VCardManager::SplitConta
 
 int32_t VCardManager::InsertRawContact(int32_t accountId, std::shared_ptr<VCardContact> contact)
 {
-    OHOS::DataShare::DataShareValuesBucket ValuesBucket;
-    ValuesBucket.Put(RawContact::ACCOUNT_ID, accountId);
-    contact->BuildRawContactDataDisplayName(ValuesBucket);
+    OHOS::DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(RawContact::ACCOUNT_ID, accountId);
+    contact->BuildRawContactDataDisplayName(valuesBucket);
     std::string uid = contact->GetUid();
     if (!uid.empty()) {
-        ValuesBucket.Put(RawContact::UUID, uid);
+        valuesBucket.Put(RawContact::UUID, uid);
     }
-    return VCardRdbHelper::GetInstance().InsertRawContact(ValuesBucket);
+    return VCardRdbHelper::GetInstance().InsertRawContact(valuesBucket);
 }
 
 bool VCardManager::IsContactsIdExit(int32_t accountId)
