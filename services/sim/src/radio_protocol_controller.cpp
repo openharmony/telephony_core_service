@@ -90,12 +90,12 @@ void RadioProtocolController::GetRadioProtocol(int32_t slotId)
 
 bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
 {
+    std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
     if (isCommunicating_) {
         TELEPHONY_LOGE("protocol is communicating, can not set now");
         return false;
     }
 
-    std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
     communicationResponseResult_ = false;
     CleanUpCommunication();
     ExecuteCheckCommunication();
