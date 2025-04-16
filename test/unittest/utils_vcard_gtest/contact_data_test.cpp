@@ -988,6 +988,15 @@ HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName001, Functi
     EXPECT_EQ(contact_->nameData_->GetDisplayName(), "");
 }
 
+HWTEST_F(ContactDataTest, VCardContact_BuildContactData001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
+    std::vector<DataShare::DataShareValuesBucket> contactDataValues;
+    int32_t result = contact_->BuildContactData(1, contactDataValues);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
