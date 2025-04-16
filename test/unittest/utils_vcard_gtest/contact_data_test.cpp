@@ -932,7 +932,6 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "三张");
-
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
