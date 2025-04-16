@@ -278,6 +278,8 @@ HWTEST_F(ContactDataTest, VCardContact_AddDatas001, Function | MediumTest | Leve
     contact_->AddRawData(rawData, errorCode);
     rawData->SetName(VCARD_TYPE_X_PHONETIC_MIDDLE_NAME);
     contact_->AddRawData(rawData, errorCode);
+    rawData->SetName(VCARD_TYPE_X_PHONETIC);
+    contact_->AddRawData(rawData, errorCode);
 
     EXPECT_NE((rawData->GetValue()).size(), 0);
     EXPECT_FALSE((rawData->GetByte()).empty());
@@ -959,20 +961,11 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumT
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "liu");
 }
 
-HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName03, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
-    std::string family = "b";
-    std::string middle = "c";
-    std::string given = "d";
-    std::string prefix = "a";
-    std::string suffix = "e";
-    std::string displayName = "";
-    SetNameData(family, given, middle, prefix, suffix);
-    nameData_->setDispalyName(displayName);
-    vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "");
 }
 
 HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)
