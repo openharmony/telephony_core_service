@@ -41,6 +41,15 @@ constexpr int32_t SYS_PARAMETER_SIZE = 256;
 constexpr int32_t MAX_SIZE = 100;
 constexpr int32_t CS_TYPE = 0;
 constexpr int32_t IMS_TYPE = 1;
+const std::map<int32_t, std::string> rilRegisterStateMap = {
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NOT_REG), "REG_STATE_NOT_REG" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_HOME_ONLY), "REG_STATE_HOME_ONLY" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_SEARCH), "REG_STATE_SEARCH" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NO_SERVICE), "REG_STATE_NO_SERVICE" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_INVALID), "REG_STATE_INVALID" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_ROAMING), "REG_STATE_ROAMING" },
+    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_EMERGENCY_ONLY), "REG_STATE_EMERGENCY_ONLY" },
+};
 
 NetworkRegister::NetworkRegister(std::shared_ptr<NetworkSearchState> networkSearchState,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
@@ -101,11 +110,7 @@ void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> c
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
     UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
-    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
-    if (iter != rilRegisterStateMap_.end()) {
-        TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-            iter->second.c_str(), registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
-    }
+    PrintCurrentRegistrationState(registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
 }
@@ -154,11 +159,21 @@ void NetworkRegister::ProcessPsRegister(const std::shared_ptr<PsRegStatusResultI
     nrSupport_ = psRegStatusResult->isNrAvailable;
     UpdateNrState();
     UpdateCfgTech();
-    auto iter = rilRegisterStateMap_.find(static_cast<int32_t>(registrationStatus));
-    TELEPHONY_LOGI("regStatus= %{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
-        iter->second.c_str(), registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
+    PrintCurrentRegistrationState(registrationStatus, psRegStatusResult->radioTechnology, roam, slotId_);
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_PS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
+}
+
+void NetworkRegister::PrintCurrentRegistrationState(RilRegister regStatus, TelRilRadioTech tech, RoamingType roam,
+    int32_t slotId)
+{
+    auto iter = rilRegisterStateMap.find(static_cast<int32_t>(regStatus));
+    if (iter != rilRegisterStateMap.end()) {
+        TELEPHONY_LOGI("regStatus=%{public}s(%{public}d) radioTechnology=%{public}d roam=%{public}d slotId:%{public}d",
+            iter->second.c_str(), regStatus, tech, roam, slotId_);
+    } else {
+        TELEPHONY_LOGE("PrintCurrentRegistrationStateFailed: rilRegisterStateMap is empty.");
+    }
 }
 
 int32_t NetworkRegister::RevertLastTechnology()
