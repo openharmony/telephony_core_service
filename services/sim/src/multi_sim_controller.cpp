@@ -703,7 +703,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
         TELEPHONY_LOGE("radioProtocolController_ is nullptr");
         return false;
     }
-    std::unique_lock<std::mutex> lck(radioProtocolController_->ctx_);
+    std::unique_lock<ffrt::mutex> lck(radioProtocolController_->ctx_);
     radioProtocolController_->RadioProtocolControllerWait();
     if (!radioProtocolController_->SetActiveSimToRil(slotId, type, enable)) {
         TELEPHONY_LOGE("SetActiveSimToRil failed");

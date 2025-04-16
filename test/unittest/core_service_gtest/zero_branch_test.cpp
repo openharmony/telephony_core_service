@@ -3035,6 +3035,10 @@ HWTEST_F(BranchTest, Telephony_RadioProtocolController_002, Function | MediumTes
     radioProtocol1.modemId = 0;
     radioProtocol1.status = RadioProtocolStatus::RADIO_PROTOCOL_STATUS_NONE;
     radioProtocolController->radioProtocol_.push_back(radioProtocol1);
+    radioProtocolController->GetRadioProtocolModemId(-1);
+    radioProtocolController->GetRadioProtocolModemId(3);
+    radioProtocolController->GetRadioProtocolTech(-1);
+    radioProtocolController->GetRadioProtocolTech(3);
     EXPECT_EQ(radioProtocolController->GetRadioProtocolModemId(SLOT_ID_0), 0);
 }
 
