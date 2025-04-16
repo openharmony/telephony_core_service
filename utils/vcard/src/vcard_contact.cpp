@@ -193,14 +193,14 @@ int32_t VCardContact::BuildContactData(int32_t rawId, std::vector<DataShare::Dat
     return TELEPHONY_SUCCESS;
 }
 
-void VCardContact::BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &RawContactDataValue)
+void VCardContact::BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &rawContactDataValue)
 {
     UpdateDisplayName();
     CheckNameExist();
     if (nameData_ == nullptr) {
         return;
     }
-    RawContactDataValue.Put(RawContact::DISPLAY_NAME, nameData_->GetDisplayName());
+    rawContactDataValue.Put(RawContact::DISPLAY_NAME, nameData_->GetDisplayName());
 }
 
 void VCardContact::BuildValuesBucket(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues,
