@@ -364,16 +364,6 @@ const std::map<int32_t, std::string> regServiceStateMap_ = {
     { static_cast<int32_t>(TelephonyRegServiceState::REG_STATE_POWER_OFF), "REG_STATE_POWER_OFF" },
 };
 
-const std::map<int32_t, std::string> rilRegisterStateMap_ = {
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NOT_REG), "REG_STATE_NOT_REG" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_HOME_ONLY), "REG_STATE_HOME_ONLY" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_SEARCH), "REG_STATE_SEARCH" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_NO_SERVICE), "REG_STATE_NO_SERVICE" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_INVALID), "REG_STATE_INVALID" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_ROAMING), "REG_STATE_ROAMING" },
-    { static_cast<int32_t>(TelephonyRilRegisterState::REG_STATE_EMERGENCY_ONLY), "REG_STATE_EMERGENCY_ONLY" },
-};
-
 /**
  * @brief Get the string of bool value.
  *
