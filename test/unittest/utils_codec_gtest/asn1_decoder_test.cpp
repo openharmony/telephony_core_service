@@ -30,6 +30,8 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
 #ifndef TEL_TEST_UNSUPPORT
+const uint32_t MAX_BPP_LENGTH = 245760;
+const uint32_t BYTE_TO_HEX_LEN = 2;
 class Asn1DecoderTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -83,6 +85,23 @@ HWTEST_F(Asn1DecoderTest, Asn1NextNode_001, Function | MediumTest | Level3)
     std::shared_ptr<Asn1Node> pAsn1Node1 = pAsn1Decoder1->Asn1NextNode();
     ret = pAsn1Node1 == nullptr ? true : false;
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(Asn1DecoderTest, Asn1NextNode_002, Function | MediumTest | Level3)
+{
+    uint32_t offset = 0;
+    uint32_t decodeLen = 6;
+    uint32_t tagStart = 0;
+    uint32_t tag = 0x81;
+    std::vector<uint8_t> src;
+    for (int i = 0; i < MAX_BPP_LENGTH * BYTE_TO_HEX_LEN + 2; i++) {
+        src.push_back(0);
+    }
+    std::shared_ptr<Asn1Decoder> pAsn1Decoder = std::make_shared<Asn1Decoder>(src, offset, decodeLen);
+    std::shared_ptr<Asn1Node> pAsn1Node = pAsn1Decoder->Asn1NextNode();
+    EXPECT_NE(pAsn1Node, nullptr);
+    std::shared_ptr<Asn1Node> pAsn1Node1 = pAsn1Decoder->BuildAsn1Node(tag, offset, tagStart);
+    EXPECT_NE(pAsn1Node1, nullptr);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
