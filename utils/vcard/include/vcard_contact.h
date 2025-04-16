@@ -56,7 +56,7 @@ public:
     ~VCardContact() {}
     void AddRawData(std::shared_ptr<VCardRawData> rawData, int32_t &errorCode);
     int32_t BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues);
-    void BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &RawContactDataValue);
+    void BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &rawContactDataValue);
     int32_t BuildContact(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
     void Init();
     std::shared_ptr<VCardNameData> GetNameData();
