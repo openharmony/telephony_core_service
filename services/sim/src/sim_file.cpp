@@ -1129,7 +1129,6 @@ bool SimFile::ProcessGetAdDone(const AppExecFwk::InnerEvent::Pointer &event)
     } else if (doneData && (lengthOfMnc_ != MNC_LEN) && (lengthOfMnc_ != MCC_LEN)) {
         lengthOfMnc_ = UNINITIALIZED_MNC;
     }
-    SaveCountryCode();
     TELEPHONY_LOGI("update5 length Mnc_= %{public}d", lengthOfMnc_);
     CheckMncLengthForAdDone();
     return isFileProcessResponse;
