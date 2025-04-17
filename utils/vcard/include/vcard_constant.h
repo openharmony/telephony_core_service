@@ -234,6 +234,7 @@ public:
     static constexpr const char *IS_DELETED = "is_deleted";
     static constexpr const char *PRIMARY_CONTACT = "primary_contact";
     static constexpr const char *UUID = "uuid";
+    static constexpr const char *DISPLAY_NAME = "display_name";
 };
 
 // contact_data

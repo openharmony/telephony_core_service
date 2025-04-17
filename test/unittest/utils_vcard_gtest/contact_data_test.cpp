@@ -278,6 +278,8 @@ HWTEST_F(ContactDataTest, VCardContact_AddDatas001, Function | MediumTest | Leve
     contact_->AddRawData(rawData, errorCode);
     rawData->SetName(VCARD_TYPE_X_PHONETIC_MIDDLE_NAME);
     contact_->AddRawData(rawData, errorCode);
+    rawData->SetName(VCARD_TYPE_X_PHONETIC);
+    contact_->AddRawData(rawData, errorCode);
 
     EXPECT_NE((rawData->GetValue()).size(), 0);
     EXPECT_FALSE((rawData->GetByte()).empty());
@@ -919,6 +921,17 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张三");
+    middle = "小";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张小三");
+    family = "";
+    given = "";
+    SetNameData(family, given, middle, displayName);
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "三张");
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
@@ -937,6 +950,23 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumT
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
 }
 
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    std::shared_ptr<VCardNameData> nameData_ = std::make_shared<VCardNameData>();
+    nameData_->SetPhoneticName("liu");
+    vCardContact.nameData_ = nameData_;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "liu");
+}
+
+HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName03, Function | MediumTest | Level3)
+{
+    VCardContact vCardContact;
+    vCardContact.UpdateDisplayName();
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "");
+}
+
 HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTest | Level3)
 {
     VCardPostalData postalData;
@@ -944,6 +974,27 @@ HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData01, Function | MediumTes
         {"pobox", "", "street", "city", "region", "postCode", "country"};
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     EXPECT_EQ((postalData.GetPostalAddress()), "pobox street city region postCode country");
+}
+
+HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode = 0;
+    rawData->SetName(VCARD_TYPE_X_PHONETIC);
+    DataShare::DataShareValuesBucket contactDataValues;
+    contact_->AddRawData(rawData, errorCode);
+    contact_->BuildRawContactDataDisplayName(contactDataValues);
+    EXPECT_EQ(contact_->nameData_->GetDisplayName(), "");
+}
+
+HWTEST_F(ContactDataTest, VCardContact_BuildContactData001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
+    std::vector<DataShare::DataShareValuesBucket> contactDataValues;
+    int32_t result = contact_->BuildContactData(1, contactDataValues);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
 #endif // TEL_TEST_UNSUPPORT
