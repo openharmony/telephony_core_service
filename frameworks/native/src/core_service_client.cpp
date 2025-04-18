@@ -242,7 +242,7 @@ int32_t CoreServiceClient::GetRadioState(int32_t slotId, const sptr<INetworkSear
     return proxy->GetRadioState(slotId, callback);
 }
 
-int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS)
+int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
