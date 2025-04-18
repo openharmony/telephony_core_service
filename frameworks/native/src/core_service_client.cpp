@@ -22,6 +22,7 @@
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "raw_parcel_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -241,14 +242,34 @@ int32_t CoreServiceClient::GetRadioState(int32_t slotId, const sptr<INetworkSear
     return proxy->GetRadioState(slotId, callback);
 }
 
-int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei)
+int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetImei(slotId, imei);
+    auto alived = std::make_shared<int>();
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [&imei, wp = std::weak_ptr(alived)] (MessageParcel &data, MessageParcel &reply) {
+        auto alive = wp.lock()
+        if (alive) {
+            TELEPHONY_LOGE("CoreServiceClient::GetImei imei");
+            imei = data.ReadString16();
+        }
+    });
+    int ret = proxy->GetImei(slotId, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    TELEPHONY_LOGE("CoreServiceClient::GetIWaitForResultmei timeoutMs = %{public}zu", timeoutMs);
+    if ((!ret) != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetImei wait callback timeout");
+        return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
