@@ -252,7 +252,7 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
     auto alived = std::make_shared<int>();
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
         [&imei, wp = std::weak_ptr(alived)] (MessageParcel &data, MessageParcel &reply) {
-        auto alive = wp.lock()
+        auto alive = wp.lock();
         if (alive) {
             TELEPHONY_LOGE("CoreServiceClient::GetImei imei");
             imei = data.ReadString16();
@@ -264,7 +264,6 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
         return ret;
     }
     ret = callback->WaitForResult(timeoutMs);
-    TELEPHONY_LOGE("CoreServiceClient::GetIWaitForResultmei timeoutMs = %{public}zu", timeoutMs);
     if ((!ret) != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("GetImei wait callback timeout");
         return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
