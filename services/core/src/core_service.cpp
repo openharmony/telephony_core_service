@@ -312,7 +312,7 @@ int32_t CoreService::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string 
     return networkSearchManager_->GetIsoCountryCodeForNetwork(slotId, countryCode);
 }
 
-int32_t CoreService::GetImei(int32_t slotId, std::u16string &imei)
+int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
