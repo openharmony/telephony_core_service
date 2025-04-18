@@ -57,7 +57,7 @@ public:
 
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+    int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
 
