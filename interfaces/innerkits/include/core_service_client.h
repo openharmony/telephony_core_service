@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int64_t DEFAULT_RAW_CALLBACK_TIMEOUT_MS = 30;
 class CoreServiceClient : public DelayedRefSingleton<CoreServiceClient> {
     DECLARE_DELAYED_REF_SINGLETON(CoreServiceClient);
 
@@ -165,7 +166,7 @@ public:
      * @param imei[out], the International Mobile Equipment Identification Number of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetImei(int32_t slotId, std::u16string &imei);
+    int32_t GetImei(int32_t slotId, std::u16string &imei, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtains the software version number of a specified card slot of the device
