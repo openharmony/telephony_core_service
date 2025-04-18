@@ -120,6 +120,7 @@ ohos_shared_library("tel_core_service") {
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sms.cpp",
     "services/core/src/core_service.cpp",
     "services/core/src/core_service_dump_helper.cpp",
+    "services/core/src/raw_parcel_callback_proxy.cpp",
     "services/core/src/core_service_hisysevent.cpp",
     "services/core/src/core_service_stub.cpp",
   ]
