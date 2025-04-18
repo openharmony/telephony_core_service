@@ -126,9 +126,9 @@ void SimFileParse::ParseOpl(const std::vector<std::string> &records, SimFile &si
         std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
         file->plmnNumeric = plmn;
 
-        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
-        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN), 0, HEXADECIMAL);
-        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN), 0, HEXADECIMAL);
+        file->lacStart = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN, HALF_BYTE_LEN).c_str(), nullptr, HEXADECIMAL));
+        file->lacEnd = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN + HALF_BYTE_LEN, HALF_BYTE_LEN).c_str(), nullptr, HEXADECIMAL));
+        file->pnnRecordId = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN + BYTE_LENGTH, HALF_LEN).c_str(), nullptr, HEXADECIMAL));
         TELEPHONY_LOGI("plmnNumeric: %{public}s, lacStart: %{public}d, lacEnd: %{public}d, pnnRecordId: %{public}d",
             file->plmnNumeric.c_str(), file->lacStart, file->lacEnd, file->pnnRecordId);
         simFile.oplFiles_.push_back(file);
@@ -161,9 +161,9 @@ void SimFileParse::ParseOpl5g(const std::vector<std::string> &records, SimFile &
         }
         std::shared_ptr<OperatorPlmnInfo> file = std::make_shared<OperatorPlmnInfo>();
         file->plmnNumeric = plmn;
-        file->lacStart = stoi(dataOpl.substr(MCCMNC_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
-        file->lacEnd = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN, LAC_RANGE_LEN), 0, HEXADECIMAL);
-        file->pnnRecordId = stoi(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN + LAC_RANGE_LEN, HALF_LEN), 0, HEXADECIMAL);
+        file->lacStart = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN, LAC_RANGE_LEN).c_str(), nullptr, HEXADECIMAL));
+        file->lacEnd = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN, LAC_RANGE_LEN).c_str(), nullptr, HEXADECIMAL));
+        file->pnnRecordId = static_cast<int>(strtol(dataOpl.substr(MCCMNC_LEN + LAC_RANGE_LEN + LAC_RANGE_LEN, HALF_LEN).c_str(), nullptr, HEXADECIMAL));
         TELEPHONY_LOGD("plmnNumeric: %{public}s, lacStart: %{public}d, lacEnd: %{public}d, pnnRecordId: %{public}d",
             file->plmnNumeric.c_str(), file->lacStart, file->lacEnd, file->pnnRecordId);
         simFile.opl5gFiles_.push_back(file);
