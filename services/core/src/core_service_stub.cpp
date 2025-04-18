@@ -515,7 +515,7 @@ int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, Mess
 int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
 {
     auto slotId = data.ReadInt32();
-    auto callback = iface_cast(data.ReadRemoteObject());
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
     if (callback == nullptr) {
     TELEPHONY_LOGE("OnGetImei no callback");
         return TELEPHONY_ERR_FAIL;
