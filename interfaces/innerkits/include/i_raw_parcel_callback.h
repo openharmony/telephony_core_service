@@ -12,29 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef RAW_PARCEL_CALLBACK_STUB_H
-#define RAW_PARCEL_CALLBACK_STUB_H
-
-#include <condition_variable>
-#include "i_raw_parcel_callback.h"
-#include "iremote_stub.h"
-
+#ifndef RAW_PARCEL_CALLBACK_H
+#define RAW_PARCEL_CALLBACK_H
+ 
+#include "iremote_broker.h"
+ 
 namespace OHOS {
 namespace Telephony {
-constexpr int64_t DEFAULT_TIMEOUT_MS = 30 * 1000;
-
-class RawParcelCallbackStub : public IRemoteStub<IRawParcelCallback> {
+class IRawParcelCallback : public IRemoteBroker {
 public:
-    explicit RawParcelCallbackStub(std::function<void(MessageParcel &data, MessageParcel &reply)> callback);
-    bool WaitForResult(int64_t timeoutMs = DEFAULT_TIMEOUT_MS);
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-private:
-    std::mutex mtx_;
-    std::condition_variable cv_;
-    bool done_ = false;
-    std::function<void(MessageParcel &data, MessageParcel &reply)> callback_;
+    // only override by proxy
+    virtual void Transfer(std::function<void(MessageParcel &)> func) {
+    }
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IRawParcelCallback");
 };
-
-} // namespace Telephony
-} // namespace OHOS
-#endif // !RAW_PARCEL_CALLBACK_STUB_H
+}
+}
+#endif // !RAW_PARCEL_CALLBACK_H
