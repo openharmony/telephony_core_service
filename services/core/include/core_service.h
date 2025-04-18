@@ -282,9 +282,10 @@ private:
     std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
-    void AsyncExecute(const std::function<void()> task);
-    void AsyncSimExecute(const std::function<void()> task);
-    void AsyncSetSimExecute(const std::function<void()> task);
+    std::shared_ptr<AppExecFwk::EventHandler> simManagerHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> simSetManagerHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
+    std::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
     int64_t endTime_ = 0;
