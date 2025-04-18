@@ -55,7 +55,7 @@ public:
     virtual int32_t GetNetworkState(int32_t slotId, sptr<NetworkState> &networkState) = 0;
     virtual int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual int32_t GetImei(int32_t slotId, std::u16string &imei) = 0;
+    virtual int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) = 0;
     virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
