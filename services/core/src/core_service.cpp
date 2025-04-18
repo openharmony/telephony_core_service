@@ -137,6 +137,45 @@ int32_t CoreService::GetServiceRunningState()
     return static_cast<int32_t>(state_);
 }
 
+void CoreService::AsyncExecute(const std::function<void()> task)
+{
+    TELEPHONY_LOGE("CoreService::AsyncExecute");
+    if (networkSearchManagerHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (networkSearchManagerHandler_ == nullptr) {
+            auto networkSearchRunner = AppExecFwk::EventRunner::Create("networkSearchHandler");
+            networkSearchManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(networkSearchRunner);
+        }
+    }
+    networkSearchManagerHandler_->PostTask(task);
+}
+
+void CoreService::AsyncSimExecute(const std::function<void()> task)
+{
+    if (simManagerHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (simManagerHandler_ == nullptr) {
+            auto simManagerRunner = AppExecFwk::EventRunner::Create("simManagerHandler");
+            simManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
+        }
+    }
+    TELEPHONY_LOGE("CoreService::AsyncSimExecute");
+    simManagerHandler_->PostTask(task);
+}
+
+void CoreService::AsyncSetSimExecute(const std::function<void()> task)
+{
+    if (simSetManagerHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (simSetManagerHandler_ == nullptr) {
+            auto simManagerRunner = AppExecFwk::EventRunner::Create("simSetManagerHandler");
+            simSetManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
+        }
+    }
+    TELEPHONY_LOGE("CoreService::AsyncSetSimExecute");
+    simSetManagerHandler_->PostTask(task);
+}
+
 int32_t CoreService::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
