@@ -73,6 +73,7 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_manager_inner.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_service_client.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/core_service_proxy.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/raw_parcel_callback_stub.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/i_network_search_callback_stub.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/ims_reg_info_callback_stub.cpp",
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/network_information.cpp",
