@@ -459,16 +459,21 @@ int32_t CoreServiceProxy::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16st
     return result;
 }
 
-int32_t CoreServiceProxy::GetImei(int32_t slotId, std::u16string &imei)
+int32_t CoreServiceProxy::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option{MessageOption::TF_ASYNC};
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetImei WriteInterfaceToken is false");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     data.WriteInt32(slotId);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetImei Remote is null");
@@ -479,12 +484,8 @@ int32_t CoreServiceProxy::GetImei(int32_t slotId, std::u16string &imei)
         TELEPHONY_LOGE("GetImei failed, error code is %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t result = reply.ReadInt32();
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        imei = reply.ReadString16();
-    }
     TELEPHONY_LOGD("CoreServiceProxy::GetImei success");
-    return result;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreServiceProxy::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
