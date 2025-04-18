@@ -37,6 +37,7 @@
 #include "operator_config_types.h"
 #include "signal_information.h"
 #include "sim_state_type.h"
+#include "i_raw_parcel_callback.h"
 
 namespace OHOS {
 namespace Telephony {
