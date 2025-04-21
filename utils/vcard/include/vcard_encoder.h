@@ -29,8 +29,10 @@ public:
     void SetPhoneNumberEncodedCallback(std::shared_ptr<PhoneNumberEncodedCallback> PhoneNumberEncodedCallback);
 
 private:
-    void ContructContact(std::shared_ptr<VCardContact> contact,
-        int32_t rawContactId, int32_t &errorCode);
+    std::shared_ptr<DataShare::DataShareResultSet> QueryContactData(
+        const std::vector<int32_t> &rawContactIdList, int32_t &errorCode);
+    void ProcessContactData(std::string &result,
+        std::shared_ptr<DataShare::DataShareResultSet> contactDataResultSet, int32_t &errorCode);
     std::shared_ptr<DataShare::DataShareResultSet> GetRawContactResultSet(std::vector<int> contactIdList);
 
 private:
