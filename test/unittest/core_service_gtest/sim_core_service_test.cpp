@@ -45,7 +45,6 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    MessageParcel data;
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
         [&testU16Str] (MessageParcel &data) {
         testU16Str = data.ReadString16();
