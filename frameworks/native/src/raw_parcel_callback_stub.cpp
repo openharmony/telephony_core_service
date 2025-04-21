@@ -23,6 +23,15 @@ RawParcelCallbackStub::RawParcelCallbackStub(std::function<void(MessageParcel &d
 {
 }
 
+void RawParcelCallbackStub::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
+{
+    if (func) {
+        func(data);
+    }
+    done_ = true;
+    cv_.notify_one();
+}
+
 int RawParcelCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -33,10 +42,10 @@ int RawParcelCallbackStub::OnRemoteRequest(
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
     if (callback_) {
-        callback_(data, reply);
+        Transfer([=](MessageParcel &data) {
+            callback_(data);
+        }, data);
     }
-    done_ = true;
-    cv_.notify_one();
     return TELEPHONY_ERR_SUCCESS;
 }
 
