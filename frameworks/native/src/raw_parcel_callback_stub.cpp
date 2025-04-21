@@ -44,8 +44,7 @@ int RawParcelCallbackStub::OnRemoteRequest(
     if (callback_) {
         Transfer([=](MessageParcel &data) {
             callback_(data);
-        },
-        data);
+            }, data);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
