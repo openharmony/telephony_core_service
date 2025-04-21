@@ -63,7 +63,6 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
             break;
         }
         ProcessContactData(result, contactDataResultSet, errorCode);
-        TELEPHONY_LOGI("result = %{public}s", result.c_str());
     }
     TELEPHONY_LOGW("ContructVCard Success");
     if (phoneNumberEncodedCallback_ != nullptr) {
