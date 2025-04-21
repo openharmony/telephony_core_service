@@ -45,11 +45,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [&testU16Str] (MessageParcel &data) {
-        testU16Str = data.ReadString16();
-    });
-    EXPECT_NE(mCoreService->GetImei(0, callback), TELEPHONY_ERR_SUCCESS);
+    sptr<IRawParcelCallback> callback0;
+    EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -197,12 +194,8 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    MessageParcel data;
-    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [&testU16Str] (MessageParcel &data) {
-        testU16Str = data.ReadString16();
-    });
-    EXPECT_NE(mCoreService->GetImei(0, callback), TELEPHONY_ERR_SUCCESS);
+    sptr<IRawParcelCallback> callback0;
+    EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
