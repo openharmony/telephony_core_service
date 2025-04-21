@@ -17,10 +17,10 @@
 
 namespace OHOS {
 namespace Telephony {
-void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func)
+void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
 {
     MessageOption option{MessageOption::TF_ASYNC};
-    MessageParcel data;
+    MessageParcel data0;
     MessageParcel reply;
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
@@ -32,9 +32,9 @@ void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func)
         return;
     }
     if (func != nullptr) {
-        func(data);
+        func(data0);
     }
-    remote->SendRequest(0, data, reply, option);
+    remote->SendRequest(0, data0, reply, option);
 }
 } // namespace Telephony
 } // namespace OHOS
