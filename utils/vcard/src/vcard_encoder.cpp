@@ -53,7 +53,6 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
             rawResultSet->GetColumnIndex(RawContact::ID, index);
             rawResultSet->GetInt(index, rawContactId);
             rawContactIdList.push_back(rawContactId);
-            TELEPHONY_LOGW("rawContactId: %{public}d", rawContactId);
             resultSetNum = rawResultSet->GoToNextRow();
         }
         rawResultSet->Close();
