@@ -678,24 +678,49 @@ HWTEST_F(ContactDataTest, VCardConfiguration_IsJapaneseDevice_002, Function | Me
     ASSERT_FALSE(result);
 }
 
-HWTEST_F(ContactDataTest, VCardEncoder, Function | MediumTest | Level3)
+HWTEST_F(ContactDataTest, queryContactData001, Function | MediumTest | Level3)
 {
     VCardEncoder encoder;
     int32_t errorCode = 0;
-    std::vector<std::vector<int>> contactIdLists;
     std::vector<int> contactIdList;
-
-    EXPECT_STREQ((encoder.ContructVCard(contactIdLists, errorCode).c_str()), "");
     contactIdList.push_back(1);
-    contactIdLists.push_back(contactIdList);
-    
-    EXPECT_STREQ((encoder.ContructVCard(contactIdLists, errorCode).c_str()), "");
+    VCardRdbHelper::GetInstance().SetDataHelper(nullptr);
+    auto contactDataResultSet = encoder.QueryContactData(contactIdList, errorCode);
+ 
+    std::string result = "";
+ 
+    encoder.ProcessContactData(result, contactDataResultSet, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
-
-    errorCode = 0;
-    std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
-    encoder.ContructContact(contact, 0, errorCode);
+}
+ 
+HWTEST_F(ContactDataTest, queryContactData002, Function | MediumTest | Level3)
+{
+    VCardEncoder encoder;
+    int32_t errorCode = 0;
+    std::vector<int> contactIdList;
+    contactIdList.push_back(1);
+    auto dataShareHelper = std::make_shared<MockDataShareHelper>();
+    VCardRdbHelper::GetInstance().SetDataHelper(dataShareHelper);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    EXPECT_CALL(*dataShareHelper, Query(_, _, _, _)).WillRepeatedly(DoAll(Return(resultSet))); 
+    auto contactDataResultSet = encoder.QueryContactData(contactIdList, errorCode);
+    std::string result = "";
+    encoder.ProcessContactData(result, contactDataResultSet, errorCode);
     EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+ 
+HWTEST_F(ContactDataTest, queryContactData003, Function | MediumTest | Level3)
+{
+    VCardEncoder encoder;
+    int32_t errorCode = 0;
+    std::vector<int> contactIdList;
+    std::string result = "";
+    contactIdList.push_back(1);
+    std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
+    EXPECT_CALL(*resultSet, GoToFirstRow()).WillRepeatedly(Return(0));
+    EXPECT_CALL(*resultSet, GoToNextRow()).WillOnce(Return(0)).WillRepeatedly(Return(-1));
+    encoder.ProcessContactData(result, resultSet, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(ContactDataTest, VCardFileUtils_Create, Function | MediumTest | Level3)

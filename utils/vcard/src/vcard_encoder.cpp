@@ -53,15 +53,18 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
             rawResultSet->GetColumnIndex(RawContact::ID, index);
             rawResultSet->GetInt(index, rawContactId);
             rawContactIdList.push_back(rawContactId);
+            TELEPHONY_LOGW("rawContactId: %{public}d", rawContactId);
             resultSetNum = rawResultSet->GoToNextRow();
         }
         rawResultSet->Close();
         TELEPHONY_LOGW("rawContactIdListSize = %{public}d", (int32_t)rawContactIdList.size());
-        for (auto rawContactId : rawContactIdList) {
-            std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
-            ContructContact(contact, rawContactId, errorCode);
-            result += contructor_->ContactVCard(contact);
+        auto contactDataResultSet = QueryContactData(rawContactIdList, errorCode);
+        if (contactDataResultSet == nullptr) {
+            TELEPHONY_LOGE("QueryContactData failed");
+            break;
         }
+        ProcessContactData(result, contactDataResultSet, errorCode);
+        TELEPHONY_LOGI("result = %{public}s", result.c_str());
     }
     TELEPHONY_LOGW("ContructVCard Success");
     if (phoneNumberEncodedCallback_ != nullptr) {
@@ -75,22 +78,71 @@ void VCardEncoder::SetPhoneNumberEncodedCallback(std::shared_ptr<PhoneNumberEnco
     phoneNumberEncodedCallback_ = PhoneNumberEncodedCallback;
 }
 
-void VCardEncoder::ContructContact(std::shared_ptr<VCardContact> contact,
-    int32_t rawContactId, int32_t &errorCode)
+std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::QueryContactData(
+        const std::vector<int32_t> &rawContactIdList, int32_t &errorCode)
 {
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(ContactData::RAW_CONTACT_ID, rawContactId);
+    for (size_t i = 0; i < rawContactIdList.size(); i++) {
+        predicates.EqualTo(ContactData::RAW_CONTACT_ID, rawContactIdList[i]);
+        if (i != rawContactIdList.size() - 1) {
+            predicates.Or();
+        }
+    }
+
     auto contactDataResultSet = VCardRdbHelper::GetInstance().QueryContactData(columns, predicates);
+    if (contactDataResultSet == nullptr) {
+        TELEPHONY_LOGE("QueryContactData failed");
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return nullptr;
+    }
+
+    return contactDataResultSet;
+}
+
+void VCardEncoder::ProcessContactData(std::string &result,
+        std::shared_ptr<DataShare::DataShareResultSet> contactDataResultSet, int32_t &errorCode)
+{
     if (contactDataResultSet == nullptr) {
         TELEPHONY_LOGE("QueryContactData failed");
         errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
         return;
     }
+
     int32_t contactDataResultSetNum = contactDataResultSet->GoToFirstRow();
-    if (contactDataResultSetNum == 0) {
-        contact->BuildContact(contactDataResultSet);
+    if (contactDataResultSetNum != 0) {
+        TELEPHONY_LOGE("GoToFirstRow failed");
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        contactDataResultSet->Close();
+        return;
     }
+
+    std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
+    int32_t current_rawContactId = -1;
+
+    do {
+        int32_t rawContactId = 0;
+        int32_t index = 0;
+        contactDataResultSet->GetColumnIndex(ContactData::RAW_CONTACT_ID, index);
+        contactDataResultSet->GetInt(index, rawContactId);
+
+        if (rawContactId != current_rawContactId) {
+            if (current_rawContactId != -1) {
+                result += contructor_->ContactVCard(contact);
+            }
+            current_rawContactId = rawContactId;
+            contact = std::make_shared<VCardContact>();
+        }
+
+        contact->BuildOneData(contactDataResultSet);
+
+        contactDataResultSetNum = contactDataResultSet->GoToNextRow();
+    } while (contactDataResultSetNum == 0);
+
+    if (current_rawContactId != -1) {
+        result += contructor_->ContactVCard(contact);
+    }
+
     contactDataResultSet->Close();
 }
 
