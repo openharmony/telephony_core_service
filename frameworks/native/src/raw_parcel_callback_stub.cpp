@@ -18,7 +18,7 @@
  
 namespace OHOS {
 namespace Telephony {
-RawParcelCallbackStub::RawParcelCallbackStub(std::function<void(MessageParcel &data, MessageParcel &reply)> callback)
+RawParcelCallbackStub::RawParcelCallbackStub(std::function<void(MessageParcel &data)> callback)
     : callback_(callback)
 {
 }
