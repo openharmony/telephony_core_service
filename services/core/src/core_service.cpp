@@ -170,7 +170,6 @@ void CoreService::AsyncSimSetExecute(const std::function<void()> task)
             simSetManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
         }
     }
-    TELEPHONY_LOGE("CoreService::AsyncSetSimExecute");
     simSetManagerHandler_->PostTask(task);
 }
 
@@ -324,7 +323,7 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncExecute([wp = std::weak_ptr<CoreService>(shared_from_this()), slotId, callback] {
+    AsyncSimExecute([wp = std::weak_ptr<CoreService>(shared_from_this()), slotId, callback] {
         if (auto service = wp.lock()) {
             std::u16string imei = u"";
             MessageParcel dataTmp;
