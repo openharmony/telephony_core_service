@@ -329,10 +329,11 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
     AsyncExecute([wp = std::weak_ptr<CoreService>(shared_from_this()), slotId, callback] {
         if (auto service = wp.lock()) {
             std::u16string imei = u"";
+            MessageParcel dataTmp;
             service->networkSearchManager_->GetImei(slotId, imei);
             callback->Transfer([=](MessageParcel &data) {
                 data.WriteString16(imei);
-            });
+            }, dataTmp);
         }
     });
     return TELEPHONY_ERR_SUCCESS;
