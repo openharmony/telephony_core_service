@@ -137,9 +137,8 @@ int32_t CoreService::GetServiceRunningState()
     return static_cast<int32_t>(state_);
 }
 
-void CoreService::AsyncExecute(const std::function<void()> task)
+void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
 {
-    TELEPHONY_LOGE("CoreService::AsyncExecute");
     if (networkSearchManagerHandler_ == nullptr) {
         std::lock_guard<std::mutex> lock(handlerInitMutex_);
         if (networkSearchManagerHandler_ == nullptr) {
@@ -159,11 +158,10 @@ void CoreService::AsyncSimExecute(const std::function<void()> task)
             simManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
         }
     }
-    TELEPHONY_LOGE("CoreService::AsyncSimExecute");
     simManagerHandler_->PostTask(task);
 }
 
-void CoreService::AsyncSetSimExecute(const std::function<void()> task)
+void CoreService::AsyncSimSetExecute(const std::function<void()> task)
 {
     if (simSetManagerHandler_ == nullptr) {
         std::lock_guard<std::mutex> lock(handlerInitMutex_);
