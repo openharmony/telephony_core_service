@@ -304,6 +304,7 @@ ohos_unittest("tel_sim_gtest") {
     "sim_core_service_test.cpp",
     "sim_elementary_file_test.cpp",
     "sim_icc_test.cpp",
+    "sim_manager_test.cpp",
     "sim_test.cpp",
     "sim_type_convert_test.cpp",
     "vcard_test.cpp",

@@ -44,7 +44,7 @@ bool SimManager::OnInit(int32_t slotCount)
 void SimManager::InitMultiSimObject()
 {
     // Program memory
-    std::lock_guard<std::shared_mutex> lck(mtx_);
+    std::lock_guard<ffrt::shared_mutex> lck(mtx_);
     if (slotCount_ <0 || slotCount_ > MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("SimManager InitMultiSimObject, slotCount = %{public}d is out of range", slotCount_);
         return;
@@ -83,7 +83,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
     if (slotId != SIM_SLOT_2) {
         return TELEPHONY_ERROR;
     }
-    std::lock_guard<std::shared_mutex> lck(mtx_);
+    std::lock_guard<ffrt::shared_mutex> lck(mtx_);
     if (simStateManager_.size() == MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("SimManager InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;
@@ -142,7 +142,7 @@ void SimManager::InitSingleSimObject()
 
 int32_t SimManager::HasSimCard(int32_t slotId, bool &hasSimCard)
 {
-    std::shared_lock<std::shared_mutex> lck(mtx_);
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simStateManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -761,6 +761,7 @@ int32_t SimManager::GetSimOperatorNumeric(int32_t slotId, std::u16string &operat
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     operatorNumeric = simFileManager_[slotId]->GetSimOperatorNumeric();
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -901,6 +902,7 @@ int32_t SimManager::GetOpName(int32_t slotId, std::u16string &opname)
         TELEPHONY_LOGE("simFileManager is null! %{public}d", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     opname = simFileManager_[slotId]->GetOpName();
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1144,7 +1146,7 @@ int32_t SimManager::UpdateIccDiallingNumbers(
 void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
-        std::shared_lock<std::shared_mutex> lck(mtx_);
+        std::shared_lock<ffrt::shared_mutex> lck(mtx_);
         if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
