@@ -270,9 +270,9 @@ public:
 #endif
 private:
     bool Init();
-    void AsyncExecute(const std::function<void()> task);
+    void AsyncNetSearchExecute(const std::function<void()> task);
     void AsyncSimExecute(const std::function<void()> task);
-    void AsyncSetSimExecute(const std::function<void()> task);
+    void AsyncSimSetExecute(const std::function<void()> task);
 
 private:
     int32_t slotId_ = DEFAULT_SLOT_ID;
