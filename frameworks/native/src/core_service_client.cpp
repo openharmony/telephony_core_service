@@ -251,7 +251,7 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
     }
     auto alived = std::make_shared<int>();
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [&imei, wp = std::weak_ptr(alived)] (MessageParcel &data, MessageParcel &reply) {
+        [&imei, wp = std::weak_ptr(alived)] (MessageParcel &data) {
         auto alive = wp.lock();
         if (alive) {
             TELEPHONY_LOGE("CoreServiceClient::GetImei imei");
