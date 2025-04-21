@@ -264,7 +264,7 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
         return ret;
     }
     ret = callback->WaitForResult(timeoutMs);
-    if ((!ret) != TELEPHONY_ERR_SUCCESS) {
+    if ((!ret)) {
         TELEPHONY_LOGE("GetImei wait callback timeout");
         return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
     }
