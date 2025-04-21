@@ -106,10 +106,10 @@ void TelRilManager::SendAckAndLock(void)
 
 void TelRilManager::InitTelModule(int32_t slotId)
 {
-    std::lock_guard<shared_mutex> telRilMutex(telRilMutex_);
+    std::shared_lock<shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
     observerHandler_.push_back(observerHandler);
-    std::shared_lock<shared_mutex> lock(mutex_);
+    std::lock_guard<shared_mutex> telRilMutex(telRilMutex_);
     telRilSms_.push_back(std::make_shared<TelRilSms>(slotId, rilInterface_, observerHandler_[slotId], handler_));
     telRilSim_.push_back(std::make_shared<TelRilSim>(slotId, rilInterface_, observerHandler_[slotId], handler_));
     telRilCall_.push_back(std::make_shared<TelRilCall>(slotId, rilInterface_, observerHandler_[slotId], handler_));
@@ -254,7 +254,6 @@ void TelRilManager::ResetRilInterfaceBySlotId(int32_t slotId)
 int32_t TelRilManager::RegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what, int32_t *obj)
 {
-    std::lock_guard<shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
     if (observerHandler != nullptr) {
         switch (what) {
@@ -296,7 +295,6 @@ int32_t TelRilManager::RegisterCoreNotify(
 int32_t TelRilManager::UnRegisterCoreNotify(
     int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int32_t what)
 {
-    std::lock_guard<shared_mutex> lock(mutex_);
     std::shared_ptr<ObserverHandler> observerHandler = GetObserverHandler(slotId);
     if (observerHandler != nullptr) {
         observerHandler->Remove(what, observerCallBack);
