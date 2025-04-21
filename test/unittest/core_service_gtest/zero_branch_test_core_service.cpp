@@ -30,6 +30,7 @@
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
+#include "raw_parcel_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
