@@ -91,13 +91,7 @@ HWTEST_F(CoreServiceTest, CoreService_SetRadioState_001, Function | MediumTest |
 HWTEST_F(CoreServiceTest, CoreService_GetImei_001, Function | MediumTest | Level1)
 {
     SecurityToken token;
-    std::u16string imei = u"";
-    MessageParcel data;
-    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [&imei] (MessageParcel &data) {
-        imei = data.ReadString16();
-    });
-    auto result = DelayedSingleton<CoreService>::GetInstance()->GetImei(0, callback);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetImei(0, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
