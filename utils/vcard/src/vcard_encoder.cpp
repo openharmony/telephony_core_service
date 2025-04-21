@@ -46,14 +46,14 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
             continue;
         }
         std::vector<int32_t> rawContactIdList;
-        int resultSetNum = rawResultSet->GoToFirstRow();
-        while (resultSetNum == 0) {
+        int dsResult = rawResultSet->GoToFirstRow();
+        while (dsResult == DataShare::E_OK) {
             int32_t index = 0;
             int32_t rawContactId = 0;
             rawResultSet->GetColumnIndex(RawContact::ID, index);
             rawResultSet->GetInt(index, rawContactId);
             rawContactIdList.push_back(rawContactId);
-            resultSetNum = rawResultSet->GoToNextRow();
+            dsResult = rawResultSet->GoToNextRow();
         }
         rawResultSet->Close();
         TELEPHONY_LOGW("rawContactIdListSize = %{public}d", (int32_t)rawContactIdList.size());
@@ -107,8 +107,8 @@ void VCardEncoder::ProcessContactData(std::string &result,
         return;
     }
 
-    int32_t contactDataResultSetNum = contactDataResultSet->GoToFirstRow();
-    if (contactDataResultSetNum != 0) {
+    int32_t contactDataResult = contactDataResultSet->GoToFirstRow();
+    if (contactDataResult != DataShare::E_OK) {
         TELEPHONY_LOGE("GoToFirstRow failed");
         errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
         contactDataResultSet->Close();
@@ -116,7 +116,7 @@ void VCardEncoder::ProcessContactData(std::string &result,
     }
 
     std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
-    int32_t current_rawContactId = -1;
+    int32_t currentRawContactId = -1;
 
     do {
         int32_t rawContactId = 0;
@@ -124,20 +124,20 @@ void VCardEncoder::ProcessContactData(std::string &result,
         contactDataResultSet->GetColumnIndex(ContactData::RAW_CONTACT_ID, index);
         contactDataResultSet->GetInt(index, rawContactId);
 
-        if (rawContactId != current_rawContactId) {
-            if (current_rawContactId != -1) {
+        if (rawContactId != currentRawContactId) {
+            if (currentRawContactId != -1) {
                 result += contructor_->ContactVCard(contact);
             }
-            current_rawContactId = rawContactId;
+            currentRawContactId = rawContactId;
             contact = std::make_shared<VCardContact>();
         }
 
         contact->BuildOneData(contactDataResultSet);
 
-        contactDataResultSetNum = contactDataResultSet->GoToNextRow();
-    } while (contactDataResultSetNum == 0);
+        contactDataResult = contactDataResultSet->GoToNextRow();
+    } while (contactDataResult == DataShare::E_OK);
 
-    if (current_rawContactId != -1) {
+    if (currentRawContactId != -1) {
         result += contructor_->ContactVCard(contact);
     }
 
