@@ -57,6 +57,9 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
         }
         rawResultSet->Close();
         TELEPHONY_LOGW("rawContactIdListSize = %{public}d", (int32_t)rawContactIdList.size());
+        if (rawContactIdList.size() == 0) {
+            continue;
+        }
         auto contactDataResultSet = QueryContactData(rawContactIdList, errorCode);
         if (contactDataResultSet == nullptr) {
             TELEPHONY_LOGE("QueryContactData failed");
@@ -77,7 +80,7 @@ void VCardEncoder::SetPhoneNumberEncodedCallback(std::shared_ptr<PhoneNumberEnco
 }
 
 std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::QueryContactData(
-        const std::vector<int32_t> &rawContactIdList, int32_t &errorCode)
+    const std::vector<int32_t> &rawContactIdList, int32_t &errorCode)
 {
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
@@ -99,7 +102,7 @@ std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::QueryContactData(
 }
 
 void VCardEncoder::ProcessContactData(std::string &result,
-        std::shared_ptr<DataShare::DataShareResultSet> contactDataResultSet, int32_t &errorCode)
+    std::shared_ptr<DataShare::DataShareResultSet> contactDataResultSet, int32_t &errorCode)
 {
     if (contactDataResultSet == nullptr) {
         TELEPHONY_LOGE("QueryContactData failed");
