@@ -149,30 +149,6 @@ void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
     networkSearchManagerHandler_->PostTask(task);
 }
 
-void CoreService::AsyncSimExecute(const std::function<void()> task)
-{
-    if (simManagerHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
-        if (simManagerHandler_ == nullptr) {
-            auto simManagerRunner = AppExecFwk::EventRunner::Create("simManagerHandler");
-            simManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
-        }
-    }
-    simManagerHandler_->PostTask(task);
-}
-
-void CoreService::AsyncSimSetExecute(const std::function<void()> task)
-{
-    if (simSetManagerHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
-        if (simSetManagerHandler_ == nullptr) {
-            auto simManagerRunner = AppExecFwk::EventRunner::Create("simSetManagerHandler");
-            simSetManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
-        }
-    }
-    simSetManagerHandler_->PostTask(task);
-}
-
 int32_t CoreService::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
