@@ -37,7 +37,7 @@ private:
 
 private:
     std::shared_ptr<PhoneNumberEncodedCallback> phoneNumberEncodedCallback_ = nullptr;
-    std::shared_ptr<VCardConstructor> contructor_ = nullptr;
+    std::shared_ptr<VCardConstructor> constructor_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
