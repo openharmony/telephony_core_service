@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int64_t DEFAULT_RAW_CALLBACK_TIMEOUT_MS = 3 * 1000;
+constexpr int64_t DEFAULT_RAW_CALLBACK_TIMEOUT_MS = 10 * 1000;
 class CoreServiceClient : public DelayedRefSingleton<CoreServiceClient> {
     DECLARE_DELAYED_REF_SINGLETON(CoreServiceClient);
 
