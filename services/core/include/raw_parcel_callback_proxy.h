@@ -23,8 +23,6 @@ public:
     explicit RawParcelCallbackProxy(const sptr<IRemoteObject> &impl)
         : IRemoteProxy<IRawParcelCallback>(impl) {}
     void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
-private:
-    static inline BrokerDelegator<RawParcelCallbackProxy> delegator_;
 };
 } // namespace Telephony
 } // namespace OHOS
