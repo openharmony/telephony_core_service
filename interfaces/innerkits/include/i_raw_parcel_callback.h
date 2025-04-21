@@ -21,8 +21,8 @@ namespace OHOS {
 namespace Telephony {
 class IRawParcelCallback : public IRemoteBroker {
 public:
-    virtual void Transfer([[maybe_unused]] std::function<void(MessageParcel &)> func
-        , [[maybe_unused]] MessageParcel &data) {
+    virtual void Transfer([[maybe_unused]] std::function<void(MessageParcel &)> func,
+        [[maybe_unused]] MessageParcel &data) {
     }
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IRawParcelCallback");
 };
