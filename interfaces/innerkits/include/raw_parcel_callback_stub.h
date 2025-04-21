@@ -25,14 +25,14 @@ constexpr int64_t DEFAULT_TIMEOUT_MS = 30 * 1000;
 
 class RawParcelCallbackStub : public IRemoteStub<IRawParcelCallback> {
 public:
-    explicit RawParcelCallbackStub(std::function<void(MessageParcel &data, MessageParcel &reply)> callback);
+    explicit RawParcelCallbackStub(std::function<void(MessageParcel &datay)> callback);
     bool WaitForResult(int64_t timeoutMs = DEFAULT_TIMEOUT_MS);
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 private:
     std::mutex mtx_;
     std::condition_variable cv_;
     bool done_ = false;
-    std::function<void(MessageParcel &data, MessageParcel &reply)> callback_;
+    std::function<void(MessageParcel &data)> callback_;
 };
 
 } // namespace Telephony
