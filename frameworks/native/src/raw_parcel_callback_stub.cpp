@@ -41,6 +41,8 @@ int RawParcelCallbackStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor check fail!");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
+    
+    std::unique_lock<std::mutex> lock(mtx_);
     if (callback_) {
         Transfer([=](MessageParcel &data) {
             callback_(data);
