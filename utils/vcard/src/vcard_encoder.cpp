@@ -113,7 +113,7 @@ void VCardEncoder::ProcessContactData(std::string &result,
     int32_t contactDataResult = contactDataResultSet->GoToFirstRow();
     if (contactDataResult != DataShare::E_OK) {
         TELEPHONY_LOGE("GoToFirstRow failed");
-        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        errorCode = TELEPHONY_ERR_FAIL;
         contactDataResultSet->Close();
         return;
     }
