@@ -28,6 +28,7 @@ public:
     explicit RawParcelCallbackStub(std::function<void(MessageParcel &datay)> callback);
     bool WaitForResult(int64_t timeoutMs = DEFAULT_TIMEOUT_MS);
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    virtual void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
 private:
     std::mutex mtx_;
     std::condition_variable cv_;
