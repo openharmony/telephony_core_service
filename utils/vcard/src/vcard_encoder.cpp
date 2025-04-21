@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 VCardEncoder::VCardEncoder(int32_t cardType, const std::string &charset)
 {
-    contructor_ = std::make_shared<VCardConstructor>(cardType, charset);
+    constructor_ = std::make_shared<VCardConstructor>(cardType, charset);
 }
 
 std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdLists, int32_t &errorCode)
@@ -69,7 +69,7 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
     }
     TELEPHONY_LOGW("ContructVCard Success");
     if (phoneNumberEncodedCallback_ != nullptr) {
-        contructor_->SetPhoneNumberEncodedCallback(phoneNumberEncodedCallback_);
+        constructor_->SetPhoneNumberEncodedCallback(phoneNumberEncodedCallback_);
     }
     return result;
 }
@@ -94,7 +94,7 @@ std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::QueryContactData(
     auto contactDataResultSet = VCardRdbHelper::GetInstance().QueryContactData(columns, predicates);
     if (contactDataResultSet == nullptr) {
         TELEPHONY_LOGE("QueryContactData failed");
-        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        errorCode = TELEPHONY_ERR_READ_DATA_FAIL;
         return nullptr;
     }
 
@@ -129,7 +129,7 @@ void VCardEncoder::ProcessContactData(std::string &result,
 
         if (rawContactId != currentRawContactId) {
             if (currentRawContactId != -1) {
-                result += contructor_->ContactVCard(contact);
+                result += constructor_->ContactVCard(contact);
             }
             currentRawContactId = rawContactId;
             contact = std::make_shared<VCardContact>();
@@ -141,7 +141,7 @@ void VCardEncoder::ProcessContactData(std::string &result,
     } while (contactDataResult == DataShare::E_OK);
 
     if (currentRawContactId != -1) {
-        result += contructor_->ContactVCard(contact);
+        result += constructor_->ContactVCard(contact);
     }
 
     contactDataResultSet->Close();
