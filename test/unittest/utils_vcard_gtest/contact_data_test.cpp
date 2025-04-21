@@ -702,7 +702,7 @@ HWTEST_F(ContactDataTest, queryContactData002, Function | MediumTest | Level3)
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
     VCardRdbHelper::GetInstance().SetDataHelper(dataShareHelper);
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
-    EXPECT_CALL(*dataShareHelper, Query(_, _, _, _)).WillRepeatedly(DoAll(Return(resultSet))); 
+    EXPECT_CALL(*dataShareHelper, Query(_, _, _, _)).WillRepeatedly(DoAll(Return(resultSet)));
     auto contactDataResultSet = encoder.QueryContactData(contactIdList, errorCode);
     std::string result = "";
     encoder.ProcessContactData(result, contactDataResultSet, errorCode);
