@@ -63,7 +63,7 @@ std::string VCardEncoder::ContructVCard(std::vector<std::vector<int>> contactIdL
         auto contactDataResultSet = QueryContactData(rawContactIdList, errorCode);
         if (contactDataResultSet == nullptr) {
             TELEPHONY_LOGE("QueryContactData failed");
-            break;
+            continue;
         }
         ProcessContactData(result, contactDataResultSet, errorCode);
     }
