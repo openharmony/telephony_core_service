@@ -22,7 +22,7 @@ namespace Telephony {
 class IRawParcelCallback : public IRemoteBroker {
 public:
     // only override by proxy
-    virtual void Transfer(std::function<void(MessageParcel &)> func) {
+    virtual void Transfer([[maybe_unused]] std::function<void(MessageParcel &)> func, [[maybe_unused]] MessageParcel &data) {
     }
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IRawParcelCallback");
 };
