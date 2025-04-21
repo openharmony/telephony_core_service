@@ -333,7 +333,7 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
             service->networkSearchManager_->GetImei(slotId, imei);
             callback->Transfer([=](MessageParcel &data) {
                 data.WriteString16(imei);
-            }, dataTmp);
+                }, dataTmp);
         }
     });
     return TELEPHONY_ERR_SUCCESS;
