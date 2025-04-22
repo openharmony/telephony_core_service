@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INVALID_VALUE = -1;
 
-BrokerDelegator<RawParcelCallbackProxy>::RawParcelCallbackProxy delegator_;
+BrokerDelegator<RawParcelCallbackProxy> delegator_;
 CoreServiceStub::CoreServiceStub()
 {
     AddHandlerNetWorkToMap();
