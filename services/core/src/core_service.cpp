@@ -299,16 +299,16 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimExecute([wp = std::weak_ptr<networkSearchManager_>(shared_from_this()), slotId, callback] {
+    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] {
+        std::u16string imei = u"";
+        MessageParcel dataTmp;
         auto networkSearchManager = wp.lock();
         if (networkSearchManager) {
-            std::u16string imei = u"";
-            MessageParcel dataTmp;
             networkSearchManager->GetImei(slotId, imei);
-            callback->Transfer([=](MessageParcel &data) {
-                data.WriteString16(imei);
-                }, dataTmp);
         }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteString16(imei);
+            }, dataTmp);
     });
     return TELEPHONY_ERR_SUCCESS;
 }
