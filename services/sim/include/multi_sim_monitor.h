@@ -83,6 +83,7 @@ private:
     void SubscribeBundleScanFinished();
     void UnSubscribeListeners();
     void CheckOpcNeedUpdata(const bool isDataShareError);
+    int32_t CheckUpdateOpcVersion();
     void UpdateAllOpkeyConfigs();
     void CheckDataShareError();
     void CheckSimNotifyRegister();
