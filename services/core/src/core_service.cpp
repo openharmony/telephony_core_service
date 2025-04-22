@@ -142,7 +142,8 @@ void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
     if (networkSearchManagerHandler_ == nullptr) {
         std::lock_guard<std::mutex> lock(handlerInitMutex_);
         if (networkSearchManagerHandler_ == nullptr) {
-            auto networkSearchRunner = AppExecFwk::EventRunner::Create("networkSearchHandler", AppExecFwk::ThreadMode::FFRT);
+            auto networkSearchRunner = AppExecFwk::EventRunner::Create("networkSearchHandler",
+                AppExecFwk::ThreadMode::FFRT);
             networkSearchManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(networkSearchRunner);
         }
     }
