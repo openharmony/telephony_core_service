@@ -519,7 +519,7 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
     auto slotId = data.ReadInt32();
     auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
     if (callback == nullptr) {
-    TELEPHONY_LOGE("OnGetImei no callback");
+        TELEPHONY_LOGE("OnGetImei no callback");
         return TELEPHONY_ERR_FAIL;
     }
     int32_t result = GetImei(slotId, callback);
