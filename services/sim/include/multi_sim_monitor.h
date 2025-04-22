@@ -60,7 +60,8 @@ public:
         REGISTER_SIM_NOTIFY_EVENT = 0,
         RESET_OPKEY_CONFIG = 1,
         REGISTER_SIM_NOTIFY_RETRY_EVENT = 2,
-        INIT_DATA_RETRY_EVENT = 3
+        INIT_DATA_RETRY_EVENT = 3,
+        RETRY_RESET_OPKEY_CONFIG = 4,
     };
 
 private:
@@ -83,7 +84,6 @@ private:
     void UnSubscribeListeners();
     void CheckOpcNeedUpdata(const bool isDataShareError);
     int32_t CheckUpdateOpcVersion();
-    void ClearAllOpcCache();
     void UpdateAllOpkeyConfigs();
     void CheckDataShareError();
     void CheckSimNotifyRegister();
