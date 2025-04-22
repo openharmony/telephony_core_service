@@ -151,7 +151,7 @@ bool IsimFile::ProcessGetIccidDone(const AppExecFwk::InnerEvent::Pointer &event)
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_ICCID_DONE result success, slotId:%{public}d", slotId_);
         if (filesFetchedObser_ != nullptr) {
             TELEPHONY_LOGI("slotId:%{public}d iccid loaded", slotId_);
-            iccidLoadObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
+            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_QUERY_ICCID_DONE, slotId_);
         }
     }
     return isFileProcessResponse;
@@ -173,8 +173,8 @@ bool IsimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
         imsi_ = *sharedObject;
         TELEPHONY_LOGI("IsimFile::ProcessEvent MSG_SIM_OBTAIN_IMSI_DONE");
         SaveCountryCode();
-        if (!imsi_.empty()) {
-            imsiReadyObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
+        if (!imsi_.empty() && filesFetchedObser_ != nullptr) {
+            filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_IMSI_LOADED_READY);
         }
     }
     return isFileHandleResponse;
