@@ -18,6 +18,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "i_raw_parcel_callback.h"
 
 #ifdef HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
