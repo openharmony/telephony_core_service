@@ -157,11 +157,11 @@ HWTEST_F(Asn1NodeTest, Asn1GetGrandson_001, Function | MediumTest | Level3)
     if (root == nullptr) {
         ret = root == nullptr ? true : false;
         EXPECT_EQ(ret, true);
-        return;
+    } else {
+        pAsn1GetChild = root->Asn1GetGrandson(TAG_ESIM_CTX_COMP_0, TAG_ESIM_PROFILE_INFO);
+        ret = pAsn1GetChild == nullptr ? true : false;
+        EXPECT_EQ(ret, false);
     }
-    pAsn1GetChild = root->Asn1GetGrandson(TAG_ESIM_CTX_COMP_0, TAG_ESIM_PROFILE_INFO);
-    ret = pAsn1GetChild == nullptr ? true : false;
-    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(Asn1NodeTest, Asn1GetChildren_001, Function | MediumTest | Level3)

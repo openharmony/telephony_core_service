@@ -372,22 +372,16 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | Mediu
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
-    if (telRilManager == nullptr) {
-        return;
-    }
+    ASSERT_NE(telRilManager, nullptr);
     telRilManager->OnInit();
     DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager;
     int32_t slotCount = DelayedSingleton<CoreService>::GetInstance()->GetMaxSimCount();
     auto simManager = std::make_shared<SimManager>(telRilManager);
-    if (simManager == nullptr) {
-        return;
-    }
+    ASSERT_NE(simManager, nullptr);
     simManager->OnInit(slotCount);
     DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    if (networkSearchManager == nullptr) {
-        return;
-    }
+    ASSERT_NE(networkSearchManager, nullptr);
     networkSearchManager->OnInit();
     DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager;
 
@@ -799,10 +793,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_SignalInformation_001, Function | Medi
     std::shared_ptr<SignalInformation> lte = std::make_shared<LteSignalInformation>();
     std::shared_ptr<SignalInformation> nr = std::make_shared<NrSignalInformation>();
     std::shared_ptr<SignalInformation> tdScdma = std::make_shared<TdScdmaSignalInformation>();
-    if (gsm == nullptr || cdma == nullptr || wcdma == nullptr || lte == nullptr || nr == nullptr ||
-        tdScdma == nullptr) {
-        return;
-    }
+    ASSERT_NE(gsm, nullptr);
+    ASSERT_NE(cdma, nullptr);
+    ASSERT_NE(wcdma, nullptr);
+    ASSERT_NE(lte, nullptr);
+    ASSERT_NE(nr, nullptr);
+    ASSERT_NE(tdScdma, nullptr);
     gsm->GetSignalLevel();
     gsm->SetSignalLevel(SIGNAL_STRENGTH_GOOD);
     EXPECT_EQ(gsm->GetSignalLevel(), SIGNAL_STRENGTH_GOOD);

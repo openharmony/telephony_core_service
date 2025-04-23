@@ -33,7 +33,6 @@ namespace Telephony {
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_0, GetHandler()));
-    return;
 }
 
 /**
@@ -44,7 +43,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0101, Function | Medium
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SIGNAL_STRENGTH), SLOT_ID_1, GetHandler()));
-    return;
 }
 
 /**
@@ -55,7 +53,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkGetRssiTest_0201, Function | Medium
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_0, GetHandler()));
-    return;
 }
 
 /**
@@ -66,7 +63,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0101, Function | MediumT
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_1, GetHandler()));
-    return;
 }
 
 /**
@@ -79,7 +75,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumT
     system::SetParameter(DYNAMIC_POWEROFF_MODEM, "1");
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_0, GetHandler()));
     system::SetParameter(DYNAMIC_POWEROFF_MODEM, "0");
-    return;
 }
 
 /**
@@ -90,7 +85,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumT
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_0, GetHandler()));
-    return;
 }
 
 /**
@@ -101,7 +95,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0101, Function | MediumT
 HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_1, GetHandler()));
-    return;
 }
 
 /**
@@ -114,7 +107,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRadioStateTest_0301, Function | MediumT
     system::SetParameter(DYNAMIC_POWEROFF_MODEM, "1");
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_POWER_STATE), SLOT_ID_1, GetHandler()));
     system::SetParameter(DYNAMIC_POWEROFF_MODEM, "0");
-    return;
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
