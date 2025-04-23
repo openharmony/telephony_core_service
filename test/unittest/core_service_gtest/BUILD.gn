@@ -96,9 +96,7 @@ ohos_unittest("tel_core_service_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_network_search_gtest") {
@@ -189,9 +187,7 @@ ohos_unittest("tel_network_search_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_network_search_manager_gtest") {
@@ -281,9 +277,7 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_sim_gtest") {
@@ -304,6 +298,7 @@ ohos_unittest("tel_sim_gtest") {
     "sim_core_service_test.cpp",
     "sim_elementary_file_test.cpp",
     "sim_icc_test.cpp",
+    "sim_manager_test.cpp",
     "sim_test.cpp",
     "sim_type_convert_test.cpp",
     "vcard_test.cpp",
@@ -380,9 +375,7 @@ ohos_unittest("tel_sim_gtest") {
     "-fno-access-control",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_core_zero_branch_gtest") {
@@ -473,9 +466,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_sim_zero_branch_gtest") {
@@ -562,13 +553,11 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
   }
 
   cflags = [
-    "-flto",    
+    "-flto",
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_core_service_test") {
@@ -648,9 +637,7 @@ ohos_unittest("tel_core_service_test") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_core_service_common_test") {
@@ -734,9 +721,7 @@ ohos_unittest("tel_core_service_common_test") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_network_search_branch_gtest") {
@@ -825,9 +810,7 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_core_service_native_branch_gtest") {
@@ -919,9 +902,7 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 ohos_unittest("tel_sim_file_manager_branch_gtest") {
@@ -1000,9 +981,7 @@ ohos_unittest("tel_sim_file_manager_branch_gtest") {
     "-fvisibility=hidden",
   ]
 
-  ldflags = [
-    "-flto",
-  ]
+  ldflags = [ "-flto" ]
 }
 
 group("unittest") {

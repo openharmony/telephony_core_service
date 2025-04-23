@@ -16,6 +16,7 @@
 #ifndef OHOS_SIM_MANAGER_H
 #define OHOS_SIM_MANAGER_H
 
+#include "ffrt_inner.h"
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -230,7 +231,7 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
     int32_t slotCount_ = SLOT_ID_ZERO;
     int32_t dsdsMode_ = DSDS_MODE_V2;
-    std::shared_mutex mtx_;
+    ffrt::shared_mutex mtx_;
 };
 } // namespace Telephony
 } // namespace OHOS
