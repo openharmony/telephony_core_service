@@ -14,6 +14,7 @@
  */
 #define private public
 #define protected public
+#include <future>
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
@@ -69,11 +70,10 @@ std::shared_ptr<SimStateManager> SimStateHandleTest::simStateManager_;
 
 void SimStateHandleTest::SetUpTestCase()
 {
-    int32_t slotId = 10;
     telRilManager_ = new MockTelRilManager();
     std::shared_ptr<MockTelRilManager> telRilManager(telRilManager_);
     simStateManager_ = std::make_shared<SimStateManager>(telRilManager);
-    simStateManager_->Init(slotId);
+    simStateManager_->Init(10);
     EXPECT_CALL(*telRilManager_, UnRegisterCoreNotify(_, _, _))
         .WillRepeatedly(Return(0));
 }
@@ -221,6 +221,27 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_008, Function | MediumTest
     ASSERT_NE(event, nullptr);
     auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager_);
     simStateHandle->GetSimIOResult(slotId, event);
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_009
+ * @tc.name     test SimStateHandle
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest | Level1)
+{
+    auto future = std::async(std::launch::async, [this]() {
+        LockStatusResponse response;
+        simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
+        simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
+        simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
+        simStateManager_->UnlockPin(slotId, "1234", response);
+        EXPECT_TRUE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_NOT_READY);
+    });
+    usleep(100 * 1000);
+    simStateManager_->SyncUnlockPinResponse();
+    usleep(100 * 1000);
+    future.get();
 }
 
 }
