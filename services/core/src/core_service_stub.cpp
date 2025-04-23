@@ -18,6 +18,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "raw_parcel_callback_proxy.h"
 
 #ifdef HICOLLIE_ENABLE
 #include "xcollie/xcollie.h"
@@ -514,19 +515,13 @@ int32_t CoreServiceStub::OnGetIsoCountryCodeForNetwork(MessageParcel &data, Mess
 
 int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t slotId = data.ReadInt32();
-    std::u16string imei = u"";
-    int32_t result = GetImei(slotId, imei);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    auto slotId = data.ReadInt32();
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnGetImei no callback");
+        return TELEPHONY_ERR_FAIL;
     }
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        if (!reply.WriteString16(imei)) {
-            TELEPHONY_LOGE("OnRemoteRequest::OnGetImei write reply failed.");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
-    }
+    GetImei(slotId, callback);
     return NO_ERROR;
 }
 

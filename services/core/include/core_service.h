@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Telephony {
 static const int32_t DEFAULT_SLOT_ID = 0;
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-class CoreService : public SystemAbility, public CoreServiceStub {
+class CoreService : public SystemAbility, public CoreServiceStub, public std::enable_shared_from_this<CoreService> {
     DECLARE_DELAYED_SINGLETON(CoreService)
     DECLARE_SYSTEM_ABILITY(CoreService)
 
@@ -57,7 +57,7 @@ public:
 
     int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    int32_t GetImei(int32_t slotId, std::u16string &imei) override;
+    int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
 
@@ -270,6 +270,7 @@ public:
 #endif
 private:
     bool Init();
+    void AsyncNetSearchExecute(const std::function<void()> task);
 
 private:
     int32_t slotId_ = DEFAULT_SLOT_ID;
@@ -279,6 +280,8 @@ private:
     std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
+    std::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
     int64_t endTime_ = 0;
