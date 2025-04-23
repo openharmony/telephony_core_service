@@ -63,21 +63,17 @@ public:
     void SyncCmdResponse();
     void SyncSimMatchResponse();
     void SyncUnlockPinResponse();
-    void SyncSimStateResponse();
 
 public:
     bool responseReady_ = false;
     bool responseSimMatchReady_ = false;
     bool responseUnlockPinReady_ = false;
-    bool responseSimStateReady_ = false;
     std::mutex ctx_;
     std::mutex stx_;
     ffrt::mutex unlockPinCtx_;
-    ffrt::mutex simStateCtx_;
     std::condition_variable cv_;
     std::condition_variable sv_;
     ffrt::condition_variable unlockPinCv_;
-    ffrt::condition_variable simStateCv_;
 
 private:
     void RequestUnlock(UnlockCmd type);
