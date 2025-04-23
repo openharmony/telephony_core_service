@@ -975,7 +975,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0100
         telephonyService_ = GetProxy();
     } else {
         sptr<NetworkInformation> newNetworkInfo = new (std::nothrow) NetworkInformation();
-        newNetworkInfo->SetOperateInformation(newNetworkInfo->GetOperatorLongName(), newNetworkInfo->GetOperatorShortName(),
+        newNetworkInfo->SetOperateInformation(newNetworkInfo->GetOperatorLongName(),
+            newNetworkInfo->GetOperatorShortName(),
             "46000", newNetworkInfo->GetNetworkState(), newNetworkInfo->GetRadioTech());
 
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
@@ -2124,7 +2125,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetImsRegStatus_0500, Functi
     } else {
         ImsRegInfo info;
         int ret =
-            CoreServiceClient::GetInstance().GetImsRegStatus(SLOT_ID1, static_cast<ImsServiceType>(INVALID_TYPE), info);
+            CoreServiceClient::GetInstance().GetImsRegStatus(SLOT_ID1,
+            static_cast<ImsServiceType>(INVALID_TYPE), info);
         EXPECT_EQ(TELEPHONY_ERR_ARGUMENT_INVALID, ret);
     }
 }
