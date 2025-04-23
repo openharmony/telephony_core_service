@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Telephony {
-BrokerDelegator<RawParcelCallbackProxy> delegator_;
+BrokerDelegator<RawParcelCallbackProxy> RawParcelCallbackProxy::delegator_;
 void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
 {
     MessageOption option{MessageOption::TF_ASYNC};
