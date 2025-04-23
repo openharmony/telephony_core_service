@@ -137,6 +137,19 @@ int32_t CoreService::GetServiceRunningState()
     return static_cast<int32_t>(state_);
 }
 
+void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
+{
+    if (networkSearchManagerHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (networkSearchManagerHandler_ == nullptr) {
+            auto networkSearchRunner = AppExecFwk::EventRunner::Create("networkSearchHandler",
+                AppExecFwk::ThreadMode::FFRT);
+            networkSearchManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(networkSearchRunner);
+        }
+    }
+    networkSearchManagerHandler_->PostTask(task);
+}
+
 int32_t CoreService::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
@@ -273,7 +286,7 @@ int32_t CoreService::GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string 
     return networkSearchManager_->GetIsoCountryCodeForNetwork(slotId, countryCode);
 }
 
-int32_t CoreService::GetImei(int32_t slotId, std::u16string &imei)
+int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -287,7 +300,18 @@ int32_t CoreService::GetImei(int32_t slotId, std::u16string &imei)
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetImei(slotId, imei);
+    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] {
+        std::u16string imei = u"";
+        MessageParcel dataTmp;
+        auto networkSearchManager = wp.lock();
+        if (networkSearchManager) {
+            networkSearchManager->GetImei(slotId, imei);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteString16(imei);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
