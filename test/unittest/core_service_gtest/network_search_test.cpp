@@ -1145,7 +1145,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0700
         telephonyService_ = GetProxy();
     } else {
         sptr<NetworkInformation> newNetworkInfo = new (std::nothrow) NetworkInformation();
-        newNetworkInfo->SetOperateInformation(newNetworkInfo->GetOperatorLongName(), newNetworkInfo->GetOperatorShortName(),
+        newNetworkInfo->SetOperateInformation(newNetworkInfo->GetOperatorLongName(),
+            newNetworkInfo->GetOperatorShortName(),
             "46000", newNetworkInfo->GetNetworkState(), newNetworkInfo->GetRadioTech());
 
         sptr<NetworkInformation> networkInfo = new (std::nothrow) NetworkInformation();
@@ -1195,7 +1196,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0100
         EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
         callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
-        TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
+        TELEPHONY_LOGI("GetNetworkSelectionMode_0100 GetNetworkModeCallbackResult mode: %{public}d",
+            networkSelectionMode);
         EXPECT_EQ(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL));
     }
 }
@@ -1231,7 +1233,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0200
         EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
         callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
-        TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
+        TELEPHONY_LOGI("GetNetworkSelectionMode_0200 GetNetworkModeCallbackResult mode: %{public}d",
+            networkSelectionMode);
         EXPECT_EQ(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO));
     }
 }
@@ -1267,7 +1270,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300
         EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
         callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
-        TELEPHONY_LOGI("GetNetworkSelectionMode_0300 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
+        TELEPHONY_LOGI("GetNetworkSelectionMode_0300 GetNetworkModeCallbackResult mode: %{public}d",
+            networkSelectionMode);
         EXPECT_EQ(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL));
     }
 }
@@ -1303,7 +1307,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0400
         EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
         callback->WaitForGetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         int32_t networkSelectionMode = callback->GetNetworkModeCallbackResult();
-        TELEPHONY_LOGI("GetNetworkSelectionMode_0400 GetNetworkModeCallbackResult mode: %{public}d", networkSelectionMode);
+        TELEPHONY_LOGI("GetNetworkSelectionMode_0400 GetNetworkModeCallbackResult mode: %{public}d",
+            networkSelectionMode);
         EXPECT_EQ(networkSelectionMode, static_cast<int32_t>(SelectionMode::MODE_TYPE_AUTO));
     }
 }
@@ -2418,21 +2423,22 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-    } else {
-        ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID1, DEFAULT_TYPE);
-        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
-        auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
-        for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
-            if (itor->slotId == SLOT_ID1 && itor->imsSrvType == DEFAULT_TYPE) {
-                if (itor->imsCallback != nullptr) {
-                    itor->imsCallback = nullptr;
-                }
-                NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
-                break;
-            }
-        }
-        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
     }
+    ASSERT_NE(NetworkSearchTest::telephonyService_, nullptr);
+    ASSERT_TRUE(NetworkSearchTest::HasSimCard(SLOT_ID1));
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID1, DEFAULT_TYPE);
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+    auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
+    for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
+        if (itor->slotId == SLOT_ID1 && itor->imsSrvType == DEFAULT_TYPE) {
+            if (itor->imsCallback != nullptr) {
+                itor->imsCallback = nullptr;
+            }
+            NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
+            break;
+        }
+    }
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
 }
 
 /**
