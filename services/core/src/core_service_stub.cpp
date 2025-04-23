@@ -521,8 +521,8 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("OnGetImei no callback");
         return TELEPHONY_ERR_FAIL;
     }
-    int32_t result = GetImei(slotId, callback);
-    return result;
+    GetImei(slotId, callback);
+    return NO_ERROR;
 }
 
 int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
