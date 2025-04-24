@@ -150,6 +150,19 @@ void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
     networkSearchManagerHandler_->PostTask(task);
 }
 
+void CoreService::AsyncSimExecute(const std::function<void()> task)
+{
+    if (simManagerHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (simManagerHandler_ == nullptr) {
+            auto simManagerRunner = AppExecFwk::EventRunner::Create("simManagerHandler",
+                AppExecFwk::ThreadMode::FFRT);
+            simManagerHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
+        }
+    }
+    simManagerHandler_->PostTask(task);
+}
+
 int32_t CoreService::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_NETWORK_INFO)) {
@@ -314,7 +327,7 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
+int32_t CoreService::GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -328,7 +341,18 @@ int32_t CoreService::GetImeiSv(int32_t slotId, std::u16string &imeiSv)
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return networkSearchManager_->GetImeiSv(slotId, imeiSv);
+    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] {
+        std::u16string imeiSv = u"";
+        MessageParcel dataTmp;
+        auto networkSearchManager = wp.lock();
+        if (networkSearchManager) {
+            networkSearchManager->GetImeiSv(slotId, imeiSv);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteString16(imeiSv);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetMeid(int32_t slotId, std::u16string &meid)
@@ -770,7 +794,7 @@ int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number)
     return simManager_->SetShowNumber(slotId, number);
 }
 
-int32_t CoreService::GetShowNumber(int32_t slotId, std::u16string &showNumber)
+int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -785,7 +809,18 @@ int32_t CoreService::GetShowNumber(int32_t slotId, std::u16string &showNumber)
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetShowNumber(slotId, showNumber);
+    AsyncSimExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+        std::u16string showNumber = u"";
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        if (simManager) {
+            simManager->GetShowNumber(slotId, showNumber);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteString16(showNumber);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name)
@@ -806,7 +841,7 @@ int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name)
     return simManager_->SetShowName(slotId, name);
 }
 
-int32_t CoreService::GetShowName(int32_t slotId, std::u16string &showName)
+int32_t CoreService::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -821,7 +856,18 @@ int32_t CoreService::GetShowName(int32_t slotId, std::u16string &showName)
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetShowName(slotId, showName);
+    AsyncSimExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+        std::u16string showName = u"";
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        if (simManager) {
+            simManager->GetShowName(slotId, showName);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteString16(showName);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
