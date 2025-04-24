@@ -104,7 +104,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetImeiSv_001, Function | MediumTest | Lev
 {
     SecurityToken token;
     std::u16string imeiSv = u"";
-    auto result = DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(0, imeiSv);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(0, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
