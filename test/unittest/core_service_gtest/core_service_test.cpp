@@ -282,7 +282,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetShowNumber_001, Function | MediumTest |
 {
     SecurityToken token;
     std::u16string showNumber = u"";
-    auto result = DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(0, showNumber);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(0, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -308,7 +308,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetShowName_001, Function | MediumTest | L
 {
     SecurityToken token;
     std::u16string showName = u"";
-    auto result = DelayedSingleton<CoreService>::GetInstance()->GetShowName(0, showName);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetShowName(0, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
