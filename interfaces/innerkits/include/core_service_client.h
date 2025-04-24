@@ -175,7 +175,7 @@ public:
      * @param imeiSv[out], the International Mobile Equipment Identification Number of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv);
+    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Checks whether a SIM card is inserted in a specified slot.
@@ -405,7 +405,8 @@ public:
      * @param showNumber[out], the SIM card show number
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
+    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Set the SIM card show name
@@ -423,7 +424,7 @@ public:
      * @param showName[out], the SIM card show name
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetShowName(int32_t slotId, std::u16string &showName);
+    int32_t GetShowName(int32_t slotId, std::u16string &showName, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the list of active SIM card account information
