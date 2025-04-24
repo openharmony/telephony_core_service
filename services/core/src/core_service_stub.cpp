@@ -527,19 +527,13 @@ int32_t CoreServiceStub::OnGetImei(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnGetImeiSv(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t slotId = data.ReadInt32();
-    std::u16string imeiSv = u"";
-    int32_t result = GetImeiSv(slotId, imeiSv);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    auto slotId = data.ReadInt32();
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnGetImeiSv no callback");
+        return TELEPHONY_ERR_FAIL;
     }
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        if (!reply.WriteString16(imeiSv)) {
-            TELEPHONY_LOGE("OnRemoteRequest::OnGetImeiSv write reply failed.");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
-    }
+    GetImeiSv(slotId, callback);
     return NO_ERROR;
 }
 
@@ -1315,16 +1309,12 @@ int32_t CoreServiceStub::OnSetShowNumber(MessageParcel &data, MessageParcel &rep
 int32_t CoreServiceStub::OnGetShowNumber(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string showNumber;
-    int32_t result = GetShowNumber(slotId, showNumber);
-    bool ret = reply.WriteInt32(result);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteString16(showNumber));
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnGetShowNumber no callback");
+        return TELEPHONY_ERR_FAIL;
     }
-    if (!ret) {
-        TELEPHONY_LOGE("OnGetShowNumber write reply failed.");
-        return ERR_FLATTEN_OBJECT;
-    }
+    GetShowNumber(slotId, callback);
     return NO_ERROR;
 }
 
@@ -1368,16 +1358,12 @@ int32_t CoreServiceStub::OnSetPreferredNetwork(MessageParcel &data, MessageParce
 int32_t CoreServiceStub::OnGetShowName(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
 {
     int32_t slotId = data.ReadInt32();
-    std::u16string showName;
-    int32_t result = GetShowName(slotId, showName);
-    bool ret = reply.WriteInt32(result);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteString16(showName));
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnGetShowName no callback");
+        return TELEPHONY_ERR_FAIL;
     }
-    if (!ret) {
-        TELEPHONY_LOGE("OnGetShowName write reply failed.");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
+    GetShowName(slotId, callback);
     return NO_ERROR;
 }
 
