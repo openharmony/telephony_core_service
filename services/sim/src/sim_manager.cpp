@@ -1299,9 +1299,12 @@ int32_t SimManager::GetSimIO(int32_t slotId, int32_t command,
         return TELEPHONY_ERR_FAIL;
     }
     SimIoRequestInfo requestInfo;
-    requestInfo.p1 = stoi(data.substr(SIM_IO_DATA_P1_OFFSET, SIM_IO_DATA_STR_LEN), nullptr, SIM_IO_HEX_SIGN);
-    requestInfo.p2 = stoi(data.substr(SIM_IO_DATA_P2_OFFSET, SIM_IO_DATA_STR_LEN), nullptr, SIM_IO_HEX_SIGN);
-    requestInfo.p3 = stoi(data.substr(SIM_IO_DATA_P3_OFFSET, SIM_IO_DATA_STR_LEN), nullptr, SIM_IO_HEX_SIGN);
+    requestInfo.p1 = static_cast<int>(strtol(
+        data.substr(SIM_IO_DATA_P1_OFFSET, SIM_IO_DATA_STR_LEN).c_str(), nullptr, SIM_IO_HEX_SIGN));
+    requestInfo.p2 = static_cast<int>(strtol(
+        data.substr(SIM_IO_DATA_P2_OFFSET, SIM_IO_DATA_STR_LEN).c_str(), nullptr, SIM_IO_HEX_SIGN));
+    requestInfo.p3 = static_cast<int>(strtol(
+        data.substr(SIM_IO_DATA_P3_OFFSET, SIM_IO_DATA_STR_LEN).c_str(), nullptr, SIM_IO_HEX_SIGN));
     requestInfo.command = command;
     requestInfo.fileId = fileId;
     requestInfo.data = data.substr(SIM_IO_DATA_MIN_LEN, data.length() - SIM_IO_DATA_MIN_LEN);

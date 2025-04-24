@@ -33,6 +33,7 @@
 #include "gtest/gtest.h"
 #include "tel_ril_manager.h"
 #include "mock_tel_ril_manager.h"
+#include "mock_sim_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -135,6 +136,11 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | L
     SimAuthenticationResponse mResponse;
     int32_t ret = simManager_->GetSimIO(slotId, command, fileId, data, path, mResponse);
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
+    auto simManager = std::make_shared<MockSimManager>();
+    EXPECT_CALL(*simManager, HasSimCard(slotId, _))
+        .WillRepeatedly(Return(true));
+    ret = simManager->GetSimIO(slotId, command, fileId, data, path, mResponse);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 /**
