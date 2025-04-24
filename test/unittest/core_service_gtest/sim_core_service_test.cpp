@@ -47,7 +47,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     std::u16string testU16Str = u"";
     sptr<IRawParcelCallback> callback0;
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNrOptionMode(0, callback), TELEPHONY_ERR_SUCCESS);
@@ -78,9 +78,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
     EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetShowNumber(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetShowName(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSimSatellite(0, 1), TELEPHONY_ERR_SUCCESS);
@@ -196,7 +196,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     std::u16string testU16Str = u"";
     sptr<IRawParcelCallback> callback0;
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetImeiSv(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetUniqueDeviceId(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNrOptionMode(0, callback), TELEPHONY_ERR_SUCCESS);
@@ -226,9 +226,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
     EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetShowNumber(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetShowName(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSimSatellite(0, 1), TELEPHONY_ERR_SUCCESS);
