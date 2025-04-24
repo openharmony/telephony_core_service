@@ -34,7 +34,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0101, Function | Me
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_0, GetHandler()));
-    return;
 }
 
 /**
@@ -46,7 +45,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0201, Function | Me
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_INIT_APN_INFO), SLOT_ID_1, GetHandler()));
-    return;
 }
 
 /**
