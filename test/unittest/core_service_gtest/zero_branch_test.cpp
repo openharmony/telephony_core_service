@@ -398,13 +398,13 @@ HWTEST_F(BranchTest, Telephony_ImsRegInfoCallbackProxy_001, Function | MediumTes
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy systemAbilityMgr is nullptr");
-        return;
     }
+    ASSERT_NE(systemAbilityMgr, nullptr);
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
     if (remote == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsRegInfoCallbackProxy remote is nullptr");
-        return;
     }
+    ASSERT_NE(remote, nullptr);
     auto imsRegInfoCallbackProxy = std::make_shared<ImsRegInfoCallbackProxy>(remote);
     EXPECT_NE(imsRegInfoCallbackProxy, nullptr);
     ImsRegInfo info;
@@ -2081,9 +2081,8 @@ HWTEST_F(BranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, false, false), "ChinaMobile");
     EXPECT_EQ(operatorName->GetCustEons(plmn, 1, true, false), "CMCC");
 
-    if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(networkSearchState->Init());
+    ASSERT_NE(operatorName->GetNetworkStatus(), nullptr);
     params = {false, "plmn", false, "spn", 1};
     operatorName->SetOperatorNameByParams(params);
     EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
@@ -3556,13 +3555,13 @@ HWTEST_F(BranchTest, Telephony_ImsCoreServiceCallbackProxy_001, Function | Mediu
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy systemAbilityMgr is nullptr");
-        return;
     }
+    ASSERT_NE(systemAbilityMgr, nullptr);
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
     if (remote == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy remote is nullptr");
-        return;
     }
+    ASSERT_NE(remote, nullptr);
     auto imsCoreServiceCallbackProxy = std::make_shared<ImsCoreServiceCallbackProxy>(remote);
     ImsServiceStatus imsServiceStatus;
     EXPECT_GE(imsCoreServiceCallbackProxy->UpdateImsServiceStatusChanged(INVALID_SLOTID, imsServiceStatus), 0);
@@ -3585,13 +3584,13 @@ HWTEST_F(BranchTest, Telephony_ImsCoreServiceProxy_001, Function | MediumTest | 
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy systemAbilityMgr is nullptr");
-        return;
     }
+    ASSERT_NE(systemAbilityMgr, nullptr);
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_IMS_SYS_ABILITY_ID);
     if (remote == nullptr) {
         TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy remote is nullptr");
-        return;
     }
+    ASSERT_NE(remote, nullptr);
     auto imsCoreServiceProxy = std::make_shared<ImsCoreServiceProxy>(remote);
     EXPECT_GE(imsCoreServiceProxy->GetImsRegistrationStatus(0), 0);
     EXPECT_GE(imsCoreServiceProxy->RegisterImsCoreServiceCallback(nullptr), 0);

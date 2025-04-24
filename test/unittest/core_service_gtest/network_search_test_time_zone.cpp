@@ -72,11 +72,11 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_FactoryReset_0300, Function 
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
         TELEPHONY_LOGI("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
-        return;
+    } else {
+        int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_0);
+        TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
+        EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     }
-    int32_t result = CoreServiceClient::GetInstance().FactoryReset(SLOT_ID_0);
-    TELEPHONY_LOGI("TelephonyTestService FactoryReset result: %{public}d", result);
-    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -90,13 +90,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0100, Functio
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
-        return;
+    } else {
+        std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+        int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
+        // Force to set the expected result as failure since incomplete implement in modem.
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+        NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
-    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
-    // Force to set the expected result as failure since incomplete implement in modem.
-    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
-    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
 }
 
 /**
@@ -110,13 +110,13 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0200, Functio
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
-        return;
+    } else {
+        std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+        int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_1, nrCellSsbIdsInfo);
+        // Force to set the expected result as failure since incomplete implement in modem.
+        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+        NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
-    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_1, nrCellSsbIdsInfo);
-    // Force to set the expected result as failure since incomplete implement in modem.
-    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
-    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
 }
 
 /**
@@ -129,12 +129,12 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNrSsbIdInfo_0300, Functio
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID_0))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
         NetworkSearchTest::telephonyService_ = GetProxy();
-        return;
+    } else {
+        std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
+        int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
+        EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+        NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
     }
-    std::shared_ptr<NrSsbInformation> nrCellSsbIdsInfo = std::make_shared<NrSsbInformation>();
-    int32_t result = CoreServiceClient::GetInstance().GetNrSsbIdInfo(SLOT_ID_0, nrCellSsbIdsInfo);
-    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
-    NetworkSearchTest::PrintNrSsbIdInfo(nrCellSsbIdsInfo);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
