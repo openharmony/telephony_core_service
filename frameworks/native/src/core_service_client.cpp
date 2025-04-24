@@ -299,7 +299,7 @@ int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int
     imeiSv = *imeiSvTmp;
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     std::string utf8str = convert.to_bytes(imeiSv);
-    TELEPHONY_LOGE("CoreServiceClient::slotId: %{public}d, imeiSv: %{public}s", slotId, utf8str.c_str());
+    TELEPHONY_LOGI("imeiSv : slotId: %{public}d, imeiSv: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -569,7 +569,6 @@ int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNum
         [wp = std::weak_ptr<std::u16string>(showNumTmp)] (MessageParcel &data) {
         auto srcNum = wp.lock();
         if (srcNum) {
-            TELEPHONY_LOGE("CoreServiceClient::GetShowNumber showNumber");
             *srcNum = data.ReadString16();
         }
     });
@@ -585,7 +584,7 @@ int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNum
     showNumber = *showNumTmp;
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     std::string utf8str = convert.to_bytes(showNumber);
-    TELEPHONY_LOGE("CoreServiceClient::slotId: %{public}d, showNumber: %{public}s", slotId, utf8str.c_str());
+    TELEPHONY_LOGI("operatorNumber : slotId: %{public}d, showNumber: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -611,7 +610,6 @@ int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName,
         [wp = std::weak_ptr<std::u16string>(showNameTmp)] (MessageParcel &data) {
         auto srcName = wp.lock();
         if (srcName) {
-            TELEPHONY_LOGE("CoreServiceClient::GetShowName showName");
             *srcName = data.ReadString16();
         }
     });
@@ -628,7 +626,7 @@ int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName,
     showName = *showNameTmp;
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     std::string utf8str = convert.to_bytes(showName);
-    TELEPHONY_LOGE("CoreServiceClient::slotId: %{public}d, showName: %{public}s", slotId, utf8str.c_str());
+    TELEPHONY_LOGI("operatorName : slotId: %{public}d, showName: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
