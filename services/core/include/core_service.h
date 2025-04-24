@@ -271,7 +271,7 @@ public:
 private:
     bool Init();
     void AsyncNetSearchExecute(const std::function<void()> task);
-    void AsyncSimExecute(const std::function<void()> task);
+    void AsyncSimGeneralExecute(const std::function<void()> task);
 
 private:
     int32_t slotId_ = DEFAULT_SLOT_ID;
@@ -282,7 +282,7 @@ private:
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
-    std::shared_ptr<AppExecFwk::EventHandler> simManagerHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> simGeneralHandler_;
     std::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
