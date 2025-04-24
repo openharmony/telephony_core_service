@@ -730,16 +730,16 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     uint32_t eventId = event->GetInnerEventId();
     TELEPHONY_LOGD("SimStateHandle::ProcessEvent(), eventId = %{public}d, slotId_ = %{public}d", eventId, slotId_);
-    auto simStateManager = simStateManager_.lock();
-    if (simStateManager == nullptr) {
-        TELEPHONY_LOGE("simStateManager nullptr");
-        return;
-    }
     auto itFunc = memberFuncMap_.find(eventId);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
             memberFunc(this, slotId_, event);
+        }
+        auto simStateManager = simStateManager_.lock();
+        if (simStateManager == nullptr) {
+            TELEPHONY_LOGE("simStateManager nullptr");
+            return;
         }
         if (eventId == MSG_SIM_SEND_NCFG_OPER_INFO_DONE) {
             simStateManager->SyncSimMatchResponse();
@@ -764,7 +764,6 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             ObtainIccStatus(slotId_);
             break;
         case MSG_SIM_GET_ICC_STATUS_DONE:
-            simStateManager->SyncSimStateResponse();
             GetSimCardData(slotId_, event);
             break;
         default:
