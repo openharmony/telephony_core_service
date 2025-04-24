@@ -212,7 +212,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     const std::u16string cardName = Str8ToStr16("SimNameZhang");
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->SetShowName(SLOT_ID, cardName);
-    DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, testU16Str);
+    DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, nullptr);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
     DelayedSingleton<CoreService>::GetInstance()->GetActiveSimAccountInfoList(iccAccountInfoList);
     EXPECT_GE(DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, nullptr), TELEPHONY_ERR_SUCCESS);
