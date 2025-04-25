@@ -39,7 +39,7 @@ std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateDat
     std::lock_guard<std::mutex> lock(lock_);
     auto result = DataShare::DataShareHelper::Creator(remoteObj, strUri, extUri, waitTime);
     if (result == nullptr && strUri == OPKEY_DB_URI) {
-        isOpkeyDbError_ = true;
+        isDataShareError_ = true;
         TELEPHONY_LOGE("CreateDataHelper error");
     }
     return result;
@@ -68,13 +68,13 @@ std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateSim
 bool TelephonyDataHelper::IsDataShareError()
 {
     std::lock_guard<std::mutex> lock(lock_);
-    return isOpkeyDbError_;
+    return isDataShareError_;
 }
 
 void TelephonyDataHelper::ResetDataShareError()
 {
     std::lock_guard<std::mutex> lock(lock_);
-    isOpkeyDbError_ = false;
+    isDataShareError_ = false;
 }
 } // namespace Telephony
 } // namespace OHOS
