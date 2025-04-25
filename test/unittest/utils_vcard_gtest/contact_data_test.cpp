@@ -36,15 +36,11 @@
 #include "vcard_encoder.h"
 #include "vcard_utils.h"
 #include "telephony_errors.h"
-#include "mock_datashare_helper.h"
-#include "mock_data_share_result_set.h"
 
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-using namespace testing;
 using namespace testing::ext;
 
 namespace OHOS {
