@@ -297,9 +297,6 @@ int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int
         return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
     }
     imeiSv = *imeiSvTmp;
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    std::string utf8str = convert.to_bytes(imeiSv);
-    TELEPHONY_LOGI("imeiSv : slotId: %{public}d, imeiSv: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -582,9 +579,6 @@ int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNum
         return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
     }
     showNumber = *showNumTmp;
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    std::string utf8str = convert.to_bytes(showNumber);
-    TELEPHONY_LOGI("operatorNumber : slotId: %{public}d, showNumber: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -624,9 +618,6 @@ int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName,
         return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
     }
     showName = *showNameTmp;
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    std::string utf8str = convert.to_bytes(showName);
-    TELEPHONY_LOGI("operatorName : slotId: %{public}d, showName: %{public}s", slotId, utf8str.c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
