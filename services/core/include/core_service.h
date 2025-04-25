@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Telephony {
 static const int32_t DEFAULT_SLOT_ID = 0;
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-class CoreService : public SystemAbility, public CoreServiceStub{
+class CoreService : public SystemAbility, public CoreServiceStub {
     DECLARE_DELAYED_SINGLETON(CoreService)
     DECLARE_SYSTEM_ABILITY(CoreService)
 
