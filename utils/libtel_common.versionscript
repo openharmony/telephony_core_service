@@ -15,6 +15,8 @@
   global:
     extern "C++" {
       OHOS::Telephony::TelFFRTUtils*;
+      OHOS::Telephony::ConvertStrToInt*;
+      OHOS::Telephony::ConvertStrToLong*;
       OHOS::Telephony::IsValidDecValue*;
       OHOS::Telephony::IsValidHexValue*;
       OHOS::Telephony::NapiUtil*;
