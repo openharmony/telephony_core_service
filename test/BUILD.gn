@@ -27,7 +27,7 @@ group("unittest") {
     "unittest/core_service_gtest:tel_network_search_branch_gtest",
     "unittest/core_service_gtest:tel_network_search_gtest",
     "unittest/core_service_gtest:tel_network_search_manager_gtest",
-    "unittest/core_service_gtest:tel_sim_file_manager_branch_gtest",
+    "unittest/core_service_gtest:tel_network_search_zero_branch_gtest",
     "unittest/core_service_gtest:tel_sim_gtest",
     "unittest/core_service_gtest:tel_sim_zero_branch_gtest",
     "unittest/icc_dialling_numbers_handler_gtest:icc_dialling_numbers_handler_gtest",
