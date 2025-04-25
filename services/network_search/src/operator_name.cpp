@@ -65,7 +65,6 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         UpdateOperatorConfig();
         sptr<NetworkState> networkState = GetNetworkStatus();
         if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
-            NotifySpnChanged();
             networkSearchState_->NotifyStateChange();
         }
     } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
@@ -104,7 +103,6 @@ void OperatorName::HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> 
     } else {
         TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
     }
-    NotifySpnChanged();
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
@@ -801,7 +799,6 @@ void OperatorName::TrySetLongOperatorNameWithTranslation()
         UpdateOperatorLongName(longOperatorName, numeric);
         SetOperatorName(longOperatorName);
     }
-    NotifySpnChanged();
 }
 } // namespace Telephony
 } // namespace OHOS
