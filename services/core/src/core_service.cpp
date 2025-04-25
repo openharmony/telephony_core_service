@@ -313,7 +313,7 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] {
+    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] () {
         std::u16string imei = u"";
         MessageParcel dataTmp;
         auto networkSearchManager = wp.lock();
@@ -341,7 +341,7 @@ int32_t CoreService::GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &c
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] {
+    AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback] () {
         std::u16string imeiSv = u"";
         MessageParcel dataTmp;
         auto networkSearchManager = wp.lock();
@@ -809,7 +809,7 @@ int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] () {
         std::u16string showNumber = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
@@ -856,7 +856,7 @@ int32_t CoreService::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> 
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] () {
         std::u16string showName = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
