@@ -809,7 +809,7 @@ int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
         std::u16string showNumber = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
@@ -856,7 +856,7 @@ int32_t CoreService::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> 
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
+    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback] {
         std::u16string showName = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
