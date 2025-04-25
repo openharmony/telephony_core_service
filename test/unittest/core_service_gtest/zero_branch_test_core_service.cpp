@@ -148,7 +148,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
     DelayedSingleton<CoreService>::GetInstance()->GetIsoCountryCodeForNetwork(SLOT_ID, u16Ret);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     result = DelayedSingleton<CoreService>::GetInstance()->GetImei(SLOT_ID, nullptr);
-    DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(SLOT_ID, u16Ret);
+    DelayedSingleton<CoreService>::GetInstance()->GetImeiSv(SLOT_ID, nullptr);
     DelayedSingleton<CoreService>::GetInstance()->GetMeid(SLOT_ID, u16Ret);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     result = DelayedSingleton<CoreService>::GetInstance()->GetUniqueDeviceId(SLOT_ID, u16Ret);
@@ -208,14 +208,14 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
     result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber);
-    DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(SLOT_ID, testU16Str);
+    DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(SLOT_ID, nullptr);
     const std::u16string cardName = Str8ToStr16("SimNameZhang");
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     DelayedSingleton<CoreService>::GetInstance()->SetShowName(SLOT_ID, cardName);
-    DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, testU16Str);
+    DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, nullptr);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
     DelayedSingleton<CoreService>::GetInstance()->GetActiveSimAccountInfoList(iccAccountInfoList);
-    EXPECT_GE(DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GE(DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, nullptr), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

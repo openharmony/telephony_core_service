@@ -21,12 +21,11 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int64_t DEFAULT_TIMEOUT_MS = 30 * 1000;
 
 class RawParcelCallbackStub : public IRemoteStub<IRawParcelCallback> {
 public:
     explicit RawParcelCallbackStub(std::function<void(MessageParcel &datay)> callback);
-    bool WaitForResult(int64_t timeoutMs = DEFAULT_TIMEOUT_MS);
+    bool WaitForResult(int64_t timeoutMs);
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
 private:

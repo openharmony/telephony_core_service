@@ -194,9 +194,9 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_002, Function |
 
     std::u16string testU16Str = u"";
     EXPECT_EQ(coreServiceProxy.SetShowNumber(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
-    EXPECT_EQ(coreServiceProxy.GetShowNumber(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
+    EXPECT_EQ(coreServiceProxy.GetShowNumber(INVALID_SLOTID, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(coreServiceProxy.SetShowName(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
-    EXPECT_EQ(coreServiceProxy.GetShowName(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
+    EXPECT_EQ(coreServiceProxy.GetShowName(INVALID_SLOTID, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
 
     OperatorConfig poc;
     EXPECT_EQ(coreServiceProxy.GetOperatorConfigs(INVALID_SLOTID, poc), TELEPHONY_ERR_SLOTID_INVALID);
