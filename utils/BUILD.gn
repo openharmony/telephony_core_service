@@ -201,7 +201,7 @@ ohos_shared_library("libtel_vcard") {
   ]
 
   include_dirs = [
-    ":tel_contact_config",
+    "tel_contact_config",
     "../interfaces/innerkits/include/",
   ]
 
