@@ -57,7 +57,7 @@ public:
     virtual int32_t SetRadioState(int32_t slotId, bool isOn, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetRadioState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
-    virtual int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) = 0;
+    virtual int32_t GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetMeid(int32_t slotId, std::u16string &meid) = 0;
     virtual int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) = 0;
     virtual bool IsNrSupported(int32_t slotId) = 0;
@@ -105,9 +105,9 @@ public:
     virtual int32_t SetPrimarySlotId(int32_t slotId) = 0;
     virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
     virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
-    virtual int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) = 0;
+    virtual int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t SetShowName(int32_t slotId, const std::u16string &name) = 0;
-    virtual int32_t GetShowName(int32_t slotId, std::u16string &showName) = 0;
+    virtual int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;
     virtual int32_t RefreshSimState(int32_t slotId) = 0;

@@ -38,7 +38,7 @@ public:
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
-    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
+    int32_t GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
     int32_t GetUniqueDeviceId(int32_t slotId, std::u16string &deviceId) override;
     int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
@@ -73,9 +73,9 @@ public:
     int32_t GetPrimarySlotId(int32_t &slotId) override;
     int32_t SetPrimarySlotId(int32_t slotId) override;
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
-    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;
+    int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
     int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
-    int32_t GetShowName(int32_t slotId, std::u16string &showName) override;
+    int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
     int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) override;
     bool IsValidSlotId(int32_t slotId);

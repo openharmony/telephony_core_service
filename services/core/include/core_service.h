@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Telephony {
 static const int32_t DEFAULT_SLOT_ID = 0;
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
-class CoreService : public SystemAbility, public CoreServiceStub, public std::enable_shared_from_this<CoreService> {
+class CoreService : public SystemAbility, public CoreServiceStub {
     DECLARE_DELAYED_SINGLETON(CoreService)
     DECLARE_SYSTEM_ABILITY(CoreService)
 
@@ -59,7 +59,7 @@ public:
 
     int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
+    int32_t GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetMeid(int32_t slotId, std::u16string &meid) override;
 
@@ -149,11 +149,11 @@ public:
 
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
 
-    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override;
+    int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
 
-    int32_t GetShowName(int32_t slotId, std::u16string &showName) override;
+    int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t RefreshSimState(int32_t slotId) override;
 
@@ -271,6 +271,7 @@ public:
 private:
     bool Init();
     void AsyncNetSearchExecute(const std::function<void()> task);
+    void AsyncSimGeneralExecute(const std::function<void()> task);
 
 private:
     int32_t slotId_ = DEFAULT_SLOT_ID;
@@ -281,6 +282,7 @@ private:
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> simGeneralHandler_;
     std::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
