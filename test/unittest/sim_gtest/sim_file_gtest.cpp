@@ -23,6 +23,7 @@
 #include "sim_file.h"
 #include "sim_file_init.h"
 #include "string_ex.h"
+#include "usim_file_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -175,6 +176,27 @@ HWTEST_F(SimFileTest, Telephony_sim_file_005, Function | MediumTest | Level1)
     simFile_->operatorNumeric_ = "1234";
     auto ret = simFile_->ObtainIsoCountryCode();
     EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.number   Telephony_sim_file_006
+ * @tc.name     SimFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimFileTest, Telephony_sim_file_006, Function | MediumTest | Level1)
+{
+    std::weak_ptr<Telephony::SimStateManager> simStateManager_;
+    auto simFile_ = std::make_shared<SimFile>(simStateManager_.lock());
+    simFile_->fileController_ = std::make_shared<UsimFileController>(0);
+    simFile_->serviceTable_ = "not null";
+    simFile_->LoadSimOtherFile();
+
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
+    simFile_->ProcessGetOpl5gDone(event);
+    event = nullptr;
+    simFile_->ProcessGetSpnCphsDone(event);
+    simFile_->ProcessGetSpnShortCphsDone(event);
+    EXPECT_TRUE(simFile_->ProcessGetOpl5gDone(event));
 }
 
 }
