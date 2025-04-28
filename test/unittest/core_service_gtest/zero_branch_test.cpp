@@ -63,6 +63,8 @@
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
 #include "telephony_ext_wrapper.h"
+#include "sim_file_parse.h"
+#include "network_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -673,21 +675,21 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ObtainUsimFunctionHandle(), nullptr);
     EXPECT_EQ(simFile->AnalysisBcdPlmn(operatorNum, operatorNum), "");
     simFile->ProcessElementaryFileCsp(operatorNum);
-    simFile->AnalysisElementaryFileSpdi(operatorNum);
+    simFile->simFileParse_->ParseSpdi(operatorNum, *simFile);
     simFile->ProcessSmses(operatorNum);
     simFile->ProcessSms(operatorNum);
     std::vector<std::string> emptyRecords = {};
     std::vector<std::string> records = { "46000", "46002", "46004", "46007", "46008" };
-    simFile->ParsePnn(emptyRecords);
-    simFile->ParseOpl(emptyRecords);
-    simFile->ParsePnn(records);
-    simFile->ParseOpl(records);
+    simFile->simFileParse_->ParsePnn(emptyRecords, *simFile);
+    simFile->simFileParse_->ParseOpl(emptyRecords, *simFile);
+    simFile->simFileParse_->ParsePnn(records, *simFile);
+    simFile->simFileParse_->ParseOpl(records, *simFile);
     std::vector<std::string> invalidRecords = { "64F0100000GGGG02", "64F0000000GGGG01" };
-    simFile->ParseOpl(invalidRecords);
+    simFile->simFileParse_->ParseOpl(invalidRecords, *simFile);
     std::vector<std::string> invalidPlmnRecords = { "F640100000FFFE02", "F640000000FFFE01" };
-    simFile->ParseOpl(invalidPlmnRecords);
+    simFile->simFileParse_->ParseOpl(invalidPlmnRecords, *simFile);
     std::vector<std::string> records5g = { "64F0100000FFFE02", "64F0000000FFFE01" };
-    simFile->ParseOpl(records5g);
+    simFile->simFileParse_->ParseOpl(records5g, *simFile);
     SimFile::SpnStatus newStatus;
     EXPECT_TRUE(simFile->IsContinueGetSpn(false, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
     EXPECT_TRUE(simFile->IsContinueGetSpn(true, SimFile::SpnStatus::OBTAIN_SPN_NONE, newStatus));
@@ -697,13 +699,13 @@ HWTEST_F(BranchTest, Telephony_SimFile_004, Function | MediumTest | Level1)
     EXPECT_FALSE(simFile->IsContinueGetSpn(true, SimFile::SpnStatus::OBTAIN_OPERATOR_NAME_SHORTFORM, newStatus));
     EXPECT_EQ(simFile->ObtainExtensionElementaryFile(ELEMENTARY_FILE_MSISDN), ELEMENTARY_FILE_EXT5);
     EXPECT_EQ(simFile->ObtainExtensionElementaryFile(ELEMENTARY_FILE_SPN), ELEMENTARY_FILE_EXT1);
-    EXPECT_EQ(simFile->ParseSpn(operatorNum, 0), "");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_NONE), "");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_START), "");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_SPN_GENERAL), "");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING), "\xC0\xCC");
-    EXPECT_EQ(simFile->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM), "\xC0\xCC");
-    EXPECT_EQ(simFile->ParseSpn("", 0), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn(operatorNum, 0, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_NONE, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_START, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_SPN_GENERAL, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAMESTRING, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("CMCC", OBTAIN_OPERATOR_NAME_SHORTFORM, *simFile), "");
+    EXPECT_EQ(simFile->simFileParse_->ParseSpn("", 0, *simFile), "");
 }
 
 /**
@@ -717,19 +719,19 @@ HWTEST_F(BranchTest, Telephony_SimFile_005, Function | MediumTest | Level1)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
     std::vector<std::string> emptyRecords = {};
-    simFile->ParseOpl5g(emptyRecords);
+    simFile->simFileParse_->ParseOpl5g(emptyRecords, *simFile);
     EXPECT_TRUE(simFile->opl5gFiles_.empty());
     std::vector<std::string> records = { "46000", "46002", "46004", "46007", "46008" };
-    simFile->ParseOpl5g(records);
+    simFile->simFileParse_->ParseOpl5g(records, *simFile);
     EXPECT_TRUE(simFile->opl5gFiles_.empty());
     std::vector<std::string> invalidRecords = { "64F010000000GGGGGG02", "64F000000000GGGGGG01" };
-    simFile->ParseOpl5g(invalidRecords);
+    simFile->simFileParse_->ParseOpl5g(invalidRecords, *simFile);
     EXPECT_TRUE(simFile->opl5gFiles_.empty());
     std::vector<std::string> invalidPlmnRecords = { "F64010000000FFFFFE02", "F64000000000FFFFFE01" };
-    simFile->ParseOpl5g(invalidPlmnRecords);
+    simFile->simFileParse_->ParseOpl5g(invalidPlmnRecords, *simFile);
     EXPECT_TRUE(simFile->opl5gFiles_.empty());
     std::vector<std::string> records5g = { "64F010000000FFFFFE02", "64F000000000FFFFFE01" };
-    simFile->ParseOpl5g(records5g);
+    simFile->simFileParse_->ParseOpl5g(records5g, *simFile);
     EXPECT_FALSE(simFile->opl5gFiles_.empty());
 }
 
@@ -752,6 +754,34 @@ HWTEST_F(BranchTest, Telephony_SimFile_006, Function | MediumTest | Level1)
     auto event = AppExecFwk::InnerEvent::Get(0);
     event = nullptr;
     EXPECT_FALSE(simFile->ProcessIccLocked(event));
+}
+
+HWTEST_F(BranchTest, Telephony_SimFile_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
+    std::string hplmn = "";
+    simFile->simFileParse_->ParseEhplmn(hplmn, *simFile);
+    std::string spdi = "";
+    simFile->simFileParse_->ParseSpdi(spdi, *simFile);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    EXPECT_TRUE(simFile->ProcessGetSpnCphsDone(event));
+    EXPECT_TRUE(simFile->ProcessGetSpnShortCphsDone(event));
+}
+
+HWTEST_F(BranchTest, Telephony_SimFile_008, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<SimFile> simFile = std::make_shared<SimFile>(simStateManager);
+    std::string hplmn1 = "42F01042F050";
+    simFile->simFileParse_->ParseEhplmn(hplmn1, *simFile);
+    std::string spdi1 = "A305800342F050";
+    simFile->simFileParse_->ParseSpdi(spdi1, *simFile);
+    auto event = AppExecFwk::InnerEvent::Get(0);
+    EXPECT_TRUE(simFile->ProcessGetSpnCphsDone(event));
+    EXPECT_TRUE(simFile->ProcessGetSpnShortCphsDone(event));
 }
 
 /**
@@ -2046,9 +2076,10 @@ HWTEST_F(BranchTest, Telephony_NetworkSearchState_001, Function | MediumTest | L
  */
 HWTEST_F(BranchTest, Telephony_NetworkSearchManager_001, Function | MediumTest | Level1)
 {
-    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->eventSender_ = std::make_unique<EventSender>(telRilManager, networkSearchManager);
     sptr<NetworkInformation> networkInfo = nullptr;
     ImsRegInfo info;
     std::u16string testStr = u"";
@@ -2998,6 +3029,20 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
         0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF});
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data8), 0, 39, 0),
         "Личный кабинет");
+}
+
+HWTEST_F(BranchTest, Telephony_SIMUtils_003, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    std::string str = "";
+    EXPECT_EQ(simUtils->Cphs7bitConvertToString(str), "");
+}
+
+HWTEST_F(BranchTest, Telephony_SIMUtils_004, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    std::string str1 = "544553541B141B281B291B2F1B3C1B3D1B3E1B4054455354";
+    EXPECT_EQ(simUtils->Cphs7bitConvertToString(str1), "TEST^{}\\[~]|TEST");
 }
 
 /**
