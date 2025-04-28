@@ -27,6 +27,7 @@
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "unistd.h"
+#include "sim_file_parse.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -149,7 +150,7 @@ void ParseOpl5g(const uint8_t *data, size_t size)
     std::string fileData(reinterpret_cast<const char *>(data), size);
     std::vector<std::string> records;
     records.push_back(fileData);
-    simFile->ParseOpl5g(records);
+    simFile->simFileParse_->ParseOpl5g(records, *simFile);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
