@@ -50,6 +50,7 @@ static const int START_POS = 3;
 static const int END_POS = 4;
 static const int POS_NOT_BLANK = 1;
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+//GSM 03.38
 static wchar_t LANGUAGE_TABLE[] = {
     L'@', L'\u00a3', L'$', L'\u00a5', L'\u00e8', L'\u00e9', L'\u00f9', L'\u00ec', L'\u00f2', L'\u00c7',
     L'\n', L'\u00d8', L'\u00f8', L'\r', L'\u00c5', L'\u00e5', L'\u0394', L'_', L'\u03a6', L'\u0393',
@@ -61,6 +62,18 @@ static wchar_t LANGUAGE_TABLE[] = {
     L'\u00c4', L'\u00d6', L'\u00d1', L'\u00dc', L'\u00a7', L'\u00bf', L'a', L'b', L'c', L'd', L'e',
     L'f', L'g', L'h', L'i', L'j', L'k', L'l', L'm', L'n', L'o', L'p', L'q', L'r', L's', L't', L'u',
     L'v', L'w', L'x', L'y', L'z', L'\u00e4', L'\u00f6', L'\u00f1', L'\u00fc', L'\u00e0'
+};
+static const std::map<int, wchar_t> LANGUAGE_EXT_TABLE_MAP = {
+    { 0x0A, L'\u000c' },
+    { 0x14, '^' },
+    { 0x28, '{' },
+    { 0x29, '}' },
+    { 0x2F, '\\' },
+    { 0x3C, '[' },
+    { 0x3D, '~' },
+    { 0x3E, ']' },
+    { 0x40, '|' },
+    { 0x65, L'\u00ac' },
 };
 // TS 24.008 Section 10.5.3.5a Network Name
 enum {
@@ -95,6 +108,8 @@ public:
         const unsigned char *charBytes, int charBytesLen, int &outChar16Len, bool bigEndian);
     static std::string Trim(std::string& str);
     static std::string Gsm7bitConvertToString(const unsigned char *bytes, int byteLen);
+    static std::string Cphs7bitConvertToString(const std::string &rawData);
+    static std::string HexVecToHexStr(const std::vector<uint8_t> &arr);
 
 private:
     static std::u16string UcsConvertToString(unsigned char *data, int length, int offset);
