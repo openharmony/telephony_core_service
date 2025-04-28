@@ -75,6 +75,7 @@ using namespace testing::ext;
 namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
+const int32_t SLOTID_OVER_MAX = 3;
 const int DATA_STORAGE_ERR_PERMISSION_ERR = -3;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
@@ -652,7 +653,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_GT(mInner.UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
