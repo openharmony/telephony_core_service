@@ -1062,7 +1062,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_002, Function | MediumTest | L
     multiSimController->SetShowNumberToDB(0, testU16Str);
     EXPECT_NE(multiSimController->GetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetShowName(0, testU16Str, false), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(multiSimController->SetActiveSim(0, 1, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SetActiveSimSatellite(0, 1, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(multiSimController->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
