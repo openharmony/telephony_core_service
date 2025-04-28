@@ -277,20 +277,18 @@ uint32_t Asn1Node::Asn1AsBytes(std::vector<uint8_t> &output)
 
 int32_t Asn1Node::Asn1AsInteger()
 {
+    int32_t dataLen = -1;
     if (constructed_) {
         TELEPHONY_LOGE("Cannot get value of a constructed node.");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
+        return dataLen;
     }
 
     if (dataBytes_.empty()) {
         TELEPHONY_LOGE("Data bytes cannot be nullptr.");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
+        return dataLen;
     }
-    int32_t dataLen = 0;
-    if (!Asn1Utils::BytesToInt(dataBytes_, dataOffset_, dataLength_, dataLen)) {
-        TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", dataOffset_);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
+
+    Asn1Utils::BytesToInt(dataBytes_, dataOffset_, dataLength_, dataLen);
     return dataLen;
 }
 
@@ -331,7 +329,6 @@ int32_t Asn1Node::Asn1AsBits()
 
     int32_t dataBits = 0;
     if (!Asn1Utils::BytesToInt(dataBytes_, dataOffset_ + 1, dataLength_ - 1, dataBits)) {
-        TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", dataOffset_ + 1);
         return integerVal;
     }
     uint32_t bits = static_cast<uint32_t>(dataBits);

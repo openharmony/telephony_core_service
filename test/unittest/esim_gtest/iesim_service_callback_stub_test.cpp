@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,8 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+constexpr int32_t DEFAULT_ERROR = -1;
+constexpr int32_t DEFAULT_RESULT = 0;
 class IEsimServiceCallbackStubTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -53,10 +55,21 @@ HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoList, Function | Med
     std::shared_ptr<IEsimServiceCallbackStub> stub = std::make_shared<IEsimServiceCallbackStub>();
     int endIndex = static_cast<int>(IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT);
     for (int requestId = static_cast<int>(IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT);
-         requestId < endIndex + 1;
-         requestId++) {
-        stub->OnEsimServiceCallback(static_cast<IEsimServiceCallback::EsimServiceCallback>(requestId), data);
+        requestId < endIndex + 1;
+        requestId++) {
+        int32_t ret = stub->OnEsimServiceCallback(
+            static_cast<IEsimServiceCallback::EsimServiceCallback>(requestId), data);
+        EXPECT_EQ(ret, DEFAULT_RESULT);
     }
+}
+
+HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoListFailed, Function | MediumTest | Level1)
+{
+    MessageParcel data;
+    std::shared_ptr<IEsimServiceCallbackStub> stub = std::make_shared<IEsimServiceCallbackStub>();
+    constexpr uint32_t outIndex = 99;
+    int32_t ret = stub->OnEsimServiceCallback(static_cast<IEsimServiceCallback::EsimServiceCallback>(outIndex), data);
+    EXPECT_EQ(ret, DEFAULT_ERROR);
 }
 } // namespace Telephony
 } // namespace OHOS

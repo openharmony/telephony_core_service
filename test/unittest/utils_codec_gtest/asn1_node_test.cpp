@@ -248,19 +248,29 @@ HWTEST_F(Asn1NodeTest, Asn1AsInteger_001, Function | MediumTest | Level3)
         std::shared_ptr<Asn1Node> resultNode = root->Asn1GetChild(TAG_ESIM_PROFILE_INSTALLATION_RESULT_DATA);
         errCodeNode = resultNode->Asn1GetGreatGrandson(TAG_ESIM_CTX_COMP_2, TAG_ESIM_CTX_COMP_1, TAG_ESIM_CTX_1);
         res = errCodeNode->Asn1AsInteger();
-        ret = res == TELEPHONY_ERR_ARGUMENT_INVALID ? true : false;
+        ret = res == -1 ? true : false;
         EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
     }
     root->constructed_ = true;
     res = root->Asn1AsInteger();
-    ret = res == TELEPHONY_ERR_ARGUMENT_INVALID ? true : false;
+    ret = res == -1 ? true : false;
     EXPECT_EQ(ret, true);
 
     root->constructed_ = false;
     root->dataBytes_.clear();
     res = root->Asn1AsInteger();
-    ret = res == TELEPHONY_ERR_ARGUMENT_INVALID ? true : false;
+    ret = res == -1 ? true : false;
     EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(Asn1NodeTest, Asn1AsInteger_002, Function | MediumTest | Level3)
+{
+    uint32_t tag = 0;
+    std::vector<uint8_t> src = {0, 1, 2};
+    uint32_t offset = 0;
+    uint32_t length = 5;
+    std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(tag, src, offset, length);
+    EXPECT_EQ(root->Asn1AsInteger(), -1);
 }
 
 HWTEST_F(Asn1NodeTest, Asn1AsString_001, Function | MediumTest | Level3)
@@ -315,6 +325,36 @@ HWTEST_F(Asn1NodeTest, Asn1AsBits_001, Function | MediumTest | Level3)
     res = childNode->Asn1AsBits();
     ret = res == 0 ? true : false;
     EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(Asn1NodeTest, Asn1AsBits_002, Function | MediumTest | Level3)
+{
+    uint32_t tag = 0;
+    std::vector<uint8_t> src = {0, 1, 2};
+    uint32_t offset = 0;
+    uint32_t length = 5;
+    std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(tag, src, offset, length);
+    EXPECT_EQ(root->Asn1AsBits(), 0);
+}
+
+HWTEST_F(Asn1NodeTest, Asn1AsBits_003, Function | MediumTest | Level3)
+{
+    uint32_t tag = 0;
+    std::vector<uint8_t> src = {0, 1, 2};
+    uint32_t offset = 0;
+    uint32_t length = 0;
+    std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(tag, src, offset, length);
+    EXPECT_EQ(root->Asn1AsBits(), 0);
+}
+
+HWTEST_F(Asn1NodeTest, Asn1AsBits_004, Function | MediumTest | Level3)
+{
+    uint32_t tag = 0;
+    std::vector<uint8_t> src = {0, 1, 2};
+    uint32_t offset = 6;
+    uint32_t length = 1;
+    std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(tag, src, offset, length);
+    EXPECT_EQ(root->Asn1AsBits(), 0);
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
