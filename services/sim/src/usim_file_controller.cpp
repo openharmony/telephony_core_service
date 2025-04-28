@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@ namespace OHOS {
 namespace Telephony {
 UsimFileController::UsimFileController(int slotId) : IccFileController("UsimFileController", slotId) {}
 
+const std::string DEDICATED_FILE_TELE = "7F10";
+
 std::string UsimFileController::ObtainElementFilePath(int efId)
 {
     std::string path = ObtainUsimElementFilePath(efId);
@@ -35,6 +37,23 @@ std::string UsimFileController::ObtainElementFilePath(int efId)
     return path;
 }
 
+static std::string ObtainUsimElementFilePathExt(int efId)
+{
+    std::string mf = MASTER_FILE_SIM;
+    switch (efId) {
+        case ELEMENTARY_FILE_PBR:
+            mf.append(DEDICATED_FILE_TELE);
+            mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
+            return mf;
+        case ELEMENTARY_FILE_OPL5G:
+            mf.append(DEDICATED_FILE_ADF);
+            mf.append(DEDICATED_FILE_DF5GS);
+            return mf;
+        default:
+            return "";
+    }
+}
+
 std::string UsimFileController::ObtainUsimElementFilePath(int efId)
 {
     std::string mf = MASTER_FILE_SIM;
@@ -49,7 +68,6 @@ std::string UsimFileController::ObtainUsimElementFilePath(int efId)
         case ELEMENTARY_FILE_MBDN:
         case ELEMENTARY_FILE_PNN:
         case ELEMENTARY_FILE_OPL:
-        case ELEMENTARY_FILE_OPL5G:
         case ELEMENTARY_FILE_SPDI:
         case ELEMENTARY_FILE_SST:
         case ELEMENTARY_FILE_CFIS:
@@ -77,12 +95,8 @@ std::string UsimFileController::ObtainUsimElementFilePath(int efId)
         case ELEMENTARY_FILE_HPPLMN:
             mf.append(DEDICATED_FILE_ADF);
             return mf;
-        case ELEMENTARY_FILE_PBR:
-            mf.append(DEDICATED_FILE_TELECOM);
-            mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
-            return mf;
         default:
-            return "";
+            return ObtainUsimElementFilePathExt(efId);
     }
 }
 
