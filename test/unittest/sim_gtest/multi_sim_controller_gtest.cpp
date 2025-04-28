@@ -353,7 +353,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimTelephoneNumber_00
     EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
 }
 
-HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_BuildRadioProtocolForCommunication_001, Function | MediumTest | Level1)
+HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
@@ -366,6 +366,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_BuildRadioProtocolForCom
     radioProtocolController->Init();
     radioProtocolController->BuildRadioProtocolForCommunication(
         RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    EXPECT_EQ(multiSimController->localCacheInfo_.size(), 2);
 }
 
 }
