@@ -20,7 +20,6 @@
 #include "core_manager_inner.h"
 #include "core_service_proxy.h"
 #include "network_search_manager.h"
-#include "resource_manager.h"
 #include "resource_utils.h"
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
@@ -143,7 +142,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_ResourceUtils, Function | Medium
     std::vector<std::string> strVector;
     std::vector<int32_t> intVector;
     resourceUtils.resourceManager_ =
-        std::unique_ptr<OHOS::Global::Resource::ResourceManager>(OHOS::Global::Resource::CreateResourceManager());
+        std::unique_ptr<Global::Resource::ResourceManager>(Global::Resource::CreateResourceManager());
     ASSERT_NE(resourceUtils.resourceManager_, nullptr);
     EXPECT_FALSE(resourceUtils.GetStringByName("testName", strValue));
     EXPECT_FALSE(resourceUtils.GetIntegerByName("testName", intValue));
@@ -195,9 +194,9 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_002, Function |
 
     std::u16string testU16Str = u"";
     EXPECT_EQ(coreServiceProxy.SetShowNumber(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
-    EXPECT_EQ(coreServiceProxy.GetShowNumber(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
+    EXPECT_EQ(coreServiceProxy.GetShowNumber(INVALID_SLOTID, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(coreServiceProxy.SetShowName(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
-    EXPECT_EQ(coreServiceProxy.GetShowName(INVALID_SLOTID, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
+    EXPECT_EQ(coreServiceProxy.GetShowName(INVALID_SLOTID, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
 
     OperatorConfig poc;
     EXPECT_EQ(coreServiceProxy.GetOperatorConfigs(INVALID_SLOTID, poc), TELEPHONY_ERR_SLOTID_INVALID);
