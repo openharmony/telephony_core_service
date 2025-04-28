@@ -23,7 +23,6 @@ class MockRawParcelCallback : public IRawParcelCallback {
 public:
     MOCK_METHOD2(Transfer, void(std::function<void(MessageParcel &)>, MessageParcel &));
     MOCK_METHOD(sptr<IRemoteObject>, AsObject, ());
-#endif
 };
 }
 }
