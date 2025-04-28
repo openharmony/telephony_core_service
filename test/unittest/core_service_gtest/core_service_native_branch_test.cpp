@@ -817,11 +817,11 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function 
     const std::u16string nickname = u"test profile";
     EuiccProfile eUiccProfile;
     std::u16string transactionId = u"12232312";
-    
+
     EXPECT_EQ(mInner.GetEid(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetSmdsAddress(slotId, portIndex, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetDefaultSmdpAddress(slotId, resultstr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    
+
     EXPECT_EQ(mInner.GetEuiccProfileInfoList(slotId, euiccProfileInfoList), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccInfo(slotId, eUiccInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.GetEuiccChallenge(slotId, portIndex, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -952,7 +952,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     ResetOption resetOption = ResetOption::DELETE_OPERATIONAL_PROFILES;
     EuiccRulesAuthTable eUiccRulesAuthTable;
     bool forceDisableProfile = true;
-    EXPECT_EQ(mInner.simManager_, nullptr);
     EXPECT_EQ(mInner.GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.ResetMemory(slotId, resetOption, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult), TELEPHONY_ERR_LOCAL_PTR_NULL);

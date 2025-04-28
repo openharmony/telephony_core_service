@@ -62,6 +62,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_Init_001, Function | Med
     multiSimController->radioProtocolController_ = nullptr;
     multiSimController->Init();
     multiSimController->radioProtocolController_ = radioProtocolController;
+    multiSimController->GetRadioProtocol(1);
     EXPECT_EQ(multiSimController->isSetActiveSimInProgress_.size(), SIM_SLOT_COUNT);
 }
 
@@ -216,6 +217,156 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetShowNumber_001, Funct
     multiSimController->localCacheInfo_ = newCache;
     result = multiSimController->GetShowNumber(0, showNumber);
     EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDataByIccId_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    radioProtocolController->Init();
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+    auto ret = multiSimController->UpdateDataByIccId(0, "000011111");
+
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    multiSimController->UpdateDataByIccId(1, "000011111");
+
+    EXPECT_EQ(ret, INVALID_VALUE);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InsertData_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+    auto ret = multiSimController->InsertData(0, "000011111");
+
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    multiSimController->InsertData(1, "000011111");
+
+    multiSimController->UpdateSubState(0, 1);
+
+    EXPECT_EQ(ret, INVALID_VALUE);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+    auto ret = multiSimController->SetPrimarySlotId(0);
+
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    multiSimController->SetPrimarySlotId(1);
+
+    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SendMainCardBroadCast_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+    multiSimController->SendMainCardBroadCast(1);
+
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+    multiSimController->ResetSetPrimarySlotRemain(0);
+    multiSimController->ResetSetPrimarySlotRemain(-1);
+    multiSimController->ResetSetPrimarySlotRemain(5);
+    multiSimController->SendMainCardBroadCast(0);
+    multiSimController->SendDefaultCellularDataBroadCast(0);
+    EXPECT_EQ(multiSimController->localCacheInfo_.size(), 2);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimTelephoneNumber_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager0->Init(0);
+    simStateManager0->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+ 
+    auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager1->Init(1);
+    simStateManager1->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+ 
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_ = { simStateManager0, simStateManager1 };
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    simFileManager->simFile_->msisdn_ = "2164181618486135";
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_ = { simFileManager, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager_, simFileManager_);
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(1);
+    std::u16string showNumber = u"";
+    newCache[0].phoneNumber = "2164181618486135";
+    multiSimController->simStateManager_ = { simStateManager0, simStateManager1 };
+    multiSimController->localCacheInfo_ = newCache;
+    int32_t result = multiSimController->GetSimTelephoneNumber(0, showNumber);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    result = multiSimController->GetSimTelephoneNumber(1, showNumber);
+ 
+    newCache[0].phoneNumber = "2164181618486139";
+    multiSimController->localCacheInfo_ = newCache;
+    result = multiSimController->GetSimTelephoneNumber(0, showNumber);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    radioProtocolController->slotCount_ = 2;
+    radioProtocolController->Init();
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    EXPECT_EQ(multiSimController->localCacheInfo_.size(), 2);
 }
 
 }
