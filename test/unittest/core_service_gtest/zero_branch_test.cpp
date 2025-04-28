@@ -1858,7 +1858,7 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
         simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "二个");
     unsigned char *data5(new unsigned char[11] { 0x82, 0x07, 0x82, 0x80, 0x38, 0x30, 0x32, 0x35, 0x45, 0x46, 0xB3 });
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data5), 0, 11, 0),
-        "8025EF��");
+        "8025EF芳");
     unsigned char *data6(new unsigned char[5] { 0x80, 0x4E, 0x2D, 0x56, 0xFD });
     EXPECT_EQ(
         simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "中国");
@@ -2268,7 +2268,6 @@ HWTEST_F(BranchTest, Telephony_ImsCoreServiceProxy_001, Function | MediumTest | 
     }
     ASSERT_NE(remote, nullptr);
     auto imsCoreServiceProxy = std::make_shared<ImsCoreServiceProxy>(remote);
-    EXPECT_TRUE(imsCoreServiceProxy != nullptr);
     EXPECT_GE(imsCoreServiceProxy->GetImsRegistrationStatus(0), 0);
     EXPECT_GE(imsCoreServiceProxy->RegisterImsCoreServiceCallback(nullptr), 0);
 }
