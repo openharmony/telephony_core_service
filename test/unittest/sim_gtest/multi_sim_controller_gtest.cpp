@@ -41,7 +41,7 @@ public:
 };
 
 
-void MultiSimControllerTest::SetUpTestCase(){}
+void MultiSimControllerTest::SetUpTestCase() {}
 
 void MultiSimControllerTest::TearDownTestCase() {}
 

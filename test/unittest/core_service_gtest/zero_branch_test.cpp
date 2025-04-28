@@ -1847,30 +1847,30 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
     auto simUtils = std::make_shared<SIMUtils>();
     unsigned char *data(new unsigned char[5] { 0x81, 0x02, 0xA9, 0xC8, 0xC8 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "����");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "哈哈");
     unsigned char *data2(new unsigned char[4] { 0x81, 0x01, 0xAA, 0xCA });
-    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "��");
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "啊");
     unsigned char *data3(new unsigned char[6] { 0x81, 0x03, 0xCE, 0xDC, 0xDC, 0xDC });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "�ŶŶ�");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "杜杜杜");
     unsigned char *data4(new unsigned char[6] { 0x82, 0x02, 0x4E, 0x2A, 0xE2, 0x80 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "����");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "二个");
     unsigned char *data5(new unsigned char[11] { 0x82, 0x07, 0x82, 0x80, 0x38, 0x30, 0x32, 0x35, 0x45, 0x46, 0xB3 });
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data5), 0, 11, 0),
         "8025EF��");
     unsigned char *data6(new unsigned char[5] { 0x80, 0x4E, 0x2D, 0x56, 0xFD });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "�й�");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "中国");
     unsigned char *data7(new unsigned char[9] { 0x80, 0x67, 0x5C, 0x00, 0x31, 0x00, 0x30, 0x5A, 0x18 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "��10��");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "杜10娘");
     unsigned char *data8(new unsigned char[39] { 0x81, 0x0E, 0x08, 0x9B, 0xB8, 0xC7, 0xBD,
         0xCB, 0xB9, 0x20, 0xBA, 0xB0, 0xB1, 0xB8, 0xBD, 0xB5, 0xC2, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x04, 0x81, 0x1A, 0x50,
         0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF});
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data8), 0, 39, 0),
-        "���ڧ�ߧ��� �ܧѧҧڧߧ֧�");
+        "Личный кабинет");
 }
 
 HWTEST_F(BranchTest, Telephony_SIMUtils_003, Function | MediumTest | Level1)
