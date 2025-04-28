@@ -298,6 +298,7 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
+            params.showSpn = false;
             params.plmn = domesticSpn;
             std::string emptyDomesticSpn = "";
             PublishEvent(params, regStatus, emptyDomesticSpn);
