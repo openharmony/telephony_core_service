@@ -76,12 +76,12 @@ public:
         return 0;
     }
 
-    int32_t GetImei(int32_t slotId, std::u16string &imei) override
+    int32_t GetImei(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override
+    int32_t GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -297,7 +297,7 @@ public:
         return 0;
     }
 
-    int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber) override
+    int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -307,7 +307,7 @@ public:
         return 0;
     }
 
-    int32_t GetShowName(int32_t slotId, std::u16string &showName) override
+    int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
