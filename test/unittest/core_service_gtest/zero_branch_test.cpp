@@ -75,7 +75,6 @@ using namespace testing::ext;
 namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
-const int32_t SLOTID_OVER_MAX = 3;
 const int DATA_STORAGE_ERR_PERMISSION_ERR = -3;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
@@ -653,6 +652,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_002, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
     mInner.simManager_ = nullptr;
     EXPECT_GT(mInner.GetSimIccStatus(0, iccStatus), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(mInner.ResetSimLoadAccount(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_GT(mInner.UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -978,16 +978,16 @@ HWTEST_F(BranchTest, Telephony_SimSmsController_001, Function | MediumTest | Lev
     auto eventUpdate = simSmsController->BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
     auto eventWrite = simSmsController->BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
     auto eventDelete = simSmsController->BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
-    EXPECT_NO_THROW(simSmsController->ProcessLoadDone(event));
-    EXPECT_NO_THROW(simSmsController->ProcessUpdateDone(event));
-    EXPECT_NO_THROW(simSmsController->ProcessWriteDone(event));
-    EXPECT_NO_THROW(simSmsController->ProcessDeleteDone(event));
-    EXPECT_NO_THROW(simSmsController->ProcessDeleteDone(event));
-    EXPECT_NO_THROW(simSmsController->ProcessEvent(event));
-    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventGet));
-    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventUpdate));
-    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventWrite));
-    EXPECT_NO_THROW(simSmsController->ProcessEvent(eventDelete));
+    simSmsController->ProcessLoadDone(event);
+    simSmsController->ProcessUpdateDone(event);
+    simSmsController->ProcessWriteDone(event);
+    simSmsController->ProcessDeleteDone(event);
+    simSmsController->ProcessDeleteDone(event);
+    simSmsController->ProcessEvent(event);
+    simSmsController->ProcessEvent(eventGet);
+    simSmsController->ProcessEvent(eventUpdate);
+    simSmsController->ProcessEvent(eventWrite);
+    simSmsController->ProcessEvent(eventDelete);
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
@@ -1847,30 +1847,30 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_002, Function | MediumTest | Level1)
     auto simUtils = std::make_shared<SIMUtils>();
     unsigned char *data(new unsigned char[5] { 0x81, 0x02, 0xA9, 0xC8, 0xC8 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "哈哈");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data), 0, 5, 0), "����");
     unsigned char *data2(new unsigned char[4] { 0x81, 0x01, 0xAA, 0xCA });
-    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "啊");
+    EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data2), 0, 4, 0), "��");
     unsigned char *data3(new unsigned char[6] { 0x81, 0x03, 0xCE, 0xDC, 0xDC, 0xDC });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "杜杜杜");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data3), 0, 6, 0), "�ŶŶ�");
     unsigned char *data4(new unsigned char[6] { 0x82, 0x02, 0x4E, 0x2A, 0xE2, 0x80 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "二个");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data4), 0, 6, 0), "����");
     unsigned char *data5(new unsigned char[11] { 0x82, 0x07, 0x82, 0x80, 0x38, 0x30, 0x32, 0x35, 0x45, 0x46, 0xB3 });
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data5), 0, 11, 0),
-        "8025EF芳");
+        "8025EF��");
     unsigned char *data6(new unsigned char[5] { 0x80, 0x4E, 0x2D, 0x56, 0xFD });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "中国");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data6), 0, 5, 0), "�й�");
     unsigned char *data7(new unsigned char[9] { 0x80, 0x67, 0x5C, 0x00, 0x31, 0x00, 0x30, 0x5A, 0x18 });
     EXPECT_EQ(
-        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "杜10娘");
+        simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data7), 0, 9, 0), "��10��");
     unsigned char *data8(new unsigned char[39] { 0x81, 0x0E, 0x08, 0x9B, 0xB8, 0xC7, 0xBD,
         0xCB, 0xB9, 0x20, 0xBA, 0xB0, 0xB1, 0xB8, 0xBD, 0xB5, 0xC2, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x04, 0x81, 0x1A, 0x50,
         0xFB, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF});
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(std::shared_ptr<unsigned char>(data8), 0, 39, 0),
-        "Личный кабинет");
+        "���ڧ�ߧ��� �ܧѧҧڧߧ֧�");
 }
 
 HWTEST_F(BranchTest, Telephony_SIMUtils_003, Function | MediumTest | Level1)
@@ -2268,6 +2268,7 @@ HWTEST_F(BranchTest, Telephony_ImsCoreServiceProxy_001, Function | MediumTest | 
     }
     ASSERT_NE(remote, nullptr);
     auto imsCoreServiceProxy = std::make_shared<ImsCoreServiceProxy>(remote);
+    EXPECT_TRUE(imsCoreServiceProxy != nullptr);
     EXPECT_GE(imsCoreServiceProxy->GetImsRegistrationStatus(0), 0);
     EXPECT_GE(imsCoreServiceProxy->RegisterImsCoreServiceCallback(nullptr), 0);
 }

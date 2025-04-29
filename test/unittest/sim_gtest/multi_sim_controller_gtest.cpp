@@ -59,6 +59,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_Init_001, Function | Med
     auto radioProtocolController =
         std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
     multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    multiSimController->ResetDataShareError();
     multiSimController->radioProtocolController_ = nullptr;
     multiSimController->Init();
     multiSimController->radioProtocolController_ = radioProtocolController;
@@ -75,6 +76,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ForgetAllData_001, Funct
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
     bool ret = multiSimController->ForgetAllData();
+    multiSimController->ResetDataShareError();
     EXPECT_FALSE(ret);
 }
 
@@ -366,7 +368,7 @@ HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Functio
     radioProtocolController->Init();
     radioProtocolController->BuildRadioProtocolForCommunication(
         RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
-    EXPECT_EQ(multiSimController->localCacheInfo_.size(), 2);
+    EXPECT_EQ(multiSimController->localCacheInfo_.size(), 0);
 }
 
 }

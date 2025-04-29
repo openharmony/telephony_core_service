@@ -236,6 +236,8 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_009,
     std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
     
     diallingNumberHandler->ProcessExtensionRecordNumbers(event, id);
+    diallingNumberHandler->ProcessLinearSizeDone(event, id);
+    diallingNumberHandler->ProcessUpdateRecordDone(event, id);
     EXPECT_EQ(diallingNumber->GetNumber(), u"");
 }
 
@@ -280,6 +282,30 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_010,
     data = SIMUtils::HexStringConvertToBytes(resultData, recordLen);
     SimNumberDecode::ExtensionBCDConvertToString(data, recordLen, offset, length);
     EXPECT_EQ(diallingNumber->GetNumber(), u"112233112233112233");
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_011
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_011, Function | MediumTest | Level1)
+{
+    int fileId = 0;
+    int exId = 1;
+    int indexNum = 0;
+    std::string pin2Str = "";
+    AppExecFwk::InnerEvent::Pointer result = AppExecFwk::InnerEvent::Get(1, 1);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+    std::shared_ptr<DiallingNumbersInfo> diallingNumber = std::make_shared<DiallingNumbersInfo>();
+    std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
+        diallingNumberHandler->CreateLoadRequest(fileId, exId, indexNum, pin2Str, result);
+    diallingNumberHandler->SendUpdateCommand(diallingNumber, 10, loadRequest, 1);
+    std::shared_ptr<void> pobj = nullptr;
+    diallingNumberHandler->BuildCallerInfo(-1, pobj, 0);
+    EXPECT_NE(loadRequest, nullptr);
 }
 
 }
