@@ -92,7 +92,7 @@ void ContactDataTest::SetNameData(const std::string &family, const std::string &
     nameData_->SetFamily(family);
     nameData_->SetGiven(given);
     nameData_->SetMiddle(middle);
-    nameData_->SetPrefix(displayName);
+    nameData_->setDispalyName(displayName);
 }
 
 void ContactDataTest::SetNameDataInfo(const std::string &phoneticFamily, const std::string &phoneticGiven,
