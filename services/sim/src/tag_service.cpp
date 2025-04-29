@@ -48,7 +48,9 @@ TagService::~TagService() {}
 int TagService::GetTagCode() const
 {
     TELEPHONY_LOGI("GetTagCode : %{public}s", tag_.c_str());
-    if (!IsValidHexValue(tag_)) {
+    std::string tagTemp = tag_.c_str();
+    if (!IsValidHexValue(tagTemp)) {
+        TELEPHONY_LOGE("GetTagCode return ERR");
         return ERR;
     }
     int i = std::stoi(tag_, nullptr, HEX_TYPE);
@@ -107,15 +109,6 @@ static int LengthFunc(const uint8_t arg, const size_t order, uint8_t &len)
     return ERROR;
 }
 
-static std::string HexVecToHexStr(const std::vector<uint8_t> &arr)
-{
-    std::stringstream ss;
-    for (auto it = arr.begin(); it != arr.end(); it++) {
-        ss << std::setiosflags(std::ios::uppercase) << std::hex << std::setw(WORD_LEN) << std::setfill('0') << int(*it);
-    }
-    return ss.str();
-}
-
 bool TagService::Next()
 {
     TELEPHONY_LOGI("TagService::Next begin!!");
@@ -163,8 +156,8 @@ bool TagService::Next()
         hasNext_ = false;
     }
     TELEPHONY_LOGI("TagService::Next for value : %{public}s",
-        HexVecToHexStr(std::vector<uint8_t>(data_.begin() + dataOffset_, data_.begin() + dataOffset_ + length_))
-            .c_str());
+        SIMUtils::HexVecToHexStr(std::vector<uint8_t>(data_.begin() + dataOffset_, data_.begin() +
+        dataOffset_ + length_)).c_str());
     return hasNext_;
 }
 } // namespace Telephony
