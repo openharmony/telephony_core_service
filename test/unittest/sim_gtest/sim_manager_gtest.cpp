@@ -134,11 +134,16 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | L
     std::string data = "ABCDEFG";
     std::string path = "";
     SimAuthenticationResponse mResponse;
+    IccSimStatus iccStatus = IccSimStatus::ICC_CONTENT_READY;
+    CardType cardType = CardType::SINGLE_MODE_USIM_CARD;
+
     int32_t ret = simManager_->GetSimIO(slotId, command, fileId, data, path, mResponse);
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
     auto simManager = std::make_shared<MockSimManager>();
     EXPECT_CALL(*simManager, HasSimCard(slotId, _))
         .WillRepeatedly(Return(true));
+    simManager->GetSimIccStatus(slotId, iccStatus);
+    simManager->GetCardType(slotId, cardType);
     ret = simManager->GetSimIO(slotId, command, fileId, data, path, mResponse);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
@@ -191,6 +196,74 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_009, Function | MediumTest | L
     std::set<std::string> spdiPlmns;
     simManager_->GetEhPlmns(slotId, ehPlmns);
     simManager_->GetSpdiPlmns(slotId, spdiPlmns);
+    simManager_->slotCount_  = -1;
+    simManager_->InitMultiSimObject();
+    simManager_->slotCount_  = 10;
+    simManager_->InitMultiSimObject();
+    EXPECT_TRUE(simManager_->simFileManager_.empty());
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_010
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_010, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    simManager_->SetActiveSim(slotId, 0);
+    slotId = -1;
+    simManager_->SetActiveSim(slotId, 0);
+    slotId = 4;
+    simManager_->SetActiveSim(slotId, 0);
+    slotId = 0;
+    simManager_->multiSimController_ = nullptr;
+    simManager_->SetActiveSim(slotId, 0);
+    simManager_->SetActiveSim(slotId, 0);
+    EXPECT_TRUE(simManager_->simFileManager_.empty());
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_011
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_011, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    simManager_->SetActiveSimSatellite(slotId, 0);
+    slotId = -1;
+    simManager_->SetActiveSimSatellite(slotId, 0);
+    slotId = 4;
+    simManager_->SetActiveSimSatellite(slotId, 0);
+    slotId = 0;
+    simManager_->multiSimController_ = nullptr;
+    simManager_->SetActiveSimSatellite(slotId, 0);
+    telRilManager_ = new MockTelRilManager();
+    simManager_->SetActiveSimSatellite(slotId, 0);
+    EXPECT_TRUE(simManager_->simFileManager_.empty());
+}
+
+/**
+ * @tc.number   Telephony_Sim_SimManager_012
+ * @tc.name     SimManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_012, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    simManager_->SetDefaultCellularDataSlotId(slotId);
+    simManager_->ResetSimLoadAccount(slotId);
+    slotId = -1;
+    simManager_->SetDefaultCellularDataSlotId(slotId);
+    simManager_->ResetSimLoadAccount(slotId);
+    slotId = 4;
+    simManager_->ResetSimLoadAccount(slotId);
+    slotId = 0;
+    simManager_->multiSimController_ = nullptr;
+    simManager_->ResetSimLoadAccount(slotId);
+    simManager_->ResetSimLoadAccount(slotId);
+    simManager_->SetDefaultCellularDataSlotId(slotId);
     EXPECT_TRUE(simManager_->simFileManager_.empty());
 }
 }

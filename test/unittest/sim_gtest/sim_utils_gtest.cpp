@@ -56,6 +56,7 @@
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 #include "usim_file_controller.h"
 #include "telephony_data_helper.h"
 #include "sim_data.h"
@@ -189,6 +190,35 @@ HWTEST_F(SimUtilsTest, Telephony_Normal_Method_Test_001, Function | MediumTest |
     std::string rawData = "";
     auto res = simUtils->Cphs7bitConvertToString(rawData);
     EXPECT_EQ(res, "");
+}
+
+/**
+ * @tc.number   Telephony_UcsWideConvertToString_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_001, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    int length = 0;
+    int offset = 0;
+    auto res = simUtils->Decode8BitConvertToString(nullptr, length, offset);
+    EXPECT_EQ(res, "");
+}
+
+/**
+ * @tc.number   Telephony_telephony_permission_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimUtilsTest, Telephony_telephony_permission_001, Function | MediumTest | Level1)
+{
+    auto telephonyPermission = std::make_shared<TelephonyPermission>();
+    std::string bundleName = "test";
+    auto res = telephonyPermission->GetBundleNameByUid(1, bundleName);
+    bundleName = "";
+    telephonyPermission->CheckPermission(bundleName);
+    EXPECT_FALSE(res);
 }
 
 } // namespace Telephony
