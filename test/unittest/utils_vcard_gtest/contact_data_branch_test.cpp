@@ -232,5 +232,20 @@ HWTEST_F(ContactDataBranchTest, Telephony_VCardManager, Function | MediumTest | 
     EXPECT_EQ(vCardManager.ExportLock(testStr, nullptr, predicates, 0, testStr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(vCardManager.Export(testStr, predicates, MIN_INVALID_VERSION, testStr), TELEPHONY_ERR_ARGUMENT_INVALID);
 }
+
+HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_006, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
+    std::map<std::string, std::vector<std::string>> parasMap;
+
+    contact->AddImppDatas("sip:", parasMap);
+    std::string value = "1";
+    contact->ConvertHarmonyEvents(VCARD_TYPE_X_MOBILE_EVENTS, value);
+    value = "2";
+    contact->ConvertHarmonyEvents(VCARD_TYPE_X_MOBILE_EVENTS, value);
+    value = "4";
+    contact->ConvertHarmonyEvents(VCARD_TYPE_X_MOBILE_EVENTS, value);
+    EXPECT_EQ((contact->sips_).size(), 0);
+}
 } // namespace Telephony
 } // namespace OHOS
