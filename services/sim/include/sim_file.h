@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Telephony {
 class SimFileInit;
+class SimFileParse;
 class SimFile : public IccFile {
 public:
     explicit SimFile(std::shared_ptr<SimStateManager> simStateManager);
@@ -91,7 +92,6 @@ private:
     void ObtainSpnPhase(bool start, const AppExecFwk::InnerEvent::Pointer &event);
     std::string AnalysisBcdPlmn(std::string data, std::string description);
     void ProcessElementaryFileCsp(std::string data);
-    void AnalysisElementaryFileSpdi(std::string data);
     void ProcessSmses(std::string messages);
     void ProcessSms(std::string data);
 
@@ -137,8 +137,11 @@ private:
     bool ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event);
     bool ProcessReloadImsi(const AppExecFwk::InnerEvent::Pointer &event);
     void DelayGetImsi();
+    bool ProcessGetSpnCphsDone(const AppExecFwk::InnerEvent::Pointer &event);
+    bool ProcessGetSpnShortCphsDone(const AppExecFwk::InnerEvent::Pointer &event);
     void StartObtainSpn();
     void LoadSimOtherFile();
+    void LoadSimOtherFileExt();
 
     void CheckMncLengthForAdDone();
     void CheckMncLengthForImsiDone();
@@ -169,15 +172,13 @@ private:
     bool CphsVoiceMailAvailable();
     bool EfCfisAvailable(int32_t size);
     void GetCphsMailBox();
-    std::string ParseSpn(const std::string &rawData, int curState);
-    void ParsePnn(const std::vector<std::string> &records);
-    void ParseOpl(const std::vector<std::string> &records);
-    void ParseOpl5g(const std::vector<std::string> &records);
     bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
     bool VoiceMailNotEditToSim();
     bool IsServiceAvailable(UsimService service);
     friend class SimFileInit;
     std::shared_ptr<SimFileInit> simFileInit_;
+    friend class SimFileParse;
+    std::shared_ptr<SimFileParse> simFileParse_;
     std::string serviceTable_;
 };
 } // namespace Telephony
