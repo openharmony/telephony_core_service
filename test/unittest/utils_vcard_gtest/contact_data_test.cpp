@@ -36,11 +36,15 @@
 #include "vcard_encoder.h"
 #include "vcard_utils.h"
 #include "telephony_errors.h"
+#include "mock_datashare_helper.h"
+#include "mock_data_share_result_set.h"
 
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
-
+#include <gmock/gmock.h>
+ 
+using namespace testing;
 using namespace testing::ext;
 
 namespace OHOS {
@@ -395,6 +399,14 @@ HWTEST_F(ContactDataTest, VCardContact_BuildContact, Function | MediumTest | Lev
 {
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     EXPECT_EQ(contact_->BuildContact(nullptr), TELEPHONY_ERROR);
+    EXPECT_EQ(contact_->BuildContact(resultSet), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardContact_BuildContact_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
+    EXPECT_CALL(*resultSet, GoToFirstRow()).WillRepeatedly(Return(0));
+    EXPECT_CALL(*resultSet, GoToNextRow()).WillOnce(Return(0)).WillRepeatedly(Return(-1));
     EXPECT_EQ(contact_->BuildContact(resultSet), TELEPHONY_SUCCESS);
 }
 
@@ -758,7 +770,7 @@ HWTEST_F(ContactDataTest, VCardRdbHelper, Function | MediumTest | Level3)
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryContactData(columns, predicates), nullptr);
-
+    
     DataShare::DataShareValuesBucket groupDataValue;
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryGroupData(columns, predicates), nullptr);
     EXPECT_EQ(VCardRdbHelper::GetInstance().QueryGroupId(""), DB_FAILD);
@@ -993,8 +1005,48 @@ HWTEST_F(ContactDataTest, VCardContact_BuildContactData001, Function | MediumTes
     std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
     std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
     std::vector<DataShare::DataShareValuesBucket> contactDataValues;
+    contact_->nameData_ = nullptr;
+    contact_->CheckNameExist();
     int32_t result = contact_->BuildContactData(1, contactDataValues);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataTest, VCardManager_ExportToStr_001, Function | MediumTest | Level3)
+{
+    DataShare::DataSharePredicates predicates;
+    std::string charset = "";
+    auto dataShareHelper = std::make_shared<MockDataShareHelper>();
+    VCardRdbHelper::GetInstance().SetDataHelper(dataShareHelper);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    EXPECT_CALL(*dataShareHelper, Query(_, _, _, _)).WillRepeatedly(DoAll(Return(resultSet)));
+    std::string str = "TestPath";
+    EXPECT_EQ(VCardManager::GetInstance().ExportToStr(str, predicates, 1, charset), 1001);
+}
+
+HWTEST_F(ContactDataTest, VCardManager_ExportToStr_002, Function | MediumTest | Level3)
+{
+    DataShare::DataSharePredicates predicates;
+    std::string charset = "";
+    auto dataShareHelper = std::make_shared<MockDataShareHelper>();
+    VCardRdbHelper::GetInstance().SetDataHelper(dataShareHelper);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
+    EXPECT_CALL(*dataShareHelper, Query(_, _, _, _)).WillRepeatedly(DoAll(Return(nullptr)));
+    EXPECT_CALL(*dataShareHelper, Release()).WillRepeatedly(DoAll(Return(false)));
+    VCardManager::GetInstance().Release();
+    std::string str = "TestPath";
+    EXPECT_EQ(VCardManager::GetInstance().ExportToStr(str, predicates, 1, charset), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
+    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
+    int32_t errorCode = 0;
+    rawData->SetName(VCARD_TYPE_X_PHONETIC);
+    DataShare::DataShareValuesBucket contactDataValues;
+    contact_->AddRawData(rawData, errorCode);
+    contact_->CheckNameExist();
+    EXPECT_EQ(contact_->nameData_->GetDisplayName(), "");
 }
 
 #endif // TEL_TEST_UNSUPPORT
