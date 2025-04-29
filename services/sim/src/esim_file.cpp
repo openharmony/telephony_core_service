@@ -701,7 +701,7 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
             return;
         }
         int32_t ret = profileStateNode->Asn1AsInteger();
-        eProfileInfo->profileState = ((ret == TELEPHONY_ERR_ARGUMENT_INVALID) ? ESIM_PROFILE_STATE_DISABLED : ret);
+        eProfileInfo->profileState = ((ret < 0) ? ESIM_PROFILE_STATE_DISABLED : ret);
     } else {
         eProfileInfo->profileState = ESIM_PROFILE_STATE_DISABLED;
     }
@@ -1952,7 +1952,7 @@ bool EsimFile::RealProcessPrepareDownloadDone()
         std::shared_ptr<Asn1Node> errCodeNode = childNode->Asn1GetChild(TAG_ESIM_UNI_2);
         if (errCodeNode != nullptr) {
             int32_t protocolErr = errCodeNode->Asn1AsInteger();
-            if (protocolErr != TELEPHONY_ERR_ARGUMENT_INVALID) {
+            if (protocolErr > 0) {
                 TELEPHONY_LOGE("Prepare download error, es10x errcode: %{public}d", protocolErr);
                 preDownloadResult_.resultCode_ = protocolErr;
                 preDownloadResult_.response_ = u"";
