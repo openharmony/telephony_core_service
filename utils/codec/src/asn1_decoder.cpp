@@ -100,7 +100,6 @@ std::shared_ptr<Asn1Node> Asn1Decoder::BuildAsn1Node(const uint32_t tag, uint32_
         }
         int32_t len = 0;
         if (!Asn1Utils::BytesToInt(srcData_, offset, lenLen, len)) {
-            TELEPHONY_LOGE("Cannot convert tag at offset:%{public}u", offset);
             return nullptr;
         }
         dataLen = static_cast<uint32_t>(len);

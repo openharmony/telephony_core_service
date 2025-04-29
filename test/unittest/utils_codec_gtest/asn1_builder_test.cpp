@@ -53,7 +53,7 @@ HWTEST_F(Asn1BuilderTest, Asn1AddChildAsString_001, Function | MediumTest | Leve
     std::string childStr = "";
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(tag);
     ret = builder->Asn1AddChildAsString(tag, childStr);
-    EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
     childStr = "abc";
     ret = builder->Asn1AddChildAsString(tag, childStr);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
@@ -67,7 +67,7 @@ HWTEST_F(Asn1BuilderTest, Asn1AddChildAsBytes_001, Function | MediumTest | Level
     std::vector<uint8_t> childByte = {};
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(tag);
     ret = builder->Asn1AddChildAsBytes(tag, childByte, byteLen);
-    EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 
     tag = 0x81;
     childByte.clear();

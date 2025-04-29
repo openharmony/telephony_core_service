@@ -110,6 +110,25 @@ HWTEST_F(Asn1UtilsTest, BytesToHexStr_001, Function | MediumTest | Level3)
     EXPECT_EQ(ret, true);
 }
 
+HWTEST_F(Asn1UtilsTest, BytesToHexStr_002, Function | MediumTest | Level3)
+{
+    int32_t res = -1;
+    bool ret = false;
+    std::vector<uint8_t> responseByte;
+    for (int i = 0; i < MAX_BPP_LENGTH + 1; i++) {
+        responseByte.push_back(0);
+    }
+    std::string destStr;
+    Asn1Utils::BchToString(responseByte, destStr);
+    res = destStr.size();
+    EXPECT_EQ(res, 0);
+    std::string strResult;
+    strResult = Asn1Utils::BytesToHexStr(responseByte);
+    res = strResult.length();
+    ret = res == 0 ? true : false;
+    EXPECT_EQ(ret, true);
+}
+
 HWTEST_F(Asn1UtilsTest, ByteCountForInt_001, Function | MediumTest | Level3)
 {
     uint32_t res = -1;
@@ -164,6 +183,39 @@ HWTEST_F(Asn1UtilsTest, HexStrToBytes_001, Function | MediumTest | Level3)
     uint32_t byteLen = responseByte.size();
     ret = byteLen == 0 ? true : false;
     EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(Asn1UtilsTest, HexStrToBytes_002, Function | MediumTest | Level3)
+{
+    const std::string resultData = "BF3";
+    std::vector<uint8_t> responseByte;
+    bool ret = false;
+    responseByte = Asn1Utils::HexStrToBytes(resultData);
+    uint32_t byteLen = responseByte.size();
+    ret = byteLen == 0 ? true : false;
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(Asn1UtilsTest, HexStrToBytes_003, Function | MediumTest | Level3)
+{
+    std::string strResult;
+    for (int i = 0; i < MAX_BPP_LENGTH * BYTE_TO_HEX_LEN + 2; i++) {
+        strResult += "0";
+    }
+    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(strResult);
+    uint32_t res = responseByte.size();
+    bool ret = res == 0 ? true : false;
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(Asn1UtilsTest, SwapHexCharPair, Function | MediumTest | Level3)
+{
+    std::string strResult;
+    for (int i = 0; i < MAX_BPP_LENGTH * BYTE_TO_HEX_LEN + 2; i++) {
+        strResult += "0";
+    }
+    std::string str = Asn1Utils::SwapHexCharPair(strResult);
+    EXPECT_TRUE(str.empty());
 }
 
 HWTEST_F(Asn1UtilsTest, UintToBytes_001, Function | MediumTest | Level3)

@@ -159,7 +159,7 @@ std::vector<uint8_t> Asn1Utils::HexStrToBytes(const std::string& hexStr)
 bool Asn1Utils::BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length, int32_t &valInt)
 {
     if (length > HEX_STR_MAX_LENGTH || (offset + length) > src.size()) {
-        TELEPHONY_LOGE("src length is more than four byte.");
+        TELEPHONY_LOGE("length(%{public}d) or offset(%{public}d) is invalid.", length, offset);
         return false;
     }
     std::vector<uint8_t> subByteStream(src.begin() + offset, src.begin() + offset + length);
