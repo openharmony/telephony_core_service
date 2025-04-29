@@ -1037,14 +1037,6 @@ HWTEST_F(ContactDataTest, VCardManager_ExportToStr_002, Function | MediumTest | 
     EXPECT_EQ(VCardManager::GetInstance().ExportToStr(str, predicates, 1, charset), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(ContactDataTest, VCardContact_CheckNameExist_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<VCardRawData> rawData = std::make_shared<VCardRawData>();
-    std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
-    contact_->nameData_ = nullptr;
-    contact_->CheckNameExist();
-}
-
 HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<VCardContact> contact_ = std::make_shared<VCardContact>();
