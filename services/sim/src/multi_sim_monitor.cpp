@@ -172,11 +172,31 @@ void MultiSimMonitor::UpdateAllOpkeyConfigs()
     }
 }
 
+bool MultiSimMonitor::CheckIfWearableEsimDevice()
+{
+    char isEsimDevice[MAX_PARAMETER_LENGTH] = { 0 };
+    GetParameter("const.ril.esim_type", "", isEsimDevice, MAX_PARAMETER_LENGTH);
+    // If it is wearable esim device, the value is 6, otherwise it is not wearable esim device.
+    return (strcmp(isEsimDevice, "6") == 0);
+}
+
+bool MultiSimMonitor::CheckIfWearableEsimUnknownState(int32_t slotId)
+{
+    return (CheckIfWearableEsimDevice() && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN));
+}
+
 void MultiSimMonitor::InitData(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d", slotId);
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
+        return;
+    }
+    // When the SIM card file changes, the ICCID refresh is triggered, and InitData is finally executed,
+    // when wearable device ESIM turn off, the profile change also triggers this process
+    // but InitData should not be executed.
+    if (CheckIfWearableEsimUnknownState(slotId)) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitData not init unknown esim");
         return;
     }
     if (isSimAccountLoaded_[slotId]) {
@@ -216,7 +236,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
-    if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
+    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
+        CheckIfWearableEsimUnknownState(slotId)) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
