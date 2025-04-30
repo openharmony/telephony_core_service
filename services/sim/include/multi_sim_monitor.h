@@ -88,6 +88,8 @@ private:
     void CheckDataShareError();
     void CheckSimNotifyRegister();
     void setRemainCount(int remainCount);
+    bool CheckIfWearableEsimDevice();
+    bool CheckIfWearableEsimUnknownState(int32_t slotId);
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
