@@ -191,12 +191,48 @@ HWTEST_F(SimFileTest, Telephony_sim_file_006, Function | MediumTest | Level1)
     simFile_->serviceTable_ = "not null";
     simFile_->LoadSimOtherFile();
 
+    simFile_->serviceTable_ = "";
+    simFile_->LoadSimOtherFile();
+    simFile_->IsServiceAvailable(UsimService::USIM_FDN);
+
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     simFile_->ProcessGetOpl5gDone(event);
+    simFile_->ProcessSpnShortCphs(event);
+    simFile_->ProcessSpnCphs(event);
+    std::string operatorNum = "";
+    simFile_ ->displayConditionOfSpn_  = 4;
+    simFile_->ObtainSpnCondition(true, operatorNum);
+
     event = nullptr;
     simFile_->ProcessGetSpnCphsDone(event);
     simFile_->ProcessGetSpnShortCphsDone(event);
     EXPECT_TRUE(simFile_->ProcessGetOpl5gDone(event));
+}
+
+/**
+ * @tc.number   Telephony_sim_file_007
+ * @tc.name     SimFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimFileTest, Telephony_sim_file_007, Function | MediumTest | Level1)
+{
+    std::weak_ptr<Telephony::SimStateManager> simStateManager_;
+    auto simFile_ = std::make_shared<SimFile>(simStateManager_.lock());
+    simFile_->fileController_ = std::make_shared<UsimFileController>(0);
+    simFile_->cphsInfo_ = "not null";
+
+    simFile_->voiceMailConfig_  = nullptr;
+    simFile_->SetVoiceMailByOperator("spn");
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);;
+    simFile_->ProcessEvent(event);
+
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_ICC_FILE_DONE, 1);
+    simFile_->ProcessEvent(event);
+
+    event = AppExecFwk::InnerEvent::Get(MSG_ICC_REFRESH, 1);
+    simFile_->ProcessEvent(event);
+
+    EXPECT_FALSE(simFile_->CphsVoiceMailAvailable());
 }
 
 }
