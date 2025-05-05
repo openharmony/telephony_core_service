@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- #ifndef OHOS_MULTI_SIM_CONTROLLER_MOCK_H
+#ifndef OHOS_MULTI_SIM_CONTROLLER_MOCK_H
 #define OHOS_MULTI_SIM_CONTROLLER_MOCK_H
 
 #include <gmock/gmock.h>
