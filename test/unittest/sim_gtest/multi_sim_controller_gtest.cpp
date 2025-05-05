@@ -178,7 +178,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_003, Function |
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
 
-    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager_);
+    auto multiSimControllerMock =
+        std::make_shared<MultiSimControllerMock>(telRilManager,simStateManager, simFileManager_);
     EXPECT_CALL(*multiSimControllerMock, InitIccId(0)).WillRepeatedly(Return(true));
     EXPECT_CALL(*multiSimControllerMock, IsValidData(0)).WillRepeatedly(Return(true));
 
