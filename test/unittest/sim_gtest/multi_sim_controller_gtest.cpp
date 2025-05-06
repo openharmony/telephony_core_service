@@ -26,6 +26,9 @@
 #include "enum_convert.h"
 
 #include "multi_sim_controller.h"
+#include "mock_sim_fil_manage.h"
+#include "mock_multi_sim_controller.h"
+#include "mock_sim_rdb_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -121,6 +124,69 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_001, Function |
     EXPECT_FALSE(ret);
 }
 
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+
+    bool ret = multiSimController->InitData(0);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
+        simStateManager, simFileManager_);
+    EXPECT_CALL(*multiSimControllerMock, InitIccId(0)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*multiSimControllerMock, IsValidData(0)).WillRepeatedly(Return(true));
+
+    bool ret = multiSimController->InitData(0);
+    EXPECT_FALSE(ret);
+}
+
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitActive_001, Function | MediumTest | Level1)
 {
     int32_t slotId = 0;
@@ -164,7 +230,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_001, Fu
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function | MediumTest | Level1)
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
@@ -178,6 +244,100 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function 
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
     bool ret = multiSimController->IsAllCardsLoaded();
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+    
+    bool ret = multiSimController->InitIccId(0);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+
+    auto mockSimRdbHelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mockSimRdbHelper, QueryDataByIccId(_, _)).WillRepeatedly(Return(INVALID_VALUE));
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    bool ret = multiSimController->InitIccId(0);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+
+    auto mockSimRdbHelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mockSimRdbHelper, QueryDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
+    EXPECT_CALL(*mockSimRdbHelper, UpdateDataByIccId(_, _)).WillRepeatedly(Return(INVALID_VALUE));
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
+    bool ret = multiSimController->InitIccId(0);
     EXPECT_FALSE(ret);
 }
 
