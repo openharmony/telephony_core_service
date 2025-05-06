@@ -36,8 +36,8 @@ std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateDat
         TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(lock_);
     auto result = DataShare::DataShareHelper::Creator(remoteObj, strUri, extUri, waitTime);
+    std::lock_guard<std::mutex> lock(lock_);
     if (result == nullptr && strUri == OPKEY_DB_URI) {
         isOpkeyDbError_ = true;
         TELEPHONY_LOGE("CreateDataHelper error");

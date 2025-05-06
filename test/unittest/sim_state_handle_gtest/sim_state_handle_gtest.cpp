@@ -244,5 +244,23 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest
     future.get();
 }
 
+/**
+ * @tc.number   Telephony_SimStateHandle_010
+ * @tc.name     sst_test
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_010, Function | MediumTest | Level1)
+{
+    auto simFile_ = std::make_shared<SimFile>(simStateManager_);
+    simFile_->fileController_ = std::make_shared<UsimFileController>(0);
+    simFile_->serviceTable_ = "";
+    EXPECT_FALSE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
+    simFile_->serviceTable_ = "867F1F1C234E0000400050";
+    EXPECT_TRUE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
+    simFile_->serviceTable_ = "00000000000000000000";
+    EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_SPN));
+    EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_PLMN_NETWORK_NAME));
+    EXPECT_TRUE(simFile_->IsSimServiceAvailable(UsimService::USIM_FDN));
+}
 }
 }
