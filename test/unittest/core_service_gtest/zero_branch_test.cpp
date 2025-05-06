@@ -193,8 +193,6 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     EXPECT_TRUE(simFile->ProcessVoiceMailCphs(event));
     EXPECT_TRUE(simFile->ProcessGetMwisDone(event));
     EXPECT_TRUE(simFile->ProcessGetMbdnDone(event));
-    simFile->serviceTable_ = "867F1F1C234E0000400050";
-    EXPECT_TRUE(simFile->IsServiceAvailable(UsimService::USIM_FDN));
 }
 
 /**

@@ -43,8 +43,10 @@ const int BYTE_TO_BIT_LEN = 8;
 const int HEX_TO_BYTE_LEN = 2;
 const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
 const int CFIS_TON_NPI_OFFSET = 3;
-const int SST_SPN_OFFSET = 4;
-const int SST_PNN_OFFSET = 12;
+const uint8_t SST_SPN_OFFSET = 4;
+const uint8_t SST_SPN_MASK = 0x3;
+const uint8_t SST_PNN_OFFSET = 12;
+const uint8_t SST_PNN_MASK = 0x30;
 const int CFIS_ADN_CAPABILITY_ID_OFFSET = 14;
 const int CFIS_ADN_EXTENSION_ID_OFFSET = 15;
 std::mutex IccFile::mtx_;
@@ -1441,7 +1443,7 @@ bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
     }
     if (iccData.empty()) {
         TELEPHONY_LOGE("sst data is nullptr");
-        return false;
+        return isFileProcessResponse;
     }
     serviceTable_ = iccData;
     if (IsServiceAvailable(UsimService::USIM_SPN)) {
@@ -1453,6 +1455,39 @@ bool SimFile::ProcessGetSstDone(const AppExecFwk::InnerEvent::Pointer &event)
     TELEPHONY_LOGI("SimFile MSG_SIM_OBTAIN_SST_DONE data:%{public}s", serviceTable_.c_str());
     LoadSimOtherFile();
     return isFileProcessResponse;
+}
+
+bool SimFile::IsAvailable(uint8_t offset, uint8_t mask)
+{
+    if (offset * HEX_TO_BYTE_LEN >= serviceTable_.length()) {
+        return false;
+    }
+    uint8_t num = strtol(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN).c_str(), nullptr, HEX_TYPE);
+    return ((num & mask) == mask);
+}
+
+bool SimFile::IsSimServiceAvailable(UsimService service)
+{
+    if (service == UsimService::USIM_SPN) {
+        return IsAvailable(SST_SPN_OFFSET, SST_SPN_MASK);
+    } else if (service == UsimService::USIM_PLMN_NETWORK_NAME) {
+        return IsAvailable(SST_PNN_OFFSET, SST_PNN_MASK);
+    }
+    return true;
+}
+
+bool SimFile::IsUsimServiceAvailable(UsimService service)
+{
+    uint8_t offset = static_cast<uint8_t>(service) / BYTE_TO_BIT_LEN;
+    uint8_t mask = static_cast<uint8_t>(service) % BYTE_TO_BIT_LEN;
+    if (mask == 0) {
+        offset--;
+        mask = 7;  // 7 means max index in one byte
+    } else {
+        mask--;
+    }
+    mask = 1 << mask;
+    return IsAvailable(offset, mask);
 }
 
 bool SimFile::IsServiceAvailable(UsimService service)
@@ -1469,28 +1504,10 @@ bool SimFile::IsServiceAvailable(UsimService service)
         return false;
     }
     if (cardType == CardType::SINGLE_MODE_SIM_CARD) {
-        return true;
-    }
-    if (service < UsimService::USIM_PHONEBOOK || service > UsimService::USIM_FOR_5G_SECURITY_PARAMETERS_EXTENDED) {
-        TELEPHONY_LOGE("service %{public}d is unavailable", service);
-        return false;
-    }
-    uint32_t offset = static_cast<uint32_t>(service) / BYTE_TO_BIT_LEN;
-    uint32_t mask = static_cast<uint32_t>(service) % BYTE_TO_BIT_LEN;
-    if (mask == 0 && offset != 0) {
-        offset--;
-        mask = 7; // 7 means max index in one byte
+        return IsSimServiceAvailable(service);
     } else {
-        mask--;
+        return IsUsimServiceAvailable(service);
     }
-    if (offset * HEX_TO_BYTE_LEN >= serviceTable_.length()) {
-        TELEPHONY_LOGE("offset exceeds serviceTable_ length");
-        return false;
-    }
-    std::istringstream istr(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN));
-    uint32_t num = 0;
-    istr >> std::hex >> num;
-    return (num & (1 << mask)) != 0;
 }
 
 bool SimFile::ProcessGetPnnDone(const AppExecFwk::InnerEvent::Pointer &event)
