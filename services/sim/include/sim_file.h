@@ -174,6 +174,9 @@ private:
     void GetCphsMailBox();
     bool FillNumber(std::shared_ptr<unsigned char> efCfisData, int32_t efCfisSize, const std::string &number);
     bool VoiceMailNotEditToSim();
+    bool IsAvailable(uint8_t offset, uint8_t mask);
+    bool IsSimServiceAvailable(UsimService service);
+    bool IsUsimServiceAvailable(UsimService service);
     bool IsServiceAvailable(UsimService service);
     friend class SimFileInit;
     std::shared_ptr<SimFileInit> simFileInit_;
