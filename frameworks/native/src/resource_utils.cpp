@@ -352,7 +352,8 @@ ResourceUtils &ResourceUtils::Get()
 
 ResourceUtils::ResourceUtils()
 {
-    resourceManager_ = std::unique_ptr<Global::Resource::ResourceManager>(Global::Resource::CreateResourceManager());
+    resourceManager_ =
+        std::unique_ptr<Global::Resource::ResourceManager>(Global::Resource::CreateResourceManager(false));
 }
 
 bool ResourceUtils::Init()
