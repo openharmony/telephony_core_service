@@ -142,7 +142,7 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
         return false;
     }
     StrToInt(strDstSubs, networkTime.dst);
-    nitzData_.isDST = (networkTime.dst > 0) ? 1 : 0;
+    nitzData_.isDST = (networkTime.dst > 0) ? 1 : 0; 
     return true;
 }
 
