@@ -30,7 +30,6 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "time_service_client.h"
-#include "zone_util.h"
 
 #ifdef ABILITY_POWER_SUPPORT
 using namespace OHOS::PowerMgr;
@@ -90,7 +89,8 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
         if (TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_ != nullptr) {
-            TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_(slotId_, networkTime.offset);
+            nitzData_.currentMillis = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+            TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_(slotId_, nitzData_);
         } else {
             offset_ = networkTime.offset;
             ProcessTimeZone();
@@ -119,6 +119,7 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
     }
     std::string strDateSubs = strsRet[0];
     std::string strTimeSubs = strsRet[1];
+    std::string strDstSubs = strsRet[2];
     strsRet.clear();
     strSep = "/";
     SplitStr(strDateSubs, strSep, strsRet);
@@ -140,6 +141,8 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
     if (!NitzTimeParse(strTimeSubs, networkTime)) {
         return false;
     }
+    StrToInt(strDstSubs, networkTime.dst);
+    nitzData_.isDST = (networkTime.dst > 0) ? 1 : 0
     return true;
 }
 
@@ -170,6 +173,7 @@ bool NitzUpdate::NitzTimeParse(std::string &strTimeSubs, NetworkTime &networkTim
     strTimeSubs = strsRet[0];
     StrToInt(strsRet[1], networkTime.offset);
     networkTime.offset = networkTime.offset * flag;
+    nitzData_.totalOffset = networkTime.offset * QUARTER_TO_MILLISECOND;
 
     strSep = ":";
     strsRet.clear();
@@ -272,17 +276,10 @@ void NitzUpdate::UpdateCountryCode(std::string &countryCode)
         TELEPHONY_LOGI("NitzUpdate::UpdateCountryCode not auto udpate timezone slotId:%{public}d", slotId_);
         return;
     }
-    OHOS::Global::I18n::ZoneUtil util;
-    std::string timeZone = util.GetDefaultZone(countryCode.c_str());
-    if (timeZone.empty()) {
-        int32_t offset = QUARTER_TO_MILLISECOND * offset_;
-        timeZone = util.GetDefaultZone(countryCode.c_str(), offset);
-    }
-    if (timeZone.empty()) {
-        TELEPHONY_LOGE("failed to get zone slotId:%{public}d", slotId_);
-        return;
-    }
-    SaveTimeZone(timeZone);
+    nitzData_.currentMillis = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+    Global::I18n::ZoneUtil util;
+    Global::I18n::CountryResult crt = util.LookupTimezoneByCountryAndNITZ(countryCode, nitzData_);
+    SaveTimeZone(crt.timezoneId);
 }
 
 void NitzUpdate::SaveTimeZone(std::string &timeZone)

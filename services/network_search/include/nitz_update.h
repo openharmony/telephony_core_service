@@ -20,6 +20,7 @@
 
 #include "event_handler.h"
 #include "want.h"
+#include "zone_util.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,6 +42,7 @@ public:
         int32_t minute = 0;
         int32_t second = 0;
         int32_t offset = 0;
+        int32_t dst = 0;
     };
 
 private:
@@ -62,6 +64,7 @@ private:
     static int64_t lastOffsetTime_;
     static std::string timeZone_;
     int64_t nitzRecvTime_ = 0;
+    Global::I18n::NITZData nitzData_ = {0};
 };
 } // namespace Telephony
 } // namespace OHOS
