@@ -967,6 +967,25 @@ struct CallForwardQueryInfoList {
      */
     std::vector<CallForwardQueryResult> calls {};
 };
+
+/**
+ * @brief Defines the info of NitzData.
+ */
+struct NitzData {
+    /**
+     * Parameter shows if DST exist
+     */
+    int32_t isDST;
+    /**
+     * Parameter shows the total offset of timezone
+     */
+    int32_t totalOffset;
+    /**
+     * Parameter shows the UTC time from 1970 0H:0M:0S in milliseconds
+     */
+    int64_t currentMillis;
+};
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_TELEPHONY_TYPES_H

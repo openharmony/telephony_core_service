@@ -30,6 +30,7 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "time_service_client.h"
+#include "telephony_types.h"
 
 #ifdef ABILITY_POWER_SUPPORT
 using namespace OHOS::PowerMgr;
@@ -89,8 +90,11 @@ void NitzUpdate::ProcessNitzUpdate(const AppExecFwk::InnerEvent::Pointer &event)
     if (NitzParse(*strTime, networkTime)) {
         ProcessTime(networkTime);
         if (TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_ != nullptr) {
-            nitzData_.currentMillis = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
-            TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_(slotId_, nitzData_);
+            NitzData nitzData = {0};
+            nitzData.currentMillis = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetWallTimeMs();
+            nitzData.isDST = nitzData_.isDST;
+            nitzData.totalOffset = nitzData_.totalOffset;
+            TELEPHONY_EXT_WRAPPER.updateTimeZoneOffsetExt_(slotId_, nitzData);
         } else {
             offset_ = networkTime.offset;
             ProcessTimeZone();
