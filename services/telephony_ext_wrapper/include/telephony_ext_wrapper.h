@@ -29,6 +29,8 @@
 #include "sim_state_type.h"
 #include "tel_ril_types.h"
 #include "operator_name_params.h"
+#include "zone_util.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -76,7 +78,7 @@ public:
     typedef void (*CREATE_ICC_FILE_EXT)(int32_t slotId, std::shared_ptr<OHOS::Telephony::IIccFileExt> iccFileExt);
 
     typedef void (*UPDATE_COUNTRY_CODE_EXT)(int32_t, const char *);
-    typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, int32_t);
+    typedef void (*UPDATE_TIME_ZONE_OFFSET_EXT)(int32_t, NitzData);
     typedef void (*UPDATE_NETWORK_STATE_EXT)(int32_t slotId, std::unique_ptr<NetworkState> &networkState);
     typedef void (*UPDATE_OPERATOR_NAME_PARAMS)(
         int32_t slotId, sptr<OHOS::Telephony::NetworkState> &networkState, OperatorNameParams &params);
