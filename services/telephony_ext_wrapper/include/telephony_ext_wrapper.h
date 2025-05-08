@@ -29,6 +29,7 @@
 #include "sim_state_type.h"
 #include "tel_ril_types.h"
 #include "operator_name_params.h"
+#include "zone_util.h"
 
 namespace OHOS {
 namespace Telephony {
