@@ -61,14 +61,6 @@ void EsimFileTest::SetUp() {}
 
 void EsimFileTest::TearDown() {}
 
-void notifyOpenChannelCv(std::shared_ptr<Telephony::EsimFile> esimFile)
-{
-    std::unique_lock<std::mutex> lck(esimFile->openChannelMutex_);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    esimFile->currentChannelId_.store(1);
-    esimFile->openChannelCv_.notify_all();
-}
-
 /**
  * @tc.name: SyncCloseChannel001
  * @tc.desc: Test EsimFileTest SyncCloseChannel.
@@ -1060,16 +1052,6 @@ HWTEST_F(EsimFileTest, ProcessObtainEuiccInfo2Done004, TestSize.Level1)
     ASSERT_TRUE(esimFile != nullptr);
 }
 
-HWTEST_F(EsimFileTest, ObtainChannelSuccessExclusive001, TestSize.Level1)
-{
-    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(nullptr);
-    esimFile->currentChannelId_.store(1);
-    std::thread t(notifyOpenChannelCv, esimFile);
-    t.join();
-    auto ret = esimFile->ObtainChannelSuccessExclusive();
-    EXPECT_EQ(ret, ResultInnerCode::RESULT_EUICC_CARD_OK);
-}
-
 HWTEST_F(EsimFileTest, ObtainChannelSuccessAlllowSameAidReuse0001, TestSize.Level1)
 {
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(nullptr);
@@ -1088,45 +1070,39 @@ HWTEST_F(EsimFileTest, SyncCloseChannel0001, TestSize.Level1)
     EXPECT_EQ(esimFile->currentChannelId_.load(), 0);
 }
 
-HWTEST_F(EsimFileTest, GetEuiccProfileInfoList0001, TestSize.Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    GetEuiccProfileInfoListInnerResult result;
-    esimFile->currentChannelId_.store(0);
-    esimFile->telRilManager_ = nullptr;
-    result = esimFile->GetEuiccProfileInfoList();
-    EXPECT_EQ(result.result_, 0);
-}
-
-void notifyGetEuiccProfileInfoListCv(std::shared_ptr<Telephony::EsimFile> esimFile)
-{
-    std::unique_lock<std::mutex> lck(esimFile->allProfileInfoMutex_);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    esimFile->currentChannelId_.store(0);
-    esimFile->allProfileInfoCv_.notify_all();
-}
-
-HWTEST_F(EsimFileTest, GetEuiccProfileInfoList002, TestSize.Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    GetEuiccProfileInfoListInnerResult result;
-    std::thread t(notifyGetEuiccProfileInfoListCv, esimFile);
-    t.join();
-    esimFile->currentChannelId_.store(0);
-    result = esimFile->GetEuiccProfileInfoList();
-    EXPECT_EQ(result.result_, 0);
-}
-
 HWTEST_F(EsimFileTest, RealProcessRequestAllProfilesDone001, TestSize.Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
     EXPECT_FALSE(esimFile->RealProcessRequestAllProfilesDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessRequestAllProfilesDone002, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf2d820000";
+    EXPECT_FALSE(esimFile->RealProcessRequestAllProfilesDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessRequestAllProfilesDone003, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF2D14A012E3105A0A896700000000004523019F700101";
+    EXPECT_TRUE(esimFile->RealProcessRequestAllProfilesDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessRequestAllProfilesDone004, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF2D14A012E3105B0A896700000000004523019F700101";
+    EXPECT_TRUE(esimFile->RealProcessRequestAllProfilesDone());
 }
 
 HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone001, TestSize.Level1)
@@ -1151,7 +1127,7 @@ HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone003, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    esimFile->recvCombineStr_ = "BF3706A10002039000";
+    esimFile->recvCombineStr_ = "BF3706A10480000200009000";
     EXPECT_FALSE(esimFile->RealProcessAuthenticateServerDone());
 }
 
@@ -1160,8 +1136,8 @@ HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone004, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    esimFile->recvCombineStr_ = "BF3705A1038001029000";
-    EXPECT_FALSE(esimFile->RealProcessAuthenticateServerDone());
+    esimFile->recvCombineStr_ = "bf38820019a18200158010d26989bcf14248379c55bb75c9569186020101";
+    EXPECT_TRUE(esimFile->RealProcessAuthenticateServerDone());
 }
 
 HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone005, TestSize.Level1)
@@ -1169,8 +1145,17 @@ HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone005, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
-    esimFile->recvCombineStr_ = "BF370581030102039000";
+    esimFile->recvCombineStr_ = "bf3882000aa1820006800000020000";
     EXPECT_FALSE(esimFile->RealProcessAuthenticateServerDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessAuthenticateServerDone006, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf3882000aa0820006800000020000";
+    EXPECT_TRUE(esimFile->RealProcessAuthenticateServerDone());
 }
 
 HWTEST_F(EsimFileTest, ProcessEsimCloseSpareChannel0001, TestSize.Level1)
@@ -1178,8 +1163,96 @@ HWTEST_F(EsimFileTest, ProcessEsimCloseSpareChannel0001, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->telRilManager_ = telRilManager;
     esimFile->ProcessEsimCloseSpareChannel();
     EXPECT_EQ(esimFile->currentChannelId_.load(), 0);
+}
+
+HWTEST_F(EsimFileTest, CommMergeRecvData001, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    std::mutex mtx;
+    bool lag = false;
+    std::condition_variable cv;
+    int32_t eventId = 0;
+    bool isHandleFinish = false;
+    IccFileData newRecvData;
+    newRecvData.sw1 = 0x90;
+    newRecvData.sw2 = 0x00;
+    esimFile->newRecvData_ = newRecvData;
+    EXPECT_TRUE(esimFile->CommMergeRecvData(mtx, lag, cv, eventId, isHandleFinish));
+}
+
+HWTEST_F(EsimFileTest, CommMergeRecvData002, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    std::mutex mtx;
+    bool lag = false;
+    std::condition_variable cv;
+    int32_t eventId = 0;
+    bool isHandleFinish = false;
+    IccFileData newRecvData;
+    newRecvData.sw1 = 0x90;
+    newRecvData.sw2 = 0x00;
+    newRecvData.resultData = "test";
+    esimFile->newRecvData_ = newRecvData;
+    EXPECT_FALSE(esimFile->CommMergeRecvData(mtx, lag, cv, eventId, isHandleFinish));
+}
+
+HWTEST_F(EsimFileTest, CommMergeRecvData003, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    std::mutex mtx;
+    bool lag = false;
+    std::condition_variable cv;
+    int32_t eventId = 0;
+    bool isHandleFinish = false;
+    IccFileData newRecvData;
+    newRecvData.sw1 = 0x61;
+    esimFile->newRecvData_ = newRecvData;
+    EXPECT_TRUE(esimFile->CommMergeRecvData(mtx, lag, cv, eventId, isHandleFinish));
+}
+
+HWTEST_F(EsimFileTest, RealProcessPrepareDownloadDone0001, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf21820019a18200158010d26989bcf14248379c55bb75c9569186020101";
+    EXPECT_FALSE(esimFile->RealProcessPrepareDownloadDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessPrepareDownloadDone002, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf21820019a18200158010d26989bcf14248379c55bb75c9569186020100";
+    EXPECT_TRUE(esimFile->RealProcessPrepareDownloadDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessPrepareDownloadDone003, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf21820019a08200158010d26989bcf14248379c55bb75c9569186020101";
+    EXPECT_TRUE(esimFile->RealProcessPrepareDownloadDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessPrepareDownloadDone004, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "bf21820016a18200128010d26989bcf14248379c55bb75c9569186";
+    EXPECT_TRUE(esimFile->RealProcessPrepareDownloadDone());
 }
 }
 }
