@@ -59,6 +59,10 @@ void MultiSimMonitor::Init()
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
+    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
+    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
+    // If it is esim only device, the value is 6
+    isEsimOnlyDevice_ = strcmp(esimType, "6") == 0;
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -172,14 +176,6 @@ void MultiSimMonitor::UpdateAllOpkeyConfigs()
     }
 }
 
-bool MultiSimMonitor::IsEsimOnlyDevice()
-{
-    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
-    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
-    // If it is esim only device, the value is 6
-    return (strcmp(esimType, "6") == 0);
-}
-
 void MultiSimMonitor::InitData(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d", slotId);
@@ -190,7 +186,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
     // When the SIM card file changes, the ICCID refresh is triggered, and InitData is finally executed,
     // when wearable device ESIM turn off, the profile change also triggers this process
     // but InitData should not be executed.
-    if (IsEsimOnlyDevice() && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN)) {
+    if (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN)) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData not init unknown esim");
         return;
     }
@@ -232,7 +228,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         return;
     }
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
-        (IsEsimOnlyDevice() && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN))) {
+        (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN))) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
