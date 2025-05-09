@@ -162,6 +162,7 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
             poc.configValue.size(), slotId);
         if (poc.configValue.size() > 0) {
             UpdateCurrentOpc(slotId, poc);
+            isLoadingConfig_ = false;
             root = nullptr;
             return TELEPHONY_ERR_SUCCESS;
         }
