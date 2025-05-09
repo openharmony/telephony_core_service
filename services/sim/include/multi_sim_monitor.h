@@ -88,7 +88,6 @@ private:
     void CheckDataShareError();
     void CheckSimNotifyRegister();
     void setRemainCount(int remainCount);
-    bool IsEsimOnlyDevice();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
@@ -139,6 +138,7 @@ private:
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
+    bool isEsimOnlyDevice_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
