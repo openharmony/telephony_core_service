@@ -757,11 +757,11 @@ int32_t SimManager::GetSimOperatorNumeric(int32_t slotId, std::u16string &operat
     if (!HasSimCardInner(slotId)) {
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     operatorNumeric = simFileManager_[slotId]->GetSimOperatorNumeric();
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -894,6 +894,7 @@ std::u16string SimManager::GetSimGid2(int32_t slotId)
 
 int32_t SimManager::GetOpName(int32_t slotId, std::u16string &opname)
 {
+   std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if (!IsValidSlotId(slotId, simFileManager_)) {
         TELEPHONY_LOGE("slotId is invalid! %{public}d", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
@@ -902,7 +903,6 @@ int32_t SimManager::GetOpName(int32_t slotId, std::u16string &opname)
         TELEPHONY_LOGE("simFileManager is null! %{public}d", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     opname = simFileManager_[slotId]->GetOpName();
     return TELEPHONY_ERR_SUCCESS;
 }
