@@ -49,7 +49,7 @@ void NetworkSearchBranchTest::TearDown() {}
 
 void NetworkSearchBranchTest::SetUpTestCase() {}
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkType, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkType, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -71,7 +71,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkType, Function | MediumTest |
     EXPECT_FALSE(networkType->WriteGetPreferredNetworkInfo(preferredTypeInfo, responseInfo, data, index));
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -124,7 +124,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, Function | MediumT
     EXPECT_EQ(data2.ReadInt32(), static_cast<int32_t>(ErrType::ERR_INVALID_PARAMETER));
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, TestSize.Level0)
 {
     OperatorNameUtils::GetInstance().Init();
     OperatorNameUtils::GetInstance().nameArray_.push_back({{"11111"}, "test", "test", "test", "test", "test", "test"});
@@ -134,7 +134,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, Function | Med
     EXPECT_EQ(NetworkSelection::GetCustomName({"00000", "00000", "00000", 0, 0}), "00000");
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, TestSize.Level0)
 {
     auto deviceStateObserver = std::make_shared<DeviceStateObserver>();
 
@@ -170,7 +170,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, Function | Medi
         DeviceStateEventIntValue::COMMON_EVENT_CHARGING);
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_001, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_001, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -189,7 +189,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_001, Function | MediumTes
     EXPECT_FALSE(nitzUpdate->NitzParse(nitzStr, networkTime));
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_002, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_002, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -207,7 +207,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_002, Function | MediumTes
     EXPECT_FALSE(nitzUpdate->NitzTimeParse(strTimeSubs, networkTime));
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_003, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_003, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -231,7 +231,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_003, Function | MediumTes
     nitzUpdate->ProcessTimeZone();
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_001, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_001, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -276,7 +276,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_001, Function | Medi
     EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_002, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_002, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -321,7 +321,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_002, Function | Medi
         RadioTech::RADIO_TECHNOLOGY_LTE_CA);
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_001, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_001, TestSize.Level0)
 {
     NetworkSearchNotify networkSearchNotify;
     sptr<NetworkState> networkState = nullptr;
@@ -354,7 +354,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_001, Function | M
     EXPECT_EQ(networkSearchState->GetImsRegState(ImsServiceType::TYPE_SMS), ImsRegState::IMS_REGISTERED);
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_002, Function | MediumTest | Level1)
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_002, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
