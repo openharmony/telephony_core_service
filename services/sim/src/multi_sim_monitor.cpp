@@ -65,42 +65,6 @@ void MultiSimMonitor::Init()
     isEsimOnlyDevice_ = strcmp(esimType, "6") == 0;
 }
 
-/**
- * @tc.number   Telephony_MultiSimMonitor_005
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
-    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        subcribeInfo, telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-        simStateManagerPtr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
-    };
-    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    multiSimMonitor->isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
-    multiSimMonitor->initDataRemainCount_.resize(SIM_SLOT_COUNT, 5);
-    multiSimMonitor->simStateManager_[0]->SetSimState(SimState::SIM_STATE_UNKNOWN);
-    multiSimMonitor->isEsimOnlyDevice_ = true;
-    multiSimMonitor->isSimAccountLoaded_[0] = 0;
-    multiSimMonitor->InitData(0);
-    EXPECT_EQ(multiSimMonitor->isSimAccountLoaded_[0], 0);
-}
-
-
-
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
