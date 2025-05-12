@@ -59,6 +59,7 @@ void MultiSimMonitor::Init()
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
+    GetEsimType();
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -179,6 +180,13 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
         return;
     }
+    // When the SIM card file changes, the ICCID refresh is triggered, and InitData is finally executed,
+    // when wearable device ESIM turn off, the profile change also triggers this process
+    // but InitData should not be executed.
+    if (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN)) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitData not init unknown esim");
+        return;
+    }
     if (isSimAccountLoaded_[slotId]) {
         TELEPHONY_LOGI("MultiSimMonitor::InitData simAccountInfo is already loaded");
         return;
@@ -216,7 +224,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
-    if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
+    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
+        (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN))) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
@@ -299,6 +308,14 @@ void MultiSimMonitor::InitListener()
     auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
     TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
     CheckOpcNeedUpdata(false);
+}
+
+void MultiSimMonitor::GetEsimType()
+{
+    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
+    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
+    // If it is esim only device, the value is 6
+    isEsimOnlyDevice_ = esimType[0] == '6';
 }
 
 void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
