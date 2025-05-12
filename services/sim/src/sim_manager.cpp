@@ -894,7 +894,7 @@ std::u16string SimManager::GetSimGid2(int32_t slotId)
 
 int32_t SimManager::GetOpName(int32_t slotId, std::u16string &opname)
 {
-   std::shared_lock<ffrt::shared_mutex> lck(mtx_);
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if (!IsValidSlotId(slotId, simFileManager_)) {
         TELEPHONY_LOGE("slotId is invalid! %{public}d", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
