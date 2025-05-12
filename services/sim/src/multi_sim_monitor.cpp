@@ -62,7 +62,7 @@ void MultiSimMonitor::Init()
     char esimType[MAX_PARAMETER_LENGTH] = { 0 };
     GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
     // If it is esim only device, the value is 6
-    isEsimOnlyDevice_ = strcmp(esimType, "6") == 0;
+    isEsimOnlyDevice_ = esimType[0] == '6';
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
