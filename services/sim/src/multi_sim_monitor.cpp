@@ -59,10 +59,7 @@ void MultiSimMonitor::Init()
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
-    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
-    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
-    // If it is esim only device, the value is 6
-    isEsimOnlyDevice_ = esimType[0] == '6';
+    GetEsimType();
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -311,6 +308,14 @@ void MultiSimMonitor::InitListener()
     auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
     TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
     CheckOpcNeedUpdata(false);
+}
+
+void MultiSimMonitor::GetEsimType()
+{
+    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
+    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
+    // If it is esim only device, the value is 6
+    isEsimOnlyDevice_ = esimType[0] == '6';
 }
 
 void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
