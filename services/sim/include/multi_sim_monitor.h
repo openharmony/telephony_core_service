@@ -78,6 +78,7 @@ private:
     bool IsValidSlotId(int32_t slotId);
     std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
     void InitListener();
+    void GetEsimType();
     void SubscribeDataShareReady();
     void SubscribeUserSwitch();
     void SubscribeBundleScanFinished();
