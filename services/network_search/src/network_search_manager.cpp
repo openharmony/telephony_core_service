@@ -188,6 +188,13 @@ bool NetworkSearchManager::OnInit()
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        if (SetPreferredNetwork(slotId,
+            static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA))) {
+            TELEPHONY_LOGI("slotId: %{public}d SetPreferredNetwork: %{public}d success.", slotId,
+                static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
+        }
+    }
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
