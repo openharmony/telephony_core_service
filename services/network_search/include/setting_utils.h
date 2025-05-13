@@ -31,7 +31,7 @@
 #include "uri.h"
 #include "system_ability_status_change_stub.h"
 #include "common_event_subscriber.h"
-#include "ffrt_inner.h"
+#include <ffrt.h>
 
 #include "network_search_handler.h"
 
