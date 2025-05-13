@@ -96,7 +96,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShar
 bool SettingUtils::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::lock_guard<ffrt::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
     for (; it != registerInfos_.end();) {
         if (it->first == uri && it->second == dataObserver) {
@@ -119,7 +119,7 @@ bool SettingUtils::UnRegisterSettingsObserver(
 bool SettingUtils::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::lock_guard<ffrt::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
     for (; it != registerInfos_.end(); it++) {
         if (it->first == uri && it->second == dataObserver) {
@@ -134,7 +134,7 @@ bool SettingUtils::RegisterSettingsObserver(
 
 void SettingUtils::RegisterSettingsObserver()
 {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::lock_guard<ffrt::mutex> lock(mtx_);
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
         if (it->second == nullptr) {
             continue;
@@ -249,11 +249,13 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
 
 void SettingUtils::SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
 {
+    std::lock_guard<ffrt::mutex> lock(mtx_);
     commonEventSubscriber_ = std::make_shared<BroadcastSubscriber>(subscribeInfo);
 }
 
 std::shared_ptr<EventFwk::CommonEventSubscriber> SettingUtils::GetCommonEventSubscriber()
 {
+    std::lock_guard<ffrt::mutex> lock(mtx_);
     return commonEventSubscriber_;
 }
 
