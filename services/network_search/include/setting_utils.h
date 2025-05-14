@@ -31,6 +31,7 @@
 #include "uri.h"
 #include "system_ability_status_change_stub.h"
 #include "common_event_subscriber.h"
+#include <ffrt.h>
 
 #include "network_search_handler.h"
 
@@ -70,7 +71,7 @@ private:
     const std::string SETTING_KEY = "KEYWORD";
     const std::string SETTING_VALUE = "VALUE";
     const int32_t RDB_INVALID_VALUE = -1;
-    std::mutex mtx_;
+    ffrt::mutex mtx_;
     std::vector<std::pair<Uri, sptr<AAFwk::IDataAbilityObserver>>> registerInfos_;
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ = nullptr;
     std::atomic<bool> isDdsReady_ = false;
