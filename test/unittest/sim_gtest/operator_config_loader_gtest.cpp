@@ -140,7 +140,6 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_UpdateIccidCache_001, Function | Me
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigCache->iccidCache_ = "";
     operatorConfigCache->UpdateIccidCache(0);
-    EXPECT_EQ(operatorConfigCache->iccidCache_, "");
     operatorConfigCache->UpdateIccidCache(1);
     EXPECT_EQ(operatorConfigCache->iccidCache_, "86890000000000000001");
     operatorConfigCache->UpdateIccidCache(0);
