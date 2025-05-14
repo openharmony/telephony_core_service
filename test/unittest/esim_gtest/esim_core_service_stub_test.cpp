@@ -50,9 +50,7 @@ int32_t EsimCoreServiceStubTest::SendRemoteRequest(MessageParcel &data, CoreServ
 HWTEST_F(EsimCoreServiceStubTest, OnSendApduData_001, Function | MediumTest | Level2)
 {
     MessageParcel data;
-    if (!data.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
-        return;
-    }
+    ASSERT_TRUE(data.WriteInterfaceToken(CoreServiceStub::GetDescriptor()));
     int32_t ret = SendRemoteRequest(data, CoreServiceInterfaceCode::SEND_APDU_DATA);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
