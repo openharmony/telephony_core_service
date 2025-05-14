@@ -473,10 +473,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_002, Function | MediumT
     operatorResult->flag = NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT;
     operatorName->HandleOperatorInfo(operatorResult);
     operatorName->TrySetLongOperatorNameWithTranslation();
- 
-    if (!networkSearchState->Init() || operatorName->GetNetworkStatus() == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(networkSearchState->Init());
     params = {false, "plmn", false, "spn", 1};
     operatorName->SetOperatorNameByParams(params);
     EXPECT_EQ(operatorName->GetNetworkStatus()->GetLongOperatorName(), "");
