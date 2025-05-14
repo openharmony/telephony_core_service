@@ -93,7 +93,6 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
@@ -113,7 +112,6 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
@@ -370,7 +368,6 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
@@ -390,7 +387,6 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | Medi
     AccessToken token;
     if (!(SimTest::HasSimCard(SimTest::slotId1_))) {
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
-        return;
     }
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
