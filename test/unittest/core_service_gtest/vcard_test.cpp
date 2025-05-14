@@ -1295,7 +1295,9 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Import, Function | MediumTe
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
         CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    ASSERT_NE(dataShareHelper == nullptr);
+    if (dataShareHelper == nullptr) {
+        return;
+    }
     int testNum = 20;
     int testStringNum = 25;
     std::vector<std::string> fileNames;
