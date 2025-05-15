@@ -89,7 +89,7 @@ private:
     const std::vector<std::string> cuMccMnc_ { "46001", "46006", "46009" };
     const std::vector<std::string> ctMccMnc_ { "46003", "46011" };
     const std::vector<std::string> cbnMccMnc_ { "46015" };
-    const std::vector<std::string> cmDomesticMccMnc_ { "46031", "46050" };
+    const std::vector<std::string> cmDomesticMccMnc_ { "46031", "46050", "46059" };
     const std::vector<std::string> cuDomesticMccMnc_ { "46022", "46061", "46059" };
     const std::vector<std::string> ctDomesticMccMnc_ { "46021", "46060" };
     const std::vector<std::string> cbDomesticnMccMnc_ { "46032", "46051" };
