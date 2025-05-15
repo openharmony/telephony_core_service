@@ -222,6 +222,7 @@ static napi_value GetRadioTechSync(napi_env env, napi_callback_info info)
     napi_value value = nullptr;
     int32_t psRadioTech = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
     int32_t csRadioTech = static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
+    napi_create_object(env, &value);
     NapiUtil::SetPropertyInt32(env, value, "psRadioTech", psRadioTech);
     NapiUtil::SetPropertyInt32(env, value, "csRadioTech", csRadioTech);
     if (parameterCount != 1) {
