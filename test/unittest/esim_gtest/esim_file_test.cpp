@@ -1254,6 +1254,78 @@ HWTEST_F(EsimFileTest, RealProcessPrepareDownloadDone004, TestSize.Level1)
     esimFile->recvCombineStr_ = "bf21820016a18200128010d26989bcf14248379c55bb75c9569186";
     EXPECT_TRUE(esimFile->RealProcessPrepareDownloadDone());
 }
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone001, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF370ABF2807A205A1038101039000";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone002, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF370ABF2707A205A1038101039000";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone003, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF3709BF2706A304A10281009000";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone004, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF2709BF2706BF2F03820101";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone005, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF2709BF2706BF2F03800101";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone006, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF270CBF2709BF2F06800101810101";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone007, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF2712BF270FBF2F0C8001018101010C01005A0100";
+    EXPECT_FALSE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
+
+HWTEST_F(EsimFileTest, RealProcessLoadBoundProfilePackageDone008, TestSize.Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(simStateManager);
+    esimFile->recvCombineStr_ = "BF270FBF270CBF2F098001018101010C0100";
+    EXPECT_TRUE(esimFile->RealProcessLoadBoundProfilePackageDone());
+}
 }
 }
 }
