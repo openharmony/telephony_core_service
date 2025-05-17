@@ -156,7 +156,7 @@ bool MultiSimController::InitData(int32_t slotId)
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     loadedSimCardInfo_[slotId] = iccid;
-    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_ size: %{public}u",
+    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_.size %{public}u",
         slotId, localCacheInfo_[slotId].simId, loadedSimCardInfo_.size());
     return true;
 }
