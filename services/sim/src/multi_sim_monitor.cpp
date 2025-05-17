@@ -57,6 +57,8 @@ void MultiSimMonitor::Init()
     TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
+    std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex);
+    controller_->loadedSimCardInfo.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     GetEsimType();
@@ -233,6 +235,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         isSimAccountLoaded_[slotId] = 0;
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         simFileManager->ClearData();
+        std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex);
+        controller_->loadedSimCardInfo.erase(slotId);
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
         simFileManager->ClearData();
