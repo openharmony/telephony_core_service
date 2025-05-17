@@ -93,9 +93,7 @@ bool MultiSimController::ForgetAllData()
         std::shared_lock<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
         for (auto& pair : loadedSimCardInfo_) {
             UpdateDataByIccId(pair.first, pair.second);
-            int32_t iccidStart = pair.second.size() >= 4 ? pair.second.size() - 4 : 0;
-            TELEPHONY_LOGI("loadedSimCardInfo_ slotid: %{public}d iccid: ****%{public}s", 
-                            pair.first, pair.second.substr(iccidStart, 4).c_str());
+            TELEPHONY_LOGI("loadedSimCardInfo_ slotid: %{public}d", pair.first);
         }
         return true;
     }
@@ -158,8 +156,8 @@ bool MultiSimController::InitData(int32_t slotId)
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     loadedSimCardInfo_[slotId] = iccid;
-    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_: %{public}u", slotId,
-        localCacheInfo_[slotId].simId, loadedSimCardInfo_.size());
+    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_ size: %{public}u",
+        slotId, localCacheInfo_[slotId].simId, loadedSimCardInfo_.size());
     return true;
 }
 
