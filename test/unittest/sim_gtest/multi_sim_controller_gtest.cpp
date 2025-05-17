@@ -531,5 +531,31 @@ HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Functio
     EXPECT_EQ(multiSimController->localCacheInfo_.size(), 0);
 }
 
+HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsValidValue, Function | MediumTest | Level1)
+{   
+    MockSimRdbHelper mockSimRdbHelper;
+    EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
+        .WillRepeatedly(Return(1));
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    EXPECT_FALSE(multiSimController->ForgetAllData());
+}
+
+HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsInvalidValue, Function | MediumTest | Level1)
+{      
+    MockSimRdbHelper mockSimRdbHelper;
+    EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
+        .WillRepeatedly(Return(0));
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    EXPECT_FALSE(multiSimController->ForgetAllData());
+}
+
 }
 }

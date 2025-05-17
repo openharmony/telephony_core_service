@@ -85,6 +85,8 @@ public:
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
+    std::unordered_map<int32_t, std::string> loadedSimCardInfo;
+    ffrt::shared_mutex loadedSimCardInfoMutex;
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
     enum {
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
