@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilSim::TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
+TelRilSim::TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {
@@ -596,6 +596,27 @@ int32_t TelRilSim::ResponseIccIo(
         return ErrorIccIoResponse(telRilRequest, radioResponseInfo);
     }
     return ProcessIccIoInfo(telRilRequest, iccIoResult);
+}
+
+int32_t TelRilSim::GetPrimarySlot(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_5::IRil::GetPrimarySlot);
+}
+
+int32_t TelRilSim::SetPrimarySlot(const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_5::IRil::SetPrimarySlot);
+}
+
+int32_t TelRilSim::GetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    int32_t primarySlotId)
+{
+    return Response<int32_t>(TELEPHONY_LOG_FUNC_NAME, responseInfo, std::make_shared<int32_t>(primarySlotId));
+}
+
+int32_t TelRilSim::SetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(TELEPHONY_LOG_FUNC_NAME, responseInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

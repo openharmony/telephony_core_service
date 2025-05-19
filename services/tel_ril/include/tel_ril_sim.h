@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class TelRilSim : public TelRilBase {
 public:
-    TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
+    TelRilSim(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface, std::shared_ptr<ObserverHandler> observerHandler,
         std::shared_ptr<TelRilHandler> handler);
     ~TelRilSim() = default;
 
@@ -67,6 +67,8 @@ public:
     int32_t UnlockSimLock(int32_t lockType, std::string password, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SendSimMatchedOperatorInfo(
         const NcfgOperatorInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t GetPrimarySlot(const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SetPrimarySlot(const AppExecFwk::InnerEvent::Pointer &response);
 
     int32_t GetSimStatusResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::CardStatusInfo &result);
@@ -109,6 +111,8 @@ public:
     int32_t UnlockSimLockResponse(
         const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, const HDI::Ril::V1_1::LockStatusResp &lockStatus);
     int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
+    int32_t GetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo, int32_t primarySlotId);
+    int32_t SetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo);
 
 private:
     int32_t ProcessIccIoInfo(

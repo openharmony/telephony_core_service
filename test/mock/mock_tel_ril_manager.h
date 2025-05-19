@@ -216,6 +216,8 @@ public:
     MOCK_METHOD2(GetNrOptionMode, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD2(GetRrcConnectionState, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD2(GetNrSsbId, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD2(GetPrimarySlot, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
+    MOCK_METHOD2(SetPrimarySlot, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
 };
 } // namespace Telephony
 } // namespace OHOS
