@@ -796,6 +796,9 @@ bool NapiUtil::CreateCommonSystemErrorMessageForJs(int32_t errorCode, JsErrorCod
         case TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE:
             jsErrorCode = JS_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             break;
+        case TELEPHONY_ERR_POLICY_DISABLED:
+            jsErrorCode = JS_ERROR_TELEPHONY_POLICY_DISABLED;
+            break;
         default:
             flag = false;
             break;
