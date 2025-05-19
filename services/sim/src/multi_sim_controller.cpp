@@ -87,7 +87,7 @@ bool MultiSimController::ForgetAllData()
         TELEPHONY_LOGE("simDbHelper_ is nullptr failed");
         return false;
     }
-    TELEPHONY_LOGI("ForgetAllData %{public}u", loadedSimCardInfo_.size());
+    TELEPHONY_LOGI("ForgetAllData %{public}zu", loadedSimCardInfo_.size());
     int32_t forgetResult = simDbHelper_->ForgetAllData();
     if (forgetResult != INVALID_VALUE) {
         std::shared_lock<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
@@ -156,7 +156,7 @@ bool MultiSimController::InitData(int32_t slotId)
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     loadedSimCardInfo_[slotId] = iccid;
-    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_.size %{public}u",
+    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_.size %{public}zu",
         slotId, localCacheInfo_[slotId].simId, loadedSimCardInfo_.size());
     return true;
 }
