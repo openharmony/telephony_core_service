@@ -103,6 +103,11 @@ enum JsErrorCode {
     JS_ERROR_TELEPHONY_DIAL_IS_BUSY,
 
     /**
+     * Policy is disabled.
+     */
+    JS_ERROR_TELEPHONY_POLICY_DISABLED,
+
+    /**
      * Unknown error code.
      */
     JS_ERROR_TELEPHONY_UNKNOW_ERROR = 8300999,
