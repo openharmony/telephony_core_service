@@ -17,7 +17,7 @@
 #define TEL_RIL_MANAGER_H
 
 #include <singleton.h>
-#include <v1_4/iril.h>
+#include <v1_5/iril.h>
 #include <ffrt.h>
 
 #include "hdf_service_status_listener.h"
@@ -258,6 +258,8 @@ public:
     int32_t GetRadioProtocol(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
     int32_t SetRadioProtocol(
         int32_t slotId, RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t GetPrimarySlot(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
+    int32_t SetPrimarySlot(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) override;
 
     int32_t GetNetworkSearchInformation(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
     int32_t GetNetworkSelectionMode(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) override;
@@ -376,7 +378,7 @@ private:
     std::shared_ptr<TelRilHandler> handler_ = nullptr;
     sptr<OHOS::HDI::ServiceManager::V1_0::IServiceManager> servMgr_ = nullptr;
     sptr<HdfServiceStatusListener::IServStatListener> hdfListener_ = nullptr;
-    sptr<HDI::Ril::V1_4::IRil> rilInterface_ = nullptr;
+    sptr<HDI::Ril::V1_5::IRil> rilInterface_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
