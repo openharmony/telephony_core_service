@@ -67,7 +67,6 @@ ohos_shared_library("libtel_common") {
     "common/src/base64.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
-    "common/src/tel_aes_crypto_util.cpp",
     "common/src/tel_event_handler.cpp",
     "common/src/tel_event_queue.cpp",
     "common/src/telephony_common_utils.cpp",
