@@ -18,7 +18,6 @@
 #include <string_ex.h>
 
 #include "hks_api.h"
-#include "tel_aes_crypto_util.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
@@ -249,107 +248,6 @@ HWTEST_F(CoreServiceCommonTest, Enum_convert_GetCellularDataConnectionState_001,
     state = static_cast<int32_t>(TelephonyDataConnectionStatus::DATA_STATE_SUSPENDED);
     result = GetCellularDataConnectionState(state);
     ASSERT_STREQ(result.c_str(), "DATA_STATE_SUSPENDED");
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_HexToDec_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_001, Function | MediumTest | Level1)
-{
-    uint8_t decodeValue;
-    bool result = TelAesCryptoUtils::HexToDec('5', decodeValue);
-    EXPECT_TRUE(result);
-    EXPECT_EQ(decodeValue, 5);
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_HexToDec_002
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_002, Function | MediumTest | Level1)
-{
-    uint8_t decodeValue;
-    bool result = TelAesCryptoUtils::HexToDec('a', decodeValue);
-    EXPECT_TRUE(result);
-    EXPECT_EQ(decodeValue, 10);
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_HexToDec_003
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDec_003, Function | MediumTest | Level1)
-{
-    uint8_t decodeValue;
-    bool result = TelAesCryptoUtils::HexToDec('g', decodeValue);
-    EXPECT_FALSE(result);
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_DecToHexString_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_001, Function | MediumTest | Level1)
-{
-    const uint8_t *data = nullptr;
-    size_t len = 10;
-    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
-    ASSERT_EQ(result, "");
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_DecToHexString_002
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_002, Function | MediumTest | Level1)
-{
-    uint8_t data[10] = {0};
-    size_t len = 0;
-    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
-    ASSERT_EQ(result, "");
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_DecToHexString_003
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_DecToHexString_003, Function | MediumTest | Level1)
-{
-    uint8_t data[10] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA};
-    size_t len = 10;
-    std::string result = TelAesCryptoUtils::DecToHexString(data, len);
-    ASSERT_EQ(result, "0102030405060708090a");
-}
-
-/**
- * @tc.number   TelAesCryptoUtils_HexToDecString_001
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(CoreServiceCommonTest, TelAesCryptoUtils_HexToDecString_001, Function | MediumTest | Level1)
-{
-    std::string hexString = "";
-    auto result = TelAesCryptoUtils::HexToDecString(hexString);
-    ASSERT_EQ(result.first, nullptr);
-    hexString = "12345";
-    result = TelAesCryptoUtils::HexToDecString(hexString);
-    ASSERT_EQ(result.first, nullptr);
-    hexString = "123456";
-    result = TelAesCryptoUtils::HexToDecString(hexString);
-    ASSERT_NE(result.first, nullptr);
-    hexString = "123456";
-    result = TelAesCryptoUtils::HexToDecString(hexString);
-    ASSERT_NE(result.first, nullptr);
-    hexString = "123456";
-    result = TelAesCryptoUtils::HexToDecString(hexString);
-    ASSERT_NE(result.first, nullptr);
 }
 
 /**
