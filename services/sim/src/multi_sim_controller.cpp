@@ -23,7 +23,6 @@
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "ims_core_service_client.h"
-#include "tel_aes_crypto_util.h"
 #include "parameters.h"
 #include "sim_data.h"
 #include "sim_utils.h"
