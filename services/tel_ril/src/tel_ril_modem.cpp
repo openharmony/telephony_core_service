@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_4::IRil> rilInterface,
+TelRilModem::TelRilModem(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {

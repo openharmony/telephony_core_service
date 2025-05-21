@@ -16,13 +16,13 @@
 #ifndef TEL_RIL_CALLBACK_H
 #define TEL_RIL_CALLBACK_H
 
-#include <v1_4/iril.h>
+#include <v1_5/iril.h>
 
 #include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
-class TelRilCallback : public HDI::Ril::V1_4::IRilCallback {
+class TelRilCallback : public HDI::Ril::V1_5::IRilCallback {
 public:
     explicit TelRilCallback(std::shared_ptr<TelRilManager> telRilManager);
     ~TelRilCallback() = default;
@@ -191,6 +191,9 @@ public:
     int32_t UnlockSimLockResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
         const HDI::Ril::V1_1::LockStatusResp &lockStatus) override;
     int32_t SendSimMatchedOperatorInfoResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t GetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+        int32_t primarySlotId) override;
+    int32_t SetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
 
     // Network
     int32_t NetworkCsRegStatusUpdated(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
