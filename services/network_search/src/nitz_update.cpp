@@ -56,6 +56,8 @@ const int32_t SIM_SLOT_ID_1 = 1;
 const std::string AUTO_TIME_OFF = "0";
 const std::string AUTO_TIME_ZONE_OFF = "0";
 const std::string PARAM_TIME_ZONE = "time-zone";
+constexpr const char* AUTO_TIME_SYSTEM_PARAMETER = "persist.time.auto_time";
+constexpr const char* AUTO_TIME_STATUS_ON = "ON";
 int64_t NitzUpdate::lastSystemTime_ = 0;
 int32_t NitzUpdate::offset_ = 0;
 int64_t NitzUpdate::lastNetworkTime_ = 0;
@@ -373,6 +375,9 @@ bool NitzUpdate::IsAutoTime()
     std::string value = "";
     if (settingHelper->Query(uri, key, value) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("Query %{public}s fail", key.c_str());
+        if (system::GetParameter(AUTO_TIME_SYSTEM_PARAMETER, "ON") == AUTO_TIME_STATUS_ON) {
+            return true;
+        }
         return false;
     }
     bool autoTime = true;
