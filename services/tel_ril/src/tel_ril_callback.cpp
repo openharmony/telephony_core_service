@@ -953,5 +953,16 @@ int32_t TelRilCallback::NetworkSliceEhplmnRpt(const HDI::Ril::V1_4::RilRadioResp
         &TelRilData::NetworkSliceEhplmnRpt, networksliceEhplmnInfo);
 }
 
+int32_t TelRilCallback::GetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo,
+    int32_t primarySlotId)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::GetPrimarySlotResponse, primarySlotId);
+}
+
+int32_t TelRilCallback::SetPrimarySlotResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+{
+    return Response(responseInfo, &TelRilManager::GetTelRilSim, &TelRilSim::SetPrimarySlotResponse);
+}
+
 } // namespace Telephony
 } // namespace OHOS
