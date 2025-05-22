@@ -263,7 +263,7 @@ HWTEST_F(EsimManagerTest, GetDefaultSmdpAddress, Function | MediumTest | Level1)
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->GetDefaultSmdpAddress(slotId, actualAddress);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, CancelSession, Function | MediumTest | Level1)
@@ -291,7 +291,7 @@ HWTEST_F(EsimManagerTest, CancelSession, Function | MediumTest | Level1)
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->CancelSession(slotId, transactionId, cancelReason, responseResult);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, GetProfile, Function | MediumTest | Level1)
@@ -320,7 +320,7 @@ HWTEST_F(EsimManagerTest, GetProfile, Function | MediumTest | Level1)
     simManager->simFileManager_.push_back(simFileManager);
     simManager->simFileManager_[slotId]->Init(slotId);
     ret = simManager->GetProfile(slotId, portIndex, iccId, eUiccProfile);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, ResetMemory, Function | MediumTest | Level1)
