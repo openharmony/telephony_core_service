@@ -59,6 +59,7 @@ void EsimServiceClientBranchTest::TearDown() {}
 
 HWTEST_F(EsimServiceClientBranchTest, GetEid_0001, Function | MediumTest | Level1)
 {
+    int a = 0;
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     sptr<IEsimServiceCallback> callback = nullptr;
