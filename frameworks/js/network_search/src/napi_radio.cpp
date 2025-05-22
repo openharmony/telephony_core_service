@@ -2278,7 +2278,7 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = new CellInformationContext();
+    auto asyncContext = std::make_unique<CellInformationContext>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
@@ -2297,18 +2297,8 @@ static napi_value GetCellInformation(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_get_value_int32(env, parameters[0], &asyncContext->slotId));
         NAPI_CALL(env, napi_create_reference(env, parameters[1], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef == nullptr) {
-        NAPI_CALL(env, napi_create_promise(env, &asyncContext->deferred, &result));
-    } else {
-        NAPI_CALL(env, napi_get_undefined(env, &result));
-    }
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "GetCellInformation", NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, NativeGetCellInformation,
-                       GetCellInformationCallback, static_cast<void *>(asyncContext), &(asyncContext->work)));
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_default));
-    return result;
+    return NapiUtil::HandleAsyncWork(
+        env, asyncContext.release(), "GetCellInformation", NativeGetCellInformation, GetCellInformationCallback);
 }
 
 static void NativeGetPrimarySlotId(napi_env env, void *data)
