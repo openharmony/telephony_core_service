@@ -231,6 +231,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_008, Function | MediumTest
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest | Level1)
 {
     auto future = std::async(std::launch::async, [this]() {
+        simStateManager_->simStateHandle_->SetSimState(SimState::SIM_STATE_LOCKED);
         LockStatusResponse response;
         simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
         simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
@@ -245,11 +246,33 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest
 }
 
 /**
- * @tc.number   Telephony_SimStateHandle_010
- * @tc.name     sst_test
+ * @tc.number   Telephony_SimStateHandle_011
+ * @tc.name     test SimStateHandle
  * @tc.desc     Function test
  */
 HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_010, Function | MediumTest | Level1)
+{
+    auto future = std::async(std::launch::async, [this]() {
+        simStateManager_->simStateHandle_->SetSimState(SimState::SIM_STATE_LOADED);
+        LockStatusResponse response;
+        simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
+        simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
+        simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
+        simStateManager_->UnlockPin(slotId, "1234", response);
+        EXPECT_TRUE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_LOADED);
+    });
+    usleep(100 * 1000);
+    simStateManager_->SyncUnlockPinResponse();
+    usleep(100 * 1000);
+    future.get();
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_011
+ * @tc.name     sst_test
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_011, Function | MediumTest | Level1)
 {
     auto simFile_ = std::make_shared<SimFile>(simStateManager_);
     simFile_->fileController_ = std::make_shared<UsimFileController>(0);
@@ -261,6 +284,50 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_010, Function | MediumTest
     EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_SPN));
     EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_PLMN_NETWORK_NAME));
     EXPECT_TRUE(simFile_->IsSimServiceAvailable(UsimService::USIM_FDN));
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_012
+ * @tc.name     test SimStateHandle
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_012, Function | MediumTest | Level1)
+{
+    auto future = std::async(std::launch::async, [this]() {
+        simStateManager_->simStateHandle_->SetSimState(SimState::SIM_STATE_LOADED);
+        LockStatusResponse response;
+        simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
+        simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
+        simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
+        simStateManager_->UnlockPuk(slotId, "1234", "12345678", response);
+        EXPECT_TRUE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_LOADED);
+    });
+    usleep(100 * 1000);
+    simStateManager_->SyncCmdResponse();
+    usleep(100 * 1000);
+    future.get();
+}
+
+/**
+ * @tc.number   Telephony_SimStateHandle_013
+ * @tc.name     test SimStateHandle
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_013, Function | MediumTest | Level1)
+{
+    auto future = std::async(std::launch::async, [this]() {
+        simStateManager_->simStateHandle_->SetSimState(SimState::SIM_STATE_LOCKED);
+        LockStatusResponse response;
+        simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
+        simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
+        simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
+        simStateManager_->UnlockPuk(slotId, "1234", "12345678", response);
+        EXPECT_TRUE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_NOT_READY);
+    });
+    usleep(100 * 1000);
+    simStateManager_->SyncCmdResponse();
+    usleep(100 * 1000);
+    future.get();
 }
 }
 }

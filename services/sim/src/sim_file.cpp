@@ -40,7 +40,7 @@ constexpr static const int32_t WAIT_TIME_SECOND = 1;
 const int64_t DELAY_TIME = 500;
 const int64_t GET_IMSI_DELAY_TIME = 2000;
 const int BYTE_TO_BIT_LEN = 8;
-const int HEX_TO_BYTE_LEN = 2;
+const uint8_t HEX_TO_BYTE_LEN = 2;
 const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
 const int CFIS_TON_NPI_OFFSET = 3;
 const uint8_t SST_SPN_OFFSET = 4;
@@ -1462,7 +1462,7 @@ bool SimFile::IsAvailable(uint8_t offset, uint8_t mask)
     if (offset * HEX_TO_BYTE_LEN >= serviceTable_.length()) {
         return false;
     }
-    uint8_t num = strtol(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN).c_str(), nullptr, HEX_TYPE);
+    uint8_t num = static_cast<uint8_t>(strtoul(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN).c_str(), nullptr, HEX_TYPE));
     return ((num & mask) == mask);
 }
 
