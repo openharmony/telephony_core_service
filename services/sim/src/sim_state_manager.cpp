@@ -212,7 +212,9 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
-        SetSimState(SimState::SIM_STATE_NOT_READY);
+        if (GetSimState() == SimState::SIM_STATE_LOCKED) {
+            SetSimState(SimState::SIM_STATE_NOT_READY);
+        }
         if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
                 slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ENABLE, pin);
@@ -251,6 +253,9 @@ int32_t SimStateManager::UnlockPuk(
     int32_t unlockResult = static_cast<int32_t>(simStateHandle_->GetUnlockData().result);
     if (unlockResult == UNLOCK_SUCCESS) {
         response.result = UNLOCK_OK;
+        if (GetSimState() == SimState::SIM_STATE_LOCKED) {
+            SetSimState(SimState::SIM_STATE_NOT_READY);
+        }
         if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
                 slotId, simStateHandle_->GetIccid(), PinOperationType::PIN_ALTER, newPin);
