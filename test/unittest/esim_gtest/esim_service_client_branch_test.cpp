@@ -59,7 +59,6 @@ void EsimServiceClientBranchTest::TearDown() {}
 
 HWTEST_F(EsimServiceClientBranchTest, GetEid_0001, Function | MediumTest | Level1)
 {
-    int a = 0;
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
     sptr<IEsimServiceCallback> callback = nullptr;
@@ -240,8 +239,8 @@ HWTEST_F(EsimServiceClientBranchTest, IsSupported_0001, Function | MediumTest | 
 {
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
-    EXPECT_EQ(result, false);
+    int32_t result = EsimServiceClient::GetInstance().IsSupported(SLOT_ID);
+    EXPECT_NE(result, 0);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | Level1)
@@ -249,8 +248,8 @@ HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | L
     DownloadableProfile profile;
     EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
         testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
-    bool result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID, profile);
-    EXPECT_EQ(result, false);
+    int32_t result = EsimServiceClient::GetInstance().AddProfile(SLOT_ID, profile);
+    EXPECT_NE(result, false);
 }
 
 HWTEST_F(EsimServiceClientBranchTest, RemoveDeathRecipient_0001, Function | MediumTest | Level1)
