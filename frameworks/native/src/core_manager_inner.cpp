@@ -1673,6 +1673,14 @@ bool CoreManagerInner::SetPreferredNetwork(
     return false;
 }
 
+bool CoreManagerInner::SetForcePreferredNetwork(int32_t slotId, int32_t networkMode)
+{
+    if (networkSearchManager_ != nullptr) {
+        return networkSearchManager_->SetForcePreferredNetwork(slotId, networkMode);
+    }
+    return false;
+}
+ 
 bool CoreManagerInner::IsNrSupported(int32_t slotId)
 {
     if (networkSearchManager_ != nullptr) {
