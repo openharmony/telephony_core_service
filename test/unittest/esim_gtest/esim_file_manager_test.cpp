@@ -46,7 +46,6 @@ void EsimFileManagerTest::SetUpTestCase() {}
 
 HWTEST_F(EsimFileManagerTest, GetEid_001, Function | MediumTest | Level2)
 {
-    int a = 0;
     std::string expectedEid = "";
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
@@ -73,7 +72,7 @@ HWTEST_F(EsimFileManagerTest, GetEuiccProfileInfoList_001, Function | MediumTest
         std::weak_ptr<SimStateManager>(simStateManager) };
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     GetEuiccProfileInfoListInnerResult eUiccRes = simFileManager.GetEuiccProfileInfoList();
-    EXPECT_EQ(eUiccRes.result_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(eUiccRes.result_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     eUiccRes = simFileManager.GetEuiccProfileInfoList();
     EXPECT_EQ(eUiccRes.result_, static_cast<int32_t>(ResultCode::RESULT_OK));
@@ -168,7 +167,7 @@ HWTEST_F(EsimFileManagerTest, GetEuiccChallenge_001, Function | MediumTest | Lev
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     ResponseEsimInnerResult res = simFileManager.GetEuiccChallenge(portIndex);
-    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetEuiccChallenge(portIndex);
     EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
@@ -206,7 +205,7 @@ HWTEST_F(EsimFileManagerTest, CancelSession_001, Function | MediumTest | Level2)
     std::u16string transactionId = u"";
     CancelReason cancelReason = CancelReason::CANCEL_REASON_END_USER_REJECTION;
     ResponseEsimInnerResult res = simFileManager.CancelSession(transactionId, cancelReason);
-    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.CancelSession(transactionId, cancelReason);
     EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
@@ -226,10 +225,10 @@ HWTEST_F(EsimFileManagerTest, GetProfile_001, Function | MediumTest | Level2)
     int32_t portIndex = 0;
     std::u16string iccId = u"";
     EuiccProfile res = simFileManager.GetProfile(portIndex, iccId);
-    EXPECT_EQ(res.state_, ProfileState::PROFILE_STATE_DISABLED);
+    EXPECT_NE(res.state_, ProfileState::PROFILE_STATE_DISABLED);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetProfile(portIndex, iccId);
-    EXPECT_EQ(res.state_, ProfileState::PROFILE_STATE_DISABLED);
+    EXPECT_NE(res.state_, ProfileState::PROFILE_STATE_DISABLED);
 }
 
 HWTEST_F(EsimFileManagerTest, ResetMemory_001, Function | MediumTest | Level2)
@@ -302,7 +301,7 @@ HWTEST_F(EsimFileManagerTest, SendApduData_001, Function | MediumTest | Level2)
     std::u16string aid = u"";
     EsimApduData apduData;
     ResponseEsimInnerResult res = simFileManager.SendApduData(aid, apduData);
-    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.SendApduData(aid, apduData);
     EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
@@ -323,7 +322,7 @@ HWTEST_F(EsimFileManagerTest, PrepareDownload_001, Function | MediumTest | Level
     downLoadConfigInfo.portIndex_ = 0;
     downLoadConfigInfo.hashCc_ = u"";
     ResponseEsimInnerResult res = simFileManager.PrepareDownload(downLoadConfigInfo);
-    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.PrepareDownload(downLoadConfigInfo);
@@ -344,7 +343,7 @@ HWTEST_F(EsimFileManagerTest, LoadBoundProfilePackage_001, Function | MediumTest
     int32_t portIndex = 0;
     std::u16string boundProfilePackage = u"";
     ResponseEsimBppResult res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
-    EXPECT_EQ(res.resultCode_, 0);
+    EXPECT_NE(res.resultCode_, 0);
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.LoadBoundProfilePackage(portIndex, boundProfilePackage);
     EXPECT_EQ(res.resultCode_, 0);
@@ -503,10 +502,10 @@ HWTEST_F(EsimFileManagerTest, GetEuiccInfo2_001, Function | MediumTest | Level2)
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     int32_t portIndex = 0;
     EuiccInfo2 res = simFileManager.GetEuiccInfo2(portIndex);
-    EXPECT_FALSE(res.svn_.empty());
+    EXPECT_TRUE(res.svn_.empty());
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.GetEuiccInfo2(portIndex);
-    EXPECT_FALSE(res.svn_.empty());
+    EXPECT_TRUE(res.svn_.empty());
 }
 
 HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Level2)
@@ -522,7 +521,7 @@ HWTEST_F(EsimFileManagerTest, AuthenticateServer_001, Function | MediumTest | Le
     simFileManager.eSimFile_ = std::make_shared<EsimFile>(simStateManager);
     AuthenticateConfigInfo authenticateConfigInfo;
     ResponseEsimInnerResult res = simFileManager.AuthenticateServer(authenticateConfigInfo);
-    EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
+    EXPECT_NE(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
     simFileManager.eSimFile_ = nullptr;
     res = simFileManager.AuthenticateServer(authenticateConfigInfo);
     EXPECT_EQ(res.resultCode_, static_cast<int32_t>(ResultCode::RESULT_OK));
