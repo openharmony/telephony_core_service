@@ -68,6 +68,7 @@ void EsimFileTest::TearDown() {}
  */
 HWTEST_F(EsimFileTest, SyncCloseChannel001, TestSize.Level1)
 {
+    int a = 0;
     esimFile->currentChannelId_ = 1;
     esimFile->SyncCloseChannel();
     ASSERT_TRUE(esimFile != nullptr);

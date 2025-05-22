@@ -54,6 +54,7 @@ void EsimManagerTest::SetUpTestCase() {}
 
 HWTEST_F(EsimManagerTest, GetEid, Function | MediumTest | Level1)
 {
+    int a = 0;
     int32_t slotId = 0;
     std::u16string eId;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
