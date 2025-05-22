@@ -681,6 +681,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     EXPECT_NE(mInner.GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.GetPreferredNetwork(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.SetPreferredNetwork(0, 0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(mInner.SetForcePreferredNetwork(INVALID_SLOTID, 0));
     std::vector<sptr<SignalInformation>> signals;
     mInner.GetSignalInfoList(0, signals);
     EXPECT_EQ(signals, std::vector<sptr<SignalInformation>>());

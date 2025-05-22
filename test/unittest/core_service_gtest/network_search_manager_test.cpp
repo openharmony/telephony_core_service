@@ -162,5 +162,32 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager2_001, Function 
     EXPECT_EQ(networkSearchManager->IsGsm(SLOT_ID_0, isGsm), TELEPHONY_SUCCESS);
     EXPECT_EQ(networkSearchManager->IsCdma(SLOT_ID_0, isGsm), TELEPHONY_SUCCESS);
 }
+
+/**
+ * @tc.number   Telephony_NetworkSearchManager2_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_002, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    EXPECT_TRUE(telRilManager->OnInit());
+    CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager);
+    auto &client = CoreServiceClient::GetInstance();
+    auto slotCount = client.GetMaxSimCount();
+    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    EXPECT_TRUE(simManager->OnInit(slotCount));
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    EXPECT_TRUE(networkSearchManager->OnInit());
+
+    std::shared_ptr<NetworkSearchManagerInner> inner = std::make_shared<NetworkSearchManagerInner>();
+    EXPECT_TRUE(networkSearchManager->InitPointer(inner, SLOT_ID_0));
+    bool ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, 1);
+    EXPECT_TRUE(ret);
+    ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, -1);
+    EXPECT_FALSE(ret);
+    
+}
 } // namespace Telephony
 } // namespace OHOS
