@@ -1232,8 +1232,8 @@ HWTEST_F(EsimTest, ProcessLoadBoundProfilePackage_002, Function | MediumTest | L
     EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
     esimFile->currentChannelId_ = 3;
     esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(boundProfilePackage);
-    EXPECT_FALSE(esimFile->ProcessLoadBoundProfilePackage(slotId));
-    esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(boundProfilePackageUnknownBpp);
+    EXPECT_TRUE(esimFile->ProcessLoadBoundProfilePackage(slotId));
+    esimFile->esimProfile_.boundProfilePackage = Str8ToStr16(BOUND_PROFILE_PACKAGE_UNKNOWN_BPP);
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     esimFile->SetRilAndFileController(telRilManager, file, handler);
