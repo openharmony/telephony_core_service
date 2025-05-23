@@ -132,6 +132,7 @@ void RuimFile::OnAllFilesFetched()
     if (stateManager_ != nullptr) {
         CardType cardType = stateManager_->GetCardType();
         NotifyRegistrySimState(cardType, SimState::SIM_STATE_LOADED, LockReason::SIM_NONE);
+        isSimRecordLoaded_ = true;
     }
     PublishSimFileEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_LOADED, "");
     LoadVoiceMail();
