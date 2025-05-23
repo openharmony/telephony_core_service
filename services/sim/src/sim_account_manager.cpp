@@ -51,7 +51,7 @@ void SimAccountManager::Init(int32_t slotId)
         return;
     }
     operatorConfigCache_ =
-        std::make_shared<OperatorConfigCache>(std::weak_ptr<SimFileManager>(simFileManager_), slotId);
+        std::make_shared<OperatorConfigCache>(std::weak_ptr<SimFileManager>(simFileManager_), simStateManager_, slotId);
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
         return;
