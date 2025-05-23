@@ -328,7 +328,7 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return;
     }
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
