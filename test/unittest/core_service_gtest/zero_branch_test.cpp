@@ -681,7 +681,6 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_003, Function | MediumTest | Lev
     EXPECT_NE(mInner.GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.GetPreferredNetwork(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.SetPreferredNetwork(0, 0, callback), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(mInner.SetForcePreferredNetwork(INVALID_SLOTID, 0));
     std::vector<sptr<SignalInformation>> signals;
     mInner.GetSignalInfoList(0, signals);
     EXPECT_EQ(signals, std::vector<sptr<SignalInformation>>());
@@ -938,6 +937,24 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_008, Function | MediumTest | Lev
     EXPECT_GT(mInner.SendImsRsdList(0, buffer, event3), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, event4), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, event5), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CoreManagerInner_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_009, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    mInner.OnInit(nullptr, nullptr, nullptr);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+
+    EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 0));
+    mInner.networkSearchManager_ = networkSearchManager;
+    EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 1));
 }
 
 /**
