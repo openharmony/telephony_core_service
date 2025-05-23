@@ -188,6 +188,16 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_002, Function |
     ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, -1);
     EXPECT_FALSE(ret);
     
+    networkSearchManager->eventSender_.reset();
+    networkSearchManager->eventSender_ = nullptr;
+    ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, 1);
+    EXPECT_FALSE(ret);
+
+    ret = networkSearchManager->SetForcePreferredNetwork(-1, 1);
+    EXPECT_FALSE(ret);
+
+    ret = networkSearchManager->SetForcePreferredNetwork(3, 1);
+    EXPECT_FALSE(ret);
 }
 } // namespace Telephony
 } // namespace OHOS
