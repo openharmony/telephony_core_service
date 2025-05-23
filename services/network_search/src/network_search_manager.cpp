@@ -894,7 +894,7 @@ bool NetworkSearchManager::SetForcePreferredNetwork(int32_t slotId, int32_t netw
     if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
         return false; 
     } 
-    if (simManager_ == nullptr || eventSender_ == nullptr) {
+    if (eventSender_ == nullptr) {
         return false; 
     } 
     int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode)); 
