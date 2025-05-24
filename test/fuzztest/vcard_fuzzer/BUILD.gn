@@ -39,6 +39,7 @@ ohos_fuzztest("VcardFuzzTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hilog:libhilog",
+    "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
