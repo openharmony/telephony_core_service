@@ -454,7 +454,7 @@ void OperatorConfigCache::UpdateIccidCache(int32_t state)
     }
 }
 
-int OperatorConfigCache::GetSimState(int32_t slotId, SimState &simstate)
+int OperatorConfigCache::GetSimState(int32_t slotId, SimState &simState)
 {
     if (slotId != slotId_) {
         TELEPHONY_LOGE("is not current slotId, current slotId %{public}d", slotId_);
