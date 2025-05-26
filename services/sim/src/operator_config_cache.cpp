@@ -29,8 +29,10 @@
 
 namespace OHOS {
 namespace Telephony {
-OperatorConfigCache::OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId)
-    : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), slotId_(slotId)
+OperatorConfigCache::OperatorConfigCache(
+    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
+    : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), simStateManager_(simStateManager),
+      slotId_(slotId)
 {
     TELEPHONY_LOGI("OperatorConfigCache create");
 }
@@ -210,7 +212,7 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
     }
     lock.unlock();
     TELEPHONY_LOGI("reload operator config, slotId = %{public}d", slotId);
-    return LoadOperatorConfig(slotId, poc);
+    return LoadOperatorConfigFile(slotId, poc);
 }
 
 int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
@@ -219,7 +221,7 @@ int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
     ClearMemoryCache(slotId);
     lock.unlock();
     if (slotId == 0) {
-        TELEPHONY_LOGD("OperatorConfigCache:UpdateOperatorConfigs ClearFilesCache");
+        TELEPHONY_LOGD("UpdateOperatorConfigs ClearFilesCache");
         OperatorFileParser::ClearFilesCache();
     }
     OperatorConfig opc;
@@ -280,7 +282,7 @@ bool OperatorConfigCache::RegisterForIccChange()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
@@ -294,7 +296,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
         return;
     }
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    CoreManagerInner::GetInstance().GetSimState(slotId_, simState);
+    GetSimState(slotId_, simState);
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_STATE_CHANGE) {
         TELEPHONY_LOGI("Sim state change, slotId = %{public}d, simstate = %{public}d",
             slotId_, static_cast<int>(simState));
@@ -315,7 +317,7 @@ bool OperatorConfigCache::UnRegisterForIccChange()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
@@ -326,7 +328,7 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("OperatorConfigCache::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return;
     }
     std::string operName = Str16ToStr8(simFileManager->GetOpName());
@@ -344,16 +346,22 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
             operName = modemSimMatchedOpNameCache_;
         }
     }
-    int32_t response = CoreManagerInner::GetInstance().SendSimMatchedOperatorInfo(slotId,
-        state, operName, operKey);
-    TELEPHONY_LOGI("OperatorConfigCache::SendSimMatchedOperatorInfo slotId[%{public}d], opkey[%{public}s],"
-        "opname[%{public}s], response = %{public}d", slotId, operKey.data(), operName.data(), response);
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId, current slotId %{public}d", slotId_);
+        return;
+    }
+    if (simStateManager_ == nullptr) {
+        TELEPHONY_LOGE("simStateManager is nullptr, slotId %{public}d", slotId_);
+    }
+    int32_t response = simStateManager_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
+    TELEPHONY_LOGI("slotId[%{public}d], opkey[%{public}s],opname[%{public}s], response = %{public}d",
+        slotId, operKey.data(), operName.data(), response);
 }
 
 void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
+    GetSimState(slotId, simState);
     if (!(simState == SimState::SIM_STATE_READY || simState == SimState::SIM_STATE_LOADED)) {
         return;
     }
@@ -362,14 +370,14 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         TELEPHONY_LOGE("get PdpProfileRdbHelper Failed.");
         return;
     }
-    TELEPHONY_LOGI("OperatorConfigCache:notifyInitApnConfigs end");
+    TELEPHONY_LOGI("notifyInitApnConfigs end");
     helper->notifyInitApnConfigs(slotId);
 }
 
 bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t state)
 {
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    CoreManagerInner::GetInstance().GetSimState(slotId, simState);
+    GetSimState(slotId, simState);
     bool isOpkeyDbError = CoreManagerInner::GetInstance().IsDataShareError();
     TELEPHONY_LOGI("isOpkeyDbError = %{public}d, state = %{public}d",
         isOpkeyDbError, state);
@@ -442,9 +450,26 @@ void OperatorConfigCache::UpdateIccidCache(int32_t state)
         return;
     }
     if (state == STATE_PARA_LOADED || state == STATE_PARA_UPDATE) {
-        std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
-        iccidCache_ = iccid;
+        iccidCache_ = Str16ToStr8(simFileManager->GetSimIccId());
     }
+}
+
+int OperatorConfigCache::GetSimState(int32_t slotId, SimState &simState)
+{
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId, current slotId %{public}d", slotId_);
+        return TELEPHONY_ERR_ARGUMENT_MISMATCH;
+    }
+    if (simStateManager_ == nullptr) {
+        TELEPHONY_LOGE("simStateManager is nullptr, slotId %{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!simStateManager_->HasSimCard()) {
+        simState = SimState::SIM_STATE_NOT_PRESENT;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    simState = simStateManager_->GetSimState();
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS
