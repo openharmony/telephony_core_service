@@ -940,6 +940,24 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_008, Function | MediumTest | Lev
 }
 
 /**
+ * @tc.number   Telephony_CoreManagerInner_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreManagerInner_009, Function | MediumTest | Level1)
+{
+    CoreManagerInner mInner;
+    mInner.OnInit(nullptr, nullptr, nullptr);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+
+    EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 0));
+    mInner.networkSearchManager_ = networkSearchManager;
+    EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 1));
+}
+
+/**
  * @tc.number   Telephony_TagService_001
  * @tc.name     test error branch
  * @tc.desc     Function test

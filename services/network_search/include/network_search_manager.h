@@ -173,6 +173,7 @@ public:
         const sptr<NetworkInformation> &networkInformation, bool resumeSelection, NSCALLBACK &callback) override;
     int32_t GetPreferredNetwork(int32_t slotId, NSCALLBACK &callback) override;
     int32_t SetPreferredNetwork(int32_t slotId, int32_t networkMode, NSCALLBACK &callback) override;
+    bool SetForcePreferredNetwork(int32_t slotId, int32_t networkMode) override;
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
     int32_t GetImei(int32_t slotId, std::u16string &imei) override;
     int32_t GetImeiSv(int32_t slotId, std::u16string &imeiSv) override;
