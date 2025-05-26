@@ -561,8 +561,8 @@ HWTEST_F(IccFileTest, Telephony_IccFile_024, Function | MediumTest | Level1)
     simFile_->imsi_ = "460990123456789";
     simFile_->mcc_ = "460";
     simFile_->mnc_ = "99";
-    simFile_->fileToGet_ = 0;
-    simFile_->fileQueried_ = false;
+    simFile_->isOnOpkeyLoaded_ = false;
+    simFile_->isSimRecordLoaded_ = false;
     SetParameter(PREVIOUS_VERSION, " ");
     multiSimMonitor_->CheckOpcNeedUpdata(true);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
@@ -577,7 +577,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_024, Function | MediumTest | Level1)
     simFileManager_.reset();
     event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
     multiSimMonitor_->ProcessEvent(event);
-    simFile_->fileQueried_ = true;
+    simFile_->isSimRecordLoaded_ = true;
     simFile_->UpdateOpkeyConfig();
     simFile_->filesFetchedObser_ = nullptr;
     simFile_->UpdateOpkeyConfig();

@@ -203,6 +203,8 @@ protected:
     void SetVoiceMailByOperator(std::string spn);
     std::shared_ptr<VoiceMailConstants> voiceMailConfig_ = nullptr;
     std::shared_mutex voiceMailMutex_;
+    bool isOnOpkeyLoaded_{false};
+    bool isSimRecordLoaded_{false};
 
 private:
     bool isVoiceMailFixed_ = false;
