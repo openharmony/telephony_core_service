@@ -65,7 +65,7 @@ constexpr static const uint32_t GET_BPP_LOAD_ERROR_LENGTH = 2;
 
 class EsimFile : public IccFile {
 public:
-    explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager);
+    explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager, int32_t slotId = 0);
     int32_t ObtainSpnCondition(bool roaming, const std::string &operatorNum);
     bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
     bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
