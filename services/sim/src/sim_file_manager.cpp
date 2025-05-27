@@ -144,7 +144,7 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
         }
         if (simFile_ != nullptr) {
 #ifdef CORE_SERVICE_SUPPORT_ESIM
-            eSimFile_ = std::make_shared<EsimFile>(simStateManager_.lock());
+            eSimFile_ = std::make_shared<EsimFile>(simStateManager_.lock(), slotId_);
 #endif
             simFile_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
         }
