@@ -35,8 +35,10 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("EsimFile", simStateManager)
+EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
+    : IccFile("EsimFile", simStateManager)
 {
+    slotId_ = slotId;
     currentChannelId_ = 0;
     InitMemberFunc();
     InitChanneMemberFunc();
