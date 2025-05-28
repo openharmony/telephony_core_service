@@ -942,12 +942,15 @@ void IccFile::UpdateOpkeyConfig()
     if (isOnOpkeyLoaded_ || isSimRecordLoaded_) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, slotId_);
     } else {
-        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-        GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
         std::string key = "";
+        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+        GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+            "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+        key = "";
         if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
             SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "true");
-            SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+            key = "";
+            SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "false");
         } else {
             SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
         }
