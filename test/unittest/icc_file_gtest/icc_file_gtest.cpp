@@ -700,5 +700,19 @@ HWTEST_F(IccFileTest, Telephony_IccFile_028, Function | MediumTest | Level1)
     simStateTracker_->operatorConfigCache_ = nullptr;
     simStateTracker_->ProcessEvent(event);
 }
+
+/**
+ * @tc.number   Telephony_IccFile_029
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_029, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    bool ret = iccFile->ObtainFilesFetched();
+    EXPECT_FALSE(ret);
+}
 }
 }

@@ -231,7 +231,11 @@ bool IccFile::UpdateMsisdnNumber(const std::string &alphaTag, const std::string 
 
 bool IccFile::ObtainFilesFetched()
 {
-    return (fileToGet_ == 0) && fileQueried_;
+    SimState state = SimState::SIM_STATE_UNKNOWN;
+    if (stateManager_ != nullptr) {
+        state = stateManager_->GetSimState();
+    }
+    return (static_cast<int32_t>(state) > 1) && (fileToGet_ == 0) && fileQueried_;
 }
 
 bool IccFile::LockQueriedOrNot()
