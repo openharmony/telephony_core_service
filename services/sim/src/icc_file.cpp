@@ -944,13 +944,13 @@ void IccFile::UpdateOpkeyConfig()
     } else {
         std::string key = "";
         char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-        GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(),
             "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
         key = "";
         if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
             SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "true");
             key = "";
-            SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "false");
+            SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
         } else {
             SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
         }
