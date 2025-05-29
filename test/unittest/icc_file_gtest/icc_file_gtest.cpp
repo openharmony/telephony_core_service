@@ -68,7 +68,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr const char *PREVIOUS_VERSION = "persist.telephony.previous_version";
-constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0 = "telephony.is_block_load_operatorconfig0";
 constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
 const int32_t SIM_COUNT = 2;
 
@@ -572,7 +572,7 @@ HWTEST_F(IccFileTest, Telephony_IccFile_024, Function | MediumTest | Level1)
     simStateTracker_->ProcessEvent(event);
     simStateTracker_->ProcessOperatorConfigUpdate(event);
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
     simFileManager_.reset();
     event = AppExecFwk::InnerEvent::Get(MultiSimMonitor::RESET_OPKEY_CONFIG, 0);
@@ -594,9 +594,9 @@ HWTEST_F(IccFileTest, Telephony_IccFile_025, Function | MediumTest | Level1)
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1);
     simStateTracker_->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 0);
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "true");
     simStateTracker_->ProcessEvent(event);
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "false");
     std::string key = "";
     SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "true");
     simStateTracker_->ProcessEvent(event);
@@ -634,9 +634,9 @@ HWTEST_F(IccFileTest, Telephony_IccFile_026, Function | MediumTest | Level1)
     vMsg[0] = std::to_string(0);
     obj = std::make_shared<std::vector<std::string>>(vMsg);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "true");
     simStateTracker_->ProcessEvent(event);
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "false");
     std::string key = "";
     SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(0)).c_str(), "false");
     simStateTracker_->ProcessEvent(event);
@@ -692,10 +692,10 @@ HWTEST_F(IccFileTest, Telephony_IccFile_028, Function | MediumTest | Level1)
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 1);
     simStateTracker_->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, 0);
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "true");
     simStateTracker_->ProcessEvent(event);
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG_SLOT0, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     ASSERT_TRUE(strcmp(isBlockLoadOperatorConfig, "false") == 0);
     simStateTracker_->operatorConfigCache_ = nullptr;
     simStateTracker_->ProcessEvent(event);

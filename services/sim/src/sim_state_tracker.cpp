@@ -56,8 +56,10 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
+    std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
         TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
         return;
@@ -90,8 +92,10 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
+    std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
         TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
         return;
@@ -154,10 +158,12 @@ void SimStateTracker::ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::
     TELEPHONY_LOGI("need Clear opkey and reload operatorconfig, slotId: %{public}d", slotId_);
     operatorConfigCache_->ClearOperatorValue(slotId);
     CoreManagerInner::GetInstance().ResetDataShareError();
+    std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
-        SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+        SetParameter(key.c_str(), "false");
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
     } else {
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_LOADED);

@@ -150,7 +150,7 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
         std::lock_guard<std::mutex> lock(mutexForData_);
         if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
             TELEPHONY_LOGI("need update config");
-            SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "true");
+            SetBlockLoadOperatorConfig(true);
             if (controller_->UpdateOpKeyInfo() != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("UpdateOpKeyInfo error");
                 return TELEPHONY_ERROR;
@@ -161,6 +161,17 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
         }
     }
     return TELEPHONY_ERROR;
+}
+
+void MultiSimMonitor::SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig)
+{
+    if (!isBlockLoadOperatorConfig) {
+        return;
+    }
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        std::string key = "";
+        SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "true");
+    }
 }
 
 void MultiSimMonitor::UpdateAllOpkeyConfigs()
@@ -426,7 +437,7 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEven
 void MultiSimMonitor::CheckSimNotifyRegister()
 {
     RemoveEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT);
-    setRemainCount(INIT_TIMES);
+    SetRemainCount(INIT_TIMES);
     RegisterSimNotify();
 }
 
@@ -438,7 +449,7 @@ void MultiSimMonitor::CheckDataShareError()
     }
 }
 
-void MultiSimMonitor::setRemainCount(int remainCount)
+void MultiSimMonitor::SetRemainCount(int remainCount)
 {
     remainCount_ = remainCount;
 }
