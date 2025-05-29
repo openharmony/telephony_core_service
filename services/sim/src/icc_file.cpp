@@ -943,16 +943,17 @@ void IccFile::UpdateOpkeyConfig()
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, slotId_);
     } else {
         std::string key = "";
-        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-        GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(),
-            "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+        std::string isBlockLoadOperatorConfigProp =
+            key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_));
         key = "";
+        std::string isUpdateOperatorConfigProp = key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_));
+        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+        GetParameter(isBlockLoadOperatorConfigProp.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
         if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
-            SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "true");
-            key = "";
-            SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
+            SetParameter(isUpdateOperatorConfigProp.c_str(), "true");
+            SetParameter(isBlockLoadOperatorConfigProp.c_str(), "false");
         } else {
-            SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
+            SetParameter(isUpdateOperatorConfigProp.c_str(), "false");
         }
         CoreManagerInner::GetInstance().ResetDataShareError();
     }

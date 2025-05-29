@@ -165,11 +165,12 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
 
 void MultiSimMonitor::SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig)
 {
+    if (!isBlockLoadOperatorConfig) {
+        return;
+    }
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-        if (isBlockLoadOperatorConfig) {
-            std::string key = "";
-            SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "true");
-        }
+        std::string key = "";
+        SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "true");
     }
 }
 
