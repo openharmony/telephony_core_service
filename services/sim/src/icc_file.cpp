@@ -235,7 +235,7 @@ bool IccFile::ObtainFilesFetched()
     if (stateManager_ != nullptr) {
         state = stateManager_->GetSimState();
     }
-    return (static_cast<int32_t>(state) > 1) && (fileToGet_ == 0) && fileQueried_;
+    return (state >= SimState::SIM_STATE_READY) && (fileToGet_ == 0) && fileQueried_;
 }
 
 bool IccFile::LockQueriedOrNot()
