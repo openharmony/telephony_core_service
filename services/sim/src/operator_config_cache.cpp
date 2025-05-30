@@ -352,6 +352,7 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
     }
     if (simStateManager_ == nullptr) {
         TELEPHONY_LOGE("simStateManager is nullptr, slotId %{public}d", slotId_);
+        return;
     }
     int32_t response = simStateManager_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
     TELEPHONY_LOGI("slotId[%{public}d], opkey[%{public}s],opname[%{public}s], response = %{public}d",
