@@ -31,7 +31,7 @@ class CoreServiceClient : public DelayedRefSingleton<CoreServiceClient> {
     DECLARE_DELAYED_REF_SINGLETON(CoreServiceClient);
 
 public:
-    sptr<ICoreService> GetProxy();
+    virtual sptr<ICoreService> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     /**
@@ -184,7 +184,7 @@ public:
      * @param hasSimCard[out], returns true if a SIM card is inserted; return false otherwise
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t HasSimCard(int32_t slotId, bool &hasSimCard);
+    int32_t HasSimCard(int32_t slotId, bool &hasSimCard, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the state of the SIM card
@@ -193,7 +193,7 @@ public:
      * @param simState[out], the state of the SIM card
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetSimState(int32_t slotId, SimState &simState);
+    int32_t GetSimState(int32_t slotId, SimState &simState, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the value of dsds mode
@@ -255,7 +255,7 @@ public:
      * @param isCTSimCard[out], returns true if a SIM card is inserted; return false otherwise
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard);
+    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Checks whether the SIM card in a specified slot is activated
@@ -263,7 +263,7 @@ public:
      * @param slotId[in], sim slot id
      * @return returns true if the SIM card activated; returns false otherwise.
      */
-    bool IsSimActive(int32_t slotId);
+    bool IsSimActive(int32_t slotId, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the sim slot id of the simId
@@ -387,7 +387,7 @@ public:
      * @param simId[out], default voice simId
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetDefaultVoiceSimId(int32_t &simId);
+    int32_t GetDefaultVoiceSimId(int32_t &simId, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Set the SIM card show number
@@ -396,7 +396,8 @@ public:
      * @param number[in], the SIM card show number
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetShowNumber(int32_t slotId, const std::u16string &number);
+    int32_t SetShowNumber(int32_t slotId, const std::u16string &number,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the SIM card show number
@@ -415,7 +416,8 @@ public:
      * @param name[in], the SIM card show name
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetShowName(int32_t slotId, const std::u16string &name);
+    int32_t SetShowName(int32_t slotId, const std::u16string &name,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the SIM card show name
@@ -451,7 +453,8 @@ public:
      * @param response[out], the response of unlock pin
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response);
+    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Unlock Puk
@@ -462,8 +465,8 @@ public:
      * @param response[out], the response of unlock puk
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t UnlockPuk(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response);
+    int32_t UnlockPuk(int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+        LockStatusResponse &response, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Alter Pin
@@ -474,8 +477,8 @@ public:
      * @param response[out], the response of alter pin
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t AlterPin(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response);
+    int32_t AlterPin(int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
+        LockStatusResponse &response, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Unlock Pin2
@@ -485,7 +488,8 @@ public:
      * @param response[out], the response of unlock pin2
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response);
+    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Unlock Puk2
@@ -496,8 +500,8 @@ public:
      * @param response[out], the response of unlock puk2
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t UnlockPuk2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response);
+    int32_t UnlockPuk2(int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
+        LockStatusResponse &response, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Alter Pin2
@@ -508,8 +512,8 @@ public:
      * @param response[out], the response of alter pin2
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t AlterPin2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response);
+    int32_t AlterPin2(int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
+        LockStatusResponse &response, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Set the SIM card lock state
@@ -519,7 +523,8 @@ public:
      * @param response[out], the response of set lock state
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response);
+    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Obtain the SIM card lock state
@@ -529,7 +534,8 @@ public:
      * @param lockState[out], the response of get lock state
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState);
+    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Refresh the SIM card State
@@ -798,7 +804,8 @@ public:
      * @param hasOperatorPrivileges[out], whether your the caller has been granted the operator permissions
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
+    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges,
+        int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
     /**
      * @brief Performs SIM card authentication
