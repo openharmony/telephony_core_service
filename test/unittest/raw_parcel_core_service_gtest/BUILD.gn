@@ -2,7 +2,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,101 +16,102 @@ SOURCE_DIR = "../../../"
 import("$SOURCE_DIR/telephony_core_service.gni")
 
 ohos_unittest("raw_parcel_core_service_test") {
-    install_enable = true
-    subsystem_name = "telephony"
-    part_name = "core_service"
-    test_module = "core_service"
-    module_out_path = part_name + "/" + test_module
-    cflags = [
-        "-Dprotected=public",
-        "-Dprivate=public",
-    ]
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+  cflags = [
+    "-Dprotected=public",
+    "-Dprivate=public",
+  ]
 
-    sources = [
-        "core_service_client_test.cpp",
-        "core_service_test.cpp"
-    ]
+  sources = [
+    "core_service_client_test.cpp",
+    "core_service_test.cpp"
+  ]
 
-    sources += [
-        # mock src
-        "SOURCEDIR/test/unittest/rawparcelcoreservicegtest/mock/telephonypermission.cpp",
-        "SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/core_service_dump_helper.cpp",
-        "SOURCEDIR/test/unittest/rawparcelcoreservicegtest/mock/televenthandler.cpp",
-        "SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/core_service_stub.cpp",
-        # tested src
-        "SOURCE_DIR/services/core/src/core_service.cpp",
-        # deps src
-        "SOURCE_DIR/services/telephony_ext_wrapper/src/telephony_ext_wrapper.cpp",
-        "SOURCEDIR/services/imsserviceinteraction/src/imscoreservicecallbackstub.cpp",
-        "SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_client.cpp",
-        "SOURCEDIR/services/imsserviceinteraction/src/imscoreserviceproxy.cpp",
-        "SOURCE_DIR/utils/common/src/telephony_common_utils.cpp",
-    ]
+  sources += [
+    # mock src
+    "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/telephony_permission.cpp",
+    "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/core_service_dump_helper.cpp",
+    "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/tel_event_handler.cpp",
+    "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/core_service_stub.cpp",
+    # tested src
+    "$SOURCE_DIR/services/core/src/core_service.cpp",
+    # deps src
+    "$SOURCE_DIR/services/telephony_ext_wrapper/src/telephony_ext_wrapper.cpp",
+    "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_callback_stub.cpp",
+    "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_client.cpp",
+    "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_proxy.cpp",
+    "$SOURCE_DIR/utils/common/src/telephony_common_utils.cpp",
+  ]
 
-    include_dirs = [
-        # first use mock .h files
-        "SOURCEDIR/test/unittest/rawparcelcoreservicegtest/mock",
-        "SOURCE_DIR/services/core/include",
-        "SOURCEDIR/utils/log/include",
-        "SOURCE_DIR/utils/preferences/include",
-        "SOURCEDIR/services/sim/include",
-        "SOURCE_DIR/services/network_search/include",
-        "SOURCEDIR/services/telril/include",
-        "SOURCE_DIR/test/mock",
-        "SOURCEDIR/services/telephonyextwrapper/include",
-        "SOURCE_DIR/utils/common/include",
-    ]
+  include_dirs = [
+    # first use mock .h files
+    "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock",
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+    "$SOURCE_DIR/utils/common/include",
+  ]
 
-    configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
-    deps = [
-        "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
-    ]
+  deps = [
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+  ]
 
-    external_deps = [
-        "cJSON:cjson",
-        "c_utils:utils",
-        "common_event_service:cesfwk_innerkits",
-        "config_policy:configpolicy_util",
-        "data_share:datashare_common",
-        "data_share:datashare_consumer",
-        "drivers_interface_ril:ril_idl_headers",
-        "eventhandler:libeventhandler",
-        "ffrt:libffrt",
-        "googletest:gmock_main",
-        "googletest:gtest_main",
-        "hilog:libhilog",
-        "init:libbegetutil",
-        "ipc:ipc_single",
-        "libphonenumber:phonenumber_standard",
-        "safwk:system_ability_fwk",
-        "samgr:samgr_proxy",
-        "hdf_core:libhdi",
-        "hdf_core:libpub_utils",
-        "netmanager_base:net_conn_manager_if",
-        "netmanager_ext:net_tether_manager_if",
-        "i18n:intl_util",
-        "i18n:zone_util",
-        "ability_base:want",
-        "ability_base:zuri",
-        "ability_runtime:ability_deps_wrapper",
-        "ability_runtime:ability_manager",
-        "ability_runtime:app_manager",
-        "ability_runtime:data_ability_helper",
-        "ability_runtime:dataobs_manager",
-        "ability_runtime:wantagent_innerkits",
-        "bundle_framework:appexecfwk_base",
-        "bundle_framework:appexecfwk_core",
-    ]
-    defines = [
-        "TELEPHONY_LOG_TAG = "CoreServiceGtest"",
-        "LOG_DOMAIN = 0xD000F00",
-    ]
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libphonenumber:phonenumber_standard",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "i18n:intl_util",
+    "i18n:zone_util",
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_deps_wrapper",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
 }
 
 group("unittest") {
-    testonly = true
-    deps = [
+  testonly = true
+  deps = [
     ":raw_parcel_core_service_test",
-    ]
+  ]
 }

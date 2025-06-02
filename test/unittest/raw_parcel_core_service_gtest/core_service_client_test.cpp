@@ -1,17 +1,19 @@
 /*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Copyright (C) 2025 Huawei Device Co., Ltd.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-#include
+#include <thread>
 #include "mock_i_core_service.h"
 #include "core_service_client.h"
 #include "telephony_errors.h"
@@ -26,16 +28,16 @@ namespace {
 
 class MockCoreServiceClient : public CoreServiceClient {
 public:
-    sptr GetProxy() override;
+    sptr<ICoreService> GetProxy() override;
 private:
     bool getProxyNullptr_ = false;
 };
 
-sptr proxy = nullptr;
-std::shared_ptr client = std::make_shared();
-sptr savedCallback = nullptr;
+sptr<MockICoreService> proxy = nullptr;
+std::shared_ptr<MockCoreServiceClient> client = std::make_shared<MockCoreServiceClient>();
+sptr<RawParcelCallbackStub> savedCallback = nullptr;
 
-sptr MockCoreServiceClient::GetProxy()
+sptr<ICoreService> MockCoreServiceClient::GetProxy()
 {
     return getProxyNullptr_ ? nullptr : proxy;
 }
@@ -50,7 +52,7 @@ public:
     }
     void SetUp()
     {
-        proxy = sptr::MakeSptr();
+        proxy = sptr<MockICoreService>::MakeSptr();
         client->getProxyNullptr_ = false;
     }
     void TearDown()
@@ -71,7 +73,7 @@ HWTEST_F(CoreServiceClientTest, GetImei001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string imei;
@@ -82,7 +84,7 @@ HWTEST_F(CoreServiceClientTest, GetImei002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string imei = u"unchanged";
@@ -94,8 +96,8 @@ HWTEST_F(CoreServiceClientTest, GetImei003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -112,8 +114,8 @@ HWTEST_F(CoreServiceClientTest, GetImei004, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -132,8 +134,8 @@ HWTEST_F(CoreServiceClientTest, GetImei005, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -152,7 +154,7 @@ HWTEST_F(CoreServiceClientTest, GetImei006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImei007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImei(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -180,7 +182,7 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string imeiSv;
@@ -191,7 +193,7 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string imeiSv = u"default";
@@ -203,8 +205,8 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -221,8 +223,8 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv004, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -241,8 +243,8 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv005, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -261,7 +263,7 @@ HWTEST_F(CoreServiceClientTest, GetImeiSv006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetImeiSv007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetImeiSv(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -289,7 +291,7 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     bool isCT = true;
@@ -301,7 +303,7 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     bool isCT = false;
@@ -313,8 +315,8 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -332,8 +334,8 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard004, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -352,8 +354,8 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard005, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -372,7 +374,7 @@ HWTEST_F(CoreServiceClientTest, IsCTSimCard006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsCTSimCard007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsCTSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -400,7 +402,7 @@ HWTEST_F(CoreServiceClientTest, IsSimActive001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return false;
         }));
     bool ret = client->IsSimActive(0, 0);
@@ -410,7 +412,7 @@ HWTEST_F(CoreServiceClientTest, IsSimActive002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return true;
         }));
     bool ret = client->IsSimActive(0, 0);
@@ -420,8 +422,8 @@ HWTEST_F(CoreServiceClientTest, IsSimActive003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -437,8 +439,8 @@ HWTEST_F(CoreServiceClientTest, IsSimActive004, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -454,7 +456,7 @@ HWTEST_F(CoreServiceClientTest, IsSimActive005, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return true;
         }));
@@ -472,7 +474,7 @@ HWTEST_F(CoreServiceClientTest, IsSimActive006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, IsSimActive007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, IsSimActive(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return true;
         }));
@@ -499,7 +501,7 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId001, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     int32_t simId = -1;
@@ -510,7 +512,7 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId002, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     int32_t simId = -1;
@@ -521,8 +523,8 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId003, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -539,8 +541,8 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId004, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -559,8 +561,8 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId005, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -579,7 +581,7 @@ HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId006, Function | MediumTest |
 HWTEST_F(CoreServiceClientTest, GetDefaultVoiceSimId007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetDefaultVoiceSimId(_))
-        .WillOnce(Invoke([](const sptr &callback) {
+        .WillOnce(Invoke([](const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -607,7 +609,7 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber002, Function | MediumTest | Level1
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     int32_t ret = client->SetShowNumber(0, u"13300000000", 0);
@@ -618,7 +620,7 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber003, Function | MediumTest | Level1
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     int32_t ret = client->SetShowNumber(0, u"13300000000", 0);
@@ -629,8 +631,8 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber004, Function | MediumTest | Level1
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -647,8 +649,8 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber005, Function | MediumTest | Level1
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -664,16 +666,16 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber005, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, SetShowNumber006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
-    .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                        const sptr &callback) {
-        sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
-        MessageParcel data;
-        MessageParcel reply;
-        MessageOption option;
-        data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
-        data.WriteInt32(13579); // custom non-standard result
-        cb->OnRemoteRequest(0, data, reply, option);
-        return TELEPHONY_ERR_SUCCESS;
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+            MessageParcel data;
+            MessageParcel reply;
+            MessageOption option;
+            data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+            data.WriteInt32(13579); // custom non-standard result
+            cb->OnRemoteRequest(0, data, reply, option);
+            return TELEPHONY_ERR_SUCCESS;
         }));
     int32_t ret = client->SetShowNumber(0, u"13300000000", 1000);
     EXPECT_TRUE(ret == 13579);
@@ -683,7 +685,7 @@ HWTEST_F(CoreServiceClientTest, SetShowNumber007, Function | MediumTest | Level1
 {
     EXPECT_CALL(*proxy, SetShowNumber(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &number,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -710,7 +712,7 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber001, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string showNumber;
@@ -721,7 +723,7 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber002, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string showNumber;
@@ -732,8 +734,8 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber003, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -750,8 +752,8 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber004, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -770,8 +772,8 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber005, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -790,7 +792,7 @@ HWTEST_F(CoreServiceClientTest, GetShowNumber006, Function | MediumTest | Level1
 HWTEST_F(CoreServiceClientTest, GetShowNumber007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowNumber(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -818,7 +820,7 @@ HWTEST_F(CoreServiceClientTest, SetShowName002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     int32_t ret = client->SetShowName(0, u"TestName", 0);
@@ -826,10 +828,10 @@ HWTEST_F(CoreServiceClientTest, SetShowName002, Function | MediumTest | Level1)
 }
 
 HWTEST_F(CoreServiceClientTest, SetShowName003, Function | MediumTest | Level1)
-    {
+{
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     int32_t ret = client->SetShowName(0, u"TestName", 0);
@@ -840,8 +842,8 @@ HWTEST_F(CoreServiceClientTest, SetShowName004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -858,8 +860,8 @@ HWTEST_F(CoreServiceClientTest, SetShowName005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -876,8 +878,8 @@ HWTEST_F(CoreServiceClientTest, SetShowName006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -894,7 +896,7 @@ HWTEST_F(CoreServiceClientTest, SetShowName007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetShowName(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &name,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
@@ -921,7 +923,7 @@ HWTEST_F(CoreServiceClientTest, GetShowName001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetShowName002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string showName;
@@ -932,7 +934,7 @@ HWTEST_F(CoreServiceClientTest, GetShowName002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetShowName003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string showName;
@@ -942,9 +944,9 @@ HWTEST_F(CoreServiceClientTest, GetShowName003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetShowName004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetShowName(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -960,9 +962,9 @@ HWTEST_F(CoreServiceClientTest, GetShowName004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetShowName005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetShowName(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -980,9 +982,9 @@ HWTEST_F(CoreServiceClientTest, GetShowName005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetShowName006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetShowName(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1000,9 +1002,9 @@ HWTEST_F(CoreServiceClientTest, GetShowName006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetShowName007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetShowName(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetShowName(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     std::u16string showName;
@@ -1029,7 +1031,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPin001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, UnlockPin002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1040,7 +1042,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPin002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, UnlockPin003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1050,9 +1052,9 @@ HWTEST_F(CoreServiceClientTest, UnlockPin003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, UnlockPin(_, _, _))
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1068,9 +1070,9 @@ HWTEST_F(CoreServiceClientTest, UnlockPin004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, UnlockPin(_, _, _))
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1087,11 +1089,12 @@ HWTEST_F(CoreServiceClientTest, UnlockPin005, Function | MediumTest | Level1)
     EXPECT_TRUE(response.result == UNLOCK_INCORRECT);
     EXPECT_TRUE(response.remain == 123);
 }
+
 HWTEST_F(CoreServiceClientTest, UnlockPin006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, UnlockPin(_, _, _))
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1110,9 +1113,9 @@ HWTEST_F(CoreServiceClientTest, UnlockPin006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin(_, _, _))
-        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, UnlockPin(_, _, _))
+        .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1140,7 +1143,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1152,7 +1155,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1162,10 +1165,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1181,10 +1184,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1204,10 +1207,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1226,10 +1229,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1257,7 +1260,7 @@ HWTEST_F(CoreServiceClientTest, AlterPin002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1269,20 +1272,20 @@ HWTEST_F(CoreServiceClientTest, AlterPin003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
     int32_t ret = client->AlterPin(0, u"", u"", response, 0);
     EXPECT_TRUE(ret == TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    }
+}
 
 HWTEST_F(CoreServiceClientTest, AlterPin004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1298,10 +1301,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1321,10 +1324,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1343,10 +1346,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1374,7 +1377,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1386,7 +1389,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1396,10 +1399,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin2004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin2(_, _, _))
+    EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1415,10 +1418,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin2005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin2(_, _, _))
+    EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1438,10 +1441,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin2006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin2(_, _, _))
+    EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1460,10 +1463,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPin2006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPin2007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPin2(_, _, _))
+    EXPECT_CALL(*proxy, UnlockPin2(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &pin2,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1491,7 +1494,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1503,7 +1506,7 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1513,10 +1516,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk2004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk2(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1532,10 +1535,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk2005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk2(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1555,10 +1558,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk2006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk2(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1577,10 +1580,10 @@ HWTEST_F(CoreServiceClientTest, UnlockPuk2006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, UnlockPuk2007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, UnlockPuk2(_, _, _, _))
+    EXPECT_CALL(*proxy, UnlockPuk2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1608,7 +1611,7 @@ HWTEST_F(CoreServiceClientTest, AlterPin2002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1620,7 +1623,7 @@ HWTEST_F(CoreServiceClientTest, AlterPin2003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1630,10 +1633,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin2003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin2004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin2(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1649,10 +1652,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin2004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin2005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin2(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1672,10 +1675,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin2005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin2006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin2(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1694,10 +1697,10 @@ HWTEST_F(CoreServiceClientTest, AlterPin2006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, AlterPin2007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, AlterPin2(_, _, _, _))
+    EXPECT_CALL(*proxy, AlterPin2(_, _, _, _))
         .WillOnce(Invoke([](int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1726,7 +1729,7 @@ HWTEST_F(CoreServiceClientTest, SetLockState002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1739,7 +1742,7 @@ HWTEST_F(CoreServiceClientTest, SetLockState003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1750,10 +1753,10 @@ HWTEST_F(CoreServiceClientTest, SetLockState003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, SetLockState004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, SetLockState(_, _, _))
+    EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1770,10 +1773,10 @@ HWTEST_F(CoreServiceClientTest, SetLockState004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, SetLockState005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, SetLockState(_, _, _))
+    EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1794,10 +1797,10 @@ HWTEST_F(CoreServiceClientTest, SetLockState005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, SetLockState006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, SetLockState(_, _, _))
+    EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1817,10 +1820,10 @@ HWTEST_F(CoreServiceClientTest, SetLockState006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, SetLockState007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, SetLockState(_, _, _))
+    EXPECT_CALL(*proxy, SetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, const LockInfo &options,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockStatusResponse response;
@@ -1849,7 +1852,7 @@ HWTEST_F(CoreServiceClientTest, GetLockState002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     LockState lockState;
@@ -1861,7 +1864,7 @@ HWTEST_F(CoreServiceClientTest, GetLockState003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
+                            const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockState lockState;
@@ -1871,10 +1874,10 @@ HWTEST_F(CoreServiceClientTest, GetLockState003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetLockState004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetLockState(_, _, _))
+    EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1890,10 +1893,10 @@ HWTEST_F(CoreServiceClientTest, GetLockState004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetLockState005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetLockState(_, _, _))
+    EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -1911,10 +1914,10 @@ HWTEST_F(CoreServiceClientTest, GetLockState005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetLockState006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetLockState(_, _, _))
+    EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             // Wrong but still testable value
             MessageParcel data;
             MessageParcel reply;
@@ -1928,15 +1931,15 @@ HWTEST_F(CoreServiceClientTest, GetLockState006, Function | MediumTest | Level1)
     LockState lockState;
     int32_t ret = client->GetLockState(0, LockType::PIN_LOCK, lockState, 1000);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
-    EXPECT_TRUE(static_cast(lockState) == 999);
+    EXPECT_TRUE(static_cast<int>(lockState) == 999);
 }
 
 HWTEST_F(CoreServiceClientTest, GetLockState007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetLockState(_, _, _))
+    EXPECT_CALL(*proxy, GetLockState(_, _, _))
         .WillOnce(Invoke([](int32_t slotId, LockType lockType,
-                            const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+                            const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     LockState lockState;
@@ -1963,7 +1966,7 @@ HWTEST_F(CoreServiceClientTest, HasSimCard001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, HasSimCard002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     bool hasSim = false;
@@ -1974,7 +1977,7 @@ HWTEST_F(CoreServiceClientTest, HasSimCard002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, HasSimCard003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     bool hasSim = false;
@@ -1984,9 +1987,9 @@ HWTEST_F(CoreServiceClientTest, HasSimCard003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, HasSimCard004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, HasSimCard(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2002,9 +2005,9 @@ HWTEST_F(CoreServiceClientTest, HasSimCard004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, HasSimCard005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, HasSimCard(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2022,9 +2025,9 @@ HWTEST_F(CoreServiceClientTest, HasSimCard005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, HasSimCard006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, HasSimCard(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2042,9 +2045,9 @@ HWTEST_F(CoreServiceClientTest, HasSimCard006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, HasSimCard007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, HasSimCard(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, HasSimCard(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     bool hasSim = false;
@@ -2071,7 +2074,7 @@ HWTEST_F(CoreServiceClientTest, GetSimState001, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetSimState002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     SimState simState;
@@ -2082,7 +2085,7 @@ HWTEST_F(CoreServiceClientTest, GetSimState002, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceClientTest, GetSimState003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     SimState simState;
@@ -2092,9 +2095,9 @@ HWTEST_F(CoreServiceClientTest, GetSimState003, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetSimState004, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetSimState(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2110,9 +2113,9 @@ HWTEST_F(CoreServiceClientTest, GetSimState004, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetSimState005, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetSimState(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2130,9 +2133,9 @@ HWTEST_F(CoreServiceClientTest, GetSimState005, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetSimState006, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            sptr cb = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetSimState(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            sptr<RawParcelCallbackStub> cb = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             MessageParcel data;
             MessageParcel reply;
             MessageOption option;
@@ -2150,9 +2153,9 @@ HWTEST_F(CoreServiceClientTest, GetSimState006, Function | MediumTest | Level1)
 
 HWTEST_F(CoreServiceClientTest, GetSimState007, Function | MediumTest | Level1)
 {
-    EXPECT_CALL(proxy, GetSimState(_, _))
-        .WillOnce(Invoke([](int32_t slotId, const sptr &callback) {
-            savedCallback = static_cast<RawParcelCallbackStub>(callback.GetRefPtr());
+    EXPECT_CALL(*proxy, GetSimState(_, _))
+        .WillOnce(Invoke([](int32_t slotId, const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub*>(callback.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));
     SimState simState;
@@ -2179,7 +2182,7 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges001, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges002, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
             return ~TELEPHONY_ERR_SUCCESS;
         }));
     bool hasOp = true;
@@ -2190,7 +2193,7 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges002, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges003, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
             return TELEPHONY_ERR_SUCCESS;
         }));
     bool hasOp = true;
@@ -2201,8 +2204,8 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges003, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges004, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
-            sptr callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
+            sptr<RawParcelCallbackStub> callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
             MessageParcel data, reply;
             MessageOption option;
             data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
@@ -2218,8 +2221,8 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges004, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges005, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
-            sptr callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
+            sptr<RawParcelCallbackStub> callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
             MessageParcel data, reply;
             MessageOption option;
             data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
@@ -2237,8 +2240,8 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges005, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges006, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
-            sptr callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
+            sptr<RawParcelCallbackStub> callback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
             MessageParcel data, reply;
             MessageOption option;
             data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
@@ -2256,7 +2259,7 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges006, Function | MediumTest 
 HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges007, Function | MediumTest | Level1)
 {
     EXPECT_CALL(*proxy, HasOperatorPrivileges(_, _))
-        .WillOnce(Invoke([](int32_t, const sptr &cb) {
+        .WillOnce(Invoke([](int32_t, const sptr<IRawParcelCallback> &cb) {
             savedCallback = static_cast<RawParcelCallbackStub *>(cb.GetRefPtr());
             return TELEPHONY_ERR_SUCCESS;
         }));

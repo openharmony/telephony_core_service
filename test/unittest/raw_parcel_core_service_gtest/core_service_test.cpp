@@ -1,17 +1,19 @@
 /*
-
-Copyright (C) 2025 Huawei Device Co., Ltd.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+    * Copyright (C) 2025 Huawei Device Co., Ltd.
+    * Licensed under the Apache License, Version 2.0 (the "License");
+    * you may not use this file except in compliance with the License.
+    * You may obtain a copy of the License at
+    *
+    *     http://www.apache.org/licenses/LICENSE-2.0
+    *
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS,
+    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    * See the License for the specific language governing permissions and
+    * limitations under the License.
 */
-#include
+
+#include <thread>
 #include "mock_i_core_service.h"
 #include "core_service.h"
 #include "telephony_errors.h"
@@ -29,16 +31,16 @@ using namespace testing::ext;
 namespace {
 constexpr int64_t DELAY_TIME_MS = 10;
 constexpr int64_t WAIT_TIME_MS = 2 * DELAY_TIME_MS;
-std::shared_ptr coreService;
+std::shared_ptr<CoreService> coreService;
 
 MockSimManager *mockSimManager;
 MockINetworkSearch *mockNetworkSearchManager;
 MockTelRilManager *mockTelRilManager;
 
-std::shared_ptrAppExecFwk::EventHandler defaultHandler;
+std::shared_ptr<AppExecFwk::EventHandler> defaultHandler;
 bool runInCaller = true;
 
-sptr directCall = nullptr;
+sptr<IRawParcelCallback> directCall = nullptr;
 
 void RunInCaller(const std::function<void()> task)
 {
@@ -83,7 +85,7 @@ private:
 
 class DirectCallRawParcelCallback : public IRawParcelCallback {
 public:
-    sptr AsObject() override
+    sptr<IRemoteObject> AsObject() override
     {
         return nullptr;
     }
@@ -97,8 +99,8 @@ class CoreServiceTest : public testing::Test {
 public:
     static void SetUpTestCase()
     {
-        coreService = std::make_shared();
-        directCall = sptr::MakeSptr();
+        coreService = std::make_shared<MockCoreService>();
+        directCall = sptr<DirectCallRawParcelCallback>::MakeSptr();
 
         auto runner = AppExecFwk::EventRunner::Create("dt_defaultHandler", AppExecFwk::ThreadMode::FFRT);
         defaultHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
