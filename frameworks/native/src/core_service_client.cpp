@@ -289,13 +289,21 @@ int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     auto imeiSvTmp = std::make_shared<std::u16string>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [wp = std::weak_ptr<std::u16string>(imeiSvTmp)] (MessageParcel &data) {
-        auto srcImeiSv = wp.lock();
-        if (srcImeiSv) {
-            *srcImeiSv = data.ReadString16();
-        }
-    });
+        [wpImeiSv = std::weak_ptr<std::u16string>(imeiSvTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spImeiSv = wpImeiSv.lock();
+            int valid = spRet && spImeiSv;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spImeiSv = data.ReadString16();
+            }
+        });
     int ret = proxy->GetImeiSv(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
@@ -304,30 +312,89 @@ int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int
     ret = callback->WaitForResult(timeoutMs);
     if (!ret) {
         TELEPHONY_LOGE("GetImeiSv wait callback timeout");
-        return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    imeiSv = *imeiSvTmp;
-    return TELEPHONY_ERR_SUCCESS;
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        imeiSv = *imeiSvTmp;
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard)
+int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->HasSimCard(slotId, hasSimCard);
+    auto hasSimCardTmp = std::make_shared<bool>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpHasSim = std::weak_ptr<bool>(hasSimCardTmp), wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spHasSim = wpHasSim.lock();
+            int valid = spRet && spHasSim;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spHasSim = data.ReadBool();
+            }
+        });
+    int ret = proxy->HasSimCard(slotId, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("HasSimCard wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        hasSimCard = *hasSimCardTmp;
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::GetSimState(int32_t slotId, SimState &simState)
+int32_t CoreServiceClient::GetSimState(int32_t slotId, SimState &simState, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetSimState(slotId, simState);
+    auto simStateTmp = std::make_shared<int32_t>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpSimState = std::weak_ptr<int32_t>(simStateTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spSimState = wpSimState.lock();
+            int valid = spRet && spSimState;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spSimState = data.ReadInt32();
+            }
+        });
+    int ret = proxy->GetSimState(slotId, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("GetSimState wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        simState = static_cast<SimState>(*simStateTmp);
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetDsdsMode(int32_t &dsdsMode)
@@ -391,24 +458,70 @@ int32_t CoreServiceClient::GetIMSI(int32_t slotId, std::u16string &imsi)
     return proxy->GetIMSI(slotId, imsi);
 }
 
-int32_t CoreServiceClient::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+int32_t CoreServiceClient::IsCTSimCard(int32_t slotId, bool &isCTSimCard, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->IsCTSimCard(slotId, isCTSimCard);
+    auto isCTsimCardTmp = std::make_shared<bool>(false);
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpIsCT = std::weak_ptr<bool>(isCTsimCardTmp), wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spCT = wpIsCT.lock();
+            int valid = spRet && spCT;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spCT = data.ReadBool();
+            }
+        });
+    int ret = proxy->IsCTSimCard(slotId, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("IsCTSimCard wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        isCTSimCard = *isCTsimCardTmp;
+    }
+    return *result;
 }
 
-bool CoreServiceClient::IsSimActive(int32_t slotId)
+bool CoreServiceClient::IsSimActive(int32_t slotId, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return false;
     }
-    return proxy->IsSimActive(slotId);
+    auto result = std::make_shared<bool>(false);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpRet = std::weak_ptr<bool>(result)] (MessageParcel &data) {
+            auto spActive = wpRet.lock();
+            if (spActive) {
+                *spActive = data.ReadBool();
+            }
+        });
+    bool ret = proxy->IsSimActive(slotId, callback);
+    if (!ret) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("IsSimActive wait callback timeout");
+        return false;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetSlotId(int32_t simId)
@@ -544,24 +657,68 @@ int32_t CoreServiceClient::GetDefaultVoiceSlotId()
     return proxy->GetDefaultVoiceSlotId();
 }
 
-int32_t CoreServiceClient::GetDefaultVoiceSimId(int32_t &simId)
+int32_t CoreServiceClient::GetDefaultVoiceSimId(int32_t &simId, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetDefaultVoiceSimId(simId);
+    auto simIdTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpSimId = std::weak_ptr<int>(simIdTmp), wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spSimId = wpSimId.lock();
+            int valid = spRet && spSimId;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spSimId = data.ReadInt32();
+            }
+        });
+    int ret = proxy->GetDefaultVoiceSimId(callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("GetDefaultVoiceSimId wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        simId = *simIdTmp;
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::SetShowNumber(int32_t slotId, const std::u16string &number)
+int32_t CoreServiceClient::SetShowNumber(int32_t slotId, const std::u16string &number, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetShowNumber(slotId, number);
+    auto result = std::make_shared<int>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpRet = std::weak_ptr<int>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            if (spRet) {
+                *spRet = data.ReadInt32();
+            }
+        });
+    int ret = proxy->SetShowNumber(slotId, number, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("SetShowNumber wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNumber, int64_t timeoutMs)
@@ -572,13 +729,21 @@ int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNum
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     auto showNumTmp = std::make_shared<std::u16string>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [wp = std::weak_ptr<std::u16string>(showNumTmp)] (MessageParcel &data) {
-        auto srcNum = wp.lock();
-        if (srcNum) {
-            *srcNum = data.ReadString16();
-        }
-    });
+        [wpNum = std::weak_ptr<std::u16string>(showNumTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spNum = wpNum.lock();
+            int valid = spRet && spNum;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spNum = data.ReadString16();
+            }
+        });
     int ret = proxy->GetShowNumber(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         return ret;
@@ -586,20 +751,39 @@ int32_t CoreServiceClient::GetShowNumber(int32_t slotId, std::u16string &showNum
     ret = callback->WaitForResult(timeoutMs);
     if (!ret) {
         TELEPHONY_LOGE("GetShowNumber wait callback timeout");
-        return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    showNumber = *showNumTmp;
-    return TELEPHONY_ERR_SUCCESS;
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        showNumber = *showNumTmp;
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::SetShowName(int32_t slotId, const std::u16string &name)
+int32_t CoreServiceClient::SetShowName(int32_t slotId, const std::u16string &name, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetShowName(slotId, name);
+    auto result = std::make_shared<int>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpRet = std::weak_ptr<int>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            if (spRet) {
+                *spRet = data.ReadInt32();
+            }
+        });
+    int ret = proxy->SetShowName(slotId, name, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("SetShowName wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName, int64_t timeoutMs)
@@ -610,13 +794,21 @@ int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName,
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     auto showNameTmp = std::make_shared<std::u16string>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [wp = std::weak_ptr<std::u16string>(showNameTmp)] (MessageParcel &data) {
-        auto srcName = wp.lock();
-        if (srcName) {
-            *srcName = data.ReadString16();
-        }
-    });
+        [wpName = std::weak_ptr<std::u16string>(showNameTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spName = wpName.lock();
+            int valid = spRet && spName;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spName = data.ReadString16();
+            }
+        });
     int ret = proxy->GetShowName(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
@@ -625,10 +817,12 @@ int32_t CoreServiceClient::GetShowName(int32_t slotId, std::u16string &showName,
     ret = callback->WaitForResult(timeoutMs);
     if (!ret) {
         TELEPHONY_LOGE("GetShowName wait callback timeout");
-        return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    showName = *showNameTmp;
-    return TELEPHONY_ERR_SUCCESS;
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        showName = *showNameTmp;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
@@ -651,88 +845,364 @@ int32_t CoreServiceClient::GetOperatorConfigs(int32_t slotId, OperatorConfig &po
     return proxy->GetOperatorConfigs(slotId, poc);
 }
 
-int32_t CoreServiceClient::UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response)
+int32_t CoreServiceClient::UnlockPin(int32_t slotId, const std::u16string &pin,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->UnlockPin(slotId, pin, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto rpRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = rpRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *rpRet = data.ReadInt32();
+            if (*rpRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->UnlockPin(slotId, pin, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("UnlockPin wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::UnlockPuk(
-    int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response)
+int32_t CoreServiceClient::UnlockPuk(int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->UnlockPuk(slotId, newPin, puk, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = spRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->UnlockPuk(slotId, newPin, puk, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("UnlockPuk wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::AlterPin(
-    int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response)
+int32_t CoreServiceClient::AlterPin(int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->AlterPin(slotId, newPin, oldPin, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = spRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->AlterPin(slotId, newPin, oldPin, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("AlterPin wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response)
+int32_t CoreServiceClient::UnlockPin2(int32_t slotId, const std::u16string &pin2,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->UnlockPin2(slotId, pin2, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = spRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->UnlockPin2(slotId, pin2, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("UnlockPin2 wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::UnlockPuk2(
-    int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response)
+int32_t CoreServiceClient::UnlockPuk2(int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->UnlockPuk2(slotId, newPin2, puk2, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = spRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->UnlockPuk2(slotId, newPin2, puk2, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("UnlockPuk2 wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::AlterPin2(
-    int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response)
+int32_t CoreServiceClient::AlterPin2(int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->AlterPin2(slotId, newPin2, oldPin2, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spResult = wpResult.lock();
+            auto spReMain = wpReMain.lock();
+            int valid = spRet && spResult && spReMain;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spResult = data.ReadInt32();
+                *spReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->AlterPin2(slotId, newPin2, oldPin2, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("AlterPin2 wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
+int32_t CoreServiceClient::SetLockState(int32_t slotId, const LockInfo &options,
+    LockStatusResponse &response, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->SetLockState(slotId, options, response);
+    auto resultTmp = std::make_shared<int>();
+    auto reMainTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpResult = std::weak_ptr<int>(resultTmp), wpReMain = std::weak_ptr<int>(reMainTmp),
+            wp = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto resultTmp = wp.lock();
+            auto srcResult = wpResult.lock();
+            auto srcReMain = wpReMain.lock();
+            int valid = resultTmp && srcResult && srcReMain;
+            if (!valid) {
+                return;
+            }
+            *resultTmp = data.ReadInt32();
+            if (*srcResult == TELEPHONY_ERR_SUCCESS) {
+                *srcResult = data.ReadInt32();
+                *srcReMain = data.ReadInt32();
+            }
+        });
+    int ret = proxy->SetLockState(slotId, options, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("SetLockState wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        response.result = *resultTmp;
+        if (response.result == UNLOCK_INCORRECT) {
+            response.remain = *reMainTmp;
+        }
+    }
+    return *result;
 }
 
-int32_t CoreServiceClient::GetLockState(int32_t slotId, LockType lockType, LockState &lockState)
+int32_t CoreServiceClient::GetLockState(int32_t slotId, LockType lockType, LockState &lockState, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->GetLockState(slotId, lockType, lockState);
+    auto lockStateTmp = std::make_shared<int>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpLockState = std::weak_ptr<int>(lockStateTmp), wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spLockState = wpLockState.lock();
+            int valid = spRet && spLockState;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spLockState = data.ReadInt32();
+            }
+        });
+    int ret = proxy->GetLockState(slotId, lockType, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("GetLockState wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        lockState = static_cast<LockState>(*lockStateTmp);
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::RefreshSimState(int32_t slotId)
@@ -1023,14 +1493,42 @@ int32_t CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lo
     return proxy->UnlockSimLock(slotId, lockInfo, response);
 }
 
-int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
+int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges, int64_t timeoutMs)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return proxy->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
+    auto hasOpPriTmp = std::make_shared<bool>(false);
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
+        [wpHasOp = std::weak_ptr<bool>(hasOpPriTmp), wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spHasOp = wpHasOp.lock();
+            int valid = spRet && spHasOp;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spHasOp = data.ReadBool();
+            }
+        });
+    int ret = proxy->HasOperatorPrivileges(slotId, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("HasOperatorPrivileges wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        hasOperatorPrivileges = *hasOpPriTmp;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::SimAuthentication(
