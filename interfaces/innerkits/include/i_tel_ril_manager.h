@@ -28,6 +28,7 @@ namespace Telephony {
 class ITelRilManager {
 public:
     virtual bool OnInit() = 0;
+    virtual bool DeInit() = 0;
     virtual ~ITelRilManager() = default;
 
     virtual int32_t RegisterCoreNotify(
