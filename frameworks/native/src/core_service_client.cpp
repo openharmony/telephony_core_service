@@ -249,14 +249,22 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
         TELEPHONY_LOGE("proxy is null!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    auto imeiTmp = std::make_shared<std::u16string>();
+    auto imeiTmp = std::make_shared<std::u16string>(u"");
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     auto callback = sptr<RawParcelCallbackStub>::MakeSptr(
-        [wp = std::weak_ptr<std::u16string>(imeiTmp)] (MessageParcel &data) {
-        auto srcImei = wp.lock();
-        if (srcImei) {
-            *srcImei = data.ReadString16();
-        }
-    });
+        [wpImei = std::weak_ptr<std::u16string>(imeiTmp),
+            wpRet = std::weak_ptr<int32_t>(result)] (MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spImei = wpImei.lock();
+            int valid = spRet && spImei;
+            if (!valid) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                *spImei = data.ReadString16();
+            }
+        });
     int ret = proxy->GetImei(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
@@ -265,10 +273,12 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
     ret = callback->WaitForResult(timeoutMs);
     if ((!ret)) {
         TELEPHONY_LOGE("GetImei wait callback timeout");
-        return TELEPHONY_ERR_RAW_PARCEL_CALLBACK_TIMEOUT;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    imei = *imeiTmp;
-    return TELEPHONY_ERR_SUCCESS;
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        imei = *imeiTmp;
+    }
+    return *result;
 }
 
 int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int64_t timeoutMs)
