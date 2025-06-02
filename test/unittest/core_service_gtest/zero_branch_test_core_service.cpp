@@ -71,7 +71,8 @@ void CoreServiceBranchTest::TearDownTestCase()
         g_simManagerPtr->multiSimMonitor_->remainCount_ = 0;
         sleep(SLEEP_TIME_SECONDS);
     }
-    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    auto telRilManager = std::static_pointer_cast<telRilManager>(
+        DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr) {
         return;
     }

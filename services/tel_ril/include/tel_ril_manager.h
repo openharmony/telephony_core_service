@@ -38,7 +38,7 @@ public:
     ~TelRilManager() override = default;
 
     bool OnInit() override;
-    bool DeInit();
+    bool DeInit() override;
 
     int32_t RegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what, int32_t *obj) override;

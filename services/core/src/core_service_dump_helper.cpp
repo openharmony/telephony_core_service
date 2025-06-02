@@ -19,6 +19,7 @@
 #include "enum_convert.h"
 #include "signal_info.h"
 #include "signal_information.h"
+#include "core_manager_inner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -71,12 +72,12 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
 {
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         bool hasSimCard = false;
-        DelayedSingleton<CoreService>::GetInstance()->HasSimCard(i, hasSimCard);
+        CoreManagerInner::GetInstance().HasSimCard(i, hasSimCard);
         if (hasSimCard) {
             result.append("SlotId = ");
             result.append(std::to_string(i));
             result.append("\nIsSimActive = ");
-            result.append(GetBoolValue(DelayedSingleton<CoreService>::GetInstance()->IsSimActive(i)));
+            result.append(GetBoolValue(CoreManagerInner::GetInstance().IsSimActive(i)));
             result.append("\nIsNrSupported = ");
             result.append(GetBoolValue(DelayedSingleton<CoreService>::GetInstance()->IsNrSupported(i)));
             result.append("\nSignalLevel = ");
@@ -91,7 +92,7 @@ void CoreServiceDumpHelper::ShowCoreServiceInfo(std::string &result) const
             result.append(GetCardType(static_cast<int32_t>(cardType)));
             result.append("\nSimState = ");
             SimState simState = SimState::SIM_STATE_UNKNOWN;
-            DelayedSingleton<CoreService>::GetInstance()->GetSimState(i, simState);
+            CoreManagerInner::GetInstance().GetSimState(i, simState);
             result.append(GetSimState(static_cast<int32_t>(simState)));
             result.append("\nSpn = ");
             std::u16string spn;

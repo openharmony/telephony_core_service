@@ -147,7 +147,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetNetworkState(data, size);
     GetISOCountryCodeForSim(data, size);
     SendTerminalResponseCmd(data, size);
-    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    auto telRilManager = std::static_pointer_cast<telRilManager>(
+        DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
     }
