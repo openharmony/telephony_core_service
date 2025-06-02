@@ -23,7 +23,7 @@ namespace Telephony {
 
 class SimManager : public testing::NiceMock<MockSimManager>, public std::enable_shared_from_this<SimManager> {
 public:
-    explicit SimManager(std::shared_ptr telRilManager)
+    explicit SimManager(std::shared_ptr<ITelRilManager> telRilManager)
     {
         testing::Mock::AllowLeak(this);
     }
