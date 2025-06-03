@@ -31,6 +31,7 @@ using namespace testing::ext;
 namespace {
 constexpr int64_t DELAY_TIME_MS = 10;
 constexpr int64_t WAIT_TIME_MS = 2 * DELAY_TIME_MS;
+constexpr int64_t DEFAULT_WAIT_TIME_MS = 1000;
 std::shared_ptr<CoreService> coreService;
 
 MockSimManager *mockSimManager;
@@ -107,7 +108,7 @@ public:
     }
     static void TearDownTestCase()
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME_MS));
     }
     void SetUp()
     {
@@ -124,7 +125,7 @@ public:
         coreService->telRilManager_ = telRilManager;
     }
     void TearDown()
-    {        
+    {
         coreService->simManager_ = nullptr;
         coreService->networkSearchManager_ = nullptr;
         coreService->telRilManager_ = nullptr;

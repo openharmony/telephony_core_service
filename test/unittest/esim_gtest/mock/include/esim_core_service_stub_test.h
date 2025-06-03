@@ -292,7 +292,8 @@ public:
         return 0;
     }
 
-    int32_t SetShowNumber(int32_t slotId, const std::u16string &number, const sptr<IRawParcelCallback> &callback) override
+    int32_t SetShowNumber(int32_t slotId, const std::u16string &number,
+        const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
