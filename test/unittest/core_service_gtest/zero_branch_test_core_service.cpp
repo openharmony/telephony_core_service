@@ -58,7 +58,8 @@ public:
 void CoreServiceBranchTest::SetUpTestCase()
 {
     DelayedSingleton<CoreService>::GetInstance()->Init();
-    auto iSimManager = DelayedSingleton<CoreService>::GetInstance()->simManager_;
+    auto iSimManager = std::static_pointer_cast<SimManager>(DelayedSingleton<CoreService>::
+        GetInstance()->simManager_);
     if (iSimManager == nullptr) {
         return;
     }
@@ -174,9 +175,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
 {
     SecurityToken token;
     bool hasSimCard = false;
-    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(SLOT_ID, hasSimCard);
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
+    DelayedSingleton<CoreService>::GetInstance()->HasSimCard(SLOT_ID, callback0);
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    DelayedSingleton<CoreService>::GetInstance()->GetSimState(SLOT_ID, simState);
+    DelayedSingleton<CoreService>::GetInstance()->GetSimState(SLOT_ID, callback0);
     CardType cardType = CardType::UNKNOWN_CARD;
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetCardType(SLOT_ID, cardType);
     std::u16string countryCode;
@@ -188,7 +190,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetSimOperatorNumeric(SLOT_ID, testU16Str);
     DelayedSingleton<CoreService>::GetInstance()->GetIMSI(SLOT_ID, testU16Str);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
-    DelayedSingleton<CoreService>::GetInstance()->IsSimActive(SLOT_ID);
+    DelayedSingleton<CoreService>::GetInstance()->IsSimActive(SLOT_ID, callback0);
     int32_t simId = 1;
     result = DelayedSingleton<CoreService>::GetInstance()->GetSlotId(simId);
     DelayedSingleton<CoreService>::GetInstance()->GetLocaleFromDefaultSim();
@@ -203,18 +205,18 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     result = DelayedSingleton<CoreService>::GetInstance()->GetSimAccountInfo(SLOT_ID, info);
     DelayedSingleton<CoreService>::GetInstance()->SetDefaultVoiceSlotId(SLOT_ID);
     DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSlotId();
-    DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSimId(simId);
+    DelayedSingleton<CoreService>::GetInstance()->GetDefaultVoiceSimId(callback0);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
     int32_t dsdsMode = 0;
     DelayedSingleton<CoreService>::GetInstance()->GetDsdsMode(dsdsMode);
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-    result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber);
+    result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber, callback0);
     auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(SLOT_ID, callback0);
     const std::u16string cardName = Str8ToStr16("SimNameZhang");
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
-    DelayedSingleton<CoreService>::GetInstance()->SetShowName(SLOT_ID, cardName);
+    DelayedSingleton<CoreService>::GetInstance()->SetShowName(SLOT_ID, cardName, callback0);
     DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, callback0);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
     DelayedSingleton<CoreService>::GetInstance()->GetActiveSimAccountInfoList(iccAccountInfoList);
@@ -248,7 +250,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_002, Function | Medium
     std::string authData = "1234";
     DelayedSingleton<CoreService>::GetInstance()->SimAuthentication(SLOT_ID, authType, authData, response);
     bool isCTSimCard = false;
-    DelayedSingleton<CoreService>::GetInstance()->IsCTSimCard(SLOT_ID, isCTSimCard);
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
+    DelayedSingleton<CoreService>::GetInstance()->IsCTSimCard(SLOT_ID, callback0);
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
 }
 

@@ -30,6 +30,8 @@
 #include "string_ex.h"
 #include "tel_profile_util.h"
 #include "telephony_ext_wrapper.h"
+#include "mock_i_raw_parcel_callback.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -45,7 +47,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    sptr<IRawParcelCallback> callback0;
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -60,16 +62,16 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<NetworkInformation> mNetworkInformation = nullptr;
     mCoreService->SetNetworkSelectionMode(0, 1, mNetworkInformation, true, callback);
     LockStatusResponse mLockStatusResponse;
-    EXPECT_NE(mCoreService->UnlockPin(0, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPuk(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->AlterPin(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPin2(0, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPuk2(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->AlterPin2(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPin(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPuk(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->AlterPin(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPin2(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPuk2(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->AlterPin2(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     LockInfo mLockInfo;
-    EXPECT_NE(mCoreService->SetLockState(0, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetLockState(0, mLockInfo, callback0), TELEPHONY_ERR_SUCCESS);
     LockState mLockState;
-    EXPECT_NE(mCoreService->GetLockState(0, LockType::PIN_LOCK, mLockState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetLockState(0, LockType::PIN_LOCK, callback0), TELEPHONY_ERR_SUCCESS);
     IccAccountInfo mIccAccountInfo;
     EXPECT_NE(mCoreService->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
@@ -77,9 +79,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     mCoreService->SetPrimarySlotId(INVALID_VALUE);
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
-    EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetShowNumber(0, callback0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->SetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetShowName(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetShowName(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
@@ -137,8 +139,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     int32_t radioTech = TELEPHONY_ERROR;
     EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetSimState(0, callback0), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
@@ -156,6 +159,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     std::string testStr = "";
     std::u16string testU16Str = u"";
     std::vector<sptr<SignalInformation>> mSignalInfoList = {};
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetSignalInfoList(0, mSignalInfoList), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
     EXPECT_NE(mCoreService->GetOperatorName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -176,10 +180,10 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetRadioState(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
-    EXPECT_FALSE(mCoreService->IsSimActive(0));
+    EXPECT_FALSE(mCoreService->IsSimActive(0, callback0));
     bool hasValue = false;
-    EXPECT_NE(mCoreService->HasSimCard(0, hasValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, hasValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasSimCard(0, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, callback0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -194,7 +198,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    sptr<IRawParcelCallback> callback0;
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -209,25 +213,25 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     sptr<NetworkInformation> mNetworkInformation = nullptr;
     mCoreService->SetNetworkSelectionMode(0, 1, mNetworkInformation, true, callback);
     LockStatusResponse mLockStatusResponse;
-    EXPECT_NE(mCoreService->UnlockPin(0, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPuk(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->AlterPin(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPin2(0, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->UnlockPuk2(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->AlterPin2(0, testU16Str, testU16Str, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPin(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPuk(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->AlterPin(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPin2(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->UnlockPuk2(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->AlterPin2(0, testU16Str, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     LockInfo mLockInfo;
-    EXPECT_NE(mCoreService->SetLockState(0, mLockInfo, mLockStatusResponse), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetLockState(0, mLockInfo, callback0), TELEPHONY_ERR_SUCCESS);
     LockState mLockState;
-    EXPECT_NE(mCoreService->GetLockState(0, LockType::PIN_LOCK, mLockState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetLockState(0, LockType::PIN_LOCK, callback0), TELEPHONY_ERR_SUCCESS);
     IccAccountInfo mIccAccountInfo;
     EXPECT_NE(mCoreService->GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetDefaultVoiceSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetDefaultVoiceSlotId(), TELEPHONY_ERR_SUCCESS);
     mCoreService->GetPreferredNetwork(0, callback);
     mCoreService->SetPreferredNetwork(0, 1, callback);
-    EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetShowNumber(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetShowNumber(0, callback0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->SetShowName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->SetShowName(0, testU16Str, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetShowName(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->SetActiveSim(0, 1), TELEPHONY_ERR_SUCCESS);
@@ -297,8 +301,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     int32_t radioTech = TELEPHONY_ERROR;
     EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
     SimState simState = SimState::SIM_STATE_UNKNOWN;
-    EXPECT_NE(mCoreService->GetSimState(0, simState), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetSimState(0, callback0), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
@@ -339,10 +344,11 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0700, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetRadioState(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
-    EXPECT_FALSE(mCoreService->IsSimActive(0));
+    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    EXPECT_FALSE(mCoreService->IsSimActive(0, callback0));
     bool hasValue = false;
-    EXPECT_NE(mCoreService->HasSimCard(0, hasValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, hasValue), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasSimCard(0, callback0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->HasOperatorPrivileges(0, callback0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
