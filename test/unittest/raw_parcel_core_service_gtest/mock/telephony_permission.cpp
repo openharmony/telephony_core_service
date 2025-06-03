@@ -20,34 +20,34 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-std::set<std::string> permissionNames;
-bool isSystemApp = false;
+std::set<std::string> g_permissionNames;
+bool g_isSystemApp = false;
 }
 
 TelephonyPermissionTestHelper::TelephonyPermissionTestHelper(bool isSystem)
 {
-    isSystemApp = isSystem;
-    permissionNames.clear();
+    g_isSystemApp = isSystem;
+    g_permissionNames.clear();
 }
 TelephonyPermissionTestHelper &TelephonyPermissionTestHelper::GrantPermission(const std::string &permissionName)
 {
-    permissionNames.insert(permissionName);
+    g_permissionNames.insert(permissionName);
     return *this;
 }
 TelephonyPermissionTestHelper::~TelephonyPermissionTestHelper()
 {
-    isSystemApp = false;
-    permissionNames.clear();
+    g_isSystemApp = false;
+    g_permissionNames.clear();
 }
 
 bool TelephonyPermission::CheckPermission(const std::string &permissionName)
 {
-    return permissionNames.count(permissionName) != 0;
+    return g_permissionNames.count(permissionName) != 0;
 }
 
 bool TelephonyPermission::CheckCallerIsSystemApp()
 {
-    return isSystemApp;
+    return g_isSystemApp;
 }
 } // namespace Telephony
 } // namespace OHOS

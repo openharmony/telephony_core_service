@@ -32,16 +32,16 @@ namespace {
 constexpr int64_t DELAY_TIME_MS = 10;
 constexpr int64_t WAIT_TIME_MS = 2 * DELAY_TIME_MS;
 constexpr int64_t DEFAULT_WAIT_TIME_MS = 1000;
-std::shared_ptr<CoreService> coreService;
+std::shared_ptr<CoreService> g_coreService;
 
-MockSimManager *mockSimManager;
-MockINetworkSearch *mockNetworkSearchManager;
-MockTelRilManager *mockTelRilManager;
+MockSimManager *g_mockSimManager;
+MockINetworkSearch *g_mockNetworkSearchManager;
+MockTelRilManager *g_mockTelRilManager;
 
-std::shared_ptr<AppExecFwk::EventHandler> defaultHandler;
-bool runInCaller = true;
+std::shared_ptr<AppExecFwk::EventHandler> g_defaultHandler;
+bool g_runInCaller = true;
 
-sptr<IRawParcelCallback> directCall = nullptr;
+sptr<IRawParcelCallback> g_directCall = nullptr;
 
 void RunInCaller(const std::function<void()> task)
 {
@@ -49,11 +49,11 @@ void RunInCaller(const std::function<void()> task)
 }
 void RunInHandler(const std::function<void()> task, int64_t delayed)
 {
-    defaultHandler->PostTask(task, "", delayed);
+    g_defaultHandler->PostTask(task, "", delayed);
 }
 void AsyncRun(const std::function<void()> task)
 {
-    if (runInCaller) {
+    if (g_runInCaller) {
         RunInCaller(task);
         return;
     }
@@ -61,11 +61,11 @@ void AsyncRun(const std::function<void()> task)
 }
 void SetRunInCaller()
 {
-    runInCaller = true;
+    g_runInCaller = true;
 }
 void SetDelayRunInHandler()
 {
-    runInCaller = false;
+    g_runInCaller = false;
 }
 
 class MockCoreService : public CoreService {
@@ -100,11 +100,11 @@ class CoreServiceTest : public testing::Test {
 public:
     static void SetUpTestCase()
     {
-        coreService = std::make_shared<MockCoreService>();
-        directCall = sptr<DirectCallRawParcelCallback>::MakeSptr();
+        g_coreService = std::make_shared<MockCoreService>();
+        g_directCall = sptr<DirectCallRawParcelCallback>::MakeSptr();
 
         auto runner = AppExecFwk::EventRunner::Create("dt_defaultHandler", AppExecFwk::ThreadMode::FFRT);
-        defaultHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+        g_defaultHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
     static void TearDownTestCase()
     {
@@ -116,19 +116,19 @@ public:
         auto networkSearchManager = std::make_shared<NetworkSearchManager>(nullptr, nullptr);
         auto telRilManager = std::make_shared<TelRilManager>();
 
-        mockSimManager = std::static_pointer_cast<MockSimManager>(simManager).get();
-        mockNetworkSearchManager = std::static_pointer_cast<MockINetworkSearch>(networkSearchManager).get();
-        mockTelRilManager = std::static_pointer_cast<MockTelRilManager>(telRilManager).get();
+        g_mockSimManager = std::static_pointer_cast<MockSimManager>(simManager).get();
+        g_mockNetworkSearchManager = std::static_pointer_cast<MockINetworkSearch>(networkSearchManager).get();
+        g_mockTelRilManager = std::static_pointer_cast<MockTelRilManager>(telRilManager).get();
         
-        coreService->simManager_ = simManager;
-        coreService->networkSearchManager_ = networkSearchManager;
-        coreService->telRilManager_ = telRilManager;
+        g_coreService->simManager_ = simManager;
+        g_coreService->networkSearchManager_ = networkSearchManager;
+        g_coreService->telRilManager_ = telRilManager;
     }
     void TearDown()
     {
-        coreService->simManager_ = nullptr;
-        coreService->networkSearchManager_ = nullptr;
-        coreService->telRilManager_ = nullptr;
+        g_coreService->simManager_ = nullptr;
+        g_coreService->networkSearchManager_ = nullptr;
+        g_coreService->telRilManager_ = nullptr;
     }
 };
 
@@ -136,14 +136,14 @@ public:
 HWTEST_F(CoreServiceTest, GetImei001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->GetImei(0, nullptr);
+    int32_t ret = g_coreService->GetImei(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, GetImei002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->GetImei(0, nullptr);
+    int32_t ret = g_coreService->GetImei(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -151,8 +151,8 @@ HWTEST_F(CoreServiceTest, GetImei003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    coreService->networkSearchManager_ = nullptr;
-    int32_t ret = coreService->GetImei(0, nullptr);
+    g_coreService->networkSearchManager_ = nullptr;
+    int32_t ret = g_coreService->GetImei(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -160,7 +160,7 @@ HWTEST_F(CoreServiceTest, GetImei004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    int32_t ret = coreService->GetImei(0, nullptr);
+    int32_t ret = g_coreService->GetImei(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -169,8 +169,8 @@ HWTEST_F(CoreServiceTest, GetImei005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetImei(0, directCall);
-    coreService->networkSearchManager_ = nullptr;
+    int32_t ret = g_coreService->GetImei(0, g_directCall);
+    g_coreService->networkSearchManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -180,9 +180,9 @@ HWTEST_F(CoreServiceTest, GetImei006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockNetworkSearchManager, GetImei(_, _))
+    EXPECT_CALL(*g_mockNetworkSearchManager, GetImei(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetImei(0, directCall);
+    int32_t ret = g_coreService->GetImei(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -190,14 +190,14 @@ HWTEST_F(CoreServiceTest, GetImei006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, GetImeiSv001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->GetImeiSv(0, nullptr);
+    int32_t ret = g_coreService->GetImeiSv(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, GetImeiSv002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->GetImeiSv(0, nullptr);
+    int32_t ret = g_coreService->GetImeiSv(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -205,8 +205,8 @@ HWTEST_F(CoreServiceTest, GetImeiSv003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    coreService->networkSearchManager_ = nullptr;
-    int32_t ret = coreService->GetImeiSv(0, nullptr);
+    g_coreService->networkSearchManager_ = nullptr;
+    int32_t ret = g_coreService->GetImeiSv(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -214,7 +214,7 @@ HWTEST_F(CoreServiceTest, GetImeiSv004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    int32_t ret = coreService->GetImeiSv(0, nullptr);
+    int32_t ret = g_coreService->GetImeiSv(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -223,8 +223,8 @@ HWTEST_F(CoreServiceTest, GetImeiSv005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetImeiSv(0, directCall);
-    coreService->networkSearchManager_ = nullptr;
+    int32_t ret = g_coreService->GetImeiSv(0, g_directCall);
+    g_coreService->networkSearchManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -234,9 +234,9 @@ HWTEST_F(CoreServiceTest, GetImeiSv006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockNetworkSearchManager, GetImeiSv(_, _))
+    EXPECT_CALL(*g_mockNetworkSearchManager, GetImeiSv(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetImeiSv(0, directCall);
+    int32_t ret = g_coreService->GetImeiSv(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -244,22 +244,22 @@ HWTEST_F(CoreServiceTest, GetImeiSv006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, IsCTSimCard001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->IsCTSimCard(0, nullptr);
+    int32_t ret = g_coreService->IsCTSimCard(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, IsCTSimCard002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->IsCTSimCard(0, nullptr);
+    int32_t ret = g_coreService->IsCTSimCard(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, IsCTSimCard003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->IsCTSimCard(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->IsCTSimCard(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -267,8 +267,8 @@ HWTEST_F(CoreServiceTest, IsCTSimCard004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     SetDelayRunInHandler();
-    int32_t ret = coreService->IsCTSimCard(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->IsCTSimCard(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -277,31 +277,31 @@ HWTEST_F(CoreServiceTest, IsCTSimCard005, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, IsCTSimCard(_, _))
+    EXPECT_CALL(*g_mockSimManager, IsCTSimCard(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->IsCTSimCard(0, directCall);
+    int32_t ret = g_coreService->IsCTSimCard(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
 /**************************************************** IsSimActive ***************************************************/
 HWTEST_F(CoreServiceTest, IsSimActive001, Function | MediumTest | Level1)
 {
-    coreService->simManager_ = nullptr;
-    bool ret = coreService->IsSimActive(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    bool ret = g_coreService->IsSimActive(0, nullptr);
     EXPECT_FALSE(ret);
 }
 
 HWTEST_F(CoreServiceTest, IsSimActive002, Function | MediumTest | Level1)
 {
-    bool ret = coreService->IsSimActive(0, nullptr);
+    bool ret = g_coreService->IsSimActive(0, nullptr);
     EXPECT_FALSE(ret);
 }
 
 HWTEST_F(CoreServiceTest, IsSimActive003, Function | MediumTest | Level1)
 {
     SetDelayRunInHandler();
-    bool ret = coreService->IsSimActive(0, directCall);
-    coreService->simManager_ = nullptr;
+    bool ret = g_coreService->IsSimActive(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret);
 }
@@ -309,40 +309,40 @@ HWTEST_F(CoreServiceTest, IsSimActive003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, IsSimActive004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, IsSimActive(_))
+    EXPECT_CALL(*g_mockSimManager, IsSimActive(_))
         .WillOnce(Return(true));
-    bool ret = coreService->IsSimActive(0, directCall);
+    bool ret = g_coreService->IsSimActive(0, g_directCall);
     EXPECT_TRUE(ret);
 }
 
 HWTEST_F(CoreServiceTest, IsSimActive005, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, IsSimActive(_))
+    EXPECT_CALL(*g_mockSimManager, IsSimActive(_))
         .WillOnce(Return(false));
-    bool ret = coreService->IsSimActive(0, directCall);
+    bool ret = g_coreService->IsSimActive(0, g_directCall);
     EXPECT_TRUE(ret);
 }
 
 /************************************************* GetDefaultVoiceSimId *********************************************/
 HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId001, Function | MediumTest | Level1)
 {
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->GetDefaultVoiceSimId(nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetDefaultVoiceSimId(nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId002, Function | MediumTest | Level1)
 {
-    int32_t ret = coreService->GetDefaultVoiceSimId(nullptr);
+    int32_t ret = g_coreService->GetDefaultVoiceSimId(nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId003, Function | MediumTest | Level1)
 {
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetDefaultVoiceSimId(directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetDefaultVoiceSimId(g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -350,9 +350,9 @@ HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId003, Function | MediumTest | Level
 HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, GetDefaultVoiceSimId(_))
+    EXPECT_CALL(*g_mockSimManager, GetDefaultVoiceSimId(_))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetDefaultVoiceSimId(directCall);
+    int32_t ret = g_coreService->GetDefaultVoiceSimId(g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -360,14 +360,14 @@ HWTEST_F(CoreServiceTest, GetDefaultVoiceSimId004, Function | MediumTest | Level
 HWTEST_F(CoreServiceTest, GetShowNumber001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->GetShowNumber(0, nullptr);
+    int32_t ret = g_coreService->GetShowNumber(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, GetShowNumber002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->GetShowNumber(0, nullptr);
+    int32_t ret = g_coreService->GetShowNumber(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -375,8 +375,8 @@ HWTEST_F(CoreServiceTest, GetShowNumber003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->GetShowNumber(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetShowNumber(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -384,7 +384,7 @@ HWTEST_F(CoreServiceTest, GetShowNumber004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    int32_t ret = coreService->GetShowNumber(0, nullptr);
+    int32_t ret = g_coreService->GetShowNumber(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -393,8 +393,8 @@ HWTEST_F(CoreServiceTest, GetShowNumber005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetShowNumber(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetShowNumber(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -404,9 +404,9 @@ HWTEST_F(CoreServiceTest, GetShowNumber006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, GetShowNumber(_, _))
+    EXPECT_CALL(*g_mockSimManager, GetShowNumber(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetShowNumber(0, directCall);
+    int32_t ret = g_coreService->GetShowNumber(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -414,14 +414,14 @@ HWTEST_F(CoreServiceTest, GetShowNumber006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, SetShowNumber001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->SetShowNumber(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowNumber(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, SetShowNumber002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->SetShowNumber(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowNumber(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -429,8 +429,8 @@ HWTEST_F(CoreServiceTest, SetShowNumber003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->SetShowNumber(0, u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetShowNumber(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -438,7 +438,7 @@ HWTEST_F(CoreServiceTest, SetShowNumber004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->SetShowNumber(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowNumber(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -447,8 +447,8 @@ HWTEST_F(CoreServiceTest, SetShowNumber005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->SetShowNumber(0, u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetShowNumber(0, u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -458,9 +458,9 @@ HWTEST_F(CoreServiceTest, SetShowNumber006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, SetShowNumber(_, _))
+    EXPECT_CALL(*g_mockSimManager, SetShowNumber(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->SetShowNumber(0, u"", directCall);
+    int32_t ret = g_coreService->SetShowNumber(0, u"", g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -468,14 +468,14 @@ HWTEST_F(CoreServiceTest, SetShowNumber006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, SetShowName001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->SetShowName(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowName(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, SetShowName002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->SetShowName(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowName(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -483,8 +483,8 @@ HWTEST_F(CoreServiceTest, SetShowName003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->SetShowName(0, u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetShowName(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -492,7 +492,7 @@ HWTEST_F(CoreServiceTest, SetShowName004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->SetShowName(0, u"", nullptr);
+    int32_t ret = g_coreService->SetShowName(0, u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -501,8 +501,8 @@ HWTEST_F(CoreServiceTest, SetShowName005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->SetShowName(0, u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetShowName(0, u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -512,9 +512,9 @@ HWTEST_F(CoreServiceTest, SetShowName006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, SetShowName(_, _))
+    EXPECT_CALL(*g_mockSimManager, SetShowName(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->SetShowName(0, u"", directCall);
+    int32_t ret = g_coreService->SetShowName(0, u"", g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -522,14 +522,14 @@ HWTEST_F(CoreServiceTest, SetShowName006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, GetShowName001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->GetShowName(0, nullptr);
+    int32_t ret = g_coreService->GetShowName(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, GetShowName002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->GetShowName(0, nullptr);
+    int32_t ret = g_coreService->GetShowName(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -537,8 +537,8 @@ HWTEST_F(CoreServiceTest, GetShowName003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->GetShowName(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetShowName(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -546,7 +546,7 @@ HWTEST_F(CoreServiceTest, GetShowName004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    int32_t ret = coreService->GetShowName(0, nullptr);
+    int32_t ret = g_coreService->GetShowName(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -555,8 +555,8 @@ HWTEST_F(CoreServiceTest, GetShowName005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetShowName(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetShowName(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -566,11 +566,11 @@ HWTEST_F(CoreServiceTest, GetShowName006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, GetShowName(_, _))
+    EXPECT_CALL(*g_mockSimManager, GetShowName(_, _))
         .WillOnce(DoAll(
             Invoke([](int32_t, std::u16string &name) { name = u"TestName"; return TELEPHONY_ERR_SUCCESS; }),
             Return(TELEPHONY_ERR_SUCCESS)));
-    int32_t ret = coreService->GetShowName(0, directCall);
+    int32_t ret = g_coreService->GetShowName(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -578,14 +578,14 @@ HWTEST_F(CoreServiceTest, GetShowName006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, UnlockPin001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->UnlockPin(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, UnlockPin002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->UnlockPin(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -593,8 +593,8 @@ HWTEST_F(CoreServiceTest, UnlockPin003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->UnlockPin(0, u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPin(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -602,7 +602,7 @@ HWTEST_F(CoreServiceTest, UnlockPin004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->UnlockPin(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -611,8 +611,8 @@ HWTEST_F(CoreServiceTest, UnlockPin005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->UnlockPin(0, u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPin(0, u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
@@ -622,9 +622,9 @@ HWTEST_F(CoreServiceTest, UnlockPin006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, UnlockPin(_, _, _))
+    EXPECT_CALL(*g_mockSimManager, UnlockPin(_, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->UnlockPin(0, u"", directCall);
+    int32_t ret = g_coreService->UnlockPin(0, u"", g_directCall);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
@@ -632,14 +632,14 @@ HWTEST_F(CoreServiceTest, UnlockPin006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, UnlockPin2001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->UnlockPin2(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin2(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, UnlockPin2002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->UnlockPin2(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin2(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -647,8 +647,8 @@ HWTEST_F(CoreServiceTest, UnlockPin2003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->UnlockPin2(0, u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPin2(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -656,7 +656,7 @@ HWTEST_F(CoreServiceTest, UnlockPin2004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->UnlockPin2(0, u"", nullptr);
+    int32_t ret = g_coreService->UnlockPin2(0, u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -665,8 +665,8 @@ HWTEST_F(CoreServiceTest, UnlockPin2005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->UnlockPin2(0, u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPin2(0, u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
@@ -676,9 +676,9 @@ HWTEST_F(CoreServiceTest, UnlockPin2006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, UnlockPin2(_, _, _))
+    EXPECT_CALL(*g_mockSimManager, UnlockPin2(_, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->UnlockPin2(0, u"", directCall);
+    int32_t ret = g_coreService->UnlockPin2(0, u"", g_directCall);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
@@ -686,14 +686,14 @@ HWTEST_F(CoreServiceTest, UnlockPin2006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, UnlockPuk001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->UnlockPuk(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk(0, u"", u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, UnlockPuk002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->UnlockPuk(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk(0, u"", u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -701,8 +701,8 @@ HWTEST_F(CoreServiceTest, UnlockPuk003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->UnlockPuk(0, u"", u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPuk(0, u"", u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -710,7 +710,7 @@ HWTEST_F(CoreServiceTest, UnlockPuk004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->UnlockPuk(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk(0, u"", u"", nullptr);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -719,8 +719,8 @@ HWTEST_F(CoreServiceTest, UnlockPuk005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->UnlockPuk(0, u"", u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPuk(0, u"", u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
@@ -730,9 +730,9 @@ HWTEST_F(CoreServiceTest, UnlockPuk006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, UnlockPuk(_, _, _, _))
+    EXPECT_CALL(*g_mockSimManager, UnlockPuk(_, _, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->UnlockPuk(0, u"1234", u"5678", directCall);
+    int32_t ret = g_coreService->UnlockPuk(0, u"1234", u"5678", g_directCall);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
@@ -740,14 +740,14 @@ HWTEST_F(CoreServiceTest, UnlockPuk006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, UnlockPuk2001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, UnlockPuk2002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -755,8 +755,8 @@ HWTEST_F(CoreServiceTest, UnlockPuk2003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -764,7 +764,7 @@ HWTEST_F(CoreServiceTest, UnlockPuk2004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -773,8 +773,8 @@ HWTEST_F(CoreServiceTest, UnlockPuk2005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -784,9 +784,9 @@ HWTEST_F(CoreServiceTest, UnlockPuk2006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, UnlockPuk2(_, _, _, _))
+    EXPECT_CALL(*g_mockSimManager, UnlockPuk2(_, _, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->UnlockPuk2(0, u"", u"", directCall);
+    int32_t ret = g_coreService->UnlockPuk2(0, u"", u"", g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -794,14 +794,14 @@ HWTEST_F(CoreServiceTest, UnlockPuk2006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, AlterPin001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->AlterPin(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, AlterPin002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->AlterPin(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -809,8 +809,8 @@ HWTEST_F(CoreServiceTest, AlterPin003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->AlterPin(0, u"", u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -818,7 +818,7 @@ HWTEST_F(CoreServiceTest, AlterPin004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->AlterPin(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -827,8 +827,8 @@ HWTEST_F(CoreServiceTest, AlterPin005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->AlterPin(0, u"", u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -838,9 +838,9 @@ HWTEST_F(CoreServiceTest, AlterPin006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, AlterPin(_, _, _, _))
+    EXPECT_CALL(*g_mockSimManager, AlterPin(_, _, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->AlterPin(0, u"", u"", directCall);
+    int32_t ret = g_coreService->AlterPin(0, u"", u"", g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -848,14 +848,14 @@ HWTEST_F(CoreServiceTest, AlterPin006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, AlterPin2001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->AlterPin2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, AlterPin2002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->AlterPin2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -863,8 +863,8 @@ HWTEST_F(CoreServiceTest, AlterPin2003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->AlterPin2(0, u"", u"", nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -872,7 +872,7 @@ HWTEST_F(CoreServiceTest, AlterPin2004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    int32_t ret = coreService->AlterPin2(0, u"", u"", nullptr);
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -881,8 +881,8 @@ HWTEST_F(CoreServiceTest, AlterPin2005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->AlterPin2(0, u"", u"", directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -892,9 +892,9 @@ HWTEST_F(CoreServiceTest, AlterPin2006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, AlterPin2(_, _, _, _))
+    EXPECT_CALL(*g_mockSimManager, AlterPin2(_, _, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->AlterPin2(0, u"", u"", directCall);
+    int32_t ret = g_coreService->AlterPin2(0, u"", u"", g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -903,7 +903,7 @@ HWTEST_F(CoreServiceTest, SetLockState001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
     LockInfo options = {};
-    int32_t ret = coreService->SetLockState(0, options, nullptr);
+    int32_t ret = g_coreService->SetLockState(0, options, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -911,7 +911,7 @@ HWTEST_F(CoreServiceTest, SetLockState002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     LockInfo options = {};
-    int32_t ret = coreService->SetLockState(0, options, nullptr);
+    int32_t ret = g_coreService->SetLockState(0, options, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -919,9 +919,9 @@ HWTEST_F(CoreServiceTest, SetLockState003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
+    g_coreService->simManager_ = nullptr;
     LockInfo options = {};
-    int32_t ret = coreService->SetLockState(0, options, nullptr);
+    int32_t ret = g_coreService->SetLockState(0, options, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -930,7 +930,7 @@ HWTEST_F(CoreServiceTest, SetLockState004, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     LockInfo options = {};
-    int32_t ret = coreService->SetLockState(0, options, nullptr);
+    int32_t ret = g_coreService->SetLockState(0, options, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -940,8 +940,8 @@ HWTEST_F(CoreServiceTest, SetLockState005, Function | MediumTest | Level1)
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetDelayRunInHandler();
     LockInfo options = {};
-    int32_t ret = coreService->SetLockState(0, options, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetLockState(0, options, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -952,9 +952,9 @@ HWTEST_F(CoreServiceTest, SetLockState006, Function | MediumTest | Level1)
     helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
     SetRunInCaller();
     LockInfo options = {};
-    EXPECT_CALL(*mockSimManager, SetLockState(_, _, _))
+    EXPECT_CALL(*g_mockSimManager, SetLockState(_, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->SetLockState(0, options, directCall);
+    int32_t ret = g_coreService->SetLockState(0, options, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
@@ -962,14 +962,14 @@ HWTEST_F(CoreServiceTest, SetLockState006, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, GetLockState001, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(false);
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(CoreServiceTest, GetLockState002, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -977,8 +977,8 @@ HWTEST_F(CoreServiceTest, GetLockState003, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -986,7 +986,7 @@ HWTEST_F(CoreServiceTest, GetLockState004, Function | MediumTest | Level1)
 {
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -995,8 +995,8 @@ HWTEST_F(CoreServiceTest, GetLockState005, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -1006,31 +1006,31 @@ HWTEST_F(CoreServiceTest, GetLockState006, Function | MediumTest | Level1)
     TelephonyPermissionTestHelper helper(true);
     helper.GrantPermission(Permission::GET_TELEPHONY_STATE);
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, GetLockState(_, _, _))
+    EXPECT_CALL(*g_mockSimManager, GetLockState(_, _, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetLockState(0, LockType::PIN_LOCK, directCall);
+    int32_t ret = g_coreService->GetLockState(0, LockType::PIN_LOCK, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
 /***************************************************** HasSimCard ***************************************************/
 HWTEST_F(CoreServiceTest, HasSimCard001, Function | MediumTest | Level1)
 {
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->HasSimCard(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->HasSimCard(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, HasSimCard002, Function | MediumTest | Level1)
 {
-    int32_t ret = coreService->HasSimCard(0, nullptr);
+    int32_t ret = g_coreService->HasSimCard(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, HasSimCard003, Function | MediumTest | Level1)
 {
     SetDelayRunInHandler();
-    int32_t ret = coreService->HasSimCard(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->HasSimCard(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -1038,31 +1038,31 @@ HWTEST_F(CoreServiceTest, HasSimCard003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, HasSimCard004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, HasSimCard(_,_))
+    EXPECT_CALL(*g_mockSimManager, HasSimCard(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->HasSimCard(0, directCall);
+    int32_t ret = g_coreService->HasSimCard(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
 /***************************************************** GetSimState **************************************************/
 HWTEST_F(CoreServiceTest, GetSimState001, Function | MediumTest | Level1)
 {
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->GetSimState(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetSimState(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, GetSimState002, Function | MediumTest | Level1)
 {
-    int32_t ret = coreService->GetSimState(0, nullptr);
+    int32_t ret = g_coreService->GetSimState(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, GetSimState003, Function | MediumTest | Level1)
 {
     SetDelayRunInHandler();
-    int32_t ret = coreService->GetSimState(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->GetSimState(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -1070,31 +1070,31 @@ HWTEST_F(CoreServiceTest, GetSimState003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, GetSimState004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, GetSimState(_, _))
+    EXPECT_CALL(*g_mockSimManager, GetSimState(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->GetSimState(0, directCall);
+    int32_t ret = g_coreService->GetSimState(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 
 /************************************************* HasOperatorPrivileges ********************************************/
 HWTEST_F(CoreServiceTest, HasOperatorPrivileges001, Function | MediumTest | Level1)
 {
-    coreService->simManager_ = nullptr;
-    int32_t ret = coreService->HasOperatorPrivileges(0, nullptr);
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->HasOperatorPrivileges(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, HasOperatorPrivileges002, Function | MediumTest | Level1)
 {
-    int32_t ret = coreService->HasOperatorPrivileges(0, nullptr);
+    int32_t ret = g_coreService->HasOperatorPrivileges(0, nullptr);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(CoreServiceTest, HasOperatorPrivileges003, Function | MediumTest | Level1)
 {
     SetDelayRunInHandler();
-    int32_t ret = coreService->HasOperatorPrivileges(0, directCall);
-    coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->HasOperatorPrivileges(0, g_directCall);
+    g_coreService->simManager_ = nullptr;
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_MS));
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
@@ -1102,9 +1102,9 @@ HWTEST_F(CoreServiceTest, HasOperatorPrivileges003, Function | MediumTest | Leve
 HWTEST_F(CoreServiceTest, HasOperatorPrivileges004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, HasOperatorPrivileges(_, _))
+    EXPECT_CALL(*g_mockSimManager, HasOperatorPrivileges(_, _))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    int32_t ret = coreService->HasOperatorPrivileges(0, directCall);
+    int32_t ret = g_coreService->HasOperatorPrivileges(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
 }

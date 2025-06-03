@@ -20,7 +20,8 @@
 namespace OHOS {
 namespace Telephony {
 
-class NetworkSearchManager : public testing::NiceMock<MockINetworkSearch>, public std::enable_shared_from_this<NetworkSearchManager> {
+class NetworkSearchManager : public testing::NiceMock<MockINetworkSearch>,
+    public std::enable_shared_from_this<NetworkSearchManager> {
 public:
     virtual ~NetworkSearchManager() = default;
     NetworkSearchManager(std::shared_ptr<ITelRilManager> telRilManager, std::shared_ptr<ISimManager> simManager)
