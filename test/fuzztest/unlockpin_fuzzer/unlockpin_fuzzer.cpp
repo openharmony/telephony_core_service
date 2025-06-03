@@ -257,7 +257,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     DiallingNumbersGet(data, size);
     DelIccDiallingNumbers(data, size);
     UnlockSimLock(data, size);
-    auto telRilManager = std::static_pointer_cast<telRilManager>(
+    auto telRilManager = std::static_pointer_cast<TelRilManager>(
         DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
