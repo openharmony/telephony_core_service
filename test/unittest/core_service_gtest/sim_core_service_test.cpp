@@ -47,7 +47,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0100, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -139,7 +139,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     int32_t radioTech = TELEPHONY_ERROR;
     EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetSimState(0, callback0), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
@@ -158,7 +158,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     std::string testStr = "";
     std::u16string testU16Str = u"";
     std::vector<sptr<SignalInformation>> mSignalInfoList = {};
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetSignalInfoList(0, mSignalInfoList), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(mCoreService->GetOperatorNumeric(0), testU16Str);
     EXPECT_NE(mCoreService->GetOperatorName(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -197,7 +197,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0400, Function | MediumTest | Level3
     sptr<INetworkSearchCallback> callback = nullptr;
     mCoreService->SetRadioState(0, true, callback);
     std::u16string testU16Str = u"";
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     EXPECT_NE(mCoreService->GetImei(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetImeiSv(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMeid(0, testU16Str), TELEPHONY_ERR_SUCCESS);
@@ -300,7 +300,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     int32_t radioTech = TELEPHONY_ERROR;
     EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     EXPECT_NE(mCoreService->GetSimState(0, callback0), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
@@ -343,7 +343,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0700, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetRadioState(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetNetworkSelectionMode(0, callback), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mCoreService->IsNrSupported(0));
-    auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
+    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     EXPECT_FALSE(mCoreService->IsSimActive(0, callback0));
     bool hasValue = false;
     EXPECT_NE(mCoreService->HasSimCard(0, callback0), TELEPHONY_ERR_SUCCESS);
