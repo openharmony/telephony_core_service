@@ -80,7 +80,7 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
 bool NetworkSearchTest::HasSimCard(int32_t slotId)
 {
     bool hasSimCard = false;
-    CoreServiceClient::GetInstance.HasSimCard(slotId, hasSimCard);
+    CoreServiceClient::GetInstance().HasSimCard(slotId, hasSimCard);
     return hasSimCard;
 }
 
