@@ -58,8 +58,8 @@ public:
 void CoreServiceBranchTest::SetUpTestCase()
 {
     DelayedSingleton<CoreService>::GetInstance()->Init();
-    auto iSimManager = std::static_pointer_cast<SimManager>(DelayedSingleton<CoreService>::
-        GetInstance()->simManager_);
+    auto iSimManager = std::static_pointer_cast<SimManager>(
+        DelayedSingleton<CoreService>::GetInstance()->simManager_);
     if (iSimManager == nullptr) {
         return;
     }
@@ -174,10 +174,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | MediumTest | Level1)
 {
     SecurityToken token;
-    bool hasSimCard = false;
     auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     DelayedSingleton<CoreService>::GetInstance()->HasSimCard(SLOT_ID, callback0);
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
     DelayedSingleton<CoreService>::GetInstance()->GetSimState(SLOT_ID, callback0);
     CardType cardType = CardType::UNKNOWN_CARD;
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetCardType(SLOT_ID, cardType);
@@ -212,7 +210,6 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetPrimarySlotId(result);
     const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
     result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(SLOT_ID, cardNumber, callback0);
-    auto callback0 = sptr<MockRawParcelCallback>::MakeSptr();
     DelayedSingleton<CoreService>::GetInstance()->GetShowNumber(SLOT_ID, callback0);
     const std::u16string cardName = Str8ToStr16("SimNameZhang");
     EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
