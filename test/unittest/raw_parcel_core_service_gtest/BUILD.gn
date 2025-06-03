@@ -27,6 +27,7 @@ ohos_unittest("raw_parcel_core_service_test") {
   ]
 
   sources = [
+    "core_service_client_test2.cpp",
     "core_service_client_test.cpp",
     "core_service_test.cpp"
   ]
