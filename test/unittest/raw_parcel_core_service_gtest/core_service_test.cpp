@@ -1038,7 +1038,7 @@ HWTEST_F(CoreServiceTest, HasSimCard003, Function | MediumTest | Level1)
 HWTEST_F(CoreServiceTest, HasSimCard004, Function | MediumTest | Level1)
 {
     SetRunInCaller();
-    EXPECT_CALL(*mockSimManager, HasSimCard(,))
+    EXPECT_CALL(*mockSimManager, HasSimCard(_,_))
         .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
     int32_t ret = coreService->HasSimCard(0, directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
