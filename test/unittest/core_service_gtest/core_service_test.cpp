@@ -206,8 +206,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetIMSI_001, Function | MediumTest | Level
 HWTEST_F(CoreServiceTest, CoreService_IsCTSimCard_001, Function | MediumTest | Level1)
 {
     SecurityToken token;
-    bool isCTSimCard = false;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->IsCTSimCard(0, isCTSimCard);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->IsCTSimCard(0, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -269,7 +268,7 @@ HWTEST_F(CoreServiceTest, CoreService_SetShowNumber_001, Function | MediumTest |
 {
     SecurityToken token;
     std::u16string number = u"";
-    auto result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(0, number);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->SetShowNumber(0, number, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -295,7 +294,7 @@ HWTEST_F(CoreServiceTest, CoreService_SetShowName_001, Function | MediumTest | L
 {
     SecurityToken token;
     std::u16string name = u"";
-    auto result = DelayedSingleton<CoreService>::GetInstance()->SetShowName(0, name);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->SetShowName(0, name, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -334,8 +333,7 @@ HWTEST_F(CoreServiceTest, CoreService_UnlockPin_001, Function | MediumTest | Lev
 {
     SecurityToken token;
     std::u16string pin = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPin(0, pin, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPin(0, pin, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -349,8 +347,7 @@ HWTEST_F(CoreServiceTest, CoreService_UnlockPuk_001, Function | MediumTest | Lev
     SecurityToken token;
     std::u16string newPin = u"";
     std::u16string puk = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPuk(0, newPin, puk, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPuk(0, newPin, puk, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -364,8 +361,7 @@ HWTEST_F(CoreServiceTest, CoreService_AlterPin_001, Function | MediumTest | Leve
     SecurityToken token;
     std::u16string newPin = u"";
     std::u16string oldPin = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->AlterPin(0, newPin, oldPin, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->AlterPin(0, newPin, oldPin, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -378,8 +374,7 @@ HWTEST_F(CoreServiceTest, CoreService_UnlockPin2_001, Function | MediumTest | Le
 {
     SecurityToken token;
     std::u16string pin2 = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPin2(0, pin2, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPin2(0, pin2, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -393,8 +388,7 @@ HWTEST_F(CoreServiceTest, CoreService_UnlockPuk2_001, Function | MediumTest | Le
     SecurityToken token;
     std::u16string newPin2 = u"";
     std::u16string puk2 = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPuk2(0, newPin2, puk2, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->UnlockPuk2(0, newPin2, puk2, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -408,8 +402,7 @@ HWTEST_F(CoreServiceTest, CoreService_AlterPin2_001, Function | MediumTest | Lev
     SecurityToken token;
     std::u16string newPin2 = u"";
     std::u16string oldPin2 = u"";
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->AlterPin2(0, newPin2, oldPin2, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->AlterPin2(0, newPin2, oldPin2, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -422,8 +415,7 @@ HWTEST_F(CoreServiceTest, CoreService_SetLockState_001, Function | MediumTest | 
 {
     SecurityToken token;
     LockInfo options;
-    LockStatusResponse response;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->SetLockState(0, options, response);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->SetLockState(0, options, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
@@ -437,7 +429,7 @@ HWTEST_F(CoreServiceTest, CoreService_GetLockState_001, Function | MediumTest | 
     SecurityToken token;
     LockType lockType = LockType::PIN_LOCK;
     LockState lockState;
-    auto result = DelayedSingleton<CoreService>::GetInstance()->GetLockState(0, lockType, lockState);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->GetLockState(0, lockType, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
