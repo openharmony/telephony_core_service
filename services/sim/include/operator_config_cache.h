@@ -18,6 +18,7 @@
 #include "core_service_errors.h"
 #include "operator_file_parser.h"
 #include "sim_file_manager.h"
+#include "sim_state_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -26,7 +27,8 @@ const std::string KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV = "const.telephony.is_
 const std::string KEY_PERSIST_TELEPHONY_VOLTE_CAP_IN_CHIP = "persist.telephony.volte_cap_in_chip_slot";
 class OperatorConfigCache : public TelEventHandler {
 public:
-    explicit OperatorConfigCache(std::weak_ptr<SimFileManager> simFileManager, int32_t slotId);
+    explicit OperatorConfigCache(
+        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager, int32_t slotId);
     virtual ~OperatorConfigCache() = default;
     void ClearAllCache(int32_t slotId);
     void ClearMemoryCache(int32_t slotId);
@@ -43,7 +45,6 @@ public:
     inline static const int32_t STATE_PARA_LOADED = 1;
     inline static const int32_t STATE_PARA_CLEAR = 2;
     inline static const int32_t STATE_PARA_UPDATE = 3;
-    inline static const int32_t STATE_COTA_UPDATE = 4;
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
     void UpdatevolteCap(int32_t slotId, OperatorConfig &opc);
     void UpdateOpcBoolValue(OperatorConfig &opc, const std::string &key, const bool value);
@@ -51,6 +52,7 @@ public:
 private:
     OperatorFileParser parser_;
     std::weak_ptr<SimFileManager> simFileManager_;
+    std::shared_ptr<SimStateManager> simStateManager_;
     std::string GetOpKey(int32_t slotId);
     void CopyOperatorConfig(const OperatorConfig &from, OperatorConfig &to);
     void UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc);
@@ -58,6 +60,8 @@ private:
     bool AnnounceOperatorConfigChanged(int32_t slotId, int32_t state);
     void notifyInitApnConfigs(int32_t slotId);
     int32_t LoadOperatorConfigFile(int32_t slotId, OperatorConfig &poc);
+    void UpdateIccidCache(int32_t state);
+    int GetSimState(int32_t slotId, SimState &simState);
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
     inline static const int32_t IMS_SWITCH_OFF = 0;
@@ -67,6 +71,7 @@ private:
     OperatorConfig opc_;
     int32_t slotId_;
     std::string modemSimMatchedOpNameCache_ = "";
+    std::string iccidCache_ = "";
     bool isLoadingConfig_ = false;
     std::mutex mutex_;
     bool isUpdateImsCapFromChipDone_ = false;
