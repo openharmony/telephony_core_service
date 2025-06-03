@@ -135,7 +135,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetActiveSimAccountInfoList(data, size);
     GetLockState(data, size);
     SetVoiceMailInfo(data, size);
-    auto telRilManager = std::static_pointer_cast<telRilManager>(
+    auto telRilManager = std::static_pointer_cast<TelRilManager>(
         DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
