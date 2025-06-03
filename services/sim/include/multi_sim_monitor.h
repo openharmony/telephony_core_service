@@ -87,7 +87,8 @@ private:
     void UpdateAllOpkeyConfigs();
     void CheckDataShareError();
     void CheckSimNotifyRegister();
-    void setRemainCount(int remainCount);
+    void SetRemainCount(int remainCount);
+    void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {

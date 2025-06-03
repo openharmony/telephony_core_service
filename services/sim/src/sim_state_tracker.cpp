@@ -20,7 +20,6 @@
 #include "core_manager_inner.h"
 #include "radio_event.h"
 #include "telephony_ext_wrapper.h"
-#include "thread"
 
 namespace OHOS {
 namespace Telephony {
@@ -57,9 +56,12 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
+    std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+        TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
         return;
     }
     if (operatorConfigLoader_ == nullptr) {
@@ -90,9 +92,12 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
+    std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    GetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+        TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
         return;
     }
     std::string opkey = (*msgObj)[1];
@@ -107,6 +112,11 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
         }
         ReloadOperatorConfigCache();
     } else {
+        auto simFileManager = simFileManager_.lock();
+        if (simFileManager != nullptr) {
+            simFileManager->SetOpKey("");
+            simFileManager->SetOpName("");
+        }
         bool hasSimCard = false;
         CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
         if (!hasSimCard) {
@@ -148,8 +158,16 @@ void SimStateTracker::ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::
     TELEPHONY_LOGI("need Clear opkey and reload operatorconfig, slotId: %{public}d", slotId_);
     operatorConfigCache_->ClearOperatorValue(slotId);
     CoreManagerInner::GetInstance().ResetDataShareError();
-    SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
-    operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
+    std::string key = "";
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+        SetParameter(key.c_str(), "false");
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
+    } else {
+        operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_LOADED);
+    }
 }
 
 void SimStateTracker::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -181,7 +199,7 @@ bool SimStateTracker::RegisterForIccLoaded()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -192,7 +210,7 @@ bool SimStateTracker::RegisterOpkeyLoaded()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_OPKEY_LOADED);
@@ -203,7 +221,7 @@ bool SimStateTracker::RegisterOperatorCacheDel()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
@@ -214,7 +232,7 @@ bool SimStateTracker::RegisterOperatorConfigUpdate()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
@@ -225,7 +243,7 @@ bool SimStateTracker::UnRegisterForIccLoaded()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -236,7 +254,7 @@ bool SimStateTracker::UnRegisterOpkeyLoaded()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_OPKEY_LOADED);
@@ -247,7 +265,7 @@ bool SimStateTracker::UnregisterOperatorCacheDel()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager::can not get simFileManager");
+        TELEPHONY_LOGE("can not get simFileManager");
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CACHE_DELETE);
@@ -258,13 +276,13 @@ bool SimStateTracker::UnRegisterOperatorConfigUpdate()
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("SimStateTracker::can not get SimFileManager");
+        TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
     simFileManager->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
     return true;
 }
-
+ 
 bool SimStateTracker::IsNeedUpdateCarrierConfig()
 {
     char isNeedUpdateCarrierConfig[SYSPARA_SIZE] = { 0 };
@@ -274,13 +292,13 @@ bool SimStateTracker::IsNeedUpdateCarrierConfig()
     bool result = strcmp(isNeedUpdateCarrierConfig, "true") == 0;
     return result;
 }
-
+ 
 void SimStateTracker::ResetNeedUpdateCarrierConfig()
 {
     std::string key = "";
     SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "false");
 }
-
+ 
 void SimStateTracker::ReloadOperatorConfigCache()
 {
     if (operatorConfigCache_ == nullptr) {
@@ -295,7 +313,7 @@ void SimStateTracker::ReloadOperatorConfigCache()
         operatorConfigCache_->LoadOperatorConfig(slotId_, opc, operatorConfigCache_->STATE_PARA_LOADED);
     }
 }
-
+ 
 void SimStateTracker::ReloadOperatorConfig()
 {
     if (operatorConfigLoader_ == nullptr) {

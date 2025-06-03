@@ -70,7 +70,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_GetMccFromMccMnc_001, Function | Me
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
-    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     std::string mccmnc = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
     std::string ret = operatorConfigLoader->GetMccFromMccMnc(mccmnc);
@@ -91,7 +91,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_SetMatchResultToSimFileManager_001,
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
-    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->mccmncFromSim_ = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
     std::string opKeyVal = operatorConfigLoader->mccmncFromSim_;
@@ -115,7 +115,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_CreateSimHelper_001, Function | Med
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
-    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, 0);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     auto result = operatorConfigLoader->CreateSimHelper();
     EXPECT_EQ(result, nullptr);
