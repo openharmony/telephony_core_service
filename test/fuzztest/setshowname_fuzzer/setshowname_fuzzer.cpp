@@ -28,6 +28,7 @@
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "unistd.h"
+#include "tel_ril_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {

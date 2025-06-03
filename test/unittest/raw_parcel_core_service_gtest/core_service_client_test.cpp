@@ -2062,7 +2062,7 @@ HWTEST_F(CoreServiceClientTest, HasSimCard007, Function | MediumTest | Level1)
     EXPECT_TRUE(ret == TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
-/**************************************************** GetSimState ******************************************************/
+/****************************************** GetSimState ***********************************************/
 HWTEST_F(CoreServiceClientTest, GetSimState001, Function | MediumTest | Level1)
 {
     client->getProxyNullptr_ = true;

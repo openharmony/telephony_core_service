@@ -28,6 +28,7 @@
 #include "tel_event_handler.h"
 #include "unistd.h"
 #include "sim_file_parse.h"
+#include "tel_ril_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {

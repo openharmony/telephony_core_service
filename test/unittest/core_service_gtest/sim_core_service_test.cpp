@@ -140,7 +140,6 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0200, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetPsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetCsRadioTech(0, radioTech), TELEPHONY_ERR_SUCCESS);
     auto callback0 = sptr<IRawParcelCallback>::MakeSptr();
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
     EXPECT_NE(mCoreService->GetSimState(0, callback0), TELEPHONY_ERR_SUCCESS);
     CardType cardType = CardType::UNKNOWN_CARD;
     EXPECT_NE(mCoreService->GetCardType(0, cardType), TELEPHONY_ERR_SUCCESS);
