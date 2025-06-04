@@ -37,6 +37,7 @@
 #include "usim_dialling_numbers_service.h"
 #include "want.h"
 #include "sim_constant.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {

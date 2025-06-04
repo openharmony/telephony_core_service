@@ -29,6 +29,7 @@
 #include "mock_sim_fil_manage.h"
 #include "mock_multi_sim_controller.h"
 #include "mock_sim_rdb_helper.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {

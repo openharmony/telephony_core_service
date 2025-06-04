@@ -26,6 +26,7 @@
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "unistd.h"
+#include "tel_ril_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -225,7 +226,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     IsCTSimCard(data, size);
-    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    auto telRilManager = std::static_pointer_cast<TelRilManager>(
+        DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
     }

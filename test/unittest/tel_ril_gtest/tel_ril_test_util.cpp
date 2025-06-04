@@ -140,7 +140,7 @@ bool TelRilTest::ProcessTest(int32_t index, int32_t slotId, std::shared_ptr<AppE
         return true;
     }
     bool hasSimCard = false;
-    telephonyService->HasSimCard(slotId, hasSimCard);
+    CoreServiceClient::GetInstance().HasSimCard(slotId, hasSimCard);
     if (!hasSimCard) {
         TELEPHONY_LOGE("TelRilTest::ProcessTest no sim card %{public}d", slotId);
         return true;
