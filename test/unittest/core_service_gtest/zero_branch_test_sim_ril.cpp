@@ -43,6 +43,7 @@
 #include "sim_constant.h"
 #include "sim_file_parse.h"
 #include "usim_file_controller.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {

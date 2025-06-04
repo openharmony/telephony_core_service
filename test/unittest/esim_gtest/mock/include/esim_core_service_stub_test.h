@@ -111,12 +111,12 @@ public:
         return 0;
     }
 
-    int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override
+    int32_t HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t GetSimState(int32_t slotId, SimState &simState) override
+    int32_t GetSimState(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -131,46 +131,46 @@ public:
         return 0;
     }
 
-    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) override
+    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t UnlockPuk(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) override
+    int32_t UnlockPuk(int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+        const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
     int32_t AlterPin(int32_t slotId, const std::u16string &newPin,
-        const std::u16string &oldPin, LockStatusResponse &response) override
+        const std::u16string &oldPin, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) override
+    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
     int32_t UnlockPuk2(int32_t slotId, const std::u16string &newPin2,
-        const std::u16string &puk2, LockStatusResponse &response) override
+        const std::u16string &puk2, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
     int32_t AlterPin2(int32_t slotId, const std::u16string &newPin2,
-        const std::u16string &oldPin2, LockStatusResponse &response) override
+        const std::u16string &oldPin2, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override
+    int32_t SetLockState(int32_t slotId, const LockInfo &options, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) override
+    int32_t GetLockState(int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -200,12 +200,12 @@ public:
         return 0;
     }
 
-    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) override
+    int32_t IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
 
-    bool IsSimActive(int32_t slotId) override
+    bool IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return true;
     }
@@ -277,7 +277,7 @@ public:
         return 0;
     }
 
-    int32_t GetDefaultVoiceSimId(int32_t &simId) override
+    int32_t GetDefaultVoiceSimId(, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -292,7 +292,8 @@ public:
         return 0;
     }
 
-    int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override
+    int32_t SetShowNumber(int32_t slotId, const std::u16string &number,
+        const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -302,7 +303,7 @@ public:
         return 0;
     }
 
-    int32_t SetShowName(int32_t slotId, const std::u16string &name) override
+    int32_t SetShowName(int32_t slotId, const std::u16string &name, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -480,7 +481,7 @@ public:
         return 0;
     }
 
-    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override
+    int32_t HasOperatorPrivileges(const int32_t slotId, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }

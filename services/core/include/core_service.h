@@ -23,7 +23,6 @@
 #include "if_system_ability_manager.h"
 #include "singleton.h"
 #include "system_ability.h"
-#include "tel_ril_manager.h"
 #include "tel_ril_sim_parcel.h"
 
 namespace OHOS {
@@ -71,9 +70,9 @@ public:
 
     int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 
-    int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override;
+    int32_t HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t GetSimState(int32_t slotId, SimState &simState) override;
+    int32_t GetSimState(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetDsdsMode(int32_t &dsdsMode) override;
 
@@ -89,9 +88,9 @@ public:
 
     int32_t GetIMSI(int32_t slotId, std::u16string &imsi) override;
 
-    int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) override;
+    int32_t IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
-    bool IsSimActive(int32_t slotId) override;
+    bool IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetSlotId(int32_t simId) override;
 
@@ -115,25 +114,25 @@ public:
 
     int32_t GetIsoCountryCodeForNetwork(int32_t slotId, std::u16string &countryCode) override;
 
-    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) override;
+    int32_t UnlockPin(int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t UnlockPuk(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) override;
+    int32_t UnlockPuk(int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+        const sptr<IRawParcelCallback> &callback) override;
 
     int32_t AlterPin(int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
-        LockStatusResponse &response) override;
+        const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) override;
+    int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t UnlockPuk2(int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
-        LockStatusResponse &response) override;
+        const sptr<IRawParcelCallback> &callback) override;
 
     int32_t AlterPin2(int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
-        LockStatusResponse &response) override;
+        const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) override;
+    int32_t SetLockState(int32_t slotId, const LockInfo &options, const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) override;
+    int32_t GetLockState(int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) override;
 
@@ -141,17 +140,18 @@ public:
 
     int32_t GetDefaultVoiceSlotId() override;
 
-    int32_t GetDefaultVoiceSimId(int32_t &simId) override;
+    int32_t GetDefaultVoiceSimId(const sptr<IRawParcelCallback> &callback) override;
 
     int32_t SetPrimarySlotId(int32_t slotId) override;
 
     int32_t GetPrimarySlotId(int32_t &slotId) override;
 
-    int32_t SetShowNumber(int32_t slotId, const std::u16string &number) override;
+    int32_t SetShowNumber(int32_t slotId, const std::u16string &number,
+        const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
-    int32_t SetShowName(int32_t slotId, const std::u16string &name) override;
+    int32_t SetShowName(int32_t slotId, const std::u16string &name, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
@@ -228,7 +228,7 @@ public:
 
     int32_t SendUpdateCellLocationRequest(int32_t slotId) override;
 
-    int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) override;
+    int32_t HasOperatorPrivileges(const int32_t slotId, const sptr<IRawParcelCallback> &callback) override;
 
     int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
@@ -270,19 +270,21 @@ public:
 #endif
 private:
     bool Init();
-    void AsyncNetSearchExecute(const std::function<void()> task);
-    void AsyncSimGeneralExecute(const std::function<void()> task);
+    virtual void AsyncNetSearchExecute(const std::function<void()> task);
+    virtual void AsyncSimGeneralExecute(const std::function<void()> task);
+    virtual void AsyncSimPinExecute(const std::function<void()> task);
 
 private:
     int32_t slotId_ = DEFAULT_SLOT_ID;
     bool registerToService_ = false;
     sptr<ISystemAbilityManager> systemManager_ = nullptr;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
-    std::shared_ptr<Telephony::ISimManager> simManager_ = nullptr;
+    std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
-    std::shared_ptr<TelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
     std::shared_ptr<AppExecFwk::EventHandler> simGeneralHandler_;
+    std::shared_ptr<AppExecFwk::EventHandler> simPinHandler_;
     std::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
@@ -290,4 +292,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // BASE_PHONE_SERVICE_STUB_H
+#endif // BASE_PHONE_SERVICE_H

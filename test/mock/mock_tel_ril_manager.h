@@ -30,6 +30,7 @@ public:
     MockTelRilManager() = default;
     virtual ~MockTelRilManager() = default;
     MOCK_METHOD0(OnInit, bool(void));
+    MOCK_METHOD0(DeInit, bool(void));
     MOCK_METHOD4(RegisterCoreNotify,
         int32_t(int32_t, const std::shared_ptr<AppExecFwk::EventHandler> &, int32_t, int32_t *));
     MOCK_METHOD3(UnRegisterCoreNotify,

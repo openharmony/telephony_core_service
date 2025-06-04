@@ -41,6 +41,7 @@
 #include "want.h"
 #include "sim_constant.h"
 #include "mock_tel_ril_manager.h"
+#include "tel_ril_manager.h"
 
 namespace OHOS {
 namespace Telephony {

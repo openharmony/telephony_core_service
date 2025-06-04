@@ -19,9 +19,10 @@
 #include "core_service_dump_helper.h"
 #include "ffrt_inner.h"
 #include "ims_core_service_client.h"
-#include "ipc_skeleton.h"
 #include "network_search_manager.h"
 #include "network_search_types.h"
+#include "tel_ril_manager.h"
+#include "sim_constant.h"
 #include "parameter.h"
 #include "sim_manager.h"
 #include "string_ex.h"
@@ -47,9 +48,8 @@ CoreService::~CoreService() {}
 
 void CoreService::OnStart()
 {
-    bindTime_ =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
-            .count();
+    bindTime_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         TELEPHONY_LOGE("CoreService has already started.");
         return;
@@ -85,31 +85,19 @@ bool CoreService::Init()
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
 #endif
     telRilManager_ = std::make_shared<TelRilManager>();
-    if (telRilManager_ != nullptr) {
-        if (!telRilManager_->OnInit()) {
-            TELEPHONY_LOGE("TelRilManager init is failed!");
-            return false;
-        }
+    if (!telRilManager_->OnInit()) {
+        TELEPHONY_LOGE("TelRilManager init is failed!");
+        return false;
     }
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager_);
     int32_t slotCount = GetMaxSimCount();
     simManager_ = std::make_shared<SimManager>(telRilManager_);
-    if (simManager_ != nullptr) {
-        simManager_->OnInit(slotCount);
-    } else {
-        TELEPHONY_LOGE("SimManager init is failed!");
-        return false;
-    }
+    simManager_->OnInit(slotCount);
     // connect ims_service
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->Init();
     networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager_, simManager_);
-    if (networkSearchManager_ != nullptr) {
-        if (!networkSearchManager_->OnInit()) {
-            TELEPHONY_LOGE("NetworkSearchManager init is failed!");
-            return false;
-        }
-    } else {
-        TELEPHONY_LOGE("NetworkSearchManager calloc failed");
+    if (!networkSearchManager_->OnInit()) {
+        TELEPHONY_LOGE("NetworkSearchManager init is failed!");
         return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
@@ -161,6 +149,19 @@ void CoreService::AsyncSimGeneralExecute(const std::function<void()> task)
         }
     }
     simGeneralHandler_->PostTask(task);
+}
+
+void CoreService::AsyncSimPinExecute(const std::function<void()> task)
+{
+    if (simPinHandler_ == nullptr) {
+        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        if (simPinHandler_ == nullptr) {
+            auto simManagerRunner = AppExecFwk::EventRunner::Create("simPinManagerHandler",
+                AppExecFwk::ThreadMode::FFRT);
+            simPinHandler_ = std::make_shared<AppExecFwk::EventHandler>(simManagerRunner);
+        }
+    }
+    simPinHandler_->PostTask(task);
 }
 
 int32_t CoreService::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
@@ -313,15 +314,23 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetImei no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback]() {
         std::u16string imei = u"";
         MessageParcel dataTmp;
         auto networkSearchManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         if (networkSearchManager) {
-            networkSearchManager->GetImei(slotId, imei);
+            ret = networkSearchManager->GetImei(slotId, imei);
         }
         callback->Transfer([=](MessageParcel &data) {
-            data.WriteString16(imei);
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteString16(imei);
+            }
             }, dataTmp);
     });
     return TELEPHONY_ERR_SUCCESS;
@@ -341,15 +350,23 @@ int32_t CoreService::GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &c
         TELEPHONY_LOGE("networkSearchManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetImeiSv no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback]() {
         std::u16string imeiSv = u"";
         MessageParcel dataTmp;
         auto networkSearchManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         if (networkSearchManager) {
-            networkSearchManager->GetImeiSv(slotId, imeiSv);
+            ret = networkSearchManager->GetImeiSv(slotId, imeiSv);
         }
         callback->Transfer([=](MessageParcel &data) {
-            data.WriteString16(imeiSv);
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteString16(imeiSv);
+            }
             }, dataTmp);
     });
     return TELEPHONY_ERR_SUCCESS;
@@ -428,25 +445,60 @@ int32_t CoreService::GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCa
     return networkSearchManager_->GetNrOptionMode(slotId, callback);
 }
 
-int32_t CoreService::HasSimCard(int32_t slotId, bool &hasSimCard)
+int32_t CoreService::HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    TELEPHONY_LOGD("CoreService::HasSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasSimCard(slotId, hasSimCard);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("HasSimCard no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        bool hasSimCard = false;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->HasSimCard(slotId, hasSimCard);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteBool(hasSimCard);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::GetSimState(int32_t slotId, SimState &simState)
+int32_t CoreService::GetSimState(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    TELEPHONY_LOGD("CoreService::GetSimState(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    return simManager_->GetSimState(slotId, simState);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetSimState no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        SimState simState = SimState::SIM_STATE_UNKNOWN;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->GetSimState(slotId, simState);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(static_cast<int32_t>(simState));
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetDsdsMode(int32_t &dsdsMode)
@@ -470,7 +522,6 @@ int32_t CoreService::GetDsdsMode(int32_t &dsdsMode)
 
 int32_t CoreService::GetCardType(int32_t slotId, CardType &cardType)
 {
-    TELEPHONY_LOGD("CoreService::GetCardType(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -481,7 +532,6 @@ int32_t CoreService::GetCardType(int32_t slotId, CardType &cardType)
 
 int32_t CoreService::GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode)
 {
-    TELEPHONY_LOGD("CoreService::GetISOCountryCodeForSim(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -492,7 +542,6 @@ int32_t CoreService::GetISOCountryCodeForSim(int32_t slotId, std::u16string &cou
 
 int32_t CoreService::GetSimSpn(int32_t slotId, std::u16string &spn)
 {
-    TELEPHONY_LOGD("CoreService::GetSimSpn(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -510,7 +559,6 @@ int32_t CoreService::GetSimIccId(int32_t slotId, std::u16string &iccId)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetSimIccId(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -520,7 +568,6 @@ int32_t CoreService::GetSimIccId(int32_t slotId, std::u16string &iccId)
 
 int32_t CoreService::GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric)
 {
-    TELEPHONY_LOGD("CoreService::GetSimOperatorNumeric(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -538,7 +585,6 @@ int32_t CoreService::GetIMSI(int32_t slotId, std::u16string &imsi)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetIMSI(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -546,33 +592,64 @@ int32_t CoreService::GetIMSI(int32_t slotId, std::u16string &imsi)
     return simManager_->GetIMSI(slotId, imsi);
 }
 
-int32_t CoreService::IsCTSimCard(int32_t slotId, bool &isCTSimCard)
+int32_t CoreService::IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    TELEPHONY_LOGD("CoreService::IsCTSimCard(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->IsCTSimCard(slotId, isCTSimCard);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IsCTSimCard no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        bool isCTSimCard = false;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->IsCTSimCard(slotId, isCTSimCard);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteBool(isCTSimCard);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-bool CoreService::IsSimActive(int32_t slotId)
+bool CoreService::IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    TELEPHONY_LOGD("CoreService::IsSimActive(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return false;
     }
-    return simManager_->IsSimActive(slotId);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IsSimActive no callback");
+        return false;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        bool isSimActive = false;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        if (simManager) {
+            isSimActive = simManager->IsSimActive(slotId);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteBool(isSimActive);
+            }, dataTmp);
+    });
+    return true;
 }
 
 int32_t CoreService::GetSlotId(int32_t simId)
 {
-    TELEPHONY_LOGD("CoreService::GetSlotId(), simId = %{public}d", simId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("CoreService::GetSlotId(), simManager_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -582,7 +659,6 @@ int32_t CoreService::GetSlotId(int32_t simId)
 
 int32_t CoreService::GetSimId(int32_t slotId)
 {
-    TELEPHONY_LOGD("CoreService::GetSimId(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("CoreService::GetSimId(), simManager_ is nullptr!");
         return TELEPHONY_ERROR;
@@ -622,7 +698,6 @@ std::u16string CoreService::GetLocaleFromDefaultSim()
         TELEPHONY_LOGE("CoreService::GetLocaleFromDefaultSim, Permission denied!");
         return std::u16string();
     }
-    TELEPHONY_LOGD("CoreService::GetLocaleFromDefaultSim()");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return std::u16string();
@@ -645,7 +720,6 @@ int32_t CoreService::GetSimGid1(int32_t slotId, std::u16string &gid1)
         TELEPHONY_LOGE("CoreService::GetSimGid1, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetSimGid1(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -663,7 +737,6 @@ std::u16string CoreService::GetSimGid2(int32_t slotId)
         TELEPHONY_LOGE("CoreService::GetSimGid2, Permission denied!");
         return std::u16string();
     }
-    TELEPHONY_LOGD("CoreService::GetSimGid2(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return std::u16string();
@@ -673,7 +746,6 @@ std::u16string CoreService::GetSimGid2(int32_t slotId)
 
 std::u16string CoreService::GetSimEons(int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired)
 {
-    TELEPHONY_LOGD("CoreService::GetSimEons(), slotId = %{public}d", slotId);
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return std::u16string();
@@ -692,7 +764,6 @@ int32_t CoreService::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
         TELEPHONY_LOGE("permission denied!");
         denied = true;
     }
-    TELEPHONY_LOGD("CoreService::GetSimAccountInfo(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -710,7 +781,6 @@ int32_t CoreService::SetDefaultVoiceSlotId(int32_t slotId)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetDefaultVoiceSlotId(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -720,7 +790,6 @@ int32_t CoreService::SetDefaultVoiceSlotId(int32_t slotId)
 
 int32_t CoreService::GetDefaultVoiceSlotId()
 {
-    TELEPHONY_LOGD("CoreService::GetDefaultVoiceSlotId()");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERROR;
@@ -728,14 +797,33 @@ int32_t CoreService::GetDefaultVoiceSlotId()
     return simManager_->GetDefaultVoiceSlotId();
 }
 
-int32_t CoreService::GetDefaultVoiceSimId(int32_t &simId)
+int32_t CoreService::GetDefaultVoiceSimId(const sptr<IRawParcelCallback> &callback)
 {
-    TELEPHONY_LOGD("start");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetDefaultVoiceSimId(simId);
+
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetDefaultVoiceSimId no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), callback]() {
+        int32_t simId = 0;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->GetDefaultVoiceSimId(simId);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(simId);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::SetPrimarySlotId(int32_t slotId)
@@ -748,7 +836,6 @@ int32_t CoreService::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetPrimarySlotId(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -768,7 +855,6 @@ int32_t CoreService::SetPrimarySlotId(int32_t slotId)
 
 int32_t CoreService::GetPrimarySlotId(int32_t &slotId)
 {
-    TELEPHONY_LOGD("CoreService::GetPrimarySlotId()");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -776,7 +862,8 @@ int32_t CoreService::GetPrimarySlotId(int32_t &slotId)
     return simManager_->GetPrimarySlotId(slotId);
 }
 
-int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number)
+int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -786,12 +873,27 @@ int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetShowNumber(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SetShowNumber(slotId, number);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("SetShowNumber no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, number, callback]() {
+        int32_t state = TELEPHONY_ERR_FAIL;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->SetShowNumber(slotId, number);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback)
@@ -804,26 +906,34 @@ int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetShowNumber(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback]() {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetShowNumber no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
         std::u16string showNumber = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         if (simManager) {
-            simManager->GetShowNumber(slotId, showNumber);
+            ret = simManager->GetShowNumber(slotId, showNumber);
         }
         callback->Transfer([=](MessageParcel &data) {
-            data.WriteString16(showNumber);
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteString16(showNumber);
+            }
             }, dataTmp);
     });
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name)
+int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -833,12 +943,26 @@ int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetShowName(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SetShowName(slotId, name);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("SetShowName no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, name, callback]() {
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->SetShowName(slotId, name);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback)
@@ -851,20 +975,27 @@ int32_t CoreService::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> 
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetShowName(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    AsyncSimGeneralExecute([wp = std::weak_ptr<Telephony::ISimManager>(simManager_), slotId, callback]() {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetShowName no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
         std::u16string showName = u"";
         MessageParcel dataTmp;
         auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         if (simManager) {
-            simManager->GetShowName(slotId, showName);
+            ret = simManager->GetShowName(slotId, showName);
         }
         callback->Transfer([=](MessageParcel &data) {
-            data.WriteString16(showName);
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteString16(showName);
+            }
             }, dataTmp);
     });
     return TELEPHONY_ERR_SUCCESS;
@@ -877,7 +1008,6 @@ int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &ic
         TELEPHONY_LOGE("permission denied!");
         denied = true;
     }
-    TELEPHONY_LOGD("CoreService::GetActiveSimAccountInfoList");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -895,7 +1025,6 @@ int32_t CoreService::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetOperatorConfigs");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -903,7 +1032,8 @@ int32_t CoreService::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
     return simManager_->GetOperatorConfigs(slotId, poc);
 }
 
-int32_t CoreService::UnlockPin(const int32_t slotId, const std::u16string &pin, LockStatusResponse &response)
+int32_t CoreService::UnlockPin(const int32_t slotId, const std::u16string &pin,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -913,17 +1043,35 @@ int32_t CoreService::UnlockPin(const int32_t slotId, const std::u16string &pin, 
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::UnlockPin(), pinLen = %{public}lu, slotId = %{public}d",
-        static_cast<unsigned long>(pin.length()), slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UnlockPin(slotId, Str16ToStr8(pin), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("UnlockPin no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, pin, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->UnlockPin(slotId, Str16ToStr8(pin), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::UnlockPuk(
-    const int slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response)
+int32_t CoreService::UnlockPuk(const int slotId, const std::u16string &newPin, const std::u16string &puk,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -939,11 +1087,31 @@ int32_t CoreService::UnlockPuk(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UnlockPuk(slotId, Str16ToStr8(newPin), Str16ToStr8(puk), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("UnlockPuk no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin, puk, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->UnlockPuk(slotId, Str16ToStr8(newPin), Str16ToStr8(puk), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::AlterPin(
-    const int slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response)
+int32_t CoreService::AlterPin(const int slotId, const std::u16string &newPin, const std::u16string &oldPin,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -959,10 +1127,31 @@ int32_t CoreService::AlterPin(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->AlterPin(slotId, Str16ToStr8(newPin), Str16ToStr8(oldPin), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("AlterPin no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin, oldPin, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->AlterPin(slotId, Str16ToStr8(newPin), Str16ToStr8(oldPin), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::UnlockPin2(const int32_t slotId, const std::u16string &pin2, LockStatusResponse &response)
+int32_t CoreService::UnlockPin2(const int32_t slotId, const std::u16string &pin2,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -978,11 +1167,31 @@ int32_t CoreService::UnlockPin2(const int32_t slotId, const std::u16string &pin2
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UnlockPin2(slotId, Str16ToStr8(pin2), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("UnlockPin2 no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, pin2, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->UnlockPin2(slotId, Str16ToStr8(pin2), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::UnlockPuk2(
-    const int slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response)
+int32_t CoreService::UnlockPuk2(const int slotId, const std::u16string &newPin2, const std::u16string &puk2,
+    const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -998,11 +1207,31 @@ int32_t CoreService::UnlockPuk2(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UnlockPuk2(slotId, Str16ToStr8(newPin2), Str16ToStr8(puk2), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("UnlockPuk2 no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin2, puk2, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->UnlockPuk2(slotId, Str16ToStr8(newPin2), Str16ToStr8(puk2), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::AlterPin2(
-    const int slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response)
+int32_t CoreService::AlterPin2(const int slotId, const std::u16string &newPin2,
+    const std::u16string &oldPin2, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1018,10 +1247,30 @@ int32_t CoreService::AlterPin2(
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->AlterPin2(slotId, Str16ToStr8(newPin2), Str16ToStr8(oldPin2), response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("AlterPin2 no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin2, oldPin2, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->AlterPin2(slotId, Str16ToStr8(newPin2), Str16ToStr8(oldPin2), response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
+int32_t CoreService::SetLockState(int32_t slotId, const LockInfo &options, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1041,10 +1290,30 @@ int32_t CoreService::SetLockState(int32_t slotId, const LockInfo &options, LockS
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SetLockState(slotId, options, response);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("SetLockState no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, options, callback]() {
+        LockStatusResponse response = { UNLOCK_FAIL, TELEPHONY_ERROR };
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->SetLockState(slotId, options, response);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(response.result);
+                data.WriteInt32(response.remain);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CoreService::GetLockState(int32_t slotId, LockType lockType, LockState &lockState)
+int32_t CoreService::GetLockState(int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1059,12 +1328,30 @@ int32_t CoreService::GetLockState(int32_t slotId, LockType lockType, LockState &
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->GetLockState(slotId, lockType, lockState);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("GetLockState no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, lockType, callback]() {
+        LockState lockState = LockState::LOCK_ERROR;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->GetLockState(slotId, lockType, lockState);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(static_cast<int32_t>(lockState));
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::RefreshSimState(int32_t slotId)
 {
-    TELEPHONY_LOGD("CoreService::RefreshSimState(), slotId = %{public}d", slotId);
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
@@ -1086,7 +1373,6 @@ int32_t CoreService::SetActiveSim(int32_t slotId, int32_t enable)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetActiveSim(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1104,7 +1390,6 @@ int32_t CoreService::SetActiveSimSatellite(int32_t slotId, int32_t enable)
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetActiveSimSatellite(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1193,7 +1478,6 @@ int32_t CoreService::GetSimTelephoneNumber(int32_t slotId, std::u16string &telep
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetSimTelephoneNumber(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1207,7 +1491,6 @@ std::u16string CoreService::GetSimTeleNumberIdentifier(const int32_t slotId)
         TELEPHONY_LOGE("CoreService::GetSimTeleNumberIdentifier, Permission denied!");
         return std::u16string();
     }
-    TELEPHONY_LOGD("CoreService::GetSimTeleNumberIdentifier(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return std::u16string();
@@ -1225,7 +1508,6 @@ int32_t CoreService::GetVoiceMailIdentifier(int32_t slotId, std::u16string &voic
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetVoiceMailIdentifier(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1243,7 +1525,6 @@ int32_t CoreService::GetVoiceMailNumber(int32_t slotId, std::u16string &voiceMai
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetVoiceMailNumber(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1308,7 +1589,6 @@ int32_t CoreService::QueryIccDiallingNumbers(
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::QueryIccDiallingNumbers");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1327,7 +1607,6 @@ int32_t CoreService::AddIccDiallingNumbers(
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::AddIccDiallingNumbers");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1346,7 +1625,6 @@ int32_t CoreService::DelIccDiallingNumbers(
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::DelIccDiallingNumbers");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1365,7 +1643,6 @@ int32_t CoreService::UpdateIccDiallingNumbers(
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::UpdateIccDiallingNumbers");
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1384,7 +1661,6 @@ int32_t CoreService::SetVoiceMailInfo(
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SetVoiceMailInfo(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1399,7 +1675,6 @@ int32_t CoreService::GetMaxSimCount()
 
 int32_t CoreService::GetOpKey(int32_t slotId, std::u16string &opkey)
 {
-    TELEPHONY_LOGD("CoreService::GetOpKey(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1409,7 +1684,6 @@ int32_t CoreService::GetOpKey(int32_t slotId, std::u16string &opkey)
 
 int32_t CoreService::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 {
-    TELEPHONY_LOGD("CoreService::GetOpKeyExt(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1419,7 +1693,6 @@ int32_t CoreService::GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt)
 
 int32_t CoreService::GetOpName(int32_t slotId, std::u16string &opname)
 {
-    TELEPHONY_LOGD("CoreService::GetOpName(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1441,7 +1714,6 @@ int32_t CoreService::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
         TELEPHONY_LOGE("CoreService::SendEnvelopeCmd, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SendEnvelopeCmd(), slotId = %{public}d", slotId);
     return simManager_->SendEnvelopeCmd(slotId, cmd);
 }
 
@@ -1459,7 +1731,6 @@ int32_t CoreService::SendTerminalResponseCmd(int32_t slotId, const std::string &
         TELEPHONY_LOGE("CoreService::SendTerminalResponseCmd, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SendTerminalResponseCmd(), slotId = %{public}d", slotId);
     return simManager_->SendTerminalResponseCmd(slotId, cmd);
 }
 
@@ -1477,7 +1748,6 @@ int32_t CoreService::SendCallSetupRequestResult(int32_t slotId, bool accept)
         TELEPHONY_LOGE("CoreService::SendCallSetupRequestResult, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SendCallSetupRequestResult(), slotId = %{public}d", slotId);
     return simManager_->SendCallSetupRequestResult(slotId, accept);
 }
 
@@ -1567,14 +1837,32 @@ int32_t CoreService::SendUpdateCellLocationRequest(int32_t slotId)
     return networkSearchManager_->SendUpdateCellLocationRequest(slotId);
 }
 
-int32_t CoreService::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges)
+int32_t CoreService::HasOperatorPrivileges(const int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    TELEPHONY_LOGD("CoreService::HasOperatorPrivileges(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("HasOperatorPrivileges no callback");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        bool hasOperatorPrivileges = false;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteBool(hasOperatorPrivileges);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CoreService::SimAuthentication(
@@ -1584,7 +1872,6 @@ int32_t CoreService::SimAuthentication(
         TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::SimAuthentication(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1768,7 +2055,6 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
         TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    TELEPHONY_LOGD("CoreService::GetSimIO(), slotId = %{public}d", slotId);
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

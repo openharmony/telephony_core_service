@@ -28,6 +28,7 @@
 #include "tel_event_handler.h"
 #include "unistd.h"
 #include "sim_file_parse.h"
+#include "tel_ril_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -165,7 +166,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     QueryIccDiallingNumbers(data, size);
     SimAuthentication(data, size);
     ParseOpl5g(data, size);
-    auto telRilManager = DelayedSingleton<CoreService>::GetInstance()->telRilManager_;
+    auto telRilManager = std::static_pointer_cast<TelRilManager>(
+        DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
         return;
     }

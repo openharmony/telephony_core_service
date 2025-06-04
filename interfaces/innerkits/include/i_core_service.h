@@ -63,29 +63,31 @@ public:
     virtual bool IsNrSupported(int32_t slotId) = 0;
     virtual int32_t SetNrOptionMode(int32_t slotId, int32_t mode, const sptr<INetworkSearchCallback> &callback) = 0;
     virtual int32_t GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
-    virtual int32_t HasSimCard(int32_t slotId, bool &hasSimCard) = 0;
-    virtual int32_t GetSimState(int32_t slotId, SimState &simState) = 0;
+    virtual int32_t HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t GetSimState(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetDsdsMode(int32_t &dsdsMode) = 0;
     virtual int32_t GetCardType(int32_t slotId, CardType &cardType) = 0;
-    virtual int32_t UnlockPin(int32_t slotId, const std::u16string &pin, LockStatusResponse &response) = 0;
-    virtual int32_t UnlockPuk(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &puk, LockStatusResponse &response) = 0;
-    virtual int32_t AlterPin(
-        int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin, LockStatusResponse &response) = 0;
-    virtual int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2, LockStatusResponse &response) = 0;
-    virtual int32_t UnlockPuk2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2, LockStatusResponse &response) = 0;
-    virtual int32_t AlterPin2(
-        int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2, LockStatusResponse &response) = 0;
-    virtual int32_t SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response) = 0;
-    virtual int32_t GetLockState(int32_t slotId, LockType lockType, LockState &lockState) = 0;
+    virtual int32_t UnlockPin(int32_t slotId, const std::u16string &pin, const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t UnlockPuk(int32_t slotId, const std::u16string &newPin, const std::u16string &puk,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t AlterPin(int32_t slotId, const std::u16string &newPin, const std::u16string &oldPin,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t UnlockPin2(int32_t slotId, const std::u16string &pin2,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t UnlockPuk2(int32_t slotId, const std::u16string &newPin2, const std::u16string &puk2,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t AlterPin2(int32_t slotId, const std::u16string &newPin2, const std::u16string &oldPin2,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t SetLockState(int32_t slotId, const LockInfo &options,
+        const sptr<IRawParcelCallback> &callback) = 0;
+    virtual int32_t GetLockState(int32_t slotId, LockType lockType, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetSimOperatorNumeric(int32_t slotId, std::u16string &operatorNumeric) = 0;
     virtual int32_t GetISOCountryCodeForSim(int32_t slotId, std::u16string &countryCode) = 0;
     virtual int32_t GetSimSpn(int32_t slotId, std::u16string &spn) = 0;
     virtual int32_t GetSimIccId(int32_t slotId, std::u16string &iccId) = 0;
     virtual int32_t GetIMSI(int32_t slotId, std::u16string &imsi) = 0;
-    virtual int32_t IsCTSimCard(int32_t slotId, bool &isCTSimCard) = 0;
-    virtual bool IsSimActive(int32_t slotId) = 0;
+    virtual int32_t IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
+    virtual bool IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetSlotId(int32_t simId) = 0;
     virtual int32_t GetSimId(int32_t slotId) = 0;
     virtual int32_t GetNetworkSearchInformation(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
@@ -101,12 +103,14 @@ public:
     virtual int32_t GetSimAccountInfo(int32_t slotId, IccAccountInfo &info) = 0;
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual int32_t GetDefaultVoiceSlotId() = 0;
-    virtual int32_t GetDefaultVoiceSimId(int32_t &simId) = 0;
+    virtual int32_t GetDefaultVoiceSimId(const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t SetPrimarySlotId(int32_t slotId) = 0;
     virtual int32_t GetPrimarySlotId(int32_t &slotId) = 0;
-    virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
+    virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number,
+        const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
-    virtual int32_t SetShowName(int32_t slotId, const std::u16string &name) = 0;
+    virtual int32_t SetShowName(int32_t slotId, const std::u16string &name,
+        const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetOperatorConfigs(int32_t slotId, OperatorConfig &poc) = 0;
@@ -149,7 +153,7 @@ public:
     virtual int32_t GetCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t GetNeighboringCellInfoList(int32_t slotId, std::vector<sptr<CellInformation>> &cellInfo) = 0;
     virtual int32_t SendUpdateCellLocationRequest(int32_t slotId) = 0;
-    virtual int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges) = 0;
+    virtual int32_t HasOperatorPrivileges(const int32_t slotId, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t SimAuthentication(
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) = 0;
     virtual int32_t RegisterImsRegInfoCallback(
