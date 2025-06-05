@@ -991,6 +991,9 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_002, Function |
     networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     networkSearchHandler->RadioResidentNetworkChange(event);
+    networkSearchHandler->CheckRegistrationState(networkSearchManager);
+    std::shared_ptr<NetworkSearchManager> networkSearchManagerNull = nullptr;
+    networkSearchHandler->CheckRegistrationState(networkSearchManagerNull);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
  
