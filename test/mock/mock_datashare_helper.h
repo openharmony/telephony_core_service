@@ -47,10 +47,9 @@ public:
     MOCK_METHOD(int, UnregisterObserver, (const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver), (override));
     MOCK_METHOD(void, NotifyChange, (const Uri &uri), (override));
-    MOCK_METHOD(
-        void, RegisterObserverExtProvider, (const Uri &uri, const std::shared_ptr<DataShareObserver> dataObserver,
-            bool isDescendants), (override));
-    MOCK_METHOD(void, UnregisterObserverExtProvider, (const Uri &uri,
+    MOCK_METHOD(int, RegisterObserverExtProvider, (const Uri &uri,
+        const std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants), (override));
+    MOCK_METHOD(int, UnregisterObserverExtProvider, (const Uri &uri,
         const std::shared_ptr<DataShareObserver> dataObserver), (override));
     MOCK_METHOD(void, NotifyChangeExtProvider, (const DataShareObserver::ChangeInfo &changeInfo), (override));
     MOCK_METHOD(Uri, NormalizeUri, (Uri &uri), (override));
