@@ -47,22 +47,22 @@ std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateDat
 
 std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateOpKeyHelper()
 {
-    return CreateDataHelper(OPKEY_DB_URI, OPKEY_URI);
+    return CreateDataHelper(OPKEY_URI, "");
 }
 
 std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateSimHelper()
 {
-    return CreateDataHelper(SIM_DB_URI, SIM_URI);
+    return CreateDataHelper(SIM_URI, "");
 }
 
 std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreatePdpHelper()
 {
-    return CreateDataHelper(PDP_DB_URI, PDP_URI);
+    return CreateDataHelper(PDP_URI, "");
 }
 
 std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateSimHelper(const int waitTime)
 {
-    return CreateDataHelper(SIM_DB_URI, SIM_URI, waitTime);
+    return CreateDataHelper(SIM_URI, "", waitTime);
 }
 
 bool TelephonyDataHelper::IsDataShareError()
