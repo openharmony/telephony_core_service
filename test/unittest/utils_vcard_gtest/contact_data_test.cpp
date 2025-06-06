@@ -959,7 +959,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumT
     nameData_->setDispalyName(displayName);
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a d c b, e");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a bcde");
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)

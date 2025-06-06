@@ -16,12 +16,8 @@
 #include "vcard_utils.h"
 
 #include <algorithm>
-#include <array>
-#include <cctype>
-#include <ctime>
 #include <fstream>
 #include <iconv.h>
-#include <iomanip>
 #include <numeric>
 #include <regex>
 #include <sstream>
@@ -556,12 +552,6 @@ bool VCardUtils::IsContainsInvisibleChar(const std::string& value)
 {
     std::regex regexPattern("([\\x00-\\x1F]|\\x7F|[\\u0000-\\u001F]|\\u007F)");
     return std::regex_search(value, regexPattern);
-}
-
-bool VCardUtils::IsChineseString(const std::string& value)
-{
-    std::regex chineseRegex("[\u4e00-\u9fa5]");
-    return std::regex_search(value, chineseRegex);
 }
 
 } // namespace Telephony
