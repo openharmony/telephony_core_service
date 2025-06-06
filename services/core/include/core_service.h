@@ -270,6 +270,7 @@ public:
 #endif
 private:
     bool Init();
+    bool NotifyCoreServiceReady();
     virtual void AsyncNetSearchExecute(const std::function<void()> task);
     virtual void AsyncSimGeneralExecute(const std::function<void()> task);
     virtual void AsyncSimPinExecute(const std::function<void()> task);
