@@ -17,6 +17,9 @@
 
 #include "core_manager_inner.h"
 #include "core_service_dump_helper.h"
+#include "common_event_data.h"
+#include "common_event_manager.h"
+#include "common_event_publish_info.h"
 #include "ffrt_inner.h"
 #include "ims_core_service_client.h"
 #include "network_search_manager.h"
@@ -75,7 +78,8 @@ void CoreService::OnStart()
     endTime_ =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
             .count();
-    TELEPHONY_LOGI("CoreService start success");
+    bool res = NotifyCoreServiceReady();
+    TELEPHONY_LOGI("CoreService start success, notify [%{public}d]", res);
 }
 
 bool CoreService::Init()
@@ -106,6 +110,19 @@ bool CoreService::Init()
     }
     TELEPHONY_LOGI("CoreService::Init success");
     return true;
+}
+
+bool CoreService::NotifyCoreServiceReady()
+{
+    AAFwk::Want want;
+    want.SetAction("telephony.event.CORE_SERVICE_READY");
+    EventFwk::CommonEventData commonEventData;
+    commonEventData.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    return EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr);
 }
 
 void CoreService::OnStop()
