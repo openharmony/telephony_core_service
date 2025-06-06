@@ -2211,7 +2211,7 @@ declare namespace sim {
    * @throws { BusinessError } 8300004 - No SIM card.
    * @throws { BusinessError } 8300999 - Unknown error.
    * @throws { BusinessError } 8301002 - An error occurred when operating the SIM card.
-   * @syscap SystemCapability.Telephony.CoreService.
+   * @syscap SystemCapability.Telephony.CoreService
    * @systemapi Hide this for inner system use.
    * @since 14
    */
