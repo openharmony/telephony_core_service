@@ -20,6 +20,7 @@
 #include "telephony_log_wrapper.h"
 #include "vcard_configuration.h"
 #include "vcard_utils.h"
+#include "locale_config.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1230,66 +1231,130 @@ std::vector<std::string> VCardContact::GetValueListFromParasMap(
     return VCardUtils::Split(((parasMap.size() == 0) ? rawValue : propValue), ";");
 }
 
+struct RawNameInfo {
+    std::string prefix;
+    std::string given;
+    std::string middle;
+    std::string family;
+    std::string suffix;
+};
+
+struct DisplayNameInfo {
+    std::string prefix;
+    std::string firstPart;
+    std::string secondPart;
+    std::string thirdPart;
+    std::string suffix;
+};
+
+/**
+* Concatenates parts of a full name inserting spaces and commas as specified.
+*
+* @param isUseSpace true: use space; false: not use
+* @param isUseCommaAfterFirstPart true: use comma after first part name; false: not use
+* @param isUseCommaAfterThirdPart true: use comma after third part name; false: not use
+* @return concatenated full name
+*/
+std::string ConcatenateDisplayName(const DisplayNameInfo &displayNameInfo, bool isUseSpace,
+    bool isUseCommaAfterFirstPart, bool isUseCommaAfterThirdPart)
+{
+    DisplayNameInfo tmpDisplayNameInfo = displayNameInfo;
+    VCardUtils::Trim(tmpDisplayNameInfo.prefix);
+    VCardUtils::Trim(tmpDisplayNameInfo.firstPart);
+    VCardUtils::Trim(tmpDisplayNameInfo.secondPart);
+    VCardUtils::Trim(tmpDisplayNameInfo.thirdPart);
+    VCardUtils::Trim(tmpDisplayNameInfo.suffix);
+
+    std::string displayName = "";
+    if (!tmpDisplayNameInfo.prefix.empty()) {
+        displayName += tmpDisplayNameInfo.prefix;
+    }
+
+    if (!tmpDisplayNameInfo.firstPart.empty()) {
+        if (!displayName.empty()) {
+            displayName += ' ';
+        }
+        displayName += tmpDisplayNameInfo.firstPart;
+    }
+
+    if (!tmpDisplayNameInfo.secondPart.empty()) {
+        if (!displayName.empty()) {
+            if (isUseCommaAfterFirstPart) {
+                displayName += ',';
+            }
+            if (isUseSpace) {
+                displayName += ' ';
+            }
+        }
+        displayName += tmpDisplayNameInfo.secondPart;
+    }
+
+    if (!tmpDisplayNameInfo.thirdPart.empty()) {
+        if (!displayName.empty()) {
+            if (isUseSpace) {
+                displayName += ' ';
+            }
+        }
+        displayName += tmpDisplayNameInfo.thirdPart;
+    }
+
+    if (!tmpDisplayNameInfo.suffix.empty()) {
+        if (!displayName.empty()) {
+            if (isUseCommaAfterThirdPart) {
+                displayName += ',';
+            }
+            if (isUseSpace) {
+                displayName += ' ';
+            }
+        }
+        displayName += tmpDisplayNameInfo.suffix;
+    }
+
+    return displayName;
+}
+
+std::string GenerateDisplayName(const std::string &language, const RawNameInfo &rawNameInfo)
+{
+    DisplayNameInfo displayNameInfo = {
+        .prefix = rawNameInfo.prefix,
+        .firstPart = rawNameInfo.family,
+        .secondPart = rawNameInfo.middle,
+        .thirdPart = rawNameInfo.given,
+        .suffix = rawNameInfo.suffix,
+    };
+
+    // zh-Hant: traditional Chinese, zh-Hans: simplified Chinese, ko: Korean
+    if (language == "zh-Hant" || language == "zh-Hans" || language == "ko") {
+        return ConcatenateDisplayName(displayNameInfo, false, false, false);
+    } else if (language == "ja") { // ja: Japanese
+        return ConcatenateDisplayName(displayNameInfo, true, false, false);
+    } else {
+        displayNameInfo.firstPart = rawNameInfo.given;
+        displayNameInfo.thirdPart = rawNameInfo.family;
+        return ConcatenateDisplayName(displayNameInfo, true, false, true);
+    }
+}
+
 void VCardContact::UpdateDisplayName()
 {
     if (nameData_ == nullptr) {
         return;
     }
-    std::string displayName = nameData_->GetDisplayName();
-    if (VCardUtils::IsChineseString(displayName)) {
-        if (nameData_->GetFamily().empty() || nameData_->GetGiven().empty()) {
-            return;
-        }
-        std::string fullName = nameData_->GetFamily();
-        if (!(nameData_->GetMiddle().empty())) {
-            fullName += nameData_->GetMiddle();
-        }
-        fullName += nameData_->GetGiven();
-        if (fullName != displayName) {
-            nameData_->setDispalyName(fullName);
-            TELEPHONY_LOGI("update display name use format name");
-        }
-    } else if (IsNameAllPrintableAscii()) {
-        std::string fullName = "";
-        FillFullName(nameData_->GetPrefix(), " ", fullName);
-        FillFullName(nameData_->GetGiven(), " ", fullName);
-        FillFullName(nameData_->GetMiddle(), " ", fullName);
-        FillFullName(nameData_->GetFamily(), " ", fullName);
-        FillFullName(nameData_->GetSuffix(), ", ", fullName);
-        VCardUtils::Trim(fullName);
-        if (!fullName.empty()) {
-            if (displayName != fullName) {
-                nameData_->setDispalyName(fullName);
-                TELEPHONY_LOGI("update overseas display name use format name");
-            }
-        } else if (displayName.empty()) {
-            std::string phoneticName = nameData_->GetPhoneticName();
-            if (!phoneticName.empty()) {
-                nameData_->setDispalyName(phoneticName);
-                TELEPHONY_LOGI("update overseas display name use phonetic name");
-            }
-        }
-    }
-}
 
-void VCardContact::FillFullName(const std::string &name, const std::string &split, std::string &fullName)
-{
-    if (name.empty()) {
+    RawNameInfo rawNameInfo = {
+        .prefix = nameData_->GetPrefix(),
+        .given = nameData_->GetGiven(),
+        .middle = nameData_->GetMiddle(),
+        .family = nameData_->GetFamily(),
+        .suffix = nameData_->GetSuffix(),
+    };
+    auto language = Global::I18n::LocaleConfig::GetSystemLanguage();
+    std::string displayName = GenerateDisplayName(language, rawNameInfo);
+    if (displayName.empty()) {
         return;
     }
-    if (!fullName.empty()) {
-        fullName.append(split);
-    }
-    fullName.append(name);
-}
- 
-bool VCardContact::IsNameAllPrintableAscii()
-{
-    return VCardUtils::IsPrintableAscii(nameData_->GetPrefix()) &&
-        VCardUtils::IsPrintableAscii(nameData_->GetGiven()) &&
-        VCardUtils::IsPrintableAscii(nameData_->GetMiddle()) &&
-        VCardUtils::IsPrintableAscii(nameData_->GetFamily()) &&
-        VCardUtils::IsPrintableAscii(nameData_->GetSuffix());
+    TELEPHONY_LOGI("do UpdateDisplayName, language: %{public}s", language.c_str());
+    nameData_->setDispalyName(displayName);
 }
 
 } // namespace Telephony
