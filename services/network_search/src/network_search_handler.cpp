@@ -797,15 +797,18 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
+    bool isInModem2Optimization = TELEPHONY_EXT_WRAPPER.isInModem2Optimization_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isInModem2Optimization_(slotId_);
     TELEPHONY_LOGI("soltid: %{public}d, IsSimActive: %{public}d, hasSim: %{public}d, isAirplaneMode: "
-        "%{public}d, IsSetActiveSimInProgress: %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d",
+        "%{public}d, IsSetActiveSimInProgress: %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d"
+        "isInModem2Optimization: %{public}d",
         slotId_, simManager->IsSimActive(slotId_), hasSim, isAirplaneMode,
-        simManager->IsSetActiveSimInProgress(slotId_), IsPowerOnPrimaryRadioWhenNoSim());
+        simManager->IsSetActiveSimInProgress(slotId_), IsPowerOnPrimaryRadioWhenNoSim(), isInModem2Optimization);
     bool hasSimAndActive =
         (hasSim && (!simManager->IsSetActiveSimInProgress(slotId_) && simManager->IsSimActive(slotId_)));
     bool primarySimNoSim = (!hasSim && IsPowerOnPrimaryRadioWhenNoSim());
-    if (!isAirplaneMode && (!GetDynamicPowerOffModeSwitch()) && (hasSimAndActive || primarySimNoSim)
-        && radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn()) {
+    if (!isAirplaneMode && (!GetDynamicPowerOffModeSwitch()) && (hasSimAndActive || primarySimNoSim) &&
+        radioState == CORE_SERVICE_POWER_OFF && !IsSatelliteOn() && !isInModem2Optimization) {
         networkSearchManager->SetRadioState(slotId_, static_cast<bool>(ModemPowerState::CORE_SERVICE_POWER_ON), 0);
     }
 }
@@ -1477,14 +1480,12 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     }
     std::string plmn = *object;
     networkSearchManager->SetResidentNetworkNumeric(slotId_, plmn);
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-        if (networkSearchManager->GetCsRegState(slotId) ==
-            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
-            networkSearchManager->GetPsRegState(slotId) ==
-            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE)) {
-            TELEPHONY_LOGE("RadioResidentNetworkChange RegState is in service");
-            return;
-        }
+    if (TELEPHONY_EXT_WRAPPER.updatePlmnExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updatePlmnExt_(slotId_, plmn);
+    }
+    if (CheckRegistrationState(networkSearchManager)) {
+        TELEPHONY_LOGE("RadioResidentNetworkChange RegState is in service");
+        return;
     }
     std::string countryCode = "";
     if (plmn.length() >= MCC_LEN) {
@@ -1508,6 +1509,23 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
             nitzUpdate_->UpdateCountryCode(countryCode);
         }
     }
+}
+
+bool NetworkSearchHandler::CheckRegistrationState(const std::shared_ptr<NetworkSearchManager> &networkSearchManager)
+{
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::CheckRegistrationState manager is nullptr!");
+        return false;
+    }
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        if (networkSearchManager->GetCsRegState(slotId) ==
+            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
+            networkSearchManager->GetPsRegState(slotId) ==
+            static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void NetworkSearchHandler::SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event)
