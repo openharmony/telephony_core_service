@@ -991,9 +991,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_002, Function |
     networkSearchHandler->GetNrOptionModeResponse(event);
     networkSearchHandler->RadioGetRrcConnectionState(event);
     networkSearchHandler->RadioResidentNetworkChange(event);
-    networkSearchHandler->CheckRegistrationState(networkSearchManager);
-    std::shared_ptr<NetworkSearchManager> networkSearchManagerNull = nullptr;
-    networkSearchHandler->CheckRegistrationState(networkSearchManagerNull);
     EXPECT_EQ(networkSearchHandler->GetPhoneType(), PhoneType::PHONE_TYPE_IS_NONE);
 }
  
@@ -1031,6 +1028,9 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
     networkSearchHandler->UpdateOperatorName();
+    networkSearchHandler->CheckRegistrationState(networkSearchManager);
+    std::shared_ptr<NetworkSearchManager> networkSearchManagerNull = nullptr;
+    networkSearchHandler->CheckRegistrationState(networkSearchManagerNull);
 }
  
  
