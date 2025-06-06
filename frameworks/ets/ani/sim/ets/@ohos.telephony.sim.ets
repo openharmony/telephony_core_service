@@ -25,8 +25,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetLockState, slotId, lockType)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as LockState);
-    }, (err: BusinessError): void => {
-        callback(err, LockState.LOCK_OFF);
+    }, (err: Error): void => {
+        callback(err as BusinessError, LockState.LOCK_OFF);
     });
   }
 
@@ -48,8 +48,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeUnlockPuk, slotId, newPin, puk)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as LockStatusResponse);
-    }, (err: BusinessError): void => {
-        callback(err, new LockStatusResponseInner());
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
     });
   }
 
@@ -71,8 +71,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeunlockPin, slotId, pin)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as LockStatusResponse);
-    }, (err: BusinessError): void => {
-        callback(err, new LockStatusResponseInner());
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
     });
   }
 
@@ -94,8 +94,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetOperatorConfigs, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as Array<OperatorConfig>);
-    }, (err: BusinessError): void => {
-        callback(err, new Array<OperatorConfig>());
+    }, (err: Error): void => {
+        callback(err as BusinessError, new Array<OperatorConfig>());
     });
   }
 
@@ -117,8 +117,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetActiveSimAccountInfoList)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as Array<IccAccountInfo>);
-    }, (err: BusinessError): void => {
-        callback(err, new Array<IccAccountInfo>());
+    }, (err: Error): void => {
+        callback(err as BusinessError, new Array<IccAccountInfo>());
     });
   }
 
@@ -140,8 +140,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetSimAccountInfo, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as IccAccountInfo);
-    }, (err: BusinessError): void => {
-        callback(err, new IccAccountInfoInner);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new IccAccountInfoInner);
     });
   }
 
@@ -163,8 +163,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeHasSimCard, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as boolean);
-    }, (err: BusinessError): void => {
-        callback(err, false);
+    }, (err: Error): void => {
+        callback(err as BusinessError, false);
     });
   }
 
@@ -186,8 +186,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetSimState, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as SimState);
-    }, (err: BusinessError): void => {
-        callback(err, SimState.SIM_STATE_UNKNOWN);
+    }, (err: Error): void => {
+        callback(err as BusinessError, SimState.SIM_STATE_UNKNOWN);
     });
   }
 
@@ -213,8 +213,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetISOCountryCodeForSim, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as string);
-    }, (err: BusinessError): void => {
-        callback(err, new string());
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
     });
   }
 
@@ -242,8 +242,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeGetDefaultVoiceSlotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as int);
-    }, (err: BusinessError): void => {
-        callback(err, 0);
+    }, (err: Error): void => {
+        callback(err as BusinessError, 0);
     });
   }
 
@@ -265,8 +265,8 @@ export default namespace sim {
     let p1 = taskpool.execute(nativeIsSimActive, slotId)
     p1.then((content: NullishType) => {
         callback(new BusinessError(), content as boolean);
-    }, (err: BusinessError): void => {
-        callback(err, false);
+    }, (err: Error): void => {
+        callback(err as BusinessError, false);
     });
   }
 
