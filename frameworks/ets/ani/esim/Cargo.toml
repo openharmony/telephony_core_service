@@ -11,9 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[workspace]
-resolver = "2"
-members = [
-    "frameworks/ets/ani/sim",
-    "frameworks/ets/ani/esim"
-]
+[package]
+name = "esim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ani_rs = { git = "https://gitee.com/openharmony/communication_netmanager_base", branch = "OpenHarmony_feature_20250328" }
+serde = { version = "1.0", features = ["derive"] }
+cxx = "1.0.115"
