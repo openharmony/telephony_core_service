@@ -797,7 +797,7 @@ void NetworkSearchHandler::RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManage
     }
     bool hasSim = false;
     simManager->HasSimCard(slotId_, hasSim);
-    bool isInModem2Optimization = TELEPHONY_EXT_WRAPPER.isInModem2Optimization_ &&
+    bool isInModem2Optimization = TELEPHONY_EXT_WRAPPER.isInModem2Optimization_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.isInModem2Optimization_(slotId_);
     TELEPHONY_LOGI("soltid: %{public}d, IsSimActive: %{public}d, hasSim: %{public}d, isAirplaneMode: "
         "%{public}d, IsSetActiveSimInProgress: %{public}d, IsPowerOnPrimaryRadioWhenNoSim: %{public}d"
