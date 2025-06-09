@@ -831,6 +831,8 @@ void IccFile::ClearData()
     opl5gFiles_.clear();
     spdiPlmns_.clear();
     ehplmns_.clear();
+    isOnOpkeyLoaded_ = false;
+    isSimRecordLoaded_ = false;
 
     ResetVoiceMailVariable();
     auto iccFileExt = iccFile_.lock();
@@ -890,6 +892,7 @@ void IccFile::OnOpkeyLoad(const std::string opkey, const std::string opName)
         vMsg[VMSG_OPNAME_INDEX] = opName;
         auto obj = std::make_shared<std::vector<std::string>>(vMsg);
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_OPKEY_LOADED, obj);
+        isOnOpkeyLoaded_ = true;
     }
 }
 
@@ -936,12 +939,22 @@ void IccFile::UpdateOpkeyConfig()
         TELEPHONY_LOGE("operatorConfigUpdateObser nullptr.");
         return;
     }
-    if (ObtainFilesFetched()) {
+    if (isOnOpkeyLoaded_ || isSimRecordLoaded_) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE, slotId_);
     } else {
         std::string key = "";
-        SetParameter(key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_)).c_str(), "true");
-        SetParameter(IS_BLOCK_LOAD_OPERATORCONFIG, "false");
+        std::string isBlockLoadOperatorConfigProp =
+            key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_));
+        key = "";
+        std::string isUpdateOperatorConfigProp = key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_));
+        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
+        GetParameter(isBlockLoadOperatorConfigProp.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+        if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+            SetParameter(isUpdateOperatorConfigProp.c_str(), "true");
+            SetParameter(isBlockLoadOperatorConfigProp.c_str(), "false");
+        } else {
+            SetParameter(isUpdateOperatorConfigProp.c_str(), "false");
+        }
         CoreManagerInner::GetInstance().ResetDataShareError();
     }
 }

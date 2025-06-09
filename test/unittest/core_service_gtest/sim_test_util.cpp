@@ -103,7 +103,7 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
-    OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), slotId);
+    OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), simStateManager, slotId);
     OperatorFileParser ofp;
     OperatorConfig poc;
     std::u16string result;
@@ -589,7 +589,8 @@ std::shared_ptr<OperatorConfigCache> SimTest::CreateOperatorConfigCache(int32_t 
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
                                                            std::weak_ptr<ITelRilManager>(telRilManager),
                                                            std::weak_ptr<SimStateManager>(simStateManager));
-    return std::make_shared<OperatorConfigCache>(std::weak_ptr<SimFileManager>(simFileManager), slotId);
+    return std::make_shared<OperatorConfigCache>(
+        std::weak_ptr<SimFileManager>(simFileManager), simStateManager, slotId);
 }
 } // namespace Telephony
 } // namespace OHOS
