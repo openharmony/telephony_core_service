@@ -981,7 +981,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     std::string iccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     if (!iccId.empty()) {
         std::string encryptIccId = EncryptIccId(iccId);
-        SetParameter(MAIN_CARD_ICCID_KEY,c_str(), encryptIccId.c_str());
+        SetParameter(MAIN_CARD_ICCID_KEY.c_str(), encryptIccId.c_str());
     }
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
