@@ -957,7 +957,6 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
         return TELEPHONY_ERR_FAIL;
     }
-
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
@@ -973,9 +972,21 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
     // change protocol for default cellulardata slotId
     isSetPrimarySlotIdInProgress_ = true;
     PublishSetPrimaryEvent(false);
+    char lastMainCardIccId[SYSTEM_PARAMETER_LENGTH] = { 0 };
+    GetParameter(MAIN_CARD_ICCID_KEY.c_str(), "", lastMainCardIccId, SYSTEM_PARAMETER_LENGTH);
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simFileManager_ is null slotId is %{public}d", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::string iccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
+    if (!iccId.empty()) {
+        std::string encryptIccId = EncryptIccId(iccId);
+        SetParameter(MAIN_CARD_ICCID_KEY,c_str(), encryptIccId.c_str());
+    }
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
         SetPrimarySlotIdDone();
+        SetParameter(MAIN_CARD_ICCID_KEY.c_str(), lastMainCardIccId);
         if (setPrimarySlotRemainCount_[slotId] > 0) {
             SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
             TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
