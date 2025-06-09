@@ -48,7 +48,7 @@ enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
  */
 struct NetworkSearchManagerInner {
     static const int32_t MSG_NUM = 3;
-    int32_t msgNum_ = MSG_NUM;
+    int32_t msgNum_ = 0;
     static const int32_t DEFAULT_RAF = 0xffff;
     static const int64_t SERIAL_NUMBER_DEFAULT = -1;
     static const int64_t SERIAL_NUMBER_THRESHOLD = 1000;
@@ -81,6 +81,8 @@ struct NetworkSearchManagerInner {
     std::mutex msgNumMutex_;
     std::mutex serialNumMutex_;
     bool hasCall_ = false;
+    bool skipFlag_ = false;
+    std::mutex skipFlagMutex_;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -137,6 +139,16 @@ struct NetworkSearchManagerInner {
     {
         std::lock_guard<std::mutex> lock(serialNumMutex_);
         return serialNum_;
+    }
+    inline void SetSkipUnsolRptFlag(bool res)
+    {
+        std::lock_guard<std::mutex> lock(skipFlagMutex_);
+        skipFlag_ = res;
+    }
+    inline bool GetSkipUnsolRptFlag()
+    {
+        std::lock_guard<std::mutex> lock(skipFlagMutex_);
+        return skipFlag_;
     }
 };
 
