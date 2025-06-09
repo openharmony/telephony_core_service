@@ -733,6 +733,11 @@ void NetworkSearchHandler::UpdateNetworkState()
     if (networkSearchManager != nullptr) {
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
+    if (networkSearchManager->GetSkipUnsolRptFlag(slotId_)) {
+        TELEPHONY_LOGI("Re-trigger RadioOnState slotId:%{public}d", slotId_);
+        RadioOnState();
+        networkSearchManager->SetSkipUnsolRptFlag(slotId_, false);
+    }
     TELEPHONY_LOGI("NetworkSearchHandler::UpdateNetworkState slotId:%{public}d", slotId_);
 }
 
@@ -854,6 +859,11 @@ void NetworkSearchHandler::RadioOnState()
     auto networkSearchManager = networkSearchManager_.lock();
     int64_t serialNum = NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT;
     if (networkSearchManager != nullptr) {
+        if (!networkSearchManager->CheckIsNeedNotify(slotId_)) {
+            networkSearchManager->SetSkipUnsolRptFlag(slotId_, true);
+            TELEPHONY_LOGE("Last request not finish, slotId:%{public}d", slotId_);
+            return;
+        }
         networkSearchManager->InitMsgNum(slotId_);
         serialNum = networkSearchManager->IncreaseSerialNum(slotId_);
         if (serialNum == NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT) {
