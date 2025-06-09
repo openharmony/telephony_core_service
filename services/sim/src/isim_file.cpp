@@ -88,6 +88,7 @@ void IsimFile::OnAllFilesFetched()
     TELEPHONY_LOGI("IsimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
     if (filesFetchedObser_ != nullptr) {
         filesFetchedObser_->NotifyObserver(RadioEvent::RADIO_SIM_RECORDS_LOADED, slotId_);
+        isSimRecordLoaded_ = true;
     }
     if (stateManager_ != nullptr) {
         CardType cardType = stateManager_->GetCardType();
