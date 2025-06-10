@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Telephony {
 BrokerDelegator<RawParcelCallbackProxy> RawParcelCallbackProxy::delegator_;
-void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
+void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> writer, MessageParcel &data)
 {
     MessageOption option{MessageOption::TF_ASYNC};
     MessageParcel reply;
@@ -31,8 +31,8 @@ void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> func, 
         TELEPHONY_LOGE("write interface token failed");
         return;
     }
-    if (func != nullptr) {
-        func(data);
+    if (writer != nullptr) {
+        writer(data);
     }
     remote->SendRequest(0, data, reply, option);
 }
