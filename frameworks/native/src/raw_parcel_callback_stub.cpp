@@ -19,35 +19,29 @@
 namespace OHOS {
 namespace Telephony {
 RawParcelCallbackStub::RawParcelCallbackStub(std::function<void(MessageParcel &data)> callback)
-    : callback_(callback)
+    : reader_(callback)
 {
 }
 
-void RawParcelCallbackStub::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
+void RawParcelCallbackStub::Transfer(std::function<void(MessageParcel&)> writer, MessageParcel &data)
 {
-    if (func) {
-        func(data);
+    if (writer) { // same process ipc call
+        writer(data);
+    } else {
+        if (!CheckCurrentDescriptor(data)) {
+            return;
+        }
     }
-    done_ = true;
-    cv_.notify_one();
+    if (reader_) {
+        reader_(data);
+        NotifyReceiveDone();
+    }
 }
 
 int RawParcelCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::u16string myDescriptor = RawParcelCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (myDescriptor != remoteDescriptor) {
-        TELEPHONY_LOGE("descriptor check fail!");
-        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
-    }
-    
-    std::unique_lock<std::mutex> lock(mtx_);
-    if (callback_) {
-        Transfer([=](MessageParcel &data) {
-            callback_(data);
-            }, data);
-    }
+    Transfer(nullptr, data);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -55,6 +49,24 @@ bool RawParcelCallbackStub::WaitForResult(int64_t timeoutMs)
 {
     std::unique_lock<std::mutex> lock(mtx_);
     return cv_.wait_for(lock, std::chrono::microseconds(timeoutMs), [this] { return done_; });
+}
+
+bool RawParcelCallbackStub::CheckCurrentDescriptor(MessageParcel &data)
+{
+    std::u16string myDescriptor = GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (myDescriptor != remoteDescriptor) {
+        TELEPHONY_LOGE("descriptor check fail!");
+        return false;
+    }
+    return true;
+}
+ 
+void RawParcelCallbackStub::NotifyReceiveDone()
+{
+    std::unique_lock<std::mutex> lock(mtx_);
+    done_ = true;
+    cv_.notify_one();
 }
 
 } // namespace Telephony
