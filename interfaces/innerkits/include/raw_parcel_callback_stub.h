@@ -29,10 +29,14 @@ public:
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
 private:
+    using MessageParcelProcesser = std::function<void(MessageParcel &)>;
+    bool CheckCurrentDescriptor(MessageParcel &data);
+    void NotifyReceiveDone();
+    MessageParcelProcesser writer_;
+    MessageParcelProcesser reader_;
     std::mutex mtx_;
     std::condition_variable cv_;
     bool done_ = false;
-    std::function<void(MessageParcel &data)> callback_;
 };
 
 } // namespace Telephony
