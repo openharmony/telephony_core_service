@@ -100,7 +100,7 @@ public:
     void SetCellRequestMinInterval(uint32_t minInterval);
     bool IsPowerOnPrimaryRadioWhenNoSim() const;
     void ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
-    void RadioOnState();
+    void RadioOnState(bool forceNotify = true);
     void UpdateOperatorName();
 
 private:
