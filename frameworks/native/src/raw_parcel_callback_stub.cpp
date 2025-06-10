@@ -19,15 +19,14 @@
 namespace OHOS {
 namespace Telephony {
 RawParcelCallbackStub::RawParcelCallbackStub(std::function<void(MessageParcel &data)> callback)
-    : writer_(nullptr), reader_(callback)
+    : reader_(callback)
 {
 }
 
-void RawParcelCallbackStub::Transfer(std::function<void(MessageParcel&)> func, MessageParcel &data)
+void RawParcelCallbackStub::Transfer(std::function<void(MessageParcel&)> writer, MessageParcel &data)
 {
-    writer_ = func;
-    if (writer_) { // same process ipc call
-        writer_(data);
+    if (writer) { // same process ipc call
+        writer(data);
     } else {
         if (!CheckCurrentDescriptor(data)) {
             return;
