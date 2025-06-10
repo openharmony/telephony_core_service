@@ -1220,11 +1220,11 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_RadioInfo_002, Function | MediumTest
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
-    networkSearchHandler->slotId_ = SLOT_ID_0;
     networkSearchHandler->RadioOnState();
-    EXPECT_EQ(networkSearchHandler->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
+    auto networkSearchManagerTmp = networkSearchHandler->networkSearchManager_.lock();
+    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
     networkSearchHandler->UpdateNetworkState();
-    EXPECT_EQ(networkSearchHandler->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), false);
+    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), false);
 }
 } // namespace Telephony
 } // namespace OHOS
