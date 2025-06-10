@@ -27,12 +27,14 @@ public:
     explicit RawParcelCallbackStub(std::function<void(MessageParcel &datay)> callback);
     bool WaitForResult(int64_t timeoutMs);
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-    void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
+    void Transfer(std::function<void(MessageParcel &)> writer, MessageParcel &data) override;
 private:
+    bool CheckCurrentDescriptor(MessageParcel &data);
+    void NotifyReceiveDone();
+    std::function<void(MessageParcel &)> reader_;
     std::mutex mtx_;
     std::condition_variable cv_;
     bool done_ = false;
-    std::function<void(MessageParcel &data)> callback_;
 };
 
 } // namespace Telephony
