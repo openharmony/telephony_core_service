@@ -69,6 +69,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 
+#ifndef TEL_TEST_UNSUPPORT
 class SimUtilsTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -220,6 +221,6 @@ HWTEST_F(SimUtilsTest, Telephony_telephony_permission_001, Function | MediumTest
     telephonyPermission->CheckPermission(bundleName);
     EXPECT_FALSE(res);
 }
-
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
