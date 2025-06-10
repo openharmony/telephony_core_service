@@ -706,7 +706,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     if (operatorInfoResult_->flag == networkSearchManager->GetSerialNum(slotId_)) {
         networkSearchManager->decMsgNum(slotId_);
         if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-        UpdateNetworkState();
+            UpdateNetworkState();
         }
     } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
         if (operatorName_ != nullptr) {
@@ -733,7 +733,7 @@ void NetworkSearchHandler::UpdateNetworkState()
     if (networkSearchManager != nullptr) {
         networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
-    if (networkSearchManager->GetSkipUnsolRptFlag(slotId_)) {
+    if (networkSearchManager->GetSkipUnsolRptFlag(slotId_) && networkSearchManager->CheckIsNeedNotify(slotId_)) {
         TELEPHONY_LOGI("Re-trigger RadioOnState slotId:%{public}d", slotId_);
         RadioOnState();
         networkSearchManager->SetSkipUnsolRptFlag(slotId_, false);
@@ -780,7 +780,7 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
             break;
         case CORE_SERVICE_POWER_ON: {
             firstInit_ = false;
-            RadioOnState();
+            RadioOnState(false);
             break;
         }
         default:
@@ -854,14 +854,14 @@ void NetworkSearchHandler::RadioOffOrUnavailableState(int32_t radioState) const
     }
 }
 
-void NetworkSearchHandler::RadioOnState()
+void NetworkSearchHandler::RadioOnState(bool forceNotify)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     int64_t serialNum = NetworkSearchManagerInner::SERIAL_NUMBER_DEFAULT;
     if (networkSearchManager != nullptr) {
-        if (!networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        if (!networkSearchManager->CheckIsNeedNotify(slotId_) && !forceNotify) {
             networkSearchManager->SetSkipUnsolRptFlag(slotId_, true);
-            TELEPHONY_LOGE("Last request not finish, slotId:%{public}d", slotId_);
+            TELEPHONY_LOGI("Last request not finish slotId:%{public}d", slotId_);
             return;
         }
         networkSearchManager->InitMsgNum(slotId_);
