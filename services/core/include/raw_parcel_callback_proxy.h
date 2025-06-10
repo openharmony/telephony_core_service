@@ -22,7 +22,7 @@ class RawParcelCallbackProxy : public IRemoteProxy<IRawParcelCallback> {
 public:
     explicit RawParcelCallbackProxy(const sptr<IRemoteObject> &impl)
         : IRemoteProxy<IRawParcelCallback>(impl) {}
-    void Transfer(std::function<void(MessageParcel &)> func, MessageParcel &data) override;
+    void Transfer(std::function<void(MessageParcel &)> writer, MessageParcel &data) override;
 private:
     static BrokerDelegator<RawParcelCallbackProxy> delegator_;
 };
