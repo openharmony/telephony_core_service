@@ -31,7 +31,7 @@ void RawParcelCallbackProxy::Transfer(std::function<void(MessageParcel&)> writer
         TELEPHONY_LOGE("write interface token failed");
         return;
     }
-    if (writer != nullptr) {
+    if (writer) {
         writer(data);
     }
     remote->SendRequest(0, data, reply, option);
