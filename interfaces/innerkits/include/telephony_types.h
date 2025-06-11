@@ -189,7 +189,7 @@ enum CommonEventPriority {
     FIRST_PRIORITY = 600,
     SECOND_PRIORITY = 500,
     THIRD_PRIORITY = 400
-}
+};
 
 template<typename T>
 struct TelRilResponseInfo {
