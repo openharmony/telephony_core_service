@@ -124,6 +124,7 @@ END:VCARD
 )";
 } // namespace
 
+#ifndef TEL_TEST_UNSUPPORT
 class VcardTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -1511,5 +1512,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Email_002, Function | MediumTest | Level
     ";=E6=B5=8B=E8=AF=95;;;;\r\nEND:VCARD\r\n";
     EXPECT_EQ(value01, expectValue01);
 }
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
