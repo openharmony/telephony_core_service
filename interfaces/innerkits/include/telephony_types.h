@@ -71,8 +71,8 @@ constexpr const char *TEL_ESIM_SUPPORT = "persist.telephony.esim.supported";
 constexpr const char *TEL_DEFAULT_ESIM_SLOT_ID = "const.telephony.esim.slotID";
 constexpr const char *DYNAMIC_POWEROFF_MODEM = "telephony.dynamic_poweroff_modem";
 constexpr const char *DYNAMIC_POWEROFF_MODEM_WITH_STR = "telephony.dynamic_poweroff_modem_with_str";
-constexpr const char *ENTER_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_ENTER_STR";
-constexpr const char *EXIT_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_EXIT_STR";
+constexpr const char *ENTER_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_ENTER_STR"; // enter tele power mode broadcast
+constexpr const char *EXIT_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_EXIT_STR"; // exit tele power mode broadcast
 }
 
 template<typename T>
