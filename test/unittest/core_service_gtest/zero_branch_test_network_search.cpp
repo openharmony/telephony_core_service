@@ -1224,15 +1224,15 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkStateReport, Function | Mediu
     networkSearchHandler->RadioOnState();
     auto networkSearchManagerTmp = networkSearchHandler->networkSearchManager_.lock();
     EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
-    EXPECT_EQ(networkSearchHandler->GetSerialNum(networkSearchHandler->slotId_), 1);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
     networkSearchHandler->RadioOnState(false);
-    EXPECT_EQ(networkSearchHandler->GetSerialNum(networkSearchHandler->slotId_), 1);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
     networkSearchHandler->RadioOnState();
-    EXPECT_EQ(networkSearchHandler->GetSerialNum(networkSearchHandler->slotId_), 2);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 2);
     networkSearchHandler->UpdateNetworkState();
     EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), false);
     networkSearchHandler->RadioOnState(false);
-    EXPECT_EQ(networkSearchHandler->GetSerialNum(networkSearchHandler->slotId_), 3);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 3);
 }
 } // namespace Telephony
 } // namespace OHOS
