@@ -937,6 +937,7 @@ sptr<CellLocation> CellInfo::GetCellLocation()
 
 sptr<CellLocation> CellInfo::GetCellLocationExt(CellInformation::CellType type)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (currentCellInfo_ == nullptr) {
         TELEPHONY_LOGE("CellInfo::GetCellLocationExt is null slotId:%{public}d", slotId_);
         return nullptr;
