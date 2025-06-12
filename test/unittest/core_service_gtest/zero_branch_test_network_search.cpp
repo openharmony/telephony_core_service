@@ -1215,5 +1215,27 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_RadioInfo, Function | MediumTest | L
     radioInfo->SetRadioOnIfNeeded();
 }
  
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkStateReport, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    networkSearchHandler->slotId_ = SLOT_ID_0;
+    networkSearchHandler->RadioOnState();
+    auto networkSearchManagerTmp = networkSearchHandler->networkSearchManager_.lock();
+    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
+    networkSearchHandler->RadioOnState(false);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
+    networkSearchHandler->RadioOnState();
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 2);
+    networkSearchHandler->UpdateNetworkState();
+    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), false);
+    networkSearchHandler->RadioOnState(false);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 3);
+}
 } // namespace Telephony
 } // namespace OHOS
