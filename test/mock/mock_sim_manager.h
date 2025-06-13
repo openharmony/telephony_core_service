@@ -51,7 +51,7 @@ public:
     MOCK_METHOD1(SetDefaultVoiceSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultSmsSlotId, int32_t(int32_t));
     MOCK_METHOD1(SetDefaultCellularDataSlotId, int32_t(int32_t));
-    MOCK_METHOD1(SetPrimarySlotId, int32_t(int32_t));
+    MOCK_METHOD2(SetPrimarySlotId, int32_t(int32_t, bool));
     MOCK_METHOD2(SetShowNumber, int32_t(int32_t, const std::u16string &));
     MOCK_METHOD2(SetShowName, int32_t(int32_t, const std::u16string &));
     MOCK_METHOD0(GetDefaultVoiceSlotId, int32_t(void));

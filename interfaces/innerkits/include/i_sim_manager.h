@@ -71,7 +71,7 @@ public:
     virtual int32_t SetDefaultVoiceSlotId(int32_t slotId) = 0;
     virtual int32_t SetDefaultSmsSlotId(int32_t slotId) = 0;
     virtual int32_t SetDefaultCellularDataSlotId(int32_t slotId) = 0;
-    virtual int32_t SetPrimarySlotId(int32_t slotId) = 0;
+    virtual int32_t SetPrimarySlotId(int32_t slotId, bool isUserSet = false) = 0;
     virtual int32_t SetShowNumber(int32_t slotId, const std::u16string &number) = 0;
     virtual int32_t SetShowName(int32_t slotId, const std::u16string &name) = 0;
     virtual int32_t GetDefaultVoiceSlotId() = 0;
