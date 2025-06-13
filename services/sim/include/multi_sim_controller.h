@@ -51,7 +51,7 @@ public:
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetPrimarySlotId();
-    int32_t SetPrimarySlotId(int32_t slotId);
+    int32_t SetPrimarySlotId(int32_t slotId, bool isUserSet);
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
     int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
     int32_t SetShowNumberToDB(int32_t slotId, std::u16string Number);
