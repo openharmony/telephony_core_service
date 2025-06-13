@@ -17,6 +17,7 @@
 
 #include <openssl/sha.h>
 
+#include "cellular_data_client.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
@@ -36,7 +37,7 @@ const int64_t DELAY_TIME = 1000;
 const int SET_PRIMARY_RETRY_TIMES = 5;
 static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
-static const int32_t MAIN_MODEM_ID = 0;
+static const int32_t MODEM_ID_0 = 0;
 const int32_t SYSTEM_PARAMETER_LENGTH = 128;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
@@ -48,6 +49,12 @@ static const std::string MAIN_CARD_ICCID_KEY = "persist.telephony.MainCard.Iccid
 static const std::string PRIMARY_SLOTID_KEY = "persist.telephony.MainSlotId";
 static const std::string MAIN_CELLULAR_DATA_SLOTID_KEY = "persist.telephony.MainCellularDataSlotId";
 static const std::string PRIMARY_SLOTID = "0";
+constexpr int32_t SLOT_ID_0 = 0;
+constexpr int32_t SLOT_ID_1 = 1;
+constexpr int32_t SLOT_ID_2 = 2;
+constexpr int32_t SIM_SLOT_SIZE = 3;
+constexpr int32_t RIL_SET_PRIMARY_SLOT_TIMEOUT = 45 * 1000; // 45 second
+const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -55,6 +62,7 @@ MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager
     : TelEventHandler("MultiSimController"), simStateManager_(simStateManager), simFileManager_(simFileManager)
 {
     TELEPHONY_LOGI("MultiSimController");
+    telRilManager_ = std::weak_ptr<ITelRilManager>(telRilManager);
     radioProtocolController_ = std::make_shared<RadioProtocolController>(std::weak_ptr<ITelRilManager>(telRilManager));
     InitMainCardSlotId();
 }
@@ -78,6 +86,8 @@ void MultiSimController::Init()
     maxCount_ = SIM_SLOT_COUNT;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
     setPrimarySlotRemainCount_.resize(maxCount_, SET_PRIMARY_RETRY_TIMES);
+    isRilSetPrimarySlotSupport_ =
+        system::GetBoolParameter(RIL_SET_PRIMARY_SLOT_SUPPORTED, false);
     TELEPHONY_LOGI("Create SimRdbHelper count = %{public}d", maxCount_);
 }
 
@@ -554,7 +564,7 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
     localCacheInfo_[slotId].isActive = enable;
     lock.unlock();
     UpdateSubState(slotId, enable);
-    CheckIfNeedSwitchMainSlotId();
+    CheckIfNeedSwitchMainSlotId(false);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -628,11 +638,11 @@ int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable
     localCacheInfo_[slotId].isActive = enable;
     lock.unlock();
     UpdateSubState(slotId, enable);
-    CheckIfNeedSwitchMainSlotId();
+    CheckIfNeedSwitchMainSlotId(false);
     return TELEPHONY_ERR_SUCCESS;
 }
 
-void MultiSimController::CheckIfNeedSwitchMainSlotId()
+void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
 {
     TELEPHONY_LOGD("start");
     bool satelliteStatusOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
@@ -644,16 +654,16 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
-            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isInit = isInit]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, !isInit);
             });
             initDataTask.detach();
-        } else if (radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) != MAIN_MODEM_ID) {
+        } else if (radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) != MODEM_ID_0 && isInit) {
             TELEPHONY_LOGI("main slot is different with modemid, need to set slot%{public}d primary", defaultSlotId);
-            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isInit = isInit]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId);
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, !isInit);
             });
             initDataTask.detach();
         } else {
@@ -667,9 +677,9 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId()
             return;
         }
         TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
-        std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId]() {
+        std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId, isInit = isInit]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId);
+            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, !isInit);
         });
         initDataTask.detach();
     }
@@ -950,8 +960,11 @@ void MultiSimController::SetPrimarySlotIdDone()
     activeSimConn_.notify_all();
 }
 
-int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
+int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
+    if (isUserSet && isRilSetPrimarySlotSupport_) {
+        return SetPrimarySlotIdWithoutModemReboot(slotId);
+    }
     TELEPHONY_LOGD("slotId = %{public}d", slotId);
     if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
@@ -962,7 +975,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (radioProtocolController_ != nullptr &&
-        radioProtocolController_->GetRadioProtocolModemId(slotId) == MAIN_MODEM_ID) {
+        radioProtocolController_->GetRadioProtocolModemId(slotId) == MODEM_ID_0) {
         TELEPHONY_LOGI("The current slot is the main slot, no need to set primary slot");
         SavePrimarySlotIdInfo(slotId);
         setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
@@ -1031,6 +1044,12 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             initDataTask.detach();
             break;
         }
+        case RADIO_SIM_SET_PRIMARY_SLOT:
+            OnRilSetPrimarySlotDone(event);
+            break;
+        case RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT:
+            OnRilSetPrimarySlotTimeout(event);
+            break;
         default:
             break;
     }
@@ -1463,6 +1482,101 @@ int32_t MultiSimController::SavePrimarySlotId(int32_t slotId)
     TELEPHONY_LOGI("slotId %{public}d", slotId);
     SavePrimarySlotIdInfo(slotId);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
+{
+    TELEPHONY_LOGD("slotId = %{public}d", slotId);
+    if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+        TELEPHONY_LOGE("in vsim handle, not allowed switch card");
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("no sim card");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    isSetPrimarySlotIdInProgress_ = true;
+    PublishSetPrimaryEvent(false);
+    if (!SetPrimarySlotToRil(slotId)) {
+        TELEPHONY_LOGE("SetPrimarySlotToRil failed");
+        SetPrimarySlotIdDone();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    SavePrimarySlotIdInfo(slotId);
+    SetPrimarySlotIdDone();
+    RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
+    int32_t ret = CellularDataClient::GetInstance().EstablishAllApnsIfConnectable(slotId);
+    TELEPHONY_LOGD("EstablishAllApns ret is %{public}d", ret);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+bool MultiSimController::SetPrimarySlotToRil(int32_t slotId)
+{
+    if (isSettingPrimarySlotToRil_) {
+        TELEPHONY_LOGE("SetPrimarySlotToRil is settting, can not set now");
+        return false;
+    }
+    std::unique_lock<ffrt::mutex> setPrimarySlotLock(setPrimarySlotToRilMutex_);
+    isSettingPrimarySlotToRil_ = true;
+    setPrimarySlotResponseResult_ = false;
+    SendSetPrimarySlotEvent(slotId);
+    while (isSettingPrimarySlotToRil_) {
+        TELEPHONY_LOGI("SetPrimarySlotToRil wait for the setPrimarySlot to finish");
+        setPrimarySlotToRilCv_.wait(setPrimarySlotLock);
+    }
+    TELEPHONY_LOGI("SetPrimarySlotToRil finish");
+    return setPrimarySlotResponseResult_;
+}
+
+void MultiSimController::SendSetPrimarySlotEvent(int32_t slotId)
+{
+    auto telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("SendSetPrimarySlotEvent telRilManager is nullptr");
+        ProcessRilSetPrimarySlotResponse(false);
+        return;
+    }
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RADIO_SIM_SET_PRIMARY_SLOT);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("SetPrimarySlot event is nullptr");
+        ProcessRilSetPrimarySlotResponse(false);
+        return;
+    }
+    event->SetOwner(shared_from_this());
+    telRilManager->SetPrimarySlot(slotId, event);
+    SendEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT, slotId, RIL_SET_PRIMARY_SLOT_TIMEOUT);
+}
+
+void MultiSimController::OnRilSetPrimarySlotDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr");
+        return;
+    }
+    std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
+    if (responseInfo == nullptr) {
+        TELEPHONY_LOGE("responseInfo is nullptr");
+        return;
+    }
+    ProcessRilSetPrimarySlotResponse(responseInfo->error == ErrType::NONE);
+}
+
+void MultiSimController::OnRilSetPrimarySlotTimeout(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr");
+        return;
+    }
+    int32_t primarySlotId = event->GetParam();
+    TELEPHONY_LOGI("setPrimarySlotToRilTimeout slotId is %{public}d", primarySlotId);
+    ProcessRilSetPrimarySlotResponse(false);
+}
+
+void MultiSimController::ProcessRilSetPrimarySlotResponse(bool result)
+{
+    isSettingPrimarySlotToRil_ = false;
+    setPrimarySlotResponseResult_ = result;
+    setPrimarySlotToRilCv_.notify_all();
 }
 
 } // namespace Telephony

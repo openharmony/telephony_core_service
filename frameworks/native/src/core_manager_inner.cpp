@@ -1962,13 +1962,13 @@ int32_t CoreManagerInner::SetDefaultCellularDataSlotId(int32_t slotId)
     return simManager_->SetDefaultCellularDataSlotId(slotId);
 }
 
-int32_t CoreManagerInner::SetPrimarySlotId(int32_t slotId)
+int32_t CoreManagerInner::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SetPrimarySlotId(slotId);
+    return simManager_->SetPrimarySlotId(slotId, isUserSet);
 }
 
 int32_t CoreManagerInner::SetShowNumber(int32_t slotId, const std::u16string &number)
