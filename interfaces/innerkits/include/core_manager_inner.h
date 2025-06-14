@@ -314,7 +314,7 @@ public:
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t SetDefaultSmsSlotId(int32_t slotId);
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
-    int32_t SetPrimarySlotId(int32_t slotId);
+    int32_t SetPrimarySlotId(int32_t slotId, bool isUserSet = false);
     int32_t SetShowNumber(int32_t slotId, const std::u16string &number);
     int32_t SetShowName(int32_t slotId, const std::u16string &name);
     int32_t GetDefaultVoiceSlotId();

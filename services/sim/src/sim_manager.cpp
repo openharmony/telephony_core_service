@@ -399,7 +399,7 @@ int32_t SimManager::SetDefaultCellularDataSlotId(int32_t slotId)
     return ret;
 }
 
-int32_t SimManager::SetPrimarySlotId(int32_t slotId)
+int32_t SimManager::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("slotId is invalid for default.");
@@ -409,7 +409,7 @@ int32_t SimManager::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("multiSimController_ is nullptr.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = multiSimController_->SetPrimarySlotId(slotId);
+    int32_t ret = multiSimController_->SetPrimarySlotId(slotId, isUserSet);
     if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
     }
