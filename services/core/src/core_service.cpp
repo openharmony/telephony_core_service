@@ -867,7 +867,7 @@ int32_t CoreService::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("sim is not active");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
-    return simManager_->SetPrimarySlotId(slotId);
+    return simManager_->SetPrimarySlotId(slotId, true);
 }
 
 int32_t CoreService::GetPrimarySlotId(int32_t &slotId)

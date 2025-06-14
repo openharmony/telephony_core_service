@@ -51,7 +51,7 @@ public:
     int32_t GetDefaultCellularDataSlotId();
     int32_t SetDefaultCellularDataSlotId(int32_t slotId);
     int32_t GetPrimarySlotId();
-    int32_t SetPrimarySlotId(int32_t slotId);
+    int32_t SetPrimarySlotId(int32_t slotId, bool isUserSet);
     int32_t GetShowNumber(int32_t slotId, std::u16string &showNumber);
     int32_t SetShowNumber(int32_t slotId, std::u16string Number, bool force = false);
     int32_t SetShowNumberToDB(int32_t slotId, std::u16string Number);
@@ -90,6 +90,7 @@ public:
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
     enum {
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
+        RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT
     };
 
 private:
@@ -110,7 +111,7 @@ private:
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
     bool RefreshActiveIccAccountInfoList();
     std::string EncryptIccId(const std::string iccid);
-    void CheckIfNeedSwitchMainSlotId();
+    void CheckIfNeedSwitchMainSlotId(bool isInit = true);
     bool IsValidSlotId(int32_t slotId);
     bool InitPrimary();
     bool IsAllCardsReady();
@@ -129,6 +130,12 @@ private:
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void SetPrimarySlotIdDone();
+    int32_t SetPrimarySlotIdWithoutModemReboot(int32_t slotId);
+    void OnRilSetPrimarySlotDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void OnRilSetPrimarySlotTimeout(const AppExecFwk::InnerEvent::Pointer &event);
+    bool SetPrimarySlotToRil(int32_t slotId);
+    void SendSetPrimarySlotEvent(int32_t slotId);
+    void ProcessRilSetPrimarySlotResponse(bool result);
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -155,6 +162,12 @@ private:
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
+    ffrt::mutex setPrimarySlotToRilMutex_;
+    ffrt::condition_variable setPrimarySlotToRilCv_;
+    std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
+    bool isSettingPrimarySlotToRil_ = false;
+    bool setPrimarySlotResponseResult_ = false;
+    bool isRilSetPrimarySlotSupport_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
