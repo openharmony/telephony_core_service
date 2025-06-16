@@ -94,6 +94,7 @@ const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_T
 const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
 const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
 static const int32_t SLEEP_TIME = 3;
+const int SLOT_COUNT = 2;
 } // namespace
 
 class BranchTest : public testing::Test {
@@ -2379,6 +2380,31 @@ HWTEST_F(BranchTest, Telephony_Network_InitTelephonyExtService_001, Function | M
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateOperatorNameParamsExt_ != nullptr);
     }
+}
+
+HWTEST_F(BranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager;
+    simStateManager.resize(SLOT_COUNT);
+    simFileManager.resize(SLOT_COUNT);
+    for (int32_t slotId = 0; slotId < SLOT_COUNT; slotId++) {
+        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
+        simStateManager[slotId]->Init(slotId);
+        simFileManager[slotId] = SimFileManager::CreateInstance(
+            std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager[slotId]));
+        simFileManager[slotId]->Init(slotId);
+    }
+    IccState iccState;
+    iccState.simType_ = ICC_UNKNOWN_TYPE;
+    iccState.simStatus_ = ICC_CONTENT_READY;
+    iccState.iccid_ = "123456789012345";
+    simStateManager[0]->simStateHandle_->oldSimType_ = ICC_USIM_TYPE;
+    simStateManager[0]->simStateHandle_->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
+    simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0);
+    EXPECT_EQ(simStateManager[0]->simStateHandle_->externalState_, SimState::SIM_STATE_READY);
 }
 } // namespace Telephony
 } // namespace OHOS
