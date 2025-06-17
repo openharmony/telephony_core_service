@@ -17,7 +17,6 @@
 #define TELEPHONY_SIMSTATETRACKER_H
 
 #include <string>
-#include <telephony_types.h>
 
 #include "iservice_registry.h"
 #include "operator_config_cache.h"
