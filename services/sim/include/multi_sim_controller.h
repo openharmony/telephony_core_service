@@ -79,7 +79,10 @@ public:
     void ResetDataShareError();
     int32_t UpdateOpKeyInfo();
     bool IsSetActiveSimInProgress(int32_t slotId);
-    bool IsSetPrimarySlotIdInProgress();
+    inline bool IsSetPrimarySlotIdInProgress()
+    {
+        return isSetPrimarySlotIdInProgress_;
+    }
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
 
