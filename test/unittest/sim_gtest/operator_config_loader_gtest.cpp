@@ -147,5 +147,33 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_UpdateIccidCache_001, Function | Me
     simFileManager = nullptr;
     operatorConfigCache->UpdateIccidCache(0);
 }
+
+/**
+ * @tc.number   Telephony_GetMccFromMccMnc_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(OperatorConfigLoaderTest, Telephony_GetMccFromMccMnc_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    std::string mccmnc = "123456";
+    std::string ret = operatorConfigLoader->GetMccFromMccMnc(mccmnc);
+    EXPECT_EQ(ret, "123");
+ 
+    mccmnc = "1234";
+    ret = operatorConfigLoader->GetMccFromMccMnc(mccmnc);
+    EXPECT_EQ(ret, "");
+    
+    mccmnc = "1234567890123456";
+    std::string result = operatorConfigLoader->GetMncFromMccMnc(mccmnc);
+    EXPECT_EQ(ret, "");
+}
 } // namespace Telephony
 } // namespace OHOS
