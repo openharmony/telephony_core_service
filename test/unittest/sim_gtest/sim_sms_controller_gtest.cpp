@@ -90,6 +90,35 @@ HWTEST_F(SimSmsControllerTest, Telephony_Sim_SetRilAndFileManager_001, Function 
     simSmsController->SetRilAndFileManager(nullptr, nullptr);
     EXPECT_EQ(simSmsController->fileManager_, nullptr);
 }
+HWTEST_F(SimSmsControllerTest, Telephony_Sim_IsCdmaCardType001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::SimSmsController> simSmsController = std::make_shared<SimSmsController>(simStateManager);
+ 
+    simSmsController->stateManager_ = nullptr;
+    EXPECT_FALSE(simSmsController->IsCdmaCardType());
+ 
+    simSmsController->stateManager_ = std::make_shared<SimStateManager>(telRilManager);
+    simSmsController->stateManager_->simStateHandle_  = std::make_shared<SimStateHandle>(simStateManager);
+    simSmsController->stateManager_->simStateHandle_->externalType_ = CardType::UNKNOWN_CARD;
+    EXPECT_FALSE(simSmsController->IsCdmaCardType());
+ 
+    simSmsController->stateManager_->simStateHandle_->externalType_ = CardType::SINGLE_MODE_RUIM_CARD;
+    EXPECT_TRUE(simSmsController->IsCdmaCardType());
+}
 
+HWTEST_F(SimSmsControllerTest, Telephony_Sim_ObtainAllSmsOfIcc001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<Telephony::SimSmsController> simSmsController = std::make_shared<SimSmsController>(simStateManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    simSmsController->fileManager_ = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    std::vector<std::string> result = simSmsController->ObtainAllSmsOfIcc();
+    EXPECT_EQ(simSmsController->responseReady_, true);
+}
 }
 }
