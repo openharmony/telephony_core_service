@@ -16,6 +16,7 @@
 #include "sim_manager.h"
 
 #include "core_service_errors.h"
+#include "ffrt.h"
 #include "radio_event.h"
 #include "str_convert.h"
 #include "telephony_errors.h"
@@ -73,7 +74,9 @@ void SimManager::InitMultiSimObject()
             stkManager_[slotId]->Init(slotId);
         }
         if (simStateManager_[slotId] != nullptr) {
-            simStateManager_[slotId]->RefreshSimState(slotId);
+            ffrt::submit([=]() {
+                simStateManager_[slotId]->RefreshSimState(slotId);
+            });
         }
     }
 }
