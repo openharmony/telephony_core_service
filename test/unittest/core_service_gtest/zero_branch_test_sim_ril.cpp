@@ -1634,8 +1634,8 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_004, Function | Medium
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
-    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache); 
-    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();   
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     operatorConfigLoader->GetOpKey(resultSet, 0);
     operatorConfigLoader->MatchOperatorRule(resultSet, 0);
     operatorConfigLoader->simFileManager_.reset();
@@ -1715,9 +1715,9 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorFileParser_001, Function | MediumTe
     cJSON *root = cJSON_CreateObject();
     parser.ParseFromCustomSystem(0, operatorConfig, root);
     parser.ParseFromCustomSystem(1, operatorConfig, root);
-    FILE* fp = fopen("testName", "r"); 
+    FILE* fp = fopen("testName", "r");
     if (fp != nullptr) {
-    EXPECT_TRUE(parser.CloseFile(fp)); 
+    EXPECT_TRUE(parser.CloseFile(fp));
     fclose(fp);
     }
 }
