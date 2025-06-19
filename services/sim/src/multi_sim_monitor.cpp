@@ -248,7 +248,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         simFileManager->ClearData();
         std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
         controller_->loadedSimCardInfo_.erase(slotId);
-    } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) {
+    } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
+                !controller_->IsSetPrimarySlotIdInProgress()) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
         simFileManager->ClearData();
     }

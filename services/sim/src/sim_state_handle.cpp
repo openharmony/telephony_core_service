@@ -398,7 +398,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         }
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
-            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId);
+            if (!iccid_.empty()) {
+                observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId);
+            }
         }
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
             slotId, externalType_, externalState_, reason);
