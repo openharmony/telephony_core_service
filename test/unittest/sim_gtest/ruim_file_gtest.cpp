@@ -146,5 +146,21 @@ HWTEST_F(RuimFileTest, RuimFileControllerTest001, Function | MediumTest | Level1
     EXPECT_NE(ruimFileController->ObtainElementFilePath(ELEMENTARY_FILE_SMS).c_str(), nullptr);
 }
 
+HWTEST_F(RuimFileTest, RuimFileControllerTest002, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::shared_ptr<RuimFileController> ruimFileController = std::make_shared<RuimFileController>(slotId);
+    int fileId = 12345;
+    int highOffset = 0;
+    int lowOffset = 10;
+    int length = 20;
+    AppExecFwk::InnerEvent::Pointer onLoaded = AppExecFwk::InnerEvent::Get();
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    iccFileController->telRilManager_ = nullptr;
+    ruimFileController->ObtainTransparentImg(fileId, highOffset, lowOffset, length, onLoaded);
+    iccFileController->telRilManager_ = std::make_shared<TelRilManager>();
+    ruimFileController->ObtainTransparentImg(fileId, highOffset, lowOffset, length, onLoaded);
+    EXPECT_NE(iccFileController->telRilManager_, nullptr);
+}
 }
 }
