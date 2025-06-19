@@ -19,6 +19,7 @@
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "radio_event.h"
+#include "telephony_types.h"
 #include "telephony_ext_wrapper.h"
 
 namespace OHOS {
