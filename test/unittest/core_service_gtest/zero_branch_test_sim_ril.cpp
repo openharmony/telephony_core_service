@@ -1954,7 +1954,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_005, Function | MediumTest |
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     EXPECT_FALSE(simFileManager->IsCTIccId(""));
-    //EXPECT_FALSE(simFileManager->IsCTIccId("898601123456789"));
 }
 } // namespace Telephony
 } // namespace OHOS
