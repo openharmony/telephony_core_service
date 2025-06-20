@@ -85,6 +85,7 @@ public:
     }
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
+    bool IsEsim(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;

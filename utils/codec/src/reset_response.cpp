@@ -89,6 +89,9 @@ bool ResetResponse::AnalysisInterfaceData(const std::vector<uint8_t> &atrData, u
             }
             charD = atrData[index];
             index++;
+        } else {
+            TELEPHONY_LOGE("ATR find tdx end, final td: 0x{public}x", charD);
+            break;
         }
         if (charD == '\0') {
             break;

@@ -31,6 +31,10 @@
 #include "string_ex.h"
 #include "telephony_ext_wrapper.h"
 
+#ifdef  CORE_SERVICE_SUPPORT_ESIM
+#include "reset_response.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
@@ -38,6 +42,8 @@ const int SET_PRIMARY_RETRY_TIMES = 5;
 static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const int32_t MODEM_ID_0 = 0;
+static const int32_t MODEM_ID_1 = 1;
+static const int32_t CARD_ATR_LEN = 65;
 const int32_t SYSTEM_PARAMETER_LENGTH = 128;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
@@ -55,6 +61,8 @@ constexpr int32_t SLOT_ID_2 = 2;
 constexpr int32_t SIM_SLOT_SIZE = 3;
 constexpr int32_t RIL_SET_PRIMARY_SLOT_TIMEOUT = 45 * 1000; // 45 second
 const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
+static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
+static const std::string GSM_SIM_ATR1 = "gsm.sim.hw_atr1";
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -571,29 +579,15 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
 int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
 {
     TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
-#ifndef  CORE_SERVICE_SUPPORT_ESIM
-    if (!IsValidData(slotId)) {
+    if ((!IsValidData(slotId)) && !IsEsim(slotId)) {
         TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     int curSimId = 0;
-    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
+    if ((GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) && !IsEsim(slotId)) {
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-#else
-    if ((!IsValidData(slotId)) && (!simFileManager_[slotId]->IsSupported())) {
-        TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    int curSimId = 0;
-    if (GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) {
-        if (!simFileManager_[slotId]->IsSupported()) {
-            TELEPHONY_LOGE("failed by out of range");
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
-        }
-    }
-#endif
     return SetActiveCommonSim(slotId, enable, force, curSimId);
 }
 
@@ -1559,6 +1553,40 @@ void MultiSimController::ProcessRilSetPrimarySlotResponse(bool result)
     isSettingPrimarySlotToRil_ = false;
     setPrimarySlotResponseResult_ = result;
     setPrimarySlotToRilCv_.notify_all();
+}
+
+bool MultiSimController::IsEsim(int32_t slotId)
+{
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    if ((radioProtocolController_ == nullptr) ||
+        (slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
+            TELEPHONY_LOGE("slotId[%{public}d] invalid or radioProtocolController_ is null", slotId);
+            return false;
+    }
+    int32_t modemId = radioProtocolController_->GetRadioProtocolModemId(slotId);
+    std::string propAtr = "";
+    propAtr = (modemId == MODEM_ID_0) ? GSM_SIM_ATR : propAtr;
+    propAtr = (modemId == MODEM_ID_1) ? GSM_SIM_ATR1 : propAtr;
+    if (propAtr.empty()) {
+        TELEPHONY_LOGE("modemId invalid, can't get atr prop.");
+        return false;
+    }
+
+    char buf[CARD_ATR_LEN + 1] = {0};
+    GetParameter(propAtr.c_str(), "", buf, CARD_ATR_LEN);
+    std::string cardAtr(buf);
+    if (cardAtr.empty()) {
+        TELEPHONY_LOGE("card atr is empty.");
+        return false;
+    }
+
+    ResetResponse resetResponse;
+    resetResponse.AnalysisAtrData(cardAtr);
+    TELEPHONY_LOGI("slot%{public}d isEsim: %{public}s", slotId, resetResponse.IsEuiccAvailable() ? "true" : "false");
+    return resetResponse.IsEuiccAvailable();
+#else
+    return false;
+#endif
 }
 
 } // namespace Telephony
