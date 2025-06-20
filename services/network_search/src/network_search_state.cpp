@@ -456,10 +456,6 @@ void NetworkSearchState::NotifyStateChange()
         NotifyEmergencyChange();
         NotifyNrStateChange();
         
-        auto networkSearchManager = networkSearchManager_.lock();
-        if (networkSearchManager != nullptr) {
-            networkSearchManager->UpdateOperatorName(slotId_);
-        }
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
