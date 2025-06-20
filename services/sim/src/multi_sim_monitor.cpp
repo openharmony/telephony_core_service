@@ -61,7 +61,6 @@ void MultiSimMonitor::Init()
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
-    GetEsimType();
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -193,19 +192,18 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
         return;
     }
-    // When the SIM card file changes, the ICCID refresh is triggered, and InitData is finally executed,
-    // when wearable device ESIM turn off, the profile change also triggers this process
-    // but InitData should not be executed.
-    if (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN)) {
-        TELEPHONY_LOGE("MultiSimMonitor::InitData not init unknown esim");
-        return;
-    }
     if (isSimAccountLoaded_[slotId]) {
         TELEPHONY_LOGI("MultiSimMonitor::InitData simAccountInfo is already loaded");
         return;
     }
     if (controller_ == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData controller_ is nullptr");
+        return;
+    }
+    // InitData is triggered when the sim card file changes.
+    // However, it should not be excuted when the eSIM profile is disabled.
+    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId)) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitData not init when esim is deactivated");
         return;
     }
     if (!controller_->InitData(slotId)) {
@@ -237,9 +235,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
-    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
-        (isEsimOnlyDevice_ && (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN))) {
-        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent", slotId);
+    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) || controller_->IsEsim(slotId)) {
+        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         controller_->ResetSetPrimarySlotRemain(slotId);
@@ -324,14 +321,6 @@ void MultiSimMonitor::InitListener()
     auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
     TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
     CheckOpcNeedUpdata(false);
-}
-
-void MultiSimMonitor::GetEsimType()
-{
-    char esimType[MAX_PARAMETER_LENGTH] = { 0 };
-    GetParameter("const.ril.esim_type", "", esimType, MAX_PARAMETER_LENGTH);
-    // If it is esim only device, the value is 6
-    isEsimOnlyDevice_ = esimType[0] == '6';
 }
 
 void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
