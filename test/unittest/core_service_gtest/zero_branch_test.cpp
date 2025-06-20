@@ -2406,5 +2406,42 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level
     simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0);
     EXPECT_EQ(simStateManager[0]->simStateHandle_->externalState_, SimState::SIM_STATE_READY);
 }
+
+/**
+ * @tc.number   Telephony_IccFile_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->ehplmns_ = { "460-01", "460-02", "470-03" };
+    iccFile->ObtainEhPlmns();
+    iccFile->ehplmns_.clear();
+    EXPECT_TRUE(iccFile->ObtainEhPlmns().empty());
+}
+ 
+/**
+ * @tc.number   Telephony_IccFile_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, zero_branch_test.cpp, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->spdiPlmns_ = { "460-01", "460-02", "470-03" };
+    iccFile->imsi_ = "1234567890";
+    iccFile->ObtainMCC();
+    iccFile->ObtainSpdiPlmns();
+    iccFile->ObtainMNC();
+    iccFile->spdiPlmns_.clear();
+    iccFile->imsi_ = "";
+    iccFile->ObtainMNC();
+    EXPECT_TRUE(iccFile->ObtainSpdiPlmns().empty());
+}
 } // namespace Telephony
 } // namespace OHOS
