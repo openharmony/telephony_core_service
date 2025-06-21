@@ -1955,5 +1955,53 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_005, Function | MediumTest |
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     EXPECT_FALSE(simFileManager->IsCTIccId(""));
 }
+
+/**
+ * @tc.number   Telephony_SimStateHandle_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->Init(0);
+ 
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_ENABLE_PIN_DONE);
+    simStateHandle->telRilManager_ = telRilManager;
+    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->UnlockPin2(0, "1213");
+    simStateHandle->UnlockPuk2(0, "1234", "1234");
+    simStateHandle->AlterPin2(0, "1234", "1234");
+ 
+ 
+    simStateHandle->telRilManager_.reset();
+    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->UnlockPin2(0, "1213");
+    simStateHandle->UnlockPuk2(0, "1234", "1234");
+    simStateHandle->AlterPin2(0, "1234", "1234");
+    simStateHandle->ObtainRealtimeIccStatus(0);
+    simStateHandle->SendSimMatchedOperatorInfo(0, 0, "", "");
+ 
+    event = nullptr;
+    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->UnlockPin2(0, "1213");
+    simStateHandle->UnlockPuk2(0, "1234", "1234");
+    simStateHandle->AlterPin2(0, "1234", "1234");
+    LockInfo options;
+    options.lockType = LockType::PIN_LOCK;
+    options.lockState = LockState::LOCK_OFF;
+    simStateHandle->SetLockState(0, options);
+    simStateHandle->GetLockState(0, options.lockType);
+    PersoLockInfo lockInfo;
+    simStateHandle->UnlockSimLock(0, lockInfo);
+    simStateHandle->ObtainIccStatus(0);
+    simStateHandle->ObtainRealtimeIccStatus(0);
+    simStateHandle->SendSimMatchedOperatorInfo(0, 0, "", "");
+    simStateHandle->ProcessEvent(event);
+    std::string authData = "test";
+    EXPECT_EQ(simStateHandle->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, authData), SIM_AUTH_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS
