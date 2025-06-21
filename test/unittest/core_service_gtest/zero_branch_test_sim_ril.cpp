@@ -1970,14 +1970,14 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_007, Function | MediumTest |
  
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_ENABLE_PIN_DONE);
     simStateHandle->telRilManager_ = telRilManager;
-    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->AlterPin(0, "1234", "1234");
     simStateHandle->UnlockPin2(0, "1213");
     simStateHandle->UnlockPuk2(0, "1234", "1234");
     simStateHandle->AlterPin2(0, "1234", "1234");
  
  
     simStateHandle->telRilManager_.reset();
-    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->AlterPin(0, "1234", "1234");
     simStateHandle->UnlockPin2(0, "1213");
     simStateHandle->UnlockPuk2(0, "1234", "1234");
     simStateHandle->AlterPin2(0, "1234", "1234");
@@ -1985,7 +1985,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_007, Function | MediumTest |
     simStateHandle->SendSimMatchedOperatorInfo(0, 0, "", "");
  
     event = nullptr;
-    simStateHandle->AlterPin(0,"1234", "1234");
+    simStateHandle->AlterPin(0, "1234", "1234");
     simStateHandle->UnlockPin2(0, "1213");
     simStateHandle->UnlockPuk2(0, "1234", "1234");
     simStateHandle->AlterPin2(0, "1234", "1234");
