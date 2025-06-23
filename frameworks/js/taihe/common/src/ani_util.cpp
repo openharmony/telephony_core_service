@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+#include "ani_util.h"
+#include "core_service_errors.h"
+#include "enum_convert_for_js.h"
+#include "state_registry_errors.h"
+#include "telephony_log_wrapper.h"
+
 #include <codecvt>
 #include <cstdio>
 #include <cstring>
@@ -20,12 +26,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-
-#include "core_service_errors.h"
-#include "enum_convert_for_js.h"
-#include "state_registry_errors.h"
-#include "telephony_log_wrapper.h"
-#include "ani_util.h"
 
 namespace OHOS {
 namespace Telephony {
