@@ -14,6 +14,9 @@
  */
 
 @!namespace("@ohos.telephony.radio", "radio")
+@!sts_inject("""
+static { loadLibrary("telephony_radio_taihe_native.z") }
+""")
 
 enum ImsServiceType: i32 {
     TYPE_VOICE,
