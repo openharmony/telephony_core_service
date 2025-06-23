@@ -293,7 +293,7 @@ int32_t TelephonyStateRegistryProxy::UpdateSimState(
 int32_t TelephonyStateRegistryProxy::RegisterStateChange(
     const sptr<TelephonyObserverBroker> &callback, int32_t slotId, uint32_t mask, bool isUpdate)
 {
-    MessageOption option;
+    MessageOption option = { MessageOption::TF_ASYNC };
     MessageParcel in;
     MessageParcel out;
     if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
@@ -320,9 +320,9 @@ int32_t TelephonyStateRegistryProxy::RegisterStateChange(
     }
     int result = remote->SendRequest(
         static_cast<uint32_t>(StateNotifyInterfaceCode::ADD_OBSERVER), in, out, option);
-    if (result == ERR_NONE) {
-        result = out.ReadInt32();
-        return result;
+    if (result != ERR_NONE) {
+        TELEPHONY_LOGE("RegisterStateChange SendRequest failed!");
+        return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
