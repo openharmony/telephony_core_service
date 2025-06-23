@@ -42,8 +42,6 @@ taihe_shared_library("telephony_radio_taihe_native") {
   include_dirs = [
     "include",
     "$SUBSYSTEM_DIR/core_service/frameworks/js/taihe/common/include",
-    "$SUBSYSTEM_DIR/core_service/interfaces/kits/native",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
   ]
   sources += [
     "src/ani_constructor.cpp",
@@ -60,7 +58,6 @@ taihe_shared_library("telephony_radio_taihe_native") {
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_single",
   ]
   sanitize = {
     cfi = true

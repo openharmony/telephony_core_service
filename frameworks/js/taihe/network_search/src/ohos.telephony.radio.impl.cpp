@@ -31,8 +31,8 @@ using namespace OHOS::Telephony;
 namespace {
 // To be implemented.
 
-static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
-static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
+constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
 
 bool IsValidSlotId(int32_t slotId)
 {
@@ -250,12 +250,12 @@ bool IsNRSupportedDefault()
     TelephonyConfig telephonyConfig;
     bool isNrSupported =
         telephonyConfig.IsCapabilitySupport(static_cast<int32_t>(TelephonyConfig::ConfigType::MODEM_CAP_SUPPORT_NR));
-    #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_UTILS_WRAPPER.InitTelephonyExtUtilsWrapper();
     if (TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_ != nullptr) {
         isNrSupported = isNrSupported && TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_();
     }
-    #endif
+#endif
     return isNrSupported;
 }
 
