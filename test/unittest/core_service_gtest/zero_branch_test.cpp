@@ -2406,5 +2406,103 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level
     simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0);
     EXPECT_EQ(simStateManager[0]->simStateHandle_->externalState_, SimState::SIM_STATE_READY);
 }
+
+/**
+ * @tc.number   Telephony_IccFile_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->ehplmns_ = { "460-01", "460-02", "470-03" };
+    iccFile->ObtainEhPlmns();
+    iccFile->ehplmns_.clear();
+    EXPECT_TRUE(iccFile->ObtainEhPlmns().empty());
+}
+ 
+/**
+ * @tc.number   Telephony_IccFile_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->spdiPlmns_ = { "460-01", "460-02", "470-03" };
+    iccFile->imsi_ = "1234567890";
+    iccFile->ObtainMCC();
+    iccFile->ObtainSpdiPlmns();
+    iccFile->ObtainMNC();
+    iccFile->spdiPlmns_.clear();
+    iccFile->imsi_ = "";
+    iccFile->ObtainMNC();
+    EXPECT_TRUE(iccFile->ObtainSpdiPlmns().empty());
+}
+
+/**
+ * @tc.number   Telephony_RadioProtocolController_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RadioProtocolController_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_GET_RADIO_PROTOCOL);
+    AppExecFwk::InnerEvent::Pointer event1 = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RADIO_PROTOCOL_NOTIFY);
+    std::shared_ptr<RadioProtocol> radioProtocol = event1->GetSharedObject<RadioProtocol>();
+    radioProtocolController->GetRadioProtocol(SLOT_ID_0);
+    RadioProtocol protocol;
+    protocol.sessionId = radioProtocolController->sessionId_;
+    radioProtocolController->ProcessRadioProtocolNotify(event1);
+    EXPECT_FALSE(radioProtocolController->communicationFailed_);
+    radioProtocolController->ProcessRadioProtocolNotify(event);
+    event = nullptr;
+    radioProtocolController->slotCount_ = -1;
+    radioProtocolController->GetRadioProtocol(SLOT_ID_0);
+    radioProtocolController->SendRadioProtocolEvent(radioProtocolController->oldRadioProtocol_, 1);
+    protocol.slotId = -1;
+    radioProtocolController->SendRadioProtocolEvent(radioProtocolController->oldRadioProtocol_, 1);
+ 
+    radioProtocolController->telRilManager_.reset();
+    radioProtocolController->Init();
+    EXPECT_FALSE(radioProtocolController->SetRadioProtocol(SLOT_ID_0));
+    radioProtocolController->isCommunicating_ = true;
+    EXPECT_FALSE(radioProtocolController->SetRadioProtocol(SLOT_ID_0));
+    radioProtocolController->oldRadioProtocol_.clear();
+    radioProtocolController->SendRadioProtocolEvent(radioProtocolController->oldRadioProtocol_, 1);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_CHECK, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+    radioProtocolController->BuildRadioProtocolForCommunication(
+        RadioProtocolPhase::RADIO_PROTOCOL_PHASE_COMPLETE, RadioProtocolStatus::RADIO_PROTOCOL_STATUS_FAIL);
+}
+ 
+/**
+ * @tc.number   Telephony_MultiSimController_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    TELEPHONY_EXT_WRAPPER.isHandleVSim_ = []() { return true; };
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_);
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_());
+    multiSimController->isRilSetPrimarySlotSupport_ = true;
+    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, true), TELEPHONY_ERR_NO_SIM_CARD);
+    multiSimController->isRilSetPrimarySlotSupport_ = false;
+    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, false), TELEPHONY_ERR_NO_SIM_CARD);
+}
 } // namespace Telephony
 } // namespace OHOS
