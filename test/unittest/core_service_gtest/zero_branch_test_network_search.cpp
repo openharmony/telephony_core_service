@@ -879,6 +879,115 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_006, Function |
     EXPECT_GT(nsm->UpdateOperatorName(SLOT_ID_0), TELEPHONY_ERR_SUCCESS);
 }
  
+/**
+ * @tc.number   Telephony_NetworkSearchManager_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_007, Function | MediumTest | Level1)
+{
+    int32_t slotId = SIM_SLOT_COUNT + 1;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    std::shared_ptr<NetworkSearchManagerInner> inner = nullptr;
+    networkSearchManager->telRilManager_ = nullptr;
+    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
+    
+    EXPECT_FALSE(networkSearchManager->InitPointer(inner, slotId));
+    EXPECT_FALSE(networkSearchManager->OnInit());
+    EXPECT_EQ(networkSearchManager->InitModuleBySlotId(slotId), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->InitModuleBySlotId(-1), TELEPHONY_ERROR);
+    EXPECT_EQ(networkSearchManager->SetRadioState(0, false, 0, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchManager_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_008, Function | MediumTest | Level1)
+{
+    int32_t radioTech;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchState_ = networkSearchState;
+    inner->observerHandler_ = std::make_unique<ObserverHandler>();
+    inner->networkSearchHandler_ = networkSearchHandler;
+ 
+    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
+    networkSearchManager->RegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 0);
+    networkSearchManager->UnRegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 0);
+ 
+    networkSearchManager->ClearManagerInner();
+    networkSearchManager->NotifyPsRoamingOpenChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsRoamingCloseChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyEmergencyOpenChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyEmergencyCloseChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsRatChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsConnectionAttachedChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsConnectionDetachedChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyNrStateChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyNrFrequencyChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyFactoryReset(INVALID_SLOTID);
+    networkSearchManager->GetPsRoamingState(INVALID_SLOTID);
+    
+    inner->observerHandler_ = nullptr;
+    inner->networkSearchHandler_ = nullptr;
+    inner->networkSearchState_ = nullptr;
+    networkSearchManager->AddManagerInner(INVALID_SLOTID, inner);
+    networkSearchManager->RegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 0);
+    networkSearchManager->UnRegisterCoreNotify(INVALID_SLOTID, networkSearchHandler, 0);
+    networkSearchManager->NotifyPsRoamingOpenChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsRoamingCloseChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyEmergencyOpenChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyEmergencyCloseChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsRatChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsConnectionAttachedChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyPsConnectionDetachedChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyNrStateChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyNrFrequencyChanged(INVALID_SLOTID);
+    networkSearchManager->NotifyFactoryReset(INVALID_SLOTID);
+    EXPECT_NE(networkSearchManager->GetPsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(networkSearchManager->GetCsRadioTech(INVALID_SLOTID, radioTech), TELEPHONY_ERR_SUCCESS);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchManager_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_009, Function | MediumTest | Level1)
+{
+    bool flag = false;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    sptr<INetworkSearchCallback> callBack = nullptr;
+    sptr<NetworkInformation> networkInfo = nullptr;
+ 
+    networkSearchManager->telRilManager_ = nullptr;
+    networkSearchManager->eventSender_ = nullptr;
+    networkSearchManager->ClearManagerInner();
+    EXPECT_EQ(networkSearchManager->IsGsm(INVALID_SLOTID, flag), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->IsCdma(INVALID_SLOTID, flag), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    networkSearchManager->UpdateDeviceId(INVALID_SLOTID);
+ 
+    EXPECT_FALSE(networkSearchManager->OnInit());
+    EXPECT_EQ(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID, callBack), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->GetPreferredNetwork(INVALID_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->GetNrOptionMode(INVALID_SLOTID, callBack), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1, callBack), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, callBack),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 0, networkInfo, callBack),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
  
 /**
  * @tc.number   Telephony_NetworkSearchHandler_001
@@ -1033,6 +1142,91 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     networkSearchHandler->CheckRegistrationState(networkSearchManagerNull);
 }
  
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    std::vector<sptr<CellInformation>> cells;
+    
+    networkSearchHandler->networkType_ = nullptr;
+    networkSearchHandler->nitzUpdate_ = nullptr;
+    networkSearchHandler->radioInfo_ = nullptr;
+    networkSearchHandler->cellInfo_ = nullptr;
+ 
+    networkSearchHandler->GetPreferredNetworkResponse(event);
+    networkSearchHandler->SetPreferredNetworkResponse(event);
+    networkSearchHandler->RadioNitzUpdate(event);
+    networkSearchHandler->RadioGetImei(event);
+    networkSearchHandler->RadioGetImeiSv(event);
+    networkSearchHandler->RadioGetMeid(event);
+    networkSearchHandler->RadioGetCurrentCellInfo(event);
+    networkSearchHandler->RadioCurrentCellInfoUpdate(event);
+    networkSearchHandler->RadioGetNeighboringCellInfo(event);
+    EXPECT_EQ(networkSearchHandler->GetNeighboringCellInfoList(cells), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+    std::vector<sptr<CellInformation>> cells;
+    std::vector<sptr<Telephony::SignalInformation>> signals;
+ 
+    networkSearchHandler->networkRegister_ = nullptr;
+    networkSearchHandler->networkSelection_ = nullptr;
+    networkSearchHandler->radioInfo_ = nullptr;
+    networkSearchHandler->nrSsbInfo_ = nullptr;
+    networkSearchHandler->nitzUpdate_ = nullptr;
+    networkSearchHandler->operatorName_ = nullptr;
+    networkSearchHandler->cellInfo_ = nullptr;
+    
+    networkSearchHandler->NetworkSearchResult(event);
+    networkSearchHandler->SetNetworkSelectionModeResponse(event);
+    networkSearchHandler->RadioRestrictedState(event);
+    networkSearchHandler->RadioChannelConfigInfo(event);
+    networkSearchHandler->DcPhysicalLinkActiveUpdate(event);
+    networkSearchHandler->HandleDelayNotifyEvent(event);
+    networkSearchHandler->NotifyStateChange(event);
+    networkSearchHandler->RadioVoiceTechChange(event);
+    networkSearchHandler->UpdateImsRegisterState(event);
+    networkSearchHandler->RadioGetBasebandVersion(event);
+    networkSearchHandler->SetNrOptionModeResponse(event);
+    networkSearchHandler->GetNrOptionModeResponse(event);
+    networkSearchHandler->RadioGetRrcConnectionState(event);
+    networkSearchHandler->GetNrSsbIdResponse(event);
+    networkSearchHandler->AutoTimeChange(event);
+    networkSearchHandler->AutoTimeZoneChange(event);
+    networkSearchHandler->GetSignalInfo(signals);
+    EXPECT_EQ(networkSearchHandler->SendUpdateCellLocationRequest(), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchHandler->GetCellInfoList(cells), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchHandler->GetNeighboringCellInfoList(cells), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchHandler->GetCellLocation(), nullptr);
+ 
+    event = nullptr;
+    networkSearchHandler->NotifyStateChange(event);
+    networkSearchHandler->GetNrSsbIdResponse(event);
+    networkSearchHandler->UpdateOperatorName();
+}
  
 /**
  * @tc.number   Telephony_NetworkRegister_001
