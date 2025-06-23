@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#include "napi_util.h"
 #include <codecvt>
 #include <cstdio>
 #include <cstring>
 #include <locale>
+#include <map>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
 #include "core_service_errors.h"
@@ -30,40 +29,40 @@
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING = "Permission denied.";
-static constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non-system applications use system APIs.";
-static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
+constexpr const char *JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING = "Permission denied.";
+constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non-system applications use system APIs.";
+constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
     "Parameter error. The type of parameter should match or the number of parameters must match.";
-static constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
-static constexpr const char *JS_ERROR_TELEPHONY_SUCCESS_STRING = "Success.";
-static constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
-static constexpr const char *JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING = "Operation failed. Cannot connect to service.";
-static constexpr const char *JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING = "System internal error.";
-static constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
-static constexpr const char *JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING = "Unknown error code.";
-static constexpr const char *JS_ERROR_SIM_BASE_ERROR_STRING = "Sim module base error.";
-static constexpr const char *JS_ERROR_SIM_CARD_IS_NOT_ACTIVE_STRING = "SIM card is not activated.";
-static constexpr const char *JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING = "SIM card operation error.";
-static constexpr const char *JS_ERROR_OPERATOR_CONFIG_ERROR_STRING = "Operator config error.";
-static constexpr const char *JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING = "Network search module base error.";
-static constexpr const char *JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING = "Call manager module base error.";
-static constexpr const char *JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR_STRING = "Cellular call module cs base error.";
-static constexpr const char *JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR_STRING = "Cellular call module ims base error.";
-static constexpr const char *JS_ERROR_CELLULAR_DATA_BASE_ERROR_STRING = "Cellular data module base error.";
-static constexpr const char *JS_ERROR_SMS_MMS_BASE_ERROR_STRING = "Sms mms module base error.";
-static constexpr const char *JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING = "State registry module base error.";
-static constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode is on.";
-static constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
-static constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
-static constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
-static constexpr const char *JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING = "call count exceeds limit";
-static constexpr const char *JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING =
+constexpr const char *JS_ERROR_DEVICE_NOT_SUPPORT_THIS_API_STRING = "The device does not support this API.";
+constexpr const char *JS_ERROR_TELEPHONY_SUCCESS_STRING = "Success.";
+constexpr const char *JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING = "Invalid parameter value.";
+constexpr const char *JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING = "Operation failed. Cannot connect to service.";
+constexpr const char *JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING = "System internal error.";
+constexpr const char *JS_ERROR_TELEPHONY_NO_SIM_CARD_STRING = "Do not have sim card.";
+constexpr const char *JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING = "Unknown error code.";
+constexpr const char *JS_ERROR_SIM_BASE_ERROR_STRING = "Sim module base error.";
+constexpr const char *JS_ERROR_SIM_CARD_IS_NOT_ACTIVE_STRING = "SIM card is not activated.";
+constexpr const char *JS_ERROR_SIM_CARD_OPERATION_ERROR_STRING = "SIM card operation error.";
+constexpr const char *JS_ERROR_OPERATOR_CONFIG_ERROR_STRING = "Operator config error.";
+constexpr const char *JS_ERROR_NETWORK_SEARCH_BASE_ERROR_STRING = "Network search module base error.";
+constexpr const char *JS_ERROR_CALL_MANAGER_BASE_ERROR_STRING = "Call manager module base error.";
+constexpr const char *JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR_STRING = "Cellular call module cs base error.";
+constexpr const char *JS_ERROR_CELLULAR_CALL_IMS_BASE_ERROR_STRING = "Cellular call module ims base error.";
+constexpr const char *JS_ERROR_CELLULAR_DATA_BASE_ERROR_STRING = "Cellular data module base error.";
+constexpr const char *JS_ERROR_SMS_MMS_BASE_ERROR_STRING = "Sms mms module base error.";
+constexpr const char *JS_ERROR_STATE_REGISTRY_BASE_ERROR_STRING = "State registry module base error.";
+constexpr const char *JS_ERROR_AIRPLANE_MODE_ON_STRING = "Airplane mode is on.";
+constexpr const char *JS_ERROR_NETWORK_NOT_IN_SERVICE = "Network not in service.";
+constexpr const char *JS_ERROR_CONFERENCE_EXCEED_LIMIT_STRING = "Conference call is exceed limit.";
+constexpr const char *JS_ERROR_CONFERENCE_CALL_IS_NOT_ACTIVE_STRING = "Conference call is not active.";
+constexpr const char *JS_ERROR_TELEPHONY_CALL_COUNTS_EXCEED_LIMIT_STRING = "call count exceeds limit";
+constexpr const char *JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING =
     "Current on a call, unable to initiate a new call";
-static constexpr const char *JS_ERROR_ESIM_SUCCESS_STRING = "Success.";
-static constexpr const char *JS_ERROR_ESIM_SERVICE_ERROR_STRING = "Service connection failed.";
-static constexpr const char *JS_ERROR_ESIM_SYSTEM_ERROR_STRING = "System internal error.";
+constexpr const char *JS_ERROR_ESIM_SUCCESS_STRING = "Success.";
+constexpr const char *JS_ERROR_ESIM_SERVICE_ERROR_STRING = "Service connection failed.";
+constexpr const char *JS_ERROR_ESIM_SYSTEM_ERROR_STRING = "System internal error.";
 
-static std::unordered_map<int32_t, const char *> errorMap_ = {
+const std::map<int32_t, const char *> ERROR_MAP = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
     { JsErrorCode::JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API, JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING },
@@ -99,8 +98,8 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
 std::string AniUtil::GetErrorMessage(int32_t errorCode)
 {
     std::string result = "";
-    auto iter = errorMap_.find(errorCode);
-    if (iter == errorMap_.end()) {
+    auto iter = ERROR_MAP.find(errorCode);
+    if (iter == ERROR_MAP.end()) {
         TELEPHONY_LOGE("NapiUtil::GetErrorMessage return null.");
         return result;
     }
