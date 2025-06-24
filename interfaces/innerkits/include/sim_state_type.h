@@ -333,6 +333,21 @@ enum class DsdsMode {
     DSDS_MODE_V5_DSDA = 3,
 };
 
+enum class SimType {
+    PSIM,
+    ESIM,
+};
+
+struct SimLabel {
+    SimType simType = SimType::PSIM;
+    int32_t index = 0;
+
+    bool operator==(const SimLabel &p)const
+    {
+        return (this->simType == p.simType && (p.simType ==SimType::ESIM || this->index == p.index));
+    }
+};
+
 /**
  * @brief Icc Account Information
  */
@@ -365,6 +380,15 @@ struct IccAccountInfo : public Parcelable {
      * Show number for card
      */
     std::u16string showNumber = u"";
+    /**
+     * sim label index for card
+     */
+    int32_t simLabelIndex = 0;
+    /**
+     * operator name for esim card
+     */
+    std::string operatorName = "";
+
     inline static const std::u16string DEFAULT_SHOW_NAME = u"Card";
     inline static const std::u16string DEFAULT_SHOW_NUMBER = u"";
     inline static const std::u16string DEFAULT_ICC_ID = u"";
@@ -405,6 +429,16 @@ struct IccAccountInfo : public Parcelable {
         this->showNumber = number;
     }
 
+    void SetSimLabelIndex(int32_t labelIndex)
+    {
+        this->simLabelIndex = labelIndex;
+    }
+
+    void SetOpoeratorName(std::string esimOperatorName)
+    {
+        this->operatorName = esimOperatorName;
+    }
+
     bool Marshalling(Parcel &parcel) const
     {
         if (!parcel.WriteInt32(simId)) {
@@ -428,6 +462,12 @@ struct IccAccountInfo : public Parcelable {
         if (!parcel.WriteString16(showNumber)) {
             return false;
         }
+        if (!parcel.WriteInt32(simLabelIndex)) {
+            return false;
+        }
+        if (!parcel.WriteString(operatorName)) {
+            return false;
+        }
         return true;
     };
 
@@ -449,6 +489,8 @@ struct IccAccountInfo : public Parcelable {
         parcel.ReadString16(iccId);
         parcel.ReadString16(showName);
         parcel.ReadString16(showNumber);
+        parcel.ReadInt32(simLabelIndex);
+        parcel.ReadString(operatorName);
         return true;
     };
 

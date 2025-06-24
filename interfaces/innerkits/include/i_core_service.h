@@ -168,6 +168,8 @@ public:
     virtual int32_t GetOpnameVersion(std::string &versionInfo) = 0;
     virtual int32_t GetSimIO(int32_t slotId, int32_t command,
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
+    virtual int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
+    virtual int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
         const EsimApduData &apduData, ResponseEsimResult &responseResult) = 0;

@@ -62,6 +62,7 @@ public:
         REGISTER_SIM_NOTIFY_RETRY_EVENT = 2,
         INIT_DATA_RETRY_EVENT = 3,
         RETRY_RESET_OPKEY_CONFIG = 4,
+        INIT_ESIM_DATA_RETRY_EVENT = 5,
     };
 
 private:
@@ -75,6 +76,7 @@ private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
+    void InitEsimData();
     bool IsValidSlotId(int32_t slotId);
     std::list<SimAccountCallbackRecord> GetSimAccountCallbackRecords();
     void InitListener();
@@ -127,7 +129,9 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<int> isSimAccountLoaded_;
+    bool isAllSimAccountLoaded_ = false;
     std::vector<int> initDataRemainCount_;
+    int initEsimDataRemainCount_;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
