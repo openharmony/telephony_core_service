@@ -408,6 +408,12 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet>
     result->GetInt(index, simBean.isCellularDataCard);
     result->GetColumnIndex(SimData::IS_ACTIVE, index);
     result->GetInt(index, simBean.isActive);
+    result->GetColumnIndex(SimData::IS_ESIM, index);
+    result->GetInt(index, simBean.isEsim);
+    result->GetColumnIndex(SimData::SIM_LABEL_INDEX, index);
+    result->GetInt(index, simBean.simLabelIndex);
+    result->GetColumnIndex(SimData::OPERATOR_NAME, index);
+    result->GetString(index, simBean.operatorName);
 }
 
 int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)

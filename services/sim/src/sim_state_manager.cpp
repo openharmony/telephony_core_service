@@ -629,6 +629,15 @@ int32_t SimStateManager::GetSimIO(
     return ret;
 }
 
+int32_t SimStateManager::NotifySimSlotsMapping(int32_t slotId)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("NotifySimSlotsMapping(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->NotifySimSlotsMapping(slotId);
+}
+
 SimStateManager::~SimStateManager()
 {
     if (simStateHandle_ != nullptr) {

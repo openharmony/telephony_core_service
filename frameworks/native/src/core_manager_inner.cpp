@@ -2638,6 +2638,51 @@ int32_t CoreManagerInner::GetDefaultMainSlotByIccId()
     return simManager_->GetDefaultMainSlotByIccId();
 }
 
+int32_t CoreManagerInner::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetAllSimAccountInfoList(false, iccAccountInfoList);
+}
+
+int32_t CoreManagerInner::GetSimLabel(int32_t slotId, SimLabel &simLabel)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return INVALID_VALUE;
+    }
+    return simManager_->GetSimLabel(slotId, simLabel);
+}
+
+int32_t CoreManagerInner::SetSimLabelIndex(const std::string &iccId, int32_t labelIndex)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return INVALID_VALUE;
+    }
+    return simManager_->SetSimLabelIndex(iccId, labelIndex);
+}
+
+int32_t CoreManagerInner::InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return INVALID_VALUE;
+    }
+    return simManager_->InsertEsimData(iccId, esimLabel, operatorName);
+}
+
+int32_t CoreManagerInner::NotifySimSlotsMapping(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return INVALID_VALUE;
+    }
+    return simManager_->NotifySimSlotsMapping(slotId);
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
 {

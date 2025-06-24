@@ -143,6 +143,7 @@ public:
     int32_t GetSendSimMatchedOperatorInfoResponse();
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo);
     SimAuthenticationResponse GetSimIOResponse();
+    int32_t NotifySimSlotsMapping(int32_t slotId);
 
 public:
     bool modemInitDone_ = false;
@@ -190,6 +191,7 @@ private:
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
     std::string iccid_ = "";
+    int32_t esimSwitchState_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

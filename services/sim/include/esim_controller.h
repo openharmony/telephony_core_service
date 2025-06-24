@@ -18,6 +18,7 @@
 
 #include <singleton.h>
 #include <string.h>
+#include "sim_rdb_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +34,7 @@ public:
     void ProcessCommandByCa(int slotId, const std::string &cmdData);
 private:
     std::mutex caMutex_;
+    std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

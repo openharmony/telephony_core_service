@@ -809,6 +809,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_002, Function | MediumTest 
     EXPECT_NE(
         simStateManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simStateManager->SendSimMatchedOperatorInfo(0, 0, "", ""), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simStateManager->NotifySimSlotsMapping(0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

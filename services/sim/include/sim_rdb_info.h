@@ -40,6 +40,9 @@ public:
     int isMessageCard;
     int isCellularDataCard;
     int isActive;
+    int isEsim;
+    int simLabelIndex;
+    std::string operatorName;
 };
 
 enum class CardSeclectedStatus {
