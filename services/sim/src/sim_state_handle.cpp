@@ -380,7 +380,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
     }
-    if (oldSimStatus_ != newSimStatus) {
+    // When esim switches from one active profile to another, the card only report a ready status
+    // and we can only detect the change by comparing the iccid before and after
+    if ((oldSimStatus_ != newSimStatus) || (iccid_ != ar.iccid_)) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;

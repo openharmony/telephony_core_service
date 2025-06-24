@@ -2266,7 +2266,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     multiSimMonitor->isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     multiSimMonitor->initDataRemainCount_.resize(SIM_SLOT_COUNT, 5);
     multiSimMonitor->simStateManager_[0]->SetSimState(SimState::SIM_STATE_UNKNOWN);
-    multiSimMonitor->isEsimOnlyDevice_ = true;
     multiSimMonitor->isSimAccountLoaded_[0] = 0;
     multiSimMonitor->InitData(0);
     EXPECT_EQ(multiSimMonitor->isSimAccountLoaded_[0], 0);
