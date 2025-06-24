@@ -25,6 +25,7 @@ namespace Telephony {
 enum ImsServiceProxyType {
     PROXY_IMS_CALL = 0,
     PROXY_IMS_SMS = 1,
+    PROXY_IMS_DCSERVICE = 2,
 };
 class ImsCoreServiceInterface : public IRemoteBroker {
 public:
