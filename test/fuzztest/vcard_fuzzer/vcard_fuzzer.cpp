@@ -75,6 +75,46 @@ END:VCARD
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
+void DecodeVcardNull01(const uint8_t *data, size_t size)
+{
+    std::string inputString = R"(
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iPhone OS 18.5//EN
+N:;Ella2;;;
+FN:Ella2
+TEL;VOICE:397472181
+UID:F6FBE71F6A8347B8828EA5075CA58B36
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iPhone OS 18.5//EN
+N:;Ivey7;;;
+FN:Ivey7
+TEL:2028717726
+TEL;VOICE:198290471
+TEL:1966159148
+TEL:406591947
+UID:BB41F8F492B5432AA679C1F9DA5713CF
+END:VCARD
+
+)";
+    WriteTestData(inputString);
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
+void DecodeVcardNull02(const uint8_t *data, size_t size)
+{
+    std::string inputString = R"(
+ 
+)";
+    WriteTestData(inputString);
+    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
+}
+
 void DecodeVcardData(const uint8_t *data, size_t size)
 {
     std::string fuzzdata(reinterpret_cast<const char *>(data), size);

@@ -946,12 +946,9 @@ void VCardContact::AddPhonesData(std::string rawValue, std::string propValue, st
 void VCardContact::HandlePhoneCase(std::string phoneNumber, std::string rawValue, std::string propValue,
     std::vector<std::string> values, std::map<std::string, std::vector<std::string>> parasMap)
 {
-    std::vector<std::string> typeCollection;
+    std::vector<std::string> typeCollection = {};
     std::map<std::string, std::vector<std::string>>::iterator it = parasMap.find(VCARD_PARAM_TYPE);
-    if (it == parasMap.end()) {
-        TELEPHONY_LOGE("Map does not contain this key, %{public}s", VCARD_PARAM_TYPE);
-        return;
-    } else {
+    if (it != parasMap.end()) {
         typeCollection = it->second;
     }
     std::tuple<int32_t, std::string> result(NUM_MINUS_ONE, "-1");
