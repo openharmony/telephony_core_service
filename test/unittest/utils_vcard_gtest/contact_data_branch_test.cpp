@@ -182,10 +182,14 @@ HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_004, Function | MediumTes
     parasMap.clear();
     ASSERT_TRUE(parasMap.empty());
     contact->AddPhonesData("", "tel:", values, parasMap);
-    EXPECT_EQ((contact->phones_).size(), 0);
+    EXPECT_EQ((contact->phones_).size(), 1);
 
     contact->AddPhonesData("", "", values, parasMap);
-    EXPECT_EQ((contact->phones_).size(), 0);
+    EXPECT_EQ((contact->phones_).size(), 2);
+
+    std::map<std::string, std::vector<std::string>> parasMapPhones = {{"TYPE", {"VOICE"}}};
+    contact->AddPhonesData("1966159148", "", values, parasMapPhones);
+    EXPECT_EQ((contact->phones_).size(), 3);
 }
 
 HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_005, Function | MediumTest | Level3)
