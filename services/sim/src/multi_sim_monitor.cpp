@@ -61,6 +61,7 @@ void MultiSimMonitor::Init()
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
+    InitEsimData();
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -82,24 +83,24 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     auto eventCode = event->GetInnerEventId();
-    TELEPHONY_LOGI("eventCode is %{public}d", eventCode);
     switch (eventCode) {
         case MultiSimMonitor::INIT_DATA_RETRY_EVENT:{
-            auto slotId = event->GetParam();
-            InitData(slotId);
+            InitData(event->GetParam());
+            break;
+        }
+        case MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT:{
+            InitEsimData();
             break;
         }
         case RadioEvent::RADIO_QUERY_ICCID_DONE:
         case RadioEvent::RADIO_SIM_STATE_LOCKED:
         case RadioEvent::RADIO_SIM_STATE_READY: {
             RemoveEvent(MultiSimMonitor::INIT_DATA_RETRY_EVENT);
-            auto slotId = event->GetParam();
-            InitData(slotId);
+            InitData(event->GetParam());
             break;
         }
         case RadioEvent::RADIO_SIM_STATE_CHANGE: {
-            auto slotId = event->GetParam();
-            RefreshData(slotId);
+            RefreshData(event->GetParam());
             break;
         }
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT: {
@@ -224,6 +225,28 @@ void MultiSimMonitor::InitData(int32_t slotId)
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId);
 }
 
+void MultiSimMonitor::InitEsimData()
+{
+    if (isAllSimAccountLoaded_) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitEsimData already loaded");
+        return;
+    }
+    if (controller_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimMonitor::controller_ is nullptr");
+        return;
+    }
+    if (!controller_->InitEsimData()) {
+        TELEPHONY_LOGE("MultiSimMonitor::InitEsimData failed");
+        if (initEsimDataRemainCount_ > 0) {
+            SendEvent(MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT, DELAY_TIME);
+            TELEPHONY_LOGI("retry remain %{public}d", initEsimDataRemainCount_);
+            initEsimDataRemainCount_--;
+        }
+        return;
+    }
+    isAllSimAccountLoaded_ = true;
+}
+
 void MultiSimMonitor::RefreshData(int32_t slotId)
 {
     if (!IsValidSlotId(slotId)) {
@@ -239,6 +262,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
+        controller_->GetAllListFromDataBase();
         controller_->ResetSetPrimarySlotRemain(slotId);
         isSimAccountLoaded_[slotId] = 0;
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;

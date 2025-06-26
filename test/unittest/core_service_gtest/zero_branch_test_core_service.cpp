@@ -217,6 +217,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Sim_001, Function | Medium
     DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, callback0);
     std::vector<IccAccountInfo> iccAccountInfoList = {};
     DelayedSingleton<CoreService>::GetInstance()->GetActiveSimAccountInfoList(iccAccountInfoList);
+    DelayedSingleton<CoreService>::GetInstance()->GetAllSimAccountInfoList(iccAccountInfoList);
     EXPECT_GE(DelayedSingleton<CoreService>::GetInstance()->GetShowName(SLOT_ID, callback0), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -457,6 +458,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     multiSimController->GetTargetSimId(INVALID_SLOTID, simId);
     std::string iccId = "";
     multiSimController->GetTargetIccId(INVALID_SLOTID, iccId);
+    multiSimController->InsertEsimData("01234567890123456789", 1, "中国联通");
+    multiSimController->SetSimLabelIndex("01234567890123456789", 0);
+    SimLabel simLabel;
+    multiSimController->GetSimLabel(0, simLabel);
 
     EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
     multiSimController->maxCount_ = 1;

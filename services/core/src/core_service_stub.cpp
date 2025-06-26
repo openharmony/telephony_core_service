@@ -244,6 +244,10 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimId(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_IO_DONE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimIO(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ALL_ACCOUNT_INFO_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetAllSimAccountInfoList(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LABEL)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimLabel(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerVoiceMailToMap()
@@ -1888,6 +1892,47 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
     reply.WriteInt32(response.sw2);
     reply.WriteString(response.response);
 
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetAllSimAccountInfoList(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    int32_t result = GetAllSimAccountInfoList(iccAccountInfoList);
+    int32_t size = static_cast<int32_t>(iccAccountInfoList.size());
+    bool ret = reply.WriteInt32(result);
+    ret = (ret && result && reply.WriteInt32(size));
+    if (!ret) {
+        TELEPHONY_LOGE("OnGetAllSimAccountInfoList write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    std::vector<IccAccountInfo>::iterator it = iccAccountInfoList.begin();
+    while (it != iccAccountInfoList.end()) {
+        TELEPHONY_LOGI("OnGetAllSimAccountInfoList slotIndex = %{public}d", (*it).slotIndex);
+        if (!(*it).Marshalling(reply)) {
+            TELEPHONY_LOGE("OnGetAllSimAccountInfoList IccAccountInfo reply Marshalling is false");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
+        ++it;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetSimLabel(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    SimLabel simLabel;
+    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    int32_t result = GetSimLabel(slotId, simLabel, callback);
+    bool ret = reply.WriteInt32(result);
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(simLabel.simType)));
+        ret = (ret && reply.WriteInt32(static_cast<int32_t>(simLabel.index)));
+    }
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_LABEL write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     return NO_ERROR;
 }
 

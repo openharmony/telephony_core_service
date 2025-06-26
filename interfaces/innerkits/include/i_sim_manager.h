@@ -163,6 +163,11 @@ public:
     virtual void ResetDataShareError() = 0;
     virtual void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) = 0;
     virtual int32_t GetDefaultMainSlotByIccId() = 0;
+    virtual int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
+    virtual int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel) = 0;
+    virtual int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex) = 0;
+    virtual int32_t NotifySimSlotsMapping(int32_t slotId) = 0;
+    virtual int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName) = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t GetEid(int32_t slotId, std::u16string &eId) = 0;
     virtual int32_t GetEuiccProfileInfoList(int32_t slotId,

@@ -2079,6 +2079,53 @@ int32_t CoreService::GetSimIO(int32_t slotId, int32_t command,
     return simManager_->GetSimIO(slotId, command, fileId, data, path, response);
 }
 
+int32_t CoreService::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
+{
+    bool denied = false;
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        denied = true;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetAllSimAccountInfoList(denied, iccAccountInfoList);
+}
+
+int32_t CoreService::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        SimLabel simLabel;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->GetSimLabel(slotId, simLabel);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(static_cast<int32_t>(simLabel.simType));
+                data.WriteInt32(simLabel.index);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)

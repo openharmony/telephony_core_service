@@ -763,6 +763,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_004, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetNrState(0), NrState::NR_STATE_NOT_SUPPORT);
     EXPECT_NE(mInner.SendUpdateCellLocationRequest(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(mInner.IsNrSupported(0));
+    EXPECT_NE(mInner.NotifySimSlotsMapping(0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -779,6 +780,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
     EXPECT_GT(mInner.GetSimAccountInfo(0, mIccAccountInfo), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList;
     EXPECT_GT(mInner.GetActiveSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(mInner.GetAllSimAccountInfoList(iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     LockState lockState;
     EXPECT_NE(mInner.GetLockState(0, LockType::PIN_LOCK, lockState), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.SendCallSetupRequestResult(0, true), TELEPHONY_ERR_SUCCESS);
@@ -789,6 +791,10 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_005, Function | MediumTest | Lev
     EXPECT_EQ(mInner.RefreshSimState(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.GetSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.GetSimId(0), TELEPHONY_ERR_SUCCESS);
+    SimLabel simLabel;
+    EXPECT_NE(mInner.InsertEsimData("01234567890123456789", 1, "中国联通"), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mInner.SetSimLabelIndex("01234567890123456789", 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mInner.GetSimLabel(0, simLabel), TELEPHONY_ERR_SUCCESS);
     mInner.SetDefaultCellularDataSlotId(0);
     mInner.SetDefaultSmsSlotId(0);
     mInner.SetDefaultVoiceSlotId(0);
@@ -1036,7 +1042,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     EXPECT_FALSE(multiSimController->InitData(0));
     EXPECT_GT(multiSimController->SetDefaultSmsSlotId(0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(multiSimController->RefreshActiveIccAccountInfoList());
+    EXPECT_FALSE(multiSimController->UpdateIccAccountInfoList(
+        multiSimController->activeIccAccountInfoList_, multiSimController->localCacheInfo_));
     EXPECT_FALSE(multiSimController->IsSimActive(0));
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
@@ -1050,6 +1057,10 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->InitShowNumber(0));
     EXPECT_FALSE(multiSimController->InitIccId(0));
     EXPECT_FALSE(multiSimController->GetListFromDataBase());
+    EXPECT_FALSE(multiSimController->GetAllListFromDataBase());
+    multiSimController->SortAllCache();
+    EXPECT_FALSE(multiSimController->UpdateIccAccountInfoList(
+        multiSimController->allIccAccountInfoList_, multiSimController->allLocalCacheInfo_));
 }
 
 /**
@@ -1246,8 +1257,13 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     simManager->GetPrimarySlotId(slotId);
     EXPECT_NE(simManager->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->GetSimId(0), TELEPHONY_ERR_SUCCESS);
+    SimLabel simLabel;
+    EXPECT_NE(simManager->InsertEsimData("01234567890123456789", 1, "中国联通"), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->SetSimLabelIndex("01234567890123456789", 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(simManager->GetSimLabel(0, simLabel), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList;
     EXPECT_GT(simManager->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->GetAllSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     OperatorConfig mOperatorConfig;
     EXPECT_GT(simManager->GetOperatorConfigs(0, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetOperatorConfigs(INVALID_SLOTID, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
@@ -1358,6 +1374,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     bool isCTSimCard = false;
     EXPECT_GT(simManager->IsCTSimCard(0, isCTSimCard), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->IsCTSimCard(INVALID_SLOTID, isCTSimCard), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->NotifySimSlotsMapping(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

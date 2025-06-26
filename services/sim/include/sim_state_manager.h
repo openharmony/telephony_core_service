@@ -63,6 +63,7 @@ public:
     void SyncCmdResponse();
     void SyncSimMatchResponse();
     void SyncUnlockPinResponse();
+    int32_t NotifySimSlotsMapping(int32_t slotId);
 
 public:
     bool responseReady_ = false;
