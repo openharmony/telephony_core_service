@@ -954,6 +954,22 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &dataStr, const std::string &path, SimAuthenticationResponse &response);
 
+    /**
+     * @brief Obtain the list of all SIM card account information
+     *
+     * @param iccAccountInfoList[out], the list of all SIM card account information
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList);
+
+    /**
+     * @brief Obtain the label of sim card
+     *
+     * @param simLabel[out], the label of the SIM card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief Provide sending upgrade or card binding data to the ESIM channel.

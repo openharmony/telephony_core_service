@@ -47,6 +47,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0100, Function | Med
         std::vector<IccAccountInfo> iccAccountInfoList;
         int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        result = CoreServiceClient::GetInstance().GetAllSimAccountInfoList(iccAccountInfoList);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -64,6 +66,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0200, Function | Med
         std::vector<IccAccountInfo> iccAccountInfoList;
         int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        result = CoreServiceClient::GetInstance().GetAllSimAccountInfoList(iccAccountInfoList);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -79,6 +83,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
     } else {
         std::vector<IccAccountInfo> iccAccountInfoList;
         int32_t result = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        result = CoreServiceClient::GetInstance().GetAllSimAccountInfoList(iccAccountInfoList);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }

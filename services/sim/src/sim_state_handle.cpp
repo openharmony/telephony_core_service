@@ -1057,6 +1057,16 @@ SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
     return simIORespon_;
 }
 
+int32_t SimStateHandle::NotifySimSlotsMapping(int32_t slotId)
+{
+    TELEPHONY_LOGI("SimStateHandle::NotifySimSlotsMapping slotId = %{public}d", slotId);
+    IccState iccState;
+    iccState.simType_ = ICC_UNKNOWN_TYPE;
+    iccState.simStatus_ = ICC_CARD_ABSENT;
+    ProcessIccCardState(iccState, slotId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
 {

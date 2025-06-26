@@ -554,6 +554,16 @@ public:
     {
         return 0;
     }
+
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel) override
+    {
+        return 0;
+    }
+
+    int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override
+    {
+        return 0;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -43,6 +43,7 @@ public:
 
     void Init();
     bool InitData(int32_t slotId);
+    bool InitEsimData();
     int32_t GetDefaultVoiceSlotId();
     int32_t SetDefaultVoiceSlotId(int32_t slotId);
     int32_t GetDefaultSmsSlotId();
@@ -70,7 +71,9 @@ public:
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
     bool GetListFromDataBase();
+    bool GetAllListFromDataBase();
     int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
+    int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
     bool InitShowName(int slotId);
@@ -86,6 +89,9 @@ public:
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
     bool IsEsim(int32_t slotId);
+    int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
+    int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -106,6 +112,7 @@ private:
     int32_t UpdateDataByIccId(int slotId, const std::string &newIccId);
     int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
+    void SortAllCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
     bool AnnouncePrimarySimIdChanged(int32_t simId);
@@ -113,7 +120,8 @@ private:
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
-    bool RefreshActiveIccAccountInfoList();
+    bool UpdateIccAccountInfoList(
+        std::vector<IccAccountInfo> &accountInfoList, std::vector<SimRdbInfo> &localCacheInfo);
     std::string EncryptIccId(const std::string iccid);
     void CheckIfNeedSwitchMainSlotId(bool isInit = true);
     bool IsValidSlotId(int32_t slotId);
@@ -159,14 +167,17 @@ private:
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
     IccAccountInfo iccAccountInfo_;
-    std::vector<IccAccountInfo> iccAccountInfoList_;
+    std::vector<IccAccountInfo> activeIccAccountInfoList_;
     std::vector<SimRdbInfo> localCacheInfo_;
+    std::vector<IccAccountInfo> allIccAccountInfoList_;
+    std::vector<SimRdbInfo> allLocalCacheInfo_;
     ffrt::mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
     bool isSetPrimarySlotIdInProgress_ = false;
     ffrt::mutex setPrimarySlotToRilMutex_;
+    ffrt::mutex writeDbMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     bool isSettingPrimarySlotToRil_ = false;

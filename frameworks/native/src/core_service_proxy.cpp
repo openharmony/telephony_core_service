@@ -1413,38 +1413,6 @@ int32_t CoreServiceProxy::SetShowName(int32_t slotId, const std::u16string &name
     return reply.ReadInt32();
 }
 
-int32_t CoreServiceProxy::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback)
-{
-    TELEPHONY_LOGD("GetShowName slotId = %{public}d", slotId);
-    if (!IsValidSlotId(slotId)) {
-        return TELEPHONY_ERR_SLOTID_INVALID;
-    }
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("GetShowName WriteInterfaceToken is false");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    data.WriteInt32(slotId);
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("GetShowName Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME), data, reply, option);
-    if (st != ERR_NONE) {
-        TELEPHONY_LOGE("GetShowName failed, error code is %{public}d", st);
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return reply.ReadInt32();
-}
-
 int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
 {
     MessageParcel data;
@@ -3287,6 +3255,108 @@ int32_t CoreServiceProxy::GetSimIO(int32_t slotId, int32_t command,
     return ret;
 }
 
+int32_t CoreServiceProxy::GetShowName(int32_t slotId, const sptr<IRawParcelCallback> &callback)
+{
+    TELEPHONY_LOGD("GetShowName slotId = %{public}d", slotId);
+    if (!IsValidSlotId(slotId)) {
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetShowName WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetShowName Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetShowName failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetAllSimAccountInfoList WriteInterfaceToken is false");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetAllSimAccountInfoList Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ALL_ACCOUNT_INFO_LIST), data,
+        reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetAllSimAccountInfoList failed, error code is %{public}d", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        int32_t size = reply.ReadInt32();
+        TELEPHONY_LOGI("CoreServiceProxy::GetAllSimAccountInfoList size = %{public}d", size);
+        if (size > MAX_VECTOR) {
+            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        }
+        iccAccountInfoList.clear();
+        for (int i = 0; i < size; i++) {
+            IccAccountInfo accountInfo;
+            accountInfo.ReadFromParcel(reply);
+            TELEPHONY_LOGD("CoreServiceProxy::GetAllSimAccountInfoList success");
+            iccAccountInfoList.emplace_back(accountInfo);
+        }
+    }
+    return result;
+}
+
+int32_t CoreServiceProxy::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimLabel WriteInterfaceToken is false");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSimLabel Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SIM_LABEL), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimLabel failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        simLabel.simType = static_cast<SimType>(reply.ReadInt32());
+        simLabel.index = reply.ReadInt32();
+    }
+    return result;
+}
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 bool CoreServiceProxy::WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData)
 {

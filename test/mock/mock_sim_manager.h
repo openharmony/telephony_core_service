@@ -126,6 +126,11 @@ public:
     MOCK_METHOD0(ResetDataShareError, void(void));
     MOCK_METHOD2(UpdateImsCapFromChip, void(int32_t, const ImsCapFromChip &));
     MOCK_METHOD0(GetDefaultMainSlotByIccId, int32_t(void));
+    MOCK_METHOD2(GetAllSimAccountInfoList, int32_t(bool, std::vector<IccAccountInfo> &));
+    MOCK_METHOD3(InsertEsimData, int32_t(const std::string &, int32_t, const std::string &));
+    MOCK_METHOD2(GetSimLabel, int32_t(int32_t, SimLabel &));
+    MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &, int32_t));
+    MOCK_METHOD1(NotifySimSlotsMapping, int32_t(int32_t));
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     MOCK_METHOD2(GetEid, int32_t(int32_t, std::u16string &));
