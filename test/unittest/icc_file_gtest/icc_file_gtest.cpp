@@ -714,5 +714,20 @@ HWTEST_F(IccFileTest, Telephony_IccFile_029, Function | MediumTest | Level1)
     bool ret = iccFile->ObtainFilesFetched();
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.number   Telephony_IccFile_030
+ * @tc.name     test IccFile
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccFileTest, Telephony_IccFile_030, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    iccFile->SetId(0);
+    iccFile->SetId(0);
+    EXPECT_NE(iccFile->voiceMailConfig_, nullptr);
+}
 }
 }
