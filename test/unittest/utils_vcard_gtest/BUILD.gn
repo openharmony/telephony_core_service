@@ -24,6 +24,7 @@ ohos_unittest("utils_vcard_gtest") {
   sources = [
     "contact_data_test.cpp",
     "vcard_utils_branch_test.cpp",
+    "$SOURCE_DIR/utils/vcard/src/vcard_contact.cpp",
   ]
 
   include_dirs = [
@@ -61,6 +62,7 @@ ohos_unittest("utils_vcard_gtest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "i18n:intl_util",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",

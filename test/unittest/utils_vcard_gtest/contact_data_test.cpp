@@ -1049,6 +1049,60 @@ HWTEST_F(ContactDataTest, VCardContact_BuildRawContactDataDisplayName_001, Funct
     EXPECT_EQ(contact_->nameData_->GetDisplayName(), "");
 }
 
+HWTEST_F(ContactDataTest, VCardGroupData_GenerateDisplayName01, Function | MediumTest | Level3)
+{
+    RawNameInfo cnNameInfo = {
+        .prefix = "前缀",
+        .given = "三",
+        .middle = "老",
+        .family = "张",
+        .suffix = "后缀",
+    };
+
+    RawNameInfo koNameInfo = {
+        .prefix = "이전",
+        .given = "선",
+        .middle = "희",
+        .family = "김",
+        .suffix = "후방",
+    };
+
+    RawNameInfo jaNameInfo = {
+        .prefix = "前",
+        .given = "夫",
+        .middle = "秀",
+        .family = "小島",
+        .suffix = "後",
+    };
+
+    RawNameInfo enNameInfo = {
+        .prefix = "St.",
+        .given = "Billie",
+        .middle = "Joe",
+        .family = "Armstrong",
+        .suffix = "Jimmy",
+    };
+
+    RawNameInfo arNameInfo = {
+        .prefix = "ما قبل",
+        .given = "نانسي",
+        .middle = "نبيل",
+        .family = "عجرم",
+        .suffix = "بعد",
+    };
+
+    // traditional Chinese
+    EXPECT_EQ(GenerateDisplayName("zh-Hant", cnNameInfo), "前缀 张老三后缀");
+    // Korean
+    EXPECT_EQ(GenerateDisplayName("ko", koNameInfo), "이전 김희선후방");
+    // Japanese
+    EXPECT_EQ(GenerateDisplayName("ja", jaNameInfo), "前 小島 秀 夫 後");
+    // English
+    EXPECT_EQ(GenerateDisplayName("en", enNameInfo), "St. Billie Joe Armstrong, Jimmy");
+    // Arabic
+    EXPECT_EQ(GenerateDisplayName("ar", arNameInfo), "ما قبل نانسي نبيل عجرم, بعد");
+}
+
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
