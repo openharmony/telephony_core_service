@@ -48,7 +48,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
     "ability_runtime:ability_manager",
     "ability_runtime:data_ability_helper",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "drivers_interface_ril:ril_idl_headers",
@@ -63,6 +63,7 @@ ohos_fuzztest("SetShowNameFuzzTest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "eventhandler:libeventhandler",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
