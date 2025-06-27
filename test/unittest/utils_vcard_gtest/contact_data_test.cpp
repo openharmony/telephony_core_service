@@ -38,6 +38,7 @@
 #include "telephony_errors.h"
 #include "mock_datashare_helper.h"
 #include "mock_data_share_result_set.h"
+#include "contact_data_test.h"
 
 #include <fcntl.h>
 #include <iostream>
