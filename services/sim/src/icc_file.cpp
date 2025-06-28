@@ -98,6 +98,9 @@ void IccFile::SetId(int id)
 {
     slotId_ = id;
     TELEPHONY_LOGI("IccFile::SetId, slotId %{public}d.", id);
+    if (voiceMailConfig_ != nullptr) {
+        voiceMailConfig_.reset();
+    }
     voiceMailConfig_ = std::make_shared<VoiceMailConstants>(id);
 }
 
