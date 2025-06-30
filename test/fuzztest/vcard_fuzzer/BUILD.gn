@@ -38,6 +38,7 @@ ohos_fuzztest("VcardFuzzTest") {
     "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "samgr:samgr_proxy",
   ]
