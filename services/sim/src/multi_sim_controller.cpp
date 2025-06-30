@@ -575,14 +575,13 @@ void MultiSimController::SortAllCache()
     SimRdbInfo emptyUnit;
     emptyUnit.isActive = DEACTIVE;
     for (int i = 0; i < count; i++) {
-        emptyUnit.slotIndex = i;
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
         TELEPHONY_LOGI(
             "index = %{public}d j = %{public}lu", allLocalCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
         if (allLocalCacheInfo_[j].simId - 1 < static_cast<int>(sortCache.size())) {
-            sortCache[allLocalCacheInfo_[j].simId = 1] = allLocalCacheInfo_[j];
+            sortCache[allLocalCacheInfo_[j].simId - 1] = allLocalCacheInfo_[j];
         }
     }
     allLocalCacheInfo_ = sortCache;
