@@ -48,7 +48,7 @@ ohos_fuzztest("UpdateSmsIccFuzzTest") {
     "ability_runtime:data_ability_helper",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "battery_manager:batterysrv_client",
     "c_utils:utils",

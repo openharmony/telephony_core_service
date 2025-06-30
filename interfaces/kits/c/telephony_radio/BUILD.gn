@@ -47,6 +47,7 @@ ohos_shared_library("telephony_radio") {
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_single",
   ]
 
   defines = [
