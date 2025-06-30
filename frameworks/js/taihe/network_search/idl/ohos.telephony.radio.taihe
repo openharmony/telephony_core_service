@@ -1,0 +1,139 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.telephony.radio", "radio")
+@!sts_inject("""
+static { loadLibrary("telephony_radio_taihe_native.z") }
+""")
+
+enum ImsServiceType: i32 {
+    TYPE_VOICE,
+    TYPE_VIDEO,
+    TYPE_UT,
+    TYPE_SMS
+}
+
+enum ImsRegTech: i32 {
+    IMS_REG_TECH_NONE = 0,
+    IMS_REG_TECH_LTE = 1,
+    IMS_REG_TECH_IWLAN = 2,
+    IMS_REG_TECH_NR = 3,
+}
+
+enum ImsRegState: i32 {
+    IMS_UNREGISTERED,
+    IMS_REGISTERED,
+}
+
+enum NetworkType: i32 {
+    NETWORK_TYPE_UNKNOWN,
+    NETWORK_TYPE_GSM,
+    NETWORK_TYPE_CDMA,
+    NETWORK_TYPE_WCDMA,
+    NETWORK_TYPE_TDSCDMA,
+    NETWORK_TYPE_LTE,
+    NETWORK_TYPE_NR
+}
+
+enum RegState: i32 {
+    REG_STATE_NO_SERVICE,
+    REG_STATE_IN_SERVICE,
+    REG_STATE_EMERGENCY_CALL_ONLY,
+    REG_STATE_POWER_OFF
+}
+
+enum RadioTechnology: i32 {
+    RADIO_TECHNOLOGY_UNKNOWN,
+    RADIO_TECHNOLOGY_GSM,
+    RADIO_TECHNOLOGY_1XRTT,
+    RADIO_TECHNOLOGY_WCDMA,
+    RADIO_TECHNOLOGY_HSPA,
+    RADIO_TECHNOLOGY_HSPAP,
+    RADIO_TECHNOLOGY_TD_SCDMA,
+    RADIO_TECHNOLOGY_EVDO,
+    RADIO_TECHNOLOGY_EHRPD,
+    RADIO_TECHNOLOGY_LTE,
+    RADIO_TECHNOLOGY_LTE_CA,
+    RADIO_TECHNOLOGY_IWLAN,
+    RADIO_TECHNOLOGY_NR
+}
+
+enum NsaState: i32 {
+    NSA_STATE_NOT_SUPPORT = 1,
+    NSA_STATE_NO_DETECT = 2,
+    NSA_STATE_CONNECTED_DETECT = 3,
+    NSA_STATE_IDLE_DETECT = 4,
+    NSA_STATE_DUAL_CONNECTED = 5,
+    NSA_STATE_SA_ATTACHED = 6
+}
+
+struct ImsRegInfo {
+    imsRegState: ImsRegState;
+    imsRegTech: ImsRegTech;
+}
+
+struct SignalInformation {
+    signalType: NetworkType;
+    signalLevel: i32;
+    dBm: i32;
+}
+
+struct NetworkState {
+    longOperatorName: String;
+    shortOperatorName: String;
+    plmnNumeric: String;
+    isRoaming: bool;
+    regState: RegState;
+    cfgTech: RadioTechnology;
+    nsaState: NsaState;
+    isEmergency: bool;
+}
+
+struct CellInformation {
+    networkType: NetworkType;
+    signalInformation: SignalInformation;
+}
+
+struct NetworkRadioTech {
+    psRadioTech: RadioTechnology;
+}
+
+@gen_promise("getImsRegInfo")
+@gen_async("getImsRegInfo")
+function GetImsRegInfoSync(slotId: i32, imsType: ImsServiceType): ImsRegInfo;
+
+
+@gen_promise("getSignalInformation")
+@gen_async("getSignalInformation")
+function GetSignalInformationSync(slotId: i32): Array<SignalInformation>;
+
+@gen_promise("getPrimarySlotId")
+@gen_async("getPrimarySlotId")
+function GetPrimarySlotIdSync(): i32;
+
+@gen_async("getNetworkState")
+function GetNetworkStateSyncDefault(): NetworkState;
+
+@gen_promise("getNetworkState")
+function GetNetworkStateSyncOptional(slotId: Optional<i32>): NetworkState;
+
+@gen_async("getNetworkState")
+function GetNetworkStateSyncWithSlotId(slotId: i32): NetworkState;
+
+@overload("isNRSupported")
+function IsNRSupportedWithSlotID(slotId: i32): bool;
+
+@overload("isNRSupported")
+function IsNRSupportedDefault(): bool;

@@ -86,7 +86,8 @@
                     "//base/telephony/core_service/frameworks/js/sim:sim",
                     "//base/telephony/core_service/frameworks/js/vcard:vcard",
                     "//base/telephony/core_service/frameworks/js/napi/ani:ani_sim_packages",
-                    "//base/telephony/core_service/frameworks/ets/ani/sim:sim_ani_group"
+                    "//base/telephony/core_service/frameworks/ets/ani/sim:sim_ani_group",
+                    "//base/telephony/core_service/frameworks/js/taihe/network_search:telephony_radio_taihe"
                 ],
                 "service_group": [
                     "//base/telephony/core_service:tel_core_service",
@@ -135,6 +136,9 @@
                         "header_files": []
                     },
                     "name": "//base/telephony/core_service/frameworks/cj/telephony_sim:cj_sim_ffi"
+                },
+                {
+                    "name": "//base/telephony/core_service/frameworks/js/taihe/network_search:copy_telephony_radio"
                 }
             ],
             "test": [
