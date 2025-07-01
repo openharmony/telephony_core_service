@@ -177,6 +177,7 @@ bool MultiSimController::InitData(int32_t slotId)
         TELEPHONY_LOGI("InitPrimary start");
         CheckIfNeedSwitchMainSlotId();
     }
+    GetAllListFromDataBase();
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     loadedSimCardInfo_[slotId] = iccid;
@@ -361,7 +362,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     }
     int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
     int simLabelIndex = PSIM1;
-    if ((slotId = 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
+    if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
         simLabelIndex = PSIM2;
     }
     DataShare::DataShareValuesBucket values;

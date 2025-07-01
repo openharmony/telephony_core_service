@@ -166,7 +166,6 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
-    IccAccountInfo iccAccountInfo_;
     std::vector<IccAccountInfo> activeIccAccountInfoList_;
     std::vector<SimRdbInfo> localCacheInfo_;
     std::vector<IccAccountInfo> allIccAccountInfoList_;
