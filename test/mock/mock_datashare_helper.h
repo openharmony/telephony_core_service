@@ -26,6 +26,7 @@ public:
     MOCK_METHOD(bool, Release, (), (override));
     MOCK_METHOD(std::vector<std::string>, GetFileTypes, (Uri &uri, const std::string &mimeTypeFilter), (override));
     MOCK_METHOD(int, OpenFile, (Uri &uri, const std::string &mode), (override));
+    MOCK_METHOD(int, OpenFileWithErrCode, (Uri &uri, const std::string &mode, int32_t &errCode), (override));
     MOCK_METHOD(int, OpenRawFile, (Uri &uri, const std::string &mode), (override));
     MOCK_METHOD(int, Insert, (Uri &uri, const DataShare::DataShareValuesBucket &value), (override));
     MOCK_METHOD(int, InsertExt, (Uri &uri, const DataShare::DataShareValuesBucket &value,
