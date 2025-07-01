@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
+const int64_t DELAY_THREE_SECONDS = 3000;
 const int64_t RETRY_TIME = 3 * 60 * 1000;
 const int32_t ACTIVE_USER_ID = 100;
 const int INIT_TIMES = 15;
@@ -54,9 +55,9 @@ MultiSimMonitor::~MultiSimMonitor()
 
 void MultiSimMonitor::Init()
 {
-    TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
+    initEsimDataRemainCount_ = INIT_DATA_TIMES;
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
@@ -238,7 +239,7 @@ void MultiSimMonitor::InitEsimData()
     if (!controller_->InitEsimData()) {
         TELEPHONY_LOGE("MultiSimMonitor::InitEsimData failed");
         if (initEsimDataRemainCount_ > 0) {
-            SendEvent(MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT, DELAY_TIME);
+            SendEvent(MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT, DELAY_THREE_SECONDS);
             TELEPHONY_LOGI("retry remain %{public}d", initEsimDataRemainCount_);
             initEsimDataRemainCount_--;
         }

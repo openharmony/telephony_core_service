@@ -1901,7 +1901,7 @@ int32_t CoreServiceStub::OnGetAllSimAccountInfoList(MessageParcel &data, Message
     int32_t result = GetAllSimAccountInfoList(iccAccountInfoList);
     int32_t size = static_cast<int32_t>(iccAccountInfoList.size());
     bool ret = reply.WriteInt32(result);
-    ret = (ret && result && reply.WriteInt32(size));
+    ret = (ret && !result && reply.WriteInt32(size));
     if (!ret) {
         TELEPHONY_LOGE("OnGetAllSimAccountInfoList write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
