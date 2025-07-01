@@ -527,6 +527,32 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_003, Function | MediumT
 }
  
 /**
+ * @tc.number   Telephony_OperatorName_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_004, Function | MediumTest | Level1)
+{
+    std::string plmn = "46000";
+    EventFwk::MatchingSkills matchingSkills;
+    OperatorNameParams params = {false, "", true, plmn, 1};
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    
+    operatorName->displayConditionCust_  = SpnType::SPN_COND_PLMN;
+    operatorName->GetCustSpnRule(false);
+    operatorName->UpdateVSimSpn(params);
+    operatorName->networkSearchManager_.reset();
+    EXPECT_EQ(operatorName->GetCurrentLac(), 0);
+}
+ 
+/**
  * @tc.number   Telephony_NetworkSearchState_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -578,6 +604,34 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_001, Function | M
     EXPECT_EQ(networkSearchState->GetImsStatus(ImsServiceType::TYPE_VIDEO, info), 0);
     EXPECT_EQ(networkSearchState->GetImsStatus(ImsServiceType::TYPE_UT, info), 0);
     EXPECT_EQ(networkSearchState->GetImsStatus(ImsServiceType::TYPE_SMS, info), 0);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchState_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_002, Function | MediumTest | Level1)
+{
+    ImsRegInfo info;
+    const std::string longName = "";
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+
+    networkSearchState->networkState_ = nullptr;
+    networkSearchState->imsServiceStatus_ = nullptr;
+    networkSearchState->networkSearchManager_ = networkSearchManager;
+    networkSearchState->SetInitial();
+    networkSearchState->CsRadioTechChange();
+    networkSearchState->NotifyNrStateChange();
+    networkSearchState->NotifyEmergencyChange();
+    networkSearchState->NotifyPsRadioTechChange();
+    networkSearchState->NotifyPsRegStatusChange();
+    networkSearchState->SetNrState(NrState::NR_STATE_NOT_SUPPORT);
+    networkSearchState->SetLongOperatorName(longName, DomainType::DOMAIN_TYPE_PS);
+    EXPECT_EQ(networkSearchState->GetImsStatus(ImsServiceType::TYPE_VOICE, info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
  
 /**
@@ -896,6 +950,8 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_007, Function |
     
     EXPECT_FALSE(networkSearchManager->InitPointer(inner, slotId));
     EXPECT_FALSE(networkSearchManager->OnInit());
+    networkSearchManager->InitAirplaneMode(slotId);
+    networkSearchManager->InitAirplaneMode(-1);
     EXPECT_EQ(networkSearchManager->InitModuleBySlotId(slotId), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->InitModuleBySlotId(-1), TELEPHONY_ERROR);
     EXPECT_EQ(networkSearchManager->SetRadioState(0, false, 0, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
@@ -987,6 +1043,78 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_009, Function |
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 0, networkInfo, callBack),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchManager_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_010, Function | MediumTest | Level1)
+{
+    ImsRegInfo info;
+    std::u16string result = u"";
+    std::vector<NetworkInformation> operatorInfo;
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, SLOT_ID_0);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, SLOT_ID_0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchState_ = networkSearchState;
+    inner->observerHandler_ = std::make_unique<ObserverHandler>();
+    inner->networkSearchHandler_ = nullptr;
+
+    inner->deviceStateObserver_ = nullptr;
+    inner->UnRegisterDeviceStateObserver();
+    EXPECT_FALSE(inner->UnRegisterSetting());
+
+    networkSearchManager->GetImei(SLOT_ID_0, result);
+    networkSearchManager->IsRadioFirstPowerOn(SLOT_ID_0);
+    networkSearchManager->TriggerTimezoneRefresh(SLOT_ID_0);
+    networkSearchManager->StartGetRilSignalIntensity(SLOT_ID_0);
+    networkSearchManager->SetLocalAirplaneMode(SLOT_ID_0, true);
+    networkSearchManager->SetRadioFirstPowerOn(SLOT_ID_0, true);
+    networkSearchManager->UpdateCellLocation(SLOT_ID_0, 1, 1, 1);
+    networkSearchManager->DcPhysicalLinkActiveUpdate(SLOT_ID_0, true);
+
+    networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
+    networkSearchManager->GetPhoneType(SLOT_ID_0);
+    networkSearchManager->GetMeid(SLOT_ID_0, result);
+    networkSearchManager->GetCellLocation(SLOT_ID_0);
+    networkSearchManager->StartRadioOnState(SLOT_ID_0);
+    networkSearchManager->TriggerTimezoneRefresh(SLOT_ID_0);
+    networkSearchManager->StartGetRilSignalIntensity(SLOT_ID_0);
+    networkSearchManager->GetUniqueDeviceId(SLOT_ID_0, result);
+    networkSearchManager->UpdateCellLocation(SLOT_ID_0, 1, 1, 1);
+    networkSearchManager->DcPhysicalLinkActiveUpdate(SLOT_ID_0, true);
+    networkSearchManager->SetNetworkSearchResultValue(SLOT_ID_0, 0, operatorInfo);
+    networkSearchManager->GetImsRegStatus(SLOT_ID_0, ImsServiceType::TYPE_SMS, info);
+    EXPECT_EQ(networkSearchManager->InitModuleBySlotId(SLOT_ID_0), TELEPHONY_SUCCESS);
+}
+ 
+/**
+ * @tc.number   Telephony_NetworkSearchManager_011
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_011, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SimManager> simManager = nullptr;
+    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->eventSender_ = std::make_unique<EventSender>(telRilManager, networkSearchManager);
+
+    auto simManager0 = std::make_shared<SimManager>(telRilManager);
+    networkSearchManager->simManager_ = simManager0;
+    
+    networkSearchManager->GetRadioState(SLOT_ID_0);
+    networkSearchManager->GetPreferredNetwork(SLOT_ID_0);
+    networkSearchManager->SetPreferredNetwork(SLOT_ID_0, 0);
+    networkSearchManager->SetPreferredNetwork(SLOT_ID_0, 0, networkSearchCallback);
+    EXPECT_NE(networkSearchManager->GetNrOptionMode(SLOT_ID_0, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
  
 /**
@@ -1229,6 +1357,41 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_005, Function |
 }
  
 /**
+ * @tc.number   Telephony_NetworkSearchHandler_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_006, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+
+    networkSearchHandler->networkSearchManager_.reset();
+    networkSearchHandler->GetDeviceId();
+    networkSearchHandler->RadioOnState(false);
+    networkSearchHandler->SetRadioOffWhenAirplaneIsOn();
+    networkSearchHandler->SetRadioOffWhenSimDeactive();
+    networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
+    networkSearchHandler->RadioOffOrUnavailableState(1);
+    networkSearchHandler->RadioResidentNetworkChange(event);
+    EXPECT_FALSE(networkSearchHandler->Init());
+
+    networkSearchHandler->radioInfo_ = nullptr;
+    networkSearchHandler->signalInfo_ = nullptr;
+    networkSearchHandler->networkSelection_ = nullptr;
+    networkSearchHandler->AirplaneModeChange(event);
+    networkSearchHandler->RadioSignalStrength(event);
+    networkSearchHandler->SatelliteStatusChanged(event);
+    networkSearchHandler->SetNetworkSelectionModeResponse(event);
+    networkSearchHandler->ClearSignalAndCellInfoList();
+}
+ 
+/**
  * @tc.number   Telephony_NetworkRegister_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1407,6 +1570,26 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_RadioInfo, Function | MediumTest | L
     radioInfo->SetRadioOnIfNeeded();
     nsm.reset();
     radioInfo->SetRadioOnIfNeeded();
+}
+ 
+HWTEST_F(NetworkSearchBranchTest, Telephony_RadioInfo_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto radioInfo = std::make_shared<RadioInfo>(networkSearchManager, INVALID_SLOTID);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
+
+    radioInfo->networkSearchManager_.reset();
+    radioInfo->SetRadioOnIfNeeded();
+    radioInfo->ProcessGetMeid(event);
+    radioInfo->ProcessGetImei(event);
+    radioInfo->ProcessGetImeiSv(event);
+    radioInfo->ProcessVoiceTechChange(event);
+    radioInfo->ProcessGetBasebandVersion(event);
+    radioInfo->ProcessGetRrcConnectionState(event);
+    EXPECT_EQ(radioInfo->RadioTechToPhoneType(RadioTech::RADIO_TECHNOLOGY_1XRTT, RadioTech::RADIO_TECHNOLOGY_LTE),
+        PhoneType::PHONE_TYPE_IS_CDMA);
 }
  
 HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkStateReport, Function | MediumTest | Level1)
