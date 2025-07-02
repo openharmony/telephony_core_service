@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResetOption")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResetOption")]
 #[repr(i32)]
 pub enum ResetOption {
     DeleteOperationalProfiles = 1,
@@ -29,7 +29,7 @@ impl From<ResetOption> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResultCode")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResultCode")]
 #[repr(i32)]
 pub enum ResultCode {
     ResultSolvableErrors = -2,

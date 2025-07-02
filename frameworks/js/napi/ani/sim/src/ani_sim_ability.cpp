@@ -61,23 +61,23 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
         return ANI_ERROR;
     }
 
-    const char *spaceName = "L@ohos.sim.d.ets/SimAbility;";
+    const char *spaceName = "@ohos.sim.d.ets.SimAbility";
     ani_namespace spc;
     status = env->FindNamespace(spaceName, &spc);
     if (ANI_OK != status) {
-        TELEPHONY_LOGE("Not found L@ohos.sim.d.ets/SimAbility.");
+        TELEPHONY_LOGE("Not found @ohos.sim.d.ets.SimAbility.");
         return ANI_INVALID_ARGS;
     }
 
     std::array methods = {
         ani_native_function { "getDefaultVoiceSlotIdExecute",
-            ":I", reinterpret_cast<void*>(getDefaultVoiceSlotIdExecute) },
+            ":i", reinterpret_cast<void*>(getDefaultVoiceSlotIdExecute) },
         ani_native_function { "getISOCountryCodeForSimExecute",
-            ":I", reinterpret_cast<void*>(getISOCountryCodeForSimExecute) },
+            ":i", reinterpret_cast<void*>(getISOCountryCodeForSimExecute) },
     };
     status = env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size());
     if (ANI_OK != status) {
-        TELEPHONY_LOGE("Cannot bind native methods in L@ohos.sim.d.ets/SimAbility.");
+        TELEPHONY_LOGE("Cannot bind native methods in @ohos.sim.d.ets.SimAbility.");
         return ANI_INVALID_TYPE;
     };
 
