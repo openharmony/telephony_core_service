@@ -743,10 +743,9 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
     int32_t result = UpdataCacheSetActiveState(slotId, enable, curSimId);
     if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
- 
     }
     result = UpdateDBSetActiveResult(slotId, enable, curSimId);
-    if ( result != TELEPHONY_ERR_SUCCESS) {
+    if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
     CheckIfNeedSwitchMainSlotId(false);
