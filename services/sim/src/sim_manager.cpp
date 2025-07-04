@@ -1150,13 +1150,16 @@ void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExe
 {
     if ((what >= RadioEvent::RADIO_IMSI_LOADED_READY) && (what <= RadioEvent::RADIO_SIM_RECORDS_LOADED)) {
         std::shared_lock<ffrt::shared_mutex> lck(mtx_);
-        if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        if ((simFileManager_.empty() || !IsValidSlotId(slotId, simFileManager_)) ||
+            (simFileManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simFileManager_ is nullptr");
             return;
         }
         simFileManager_[slotId]->RegisterCoreNotify(handler, what);
     } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) && (what <= RadioEvent::RADIO_SIM_STATE_SIMLOCK)) {
-        if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        std::shared_lock<ffrt::shared_mutex> lck(mtx_);
+        if ((simStateManager_.empty() || !IsValidSlotId(slotId, simStateManager_)) ||
+            (simStateManager_[slotId] == nullptr)) {
             TELEPHONY_LOGE("slotId is invalid or simStateManager_ is nullptr");
             return;
         }
