@@ -680,6 +680,45 @@ void MultiSimController::UpdateSubState(int32_t slotId, int32_t enable)
     isSetActiveSimInProgress_[slotId] = 0;
 }
 
+int32_t MultiSimController::UpdateDBSetActiveResult(int32_t slotId, int32_t enable, int32_t curSimId)
+{
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(enable);
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
+    if (result == INVALID_VALUE) {
+        TELEPHONY_LOGE("failed by database");
+        isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+ 
+int32_t MultiSimController::UpdataCacheSetActiveState(int32_t slotId, int32_t enable, int32_t curSimId)
+{
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+        TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
+        isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    localCacheInfo_[slotId].isActive = enable;
+    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
+        TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
+        isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
+    }
+    allLocalCacheInfo_[curSimId - 1].isActive = enable;
+    lock.unlock();
+    UpdateSubState(slotId, enable);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId)
 {
     isSetActiveSimInProgress_[slotId] = 1;
@@ -701,33 +740,14 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
         UpdateSubState(slotId, enable);
         return TELEPHONY_ERR_SUCCESS;
     }
-    if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("failed by nullptr");
-        isSetActiveSimInProgress_[slotId] = 0;
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    int32_t result = UpdataCacheSetActiveState(slotId, enable, curSimId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
     }
-    DataShare::DataShareValuesBucket values;
-    DataShare::DataShareValueObject valueObj(enable);
-    values.Put(SimData::IS_ACTIVE, valueObj);
-    int32_t result = simDbHelper_->UpdateDataBySimId(curSimId, values);
-    if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("failed by database");
-        isSetActiveSimInProgress_[slotId] = 0;
-        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    result = UpdateDBSetActiveResult(slotId, enable, curSimId);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
     }
-    std::unique_lock<ffrt::mutex> lock(mutex_);
-    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
-        isSetActiveSimInProgress_[slotId] = 0;
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    localCacheInfo_[slotId].isActive = enable;
-    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
-        return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
-    }
-    allLocalCacheInfo_[curSimId - 1].isActive = enable;
-    lock.unlock();
-    UpdateSubState(slotId, enable);
     CheckIfNeedSwitchMainSlotId(false);
     return TELEPHONY_ERR_SUCCESS;
 }

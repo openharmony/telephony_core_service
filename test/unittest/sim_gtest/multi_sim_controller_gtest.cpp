@@ -653,5 +653,61 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_003, Fu
     multiSimController->radioProtocolController_->radioProtocol_[0].modemId = 1;
     ret = multiSimController->SetPrimarySlotId(0, false);
 }
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetActiveCommonSim_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->isSetActiveSimInProgress_.resize(2, 0);
+    multiSimController->radioProtocolController_ = nullptr;
+    multiSimController->SetActiveCommonSim(0, 1, false, 0);
+    int32_t result = multiSimController-> SetActiveCommonSim(0, 1, false, 0);
+    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
+}
+ 
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdataCacheSetActiveState_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->isSetActiveSimInProgress_.resize(2, 0);
+    multiSimController->radioProtocolController_ = nullptr;
+    auto result = multiSimController->UpdataCacheSetActiveState(0, 1, 0);
+    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
+ 
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+ 
+    result = multiSimController->UpdataCacheSetActiveState(0, 1, 0);
+}
+ 
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBSetActiveResult_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->isSetActiveSimInProgress_.resize(2, 0);
+    multiSimController->radioProtocolController_ = nullptr;
+    auto result = multiSimController->UpdateDBSetActiveResult(0, 1, 0);
+    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
+ 
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+ 
+    result = multiSimController->UpdateDBSetActiveResult(0, 1, 0);
+}
 }
 }

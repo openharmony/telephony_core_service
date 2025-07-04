@@ -139,6 +139,8 @@ private:
     bool IsAllModemInitDone();
     int32_t IsSatelliteSupported();
     int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
+    int32_t UpdataCacheSetActiveState(int32_t slotId, int32_t enable, int32_t curSimId);
+    int32_t UpdateDBSetActiveResult(int32_t slotId, int32_t enable, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void SetPrimarySlotIdDone();
