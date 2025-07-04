@@ -73,11 +73,20 @@ std::string VCardDecoder::GetVersion()
         if (index == std::string::npos) {
             continue;
         }
-        version = line.substr(index + std::string(VCARD_TYPE_VERSION).length() + 1);
+        version = GetVersionFromFileUtils(line, index);
         break;
     }
     fileUtils_.Reset();
     return version;
+}
+
+std::string VCardDecoder::GetVersionFromFileUtils(const std::string &line, int index)
+{
+    int versionIndex = index + std::string(VCARD_TYPE_VERSION).length() + 1;
+    if (versionIndex < static_cast<int>(line.length())) {
+        return line.substr(versionIndex);
+    }
+    return "";
 }
 
 std::shared_ptr<VCardDecoder> VCardDecoder::GetDecoder(const std::string &version)

@@ -1104,6 +1104,14 @@ HWTEST_F(ContactDataTest, VCardGroupData_GenerateDisplayName01, Function | Mediu
     EXPECT_EQ(GenerateDisplayName("ar", arNameInfo), "ما قبل نانسي نبيل عجرم, بعد");
 }
 
+HWTEST_F(ContactDataTest, GetVersionFromFileUtils_001, Function | MediumTest | Level3)
+{
+    std::string line = "VERSION:2.1";
+    VCardDecoder decoder;
+    ASSERT_EQ(decoder.GetVersionFromFileUtils(line, 0), "2.1");
+    line = "VERSION:";
+    ASSERT_EQ(decoder.GetVersionFromFileUtils(line, 0), "");
+}
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS

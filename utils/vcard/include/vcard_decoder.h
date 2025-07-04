@@ -48,6 +48,7 @@ public:
 protected:
     static VCardFileUtils fileUtils_;
     static std::string GetVersion();
+    static std::string GetVersionFromFileUtils(const std::string &line, int index);
     static std::shared_ptr<VCardDecoder> GetDecoder(const std::string &version);
 };
 } // namespace Telephony
