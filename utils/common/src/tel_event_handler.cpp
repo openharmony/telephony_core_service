@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-
+constexpr int DEACTIVE_DATA_CALL = 31;
 void TelFFRTUtils::Submit(const TelTask &task)
 {
     ffrt::submit(task);
