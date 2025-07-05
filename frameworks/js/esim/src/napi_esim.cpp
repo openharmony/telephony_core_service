@@ -39,6 +39,8 @@
 #include "switch_to_profile.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "get_supported_pkids_callback.h"
+#include "get_contract_info_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -436,6 +438,30 @@ void ConfigurationInfoAnalyze(napi_env env, napi_value arg, AsyncDownloadConfigu
     napi_value alowState = NapiUtil::GetNamedProperty(env, arg, "isPprAllowed");
     if (alowState) {
         NapiValueToCppValue(env, alowState, napi_boolean, &configuration.isPprAllowed);
+    }
+}
+
+void ContractRequestDataAnalyze(napi_env env, napi_value arg, AsyncContractRequestData &contractRequestData)
+{
+    napi_value publicKey = NapiUtil::GetNamedProperty(env, arg, "publicKey");
+    if (publicKey) {
+        std::array<char, ARRAY_SIZE> publicKeyStr = {0};
+        NapiValueToCppValue(env, publicKey, napi_string, std::data(publicKeyStr));
+        contractRequestData.publicKey = std::string(publicKeyStr.data());
+    }
+
+    napi_value nonce = NapiUtil::GetNamedProperty(env, arg, "nonce");
+    if (nonce) {
+        std::array<char, ARRAY_SIZE> nonceStr = {0};
+        NapiValueToCppValue(env, nonce, napi_string, std::data(nonceStr));
+        contractRequestData.nonce = std::string(nonceStr.data());
+    }
+
+    napi_value pkid = NapiUtil::GetNamedProperty(env, arg, "pkid");
+    if (pkid) {
+        std::array<char, ARRAY_SIZE> pkidStr = {0};
+        NapiValueToCppValue(env, pkid, napi_string, std::data(pkidStr));
+        contractRequestData.pkid = std::string(pkidStr.data());
     }
 }
 
@@ -1600,6 +1626,129 @@ napi_value ReserveProfilesForFactoryRestore(napi_env env, napi_callback_info inf
     return result;
 }
 
+void NativeGetSupportedPkids(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto getSupportedPkidsCtx = static_cast<AsyncContext<std::string> *>(data);
+    if (!IsValidSlotId(getSupportedPkidsCtx->slotId)) {
+        TELEPHONY_LOGE("NativeGetSupportedPkids slotId is invalid");
+        getSupportedPkidsCtx->context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    std::unique_ptr<GetSupportedPkidsResultCallback> callback =
+        std::make_unique<GetSupportedPkidsResultCallback>(getSupportedPkidsCtx);
+    std::unique_lock<std::mutex> callbackLock(getSupportedPkidsCtx->callbackMutex);
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetSupportedPkids(
+        getSupportedPkidsCtx->slotId, callback.release());
+
+    TELEPHONY_LOGI("NAPI NativeGetSupportedPkids %{public}d", errorCode);
+    getSupportedPkidsCtx->context.errorCode = errorCode;
+    if (errorCode == TELEPHONY_SUCCESS) {
+        getSupportedPkidsCtx->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [getSupportedPkidsCtx] { return getSupportedPkidsCtx->isCallbackEnd; });
+    }
+}
+
+void GetSupportedPkidsCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    if (context == nullptr) {
+        TELEPHONY_LOGE("GetSupportedPkidsCallback context is nullptr");
+        return;
+    }
+    if ((!context->isCallbackEnd) && (context->context.errorCode == TELEPHONY_SUCCESS)) {
+        TELEPHONY_LOGE("GetSupportedPkidsCallback get result timeout.");
+        context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, *context, false, { "GetSupportedPkids", Permission::GET_TELEPHONY_ESIM_STATE });
+}
+
+napi_value GetSupportedPkids(napi_env env, napi_callback_info info)
+{
+    return NapiCreateAsyncWork<std::string, NativeGetSupportedPkids, GetSupportedPkidsCallback>(
+        env, info, "GetSupportedPkids");
+}
+
+void NativeGetContractInfo(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    auto contractInfoCtx = static_cast<AsyncGetContractInfo *>(data);
+    if (!IsValidSlotId(contractInfoCtx->asyncContext.slotId)) {
+        TELEPHONY_LOGE("NativeGetContractInfo slotId is invalid");
+        contractInfoCtx->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    std::unique_ptr<GetContractInfoResultCallback> callback =
+        std::make_unique<GetContractInfoResultCallback>(contractInfoCtx);
+    std::unique_lock<std::mutex> callbackLock(contractInfoCtx->asyncContext.callbackMutex);
+    ContractRequestData contractRequestData;
+    contractRequestData.publicKey_ = NapiUtil::ToUtf16(contractInfoCtx->contractRequestData.publicKey.data());
+    contractRequestData.nonce_ = NapiUtil::ToUtf16(contractInfoCtx->contractRequestData.nonce.data());
+    contractRequestData.pkid_ = NapiUtil::ToUtf16(contractInfoCtx->contractRequestData.pkid.data());
+
+    int32_t errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().GetContractInfo(
+        contractInfoCtx->asyncContext.slotId, contractRequestData, callback.release());
+
+    TELEPHONY_LOGI("NAPI NativeGetContractInfo %{public}d", errorCode);
+    contractInfoCtx->asyncContext.context.errorCode = errorCode;
+    if (errorCode == TELEPHONY_SUCCESS) {
+        contractInfoCtx->asyncContext.cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+            [contractInfoCtx] { return contractInfoCtx->asyncContext.isCallbackEnd; });
+    }
+}
+
+void GetContractInfoCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncContext<std::string>> context(static_cast<AsyncContext<std::string> *>(data));
+    if (context == nullptr) {
+        TELEPHONY_LOGE("GetContractInfoCallback context is nullptr");
+        return;
+    }
+    if ((!context->isCallbackEnd) && (context->context.errorCode == TELEPHONY_SUCCESS)) {
+        TELEPHONY_LOGE("GetContractInfoCallback get result timeout.");
+        context->context.errorCode = TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT;
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, *context, false, { "GetContractInfo", Permission::GET_TELEPHONY_ESIM_STATE });
+}
+
+napi_value GetContractInfo(napi_env env, napi_callback_info info)
+{
+    auto getContractInfoCtx = std::make_unique<AsyncGetContractInfo>();
+    if (getContractInfoCtx == nullptr) {
+        return nullptr;
+    }
+    BaseContext &context = getContractInfoCtx->asyncContext.context;
+    napi_value contractRequestDataObject = NapiUtil::CreateUndefined(env);
+
+    auto initPara = std::make_tuple(
+        &getContractInfoCtx->asyncContext.slotId, &contractRequestDataObject, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetContractInfo",
+        .env = env,
+        .info = info,
+        .execute = NativeGetContractInfo,
+        .complete = GetContractInfoCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncGetContractInfo>(para, getContractInfoCtx.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    ContractRequestDataAnalyze(env, contractRequestDataObject, getContractInfoCtx->contractRequestData);
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+        getContractInfoCtx.release();
+    }
+    return result;
+}
+
 napi_status InitEnumResetOption(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -1851,6 +2000,8 @@ napi_status InitEuiccServiceInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setDefaultSmdpAddress", SetDefaultSmdpAddress),
         DECLARE_NAPI_FUNCTION("getDefaultSmdpAddress", GetDefaultSmdpAddress),
         DECLARE_NAPI_FUNCTION("cancelSession", CancelSession),
+        DECLARE_NAPI_FUNCTION("getSupportedPkids", GetSupportedPkids),
+        DECLARE_NAPI_FUNCTION("getContractInfo", GetContractInfo),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }

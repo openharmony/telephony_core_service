@@ -339,6 +339,26 @@ struct EuiccInfo2 {
     std::string response_ = "";
     int32_t resultCode_ = 0;
 };
+
+/**
+ * @brief Map meta data.
+ */
+struct MapMetaData {
+    std::u16string nonce = u"";
+    std::u16string imei = u"";
+    std::u16string imei2 = u"";
+    std::u16string timestamp = u"";
+};
+
+/**
+ * @brief Get contract info request.
+ */
+struct GetContractInfoRequest {
+    std::u16string euiccCiPkidToBeUsed = u"";
+    MapMetaData mapMetaData;
+    std::u16string ePkPosHpke = u"";
+};
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_ESIM_STATE_TYPE_H

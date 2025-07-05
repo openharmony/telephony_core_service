@@ -230,6 +230,26 @@ public:
      */
     int32_t AddProfile(int32_t slotId, DownloadableProfile profile);
 
+    /**
+     * @brief Get supported pkids string.
+     *
+     * @param slotId[in], indicates the card slot index number.
+     * @param callback[in], call back function.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetSupportedPkids(int32_t slotId, const sptr<IEsimServiceCallback> &callback);
+
+    /**
+     * @brief Get contract info string.
+     *
+     * @param slotId[in], indicates the card slot index number.
+     * @param contractRequestData[in], contractRequestData contract request data required to sign and encrypt
+     * @param callback[in], call back function.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetContractInfo(int32_t slotId, ContractRequestData &contractRequestData,
+        const sptr<IEsimServiceCallback> &callback);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class EsimServiceDeathRecipient : public IRemoteObject::DeathRecipient {

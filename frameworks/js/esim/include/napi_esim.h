@@ -31,6 +31,7 @@
 #include "response_esim_result.h"
 #include "telephony_napi_common_error.h"
 #include "telephony_types.h"
+#include "contract_request_data_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -137,6 +138,17 @@ struct AsyncResetMemory {
 struct AsyncAddProfileInfo {
     AsyncContext<bool> asyncContext;
     AsyncDownloadableProfile profile;
+};
+
+struct AsyncContractRequestData {
+    std::string publicKey = "";
+    std::string nonce = "";
+    std::string pkid = "";
+};
+
+struct AsyncGetContractInfo {
+    AsyncContext<std::string> asyncContext;
+    AsyncContractRequestData contractRequestData;
 };
 } // namespace Telephony
 } // namespace OHOS
