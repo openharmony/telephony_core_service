@@ -25,7 +25,7 @@ enum class TelPriority : uint32_t { IMMEDIATE = 0, HIGH, LOW };
 }
 
 static constexpr int PRINT_INTELVAL_MINUTES = 5;
-
+constexpr int DEACTIVE_DATA_CALL = 31;
 TelEventQueue::TelEventQueue(const std::string &name) : name_(name)
 {
     TELEPHONY_LOGI("%{public}s create", name_.c_str());
