@@ -59,7 +59,9 @@ bool TelEventHandler::SendEvent(AppExecFwk::InnerEvent::Pointer &event, int64_t 
         TELEPHONY_LOGE("Could not send an invalid event");
         return false;
     }
-
+    if (event->GetInnerEventId() == DEACTIVE_DATA_CALL) {
+        TELEPHONY_LOGI("RADIO_RIL_DEACTIVATE_DATA_CALL delayTime = %{public}" PRId64, delayTime);
+    }
     AppExecFwk::InnerEvent::TimePoint now = AppExecFwk::InnerEvent::Clock::now();
     if (delayTime > 0) {
         event->SetHandleTime(now + std::chrono::milliseconds(delayTime));
