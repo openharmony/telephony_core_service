@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include "tel_event_handler.h"
 
 #include "tel_event_queue.h"
