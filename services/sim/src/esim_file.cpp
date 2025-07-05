@@ -3392,6 +3392,157 @@ void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable 
     cv.notify_all();
 }
 
+std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
+    uint32_t kTag, std::string &key, uint32_t vTag, std::string &value)
+{
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
+    builder->Asn1AddChildAsString(kTag, key);
+    if (vTag == TAG_ESIM_OCTET_STRING_TYPE) {
+        std::vector<uint8_t> valueVec = Asn1Utils::HexStrToBytes(value);
+        builder->Asn1AddChildAsBytes(kTag, valueVec, valueVec.size());
+    } else {
+        builder->Asn1AddChildAsString(vTag, value);
+    }
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return nullptr;
+    }
+    return builder->Asn1Build();
+}
+
+std::shared_ptr<Asn1Node> EsimFile::GetMapMetaDataNode()
+{
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return nullptr;
+    }
+    std::string keyIMEI = "kIMEI";
+    std::string imeiStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei);
+    std::shared_ptr<Asn1Node> imeiNode = GetKeyValueSequenceNode(
+        TAG_ESIM_TARGET_ADDR, keyIMEI, TAG_ESIM_TARGET_ADDR, imeiStr);
+    builder->Asn1AddChild(imeiNode);
+    std::string keyIMEI2 = "kIMEI2";
+    std::string imei2Str = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei2);
+    std::shared_ptr<Asn1Node> imei2Node = GetKeyValueSequenceNode(
+        TAG_ESIM_TARGET_ADDR, keyIMEI2, TAG_ESIM_TARGET_ADDR, imei2Str);
+    builder->Asn1AddChild(imei2Node);
+    std::string keyNonce = "kNonce";
+    std::string nonceStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.nonce);
+    std::shared_ptr<Asn1Node> nonceNode = GetKeyValueSequenceNode(
+        TAG_ESIM_TARGET_ADDR, keyNonce, TAG_ESIM_OCTET_STRING_TYPE, nonceStr);
+    builder->Asn1AddChild(nonceNode);
+    std::string keyTimestamp = "kTimestamp";
+    std::string timestampStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.timestamp);
+    std::shared_ptr<Asn1Node> timestampNode = GetKeyValueSequenceNode(
+        TAG_ESIM_TARGET_ADDR, keyTimestamp, TAG_ESIM_TARGET_ADDR, timestampStr);
+    builder->Asn1AddChild(timestampNode);
+    return builder->Asn1Build();
+}
+
+bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &responseEvent)
+{
+    if (!IsLogicChannelOpen()) {
+        return false;
+    }
+    std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONTRACT_INFO);
+    if (builder == nullptr) {
+        TELEPHONY_LOGE("builder is nullptr");
+        return false;
+    }
+    // euiccCiPkidToBeUsed
+    std::string pkidStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.euiccCiPkidToBeUsed);
+    std::vector<uint8_t> pkidVec = Asn1Utils::HexStrToBytes(pkidStr);
+    builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, pkidVec, pkidVec.size());
+    // mapMetaData
+    std::shared_ptr<Asn1Node> mapMetaDataNode = GetMapMetaDataNode();
+    if (mapMetaDataNode == nullptr) {
+        TELEPHONY_LOGE("mapMetaDataNode is nullptr");
+        return false;
+    }
+    builder->Asn1AddChild(mapMetaDataNode);
+    // publicKey
+    std::string publicKeyStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.ePkPosHpke);
+    std::vector<uint8_t> publicKeyVec = Asn1Utils::HexStrToBytes(publicKeyStr);
+    builder->Asn1AddChildAsBytes(TAG_ESIM_OCTET_STRING_TYPE, publicKeyVec, publicKeyVec.size());
+
+    ApduSimIORequestInfo requestInfo;
+    CommBuildOneApduReqInfo(requestInfo, builder);
+    if (telRilManager_ == nullptr) {
+        return false;
+    }
+    int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId_, requestInfo, responseEvent);
+    if (apduResult == TELEPHONY_ERR_FAIL) {
+        return false;
+    }
+    return true;
+}
+
+bool EsimFile::ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr");
+        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
+        return false;
+    }
+
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("receive message is nullptr");
+        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
+        return false;
+    }
+    newRecvData_ = rcvMsg->fileData;
+    bool isHandleFinish = false;
+    bool retValue = CommMergeRecvData(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_,
+        MSG_ESIM_GET_CONTRACT_INFO_DONE, isHandleFinish);
+    if (isHandleFinish) {
+        TELEPHONY_LOGI("waits for continuing data...");
+        return retValue;
+    }
+
+    TELEPHONY_LOGI("recv contract info len: %{public}lu", recvCombineStr_.length());
+    if (recvCombineStr_.length() <= CONTRACT_INFO_CONTENT_IDX) {
+        TELEPHONY_LOGE("recv message len illegal");
+        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
+        return false;
+    }
+    getContractInfoResult_ = recvCombineStr_.substr(CONTRACT_INFO_CONTENT_IDX);
+    NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
+    return true;
+}
+
+std::string EsimFile::GetContractInfo(const GetContractInfoRequest &getContractInfoRequest)
+{
+    getContractInfoResult_ = "";
+    getContractInfoRequest_.euiccCiPkidToBeUsed = getContractInfoRequest.euiccCiPkidToBeUsed;
+    getContractInfoRequest_.mapMetaData = getContractInfoRequest.mapMetaData;
+    getContractInfoRequest_.ePkPosHpke = getContractInfoRequest.ePkPosHpke;
+
+    ResultInnerCode resultFlag = ObtainChannelSuccessExclusive();
+    if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
+        TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
+        return getContractInfoResult_;
+    }
+
+    recvCombineStr_ = "";
+    AppExecFwk::InnerEvent::Pointer eventGetContractInfo = BuildCallerInfo(MSG_ESIM_GET_CONTRACT_INFO_DONE);
+    if (!ProcessGetContractInfo(eventGetContractInfo)) {
+        TELEPHONY_LOGE("GetContractInfo failed");
+        SyncCloseChannel();
+        return getContractInfoResult_;
+    }
+    isGetContractInfoReady_ = false;
+    std::unique_lock<std::mutex> lock(getContractInfoMutex_);
+    if (!getContractInfoCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
+        [this]() { return isGetContractInfoReady_; })) {
+        SyncCloseChannel();
+        return getContractInfoResult_;
+    }
+    SyncCloseChannel();
+    return getContractInfoResult_;
+}
+
 bool EsimFile::CommMergeRecvData(
     std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish)
 {
@@ -3474,6 +3625,8 @@ void EsimFile::InitMemberFunc()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessObtainEuiccInfo2Done(event); };
     memberFuncMap_[MSG_ESIM_AUTHENTICATE_SERVER] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessAuthenticateServerDone(event); };
+    memberFuncMap_[MSG_ESIM_GET_CONTRACT_INFO_DONE] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { return ProcessGetContractInfoDone(event); };
 }
 
 void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)

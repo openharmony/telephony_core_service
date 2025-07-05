@@ -30,14 +30,14 @@
 #include "profile_info_list_parcel.h"
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
-
+#include "contract_request_data_parcel.h"
 namespace OHOS {
 namespace Telephony {
 class IEsimServiceCallbackStub : public IRemoteStub<IEsimServiceCallback> {
 public:
     static const int32_t DEFAULT_ERROR = -1;
     static const int32_t DEFAULT_RESULT = 0;
-    IEsimServiceCallbackStub() = default;
+    IEsimServiceCallbackStub();
     virtual ~IEsimServiceCallbackStub() = default;
     int32_t OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data) override;
     int OnRemoteRequest(
@@ -58,7 +58,12 @@ public:
     virtual void OnGetEuiccProfileInfoList(const GetEuiccProfileInfoListResult &result, const int32_t errorCode);
     virtual void OnSetDefaultSmdpAddress(const int32_t &result, const int32_t errorCode);
     virtual void OnSetProfileNickName(const int32_t &result, const int32_t errorCode);
+    virtual void OnGetSupportedPkids(const std::string &result, const int32_t errorCode);
+    virtual void OnGetContractInfo(const std::string &result, const int32_t errorCode);
 private:
+    using EsimServiceCallbackFunc = std::function<void(MessageParcel &data)>;
+    std::map<uint32_t, EsimServiceCallbackFunc> memberFuncMap_;
+
     void OnGetEuiccInfo(MessageParcel &data);
     void OnGetEid(MessageParcel &data);
     void OnGetDownloadableProfileMetadata(MessageParcel &data);
@@ -73,6 +78,8 @@ private:
     void OnStartOsu(MessageParcel &data);
     void OnSwitchToProfile(MessageParcel &data);
     void OnResetMemory(MessageParcel &data);
+    void OnGetSupportedPkids(MessageParcel &data);
+    void OnGetContractInfo(MessageParcel &data);
 };
 } // namespace Telephony
 } // namespace OHOS

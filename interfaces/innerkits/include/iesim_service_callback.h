@@ -38,9 +38,10 @@ public:
 		SWITCH_PROFILE_RESULT,
 		RESET_MEMORY_RESULT,
 		GET_EID_RESULT,
+		GET_SUPPORTED_PKIDS_RESULT,
+		GET_CONTRACT_INFO_RESULT,
     };
     virtual int32_t OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data) = 0;
-
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IEsimServiceCallback");
 };

@@ -28,6 +28,7 @@
 #include "profile_info_list_parcel.h"
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
+#include "contract_request_data_parcel.h"
 #endif
 #include "i_network_search_callback.h"
 #include "ims_reg_info_callback.h"
