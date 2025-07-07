@@ -207,7 +207,7 @@ protected:
     bool isSimRecordLoaded_{false};
 
 private:
-    bool isVoiceMailFixed_ = false;
+    std::atomic<bool> isVoiceMailFixed_{false};
     void ResetVoiceMailVariable();
     bool ProcessIccFileObtained(const AppExecFwk::InnerEvent::Pointer &event);
     void RegisterImsiLoaded(std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
