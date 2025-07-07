@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include "tel_event_handler.h"
 
 #include "tel_event_queue.h"
@@ -20,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-
+constexpr int DEACTIVE_DATA_CALL = 31;
 void TelFFRTUtils::Submit(const TelTask &task)
 {
     ffrt::submit(task);
@@ -59,7 +60,9 @@ bool TelEventHandler::SendEvent(AppExecFwk::InnerEvent::Pointer &event, int64_t 
         TELEPHONY_LOGE("Could not send an invalid event");
         return false;
     }
-
+    if (event->GetInnerEventId() == DEACTIVE_DATA_CALL) {
+        TELEPHONY_LOGI("RADIO_RIL_DEACTIVATE_DATA_CALL delayTime = %{public}" PRId64, delayTime);
+    }
     AppExecFwk::InnerEvent::TimePoint now = AppExecFwk::InnerEvent::Clock::now();
     if (delayTime > 0) {
         event->SetHandleTime(now + std::chrono::milliseconds(delayTime));

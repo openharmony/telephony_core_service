@@ -25,7 +25,7 @@ enum class TelPriority : uint32_t { IMMEDIATE = 0, HIGH, LOW };
 }
 
 static constexpr int PRINT_INTELVAL_MINUTES = 5;
-
+constexpr int DEACTIVE_DATA_CALL = 31;
 TelEventQueue::TelEventQueue(const std::string &name) : name_(name)
 {
     TELEPHONY_LOGI("%{public}s create", name_.c_str());
@@ -164,6 +164,9 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
             std::shared_ptr<TelEventHandler> handler = nullptr;
             if (event) {
                 handler = std::static_pointer_cast<TelEventHandler>(event->GetOwner());
+                if (event->GetInnerEventId() == DEACTIVE_DATA_CALL) {
+                    TELEPHONY_LOGI("RADIO_RIL_DEACTIVATE_DATA_CALL ffrt");
+                }
             }
             if (event && handler) {
                 TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", name_.c_str(),
