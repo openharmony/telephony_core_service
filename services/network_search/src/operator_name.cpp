@@ -499,8 +499,6 @@ unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
     }
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
         spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
-    } else if (!roaming && IsChinaCard()) {
-        spnRule = SPN_CONDITION_DISPLAY_PLMN;
     } else {
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
