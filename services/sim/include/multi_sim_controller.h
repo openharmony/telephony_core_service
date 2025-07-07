@@ -176,7 +176,7 @@ private:
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
-    bool isSetPrimarySlotIdInProgress_ = false;
+    std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
     ffrt::mutex setPrimarySlotToRilMutex_;
     ffrt::mutex writeDbMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
