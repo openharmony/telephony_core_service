@@ -52,12 +52,10 @@ HWTEST_F(TelEventQueueTest, SubmitToFFRT_001, Function | MediumTest | Level0)
     auto event = AppExecFwk::InnerEvent::Get(31);
     std::shared_ptr telEventHandler = std::make_shared("TelEventHandler");
     event->SetOwner(telEventHandler);
-    int32_t queueId = telEventQueue->GetNextQueueId();
-    queueId += 1;
+    int32_t queueId = telEventQueue->queueId_;
     telEventQueue->InsertEventsInner(event, AppExecFwk::EventQueue::Priority::LOW);
     AppExecFwk::InnerEvent::TimePoint now = AppExecFwk::InnerEvent::Clock::now();
-    telEventQueue->SubmitToFFRT(queueId, now, 0);
-    usleep(500);
+    telEventQueue->SubmitToFFRT(telEventQueue->queueId_, now, 0);
     EXPECT_EQ(queueId, telEventQueue->queueId_);
 }
 #endif // TEL_TEST_UNSUPPORT
