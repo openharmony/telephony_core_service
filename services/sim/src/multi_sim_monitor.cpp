@@ -259,7 +259,8 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
         return;
     }
-    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) || controller_->IsEsim(slotId)) {
+    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
+        ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId))) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();

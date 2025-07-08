@@ -34,6 +34,7 @@
 #include "tel_ril_modem_parcel.h"
 #include "telephony_log_wrapper.h"
 #include "usim_file_controller.h"
+#include "esim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -119,6 +120,7 @@ public:
     int32_t SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
     EuiccInfo2 GetEuiccInfo2(int32_t portIndex);
     ResponseEsimInnerResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
+    std::string GetContractInfo(int32_t slotId, const GetContractInfoRequest &getContractInfoRequest);
 #endif
 
 protected:

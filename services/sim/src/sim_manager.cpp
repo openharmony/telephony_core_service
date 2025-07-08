@@ -1618,6 +1618,17 @@ int32_t SimManager::AuthenticateServer(
     responseResult = simFileManager_[slotId]->AuthenticateServer(authenticateConfigInfo);
     return TELEPHONY_ERR_SUCCESS;
 }
+
+int32_t SimManager::GetContractInfo(
+    int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response)
+{
+    if ((!IsValidSlotId(slotId, simFileManager_)) || (simFileManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("simFileManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    response = simFileManager_[slotId]->GetContractInfo(slotId, getContractInfoRequest);
+    return TELEPHONY_ERR_SUCCESS;
+}
 #endif
 
 void SimManager::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip)

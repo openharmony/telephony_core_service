@@ -211,6 +211,8 @@ public:
     virtual int32_t GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2) = 0;
     virtual int32_t AuthenticateServer(int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo,
         ResponseEsimInnerResult &responseResult) = 0;
+    virtual int32_t GetContractInfo(int32_t slotId, const GetContractInfoRequest &contractInfoRequest,
+        std::string &response) = 0;
 #endif
 };
 } // namespace Telephony

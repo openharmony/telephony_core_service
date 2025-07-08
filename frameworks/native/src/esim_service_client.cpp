@@ -315,6 +315,27 @@ int32_t EsimServiceClient::CancelSession(
     return proxy->CancelSession(slotId, transactionId, cancelReason, callback);
 }
 
+int32_t EsimServiceClient::GetSupportedPkids(int32_t slotId, const sptr<IEsimServiceCallback> &callback)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetSupportedPkids(slotId, callback);
+}
+
+int32_t EsimServiceClient::GetContractInfo(
+    int32_t slotId, ContractRequestData &contractRequestData, const sptr<IEsimServiceCallback> &callback)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetContractInfo(slotId, contractRequestData, callback);
+}
+
 int32_t EsimServiceClient::IsSupported(int32_t slotId)
 {
     auto proxy = GetProxy();

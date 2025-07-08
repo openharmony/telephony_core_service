@@ -209,6 +209,8 @@ public:
         bool forceDisableProfile, int32_t &enumResult) override;
     int32_t SetProfileNickname(
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, int32_t &enumResult) override;
+    int32_t GetContractInfo(
+        int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response) override;
 #endif
 
 private:

@@ -20,6 +20,7 @@ sequenceable get_downloadable_profiles_result_parcel..OHOS.Telephony.GetDownload
 sequenceable profile_info_list_parcel..OHOS.Telephony.GetDownloadableProfilesResult;
 sequenceable profile_metadata_result_parcel..OHOS.Telephony.GetEuiccProfileInfoListResult;
 sequenceable response_esim_result..OHOS.Telephony.ResponseEsimResult;
+sequenceable contract_request_data_parcel..OHOS.Telephony.ContractRequestData;
 interface OHOS.Telephony.IEsimServiceCallback;
 interface OHOS.Telephony.IEsimService {
     void GetEid([in] int slotId, [in] IEsimServiceCallback listener);
@@ -66,4 +67,9 @@ interface OHOS.Telephony.IEsimService {
         [in] IEsimServiceCallback listener);
     void IsSupported([in] int slotId);
     void AddProfile([in] int slotId, [in] DownloadableProfile profile);
+    void GetSupportedPkids([in] int slotId, [in] IEsimServiceCallback listener);
+    void GetContractInfo(
+        [in] int slotId,
+        [in] ContractRequestData contractRequestData,
+        [in] IEsimServiceCallback listener);
 }
