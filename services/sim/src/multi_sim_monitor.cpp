@@ -262,13 +262,13 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
         ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId))) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
+        simFileManager->ClearData();
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         controller_->GetAllListFromDataBase();
         controller_->ResetSetPrimarySlotRemain(slotId);
         isSimAccountLoaded_[slotId] = 0;
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
-        simFileManager->ClearData();
         std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
         controller_->loadedSimCardInfo_.erase(slotId);
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
