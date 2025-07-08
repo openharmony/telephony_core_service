@@ -197,9 +197,9 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
         wchar_t c = LANGUAGE_TABLE[gsmValIndex];
         wide_str += c;
     }
-    if(byteLen > 0 && byteLen % 7 == 0) {
+    if(byteLen > 0 && byteLen % CHAR_GSM_7BIT == 0) {
         wide_str = static_cast<int>(bytes[byteLen - 1]) > 1 ? wide_str : wide_str.substr(0, n);
-    } esle {
+    } else {
         wide_str = wide_str.substr(0, n);
     }
     TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
