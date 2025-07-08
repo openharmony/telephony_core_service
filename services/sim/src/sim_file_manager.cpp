@@ -1292,6 +1292,16 @@ ResponseEsimInnerResult SimFileManager::AuthenticateServer(const AuthenticateCon
     ResponseEsimInnerResult result = eSimFile_->AuthenticateServer(authenticateConfigInfo);
     return result;
 }
+
+std::string SimFileManager::GetContractInfo(int32_t slotId, const GetContractInfoRequest &getContractInfoRequest)
+{
+    if (eSimFile_ == nullptr) {
+        TELEPHONY_LOGE("esimFile is nullptr");
+        return "";
+    }
+    std::string result = eSimFile_->GetContractInfo(getContractInfoRequest);
+    return result;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

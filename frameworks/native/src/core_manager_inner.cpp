@@ -2923,6 +2923,16 @@ int32_t CoreManagerInner::SetProfileNickname(
     }
     return simManager_->SetProfileNickname(slotId, iccId, nickname, enumResult);
 }
+
+int32_t CoreManagerInner::GetContractInfo(
+    int32_t slotId, GetContractInfoRequest &getContractInfoRequest, std::string &response)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetContractInfo(slotId, getContractInfoRequest, response);
+}
 #endif
 /******************** simManager_ end ************************/
 } // namespace Telephony

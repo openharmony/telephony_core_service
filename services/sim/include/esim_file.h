@@ -62,6 +62,7 @@ constexpr static const uint32_t RESPONS_DATA_FINISH = 0;
 constexpr static const uint32_t RESPONS_DATA_NOT_FINISH = 1;
 constexpr static const uint32_t RESPONS_DATA_ERROR = 2;
 constexpr static const uint32_t GET_BPP_LOAD_ERROR_LENGTH = 2;
+constexpr static const uint32_t CONTRACT_INFO_CONTENT_IDX = 18;
 
 class EsimFile : public IccFile {
 public:
@@ -112,7 +113,7 @@ public:
     int32_t SetProfileNickname(const std::u16string &iccId, const std::u16string &nickname);
     EuiccInfo2 ObtainEuiccInfo2(int32_t portIndex);
     ResponseEsimInnerResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
-
+    std::string GetContractInfo(const GetContractInfoRequest &getContractInfoRequest);
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     void InitMemberFunc();
@@ -215,7 +216,12 @@ private:
     bool ProcessAuthenticateServer(int32_t slotId);
     bool ProcessAuthenticateServerDone(const AppExecFwk::InnerEvent::Pointer &event);
     bool RealProcessAuthenticateServerDone();
-    void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
+    bool ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &responseEvent);
+    bool ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event);
+    std::shared_ptr<Asn1Node> GetKeyValueSequenceNode(
+        uint32_t kTag, std::string &key, uint32_t vTag, std::string &value);
+    std::shared_ptr<Asn1Node> GetMapMetaDataNode();
+        void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
     void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes);
     void GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &imei);
     void CovertAuthToApiStruct(ResponseEsimInnerResult &dst, AuthServerResponse &src);
@@ -262,6 +268,8 @@ private:
     EuiccNotificationList eUiccNotificationList_;
     EuiccNotificationList retrieveNotificationList_;
     ResponseEsimInnerResult transApduDataResponse_;
+    GetContractInfoRequest getContractInfoRequest_;
+    std::string getContractInfoResult_ = "";
     bool isSupported_ = false;
     std::string recvCombineStr_ = "";
     IccFileData newRecvData_;
@@ -370,6 +378,10 @@ private:
     std::mutex authenticateServerMutex_;
     std::condition_variable authenticateServerCv_;
     bool isAuthenticateServerReady_ = false;
+
+    std::mutex getContractInfoMutex_;
+    std::condition_variable getContractInfoCv_;
+    bool isGetContractInfoReady_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

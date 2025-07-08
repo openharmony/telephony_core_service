@@ -25,58 +25,55 @@
 
 namespace OHOS {
 namespace Telephony {
-int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
+IEsimServiceCallbackStub::IEsimServiceCallbackStub()
 {
-    auto callbackType = requestId;
-    switch (callbackType) {
-        case IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT:
-            OnGetEuiccInfo(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT:
-            OnGetEid(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT:
-            OnGetDownloadableProfileMetadata(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILES_RESULT:
-            OnGetDownloadableProfiles(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::GET_EUICC_PROFILE_INFO_LIST_RESULT:
-            OnGetEuiccProfileInfoList(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::GET_DEFAULT_SMDP_ADDRESS_RESULT:
-            OnGetDefaultSmdpAddress(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::SET_DEFAULT_SMDP_ADDRESS_RESULT:
-            OnSetDefaultSmdpAddress(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::SET_PROFILE_NICKNAME_RESULT:
-            OnSetProfileNickname(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::CANCEL_SESSION_CALLBACK_RESULT:
-            OnCancelSession(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::DOWNLOAD_PROFILE_RESULT:
-            OnDownloadProfile(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::DELETE_PROFILE_RESULT:
-            OnDeleteProfile(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::START_OSU_RESULT:
-            OnStartOsu(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::SWITCH_PROFILE_RESULT:
-            OnSwitchToProfile(data);
-            break;
-        case IEsimServiceCallback::EsimServiceCallback::RESET_MEMORY_RESULT:
-            OnResetMemory(data);
-            break;
-        default:
-            return DEFAULT_ERROR;
-    }
-    return DEFAULT_RESULT;
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT)] =
+        [this](MessageParcel &data) { OnGetEuiccInfo(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILE_METADATA_RESULT)] =
+        [this](MessageParcel &data) { OnGetDownloadableProfileMetadata(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_DOWNLOADABLE_PROFILES_RESULT)] =
+        [this](MessageParcel &data) { OnGetDownloadableProfiles(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_EUICC_PROFILE_INFO_LIST_RESULT)] =
+        [this](MessageParcel &data) { OnGetEuiccProfileInfoList(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_DEFAULT_SMDP_ADDRESS_RESULT)] =
+        [this](MessageParcel &data) { OnGetDefaultSmdpAddress(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::SET_DEFAULT_SMDP_ADDRESS_RESULT)] =
+        [this](MessageParcel &data) { OnSetDefaultSmdpAddress(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::SET_PROFILE_NICKNAME_RESULT)] =
+        [this](MessageParcel &data) { OnSetProfileNickname(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::CANCEL_SESSION_CALLBACK_RESULT)] =
+        [this](MessageParcel &data) { OnCancelSession(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::DOWNLOAD_PROFILE_RESULT)] =
+        [this](MessageParcel &data) { OnDownloadProfile(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::DELETE_PROFILE_RESULT)] =
+        [this](MessageParcel &data) { OnDeleteProfile(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::START_OSU_RESULT)] =
+        [this](MessageParcel &data) { OnStartOsu(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::SWITCH_PROFILE_RESULT)] =
+        [this](MessageParcel &data) { OnSwitchToProfile(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::RESET_MEMORY_RESULT)] =
+        [this](MessageParcel &data) { OnResetMemory(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT)] =
+        [this](MessageParcel &data) { OnGetEid(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_SUPPORTED_PKIDS_RESULT)] =
+        [this](MessageParcel &data) { OnGetSupportedPkids(data); };
+    memberFuncMap_[uint32_t(IEsimServiceCallback::EsimServiceCallback::GET_CONTRACT_INFO_RESULT)] =
+        [this](MessageParcel &data) { OnGetContractInfo(data); };
 }
 
+uint32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
+{
+    uint32_t code = static_cast<uint32_t>(requestId);
+    auto itFunc = memberFuncMap_.find(code);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            memberFunc(data);
+            return DEFAULT_RESULT;
+        }
+    }
+    return DEFAULT_ERROR;
+}
 void IEsimServiceCallbackStub::OnGetEuiccInfo(MessageParcel &data)
 {
     int32_t errorCode = data.ReadInt32();
@@ -196,6 +193,18 @@ void IEsimServiceCallbackStub::OnResetMemory(MessageParcel &data)
     int32_t resetMemoryResult = data.ReadInt32();
     OnResetMemory(resetMemoryResult, errCode);
 }
+void IEsimServiceCallbackStub::OnGetSupportedPkids(MessageParcel &data)
+{
+    ErrCode errCode = data.ReadInt32();
+    std::string supportedPkids = Str16ToStr8(data.ReadString16());
+    OnGetSupportedPkids(supportedPkids, errCode);
+}
+void IEsimServiceCallbackStub::OnGetContractInfo(MessageParcel &data)
+{
+    ErrCode errCode = data.ReadInt32();
+    std::string contractInfo = Str16ToStr8(data.ReadString16());
+    OnGetContractInfo(contractInfo, errCode);
+}
 
 int IEsimServiceCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -207,7 +216,7 @@ int IEsimServiceCallbackStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor check fail!");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    return OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
+    OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
 }
 void IEsimServiceCallbackStub::OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode)
 {}
@@ -254,5 +263,10 @@ void IEsimServiceCallbackStub::OnSetDefaultSmdpAddress(const int32_t &result, co
 void IEsimServiceCallbackStub::OnSetProfileNickName(const int32_t &result, const int32_t errorCode)
 {}
 
+void IEsimServiceCallbackStub::OnGetSupportedPkids(const std::string &result, const int32_t errorCode)
+{}
+
+void IEsimServiceCallbackStub::OnGetContractInfo(const std::string &result, const int32_t errorCode)
+{}
 } // namespace Telephonyd
 } // namespace OHOS

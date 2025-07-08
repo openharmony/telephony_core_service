@@ -61,6 +61,7 @@
       OHOS::Telephony::BaseParcel::Read*;
       OHOS::Telephony::BaseParcel::Write*;
       *IEsimServiceCallbackStub*;
+      *ContractRequestData*;
     };
   local:
     *;
