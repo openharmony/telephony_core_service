@@ -49,6 +49,7 @@
                 "drivers_interface_ril",
                 "eventhandler",
                 "ffrt",
+                "runtime_core",
                 "hdf_core",
                 "hicollie",
                 "hilog",
