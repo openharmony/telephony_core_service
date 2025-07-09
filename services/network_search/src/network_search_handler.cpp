@@ -730,9 +730,10 @@ void NetworkSearchHandler::UpdateNetworkState()
         operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager != nullptr) {
-        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
+    if (networkSearchManager == nullptr) {
+        return;
     }
+    networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     if (networkSearchManager->GetSkipUnsolRptFlag(slotId_) && networkSearchManager->CheckIsNeedNotify(slotId_)) {
         TELEPHONY_LOGI("Re-trigger RadioOnState slotId:%{public}d", slotId_);
         RadioOnState();

@@ -1724,7 +1724,7 @@ int32_t CoreServiceClient::GetSimLabel(int32_t slotId, SimLabel &simLabel, int64
                                                   wpRet = std::weak_ptr<int32_t>(result)](MessageParcel &data) {
             auto spRet = wpRet.lock();
             auto spSimLabel = wpSimLabel.lock();
-            if (spRet == nullptr && spSimLabel == nullptr) {
+            if (spRet == nullptr || spSimLabel == nullptr) {
                 return;
             }
             *spRet = data.ReadInt32();
