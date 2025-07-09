@@ -730,7 +730,7 @@ void NetworkSearchHandler::UpdateNetworkState()
         operatorName_->TrySetLongOperatorNameWithTranslation();
     }
     auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager = nullptr) {
+    if (networkSearchManager == nullptr) {
         return;
     }
     networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
