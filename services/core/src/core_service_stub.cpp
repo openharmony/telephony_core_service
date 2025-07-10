@@ -1923,6 +1923,10 @@ int32_t CoreServiceStub::OnGetSimLabel(MessageParcel &data, MessageParcel &reply
     int32_t slotId = data.ReadInt32();
     SimLabel simLabel;
     auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnGetSimLabel: callback is nullptr");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     int32_t result = GetSimLabel(slotId, simLabel, callback);
     bool ret = reply.WriteInt32(result);
     if (result == TELEPHONY_ERR_SUCCESS) {

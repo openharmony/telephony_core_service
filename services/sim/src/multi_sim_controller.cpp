@@ -448,7 +448,7 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
     DataShare::DataShareValueObject indexObj(labelIndex);
     values.Put(SimData::SIM_LABEL_INDEX, indexObj);
     if (simDbHelper_->UpdateDataByIccId(iccId, values) == TELEPHONY_ERR_SUCCESS) {
-        size_t count = static_cast<int>(allLocalCacheInfo_.size());
+        size_t count = allLocalCacheInfo_.size();
         if (count <= 0) {
             TELEPHONY_LOGE("allLocalCacheInfo_ empty");
             return INVALID_VALUE;
@@ -575,7 +575,7 @@ void MultiSimController::SortAllCache()
     std::vector<SimRdbInfo> sortCache;
     SimRdbInfo emptyUnit;
     emptyUnit.isActive = DEACTIVE;
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
