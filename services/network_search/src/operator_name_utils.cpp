@@ -113,7 +113,6 @@ int32_t OperatorNameUtils::LoaderJsonFile(char *&content, const char *path) cons
     long len = 0;
     char realPath[PATH_MAX] = { 0x00 };
     if (realpath(path, realPath) == nullptr) {
-        TELEPHONY_LOGE("realpath fail! #PATH: %{public}s", path);
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
     FILE *f = fopen(realPath, "rb");

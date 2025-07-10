@@ -1437,7 +1437,7 @@ int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t size = reply.ReadInt32();
         TELEPHONY_LOGI("CoreServiceProxy::GetActiveSimAccountInfoList size = %{public}d", size);
-        if (size > MAX_VECTOR) {
+        if (size > MAX_VECTOR || size < 0) {
             return false;
         }
         iccAccountInfoList.clear();
