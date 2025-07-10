@@ -428,7 +428,12 @@ bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
     std::string filename = EncryptIccId(iccid + opkey) + ".json";
     std::string path = parser_.GetOperatorConfigFilePath(filename);
-    std::ifstream f(path.c_str());
+    char realPath[PATH_MAX] = { '\0' };
+    if (realpath(path.c_str(), realPath) == nullptr) {
+        TELEPHONY_LOGE("get real path fail");
+        return true;
+    }
+    std::ifstream f(realPath);
     return !f.good();
 }
 

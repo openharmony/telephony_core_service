@@ -131,7 +131,7 @@ private:
     std::vector<int> isSimAccountLoaded_;
     bool isAllSimAccountLoaded_ = false;
     std::vector<int> initDataRemainCount_;
-    int initEsimDataRemainCount_;
+    int initEsimDataRemainCount_ = INIT_DATA_TIMES;
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
