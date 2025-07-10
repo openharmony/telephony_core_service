@@ -234,7 +234,7 @@ bool OperatorConfig::ReadFromU16StringMap(Parcel &parcel)
 {
     configValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -251,7 +251,7 @@ bool OperatorConfig::ReadFromStringMap(Parcel &parcel)
 {
     stringValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -268,7 +268,7 @@ bool OperatorConfig::ReadFromIntMap(Parcel &parcel)
 {
     intValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -285,7 +285,7 @@ bool OperatorConfig::ReadFromBoolMap(Parcel &parcel)
 {
     boolValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -301,7 +301,7 @@ bool OperatorConfig::ReadFromLongMap(Parcel &parcel)
 {
     longValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -317,7 +317,7 @@ bool OperatorConfig::ReadFromStringArrayMap(Parcel &parcel)
 {
     stringArrayValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -334,7 +334,7 @@ bool OperatorConfig::ReadFromIntArrayMap(Parcel &parcel)
 {
     intArrayValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
@@ -351,7 +351,7 @@ bool OperatorConfig::ReadFromLongArrayMap(Parcel &parcel)
 {
     longArrayValue.clear();
     int32_t valueSize = parcel.ReadInt32();
-    if (valueSize > MAX_CONFIG_SIZE) {
+    if (valueSize > MAX_CONFIG_SIZE || valueSize < 0) {
         return false;
     }
     int32_t k = 0;
