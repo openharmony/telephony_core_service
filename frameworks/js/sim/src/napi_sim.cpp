@@ -2975,7 +2975,10 @@ void GetAllSimAccountInfoListCallback(napi_env env, napi_status status, void *da
 
 napi_value GetAllSimAccountInfoList(napi_env env, napi_callback_info info)
 {
-    auto accountInfo = new AsyncIccAccountInfo();
+    auto accountInfo = std::make_unique<AsyncIccAccountInfo>();
+    if (accountInfo == nullptr) {
+        return nullptr;
+    }
     BaseContext &context = accountInfo->asyncContext.context;
 
     auto initPara = std::make_tuple(&context.callbackRef);
@@ -2986,9 +2989,13 @@ napi_value GetAllSimAccountInfoList(napi_env env, napi_callback_info info)
         .execute = NativeGetAllSimAccountInfoList,
         .complete = GetAllSimAccountInfoListCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, accountInfo, initPara);
-    if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, accountInfo.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("create asyncwork failed");
+        return nullptr;
+        if(napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+            accountInfo.release();
+        }
     }
     return result;
 }
