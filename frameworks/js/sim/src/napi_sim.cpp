@@ -2994,7 +2994,7 @@ napi_value GetAllSimAccountInfoList(napi_env env, napi_callback_info info)
         TELEPHONY_LOGE("create asyncwork failed");
         return nullptr;
     }
-    if(napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
+    if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         accountInfo.release();
     }
     return result;
