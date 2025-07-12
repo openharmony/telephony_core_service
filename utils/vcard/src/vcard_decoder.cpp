@@ -83,7 +83,7 @@ std::string VCardDecoder::GetVersion()
 std::string VCardDecoder::GetVersionFromFileUtils(const std::string &line, int index)
 {
     int versionIndex = index + static_cast<int>(std::string(VCARD_TYPE_VERSION).length()) + 1;
-    if (versionIndex < static_cast<int>(line.length()) {
+    if (versionIndex < static_cast<int>(line.length())) {
         return line.substr(versionIndex);
     }
     return "";
