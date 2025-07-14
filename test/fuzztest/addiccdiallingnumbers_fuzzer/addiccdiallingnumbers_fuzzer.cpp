@@ -27,6 +27,9 @@
 #include "tel_event_handler.h"
 #include "unistd.h"
 #include "tel_ril_manager.h"
+#include "sim_state_type.h"
+#include "sim_manager.h"
+#include "operator_config_cache.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -35,6 +38,9 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
 constexpr int32_t SIZE_LIMIT = 4;
 constexpr uint32_t FUCTION_SIZE = 100;
+constexpr int32_t SIM_STATUS_NUM = 5;
+constexpr int32_t ICC_STATUS_NUM = 12;
+constexpr const char *DEFAULT_SLOT_COUNT = "1";
 
 bool IsServiceInited()
 {
@@ -210,6 +216,145 @@ void IsCTSimCard(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnIsCTSimCard(dataMessageParcel, reply);
 }
 
+static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
+{
+    size_t typeSize = sizeof(int32_t);
+    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
+    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
+    if (size - align < typeSize * index + (typeSize - align)) {
+        return 0;
+    }
+    return *reinterpret_cast<const int32_t*>(base + index * typeSize);
+}
+ 
+void SimManagerFunc(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    simManager->multiSimController_ =std::make_shared<MultiSimController>(
+        telRilManager, simStateManager, simFileManager);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotCount = GetInt(data, size, index++);
+    int32_t voiceMailCount = GetInt(data, size, index++);
+    bool hasOperatorPrivileges = true;
+    simManager->OnInit(slotCount);
+    simManager->InitTelExtraModule(slotId);
+    simManager->SetDefaultVoiceSlotId(slotId);
+    simManager->SetDefaultSmsSlotId(slotId);
+    simManager->SetDefaultCellularDataSlotId(slotId);
+    simManager->SetPrimarySlotId(slotId, true);
+    simManager->GetDefaultVoiceSimId(slotId);
+    simManager->GetDefaultSmsSlotId();
+    simManager->GetDefaultSmsSimId(slotId);
+    simManager->GetDefaultCellularDataSlotId();
+    simManager->GetDefaultCellularDataSimId(slotId);
+    simManager->UpdateOperatorConfigs(slotId);
+    simManager->HasOperatorPrivileges(slotId, hasOperatorPrivileges);
+    simManager->ResetSimLoadAccount(slotId);
+    simManager->InsertEsimData(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount,
+        std::string(reinterpret_cast<const char *>(data), size));
+    simManager->SetSimLabelIndex(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
+    simManager->SaveImsSwitch(slotId, voiceMailCount);
+    simManager->QueryImsSwitch(slotId, voiceMailCount);
+    simManager->IsSetPrimarySlotIdInProgress();
+    simManager->SavePrimarySlotId(slotId);
+    simManager->IsDataShareError();
+    simManager->ResetDataShareError();
+    simManager->GetPrimarySlotId(slotId);
+}
+
+void SimManagerFuncTwo(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t voiceMailCount = GetInt(data, size, index++);
+    simManager->multiSimController_ = nullptr;
+    simManager->SetDefaultVoiceSlotId(slotId);
+    simManager->SetDefaultSmsSlotId(slotId);
+    simManager->SetDefaultCellularDataSlotId(slotId);
+    simManager->SetPrimarySlotId(slotId, true);
+    simManager->GetDefaultVoiceSimId(slotId);
+    simManager->GetDefaultSmsSlotId();
+    simManager->GetDefaultSmsSimId(slotId);
+    simManager->GetDefaultCellularDataSlotId();
+    simManager->GetDefaultCellularDataSimId(slotId);
+    simManager->GetPrimarySlotId(slotId);
+    simManager->InsertEsimData(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount,
+        std::string(reinterpret_cast<const char *>(data), size));
+    simManager->SetSimLabelIndex(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
+    simManager->slotCount_ = std::atoi(DEFAULT_SLOT_COUNT);
+    simManager->GetDefaultSmsSlotId();
+    simManager->GetDefaultCellularDataSlotId();
+    simManager->GetPrimarySlotId(slotId);
+}
+
+void SimManagerFuncThree(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotCount = GetInt(data, size, index++);
+    int32_t voiceMailCount = GetInt(data, size, index++);
+    int32_t simState = *data % SIM_STATUS_NUM + 1;
+    int32_t iccStatus = *data % ICC_STATUS_NUM + 1;
+    SimState simEnum = static_cast<SimState>(simState);
+    IccSimStatus iccEnum = static_cast<IccSimStatus>(iccStatus);
+    bool hasOperatorPrivileges = true;
+    simManager->GetSimState(slotId, simEnum);
+    simManager->GetSimIccStatus(slotId, iccEnum);
+    simManager->SetModemInit(slotId, true);
+    simManager->RefreshSimState(slotId);
+    simManager->SendSimMatchedOperatorInfo(slotId, simState, std::string(reinterpret_cast<const char *>(data), size),
+        std::string(reinterpret_cast<const char *>(data), size));
+    simManager->SetVoiceMailCount(slotId, voiceMailCount);
+    simManager->GetVoiceMailCount(slotId, voiceMailCount);
+    simManager->ObtainSpnCondition(
+        slotId, hasOperatorPrivileges, std::string(reinterpret_cast<const char *>(data), size));
+    std::string pdu(reinterpret_cast<const char*>(data), size);
+    std::string smsc(reinterpret_cast<const char*>(data), size);
+    simManager->AddSmsToIcc(slotId, static_cast<int32_t>(simState), pdu, smsc);
+    simManager->IsCTSimCard(slotId, hasOperatorPrivileges);
+    simManager->IsValidSlotIdForDefault(slotId);
+    simManager->GetSimIst(slotId);
+    simManager->NotifySimSlotsMapping(slotId);
+}
+ 
+void OperatorConfigCacheFunc(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t simState = *data % SIM_STATUS_NUM + 1;
+    SimState simEnum = static_cast<SimState>(simState);
+    operatorConfigCache->UpdateIccidCache(simState);
+    operatorConfigCache->GetSimState(slotId, simEnum);
+    operatorConfigCache->IsNeedOperatorLoad(slotId);
+    operatorConfigCache->AnnounceOperatorConfigChanged(slotId, simState);
+    operatorConfigCache->notifyInitApnConfigs(slotId);
+    operatorConfigCache->SendSimMatchedOperatorInfo(slotId, simState);
+    operatorConfigCache->UnRegisterForIccChange();
+    operatorConfigCache->UpdateOperatorConfigs(slotId);
+    operatorConfigCache->ClearOperatorValue(slotId);
+    operatorConfigCache->ClearMemoryAndOpkey(slotId);
+    operatorConfigCache->ClearAllCache(slotId);
+    operatorConfigCache->simStateManager_ = nullptr;
+    operatorConfigCache->GetSimState(slotId, simEnum);
+    slotId = GetInt(data, size, index++);
+    operatorConfigCache->GetSimState(slotId, simEnum);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -226,6 +371,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     IsCTSimCard(data, size);
+    SimManagerFunc(data, size);
+    SimManagerFuncTwo(data, size);
+    SimManagerFuncThree(data, size);
+    OperatorConfigCacheFunc(data, size);
     auto telRilManager = std::static_pointer_cast<TelRilManager>(
         DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
