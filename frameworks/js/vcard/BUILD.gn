@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Copyright (C) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -36,6 +36,7 @@ ohos_shared_library("vcard") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:data_ability_helper",
@@ -48,6 +49,7 @@ ohos_shared_library("vcard") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "resource_management:global_resmgr",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceVcardJsApi\"",
