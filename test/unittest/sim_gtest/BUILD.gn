@@ -59,6 +59,7 @@ ohos_unittest("sim_gtest") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "ability_runtime:dataobs_manager",
     "ability_runtime:data_ability_helper",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
@@ -89,7 +90,7 @@ ohos_unittest("sim_gtest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "ability_runtime:dataobs_manager",
+    "telephony_data:tel_telephony_data",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
