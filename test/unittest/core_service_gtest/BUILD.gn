@@ -80,6 +80,7 @@ ohos_unittest("tel_core_service_gtest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
