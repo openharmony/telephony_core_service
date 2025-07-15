@@ -17,6 +17,7 @@
 #define OHOS_MULTI_SIM_MONITOR_H
 
 #include <list>
+#include <ffrt.h>
 
 #include "common_event_subscriber.h"
 #include "iservice_registry.h"
@@ -144,6 +145,7 @@ private:
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
+    ffrt::shared_mutex simStateMgrMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
