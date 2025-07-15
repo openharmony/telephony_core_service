@@ -65,10 +65,13 @@ void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManage
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
     if (static_cast<int32_t>(simStateManager_.size()) == SIM_SLOT_COUNT) {
-        simStateManager_.push_back(simStateManager);
-        simFileManager_.push_back(simFileManager);
-        isSimAccountLoaded_.push_back(0);
-        initDataRemainCount_.push_back(INIT_DATA_TIMES);
+        {
+            std::unique_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
+            simStateManager_.push_back(simStateManager);
+            simFileManager_.push_back(simFileManager);
+            isSimAccountLoaded_.push_back(0);
+            initDataRemainCount_.push_back(INIT_DATA_TIMES);
+        }
         RegisterSimNotify(SIM_SLOT_2);
     }
 }
@@ -162,6 +165,7 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
 
 void MultiSimMonitor::UpdateAllOpkeyConfigs()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         auto simFileManager = simFileManager_[slotId].lock();
         if (simFileManager == nullptr) {
@@ -211,6 +215,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData slotId is invalid");
         return;
     }
+    std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
     auto simFileManager = simFileManager_[slotId].lock();
     if (controller_ == nullptr || simStateManager_[slotId] == nullptr || simFileManager == nullptr) {
         TELEPHONY_LOGE("MultiSimMonitor::RefreshData controller_ or simStateManager_ is nullptr");
@@ -550,6 +555,7 @@ void MultiSimMonitor::RegisterSimNotify(int32_t slotId)
         TELEPHONY_LOGE("RegisterSimNotify slotId is invalid");
         return;
     }
+    std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
     auto simFileManager = simFileManager_[slotId].lock();
     if (simFileManager == nullptr) {
         TELEPHONY_LOGE("simFileManager is null slotId : %{public}d", slotId);
@@ -568,6 +574,7 @@ void MultiSimMonitor::RegisterSimNotify(int32_t slotId)
 
 void MultiSimMonitor::UnRegisterSimNotify()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         auto simFileManager = simFileManager_[slotId].lock();
         if (simFileManager == nullptr) {
