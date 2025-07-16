@@ -1668,7 +1668,11 @@ int32_t SimManager::InsertEsimData(const std::string &iccId, int32_t esimLabel, 
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
-    return multiSimController_->InsertEsimData(iccId, esimLabel, operatorName);
+    int32_t ret = multiSimController_->InsertEsimData(iccId, esimLabel, operatorName);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::SetSimLabelIndex(const std::string &iccId, int32_t labelIndex)
@@ -1677,7 +1681,11 @@ int32_t SimManager::SetSimLabelIndex(const std::string &iccId, int32_t labelInde
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
-    return multiSimController_->SetSimLabelIndex(iccId, labelIndex);
+    int32_t ret = multiSimController_->SetSimLabelIndex(iccId, labelIndex);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::NotifySimSlotsMapping(int32_t slotId)
@@ -1686,6 +1694,7 @@ int32_t SimManager::NotifySimSlotsMapping(int32_t slotId)
         TELEPHONY_LOGE("NotifySimSlotsMapping has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
+    multiSimController_->isSimSlotsMapping_[slotId] = true;
     return simStateManager_[slotId]->NotifySimSlotsMapping(slotId);
 }
 

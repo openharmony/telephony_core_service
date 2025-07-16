@@ -3088,6 +3088,19 @@ napi_status InitEnumSimState(napi_env env, napi_value exports)
     return napi_define_properties(env, exports, arrSize, desc);
 }
 
+napi_status InitEnumSimType(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "PSIM", GetNapiValue(env, static_cast<int32_t>(SimType::PSIM))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "ESIM", GetNapiValue(env, static_cast<int32_t>(SimType::ESIM))),
+    };
+    constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
+    NapiUtil::DefineEnumClassByName(env, exports, "SimType", arrSize, desc);
+    return napi_define_properties(env, exports, arrSize, desc);
+}
+
 napi_status InitEnumContactType(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3355,6 +3368,7 @@ napi_value InitNapiSim(napi_env env, napi_value exports)
     NAPI_CALL(env, InitSimDiallingNumbersInterface(env, exports));
     NAPI_CALL(env, InitSimInterfaceAboutVoice(env, exports));
     NAPI_CALL(env, InitEnumSimState(env, exports));
+    NAPI_CALL(env, InitEnumSimType(env, exports));
     NAPI_CALL(env, InitEnumContactType(env, exports));
     NAPI_CALL(env, InitEnumLockState(env, exports));
     NAPI_CALL(env, InitEnumLockType(env, exports));

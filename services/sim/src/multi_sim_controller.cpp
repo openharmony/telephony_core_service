@@ -130,7 +130,9 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
         TELEPHONY_LOGE("simDbHelper_ is nullptr");
         return false;
     }
-    return simDbHelper_->ForgetAllData(slotId) != INVALID_VALUE;
+    bool isUpdateSimLabel = !IsEsim(slotId) && !isSimSlotsMapping_[slotId];
+    isSimSlotsMapping_[slotId] = false;
+    return simDbHelper_->ForgetAllData(slotId, isUpdateSimLabel) != INVALID_VALUE;
 }
 
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -321,6 +323,10 @@ bool MultiSimController::InitIccId(int slotId)
     }
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
         TELEPHONY_LOGI("old sim insert, slotId%{public}d", slotId);
+        if (IsEsim(slotId)) {
+            TELEPHONY_LOGI("esim no need update slotId");
+            result = TELEPHONY_ERR_SUCCESS;
+        }
         result = UpdateDataByIccId(slotId, newIccId);
     } else { // insert a new data for new IccId
         TELEPHONY_LOGI("new sim insert, slotId%{public}d", slotId);
@@ -340,11 +346,19 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
+    int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
+    int simLabelIndex = PSIM1;
+    if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
+        simLabelIndex = PSIM2;
+    }
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject slotObj(slotId);
     values.Put(SimData::SLOT_INDEX, slotObj);
-    const int32_t slotSingle = 1;
-    if (SIM_SLOT_COUNT == slotSingle) {
+    if (!(slotId == 1 && simLabelState != PSIM1_PSIM2)) {
+        DataShare::DataShareValueObject labelIndexObj(simLabelIndex);
+        values.Put(SimData::SIM_LABEL_INDEX, labelIndexObj);
+    }
+    if (SIM_SLOT_COUNT == 1) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
         values.Put(SimData::IS_VOICE_CARD, mainCardObj);
@@ -377,8 +391,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     values.Put(SimData::IS_ACTIVE, valueObj);
     values.Put(SimData::SIM_LABEL_INDEX, simLabelIndexObj);
     values.Put(SimData::IS_ESIM, isEsimObj);
-    const int32_t slotSingle = 1;
-    if (SIM_SLOT_COUNT == slotSingle) {
+    if (SIM_SLOT_COUNT == 1) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
         values.Put(SimData::IS_VOICE_CARD, mainCardObj);
@@ -415,8 +428,7 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
     values.Put(SimData::IS_ESIM, isEsimObj);
     values.Put(SimData::SIM_LABEL_INDEX, simLabelIndexObj);
     values.Put(SimData::OPERATOR_NAME, operatorNameObj);
-    const int32_t slotSingle = 1;
-    if (SIM_SLOT_COUNT == slotSingle) {
+    if (SIM_SLOT_COUNT == 1) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
         values.Put(SimData::IS_VOICE_CARD, mainCardObj);
@@ -541,7 +553,7 @@ void MultiSimController::SortCache()
 {
     size_t count = localCacheInfo_.size();
     TELEPHONY_LOGI("count = %{public}lu", static_cast<unsigned long>(count));
-    if (count <= 0) {
+    if (count == 0) {
         TELEPHONY_LOGE("empty");
         return;
     }
@@ -568,7 +580,7 @@ void MultiSimController::SortAllCache()
 {
     size_t count = allLocalCacheInfo_.size();
     TELEPHONY_LOGI("count = %{public}lu", static_cast<unsigned long>(count));
-    if (count <= 0) {
+    if (count == 0) {
         TELEPHONY_LOGE("empty");
         return;
     }
@@ -606,7 +618,7 @@ bool MultiSimController::IsValidData(int32_t slotId)
 }
 
 bool MultiSimController::UpdateIccAccountInfoList(
-    std::vector<IccAccountInfo> &accountInfoList, std::vector<SimRdbInfo> &localCacheInfo)
+    std::vector<IccAccountInfo> &accountInfoList, std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo)
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (localCacheInfo.empty()) {
@@ -618,6 +630,9 @@ bool MultiSimController::UpdateIccAccountInfoList(
     }
     IccAccountInfo iccAccountInfo;
     for (const auto& info : localCacheInfo) {
+        if (isGetActiveAccountInfo && info.isActive != ACTIVE) {
+            continue;
+        }
         iccAccountInfo.Init(info.simId, info.slotIndex);
         iccAccountInfo.showName = Str8ToStr16(info.showName);
         iccAccountInfo.showNumber = Str8ToStr16(info.phoneNumber);
@@ -708,7 +723,7 @@ int32_t MultiSimController::UpdataCacheSetActiveState(int32_t slotId, int32_t en
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].isActive = enable;
-    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
+    if (curSimId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || curSimId - 1 < 0) {
         TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
         isSetActiveSimInProgress_[slotId] = 0;
         return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
@@ -748,6 +763,19 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
     if (result != TELEPHONY_ERR_SUCCESS) {
         return result;
     }
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+        TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
+        isSetActiveSimInProgress_[slotId] = 0;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    localCacheInfo_[slotId].isActive = enable;
+    if (curSimId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || curSimId - 1 < 0) {
+        return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
+    }
+    allLocalCacheInfo_[curSimId - 1].isActive = enable;
+    lock.unlock();
+    UpdateSubState(slotId, enable);
     CheckIfNeedSwitchMainSlotId(false);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -806,7 +834,7 @@ int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].isActive = enable;
-    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
+    if (curSimId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || curSimId - 1 < 0) {
         return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
     }
     allLocalCacheInfo_[curSimId - 1].isActive = enable;
@@ -932,7 +960,7 @@ int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAc
     info.simId = localCacheInfo_[slotId].simId;
     info.isActive = localCacheInfo_[slotId].isActive;
     info.showName = Str8ToStr16(localCacheInfo_[slotId].showName);
-    info.isEsim = false;
+    info.isEsim = localCacheInfo_[slotId].isEsim;
     if (!denied) {
         info.showNumber = Str8ToStr16(localCacheInfo_[slotId].phoneNumber);
         info.iccId = Str8ToStr16(localCacheInfo_[slotId].iccId);
@@ -1396,7 +1424,7 @@ int32_t MultiSimController::SetShowNumberToDB(int32_t slotId, std::u16string num
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     localCacheInfo_[slotId].phoneNumber = Str16ToStr8(number); // save to cache
-    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
+    if (curSimId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || curSimId - 1 < 0) {
         return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
     }
     allLocalCacheInfo_[curSimId - 1].phoneNumber = Str16ToStr8(number);
@@ -1449,7 +1477,7 @@ int32_t MultiSimController::SetShowName(int32_t slotId, std::u16string name, boo
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     localCacheInfo_[slotId].showName = Str16ToStr8(name); // save to cache
-    if (curSimId -1 >= static_cast<int>(allLocalCacheInfo_.size())) {
+    if (curSimId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || curSimId - 1 < 0) {
         return TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS;
     }
     allLocalCacheInfo_[curSimId - 1].showName = Str16ToStr8(name);
@@ -1582,7 +1610,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
 
 int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
-    if (!UpdateIccAccountInfoList(activeIccAccountInfoList_, localCacheInfo_)) {
+    if (!UpdateIccAccountInfoList(activeIccAccountInfoList_, localCacheInfo_, true)) {
         TELEPHONY_LOGE("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
@@ -1602,7 +1630,7 @@ int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector
 
 int32_t MultiSimController::GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
-    if (!UpdateIccAccountInfoList(allIccAccountInfoList_, allLocalCacheInfo_)) {
+    if (!UpdateIccAccountInfoList(allIccAccountInfoList_, allLocalCacheInfo_, false)) {
         TELEPHONY_LOGE("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
