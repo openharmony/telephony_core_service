@@ -78,7 +78,7 @@ void CellInfo::InitCellSignalBar(const int32_t bar)
 void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGD("CellInfo::ProcessNeighboringCellInfo cell info start...... slotId:%{public}d", slotId_);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessNeighboringCellInfo event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -117,7 +117,7 @@ void CellInfo::ProcessNeighboringCellInfo(const AppExecFwk::InnerEvent::Pointer 
 void CellInfo::ProcessCurrentCellInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     ClearCellInfoList();
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("CellInfo::ProcessCurrentCellInfo event is nullptr slotId:%{public}d", slotId_);
         return;
@@ -171,6 +171,7 @@ void CellInfo::UpdateCellLocation(int32_t techType, int32_t cellId, int32_t lac)
                 UpdateSignalLevel(cell, type);
                 NotifyCellInfoUpdated();
                 cell->SetIsCamped(true);
+                std::lock_guard<ffrt::mutex> lock(mutex_);
                 currentCellInfo_ = cell;
             }
             break;
@@ -812,7 +813,7 @@ void CellInfo::GetCellInfoList(std::vector<sptr<CellInformation>> &cellInfo)
 {
     cellInfo.clear();
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         for (auto &cell : cellInfos_) {
             AddCellInformation(cell, cellInfo);
         }
@@ -824,7 +825,7 @@ void CellInfo::GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &ce
 {
     cellInfo.clear();
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         for (auto &cell : neighboringCellInfos_) {
             AddCellInformation(cell, cellInfo);
         }
@@ -835,7 +836,7 @@ void CellInfo::GetNeighboringCellInfoList(std::vector<sptr<CellInformation>> &ce
 
 void CellInfo::ClearCellInfoList()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     currentCellInfo_ = nullptr;
     cellInfos_.clear();
 }
@@ -893,6 +894,7 @@ void CellInfo::AddCellInformation(sptr<CellInformation> &cellInfo, std::vector<s
 
 sptr<CellLocation> CellInfo::GetCellLocation()
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (currentCellInfo_ == nullptr) {
         TELEPHONY_LOGE("CellInfo::GetCellLocation is null slotId:%{public}d", slotId_);
         return nullptr;
@@ -937,7 +939,6 @@ sptr<CellLocation> CellInfo::GetCellLocation()
 
 sptr<CellLocation> CellInfo::GetCellLocationExt(CellInformation::CellType type)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (currentCellInfo_ == nullptr) {
         TELEPHONY_LOGE("CellInfo::GetCellLocationExt is null slotId:%{public}d", slotId_);
         return nullptr;
