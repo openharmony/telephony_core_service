@@ -102,6 +102,7 @@ public:
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
         RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT
     };
+    std::vector<bool> isSimSlotsMapping_ = {false, false};
 
 private:
     bool IsValidData(int32_t slotId);
@@ -120,8 +121,8 @@ private:
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
-    bool UpdateIccAccountInfoList(
-        std::vector<IccAccountInfo> &accountInfoList, std::vector<SimRdbInfo> &localCacheInfo);
+    bool UpdateIccAccountInfoList(std::vector<IccAccountInfo> &accountInfoList,
+        std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo);
     std::string EncryptIccId(const std::string iccid);
     void CheckIfNeedSwitchMainSlotId(bool isInit = true);
     bool IsValidSlotId(int32_t slotId);

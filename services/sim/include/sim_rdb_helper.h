@@ -54,7 +54,7 @@ public:
     int32_t UpdateDataBySimId(int32_t simId, const DataShare::DataShareValuesBucket &values);
     int32_t UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values);
     int32_t ForgetAllData();
-    int32_t ForgetAllData(int32_t slotId);
+    int32_t ForgetAllData(int32_t slotId, bool isUpdateSimLabel);
     int32_t ClearData();
     int32_t UpdateOpKeyInfo();
     bool IsDataShareError();

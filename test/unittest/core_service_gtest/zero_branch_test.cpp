@@ -1043,7 +1043,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->InitData(0));
     EXPECT_GT(multiSimController->SetDefaultSmsSlotId(0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(multiSimController->UpdateIccAccountInfoList(
-        multiSimController->activeIccAccountInfoList_, multiSimController->localCacheInfo_));
+        multiSimController->activeIccAccountInfoList_, multiSimController->localCacheInfo_, false));
     EXPECT_FALSE(multiSimController->IsSimActive(0));
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
@@ -1060,7 +1060,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->GetAllListFromDataBase());
     multiSimController->SortAllCache();
     EXPECT_FALSE(multiSimController->UpdateIccAccountInfoList(
-        multiSimController->allIccAccountInfoList_, multiSimController->allLocalCacheInfo_));
+        multiSimController->allIccAccountInfoList_, multiSimController->allLocalCacheInfo_, true));
 }
 
 /**
