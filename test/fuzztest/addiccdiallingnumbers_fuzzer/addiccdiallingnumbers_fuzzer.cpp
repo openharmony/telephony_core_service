@@ -360,9 +360,9 @@ void VoiceMailConstantseFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-	auto voiceMailConstants = std::make_shared<VoiceMailConstants>(slotId);
+    auto voiceMailConstants = std::make_shared<VoiceMailConstants>(slotId);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
-	std::string key(reinterpret_cast<const char *>(data), size);
+    std::string key(reinterpret_cast<const char *>(data), size);
     voiceMailConstants->GetStringValueFromCust(slotId, key);
     voiceMailConstants->ResetVoiceMailLoadedFlag();
     voiceMailConstants->GetVoiceMailFixed(key);
