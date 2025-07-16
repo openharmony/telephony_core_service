@@ -16,6 +16,8 @@
 #ifndef NETWORK_SEARCH_INCLUDE_CELL_INFO_H
 #define NETWORK_SEARCH_INCLUDE_CELL_INFO_H
 
+#include <ffrt.h>
+
 #include "event_handler.h"
 #include "tel_ril_network_parcel.h"
 #include "cell_information.h"
@@ -68,7 +70,7 @@ private:
     CellInformation::CellType ConvertTechToCellType(RadioTech techType) const;
     CellInformation::CellType ConvertRatToCellType(int ratType) const;
     sptr<CellLocation> GetCellLocationExt(CellInformation::CellType type);
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::vector<sptr<CellInformation>> cellInfos_;
     std::vector<sptr<CellInformation>> neighboringCellInfos_;
     sptr<CellInformation> currentCellInfo_ = nullptr;
