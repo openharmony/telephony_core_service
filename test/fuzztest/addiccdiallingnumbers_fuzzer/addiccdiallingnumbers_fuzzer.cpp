@@ -41,6 +41,8 @@ constexpr int32_t SIZE_LIMIT = 4;
 constexpr uint32_t FUCTION_SIZE = 100;
 constexpr int32_t SIM_STATUS_NUM = 5;
 constexpr int32_t ICC_STATUS_NUM = 12;
+constexpr int32_t LOCK_TYPE_NUM = 2;
+constexpr int32_t LOCK_STATE_NUM = 3;
 constexpr const char *DEFAULT_SLOT_COUNT = "1";
 
 bool IsServiceInited()
