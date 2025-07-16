@@ -943,13 +943,11 @@ sptr<CellLocation> CellInfo::GetCellLocationExt(CellInformation::CellType type)
         return nullptr;
     }
     if (type == CellInformation::CellType::CELL_TYPE_LTE) {
-        std::lock_guard<std::mutex> lock(mutex_);
         sptr<LteCellInformation> cellinfo = static_cast<LteCellInformation *>(currentCellInfo_.GetRefPtr());
         sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
         cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetTac());
         return cellLocation;
     } else if (type == CellInformation::CellType::CELL_TYPE_NR) {
-        std::lock_guard<std::mutex> lock(mutex_);
         sptr<NrCellInformation> cellinfo = static_cast<NrCellInformation *>(currentCellInfo_.GetRefPtr());
         sptr<GsmCellLocation> cellLocation = new GsmCellLocation;
         cellLocation->SetGsmParam(cellinfo->GetCellId(), cellinfo->GetTac());
