@@ -547,7 +547,7 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
 int32_t SimRdbHelper::ForgetAllData()
 {
     TELEPHONY_LOGD("start");
-    DataShare::DataSharePredicates predicates;
+    DataShare::DataSharePredicates predicates1;
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(INVALID_VALUE);
     value.Put(SimData::SLOT_INDEX, valueObj);
@@ -556,13 +556,21 @@ int32_t SimRdbHelper::ForgetAllData()
         TELEPHONY_LOGE("failed by nullptr");
         return INVALID_VALUE;
     }
-    int result = Update(dataShareHelper, value, predicates);
+    int result = Update(dataShareHelper, value, predicates1);
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("ForgetAllData update slotId fail");
+    }
+    DataShare::DataSharePredicates predicates2;
+    predicates2.EqualTo(SimData::IS_ESIM, std::to_string(0));
+    DataShare::DataShareValuesBucket simLabelValue;
+    simLabelValue.Put(SimData::SIM_LABEL_INDEX, valueObj);
+    result = Update(dataShareHelper, simLabelValue, predicates2);
     dataShareHelper->Release();
     TELEPHONY_LOGD("result = %{public}d", result);
     return result;
 }
 
-int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
+int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isUpdateSimLabel)
 {
     TELEPHONY_LOGD("slotId = %{public}d", slotId);
     DataShare::DataSharePredicates predicates;
@@ -577,6 +585,9 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId)
     }
     DataShare::DataShareValueObject valueIndex(INVALID_VALUE);
     value.Put(SimData::SLOT_INDEX, valueIndex);
+    if (isUpdateSimLabel) {
+        value.Put(SimData::SIM_LABEL_INDEX, valueIndex);
+    }
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");

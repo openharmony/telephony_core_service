@@ -250,6 +250,7 @@ void MultiSimMonitor::InitEsimData()
         return;
     }
     isAllSimAccountLoaded_ = true;
+    NotifySimAccountChanged();
 }
 
 void MultiSimMonitor::RefreshData(int32_t slotId)
