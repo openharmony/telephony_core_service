@@ -390,7 +390,7 @@ void SimManagerFuncFour(const uint8_t *data, size_t size)
     int32_t lockType = *data % LOCK_TYPE_NUM + 1;
     LockType lockEnum = static_cast<LockType>(lockType);
     int32_t lockState = *data % LOCK_STATE_NUM + 1;
-    LockState lockStateEnum = static_cast<LockState>(lockState);;
+    LockState lockStateEnum = static_cast<LockState>(lockState);
     PersoLockInfo lockInfo;
     SimAuthenticationResponse simResponse;
     simManager->UnlockPin(slotId, pin, lockResponse);
