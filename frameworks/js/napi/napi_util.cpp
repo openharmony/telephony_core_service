@@ -270,6 +270,48 @@ std::string NapiUtil::GetStringFromValue(napi_env env, napi_value value)
     }
 }
 
+std::string NapiUtil::Get64StringFromValue(napi_env env, napi_value value)
+{
+    auto msgChars = std::make_unique<char[]>(MAX_TEXT_LENGTH);
+    size_t strLength = 0;
+    napi_get_value_string_utf8(env, value, msgChars.get(), MAX_TEXT_LENGTH, &strLength);
+    if (strLength > 0) {
+        return std::string(msgChars.get(), strLength);
+    } else {
+        return "";
+    }
+}
+
+// 将 JavaScript 数组转换为 std::vector<int32_t>
+void NapiUtil::ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std::vector<int32_t>& result)
+{
+    result.clear();
+    bool isArray;
+    napi_is_array(env, arrayValue, &isArray);
+
+    if (!isArray) {
+        ThrowParameterError(env);
+        return;
+    }
+
+    uint32_t length;
+    napi_get_array_length(env, arrayValue, &length);
+    result.resize(length);
+
+    for(uint32_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, arrayValue, i, &element);
+        int32_t value;
+        napi_status status = napi_get_value_int32(env, element, &value);
+        if (status != napi_ok) {
+            result.clear();
+            ThrowParameterError(env);
+            return;
+        }
+        result[i] = value;
+    }
+}
+
 napi_value NapiUtil::GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName)
 {
     napi_value value = nullptr;
