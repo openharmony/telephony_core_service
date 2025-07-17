@@ -367,4 +367,26 @@ export default namespace sim {
 
     SIM_STATE_LOADED
   }
+
+  export enum CardType {
+    UNKNOWN_CARD = -1,
+
+    SINGLE_MODE_SIM_CARD = 10,
+
+    SINGLE_MODE_USIM_CARD = 20,
+
+    SINGLE_MODE_RUIM_CARD = 30,
+    
+    DUAL_MODE_CG_CARD = 40,
+
+    CT_NATIONAL_ROAMING_CARD = 41,
+
+    CU_DUAL_MODE_CARD = 42,
+
+    DUAL_MODE_TELECOM_LTE_CARD = 43,
+
+    DUAL_MODE_UG_CARD = 50,
+
+    SINGLE_MODE_ISIM_CARD = 60
+  }
 }
