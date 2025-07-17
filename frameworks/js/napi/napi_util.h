@@ -66,6 +66,8 @@ public:
     static JsError ConverEsimErrorMessageForJs(int32_t errorCode);
     static JsError ConverEsimErrorMessageWithPermissionForJs(
         int32_t errorCode, const std::string &funcName, const std::string &permission);
+    static std::string Get64StringFromValue(napi_env env, napi_value value);
+    static void ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std::vector<int32_t>& result);
 
 private:
     static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
