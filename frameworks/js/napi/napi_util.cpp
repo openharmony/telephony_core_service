@@ -298,7 +298,7 @@ void NapiUtil::ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std:
     napi_get_array_length(env, arrayValue, &length);
     result.resize(length);
 
-    for(uint32_t i = 0; i < length; i++) {
+    for (uint32_t i = 0; i < length; i++) {
         napi_value element;
         napi_get_element(env, arrayValue, i, &element);
         int32_t value;
