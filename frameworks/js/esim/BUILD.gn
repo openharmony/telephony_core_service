@@ -74,6 +74,7 @@ ohos_shared_library("esim") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   defines = [
