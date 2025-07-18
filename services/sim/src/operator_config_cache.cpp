@@ -361,11 +361,6 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
 
 void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
-    GetSimState(slotId, simState);
-    if (!(simState == SimState::SIM_STATE_READY || simState == SimState::SIM_STATE_LOADED)) {
-        return;
-    }
     auto helper = PdpProfileRdbHelper::GetInstance();
     if (helper == nullptr) {
         TELEPHONY_LOGE("get PdpProfileRdbHelper Failed.");
