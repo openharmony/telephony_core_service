@@ -714,7 +714,6 @@ HWTEST_F(IccFileTest, Telephony_IccFile_029, Function | MediumTest | Level1)
     bool ret = iccFile->ObtainFilesFetched();
     EXPECT_FALSE(ret);
 }
-
 /**
  * @tc.number   Telephony_IccFile_030
  * @tc.name     test IccFile
