@@ -3357,7 +3357,7 @@ int32_t CoreServiceProxy::GetSimLabel(int32_t slotId, SimLabel &simLabel, const 
     }
     return result;
 }
-#ifdef CORE_SERVICE_SUPPORT_ESIM
+
 bool CoreServiceProxy::WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData)
 {
     if (!data.WriteBool(apduData.closeChannelFlag_)) {
@@ -3430,13 +3430,13 @@ int32_t CoreServiceProxy::SendApduData(
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
-        responseResult.resultCode_ = static_cast<ResultCode>(reply.ReadInt32());
+        responseResult.resultCode_ = static_cast<EsimResultCode>(reply.ReadInt32());
         responseResult.response_ = reply.ReadString16();
         responseResult.sw1_ = reply.ReadInt32();
         responseResult.sw2_ = reply.ReadInt32();
     }
     return result;
 }
-#endif
+
 } // namespace Telephony
 } // namespace OHOS

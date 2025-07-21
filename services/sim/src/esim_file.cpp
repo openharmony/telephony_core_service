@@ -16,7 +16,8 @@
 #include "esim_file.h"
 
 #include <unistd.h>
-
+#include <memory>
+#include <shared_mutex>
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
@@ -30,21 +31,38 @@
 #include "telephony_state_registry_client.h"
 #include "telephony_tag_def.h"
 #include "vcard_utils.h"
+#include "tel_ril_manager.h"
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
-EsimFile::EsimFile(std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
-    : IccFile("EsimFile", simStateManager)
+EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId,
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner) : AppExecFwk::EventHandler(eventRunner)
 {
     slotId_ = slotId;
+    telRilManager_ = telRilManager;
     currentChannelId_ = 0;
     InitMemberFunc();
     InitChanneMemberFunc();
 }
 
-void EsimFile::StartLoad() {}
+AppExecFwk::InnerEvent::Pointer EsimFile::BuildCallerInfo(int eventId)
+{
+    std::unique_ptr<FileToControllerMsg> object = std::make_unique<FileToControllerMsg>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    int eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    event->SetOwner(shared_from_this());
+    return event;
+}
 
 ResultInnerCode EsimFile::ObtainChannelSuccessExclusive()
 {
@@ -1014,7 +1032,7 @@ bool EsimFile::ProcessObtainSmdsAddressDone(const AppExecFwk::InnerEvent::Pointe
     return true;
 }
 
-struct CarrierIdentifier CarrierIdentifiers(const std::vector<uint8_t> &mccMncData, int mccMncLen,
+struct CarrierIdentifier EsimFile::CarrierIdentifiers(const std::vector<uint8_t> &mccMncData, int mccMncLen,
     const std::u16string &gid1, const std::u16string &gid2)
 {
     std::string strResult = Asn1Utils::BytesToHexStr(mccMncData);
@@ -1036,7 +1054,7 @@ struct CarrierIdentifier CarrierIdentifiers(const std::vector<uint8_t> &mccMncDa
     return carrierId;
 }
 
-struct CarrierIdentifier buildCarrierIdentifiers(std::shared_ptr<Asn1Node> &root)
+struct CarrierIdentifier EsimFile::buildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root)
 {
     std::u16string gid1;
     std::u16string gid2;
@@ -1751,7 +1769,7 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
     return loadBPPResult_;
 }
 
-EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, Event events)
+EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, EsimEvent events)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
@@ -2222,7 +2240,7 @@ std::shared_ptr<Asn1Node> EsimFile::LoadBoundProfilePackageParseProfileInstallRe
 }
 
 bool EsimFile::ProcessListNotifications(
-    int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+    int32_t slotId, EsimEvent events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
     if (!IsLogicChannelOpen()) {
         return false;
@@ -2362,7 +2380,7 @@ bool EsimFile::ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointe
     return true;
 }
 
-EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Event events)
+EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, EsimEvent events)
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
@@ -2446,7 +2464,7 @@ int32_t EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumbe
 }
 
 bool EsimFile::ProcessRetrieveNotificationList(
-    int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
+    int32_t slotId, EsimEvent events, const AppExecFwk::InnerEvent::Pointer &responseEvent)
 {
     if (!IsLogicChannelOpen()) {
         return false;
@@ -3643,8 +3661,6 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             bool isFileProcessResponse = memberFunc(event);
             return;
         }
-    } else {
-        IccFile::ProcessEvent(event);
     }
 }
 
@@ -3677,11 +3693,6 @@ std::shared_ptr<Asn1Node> EsimFile::ParseEvent(const AppExecFwk::InnerEvent::Poi
     return Asn1ParseResponse(responseByte, byteLen);
 }
 
-int32_t EsimFile::ObtainSpnCondition(bool roaming, const std::string &operatorNum)
-{
-    return 0;
-}
-
 bool EsimFile::IsSameAid(const std::u16string &aid)
 {
     std::lock_guard<std::mutex> lock(occupyChannelMutex_);
@@ -3699,51 +3710,6 @@ bool EsimFile::IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid)
     } else {
         return true;
     }
-}
-
-bool EsimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    return false;
-}
-
-bool EsimFile::UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber)
-{
-    return false;
-}
-
-bool EsimFile::SetVoiceMailCount(int32_t voiceMailCount)
-{
-    return false;
-}
-
-bool EsimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
-{
-    return false;
-}
-
-std::string EsimFile::GetVoiceMailNumber()
-{
-    return "";
-}
-
-void EsimFile::SetVoiceMailNumber(const std::string mailNumber)
-{
-    return;
-}
-
-void EsimFile::ProcessIccRefresh(int msgId)
-{
-    return;
-}
-
-void EsimFile::ProcessFileLoaded(bool response)
-{
-    return;
-}
-
-void EsimFile::OnAllFilesFetched()
-{
-    return;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -796,7 +796,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0017, Function 
     mInner.UpdateImsCapFromChip(0, {0, 0, 0, 0});
     EXPECT_NE(mInner.simManager_, simManager);
 }
-#ifdef CORE_SERVICE_SUPPORT_ESIM
+
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0018, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
@@ -891,7 +891,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     int32_t portIndex = 0;
     int32_t slotId = -1;
     mInner.simManager_ = nullptr;
-    Event events = Event::EVENT_ALL;
+    EsimEvent events = EsimEvent::EVENT_ALL;
     EuiccNotification notification;
     EuiccNotificationList notificationList;
     const std::u16string iccId = u"122323123123122312";
@@ -939,7 +939,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     int32_t portIndex = 0;
     int32_t slotId = -1;
     mInner.simManager_ = simManager;
-    Event events = Event::EVENT_ALL;
+    EsimEvent events = EsimEvent::EVENT_ALL;
     EuiccNotification notification;
     EuiccNotificationList notificationList;
     const std::u16string iccId = u"122323123123122312";
@@ -971,7 +971,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     EXPECT_EQ(mInner.AuthenticateServer(slotId, authenticateConfigInfo, responseResult), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-#endif
 
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0022, Function | MediumTest | Level1)
 {

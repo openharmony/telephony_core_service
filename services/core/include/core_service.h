@@ -19,6 +19,7 @@
 #include "core_service_stub.h"
 #include "i_network_search.h"
 #include "i_sim_manager.h"
+#include "i_esim_manager.h"
 #include "i_tel_ril_manager.h"
 #include "if_system_ability_manager.h"
 #include "singleton.h"
@@ -266,10 +267,8 @@ public:
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) override;
     int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
-#endif
 private:
     bool Init();
     bool NotifyCoreServiceReady();
@@ -283,6 +282,7 @@ private:
     sptr<ISystemAbilityManager> systemManager_ = nullptr;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
+    std::shared_ptr<IEsimManager> esimManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;

@@ -28,7 +28,7 @@ namespace Telephony {
  * @brief Result of a operation.
  */
 struct GetEuiccProfileInfoListResult : public Parcelable {
-    ResultCode result_;
+    EsimResultCode result_;
     std::vector<EuiccProfile> profiles_{};
     bool isRemovable_ = false;
 
