@@ -44,4 +44,5 @@ group("fuzztest") {
   deps += [ "coreservice_fuzzer:fuzztest" ]
   deps += [ "satellitecoretwo_fuzzer:fuzztest" ]
   deps += [ "simmanager_fuzzer:fuzztest" ]
+  deps += [ "voicemailconstants_fuzzer:fuzztest" ]
 }
