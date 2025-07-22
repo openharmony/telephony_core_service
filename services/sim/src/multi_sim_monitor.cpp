@@ -433,10 +433,12 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
     std::vector<int32_t> activeList = { 0 };
     DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (action == DATASHARE_READY_EVENT) {
-        handler_.isDataShareReady_ = true;
-        if (activeList[0] == ACTIVE_USER_ID) {
-            handler_.CheckDataShareError();
-            handler_.CheckSimNotifyRegister();
+        if (handler_ != nullptr) {
+            handler_.isDataShareReady_ = true;
+            if (activeList[0] == ACTIVE_USER_ID) {
+                handler_.CheckDataShareError();
+                handler_.CheckSimNotifyRegister();
+            }
         }
     }
 }
