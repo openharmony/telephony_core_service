@@ -41,9 +41,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerVoiceMailToMap();
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     AddHandlerEsimToMap();
-#endif
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -286,13 +284,11 @@ void CoreServiceStub::AddHandlerOpkeyVersionToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetOpnameVersion(data, reply); };
 }
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
 void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
 }
-#endif
 
 int32_t CoreServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -1940,7 +1936,6 @@ int32_t CoreServiceStub::OnGetSimLabel(MessageParcel &data, MessageParcel &reply
     return NO_ERROR;
 }
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &reply)
 {
     EsimApduData apduData;
@@ -1969,6 +1964,5 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
     }
     return NO_ERROR;
 }
-#endif
 } // namespace Telephony
 } // namespace OHOS

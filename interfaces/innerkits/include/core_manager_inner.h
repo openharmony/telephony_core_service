@@ -19,6 +19,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "i_esim_manager.h"
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -36,6 +37,7 @@ public:
     void OnInit(std::shared_ptr<INetworkSearch> networkSearchManager,
         std::shared_ptr<Telephony::ISimManager> simManager, std::shared_ptr<ITelRilManager> telRilManager);
     void SetTelRilMangerObj(std::shared_ptr<ITelRilManager> telRilManager);
+    void SetEsimManagerObj(std::shared_ptr<IEsimManager> esimManager);
     int32_t RegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, int32_t *obj);
     int32_t UnRegisterCoreNotify(
@@ -344,7 +346,7 @@ public:
     int32_t NotifySimSlotsMapping(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
     /******************** simManager end *****************************/
-#ifdef CORE_SERVICE_SUPPORT_ESIM
+    /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);
     int32_t GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListInnerResult &euiccProfileInfoList);
     int32_t GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo);
@@ -368,10 +370,10 @@ public:
         ResponseEsimInnerResult &responseResult);
     int32_t LoadBoundProfilePackage(int32_t slotId, int32_t portIndex, const std::u16string &boundProfilePackage,
         ResponseEsimBppResult &responseResult);
-    int32_t ListNotifications(int32_t slotId, int32_t portIndex, Event events,
+    int32_t ListNotifications(int32_t slotId, int32_t portIndex, EsimEvent events,
         EuiccNotificationList &notificationList);
     int32_t RetrieveNotificationList(
-        int32_t slotId, int32_t portIndex, Event events, EuiccNotificationList &notificationList);
+        int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList);
     int32_t RetrieveNotification(
         int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification);
     int32_t RemoveNotificationFromList(
@@ -386,7 +388,7 @@ public:
         int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, int32_t &enumResult);
     int32_t GetContractInfo(
         int32_t slotId, GetContractInfoRequest &getContractInfoRequest, std::string &response);
-#endif
+    /******************** esimManager end *****************************/
 
 private:
     CoreManagerInner();
@@ -397,6 +399,7 @@ private:
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<IEsimManager> esimManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

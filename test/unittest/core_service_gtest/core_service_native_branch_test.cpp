@@ -891,7 +891,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0020, Function 
     int32_t portIndex = 0;
     int32_t slotId = -1;
     mInner.simManager_ = nullptr;
-    Event events = Event::EVENT_ALL;
+    EsimEvent events = EsimEvent::EVENT_ALL;
     EuiccNotification notification;
     EuiccNotificationList notificationList;
     const std::u16string iccId = u"122323123123122312";
@@ -939,7 +939,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     int32_t portIndex = 0;
     int32_t slotId = -1;
     mInner.simManager_ = simManager;
-    Event events = Event::EVENT_ALL;
+    EsimEvent events = EsimEvent::EVENT_ALL;
     EuiccNotification notification;
     EuiccNotificationList notificationList;
     const std::u16string iccId = u"122323123123122312";
@@ -972,7 +972,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0021, Function 
     EXPECT_EQ(mInner.RetrieveNotification(slotId, portIndex, seqNumber, notification), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 #endif
-
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0022, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;

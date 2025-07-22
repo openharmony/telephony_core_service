@@ -35,6 +35,9 @@
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+#include "esim_manager.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -95,6 +98,11 @@ bool CoreService::Init()
     }
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager_);
     int32_t slotCount = GetMaxSimCount();
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    esimManager_ = std::make_shared<EsimManager>(telRilManager_);
+    esimManager_->OnInit(slotCount);
+    CoreManagerInner::GetInstance().SetEsimManagerObj(esimManager_);
+#endif
     simManager_ = std::make_shared<SimManager>(telRilManager_);
     simManager_->OnInit(slotCount);
     // connect ims_service
@@ -2126,7 +2134,6 @@ int32_t CoreService::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<
     return TELEPHONY_ERR_SUCCESS;
 }
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
@@ -2138,19 +2145,18 @@ int32_t CoreService::SendApduData(
         TELEPHONY_LOGE("Failed because no permission:SET_TELEPHONY_ESIM_STATE");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("esimManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     OHOS::Telephony::ResponseEsimInnerResult result;
-    int32_t res = simManager_->SendApduData(slotId, aid, apduData, result);
-    responseResult.resultCode_ = static_cast<ResultCode>(result.resultCode_);
+    int32_t res = esimManager_->SendApduData(slotId, aid, apduData, result);
+    responseResult.resultCode_ = static_cast<EsimResultCode>(result.resultCode_);
     responseResult.response_ = result.response_;
     responseResult.sw1_ = result.sw1_;
     responseResult.sw2_ = result.sw2_;
 
     return res;
 }
-#endif
 } // namespace Telephony
 } // namespace OHOS

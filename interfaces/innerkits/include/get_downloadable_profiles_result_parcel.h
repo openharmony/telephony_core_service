@@ -28,7 +28,7 @@ namespace Telephony {
  *  @brief Series data of downloadable configuration files.
  */
 struct GetDownloadableProfilesResult : public Parcelable {
-    ResultCode result_;
+    EsimResultCode result_;
     std::vector<DownloadableProfile> downloadableProfiles_{};
 
     bool ReadFromParcel(Parcel &parcel);

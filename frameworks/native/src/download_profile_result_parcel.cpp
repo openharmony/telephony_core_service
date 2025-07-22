@@ -28,7 +28,7 @@ bool DownloadProfileResult::ReadFromParcel(Parcel &parcel)
         !parcel.ReadUint32(cardId_)) {
         return false;
     }
-    result_ = static_cast<ResultCode>(resultValue);
+    result_ = static_cast<EsimResultCode>(resultValue);
     resolvableErrors_ = static_cast<SolvableErrors>(resolvableErrorsValue);
     return true;
 }
