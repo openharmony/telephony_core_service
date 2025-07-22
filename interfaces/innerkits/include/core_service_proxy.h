@@ -155,10 +155,8 @@ public:
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) override;
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
-#endif
 
 private:
     template<class T>
@@ -174,9 +172,7 @@ private:
     void ProcessSignalInfo(MessageParcel &reply, std::vector<sptr<SignalInformation>> &result);
     void ProcessCellInfo(MessageParcel &reply, std::vector<sptr<CellInformation>> &cells);
     int32_t SerializeImsRegInfoData(int32_t slotId, ImsServiceType imsSrvType, MessageParcel &data);
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     bool WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData);
-#endif
 
 private:
     static inline BrokerDelegator<CoreServiceProxy> delegator_;

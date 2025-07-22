@@ -1749,7 +1749,6 @@ int32_t CoreServiceClient::GetSimLabel(int32_t slotId, SimLabel &simLabel, int64
     return *result;
 }
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceClient::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
 {
@@ -1760,6 +1759,6 @@ int32_t CoreServiceClient::SendApduData(
     }
     return proxy->SendApduData(slotId, aid, apduData, responseResult);
 }
-#endif
+
 }  // namespace Telephony
 } // namespace OHOS

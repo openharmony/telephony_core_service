@@ -124,8 +124,6 @@ enum class CoreServiceInterfaceCode {
     GET_SIM_IO_DONE,
     GET_ALL_ACCOUNT_INFO_LIST,
     GET_SIM_LABEL,
-
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     GET_EID,
     GET_EUICC_PROFILE_INFO_LIST,
     GET_EUICC_INFO,
@@ -151,7 +149,6 @@ enum class CoreServiceInterfaceCode {
     REMOVE_NOTIFICATION,
     IS_ESIM_SUPPORTED,
     SEND_APDU_DATA,
-#endif
     GET_OPNAME_VERSION,
 };
 } // namespace Telephony

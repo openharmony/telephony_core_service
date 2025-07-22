@@ -970,7 +970,6 @@ public:
      */
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     /**
      * @brief Provide sending upgrade or card binding data to the ESIM channel.
      *
@@ -982,7 +981,6 @@ public:
      */
     int32_t SendApduData(
         int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult);
-#endif
 
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);

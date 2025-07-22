@@ -108,7 +108,7 @@ typedef struct TagEsimProfile {
     std::u16string matchingId;
     std::u16string imei;
     std::u16string boundProfilePackage;
-    OHOS::Telephony::Event events = OHOS::Telephony::Event::EVENT_DONOTHING;
+    OHOS::Telephony::EsimEvent events = OHOS::Telephony::EsimEvent::EVENT_DONOTHING;
     std::u16string defaultSmdpAddress = u"";
     std::u16string aid = u"";
     EsimApduData apduData;

@@ -18,7 +18,6 @@
 
 #include "cell_information.h"
 #include "dialling_numbers_info.h"
-#ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "download_profile_config_info_parcel.h"
 #include "download_profile_result_parcel.h"
 #include "downloadable_profile_parcel.h"
@@ -29,7 +28,6 @@
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
 #include "contract_request_data_parcel.h"
-#endif
 #include "i_network_search_callback.h"
 #include "ims_reg_info_callback.h"
 #include "network_search_result.h"
@@ -171,11 +169,8 @@ public:
         int32_t fileId, const std::string &data, const std::string &path, SimAuthenticationResponse &response) = 0;
     virtual int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) = 0;
-#ifdef CORE_SERVICE_SUPPORT_ESIM
     virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
         const EsimApduData &apduData, ResponseEsimResult &responseResult) = 0;
-#endif
-
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;
