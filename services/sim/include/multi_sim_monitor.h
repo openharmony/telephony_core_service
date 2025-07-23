@@ -92,6 +92,7 @@ private:
     void CheckSimNotifyRegister();
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
+    bool GetBlockLoadOperatorConfig();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
