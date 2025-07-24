@@ -178,6 +178,21 @@ void MultiSimMonitor::SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig)
     }
 }
 
+bool MultiSimMonitor::GetBlockLoadOperatorConfig()
+{
+    std::string key = "";
+    char isBlockLoadOperatorConfig[SYSPARA_SIZE] = {0};
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        key.clear();
+        key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId));
+        GetParameter(key.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+        if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void MultiSimMonitor::UpdateAllOpkeyConfigs()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
@@ -465,8 +480,8 @@ void MultiSimMonitor::CheckSimNotifyRegister()
 
 void MultiSimMonitor::CheckDataShareError()
 {
-    if (controller_->IsDataShareError()) {
-        TELEPHONY_LOGI("CheckDataShareError, need Reset Opkey");
+    if (controller_->IsDataShareError() || GetBlockLoadOperatorConfig()) {
+        TELEPHONY_LOGI("CheckDataShareError or GetBlockLoadOperatorConfig is true, need Reset Opkey");
         CheckOpcNeedUpdata(true);
     }
 }
