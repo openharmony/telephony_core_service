@@ -1716,8 +1716,7 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     SetPrimarySlotIdDone();
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
-    int32_t ret = CellularDataClient::GetInstance().EstablishAllApnsIfConnectable(slotId);
-    TELEPHONY_LOGD("EstablishAllApns ret is %{public}d", ret);
+    TELEPHONY_LOGD("SetPrimarySlotIdWithoutModemReboot finish");
     return TELEPHONY_ERR_SUCCESS;
 }
 
