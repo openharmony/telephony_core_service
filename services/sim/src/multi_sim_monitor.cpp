@@ -435,7 +435,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
     if (action == DATASHARE_READY_EVENT) {
         if (handler_ != nullptr) {
             handler_.isDataShareReady_ = true;
-            if (activeList[0] == ACTIVE_USER_ID) {
+            if (!activeList.empty() && activeList[0] == ACTIVE_USER_ID) {
                 handler_.CheckDataShareError();
                 handler_.CheckSimNotifyRegister();
             }
