@@ -34,13 +34,13 @@ TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
 
 void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_5::IRil> rilInterface)
 {
-    ffrt::lock_guard<std::mutex> lock(dealLock_);
+    std::lock_guard<ffrt::mutex> lock(dealLock_);
     rilInterface_ = rilInterface;
 }
 
 sptr<HDI::Ril::V1_5::IRil> TelRilBase::GetRilInterface()
 {
-    ffrt::lock_guard<std::mutex> lock(dealLock_);
+    std::lock_guard<ffrt::mutex> lock(dealLock_);
     return rilInterface_;
 }
 
