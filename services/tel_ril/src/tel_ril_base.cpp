@@ -14,7 +14,7 @@
  */
 
 #include "tel_ril_base.h"
-
+#include "ffrt.h"
 #include "core_service_hisysevent.h"
 
 namespace OHOS {
@@ -22,7 +22,7 @@ namespace Telephony {
 std::atomic_int TelRilBase::nextSerialId_(1);
 std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
 std::mutex TelRilBase::requestLock_;
-std::mutex dealLock_;
+ffrt::mutex dealLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
 TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
@@ -34,13 +34,13 @@ TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
 
 void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_5::IRil> rilInterface)
 {
-    std::lock_guard<std::mutex> lock(dealLock_);
+    ffrt::lock_guard<std::mutex> lock(dealLock_);
     rilInterface_ = rilInterface;
 }
 
 sptr<HDI::Ril::V1_5::IRil> TelRilBase::GetRilInterface()
 {
-    std::lock_guard<std::mutex> lock(dealLock_);
+    ffrt::lock_guard<std::mutex> lock(dealLock_);
     return rilInterface_;
 }
 
