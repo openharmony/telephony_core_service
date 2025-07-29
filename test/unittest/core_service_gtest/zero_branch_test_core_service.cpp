@@ -30,10 +30,12 @@
 #include "sim_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_log_wrapper.h"
+#include "mock_multi_sim_controller.h"
 #include "mock_i_raw_parcel_callback.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 std::shared_ptr<SimManager> g_simManagerPtr = nullptr;
 
@@ -450,6 +452,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     multiSimController->PublishSetPrimaryEvent(true);
     multiSimController->EncryptIccId("");
     multiSimController->GetDefaultMainSlotByIccId();
+    multiSimController->lastPrimarySlotId_ = 1;
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
+        simStateManager, simFileManager);
+    EXPECT_CALL(*multiSimControllerMock, GetDefaultMainSlotByIccId()).WillRepeatedly(Return(0));
     multiSimController->CheckIfNeedSwitchMainSlotId();
     multiSimController->IsAllModemInitDone();
     multiSimController->ReCheckPrimary();
