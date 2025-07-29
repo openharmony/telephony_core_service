@@ -2584,7 +2584,7 @@ bool CoreManagerInner::IsSetActiveSimInProgress(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return TELEPHONY_ERROR;
+        return false;
     }
     return simManager_->IsSetActiveSimInProgress(slotId);
 }
@@ -2593,7 +2593,7 @@ bool CoreManagerInner::IsSetPrimarySlotIdInProgress()
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return TELEPHONY_ERROR;
+        return false;
     }
     return simManager_->IsSetPrimarySlotIdInProgress();
 }
