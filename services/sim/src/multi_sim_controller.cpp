@@ -856,6 +856,10 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
+            if (radioProtocolController_ != nullptr &&
+                radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) == MODEM_ID_0) {
+                isInit = false;
+            }
             std::thread initDataTask([&, defaultSlotId = defaultSlotId, isInit = isInit]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
                 CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, !isInit);
@@ -879,9 +883,13 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
             return;
         }
         TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
+        if (radioProtocolController_ != nullptr &&
+            radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) == MODEM_ID_0) {
+            isInit = false;
+        }
         std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId, isInit = isInit]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, !isInit);
+            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, isInit);
         });
         initDataTask.detach();
     }
@@ -1256,7 +1264,7 @@ void MultiSimController::PublishSetPrimaryEvent(bool setDone)
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("result : %{public}d", publishResult);
+    TELEPHONY_LOGI("setDone: %{public}d, result: %{public}d", setDone, publishResult);
 }
 
 void MultiSimController::SendMainCardBroadCast(int32_t slotId)
