@@ -375,7 +375,6 @@ void NetworkRegister::UpdateCfgTech()
         TELEPHONY_LOGE("NetworkRegister::UpdateCfgTech networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    RadioTech tech = networkSearchState_->GetNetworkStatus()->GetPsRadioTech();
     auto networkState = networkSearchState_->GetNetworkStatus();
     RadioTech tech = networkState->GetPsRadioTech() != RadioTech::RADIO_TECHNOLOGY_UNKNOWN ?
         networkState->GetPsRadioTech() : networkState->GetCsRadioTech();
