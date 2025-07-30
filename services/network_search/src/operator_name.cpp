@@ -499,6 +499,8 @@ unsigned int OperatorName::GetSpnRule(sptr<NetworkState> &networkState)
     }
     if (enableCust_ && displayConditionCust_ != SPN_INVALID) {
         spnRule = static_cast<int32_t>(GetCustSpnRule(roaming));
+    } else if (!networkState->IsRoaming() && IsChinaCard()) {
+        spnRule = static_cast<int32_t>(SPN_CONDITION_DISPLAY_PLMN);
     } else {
         std::string numeric = networkState->GetPlmnNumeric();
         if (simManager_ != nullptr) {
@@ -702,7 +704,7 @@ bool OperatorName::IsChinaCard()
         simManager_->GetSimOperatorNumeric(slotId_, operatorNumeric);
         simPlmn = Str16ToStr8(operatorNumeric);
     }
-    return isCMCard(simPlmn) || isCUCard(simPlmn) || isCTCard(simPlmn) || isCBCard(simPlmn);
+    return isCMCard(simPlmn) || isCTCard(simPlmn) || isCBCard(simPlmn);
 }
 
 int32_t OperatorName::GetCurrentLac()

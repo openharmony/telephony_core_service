@@ -679,6 +679,12 @@ void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("NetworkSearchHandler::RadioSignalStrength event is nullptr!");
         return;
     }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr ||
+        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        TELEPHONY_LOGI("radio is power off, no need update signal strength");
+        return;
+    }
     if (signalInfo_ != nullptr) {
         signalInfo_->ProcessSignalIntensity(slotId_, event);
     }
