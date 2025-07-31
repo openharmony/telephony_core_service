@@ -288,15 +288,7 @@ void OperatorName::NotifyGsmSpnChanged(
         params.showSpn = false;
     }
     SetOperatorNameByParams(params);
-    TELEPHONY_LOGI(
-        "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
-        "curPlmn_:%{public}s plmn:%{public}s showPlmnOld:%{public}d enableCust_:%{public}d "
-        "displayConditionCust_:%{public}d domesticSpn:%{public}s slotId:%{public}d",
-        params.showSpn, curParams_.spn.c_str(), params.spn.c_str(), params.showPlmn, curParams_.plmn.c_str(),
-        params.plmn.c_str(), showPlmnOld, enableCust_, displayConditionCust_, domesticSpn.c_str(), slotId_);
-    if (isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
-        curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
-        curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
+    if (IsShouldNotify(regStatus, params, isForce)) {
         TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
@@ -347,14 +339,7 @@ void OperatorName::NotifyCdmaSpnChanged(
     }
     params.showPlmn = !params.plmn.empty();
     SetOperatorNameByParams(params);
-    TELEPHONY_LOGI(
-        "OperatorName::NotifyCdmaSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
-        "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
-        params.showSpn, curParams_.spn.c_str(), params.spn.c_str(), params.showPlmn, curParams_.plmn.c_str(),
-        params.plmn.c_str(), slotId_);
-    if (isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
-        curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
-        curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
+    if (IsShouldNotify(regStatus, params, isForce)) {
         TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
         PublishEvent(params, regStatus, domesticSpn);
     } else {
@@ -404,6 +389,7 @@ void OperatorName::PublishEvent(OperatorNameParams params, const RegServiceState
     }
     TELEPHONY_LOGI("OperatorName::PublishEvent result : %{public}d slotId:%{public}d", publishResult, slotId_);
     if (publishResult) {
+        std::unique_lock<ffrt::shared_mutex> lock(mutex_);
         curRegState_ = state;
         curParams_.spnRule = params.spnRule;
         curParams_.spn = params.spn;
@@ -842,6 +828,30 @@ void OperatorName::TrySetLongOperatorNameWithTranslation()
         SetOperatorName(longOperatorName);
     }
     NotifySpnChanged();
+}
+
+bool OperatorName::IsShouldNotify(const RegServiceState &regStatus, const OperatorNameParams &params, bool isForce)
+{
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
+    bool shouldNotify = false;
+    if (networkSearchState_ != nullptr) {
+        shouldNotify = !networkSearchState_->IsProcessNetworkState() && (
+            isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
+            curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
+            curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)
+        );
+    } else {
+        TELEPHONY_LOGE("OperatorName::IsShouldNotify networkSearchState_ = nullptr.");
+        shouldNotify = isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
+            curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
+            curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn);
+    }
+    TELEPHONY_LOGI(
+        "OperatorName::IsShouldNotify showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
+        "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s isForce:%{public}d shouldNotify:%{public}d "
+        "slotId:%{public}d", params.showSpn, curParams_.spn.c_str(), params.spn.c_str(), params.showPlmn, 
+        curParams_.plmn.c_str(), params.plmn.c_str(), isForce, shouldNotify, slotId_);
+    return shouldNotify;
 }
 } // namespace Telephony
 } // namespace OHOS
