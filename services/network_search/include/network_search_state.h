@@ -50,6 +50,7 @@ public:
     void NotifyStateChange();
     void CsRadioTechChange();
     void SetLongOperatorName(const std::string &longName, DomainType domainType);
+    bool IsProcessNetworkState();
 
 private:
     void NotifyPsRegStatusChange();
