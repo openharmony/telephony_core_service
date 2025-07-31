@@ -849,7 +849,7 @@ bool OperatorName::IsShouldNotify(const RegServiceState &regStatus, const Operat
     TELEPHONY_LOGI(
         "OperatorName::IsShouldNotify showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
         "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s isForce:%{public}d shouldNotify:%{public}d "
-        "slotId:%{public}d", params.showSpn, curParams_.spn.c_str(), params.spn.c_str(), params.showPlmn, 
+        "slotId:%{public}d", params.showSpn, curParams_.spn.c_str(), params.spn.c_str(), params.showPlmn,
         curParams_.plmn.c_str(), params.plmn.c_str(), isForce, shouldNotify, slotId_);
     return shouldNotify;
 }
