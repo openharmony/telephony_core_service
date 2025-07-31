@@ -80,7 +80,6 @@ private:
     void SetOperatorNameByParams(OperatorNameParams &params);
     bool IsShouldNotify(const RegServiceState &regStatus, const OperatorNameParams &params, bool isForce);
 
-
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
