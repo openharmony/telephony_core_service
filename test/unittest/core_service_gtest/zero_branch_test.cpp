@@ -2136,6 +2136,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_RECORDS_LOADED, 1);
     multiSimMonitor->isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     multiSimMonitor->initDataRemainCount_.resize(SIM_SLOT_COUNT, 5);
+    multiSimController->setPrimarySlotRemainCount_.resize(maxCount_, SET_PRIMARY_RETRY_TIMES);
     multiSimMonitor->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1);
     multiSimMonitor->ProcessEvent(event);

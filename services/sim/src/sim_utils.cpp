@@ -228,7 +228,7 @@ std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
         }
         gsmVal = low * 16 + high; // 16 is the hex val max
         i++;
-        if (gsmVal < 0 || gsmVal >= 129) { // 129 is gsm val index max
+        if (gsmVal < 0 || gsmVal >= static_cast<int>(sizeof(LANGUAGE_TABLE) / sizeof(LANGUAGE_TABLE[0]))) {
             continue;
         }
         if (!escTag && gsmVal == 0x1B) { // 1B is the ESC tag refer to GSM 03.38;
