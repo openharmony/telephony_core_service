@@ -60,8 +60,16 @@ HWTEST_F(SimManagerBranchTest, Telephony_SimManager_001, Function | MediumTest |
     EXPECT_EQ(simManager->GetOpName(INVALID_SLOTID, result), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(simManager->GetSimOperatorNumeric(1, testStr), TELEPHONY_ERR_NO_SIM_CARD);
     EXPECT_EQ(simManager->GetOpName(1, testStr), TELEPHONY_ERR_SUCCESS);
+}
+ 
+HWTEST_F(SimManagerBranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->OnInit(MAX_SLOT_COUNT);
+    std::u16string testStr = u"";
     simManager->simFileManager_[0] = nullptr;
-    EXPECT_EQ(simManager->GetSimOperatorNumeric(0, testStr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(simManager->GetSimOperatorNumeric(0, testStr), TELEPHONY_ERR_NO_SIM_CARD);
     EXPECT_EQ(simManager->GetOpName(0, testStr), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
