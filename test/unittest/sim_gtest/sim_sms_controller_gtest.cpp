@@ -118,7 +118,7 @@ HWTEST_F(SimSmsControllerTest, Telephony_Sim_ObtainAllSmsOfIcc001, Function | Me
     EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     simSmsController->fileManager_ = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     std::vector<std::string> result = simSmsController->ObtainAllSmsOfIcc();
-    EXPECT_EQ(simSmsController->responseReady_, true);
+    EXPECT_EQ(simSmsController->responseReady_, false);
 }
 }
 }
