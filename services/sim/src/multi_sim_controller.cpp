@@ -884,12 +884,12 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
         }
         TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
         if (radioProtocolController_ != nullptr &&
-            radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) == MODEM_ID_0) {
+            radioProtocolController_->GetRadioProtocolModemId(firstActivedSlotId) == MODEM_ID_0) {
             isInit = false;
         }
         std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId, isInit = isInit]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, isInit);
+            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, !isInit);
         });
         initDataTask.detach();
     }
