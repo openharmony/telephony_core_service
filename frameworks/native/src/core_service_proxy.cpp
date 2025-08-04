@@ -3311,7 +3311,7 @@ int32_t CoreServiceProxy::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t size = reply.ReadInt32();
         TELEPHONY_LOGI("CoreServiceProxy::GetAllSimAccountInfoList size = %{public}d", size);
-        if (size > MAX_VECTOR) {
+        if (size > MAX_VECTOR || size < 0) {
             return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
         iccAccountInfoList.clear();
