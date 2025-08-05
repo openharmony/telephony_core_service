@@ -306,7 +306,7 @@ int IccDiallingNumbersManager::GetFileIdForType(int fileType)
 {
     int fileId = 0;
     if (fileType == DiallingNumbersInfo::SIM_ADN) {
-        fileId = ELEMENTARY_FILE_ADN; //  ELEMENTARY_FILE_PBR  for usim
+        fileId = ELEMENTARY_FILE_PBR; //  ELEMENTARY_FILE_PBR  for usim
     } else if (fileType == DiallingNumbersInfo::SIM_FDN) {
         fileId = ELEMENTARY_FILE_FDN;
     }
@@ -344,12 +344,7 @@ std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInst
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
         return nullptr;
     }
-    std::shared_ptr<IccDiallingNumbersManager> manager = std::make_shared<IccDiallingNumbersManager>(simFile, simState);
-    if (manager == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
-        return nullptr;
-    }
-    return manager;
+    return std::make_shared<IccDiallingNumbersManager>(simFile, simState);
 }
 
 bool IccDiallingNumbersManager::HasSimCard()
