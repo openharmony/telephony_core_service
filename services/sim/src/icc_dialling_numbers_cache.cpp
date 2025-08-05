@@ -14,6 +14,8 @@
  */
 
 #include "icc_dialling_numbers_cache.h"
+#include "usim_dialling_numbers_service.h"
+#include "icc_dialling_numbers_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -57,7 +59,6 @@ void IccDiallingNumbersCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGD("IccDiallingNumbersCache ProcessEvent Id is %{public}d", id);
     switch (id) {
         case MSG_SIM_OBTAIN_ADN_DETAILS_DONE:
             ProcessObtainAdnDetailsDone(event);
@@ -332,7 +333,6 @@ void IccDiallingNumbersCache::SendBackResult(const AppExecFwk::InnerEvent::Point
     } else {
         TELEPHONY_LOGE("IccDiallingNumbersCache::SendBackResult null owner");
     }
-    TELEPHONY_LOGD("IccDiallingNumbersCache::SendBackResult send end");
 }
 
 void IccDiallingNumbersCache::SendUpdateResult(
