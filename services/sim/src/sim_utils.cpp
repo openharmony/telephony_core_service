@@ -276,7 +276,6 @@ std::string SIMUtils::DiallingNumberStringFieldConvertToString(
     }
     unsigned char *data = array.get();
     std::u16string hs = u"";
-    TELEPHONY_LOGI("DiallingNumberStringFieldToString: start 16be decode");
     if (data[offset] == static_cast<unsigned char>(CHINESE_FLAG)) {
         int ucslen = (length - 1) / HALF_LEN;
         int outlen = 0;
