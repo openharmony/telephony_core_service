@@ -107,7 +107,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
 #endif
 }
 
-void TelRilHandler::ReduceRunningLock(int32_t lockType)
+void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
