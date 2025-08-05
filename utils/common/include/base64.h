@@ -20,6 +20,11 @@
 #include <string>
 #include <vector>
 
+constexpr const size_t BASE64_ENCODED_UNIT = 4;
+constexpr const size_t BASE64_INPUT_UNIT = 3;
+constexpr const size_t BASE64_INPUT_UNIT_PAD = 2;
+constexpr const size_t BASE64_OUTPUT_PADDING = 1;
+
 namespace OHOS {
 namespace Telephony {
 class Base64 {
@@ -27,6 +32,7 @@ public:
     Base64() = delete;
     ~Base64() = delete;
     static std::shared_ptr<std::string> Encode(const std::vector<unsigned char> &input);
+    static std::shared_ptr<std::string> EncodeNoCopy(const std::string &input);
     static std::shared_ptr<std::vector<unsigned char>> Decode(const std::string &input);
 };
 }
