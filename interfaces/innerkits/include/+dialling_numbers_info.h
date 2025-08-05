@@ -92,9 +92,6 @@ public:
     static std::shared_ptr<DiallingNumbersInfo> UnMarshalling(Parcel &parcel)
     {
         std::shared_ptr<DiallingNumbersInfo> param = std::make_shared<DiallingNumbersInfo>();
-        if (param == nullptr) {
-            return nullptr;
-        }
         if (!param->ReadFromParcel(parcel)) {
             return nullptr;
         }
