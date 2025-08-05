@@ -73,13 +73,13 @@ void TelRilManager::CreatTelRilHandler(void)
     handler_->OnInit();
 }
 
-void TelRilManager::ReduceRunningLock()
+void TelRilManager::ReduceRunningLock(int32_t serialId)
 {
     if (handler_ == nullptr) {
         TELEPHONY_LOGE("handler_ is null");
         return;
     }
-    handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+    handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK, serialId);
 }
 
 void TelRilManager::ReleaseRunningLock()
