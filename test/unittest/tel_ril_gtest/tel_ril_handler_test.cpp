@@ -83,19 +83,19 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_003, Function | MediumTest
     auto telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType);
+    telRilManager->handler_->ReduceRunningLock(lockType, 0);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
     lockType = TelRilHandler::ACK_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType);
+    telRilManager->handler_->ReduceRunningLock(lockType, 0);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
     #ifdef ABILITY_POWER_SUPPORT
     telRilManager->handler_->reqRunningLock_ = nullptr;
     #endif
     lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType);
+    telRilManager->handler_->ReduceRunningLock(lockType, 0);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
     lockType = TelRilHandler::ACK_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType);
+    telRilManager->handler_->ReduceRunningLock(lockType, 0);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
 }
 
@@ -119,6 +119,18 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_004, Function | MediumTest
     telRilManager->handler_->reqRunningLock_ = nullptr;
     #endif
     telRilManager->handler_->ReleaseRunningLock(lockType);
+    ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
+}
+
+HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_005, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    telRilManager->OnInit();
+    int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
+    telRilManager->handler_->ApplyRunningLock(lockType);
+    telRilManager->handler_->ReduceRunningLock(lockType, 0);
+    ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 1);
+    telRilManager->handler_->ReduceRunningLock(lockType, 1);
     ASSERT_NE(telRilManager->handler_->reqRunningLockCount_, 0);
 }
 
