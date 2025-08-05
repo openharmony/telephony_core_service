@@ -58,9 +58,11 @@ private:
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
     std::mutex mutexRunningLock_;
+    std::vector<int32_t> reqSerialVector_ {};
 
 private:
     void ReleaseRunningLockDelay(int32_t lockType);
+    void ReduceVectorAndCount(int32_t serialId);
 };
 } // namespace Telephony
 } // namespace OHOS
