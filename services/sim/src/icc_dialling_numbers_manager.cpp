@@ -268,7 +268,7 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
     if (hasQueryEventDone_) {
         ClearRecords();
-        int fileId = GetFileIdForType(type);
+        int fileId = ELEMENTARY_FILE_PBR;
         int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
         AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
         hasQueryEventDone_ = false;
@@ -306,7 +306,7 @@ int IccDiallingNumbersManager::GetFileIdForType(int fileType)
 {
     int fileId = 0;
     if (fileType == DiallingNumbersInfo::SIM_ADN) {
-        fileId = ELEMENTARY_FILE_PBR; //  ELEMENTARY_FILE_PBR  for usim
+        fileId = ELEMENTARY_FILE_ADN; //  ELEMENTARY_FILE_PBR  for usim
     } else if (fileType == DiallingNumbersInfo::SIM_FDN) {
         fileId = ELEMENTARY_FILE_FDN;
     }
