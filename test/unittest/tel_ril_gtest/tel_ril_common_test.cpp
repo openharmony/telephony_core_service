@@ -68,7 +68,7 @@ HWTEST_F(TelRilCommonTest, TelRilManager_ConnectRilInterface_001, Function | Med
     telRilManager->rilInterface_ = nullptr;
     auto result = telRilManager->ConnectRilInterface();
     telRilManager->OnInit();
-    telRilManager->ReduceRunningLock();
+    telRilManager->ReduceRunningLock(0);
     ASSERT_EQ(result, true);
 }
 
