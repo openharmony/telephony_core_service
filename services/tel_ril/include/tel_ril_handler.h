@@ -34,7 +34,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnInit(void);
     void ApplyRunningLock(int32_t lockType);
-    void ReduceRunningLock(int32_t lockType);
+    void ReduceRunningLock(int32_t lockType, int32_t serialId);
     void ReleaseRunningLock(int32_t lockType);
 
 public:
