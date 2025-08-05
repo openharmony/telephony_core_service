@@ -16,16 +16,8 @@
 #ifndef OHOS_SIM_DIALLING_NUMBERS_CACHE_H
 #define OHOS_SIM_DIALLING_NUMBERS_CACHE_H
 
-#include <algorithm>
-#include <iostream>
-#include <map>
-#include <vector>
-
-#include "icc_dialling_numbers_handler.h"
-#include "icc_file_controller.h"
 #include "sim_file_manager.h"
 #include "tel_event_handler.h"
-#include "usim_dialling_numbers_service.h"
 
 namespace OHOS {
 namespace Telephony {
