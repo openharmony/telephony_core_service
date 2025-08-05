@@ -28,7 +28,8 @@ namespace OHOS {
 namespace Telephony {
 enum UsimMessage {
     MSG_USIM_PBR_LOAD_DONE = 1,
-    MSG_USIM_USIM_ADN_LOAD_DONE = 2
+    MSG_USIM_USIM_ADN_LOAD_DONE = 2,
+    MSG_USIM_USIM_ANR_LOAD_DONE = 3
 };
 
 struct UsimDiallingNumberFile {
@@ -49,7 +50,6 @@ public:
     ~UsimDiallingNumbersService();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);
-    void EnableReloadFiles();
     void SetFileControllerAndDiallingNumberHandler(
         std::shared_ptr<IccFileController> &ctrl, std::shared_ptr<IccDiallingNumbersHandler> handler);
 
@@ -58,6 +58,7 @@ protected:
     bool pbrFileLoaded_ = true;
     std::vector<std::shared_ptr<UsimDiallingNumberFile>> pbrFiles_;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersFiles_;
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> tmpDiallingNumbers_;
     std::map<int, int> efIdOfSfi_;
     uint pbrIndex_ = 0;
     void ReloadAllFiles();
@@ -68,9 +69,8 @@ protected:
 private:
     using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
-    void UpdatePhoneDiallingNumberFile();
-    std::string GetEmailContents(int index);
-    bool LoadDiallingNumberFiles(int index);
+    bool LoadDiallingNumberFiles(size_t index);
+    bool LoadDiallingNumber2Files(size_t index);
     void GeneratePbrFile(std::vector<std::string> &records);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     AppExecFwk::InnerEvent::Pointer CreateHandlerPointer(
@@ -78,8 +78,9 @@ private:
     static std::mutex mtx_;
     void ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessDiallingNumber2LoadDone(const AppExecFwk::InnerEvent::Pointer &event);
+    std::u16string FetchAnrContent(const std::string &recordData);
     void FillDiallingNumbersRecords(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list);
-    bool CheckEmailFiles(const std::shared_ptr<TagData> &email, int index);
 
     std::shared_ptr<UsimDiallingNumberFile> BuildNumberFileByRecord(const std::string &record);
     void StorePbrDetailInfo(std::shared_ptr<UsimDiallingNumberFile> file,
