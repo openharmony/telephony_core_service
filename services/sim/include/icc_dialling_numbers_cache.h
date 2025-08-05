@@ -28,6 +28,8 @@ enum {
 };
 
 const int ADD_FLAG = -1;
+class UsimDiallingNumbersService;
+class IccDiallingNumbersHandler;
 class IccDiallingNumbersCache : public TelEventHandler {
 public:
     explicit IccDiallingNumbersCache(std::shared_ptr<SimFileManager> simFileManager);
