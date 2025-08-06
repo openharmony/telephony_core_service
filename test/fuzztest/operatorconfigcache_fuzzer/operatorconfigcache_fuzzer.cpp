@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
  
-#include "voicemailconstants_fuzzer.h"
+#include "operatorconfigcache_fuzzer.h"
  
 #include <cstddef>
 #include <cstdint>
@@ -49,20 +49,34 @@ static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
     return *reinterpret_cast<const int32_t*>(base + index * typeSize);
 }
  
-void VoiceMailConstantseFunc(const uint8_t *data, size_t size)
+void OperatorConfigCacheFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    auto voiceMailConstants = std::make_shared<VoiceMailConstants>(slotId);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
-    std::string key(reinterpret_cast<const char *>(data), size);
-    voiceMailConstants->GetStringValueFromCust(slotId, key);
-    voiceMailConstants->ResetVoiceMailLoadedFlag();
-    voiceMailConstants->GetVoiceMailFixed(key);
-    voiceMailConstants->GetVoiceMailNumber(key);
-    voiceMailConstants->GetVoiceMailTag(key);
-    voiceMailConstants->LoadVoiceMailConfigFromCard(key, key);
-    voiceMailConstants->ContainsCarrier(key);
+    SimState simEnum = static_cast<SimState>(simState);
+    operatorConfigCache->UpdateIccidCache(simState);
+    operatorConfigCache->GetSimState(slotId, simEnum);
+    operatorConfigCache->IsNeedOperatorLoad(slotId);
+    operatorConfigCache->AnnounceOperatorConfigChanged(slotId, simState);
+    operatorConfigCache->notifyInitApnConfigs(slotId);
+    operatorConfigCache->SendSimMatchedOperatorInfo(slotId, simState);
+    operatorConfigCache->UnRegisterForIccChange();
+    operatorConfigCache->UpdateOperatorConfigs(slotId);
+    operatorConfigCache->ClearOperatorValue(slotId);
+    operatorConfigCache->ClearMemoryAndOpkey(slotId);
+    operatorConfigCache->ClearAllCache(slotId);
+    operatorConfigCache->simStateManager_ = nullptr;
+    operatorConfigCache->GetSimState(slotId, simEnum);
+    slotId = GetInt(data, size, index++);
+    operatorConfigCache->GetSimState(slotId, simEnum);
 }
  
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -70,8 +84,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
- 
-    VoiceMailConstantseFunc(data, size);
+
+    OperatorConfigCacheFunc(data, size);
     auto telRilManager = std::static_pointer_cast<TelRilManager>(
          DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {

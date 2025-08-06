@@ -13,7 +13,7 @@
  * limitations under the License.
  */
  
-#include "voicemailconstants_fuzzer.h"
+#include "simmanagerthree_fuzzer.h"
  
 #include <cstddef>
 #include <cstdint>
@@ -36,6 +36,7 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_STATUS_NUM = 5;
+constexpr int32_t ICC_STATUS_NUM = 12;
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
 static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
@@ -48,30 +49,46 @@ static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
     }
     return *reinterpret_cast<const int32_t*>(base + index * typeSize);
 }
- 
-void VoiceMailConstantseFunc(const uint8_t *data, size_t size)
+
+void SimManagerFuncThree(const uint8_t *data, size_t size)
 {
     int index = 0;
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    auto voiceMailConstants = std::make_shared<VoiceMailConstants>(slotId);
+    int32_t slotCount = GetInt(data, size, index++);
+    int32_t voiceMailCount = GetInt(data, size, index++);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
-    std::string key(reinterpret_cast<const char *>(data), size);
-    voiceMailConstants->GetStringValueFromCust(slotId, key);
-    voiceMailConstants->ResetVoiceMailLoadedFlag();
-    voiceMailConstants->GetVoiceMailFixed(key);
-    voiceMailConstants->GetVoiceMailNumber(key);
-    voiceMailConstants->GetVoiceMailTag(key);
-    voiceMailConstants->LoadVoiceMailConfigFromCard(key, key);
-    voiceMailConstants->ContainsCarrier(key);
+    int32_t iccStatus = *data % ICC_STATUS_NUM + 1;
+    SimState simEnum = static_cast<SimState>(simState);
+    IccSimStatus iccEnum = static_cast<IccSimStatus>(iccStatus);
+    bool hasOperatorPrivileges = true;
+    simManager->GetSimState(slotId, simEnum);
+    simManager->GetSimIccStatus(slotId, iccEnum);
+    simManager->SetModemInit(slotId, true);
+    simManager->RefreshSimState(slotId);
+    simManager->SendSimMatchedOperatorInfo(slotId, simState, std::string(reinterpret_cast<const char *>(data), size),
+        std::string(reinterpret_cast<const char *>(data), size));
+    simManager->SetVoiceMailCount(slotId, voiceMailCount);
+    simManager->GetVoiceMailCount(slotId, voiceMailCount);
+    simManager->ObtainSpnCondition(
+        slotId, hasOperatorPrivileges, std::string(reinterpret_cast<const char *>(data), size));
+    std::string pdu(reinterpret_cast<const char*>(data), size);
+    std::string smsc(reinterpret_cast<const char*>(data), size);
+    simManager->AddSmsToIcc(slotId, static_cast<int32_t>(simState), pdu, smsc);
+    simManager->IsCTSimCard(slotId, hasOperatorPrivileges);
+    simManager->IsValidSlotIdForDefault(slotId);
+    simManager->GetSimIst(slotId);
+    simManager->NotifySimSlotsMapping(slotId);
 }
- 
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
- 
-    VoiceMailConstantseFunc(data, size);
+
+    SimManagerFuncThree(data, size);
     auto telRilManager = std::static_pointer_cast<TelRilManager>(
          DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
