@@ -33,6 +33,8 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 static const int32_t INVALID_SLOTID = -1;
+constexpr int32_t SLEEP_TIME_SECONDS = 100000;
+
 void NetworkSearchHandlerInit()
 {
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
@@ -215,6 +217,20 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     NetworkSearchHandlerEvents(data, size);
     NetworkSearchHandlerProcesses(data, size);
     NetworkSearchHandlerGetRegistration(data, size);
+
+    auto telRilManager = std::static_pointer_cast<TelRilManager>(
+         DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
+    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
+        return;
+    }
+    auto handler = telRilManager->handler_;
+    if (handler != nullptr) {
+        handler->RemoveAllEvents();
+        usleep(SLEEP_TIME_SECONDS);
+    }
+    telRilManager->handler_->ClearFfrt(false);
+    telRilManager->handler_->queue_ = nullptr;
+    return;
 }
 } // namespace OHOS
 
@@ -230,6 +246,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }
