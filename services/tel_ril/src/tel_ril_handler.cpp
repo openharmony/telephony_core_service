@@ -131,7 +131,7 @@ void TelRilHandler::ReduceVectorAndCount(int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     auto iter = std::find(reqSerialVector_.begin(), reqSerialVector_.end(), serialId);
-    if (iter != reqSerialVector_.begin()) {
+    if (iter != reqSerialVector_.end()) {
         reqSerialVector_.erase(iter);
         reqRunningLockCount_--;
     }
