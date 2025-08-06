@@ -90,7 +90,8 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
     }
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         reqRunningLockCount_++;
-        reqSerialVector_.push_back(++reqLockSerialNum_);
+        reqLockSerialNum_++；
+        reqSerialVector_.push_back(reqLockSerialNum_);
         if (!reqRunningLock_->IsUsed()) {
             reqRunningLock_->Lock();
         }
@@ -130,7 +131,7 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 void TelRilHandler::ReduceVectorAndCount(int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
-    auto iter = std::find(reqSerialVector_.begin(), reqSerialVector_.end(), serialId);
+    auto iter = reqSerialVector_.find(serialId);
     if (iter != reqSerialVector_.end()) {
         reqSerialVector_.erase(iter);
         reqRunningLockCount_--;
