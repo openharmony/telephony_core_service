@@ -60,8 +60,7 @@ std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR
 
 std::string VCardUtils::EncodeBase64(const std::string &input)
 {
-    std::vector<unsigned char> tempInput(input.begin(), input.end());
-    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
+    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::EncodeNoCopy(input);
     if (encodedDataString == nullptr) {
         return "";
     }
@@ -200,15 +199,9 @@ std::string VCardUtils::CreateFileName()
 
 void VCardUtils::SaveFile(const std::string &fileStr, const std::string &path)
 {
-    std::ofstream file(path, std::ios::trunc);
+    std::ofstream file(path, std::ios::trunc | std::ios::binary);
     if (file.is_open()) {
-        std::stringstream ss(fileStr);
-        std::string line;
-
-        while (std::getline(ss, line)) {
-            file << line << std::endl;
-        }
-        file.close();
+        file.write(fileStr.data(), fileStr.size());
     }
 }
 
@@ -552,6 +545,17 @@ bool VCardUtils::IsContainsInvisibleChar(const std::string& value)
 {
     std::regex regexPattern("([\\x00-\\x1F]|\\x7F|[\\u0000-\\u001F]|\\u007F)");
     return std::regex_search(value, regexPattern);
+}
+
+size_t VCardUtils::GetOStreamSize(const std::ostringstream &oss)
+{
+    std::streambuf *buf = oss.rdbuf();
+    const std::streampos beg = buf->pubseekoff(0, std::ios_base::beg, std::ios_base::out);
+    const std::streampos end = buf->pubseekoff(0, std::ios_base::end, std::ios_base::out);
+    if (beg == -1 || end == -1) {
+        return oss.str().size();
+    }
+    return static_cast<size_t>(end - beg);
 }
 
 } // namespace Telephony

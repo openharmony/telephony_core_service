@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace OHOS {
 namespace Telephony {
@@ -60,6 +61,7 @@ public:
     static void HandleTypeAndLabel(int32_t &type, std::string &label, std::string number, std::string typeStringOrg);
     static bool IsContainsInvisibleChar(const std::string& value);
     static bool IsChineseString(const std::string& value);
+    static size_t GetOStreamSize(const std::ostringstream &oss);
 };
 } // namespace Telephony
 } // namespace OHOS
