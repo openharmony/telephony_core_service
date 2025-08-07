@@ -40,7 +40,7 @@ public:
         const std::string &prefix, const std::string &suffix);
     int32_t ConstructPhoneticNameFields(std::shared_ptr<VCardNameData> nameData);
     int32_t AddPhoneticName(const std::string &phoneticType, const std::string &phoneticName);
-    void DealNoEmptyFimilyOrGivenName(const std::string &familyName, const std::string &givenName,
+    void DealNoEmptyFamilyOrGivenName(const std::string &familyName, const std::string &givenName,
         const std::string &middleName, const std::string &prefix, const std::string &suffix,
         const std::string &displayName);
     void AddCharsetOrQuotedPrintable(bool needAddCharset, bool needAddQuotedPrintable);
@@ -62,7 +62,7 @@ public:
         bool needCharset, bool needQuotedPrintable);
     void AddParamType(const std::string &paramType);
     void AddParamTypes(std::vector<std::string> types);
-    void AddParamType(std::stringstream &result, const std::string &paramType);
+    void AddParamType(std::ostringstream &result, const std::string &paramType);
     std::string FormatFullName(
         const std::string &givenName, const std::string &middleName, const std::string &familyName);
     void AddLineWithCharsetAndQP(const std::string &type, std::vector<std::string> valueList);
@@ -70,7 +70,7 @@ public:
     void AddPhotoLine(const std::string &encodedValue, const std::string &photoType);
     void AddEmailLine(
         int32_t emailType, const std::string &labelName, const std::string &email, const std::string &displayName);
-    void ConstructPostalLine(std::shared_ptr<VCardPostalData> postalData, std::stringstream &postalLine,
+    void ConstructPostalLine(std::shared_ptr<VCardPostalData> postalData, std::ostringstream &postalLine,
         bool &needCharset, bool &needAddQuotedPrintable);
     void AddPostalLine(std::shared_ptr<VCardPostalData> postalData, int32_t postalType, const std::string &labelName);
     std::string ToString();
@@ -96,7 +96,7 @@ private:
     size_t headLength_;
     int32_t cardType_;
     std::string charset_;
-    std::stringstream result_;
+    std::ostringstream result_;
     std::string charsetParam_;
     std::shared_ptr<PhoneNumberEncodedCallback> phoneNumberEncodedCallback_;
     bool isV30OrV40_;

@@ -23,7 +23,8 @@ constexpr unsigned int MAX_BASE64_BUF_PADDING_SIZE = 2;
 std::shared_ptr<std::string> Base64::Encode(const std::vector<unsigned char> &input)
 {
     auto size = input.size();
-    size_t bufLen = size / 3 * 4 + (size % 3 == 0 ? 0 : 4) + 1;
+    size_t bufLen = BASE64_ENCODED_UNIT * ((size + BASE64_INPUT_UNIT_PAD) / BASE64_INPUT_UNIT) +
+        BASE64_OUTPUT_PADDING;
     std::vector<unsigned char> outBuffer(bufLen, 0);
     auto outLen = EVP_EncodeBlock(outBuffer.data(), input.data(), size);
     if (outLen < 0) {
@@ -32,10 +33,28 @@ std::shared_ptr<std::string> Base64::Encode(const std::vector<unsigned char> &in
     outBuffer.resize(outLen);
     return std::make_shared<std::string>(outBuffer.begin(), outBuffer.end());
 }
+
+std::shared_ptr<std::string> Base64::EncodeNoCopy(const std::string &input)
+{
+    size_t inputSize = input.size();
+    size_t encodeSize = BASE64_ENCODED_UNIT * ((inputSize + BASE64_INPUT_UNIT_PAD) / BASE64_INPUT_UNIT) +
+        BASE64_OUTPUT_PADDING;
+    auto outStr = std::make_shared<std::string>(encodeSize, '\0');
+    auto inputPtr = reinterpret_cast<const unsigned char*>(input.data());
+    auto outStrPtr = reinterpret_cast<unsigned char*>(outStr->data());
+
+    int actualSize = EVP_EncodeBlock(outStrPtr, inputPtr, static_cast<int>(inputSize));
+    if (actualSize < 0) {
+        return nullptr;
+    }
+    outStr->resize(actualSize);
+    return outStr;
+}
+
 std::shared_ptr<std::vector<unsigned char>> Base64::Decode(const std::string &input)
 {
     auto size = input.size();
-    size_t bufLen = size / 4 * 3;
+    size_t bufLen = size / BASE64_ENCODED_UNIT * BASE64_INPUT_UNIT;
     auto outBuffer = std::make_shared<std::vector<unsigned char>>(bufLen, 0);
     auto outLen = EVP_DecodeBlock(reinterpret_cast<unsigned char *>(outBuffer->data()),
                                   reinterpret_cast<const unsigned char *>(input.c_str()), size);

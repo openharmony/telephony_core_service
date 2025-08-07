@@ -146,6 +146,9 @@ constexpr const char *VCARD_EXPORT_FILE_PATH = "/data/storage/el4/base/files/";
 constexpr const char *VCARD_TIME_FORMAT = "%Y%m%d_%H%M%S";
 constexpr const char *VCARD_FILE_EXTENSION = ".vcf";
 
+constexpr const char *VCARD_HEX_TABLE = "0123456789ABCDEF";
+constexpr const char VCARD_HALF_BYTE = 4;
+
 constexpr const int32_t VCARD_PHONE_NUM_FORMAT_JAPAN = 2;
 constexpr const int32_t VCARD_PHONE_NUM_FORMAT_NANP = 1;
 constexpr const int32_t SIZE_ZERO = 0;

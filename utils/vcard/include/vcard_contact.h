@@ -58,6 +58,7 @@ public:
     int32_t BuildContactData(int32_t rawId, std::vector<DataShare::DataShareValuesBucket> &contactDataValues);
     void BuildRawContactDataDisplayName(DataShare::DataShareValuesBucket &rawContactDataValue);
     int32_t BuildContact(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
+    int32_t BuildOneData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
     void Init();
     std::shared_ptr<VCardNameData> GetNameData();
     std::vector<std::shared_ptr<VCardNameData>> GetNames();
@@ -86,7 +87,6 @@ private:
     template<typename T>
     void BuildData(
         std::shared_ptr<DataShare::DataShareResultSet> resultSet, std::vector<std::shared_ptr<T>> &contactDatas);
-    int32_t BuildOneData(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
     int32_t BuildOtherData(int32_t typeId, std::shared_ptr<DataShare::DataShareResultSet> resultSet);
     void AddDatas(std::string name, std::string rawValue, std::string byte, std::vector<std::string> values,
         std::string propValue, std::vector<std::string> groups,
