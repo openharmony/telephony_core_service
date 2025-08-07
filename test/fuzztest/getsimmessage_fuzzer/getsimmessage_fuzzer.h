@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SIMMANAGERFIVE_FUZZER_H
-#define SIMMANAGERFIVE_FUZZER_H
+#ifndef GETSIMMESSAGE_FUZZER_H
+#define GETSIMMESSAGE_FUZZER_H
  
-#define FUZZ_PROJECT_NAME "simmanagerfive_fuzzer"
+#define FUZZ_PROJECT_NAME "getsimmessage_fuzzer"
  
-#endif // SIMMANAGERFIVE_FUZZER_H
+#endif // GETSIMMESSAGE_FUZZER_H

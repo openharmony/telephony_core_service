@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
  
-#include "simmanagerfour_fuzzer.h"
+#include "simoperation_fuzzer.h"
  
 #include <cstddef>
 #include <cstdint>
@@ -50,7 +50,7 @@ static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
     return *reinterpret_cast<const int32_t*>(base + index * typeSize);
 }
  
-void SimManagerFuncFour(const uint8_t *data, size_t size)
+void SimOperationFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -99,7 +99,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    SimManagerFuncFour(data, size);
+    SimOperationFunc(data, size);
     auto telRilManager = std::static_pointer_cast<TelRilManager>(
          DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
     if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
