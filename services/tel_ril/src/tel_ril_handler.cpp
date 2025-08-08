@@ -32,7 +32,7 @@ void TelRilHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         id, static_cast<int>(serial), static_cast<int>(reqLockSerialNum_), static_cast<int>(ackLockSerialNum_));
     switch (id) {
         case RUNNING_LOCK_TIMEOUT_EVENT_ID:
-            if (serial == reqLockSerialNum_ && reqRunningLockCount_ != 0) {
+            if (serial == reqLockSerialNum_) {
                 TELEPHONY_LOGI("Running lock timeout, id:%{public}d, serial:%{public}d, reqLockSerialNum_:%{public}d",
                                id, static_cast<int>(serial), static_cast<int>(reqLockSerialNum_));
                 ReleaseRunningLock(NORMAL_RUNNING_LOCK);
@@ -67,7 +67,6 @@ void TelRilHandler::OnInit(void)
             "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
 #endif
-    reqRunningLockCount_ = 0;
     reqLockSerialNum_ = 0;
     ackLockSerialNum_ = 0;
 }
@@ -86,11 +85,10 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
         auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
         reqRunningLock_ = powerMgrClient.CreateRunningLock(
             "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
-        reqRunningLockCount_ = 0;
+        reqSerialVector_.clear();
         reqLockSerialNum_ = 0;
     }
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
-        reqRunningLockCount_++;
         reqLockSerialNum_++;
         reqSerialVector_.push_back(reqLockSerialNum_);
         if (!reqRunningLock_->IsUsed()) {
@@ -113,12 +111,11 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
-    TELEPHONY_LOGD("ReduceRunningLock, reqRunningLockCount_:%{public}d", static_cast<int>(reqRunningLockCount_));
+    TELEPHONY_LOGD("ReduceRunningLock, reqRunningCountSize:%{public}d", static_cast<int>(reqSerialVector_.size()));
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
-        if (reqRunningLockCount_ > 1) {
-            ReduceVectorAndCount(serialId);
+        if (reqSerialVector_.size() > 1) {
+            ReduceReqCount(serialId);
         } else {
-            reqRunningLockCount_ = 0;
             reqSerialVector_.clear();
             TELEPHONY_LOGD("ReduceRunningLock, UnLock");
             ReleaseRunningLockDelay(lockType);
@@ -129,13 +126,12 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 #endif
 }
 
-void TelRilHandler::ReduceVectorAndCount(int32_t serialId)
+void TelRilHandler::ReduceReqCount(int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     auto iter = reqSerialVector_.find(serialId);
     if (iter != reqSerialVector_.end()) {
         reqSerialVector_.erase(iter);
-        reqRunningLockCount_--;
     }
 #endif
 }
@@ -150,7 +146,6 @@ void TelRilHandler::ReleaseRunningLock(int32_t lockType)
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGD("ReleaseRunningLock, lockType:%{public}d", lockType);
     if (lockType == NORMAL_RUNNING_LOCK) {
-        reqRunningLockCount_ = 0;
         reqSerialVector_.clear();
         ReleaseRunningLockDelay(lockType);
     } else if (lockType == ACK_RUNNING_LOCK) {
