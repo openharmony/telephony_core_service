@@ -61,7 +61,7 @@ private:
 
 private:
     void ReleaseRunningLockDelay(int32_t lockType);
-    void ReduceVectorAndCount(int32_t serialId);
+    void ReduceReqRLockCount(int32_t serialId);
 };
 } // namespace Telephony
 } // namespace OHOS
