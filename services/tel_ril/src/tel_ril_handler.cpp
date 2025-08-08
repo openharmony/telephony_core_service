@@ -129,7 +129,7 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 void TelRilHandler::ReduceReqRLockCount(int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
-    auto iter = std::find(reqSerialSet_.begin(), reqSerialSet_.end(), serialId);
+    auto iter = reqSerialSet_.find(serialId);
     if (iter != reqSerialSet_.end()) {
         reqSerialSet_.erase(iter);
     }
