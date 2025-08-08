@@ -31,7 +31,7 @@ namespace OHOS {
 namespace Telephony {
 OperatorFileParser::~OperatorFileParser() {}
 
-bool OperatorFileParser::WriteOperatorConfigJson(std::string filename, const cJSON *root)
+bool OperatorFileParser::WriteOperatorConfigJson(const char *filePath, const cJSON *root)
 {
     if (root == nullptr) {
         TELEPHONY_LOGE("json is invalid");
@@ -44,11 +44,12 @@ bool OperatorFileParser::WriteOperatorConfigJson(std::string filename, const cJS
         }
     }
     FILE *file = nullptr;
-    file = fopen(GetOperatorConfigFilePath(filename).c_str(), "w");
+    file = fopen(filePath, "w");
     if (file == nullptr) {
         printf("OpenFileFailed");
         return false;
     }
+    chmod(filePath, S_IRUSR | S_IWUSR);
     char *cjValue = cJSON_Print(root);
     if (cjValue == nullptr) {
         printf("ParseJsonFailed");
