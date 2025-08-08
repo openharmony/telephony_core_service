@@ -114,7 +114,7 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
     TELEPHONY_LOGD("ReduceRunningLock, reqRunningCountSize:%{public}d", static_cast<int>(reqSerialVector_.size()));
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         if (reqSerialVector_.size() > 1) {
-            ReduceReqCount(serialId);
+            ReduceReqRLockCount(serialId);
         } else {
             reqSerialVector_.clear();
             TELEPHONY_LOGD("ReduceRunningLock, UnLock");
@@ -126,7 +126,7 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 #endif
 }
 
-void TelRilHandler::ReduceReqCount(int32_t serialId)
+void TelRilHandler::ReduceReqRLockCount(int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     auto iter = reqSerialVector_.find(serialId);
