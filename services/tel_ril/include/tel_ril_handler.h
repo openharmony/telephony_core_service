@@ -54,7 +54,6 @@ private:
     std::shared_ptr<PowerMgr::RunningLock> reqRunningLock_;
     std::shared_ptr<PowerMgr::RunningLock> ackRunningLock_;
 #endif
-    std::atomic_uint reqRunningLockCount_;
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
     std::mutex mutexRunningLock_;
