@@ -143,7 +143,6 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
