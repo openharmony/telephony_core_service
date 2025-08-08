@@ -158,7 +158,8 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
     }
     isLoadingConfig_ = true;
     TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d, opkey = %{public}s", slotId, opkey.data());
-    cJSON *root = nullptr;
+    std::string filePath = parser_.GetOperatorConfigFilePath(filename);
+    if (parser_.ParseOperatorConfigFromFile(poc, filePath, root)) {
     if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu, slotId = %{public}d",
             poc.configValue.size(), slotId);
@@ -172,7 +173,7 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
     root = cJSON_CreateObject();
     if (parser_.ParseFromCustomSystem(slotId, poc, root)) {
         TELEPHONY_LOGI("load from custom system success, slotId = %{public}d", slotId);
-        parser_.WriteOperatorConfigJson(filename, root);
+        parser_.WriteOperatorConfigJson(filePath.c_str(), root);
         if (poc.configValue.size() > 0) {
             UpdateCurrentOpc(slotId, poc);
             isLoadingConfig_ = false;
