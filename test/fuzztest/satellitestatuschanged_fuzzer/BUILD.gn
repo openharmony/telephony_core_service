@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,11 +18,11 @@ import("//build/ohos.gni")
 import("//build/test.gni")
  
 ##############################fuzztest##########################################
-ohos_fuzztest("SatelliteCoreTwoFuzzTest") {
+ohos_fuzztest("SatelliteStatusChangedFuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
-      "$SUBSYSTEM_DIR/core_service/test/fuzztest/satellitecoretwo_fuzzer"
+      "$SUBSYSTEM_DIR/core_service/test/fuzztest/satellitestatuschanged_fuzzer"
  
   include_dirs = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/include",
@@ -70,7 +70,7 @@ ohos_fuzztest("SatelliteCoreTwoFuzzTest") {
     "samgr:samgr_proxy",
   ]
   defines = [
-    "TELEPHONY_LOG_TAG = \"SatelliteCoreTwoFuzzTest\"",
+    "TELEPHONY_LOG_TAG = \"SatelliteStatusChangedFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
  
@@ -94,7 +94,7 @@ ohos_fuzztest("SatelliteCoreTwoFuzzTest") {
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
-    "satellitecoretwo_fuzzer.cpp",
+    "satellitestatuschanged_fuzzer.cpp",
   ]
 }
  
@@ -104,7 +104,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":SatelliteCoreTwoFuzzTest",
+    ":SatelliteStatusChangedFuzzTest",
   ]
 }
 ###############################################################################
