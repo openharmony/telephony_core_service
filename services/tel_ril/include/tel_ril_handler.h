@@ -57,7 +57,7 @@ private:
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
     std::mutex mutexRunningLock_;
-    std::set<int32_t> reqSerialSet_ {};
+    std::set<int32_t> reqSerialSet_;
 
 private:
     void ReleaseRunningLockDelay(int32_t lockType);
