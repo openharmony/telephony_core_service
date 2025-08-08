@@ -32,11 +32,12 @@ void TelRilHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         id, static_cast<int>(serial), static_cast<int>(reqLockSerialNum_), static_cast<int>(ackLockSerialNum_));
     switch (id) {
         case RUNNING_LOCK_TIMEOUT_EVENT_ID:
-            ReduceRunningLock(NORMAL_RUNNING_LOCK, serial);
             if (serial == reqLockSerialNum_ && reqRunningLockCount_ != 0) {
                 TELEPHONY_LOGI("Running lock timeout, id:%{public}d, serial:%{public}d, reqLockSerialNum_:%{public}d",
                                id, static_cast<int>(serial), static_cast<int>(reqLockSerialNum_));
                 ReleaseRunningLock(NORMAL_RUNNING_LOCK);
+            } else {
+                ReduceRunningLock(NORMAL_RUNNING_LOCK, serial);
             }
             break;
         case ACK_RUNNING_LOCK_TIMEOUT_EVENT_ID:
@@ -90,7 +91,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
     }
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         reqRunningLockCount_++;
-        reqLockSerialNum_++；
+        reqLockSerialNum_++;
         reqSerialVector_.push_back(reqLockSerialNum_);
         if (!reqRunningLock_->IsUsed()) {
             reqRunningLock_->Lock();
