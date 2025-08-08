@@ -67,6 +67,7 @@ void TelRilHandler::OnInit(void)
             "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
 #endif
+    reqSerialSet_.clear(); 
     reqLockSerialNum_ = 0;
     ackLockSerialNum_ = 0;
 }
