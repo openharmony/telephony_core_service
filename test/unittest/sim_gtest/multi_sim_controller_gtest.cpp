@@ -111,6 +111,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateOpKeyInfo_001, Fun
     multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
     multiSimController->UpdateOpKeyInfo();
     EXPECT_TRUE(ret);
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_EQ(multiSimController->UpdateOpKeyInfo(), TELEPHONY_ERROR);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_001, Function | MediumTest | Level1)

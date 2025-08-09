@@ -270,7 +270,7 @@ std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateOpKeyHel
         TELEPHONY_LOGE("get CreateOpKeyHelper Failed.");
         return nullptr;
     }
-    return helper->CreateOpKeyHelper();
+    return helper->CreateOpKeyHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);
 }
 
 std::shared_ptr<DataShare::DataShareHelper> OperatorConfigLoader::CreateSimHelper() const

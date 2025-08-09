@@ -63,7 +63,7 @@ public:
 private:
     std::shared_ptr<TelephonyDataHelper> mTelephonyDatahelper = DelayedSingleton<TelephonyDataHelper>::GetInstance();
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
-    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
+    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper(int waitTime);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const int waitTime);
     int Insert(
         std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataShareValuesBucket &values);
