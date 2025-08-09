@@ -15,6 +15,7 @@
 
 #ifndef TEL_RIL_HANDLER_H
 #define TEL_RIL_HANDLER_H
+#include <set>
 
 #include "event_handler.h"
 #include "event_runner.h"
@@ -34,7 +35,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void OnInit(void);
     void ApplyRunningLock(int32_t lockType);
-    void ReduceRunningLock(int32_t lockType);
+    void ReduceRunningLock(int32_t lockType, int32_t serialId);
     void ReleaseRunningLock(int32_t lockType);
 
 public:
@@ -54,13 +55,14 @@ private:
     std::shared_ptr<PowerMgr::RunningLock> reqRunningLock_;
     std::shared_ptr<PowerMgr::RunningLock> ackRunningLock_;
 #endif
-    std::atomic_uint reqRunningLockCount_;
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
     std::mutex mutexRunningLock_;
+    std::set<int32_t> reqSerialSet_;
 
 private:
     void ReleaseRunningLockDelay(int32_t lockType);
+    void ReduceReqRLockCount(int32_t serialId);
 };
 } // namespace Telephony
 } // namespace OHOS

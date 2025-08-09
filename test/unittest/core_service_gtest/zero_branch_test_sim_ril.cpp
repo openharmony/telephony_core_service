@@ -904,7 +904,7 @@ HWTEST_F(SimRilBranchTest, Telephony_tel_ril_manager_001, Function | MediumTest 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     telRilManager->DeInit();
-    telRilManager->ReduceRunningLock();
+    telRilManager->ReduceRunningLock(0);
     telRilManager->SendAckAndLock();
     int32_t slotFaild = -1;
     auto sms = telRilManager->GetTelRilSms(slotFaild);

@@ -928,7 +928,7 @@ int32_t TelRilCallback::CommonErrorResponse(const HDI::Ril::V1_1::RilRadioRespon
         TELEPHONY_LOGE("telRilManager_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    telRilManager_->ReduceRunningLock();
+    telRilManager_->ReduceRunningLock(responseInfo.serial);
     return TELEPHONY_ERR_SUCCESS;
 }
 
