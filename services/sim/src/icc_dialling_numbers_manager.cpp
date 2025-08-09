@@ -42,12 +42,7 @@ void IccDiallingNumbersManager::Init()
         TELEPHONY_LOGE("SimFileManager null pointer");
         return;
     }
-
     diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(simFileManager);
-    if (diallingNumbersCache_ == nullptr) {
-        TELEPHONY_LOGE("simFile create nullptr.");
-        return;
-    }
 
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
