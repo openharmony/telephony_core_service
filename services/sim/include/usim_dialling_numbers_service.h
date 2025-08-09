@@ -79,6 +79,7 @@ private:
     void ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumber2LoadDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void MergeDiallingNumbers(const std::vector<std::u16string> &number2s);
     std::u16string FetchAnrContent(const std::string &recordData);
     void FillDiallingNumbersRecords(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list);
 
