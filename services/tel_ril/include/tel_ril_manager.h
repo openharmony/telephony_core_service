@@ -315,7 +315,7 @@ public:
     std::shared_ptr<TelRilNetwork> GetTelRilNetwork(int32_t slotId);
     std::shared_ptr<TelRilModem> GetTelRilModem(int32_t slotId);
     void SendAckAndLock(void);
-    void ReduceRunningLock();
+    void ReduceRunningLock(int32_t serialId);
     void ReleaseRunningLock();
     int32_t GetTelRilSimSize();
     int32_t GetTelRilModemSize();

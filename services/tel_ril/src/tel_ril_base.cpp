@@ -77,7 +77,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const RadioResponse
     } else {
         telRilRequest = iter->second;
         if (handler_ != nullptr) {
-            handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+            handler_->ReduceRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK, serial);
         }
     }
     if (telRilRequest == nullptr) {
