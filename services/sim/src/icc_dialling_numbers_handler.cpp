@@ -20,6 +20,14 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
+constexpr int RECORD_LENGTH = 28;
+constexpr int LENGTH_RATE = 2;
+constexpr int INVALID_LENGTH = 49;
+constexpr int32_t PRE_BYTES_NUM = 14;
+constexpr int32_t MAX_NUMBER_SIZE_BYTES = 11;
+constexpr int32_t MAX_EXT_RECORD_LENGTH_BYTES = 13;
+constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
+constexpr int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
 std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
 std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
 static std::mutex requestLock_;
@@ -36,10 +44,6 @@ std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::CreateLoad
     std::lock_guard<std::mutex> lock(requestLock_);
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
         std::make_shared<DiallingNumberLoadRequest>(GetNextSerialId(), fileId, exId, indexNum, pin2Str, result);
-    if (loadRequest == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersHandler loadRequest is nullptr");
-        return nullptr;
-    }
     IccDiallingNumbersHandler::requestMap_.insert(std::make_pair(loadRequest->GetLoadId(), loadRequest));
     return loadRequest;
 }
@@ -228,7 +232,6 @@ void IccDiallingNumbersHandler::ProcessDiallingNumberAllLoadDone(
         if (loadRequest != nullptr) {
             loadRequest->SetException(fdError->exception);
         }
-        TELEPHONY_LOGE("ProcessDiallingNumberAllLoadDone error occured");
         return;
     }
 
@@ -387,11 +390,7 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         TELEPHONY_LOGE("fd is nullptr!");
         return false;
     }
-    std::unique_ptr<DiallingNumbersHandlerResult> data = make_unique<DiallingNumbersHandlerResult>(fd.get());
-    if (data == nullptr) {
-        TELEPHONY_LOGE("data is nullptr!");
-        return false;
-    }
+    std::unique_ptr<DiallingNumbersHandlerResult> data = std::make_unique<DiallingNumbersHandlerResult>(fd.get());
     data->result = loadRequest->GetResult();
     data->exception = loadRequest->GetException();
     if (owner == nullptr) {
@@ -400,7 +399,6 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
     }
     TelEventHandler::SendTelEvent(owner, id, data);
     ClearLoadRequest(loadId);
-    TELEPHONY_LOGI("IccDiallingNumbersHandler::SendBackResult send end");
     return true;
 }
 
@@ -504,7 +502,6 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, const std::string &recordData,
     const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest)
 {
-    TELEPHONY_LOGD("FetchDiallingNumberContent start");
     int recordLen = 0;
     std::shared_ptr<unsigned char> data = SIMUtils::HexStringConvertToBytes(recordData, recordLen);
     if (diallingNumber == nullptr || data == nullptr) {

@@ -245,14 +245,6 @@ private:
     void SendUpdateCommand(const std::shared_ptr<DiallingNumbersInfo> &diallingNumber, int length,
         const std::shared_ptr<DiallingNumberLoadRequest> &loadRequest, int loadId);
     void InitFuncMap();
-    const int RECORD_LENGTH = 28;
-    const int LENGTH_RATE = 2;
-    const int INVALID_LENGTH = 49;
-    const static int32_t PRE_BYTES_NUM = 14;
-    const static int32_t MAX_NUMBER_SIZE_BYTES = 11;
-    const static int32_t MAX_EXT_RECORD_LENGTH_BYTES = 13;
-    const static int32_t MAX_EXT_BCD_LENGTH = 10;
-    const static int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
 };
 } // namespace Telephony
 } // namespace OHOS

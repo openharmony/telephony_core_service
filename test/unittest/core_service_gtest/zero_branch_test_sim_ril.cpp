@@ -717,7 +717,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_004, Function | 
     auto usimDiallingNumbersService = std::make_shared<UsimDiallingNumbersService>();
     usimDiallingNumbersService->InitFuncMap();
     AppExecFwk::InnerEvent::Pointer event = usimDiallingNumbersService->CreateHandlerPointer(
-        MSG_USIM_USIM_ADN_LOAD_DONE, ELEMENTARY_FILE_PBR, 0, nullptr);
+        MSG_USIM_ADN_LOAD_DONE, ELEMENTARY_FILE_PBR, 0, nullptr);
     EXPECT_NE(event, nullptr);
 }
 

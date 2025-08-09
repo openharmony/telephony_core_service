@@ -42,12 +42,7 @@ void IccDiallingNumbersManager::Init()
         TELEPHONY_LOGE("SimFileManager null pointer");
         return;
     }
-
     diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(simFileManager);
-    if (diallingNumbersCache_ == nullptr) {
-        TELEPHONY_LOGE("simFile create nullptr.");
-        return;
-    }
 
     stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
 
@@ -268,7 +263,7 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
     if (hasQueryEventDone_) {
         ClearRecords();
-        int fileId = GetFileIdForType(type);
+        int fileId = ELEMENTARY_FILE_PBR;
         int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
         AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
         hasQueryEventDone_ = false;
@@ -344,12 +339,7 @@ std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInst
         TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
         return nullptr;
     }
-    std::shared_ptr<IccDiallingNumbersManager> manager = std::make_shared<IccDiallingNumbersManager>(simFile, simState);
-    if (manager == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::Init manager create nullptr.");
-        return nullptr;
-    }
-    return manager;
+    return std::make_shared<IccDiallingNumbersManager>(simFile, simState);
 }
 
 bool IccDiallingNumbersManager::HasSimCard()
