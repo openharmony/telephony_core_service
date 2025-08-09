@@ -38,7 +38,8 @@ public:
     static constexpr const char *PDP_DB_URI =
         "datashare:///com.ohos.telephonydataability/entry/net/pdp_profile?Proxy=true";
     static constexpr const char *PDP_URI = "datashare:///com.ohos.pdpprofileability";
-    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper();
+    static constexpr int DB_CONNECT_MAX_WAIT_TIME = 10;
+    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper(int waitTime);
     std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper();
     std::shared_ptr<DataShare::DataShareHelper> CreatePdpHelper();
     std::shared_ptr<DataShare::DataShareHelper> CreateSimHelper(const int waitTime);

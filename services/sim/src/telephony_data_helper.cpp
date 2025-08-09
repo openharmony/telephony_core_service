@@ -45,9 +45,9 @@ std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateDat
     return result;
 }
 
-std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateOpKeyHelper()
+std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateOpKeyHelper(int waitTime)
 {
-    return CreateDataHelper(OPKEY_URI, "");
+    return CreateDataHelper(OPKEY_URI, "", waitTime);
 }
 
 std::shared_ptr<OHOS::DataShare::DataShareHelper> TelephonyDataHelper::CreateSimHelper()
