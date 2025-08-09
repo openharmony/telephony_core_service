@@ -67,7 +67,7 @@ void TelRilHandler::OnInit(void)
             "telRilRequestRunningLock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
 #endif
-    reqSerialSet_.clear(); 
+    reqSerialSet_.clear();
     reqLockSerialNum_ = 0;
     ackLockSerialNum_ = 0;
 }
@@ -91,7 +91,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
     }
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         reqLockSerialNum_++;
-        reqSerialSet_.push_back(reqLockSerialNum_);
+        reqSerialSet_.insert(reqLockSerialNum_);
         if (!reqRunningLock_->IsUsed()) {
             reqRunningLock_->Lock();
         }
