@@ -28,8 +28,8 @@ namespace OHOS {
 namespace Telephony {
 enum UsimMessage {
     MSG_USIM_PBR_LOAD_DONE = 1,
-    MSG_USIM_USIM_ADN_LOAD_DONE = 2,
-    MSG_USIM_USIM_ANR_LOAD_DONE = 3
+    MSG_USIM_ADN_LOAD_DONE = 2,
+    MSG_USIM_ANR_LOAD_DONE = 3
 };
 
 struct UsimDiallingNumberFile {
@@ -58,7 +58,7 @@ protected:
     bool pbrFileLoaded_ = true;
     std::vector<std::shared_ptr<UsimDiallingNumberFile>> pbrFiles_;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersFiles_;
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> tmpDiallingNumbers_;
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersFromAdn_;
     std::map<int, int> efIdOfSfi_;
     uint pbrIndex_ = 0;
     void ReloadAllFiles();
