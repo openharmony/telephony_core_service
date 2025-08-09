@@ -115,7 +115,7 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
         EXPECT_TRUE(true);
         return false;
     }
-    ofp.WriteOperatorConfigJson(filename, root);
+    ofp.WriteOperatorConfigJson(filename.c_str(), root);
     cJSON_Delete(root);
     cJSON *ret = nullptr;
     ofp.ParseOperatorConfigFromFile(poc, filename, ret);

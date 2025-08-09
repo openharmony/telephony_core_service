@@ -143,7 +143,6 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
 {
     auto simFileManager = simFileManager_.lock();
     if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("simFileManager is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string iccid = Str16ToStr8(simFileManager->GetSimIccId());
@@ -159,7 +158,8 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
     isLoadingConfig_ = true;
     TELEPHONY_LOGI("LoadOperatorConfig slotId = %{public}d, opkey = %{public}s", slotId, opkey.data());
     cJSON *root = nullptr;
-    if (parser_.ParseOperatorConfigFromFile(poc, parser_.GetOperatorConfigFilePath(filename), root)) {
+    std::string filePath = parser_.GetOperatorConfigFilePath(filename);
+    if (parser_.ParseOperatorConfigFromFile(poc, filePath, root)) {
         TELEPHONY_LOGI("load from file success opc size %{public}zu, slotId = %{public}d",
             poc.configValue.size(), slotId);
         if (poc.configValue.size() > 0) {
@@ -172,7 +172,7 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
     root = cJSON_CreateObject();
     if (parser_.ParseFromCustomSystem(slotId, poc, root)) {
         TELEPHONY_LOGI("load from custom system success, slotId = %{public}d", slotId);
-        parser_.WriteOperatorConfigJson(filename, root);
+        parser_.WriteOperatorConfigJson(filePath.c_str(), root);
         if (poc.configValue.size() > 0) {
             UpdateCurrentOpc(slotId, poc);
             isLoadingConfig_ = false;
