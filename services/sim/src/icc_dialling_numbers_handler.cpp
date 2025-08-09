@@ -391,10 +391,6 @@ bool IccDiallingNumbersHandler::SendBackResult(int loadId)
         return false;
     }
     std::unique_ptr<DiallingNumbersHandlerResult> data = std::make_unique<DiallingNumbersHandlerResult>(fd.get());
-    if (data == nullptr) {
-        TELEPHONY_LOGE("data is nullptr!");
-        return false;
-    }
     data->result = loadRequest->GetResult();
     data->exception = loadRequest->GetException();
     if (owner == nullptr) {
