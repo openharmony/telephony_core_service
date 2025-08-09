@@ -33,8 +33,8 @@ OperatorFileParser::~OperatorFileParser() {}
 
 bool OperatorFileParser::WriteOperatorConfigJson(const char *filePath, const cJSON *root)
 {
-    if (root == nullptr) {
-        TELEPHONY_LOGE("json is invalid");
+    if (root == nullptr || filePath == nullptr) {
+        TELEPHONY_LOGE("param invalid");
         return false;
     }
     if (!isCachePathExit()) {
