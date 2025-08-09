@@ -81,5 +81,190 @@ HWTEST_F(UsimDiallingNumbersServiceTest, LoadPbrFilesTest001, Function | MediumT
     EXPECT_NE(usimDiallingNumbersService->fileController_, nullptr);
 }
 
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    auto event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE);
+    std::shared_ptr<UsimDiallingNumberFile> file;
+    std::unique_ptr<DiallingNumbersHandlerResult> result;
+    std::shared_ptr<RadioResponseInfo> responseInfo;
+    
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE);
+    service->ProcessDiallingNumberLoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    service->pbrFiles_.push_back(file);
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE);
+    service->ProcessDiallingNumberLoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->pbrIndex_ == 1);
+}
+ 
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone002, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    auto event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE);
+    std::shared_ptr<UsimDiallingNumberFile> file;
+    std::unique_ptr<DiallingNumbersHandlerResult> result;
+    std::shared_ptr<RadioResponseInfo> responseInfo;
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    service->pbrFiles_.push_back(file);
+    result = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
+    responseInfo = std::make_shared<RadioResponseInfo>();
+    responseInfo->error = static_cast<Telephony::ErrType>(0);
+    result->exception = static_cast<std::shared_ptr<void>>(responseInfo);
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, result);
+    service->ProcessDiallingNumberLoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->pbrIndex_ == 1);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    service->pbrFiles_.push_back(file);
+    result = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
+    result->exception = nullptr;
+    result->result = nullptr;
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, result);
+    service->ProcessDiallingNumberLoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->pbrIndex_ == 1);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    service->pbrFiles_.push_back(file);
+    result = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
+    result->exception = nullptr;
+    result->result = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, result);
+    service->ProcessDiallingNumberLoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->pbrIndex_ == 1);
+}
+ 
+HWTEST_F(UsimDiallingNumbersServiceTest, FetchAnrContent001, Function | MediumTest | Level1)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    std::u16string result;
+ 
+    result = service->FetchAnrContent(""); // 码流为空
+    EXPECT_TRUE(result == u"");
+ 
+    result = service->FetchAnrContent("000"); // 16 进制码流长度为奇数
+    EXPECT_TRUE(result == u"");
+ 
+    std::string str = "000500";
+    str += "12345678901234567890"; // 不到 15 位
+    result = service->FetchAnrContent(str);
+    EXPECT_TRUE(result == u"");
+ 
+    str = "000500";
+    str += "123456789012345678901234"; // 刚好 15 位，号码不超长
+    result = service->FetchAnrContent(str);
+    EXPECT_TRUE(result == u"2143658709");
+ 
+    str = "000D00";
+    str += "12345678901234567890123456"; // 号码（0D: 13 * 2 = 26）超过 20 位，只截取 20 位
+    result = service->FetchAnrContent(str);
+    EXPECT_TRUE(result == u"21436587092143658709");
+}
+ 
+HWTEST_F(UsimDiallingNumbersServiceTest, LoadDiallingNumberFiles001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    std::shared_ptr<UsimDiallingNumberFile> file;
+    std::unique_ptr<DiallingNumbersHandlerResult> result;
+    std::shared_ptr<RadioResponseInfo> responseInfo;
+    bool ret;
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    ret = service->LoadDiallingNumber2Files(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_FALSE(ret);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    service->pbrFiles_.push_back(file);
+    ret = service->LoadDiallingNumber2Files(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_FALSE(ret);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    file->fileIds_.emplace(UsimDiallingNumbersService::TAG_SIM_USIM_ANR, nullptr);
+    service->pbrFiles_.push_back(file);
+    ret = service->LoadDiallingNumber2Files(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_FALSE(ret);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    file->fileIds_.emplace(UsimDiallingNumbersService::TAG_SIM_USIM_ANR, std::make_shared<TagData>(0, 0, 0, 0));
+    service->pbrFiles_.push_back(file);
+    ret = service->LoadDiallingNumber2Files(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_FALSE(ret);
+ 
+    service->pbrIndex_ = 0;
+    service->pbrFiles_.clear();
+    file = std::make_shared<UsimDiallingNumberFile>();
+    file->fileIds_.emplace(UsimDiallingNumbersService::TAG_SIM_USIM_ANR, std::make_shared<TagData>(0, 0, 0, 0));
+    service->pbrFiles_.push_back(file);
+    service->fileController_ = std::make_shared<UsimFileController>(0);
+    ret = service->LoadDiallingNumber2Files(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(ret);
+}
+ 
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumber2LoadDone001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    std::shared_ptr<MultiRecordResult> recordResult = nullptr;
+    std::u16string alphaTag = u"";
+    std::u16string number = u"12345";
+ 
+    service->ProcessDiallingNumber2LoadDone(event);
+ 
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE);
+    service->diallingNumbersFromAdn_.push_back(std::make_shared<DiallingNumbersInfo>(alphaTag, number));
+    service->ProcessDiallingNumber2LoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->diallingNumbersFromAdn_.empty());
+ 
+    recordResult = std::make_shared<MultiRecordResult>(nullptr);
+    recordResult->fileResults.push_back("000500123456789012345678901234");
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, recordResult);
+    service->diallingNumbersFromAdn_.push_back(std::make_shared<DiallingNumbersInfo>(alphaTag, number));
+    service->diallingNumbersFromAdn_.push_back(std::make_shared<DiallingNumbersInfo>(alphaTag, number));
+    service->ProcessDiallingNumber2LoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->diallingNumbersFromAdn_.empty());
+ 
+    recordResult = std::make_shared<MultiRecordResult>(nullptr);
+    recordResult->fileResults.push_back("000500123456789012345678901234");
+    recordResult->fileResults.push_back("");
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, recordResult);
+    service->diallingNumbersFromAdn_.push_back(std::make_shared<DiallingNumbersInfo>(alphaTag, number));
+    service->diallingNumbersFromAdn_.push_back(std::make_shared<DiallingNumbersInfo>(alphaTag, number));
+    service->ProcessDiallingNumber2LoadDone(event);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    EXPECT_TRUE(service->diallingNumbersFromAdn_.empty());
+}
+
 }
 }
