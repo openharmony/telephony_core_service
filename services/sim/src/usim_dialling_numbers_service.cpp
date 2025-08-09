@@ -175,7 +175,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
         for (size_t i = 0; i < dataList.size(); i++) {
             number2s.push_back(FetchAnrContent(dataList[i]));
         }
-        MergeDiallingNumbers(diallingNumbersFromAdn_, number2s);
+        MergeDiallingNumbers(number2s);
     }
     auto tmp = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
     tmp->swap(diallingNumbersFromAdn_);
