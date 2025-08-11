@@ -1030,7 +1030,7 @@ int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &ic
 {
     bool denied = false;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("permission denied!");
+        TELEPHONY_LOGW("permission denied!");
         denied = true;
     }
     if (simManager_ == nullptr) {

@@ -622,7 +622,7 @@ bool MultiSimController::UpdateIccAccountInfoList(
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (localCacheInfo.empty()) {
-        TELEPHONY_LOGE("failed by invalid data");
+        TELEPHONY_LOGW("failed by invalid data");
         return false;
     }
     if (accountInfoList.size() > 0) {
@@ -952,7 +952,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
 {
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
+        TELEPHONY_LOGW("slotId %{public}d is invalid", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
@@ -1619,7 +1619,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
 int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
     if (!UpdateIccAccountInfoList(activeIccAccountInfoList_, localCacheInfo_, true)) {
-        TELEPHONY_LOGE("refresh failed");
+        TELEPHONY_LOGW("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     iccAccountInfoList.clear();
