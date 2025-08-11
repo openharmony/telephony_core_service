@@ -61,7 +61,7 @@ IEsimServiceCallbackStub::IEsimServiceCallbackStub()
         [this](MessageParcel &data) { OnGetContractInfo(data); };
 }
 
-uint32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
+int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
     uint32_t code = static_cast<uint32_t>(requestId);
     auto itFunc = memberFuncMap_.find(code);
@@ -216,7 +216,7 @@ int IEsimServiceCallbackStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor check fail!");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
+    return OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
 }
 void IEsimServiceCallbackStub::OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode)
 {}
