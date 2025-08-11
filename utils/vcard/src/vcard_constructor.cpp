@@ -1006,7 +1006,6 @@ std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
             lineCount = 0;
         }
     }
-    
     return encoded;
 }
 
