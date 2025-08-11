@@ -3417,7 +3417,7 @@ std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
     builder->Asn1AddChildAsString(kTag, key);
     if (vTag == TAG_ESIM_OCTET_STRING_TYPE) {
         std::vector<uint8_t> valueVec = Asn1Utils::HexStrToBytes(value);
-        builder->Asn1AddChildAsBytes(kTag, valueVec, valueVec.size());
+        builder->Asn1AddChildAsBytes(vTag, valueVec, valueVec.size());
     } else {
         builder->Asn1AddChildAsString(vTag, value);
     }
