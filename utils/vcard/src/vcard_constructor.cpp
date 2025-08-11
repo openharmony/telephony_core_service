@@ -989,7 +989,8 @@ std::string VCardConstructor::DealCharacters(std::string value)
 std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
 {
     int32_t inputSize = static_cast<int32_t>(input.size());
-    int32_t maxEncodedLen = (inputSize * VALUE_LEN_THREE) + 2 * (inputSize * VALUE_LEN_THREE / ENCODEN_QUOTED_PRIN_MAX_LEN + VALUE_LEN_TWO);
+    int32_t maxEncodedLen = 
+        (inputSize * VALUE_LEN_THREE) + 2 * (inputSize * VALUE_LEN_THREE / ENCODEN_QUOTED_PRIN_MAX_LEN + VALUE_LEN_TWO);
     std::string encoded;
     encoded.reserve(maxEncodedLen);
 
