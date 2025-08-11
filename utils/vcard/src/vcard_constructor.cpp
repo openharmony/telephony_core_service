@@ -988,9 +988,8 @@ std::string VCardConstructor::DealCharacters(std::string value)
 
 std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
 {
-    size_t inputSize = input.size();
-    size_t maxLen = ENCODEN_QUOTED_PRIN_MAX_LEN;
-    size_t maxEncodedLen = (inputSize * VALUE_LEN_THREE) + 2 * (inputSize * VALUE_LEN_THREE / maxLen + VALUE_LEN_TWO);
+    int32_t inputSize = static_cast<int32_t>(input.size());
+    int32_t maxEncodedLen = (inputSize * VALUE_LEN_THREE) + 2 * (inputSize * VALUE_LEN_THREE / ENCODEN_QUOTED_PRIN_MAX_LEN + VALUE_LEN_TWO);
     std::string encoded;
     encoded.reserve(maxEncodedLen);
 
@@ -1001,7 +1000,7 @@ std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
         encoded.append(1, VCARD_HEX_TABLE[ch & 0xF]);
         lineCount += VALUE_LEN_THREE;
 
-        if (lineCount >= maxLen) {
+        if (lineCount >= ENCODEN_QUOTED_PRIN_MAX_LEN) {
             encoded.append("=\r\n");
             lineCount = 0;
         }
