@@ -212,7 +212,7 @@ private:
     bool ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event);
     std::shared_ptr<Asn1Node> GetKeyValueSequenceNode(
-        uint32_t kTag, std::string &key, uint32_t vTag, std::string &value);
+        uint32_t kTag, const std::string &key, uint32_t vTag, std::string &value);
     std::shared_ptr<Asn1Node> GetMapMetaDataNode();
         void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
     void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes);

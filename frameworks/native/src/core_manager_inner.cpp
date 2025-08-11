@@ -2696,7 +2696,7 @@ int32_t CoreManagerInner::NotifySimSlotsMapping(int32_t slotId)
 int32_t CoreManagerInner::GetEid(int32_t slotId, std::u16string &eId)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetEid esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetEid(slotId, eId);
@@ -2706,7 +2706,7 @@ int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId,
     GetEuiccProfileInfoListInnerResult &euiccProfileInfoList)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetEuiccProfileInfoList esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetEuiccProfileInfoList(slotId, euiccProfileInfoList);
@@ -2715,7 +2715,7 @@ int32_t CoreManagerInner::GetEuiccProfileInfoList(int32_t slotId,
 int32_t CoreManagerInner::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetEuiccInfo esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetEuiccInfo(slotId, eUiccInfo);
@@ -2725,7 +2725,7 @@ int32_t CoreManagerInner::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("DisableProfile esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
@@ -2734,7 +2734,7 @@ int32_t CoreManagerInner::DisableProfile(
 int32_t CoreManagerInner::GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetSmdsAddress esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetSmdsAddress(slotId, portIndex, smdsAddress);
@@ -2743,7 +2743,7 @@ int32_t CoreManagerInner::GetSmdsAddress(int32_t slotId, int32_t portIndex, std:
 int32_t CoreManagerInner::GetRulesAuthTable(int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetRulesAuthTable esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetRulesAuthTable(slotId, portIndex, eUiccRulesAuthTable);
@@ -2752,7 +2752,7 @@ int32_t CoreManagerInner::GetRulesAuthTable(int32_t slotId, int32_t portIndex, E
 int32_t CoreManagerInner::GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimInnerResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetEuiccChallenge esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetEuiccChallenge(slotId, portIndex, responseResult);
@@ -2761,7 +2761,7 @@ int32_t CoreManagerInner::GetEuiccChallenge(int32_t slotId, int32_t portIndex, R
 int32_t CoreManagerInner::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetDefaultSmdpAddress esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetDefaultSmdpAddress(slotId, defaultSmdpAddress);
@@ -2771,7 +2771,7 @@ int32_t CoreManagerInner::CancelSession(int32_t slotId, const std::u16string &tr
     CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("CancelSession esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->CancelSession(slotId, transactionId, cancelReason, responseResult);
@@ -2781,7 +2781,7 @@ int32_t CoreManagerInner::GetProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetProfile esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetProfile(slotId, portIndex, iccId, eUiccProfile);
@@ -2790,7 +2790,7 @@ int32_t CoreManagerInner::GetProfile(
 int32_t CoreManagerInner::ResetMemory(int32_t slotId, ResetOption resetOption, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("ResetMemory esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->ResetMemory(slotId, resetOption, enumResult);
@@ -2800,7 +2800,7 @@ int32_t CoreManagerInner::SetDefaultSmdpAddress(
     int32_t slotId, const std::u16string &defaultSmdpAddress, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("SetDefaultSmdpAddress esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->SetDefaultSmdpAddress(slotId, defaultSmdpAddress, enumResult);
@@ -2809,7 +2809,7 @@ int32_t CoreManagerInner::SetDefaultSmdpAddress(
 bool CoreManagerInner::IsSupported(int32_t slotId)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("IsSupported esimManager_ is null!");
         return false;
     }
     return esimManager_->IsSupported(slotId);
@@ -2819,7 +2819,7 @@ int32_t CoreManagerInner::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimInnerResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("SendApduData esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->SendApduData(slotId, aid, apduData, responseResult);
@@ -2829,7 +2829,7 @@ int32_t CoreManagerInner::PrepareDownload(
     int32_t slotId, const DownLoadConfigInfo &downLoadConfigInfo, ResponseEsimInnerResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("PrepareDownload esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->PrepareDownload(slotId, downLoadConfigInfo, responseResult);
@@ -2839,7 +2839,7 @@ int32_t CoreManagerInner::LoadBoundProfilePackage(int32_t slotId, int32_t portIn
     const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("LoadBoundProfilePackage esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->LoadBoundProfilePackage(slotId, portIndex, boundProfilePackage, responseResult);
@@ -2849,7 +2849,7 @@ int32_t CoreManagerInner::ListNotifications(
     int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("ListNotifications esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->ListNotifications(slotId, portIndex, events, notificationList);
@@ -2859,7 +2859,7 @@ int32_t CoreManagerInner::RetrieveNotificationList(
     int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("RetrieveNotificationList esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->RetrieveNotificationList(slotId, portIndex, events, notificationList);
@@ -2869,7 +2869,7 @@ int32_t CoreManagerInner::RetrieveNotification(
     int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("RetrieveNotification esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->RetrieveNotification(slotId, portIndex, seqNumber, notification);
@@ -2879,7 +2879,7 @@ int32_t CoreManagerInner::RemoveNotificationFromList(
     int32_t slotId, int32_t portIndex, int32_t seqNumber, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("RemoveNotificationFromList esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
@@ -2888,7 +2888,7 @@ int32_t CoreManagerInner::RemoveNotificationFromList(
 int32_t CoreManagerInner::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetEuiccInfo2 esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetEuiccInfo2(slotId, portIndex, euiccInfo2);
@@ -2898,7 +2898,7 @@ int32_t CoreManagerInner::AuthenticateServer(
     int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimInnerResult &responseResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("AuthenticateServer esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->AuthenticateServer(slotId, authenticateConfigInfo, responseResult);
@@ -2907,7 +2907,7 @@ int32_t CoreManagerInner::AuthenticateServer(
 int32_t CoreManagerInner::DeleteProfile(int32_t slotId, const std::u16string &iccId, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("DeleteProfile esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->DeleteProfile(slotId, iccId, enumResult);
@@ -2917,7 +2917,7 @@ int32_t CoreManagerInner::SwitchToProfile(int32_t slotId, int32_t portIndex, con
     bool forceDisableProfile, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("SwitchToProfile esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
@@ -2927,7 +2927,7 @@ int32_t CoreManagerInner::SetProfileNickname(
     int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, int32_t &enumResult)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("SetProfileNickname esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->SetProfileNickname(slotId, iccId, nickname, enumResult);
@@ -2937,7 +2937,7 @@ int32_t CoreManagerInner::GetContractInfo(
     int32_t slotId, GetContractInfoRequest &getContractInfoRequest, std::string &response)
 {
     if (esimManager_ == nullptr) {
-        TELEPHONY_LOGE("esimManager_ is null!");
+        TELEPHONY_LOGE("GetContractInfo esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->GetContractInfo(slotId, getContractInfoRequest, response);

@@ -28,9 +28,9 @@ namespace Telephony {
  * @brief Contract request data
  */
 struct ContractRequestData : public Parcelable {
-    std::u16string publicKey_ = u"";
-    std::u16string nonce_ = u"";
-    std::u16string pkid_ = u"";
+    std::u16string publicKey = u"";
+    std::u16string nonce = u"";
+    std::u16string pkid = u"";
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

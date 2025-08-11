@@ -61,9 +61,6 @@ public:
     virtual void OnGetSupportedPkids(const std::string &result, const int32_t errorCode);
     virtual void OnGetContractInfo(const std::string &result, const int32_t errorCode);
 private:
-    using EsimServiceCallbackFunc = std::function<void(MessageParcel &data)>;
-    std::map<uint32_t, EsimServiceCallbackFunc> memberFuncMap_;
-
     void OnGetEuiccInfo(MessageParcel &data);
     void OnGetEid(MessageParcel &data);
     void OnGetDownloadableProfileMetadata(MessageParcel &data);
@@ -80,6 +77,8 @@ private:
     void OnResetMemory(MessageParcel &data);
     void OnGetSupportedPkids(MessageParcel &data);
     void OnGetContractInfo(MessageParcel &data);
+    using EsimServiceCallbackFunc = std::function<void(MessageParcel &data)>;
+    std::map<uint32_t, EsimServiceCallbackFunc> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -37,6 +37,10 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char *KEY_IMEI = "kIMEI";
+static constexpr const char *KEY_IMEI2 = "kIMEI2";
+static constexpr const char *KEY_NONCE = "kNonce";
+static constexpr const char *KEY_TIMESTAMP = "kTimestamp";
 EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId,
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner) : AppExecFwk::EventHandler(eventRunner)
 {
@@ -45,6 +49,7 @@ EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId
     currentChannelId_ = 0;
     InitMemberFunc();
     InitChanneMemberFunc();
+    TELEPHONY_LOGI("esimFile init end");
 }
 
 AppExecFwk::InnerEvent::Pointer EsimFile::BuildCallerInfo(int eventId)
@@ -524,7 +529,6 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     }
     std::string responseHexStr = rawData.resultData;
     eUiccInfo_.response_ = Str8ToStr16(responseHexStr);
-    TELEPHONY_LOGI("obtain eUiccInfo_ len:%{public}lu", eUiccInfo_.response_.length());
     NotifyReady(euiccInfo1Mutex_, isEuiccInfo1Ready_, euiccInfo1Cv_);
     return true;
 }
@@ -3411,7 +3415,7 @@ void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable 
 }
 
 std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
-    uint32_t kTag, std::string &key, uint32_t vTag, std::string &value)
+    uint32_t kTag, const std::string &key, uint32_t vTag, std::string &value)
 {
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
     builder->Asn1AddChildAsString(kTag, key);
@@ -3431,29 +3435,25 @@ std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
 std::shared_ptr<Asn1Node> EsimFile::GetMapMetaDataNode()
 {
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return nullptr;
-    }
-    std::string keyIMEI = "kIMEI";
+    // add imei node
     std::string imeiStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei);
     std::shared_ptr<Asn1Node> imeiNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyIMEI, TAG_ESIM_TARGET_ADDR, imeiStr);
+        TAG_ESIM_TARGET_ADDR, KEY_IMEI, TAG_ESIM_TARGET_ADDR, imeiStr);
     builder->Asn1AddChild(imeiNode);
-    std::string keyIMEI2 = "kIMEI2";
+    // add imei2 node
     std::string imei2Str = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei2);
     std::shared_ptr<Asn1Node> imei2Node = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyIMEI2, TAG_ESIM_TARGET_ADDR, imei2Str);
+        TAG_ESIM_TARGET_ADDR, KEY_IMEI2, TAG_ESIM_TARGET_ADDR, imei2Str);
     builder->Asn1AddChild(imei2Node);
-    std::string keyNonce = "kNonce";
+    // add nonce node
     std::string nonceStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.nonce);
     std::shared_ptr<Asn1Node> nonceNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyNonce, TAG_ESIM_OCTET_STRING_TYPE, nonceStr);
+        TAG_ESIM_TARGET_ADDR, KEY_NONCE, TAG_ESIM_OCTET_STRING_TYPE, nonceStr);
     builder->Asn1AddChild(nonceNode);
-    std::string keyTimestamp = "kTimestamp";
+    // add timestamp node
     std::string timestampStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.timestamp);
     std::shared_ptr<Asn1Node> timestampNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyTimestamp, TAG_ESIM_TARGET_ADDR, timestampStr);
+        TAG_ESIM_TARGET_ADDR, KEY_TIMESTAMP, TAG_ESIM_TARGET_ADDR, timestampStr);
     builder->Asn1AddChild(timestampNode);
     return builder->Asn1Build();
 }
@@ -3464,10 +3464,6 @@ bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &res
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONTRACT_INFO);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return false;
-    }
     // euiccCiPkidToBeUsed
     std::string pkidStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.euiccCiPkidToBeUsed);
     std::vector<uint8_t> pkidVec = Asn1Utils::HexStrToBytes(pkidStr);
@@ -3498,12 +3494,6 @@ bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &res
 
 bool EsimFile::ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr");
-        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
-        return false;
-    }
-
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("receive message is nullptr");
