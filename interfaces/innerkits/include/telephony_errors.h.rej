@@ -1,9 +1,0 @@
-diff a/interfaces/innerkits/include/telephony_errors.h b/interfaces/innerkits/include/telephony_errors.h	(rejected hunks)
-@@ -86,6 +86,7 @@ enum {
-     TELEPHONY_ERR_DATABASE_READ_EMPTY,
-     TELEPHONY_ERR_POLICY_DISABLED,
-     TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS,
-+    TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM,
- };
- 
- // Error code for telephony call manager

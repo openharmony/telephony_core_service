@@ -397,21 +397,9 @@ ohos_unittest("esim_file_branch_test") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   external_deps = [
-    "ability_base:want",
-    "ability_base:zuri",
-    "ability_runtime:ability_manager",
-    "ability_runtime:data_ability_helper",
-    "ability_runtime:wantagent_innerkits",
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken_shared",
-    "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "config_policy:configpolicy_util",
     "core_service:libtel_vcard",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -419,14 +407,6 @@ ohos_unittest("esim_file_branch_test") {
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-    "netmanager_base:net_conn_manager_if",
-    "netmanager_ext:net_tether_manager_if",
-    "power_manager:powermgr_client",
-    "preferences:native_preferences",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",

@@ -252,6 +252,25 @@ HWTEST_F(EsimServiceClientBranchTest, AddProfile_0001, Function | MediumTest | L
     EXPECT_NE(result, false);
 }
 
+HWTEST_F(EsimServiceClientBranchTest, GetSupportedPkids_0001, Function | MediumTest | Level1)
+{
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetSupportedPkids(SLOT_ID, callback);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(EsimServiceClientBranchTest, GetContractInfo_0001, Function | MediumTest | Level1)
+{
+    ContractRequestData requestData;
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetContractInfo(SLOT_ID, requestData, callback);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
 HWTEST_F(EsimServiceClientBranchTest, RemoveDeathRecipient_0001, Function | MediumTest | Level1)
 {
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
