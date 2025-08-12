@@ -40,7 +40,7 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &cont
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
     : TelEventHandler("MultiSimMonitor"), controller_(controller), simStateManager_(simStateManager),
-      simFileManager_(simFileManager)
+      simFileManager_(simFileManager), initEsimDataRemainCount_(INIT_DATA_TIMES)
 {
     if (observerHandler_ == nullptr) {
         observerHandler_ = std::make_unique<ObserverHandler>();

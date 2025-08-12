@@ -17,7 +17,6 @@
 #include "telephony_data_helper.h"
 #include "telephony_log_wrapper.h"
 
-static constexpr const char *PDP_PROFILE_RDB_URI = "datashare:///com.ohos.pdpprofileability/net";
 static constexpr const char *PDP_PROFILE_RDB_INIT_URI =
     "datashare:///com.ohos.pdpprofileability/net/pdp_profile/init";
 static constexpr const char *SLOT_ID = "slotId";

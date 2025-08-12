@@ -907,7 +907,6 @@ int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, number, callback]() {
-        int32_t state = TELEPHONY_ERR_FAIL;
         MessageParcel dataTmp;
         auto simManager = wp.lock();
         int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
