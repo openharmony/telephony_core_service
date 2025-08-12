@@ -41,7 +41,10 @@ ohos_unittest("esim_service_client_branch_gtest") {
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
-  deps = [ "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api" ]
+  deps = [
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
 
   external_deps = [
     "ability_base:want",
@@ -61,7 +64,6 @@ ohos_unittest("esim_service_client_branch_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -124,6 +126,7 @@ ohos_unittest("tel_esim_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -145,7 +148,6 @@ ohos_unittest("tel_esim_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -211,6 +213,7 @@ ohos_unittest("esim_core_service_client_branch_test") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -232,7 +235,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -245,6 +247,11 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  deps = [
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",

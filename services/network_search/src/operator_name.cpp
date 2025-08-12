@@ -280,7 +280,6 @@ void OperatorName::NotifyGsmSpnChanged(
         TELEPHONY_EXT_WRAPPER.updateOperatorNameParamsExt_(slotId_, networkState, params);
     }
 
-    bool showPlmnOld = params.showPlmn;
     if (params.spn.empty() && !params.plmn.empty()) {
         params.showPlmn = true;
     }
