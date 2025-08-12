@@ -42,7 +42,6 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-const int32_t MAX_IPC_THREAD_NUM = 6;
 const int32_t MAX_FFRT_THREAD_NUM = 32;
 }
 const bool G_REGISTER_RESULT =
