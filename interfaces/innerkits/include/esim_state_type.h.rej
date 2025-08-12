@@ -1,0 +1,22 @@
+diff a/interfaces/innerkits/include/esim_state_type.h b/interfaces/innerkits/include/esim_state_type.h	(rejected hunks)
+@@ -24,9 +24,9 @@
+ namespace OHOS {
+ namespace Telephony {
+ /**
+- * @brief Result code.
++ * @brief Esim Result code.
+  */
+-enum class ResultCode {
++enum class EsimResultCode {
+     RESULT_SOLVABLE_ERRORS = -2,
+     RESULT_MUST_DISABLE_PROFILE = -1,
+     RESULT_OK = 0,
+@@ -251,7 +251,7 @@ struct ResponseEsimBppResult {
+ /**
+  * @brief  A profile installation result or a notification generated for profile operations.
+  */
+-enum class Event {
++enum class EsimEvent {
+     EVENT_DONOTHING = 0,
+     EVENT_INSTALL = 1,
+     EVENT_ENABLE = 1 << 1,

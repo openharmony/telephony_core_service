@@ -1,0 +1,23 @@
+diff a/services/core/include/core_service_stub.h b/services/core/include/core_service_stub.h	(rejected hunks)
+@@ -39,10 +39,7 @@ private:
+     void AddHandlerPdpProfileToMap();
+     void AddHandlerOpkeyVersionToMap();
+     void AddHandlerEmcRescueToMap();
+-
+-#ifdef CORE_SERVICE_SUPPORT_ESIM
+     void AddHandlerEsimToMap();
+-#endif
+     int32_t SetTimer(uint32_t code);
+     void CancelTimer(int32_t id);
+ 
+@@ -155,10 +152,7 @@ private:
+     int32_t OnStopEmcRescueService(MessageParcel &data, MessageParcel &reply);
+     int32_t OnRegisterEmcRescueNetInfoCallback(MessageParcel &data, MessageParcel &reply);
+     int32_t OnUnRegisterEmcRescueNetInfoCallback(MessageParcel &data, MessageParcel &reply);
+-
+-#ifdef CORE_SERVICE_SUPPORT_ESIM
+     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
+-#endif
+ 
+ private:
+     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

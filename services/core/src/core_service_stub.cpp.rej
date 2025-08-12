@@ -1,0 +1,40 @@
+diff a/services/core/src/core_service_stub.cpp b/services/core/src/core_service_stub.cpp	(rejected hunks)
+@@ -42,9 +42,7 @@ CoreServiceStub::CoreServiceStub()
+     AddHandlerPdpProfileToMap();
+     AddHandlerOpkeyVersionToMap();
+     AddHandlerEmcRescueToMap();
+-#ifdef CORE_SERVICE_SUPPORT_ESIM
+     AddHandlerEsimToMap();
+-#endif
+ }
+ 
+ void CoreServiceStub::AddHandlerNetWorkToMap()
+@@ -299,13 +297,11 @@ void CoreServiceStub::AddHandlerEmcRescueToMap()
+         [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterEmcRescueNetInfoCallback(data, reply); };
+ }
+ 
+-#ifdef CORE_SERVICE_SUPPORT_ESIM
+ void CoreServiceStub::AddHandlerEsimToMap()
+ {
+     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
+         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
+ }
+-#endif
+ 
+ int32_t CoreServiceStub::OnRemoteRequest(
+     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+@@ -2008,7 +2004,6 @@ int32_t CoreServiceStub::OnStopEmcRescueService(MessageParcel &data, MessageParc
+     return NO_ERROR;
+ }
+ 
+-#ifdef CORE_SERVICE_SUPPORT_ESIM
+ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &reply)
+ {
+     EsimApduData apduData;
+@@ -2037,6 +2032,5 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
+     }
+     return NO_ERROR;
+ }
+-#endif
+ } // namespace Telephony
+ } // namespace OHOS

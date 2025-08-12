@@ -1,0 +1,92 @@
+diff a/services/sim/include/esim_file.h b/services/sim/include/esim_file.h	(rejected hunks)
+@@ -28,13 +28,15 @@
+ #include "esim_state_type.h"
+ #include "euicc_info_parcel.h"
+ #include "esim_service.h"
++#include "event_handler.h"
+ #include "get_downloadable_profiles_result_parcel.h"
++#include "i_tel_ril_manager.h"
+ #include "profile_info_list_parcel.h"
+ #include "profile_metadata_result_parcel.h"
+-#include "icc_file.h"
+ #include "request_apdu_build.h"
+ #include "reset_response.h"
+ #include "response_esim_result.h"
++#include "sim_data_type.h"
+ #include "tel_ril_sim_parcel.h"
+ 
+ namespace OHOS {
+@@ -64,20 +66,11 @@ constexpr static const uint32_t RESPONS_DATA_ERROR = 2;
+ constexpr static const uint32_t GET_BPP_LOAD_ERROR_LENGTH = 2;
+ constexpr static const uint32_t CONTRACT_INFO_CONTENT_IDX = 18;
+ 
+-class EsimFile : public IccFile {
++class EsimFile : public AppExecFwk::EventHandler {
+ public:
+-    explicit EsimFile(std::shared_ptr<SimStateManager> simStateManager, int32_t slotId = 0);
+-    int32_t ObtainSpnCondition(bool roaming, const std::string &operatorNum);
+-    bool ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event);
+-    bool UpdateVoiceMail(const std::string &mailName, const std::string &mailNumber);
+-    bool SetVoiceMailCount(int32_t voiceMailCount);
+-    bool SetVoiceCallForwarding(bool enable, const std::string &number);
+-    std::string GetVoiceMailNumber();
+-    void SetVoiceMailNumber(const std::string mailNumber);
+-    void ProcessIccRefresh(int msgId);
+-    void ProcessFileLoaded(bool response);
+-    void OnAllFilesFetched();
+-    void StartLoad();
++    explicit EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId = 0,
++        std::shared_ptr<AppExecFwk::EventRunner> eventRunner =
++        AppExecFwk::EventRunner::Create("esimFileHandler", AppExecFwk::ThreadMode::FFRT));
+     ~EsimFile() = default;
+     std::string ObtainEid();
+     GetEuiccProfileInfoListInnerResult GetEuiccProfileInfoList();
+@@ -104,8 +97,8 @@ public:
+     ResponseEsimInnerResult SendApduData(const std::u16string &aid, const EsimApduData &apduData);
+     ResponseEsimInnerResult ObtainPrepareDownload(const DownLoadConfigInfo &downLoadConfigInfo);
+     ResponseEsimBppResult ObtainLoadBoundProfilePackage(int32_t portIndex, const std::u16string boundProfilePackage);
+-    EuiccNotificationList ListNotifications(int32_t portIndex, Event events);
+-    EuiccNotificationList RetrieveNotificationList(int32_t portIndex, Event events);
++    EuiccNotificationList ListNotifications(int32_t portIndex, EsimEvent events);
++    EuiccNotificationList RetrieveNotificationList(int32_t portIndex, EsimEvent events);
+     EuiccNotification ObtainRetrieveNotification(int32_t portIndex, int32_t seqNumber);
+     int32_t RemoveNotificationFromList(int32_t portIndex, int32_t seqNumber);
+     int32_t DeleteProfile(const std::u16string &iccId);
+@@ -174,7 +167,7 @@ private:
+     bool LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<Asn1Node> &notificationMetadata);
+     bool RealProcessLoadBoundProfilePackageDone();
+     bool ProcessListNotifications(
+-        int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
++        int32_t slotId, EsimEvent events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
+     void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
+     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
+@@ -185,7 +178,7 @@ private:
+     uint32_t CombineResponseDataFinish(IccFileData &fileData);
+     void ProcessIfNeedMoreResponse(IccFileData &fileData, int32_t eventId);
+     bool ProcessRetrieveNotificationList(
+-        int32_t slotId, Event events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
++        int32_t slotId, EsimEvent events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+     bool ProcessRetrieveNotificationListDone(const AppExecFwk::InnerEvent::Pointer &event);
+     bool RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root);
+     bool ProcessRetrieveNotification(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &responseEvent);
+@@ -237,7 +230,10 @@ private:
+     bool RealProcessRequestAllProfilesDone();
+     void ProcessEsimCloseSpareChannel();
+     bool ProcessEsimCloseSpareChannelDone(const AppExecFwk::InnerEvent::Pointer &event);
+-
++    AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
++    struct CarrierIdentifier CarrierIdentifiers(const std::vector<uint8_t> &mccMncData, int mccMncLen,
++        const std::u16string &gid1, const std::u16string &gid2);
++    struct CarrierIdentifier buildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root);
+ private:
+     std::map<int32_t, FileProcessFunc> memberFuncMap_;
+     std::atomic_int nextSerialId_ = 0;
+@@ -273,6 +269,7 @@ private:
+     bool isSupported_ = false;
+     std::string recvCombineStr_ = "";
+     IccFileData newRecvData_;
++    std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
+ 
+     std::u16string aidStr_ = u"";
+     std::mutex occupyChannelMutex_;
