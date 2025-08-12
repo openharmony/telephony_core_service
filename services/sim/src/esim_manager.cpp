@@ -38,7 +38,7 @@ bool EsimManager::OnInit(int32_t slotCount)
     slotCount_ = slotCount;
     esimFiles_.resize(slotCount_);
     for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
-        if (DelayedSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId) == TELEPHONY_ERR_SUCCESS) {
+        if (DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId) == TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGI("esimFiles_[%{public}d] to be init", slotId);
             esimFiles_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
         }
@@ -69,7 +69,7 @@ int32_t EsimManager::GetEid(int32_t slotId, std::u16string &eId)
 int32_t EsimManager::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListInnerResult &euiccProfileInfoList)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     euiccProfileInfoList = esimFiles_[slotId]->GetEuiccProfileInfoList();
@@ -79,7 +79,7 @@ int32_t EsimManager::GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfo
 int32_t EsimManager::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccInfo = esimFiles_[slotId]->GetEuiccInfo();
@@ -90,7 +90,7 @@ int32_t EsimManager::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->DisableProfile(portIndex, iccId);
@@ -100,7 +100,7 @@ int32_t EsimManager::DisableProfile(
 int32_t EsimManager::GetSmdsAddress(int32_t slotId, int32_t portIndex, std::u16string &smdsAddress)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     smdsAddress = Str8ToStr16(esimFiles_[slotId]->ObtainSmdsAddress(portIndex));
@@ -111,7 +111,7 @@ int32_t EsimManager::GetRulesAuthTable(
     int32_t slotId, int32_t portIndex, EuiccRulesAuthTable &eUiccRulesAuthTable)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccRulesAuthTable = esimFiles_[slotId]->ObtainRulesAuthTable(portIndex);
@@ -121,7 +121,7 @@ int32_t EsimManager::GetRulesAuthTable(
 int32_t EsimManager::GetEuiccChallenge(int32_t slotId, int32_t portIndex, ResponseEsimInnerResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = esimFiles_[slotId]->ObtainEuiccChallenge(portIndex);
@@ -131,7 +131,7 @@ int32_t EsimManager::GetEuiccChallenge(int32_t slotId, int32_t portIndex, Respon
 int32_t EsimManager::GetDefaultSmdpAddress(int32_t slotId, std::u16string &defaultSmdpAddress)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     defaultSmdpAddress = Str8ToStr16(esimFiles_[slotId]->ObtainDefaultSmdpAddress());
@@ -145,7 +145,7 @@ int32_t EsimManager::CancelSession(int32_t slotId, const std::u16string &transac
     CancelReason cancelReason, ResponseEsimInnerResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = esimFiles_[slotId]->CancelSession(transactionId, cancelReason);
@@ -159,7 +159,7 @@ int32_t EsimManager::GetProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, EuiccProfile &eUiccProfile)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     eUiccProfile = esimFiles_[slotId]->ObtainProfile(portIndex, iccId);
@@ -214,7 +214,7 @@ int32_t EsimManager::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &d
     ResponseEsimInnerResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = esimFiles_[slotId]->ObtainPrepareDownload(downLoadConfigInfo);
@@ -225,7 +225,7 @@ int32_t EsimManager::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
     const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = esimFiles_[slotId]->ObtainLoadBoundProfilePackage(portIndex, boundProfilePackage);
@@ -236,7 +236,7 @@ int32_t EsimManager::ListNotifications(
     int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     notificationList = esimFiles_[slotId]->ListNotifications(portIndex, events);
@@ -279,7 +279,7 @@ int32_t EsimManager::RemoveNotificationFromList(
 int32_t EsimManager::DeleteProfile(int32_t slotId, const std::u16string &iccId, int32_t &enumResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->DeleteProfile(iccId);
@@ -290,7 +290,7 @@ int32_t EsimManager::SwitchToProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool forceDisableProfile, int32_t &enumResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->SwitchToProfile(portIndex, iccId, forceDisableProfile);
@@ -301,7 +301,7 @@ int32_t EsimManager::SetProfileNickname(
     int32_t slotId, const std::u16string &iccId, const std::u16string &nickname, int32_t &enumResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->SetProfileNickname(iccId, nickname);
@@ -311,7 +311,7 @@ int32_t EsimManager::SetProfileNickname(
 int32_t EsimManager::GetEuiccInfo2(int32_t slotId, int32_t portIndex, EuiccInfo2 &euiccInfo2)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     euiccInfo2 = esimFiles_[slotId]->ObtainEuiccInfo2(portIndex);
@@ -322,7 +322,7 @@ int32_t EsimManager::AuthenticateServer(
     int32_t slotId, const AuthenticateConfigInfo &authenticateConfigInfo, ResponseEsimInnerResult &responseResult)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     responseResult = esimFiles_[slotId]->AuthenticateServer(authenticateConfigInfo);
@@ -333,7 +333,7 @@ int32_t EsimManager::GetContractInfo(
     int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response)
 {
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
-        TELEPHONY_LOGE("slotId is invalid or simFileManager is null!");
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     response = esimFiles_[slotId]->GetContractInfo(getContractInfoRequest);

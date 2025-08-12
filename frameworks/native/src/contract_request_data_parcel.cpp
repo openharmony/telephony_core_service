@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Telephony {
 bool ContractRequestData::ReadFromParcel(Parcel &parcel)
 {
-    if (!parcel.ReadString16(publicKey_) || !parcel.ReadString16(nonce_) || !parcel.ReadString16(pkid_)) {
+    if (!parcel.ReadString16(publicKey) || !parcel.ReadString16(nonce) || !parcel.ReadString16(pkid)) {
         return false;
     }
     return true;
@@ -29,7 +29,7 @@ bool ContractRequestData::ReadFromParcel(Parcel &parcel)
 
 bool ContractRequestData::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteString16(publicKey_) || !parcel.WriteString16(nonce_) || !parcel.WriteString16(pkid_)) {
+    if (!parcel.WriteString16(publicKey) || !parcel.WriteString16(nonce) || !parcel.WriteString16(pkid)) {
         return false;
     }
     return true;

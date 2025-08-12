@@ -1058,7 +1058,7 @@ struct CarrierIdentifier EsimFile::CarrierIdentifiers(const std::vector<uint8_t>
     return carrierId;
 }
 
-struct CarrierIdentifier EsimFile::buildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root)
+struct CarrierIdentifier EsimFile::BuildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root)
 {
     std::u16string gid1;
     std::u16string gid2;
@@ -1119,7 +1119,7 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             if (curNode == nullptr) {
                 return false;
             }
-            eUiccRulesAuthTable_.carrierIds_.push_back(buildCarrierIdentifiers(curNode));
+            eUiccRulesAuthTable_.carrierIds_.push_back(BuildCarrierIdentifiers(curNode));
         }
         grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_0);
         if (grandson == nullptr) {
@@ -2267,10 +2267,10 @@ bool EsimFile::ProcessListNotifications(
     return true;
 }
 
-void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
+void EsimFile::CreateNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
 {
     if (node == nullptr) {
-        TELEPHONY_LOGE("createNotification node is nullptr");
+        TELEPHONY_LOGE("CreateNotification node is nullptr");
         return;
     }
     std::shared_ptr<Asn1Node> metadataNode;
@@ -2340,7 +2340,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &r
     for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
-        createNotification(curNode, euicc);
+        CreateNotification(curNode, euicc);
         euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
@@ -2539,7 +2539,7 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
     for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
-        createNotification(curNode, euicc);
+        CreateNotification(curNode, euicc);
         euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
@@ -2631,7 +2631,7 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
 
     EuiccNotification notification;
     std::shared_ptr<Asn1Node> firstNode = nodes.front();
-    createNotification(firstNode, notification);
+    CreateNotification(firstNode, notification);
     notification_.seq_ = notification.seq_;
     notification_.targetAddr_ = notification.targetAddr_;
     notification_.event_ = notification.event_;
@@ -3424,10 +3424,6 @@ std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
         builder->Asn1AddChildAsBytes(vTag, valueVec, valueVec.size());
     } else {
         builder->Asn1AddChildAsString(vTag, value);
-    }
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return nullptr;
     }
     return builder->Asn1Build();
 }
