@@ -17,6 +17,7 @@
 #define OHOS_ICC_FILE_H
 #include <shared_mutex>
 #include <set>
+#include <ffrt.h>
 
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -225,6 +226,7 @@ private:
     void AddRecordsOverrideObser();
     bool ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
         std::string &eons, bool longNameRequired, const std::string &plmn);
+    ffrt::shared_mutex iccFileMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
