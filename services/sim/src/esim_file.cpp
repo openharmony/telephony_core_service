@@ -672,7 +672,7 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
         return;
     }
     std::vector<uint8_t> iccidBytes;
-    uint32_t iccidBytesLen = iccIdNode->Asn1AsBytes(iccidBytes);
+    iccIdNode->Asn1AsBytes(iccidBytes);
     Asn1Utils::BchToString(iccidBytes, eProfileInfo->iccid);
     if (profileNode->Asn1HasChild(TAG_ESIM_NICKNAME)) {
         std::shared_ptr<Asn1Node> nickNameNode = profileNode->Asn1GetChild(TAG_ESIM_NICKNAME);
@@ -2024,7 +2024,7 @@ void EsimFile::BuildApduForInitSecureChannel(
 void EsimFile::BuildApduForFirstSequenceOf87(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &firstSequenceOf87)
 {
     std::string hexStr;
-    uint32_t cursorLen = firstSequenceOf87->Asn1NodeToHexStr(hexStr);
+    firstSequenceOf87->Asn1NodeToHexStr(hexStr);
     codec.BuildStoreData(hexStr);
 }
 
@@ -2036,7 +2036,7 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr
         return;
     }
     std::string hexStr;
-    uint32_t cursorLen = sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
+    sequenceOf88->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = metaDataSeqs.begin(); it != metaDataSeqs.end(); ++it) {
@@ -2068,7 +2068,7 @@ void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr
         pGetChild->Asn1NodeToHexStr(hexStr);
         codec.BuildStoreData(hexStr);
     }
-    uint32_t cursorLen = sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
+    sequenceOf86->Asn1GetHeadAsHexStr(hexStr);
     codec.BuildStoreData(hexStr);
     std::shared_ptr<Asn1Node> curNode = nullptr;
     for (auto it = elementSeqs.begin(); it != elementSeqs.end(); ++it) {
@@ -2212,7 +2212,7 @@ bool EsimFile::LoadBoundProfilePackageParseNotificationMetadata(std::shared_ptr<
     }
     std::vector<uint8_t> iccid;
     std::string iccString;
-    uint32_t iccidLen = iccidAsn->Asn1AsBytes(iccid);
+    iccidAsn->Asn1AsBytes(iccid);
     Asn1Utils::BchToString(iccid, iccString);
     loadBPPResult_.iccId_ = OHOS::Telephony::ToUtf16(iccString);
     return true;
@@ -2991,7 +2991,7 @@ bool EsimFile::ProcessObtainEuiccInfo2(int32_t slotId, const AppExecFwk::InnerEv
         return false;
     }
     std::string hexStr;
-    uint32_t strLen = builder->Asn1BuilderToHexStr(hexStr);
+    builder->Asn1BuilderToHexStr(hexStr);
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -3051,7 +3051,7 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     }
     builder->Asn1AddChild(ctxNode);
     std::string hexStr;
-    uint32_t hexStrLen = builder->Asn1BuilderToHexStr(hexStr);
+    builder->Asn1BuilderToHexStr(hexStr);
     RequestApduBuild codec(currentChannelId_);
     codec.BuildStoreData(hexStr);
     SplitSendLongData(codec, MSG_ESIM_AUTHENTICATE_SERVER,
@@ -3644,7 +3644,7 @@ void EsimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            bool isFileProcessResponse = memberFunc(event);
+            memberFunc(event);
             return;
         }
     }

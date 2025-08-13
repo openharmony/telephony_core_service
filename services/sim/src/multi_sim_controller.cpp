@@ -60,10 +60,7 @@ static const std::string MAIN_CARD_ICCID_KEY = "persist.telephony.MainCard.Iccid
 static const std::string PRIMARY_SLOTID_KEY = "persist.telephony.MainSlotId";
 static const std::string MAIN_CELLULAR_DATA_SLOTID_KEY = "persist.telephony.MainCellularDataSlotId";
 static const std::string PRIMARY_SLOTID = "0";
-constexpr int32_t SLOT_ID_0 = 0;
 constexpr int32_t SLOT_ID_1 = 1;
-constexpr int32_t SLOT_ID_2 = 2;
-constexpr int32_t SIM_SLOT_SIZE = 3;
 constexpr int32_t RIL_SET_PRIMARY_SLOT_TIMEOUT = 45 * 1000; // 45 second
 const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
 static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
@@ -622,7 +619,7 @@ bool MultiSimController::UpdateIccAccountInfoList(
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (localCacheInfo.empty()) {
-        TELEPHONY_LOGE("failed by invalid data");
+        TELEPHONY_LOGW("failed by invalid data");
         return false;
     }
     if (accountInfoList.size() > 0) {
@@ -952,7 +949,7 @@ bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t
 int32_t MultiSimController::GetSimAccountInfo(int32_t slotId, bool denied, IccAccountInfo &info)
 {
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
+        TELEPHONY_LOGW("slotId %{public}d is invalid", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
@@ -1619,7 +1616,7 @@ int32_t MultiSimController::QueryImsSwitch(int32_t slotId, int32_t &imsSwitchVal
 int32_t MultiSimController::GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList)
 {
     if (!UpdateIccAccountInfoList(activeIccAccountInfoList_, localCacheInfo_, true)) {
-        TELEPHONY_LOGE("refresh failed");
+        TELEPHONY_LOGW("refresh failed");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     iccAccountInfoList.clear();

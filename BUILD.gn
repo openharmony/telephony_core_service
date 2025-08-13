@@ -192,7 +192,6 @@ ohos_shared_library("tel_core_service") {
     "drivers_interface_ril:libril_proxy_1.4",
     "drivers_interface_ril:libril_proxy_1.5",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "hdf_core:libhdi",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
@@ -247,6 +246,12 @@ ohos_shared_library("tel_core_service") {
   if (telephony_hicollie_able) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
+  }
+
+  if (use_clang_coverage) {
+    deps += [ "test/mock/ffrt:ffrt_mocked" ]
+  } else {
+    external_deps += [ "ffrt:libffrt" ]
   }
 
   part_name = "core_service"

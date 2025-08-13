@@ -42,7 +42,6 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-const int32_t MAX_IPC_THREAD_NUM = 6;
 const int32_t MAX_FFRT_THREAD_NUM = 32;
 }
 const bool G_REGISTER_RESULT =
@@ -907,7 +906,6 @@ int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, number, callback]() {
-        int32_t state = TELEPHONY_ERR_FAIL;
         MessageParcel dataTmp;
         auto simManager = wp.lock();
         int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1030,7 +1028,7 @@ int32_t CoreService::GetActiveSimAccountInfoList(std::vector<IccAccountInfo> &ic
 {
     bool denied = false;
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("permission denied!");
+        TELEPHONY_LOGW("permission denied!");
         denied = true;
     }
     if (simManager_ == nullptr) {

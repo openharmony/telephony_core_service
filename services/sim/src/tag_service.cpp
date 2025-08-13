@@ -25,7 +25,6 @@ static const int ERROR = -1;
 static const size_t FIRST = 0;
 static const size_t SECOND = 1;
 static const uint8_t BYTE_ZERO = 0;
-static const uint8_t WORD_LEN = 2;
 constexpr size_t BUFF_SIZE = 3;
 constexpr size_t CHAR_LEN = 2;
 

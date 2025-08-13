@@ -39,6 +39,7 @@ ohos_fuzztest("SimOperationFuzzTest") {
   deps = [
     "$SUBSYSTEM_DIR/core_service:tel_core_service",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/test/mock/ffrt:ffrt_mocked",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
  
@@ -52,7 +53,6 @@ ohos_fuzztest("SimOperationFuzzTest") {
     "drivers_interface_ril:libril_proxy_1.1",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
     "libxml2:libxml2",
