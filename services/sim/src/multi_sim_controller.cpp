@@ -619,7 +619,6 @@ bool MultiSimController::UpdateIccAccountInfoList(
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (localCacheInfo.empty()) {
-        TELEPHONY_LOGW("failed by invalid data");
         return false;
     }
     if (accountInfoList.size() > 0) {
