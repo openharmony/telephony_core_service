@@ -81,7 +81,6 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     int32_t slotCount_ = ESIM_MAX_SLOT_COUNT;
-    int32_t slotId_ = ESIM_SLOT_ID_ZERO;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     std::vector<std::shared_ptr<Telephony::EsimFile>> esimFiles_;
 #endif

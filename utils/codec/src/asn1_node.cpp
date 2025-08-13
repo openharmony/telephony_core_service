@@ -45,7 +45,7 @@ uint32_t Asn1Node::Asn1NodeToHexStr(std::string &destStr)
 {
     TELEPHONY_LOGD("enter Asn1NodeToHexStr");
     std::vector<uint8_t> byteStream;
-    uint32_t byteLen = Asn1NodeToBytes(byteStream);
+    Asn1NodeToBytes(byteStream);
     destStr = Asn1Utils::BytesToHexStr(byteStream);
     return static_cast<uint32_t>(destStr.length());
 }
@@ -332,8 +332,7 @@ int32_t Asn1Node::Asn1AsBits()
         return integerVal;
     }
     uint32_t bits = static_cast<uint32_t>(dataBits);
-    int32_t index = static_cast<int32_t>(dataLength_) - 1;
-    for (index; index < static_cast<int32_t>(sizeof(int32_t)); index++) {
+    for (int32_t i = static_cast<int32_t>(dataLength_) - 1; i < static_cast<int32_t>(sizeof(int32_t)); i++) {
         bits <<= OFFSET_EIGHT_BIT;
     }
     integerVal = static_cast<int32_t>(Asn1Utils::ReverseInt(bits));

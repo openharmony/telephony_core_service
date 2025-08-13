@@ -38,6 +38,7 @@ ohos_unittest("icc_file_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -59,7 +60,6 @@ ohos_unittest("icc_file_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",

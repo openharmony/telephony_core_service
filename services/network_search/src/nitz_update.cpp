@@ -50,7 +50,6 @@ const uint32_t YEAR_LENGTH_FOUR = 4;
 const uint32_t CST_YEAR = 1900;
 constexpr int32_t QUARTER_TO_MILLISECOND = 15 * 60 * 1000;
 const uint32_t LOCATION_DAY_OR_SEC = 2;
-const uint32_t TIME_THRESHOLD = 3; // seconds
 const int32_t SIM_SLOT_ID_0 = 0;
 const int32_t SIM_SLOT_ID_1 = 1;
 const std::string AUTO_TIME_OFF = "0";

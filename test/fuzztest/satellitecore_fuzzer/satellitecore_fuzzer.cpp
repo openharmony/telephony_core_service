@@ -31,7 +31,6 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SATELLITE_CORE = 4;
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
 
