@@ -29,7 +29,6 @@ namespace Telephony {
 using namespace testing::ext;
 
 namespace {
-const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
 } // namespace
 

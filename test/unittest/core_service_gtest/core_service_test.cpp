@@ -428,7 +428,6 @@ HWTEST_F(CoreServiceTest, CoreService_GetLockState_001, Function | MediumTest | 
 {
     SecurityToken token;
     LockType lockType = LockType::PIN_LOCK;
-    LockState lockState;
     auto result = DelayedSingleton<CoreService>::GetInstance()->GetLockState(0, lockType, nullptr);
     ASSERT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }

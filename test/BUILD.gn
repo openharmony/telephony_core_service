@@ -15,6 +15,15 @@ import("//build/test.gni")
 SUBSYSTEM_DIR = "../.."
 import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
+group("telephony_mock_deps") {
+  deps = []
+  if (use_clang_coverage) {
+    deps += [
+      "./mock/ffrt:ffrt_mocked"
+    ]
+  }
+}
+
 group("unittest") {
   testonly = true
   deps = []
@@ -50,4 +59,12 @@ group("unittest") {
       "unittest/utils_codec_gtest:utils_codec_gtest",
     ]
   }
+}
+
+group("test") {
+  testonly = true
+  deps = [
+    ":unittest",
+    "fuzztest:fuzztest"
+  ]
 }

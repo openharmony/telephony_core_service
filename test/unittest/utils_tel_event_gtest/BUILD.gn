@@ -35,6 +35,7 @@ ohos_unittest("utils_tel_event_gtest") {
     ]
     deps = [
         "$SOURCE_DIR/utils:libtel_common",
+        "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     ]
     external_deps = [
         "c_utils:utils",
@@ -42,7 +43,6 @@ ohos_unittest("utils_tel_event_gtest") {
         "googletest:gmock_main",
         "googletest:gtest_main",
         "hilog:libhilog",
-        "ffrt:libffrt",
     ]
     defines = [
         "TELEPHONY_LOG_TAG = "CoreServiceGtest"",
