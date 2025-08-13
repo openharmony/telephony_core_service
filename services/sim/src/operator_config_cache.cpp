@@ -300,7 +300,8 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_STATE_CHANGE) {
         TELEPHONY_LOGI("Sim state change, slotId = %{public}d, simstate = %{public}d",
             slotId_, static_cast<int>(simState));
-        if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED) {
+        if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED ||
+            simState == SimState::SIM_STATE_UNKNOWN) {
             std::unique_lock<std::mutex> lock(mutex_);
             ClearOperatorValue(slotId_);
             modemSimMatchedOpNameCache_ = "";
