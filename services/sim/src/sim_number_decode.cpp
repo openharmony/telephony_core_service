@@ -22,7 +22,7 @@ using namespace std;
 
 namespace OHOS {
 namespace Telephony {
-static std::string HexToStr(const std::vector<uint8_t> &arr)
+[[maybe_unused]] static std::string HexToStr(const std::vector<uint8_t> &arr)
 {
     std::stringstream ss;
     for (const auto &v : arr) {

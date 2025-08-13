@@ -56,7 +56,7 @@ void GetSimStateFunc(const uint8_t *data, size_t size)
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t slotCount = GetInt(data, size, index++);
+    [[maybe_unused]] int32_t slotCount = GetInt(data, size, index++);
     int32_t voiceMailCount = GetInt(data, size, index++);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
     int32_t iccStatus = *data % ICC_STATUS_NUM + 1;

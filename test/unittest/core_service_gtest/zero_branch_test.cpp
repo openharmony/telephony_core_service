@@ -75,7 +75,6 @@ using namespace testing::ext;
 namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
-const int32_t SLOTID_OVER_MAX = 3;
 const int DATA_STORAGE_ERR_PERMISSION_ERR = -3;
 const int32_t OBTAIN_SPN_NONE = 0;
 const int32_t OBTAIN_SPN_START = 1;
@@ -84,15 +83,7 @@ const int32_t OBTAIN_OPERATOR_NAMESTRING = 3;
 const int32_t OBTAIN_OPERATOR_NAME_SHORTFORM = 4;
 const int32_t BYTES_LENGTH = 3;
 const int32_t LO_FOUR_LENGTH = 15;
-const int32_t CORE_NETWORK_MODE_NR = 31;
 const int32_t VALUE_LENGTH = 128;
-const CellInformation::CellType NONE = CellInformation::CellType::CELL_TYPE_NONE;
-const CellInformation::CellType GSM = CellInformation::CellType::CELL_TYPE_GSM;
-const CellInformation::CellType CDMA = CellInformation::CellType::CELL_TYPE_CDMA;
-const CellInformation::CellType WCDMA = CellInformation::CellType::CELL_TYPE_WCDMA;
-const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_TDSCDMA;
-const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
-const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
 static const int32_t SLEEP_TIME = 3;
 const int SLOT_COUNT = 2;
 } // namespace

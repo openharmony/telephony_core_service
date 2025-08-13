@@ -384,8 +384,8 @@ private:
     std::mutex mutexInner_;
     std::mutex mutexIms_;
     int32_t delayTime_ = 0;
-    NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
-    NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;
+    [[maybe_unused]] NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
+    [[maybe_unused]] NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS

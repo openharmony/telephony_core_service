@@ -158,7 +158,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_001, Function |
 {
     sptr<TestIRemoteObject> remote = new (std::nothrow) TestIRemoteObject();
     CoreServiceProxy coreServiceProxy(remote);
-    SimState simState = SimState::SIM_STATE_UNKNOWN;
     EXPECT_EQ(coreServiceProxy.GetSimState(-1, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
 
     std::u16string testU16Str = u"";
@@ -168,7 +167,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_001, Function |
     EXPECT_EQ(coreServiceProxy.GetSimIccId(-1, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ(coreServiceProxy.GetIMSI(-1, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
 
-    bool isCTSimCard = false;
     EXPECT_EQ(coreServiceProxy.IsCTSimCard(-1, nullptr), TELEPHONY_ERR_SLOTID_INVALID);
 
     EXPECT_FALSE(coreServiceProxy.IsSimActive(-1, nullptr));
