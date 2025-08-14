@@ -815,7 +815,9 @@ void VCardConstructor::AddPhotoLine(const std::string &encodedValue, const std::
     while (remaining > 0) {
         const size_t chunk = std::min(leftOnLine, remaining);
         emitLine(chunk);
-        if (remaining  == 0) break;
+        if (remaining == 0) {
+            break;
+        }
 
         result_ << END_OF_LINE << WS;
         leftOnLine = secondOnCap;
@@ -989,8 +991,8 @@ std::string VCardConstructor::DealCharacters(std::string value)
 std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
 {
     size_t inputSize = input.size();
-    int32_t maxEncodedLen = (inputSize * VALUE_LEN_THREE) +
-        2 * (inputSize * VALUE_LEN_THREE / ENCODEN_QUOTED_PRIN_MAX_LEN + VALUE_LEN_TWO);  // 2: one byte has two char
+    size_t maxEncodedLen = (inputSize * 3) + // 3: one byte encode three char
+        3 * (inputSize * 3 / ENCODEN_QUOTED_PRIN_MAX_LEN);  // 3: size of "=\r\n"
     std::string encoded;
     encoded.reserve(maxEncodedLen);
 
