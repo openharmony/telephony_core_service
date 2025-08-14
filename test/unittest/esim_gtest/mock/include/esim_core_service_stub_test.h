@@ -277,7 +277,7 @@ public:
         return 0;
     }
 
-    int32_t GetDefaultVoiceSimId(, const sptr<IRawParcelCallback> &callback) override
+    int32_t GetDefaultVoiceSimId(const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }
@@ -555,7 +555,7 @@ public:
         return 0;
     }
 
-    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel) override
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) override
     {
         return 0;
     }

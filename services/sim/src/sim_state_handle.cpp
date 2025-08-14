@@ -757,9 +757,6 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-            UpdateEsimOSVersion(slotId_);
-#endif
             if (IsRadioStateUnavailable(event)) {
                 break;
             }
@@ -1067,21 +1064,5 @@ int32_t SimStateHandle::NotifySimSlotsMapping(int32_t slotId)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-void SimStateHandle::UpdateEsimOSVersion(int32_t slotId)
-{
-    bool result = DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId_);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        std::unique_ptr<StartOsuResultCallback> callback = std::make_unique<StartOsuResultCallback>(0);
-        int32_t updateResult =
-            DelayedRefSingleton<EsimServiceClient>::GetInstance().StartOsu(slotId_, callback.release());
-        if (updateResult == TELEPHONY_ERR_SUCCESS) {
-            TELEPHONY_LOGI("StartOsu success");
-        } else {
-            TELEPHONY_LOGE("StartOsu fail, updateResult: %{public}d", updateResult);
-        }
-    }
-}
-#endif
 } // namespace Telephony
 } // namespace OHOS
