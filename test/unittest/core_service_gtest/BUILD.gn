@@ -1147,6 +1147,7 @@ ohos_unittest("tel_satellite_service_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1241,6 +1242,7 @@ ohos_unittest("tel_sim_core_service_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1337,6 +1339,7 @@ ohos_unittest("tel_sim_elementary_file_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1433,6 +1436,7 @@ ohos_unittest("tel_sim_icc_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1529,6 +1533,7 @@ ohos_unittest("tel_sim_type_convert_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1625,6 +1630,7 @@ ohos_unittest("tel_vcard_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
@@ -1721,6 +1727,7 @@ ohos_unittest("tel_vsim_gtest") {
   deps = [
     "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
   ]
 
