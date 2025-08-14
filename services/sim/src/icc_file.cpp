@@ -279,6 +279,7 @@ std::string IccFile::ObtainSPN()
 bool IccFile::ObtainEonsExternRules(const std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles, bool roaming,
     std::string &eons, bool longNameRequired, const std::string &plmn)
 {
+    std::shared_lock<ffrt::shared_mutex> lock(iccFileMutex_);
     if ((oplFiles.empty() && !pnnFiles_.empty()) && pnnFiles_.at(0) != nullptr && !roaming) {
         TELEPHONY_LOGI("get PNN");
         if (longNameRequired) {
@@ -344,6 +345,7 @@ std::string IccFile::ObtainEons(const std::string &plmn, int32_t lac, bool longN
         }
     }
 
+    std::shared_lock<ffrt::shared_mutex> lock(iccFileMutex_);
     if (pnnIndex >= 1 && pnnIndex <= static_cast<int>(pnnFiles_.size())) {
         TELEPHONY_LOGI("ObtainEons longNameRequired:%{public}d, longName:%{public}s, shortName:%{public}s,",
             longNameRequired, pnnFiles_.at(pnnIndex - 1)->longName.c_str(),
@@ -813,6 +815,7 @@ void IccFile::ResetVoiceMailVariable()
 void IccFile::ClearData()
 {
     TELEPHONY_LOGI("IccFile ClearData");
+    std::unique_lock<ffrt::shared_mutex> lock(iccFileMutex_);
     imsi_ = "";
     iccId_ = "";
     decIccId_ = "";

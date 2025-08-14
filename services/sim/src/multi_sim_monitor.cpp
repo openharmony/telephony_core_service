@@ -296,6 +296,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
                 !controller_->IsSetPrimarySlotIdInProgress()) {
         TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
         simFileManager->ClearData();
+        isSimAccountLoaded_[slotId] = 0;
     }
     if (controller_->unInitModemSlotId_ == slotId) {
         TELEPHONY_LOGI("need to recheck primary");
