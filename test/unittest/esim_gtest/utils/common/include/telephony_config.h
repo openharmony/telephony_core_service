@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CONTRACT_REQUEST_DATA_PARCEL_H
-#define OHOS_CONTRACT_REQUEST_DATA_PARCEL_H
+#ifndef TELEPHONY_CONFIG_H
+#define TELEPHONY_CONFIG_H
 
-#include <parcel.h>
 #include <string>
-#include <vector>
-
-#include "esim_state_type.h"
 
 namespace OHOS {
 namespace Telephony {
-/**
- * @brief Contract request data
- */
-struct ContractRequestData : public Parcelable {
-    std::u16string publicKey = u"";
-    std::u16string nonce = u"";
-    std::u16string pkid = u"";
+class TelephonyConfig {
+public:
+    enum ConfigType {
+        MODEM_CAP_SUPPORT_NR = 1,
+        MODEM_CAP_MAX = 32,
+    };
 
-    bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
-    static ContractRequestData *Unmarshalling(Parcel &parcel);
+    bool IsCapabilitySupport(uint32_t capablity);
+
+private:
+    int32_t ConvertCharToInt(uint32_t &retValue, const std::string &maxCap, uint32_t index);
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_CONTRACT_REQUEST_DATA_PARCEL_H
+
+#endif // TELEPHONY_CONFIG_H

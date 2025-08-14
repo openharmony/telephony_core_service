@@ -169,7 +169,7 @@ private:
     bool ProcessListNotifications(
         int32_t slotId, EsimEvent events, const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessListNotificationsDone(const AppExecFwk::InnerEvent::Pointer &event);
-    void createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
+    void CreateNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
     void SplitSendLongData(RequestApduBuild &codec, int32_t esimMessageId,
         std::mutex &mtx, bool &flag, std::condition_variable &cv);
@@ -212,7 +212,7 @@ private:
     bool ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &responseEvent);
     bool ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event);
     std::shared_ptr<Asn1Node> GetKeyValueSequenceNode(
-        uint32_t kTag, std::string &key, uint32_t vTag, std::string &value);
+        uint32_t kTag, const std::string &key, uint32_t vTag, std::string &value);
     std::shared_ptr<Asn1Node> GetMapMetaDataNode();
         void AddDeviceCapability(std::shared_ptr<Asn1Builder> &devCapsBuilder);
     void AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es9PlusInitAuthResp &pbytes);
@@ -233,7 +233,7 @@ private:
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     struct CarrierIdentifier CarrierIdentifiers(const std::vector<uint8_t> &mccMncData, int mccMncLen,
         const std::u16string &gid1, const std::u16string &gid2);
-    struct CarrierIdentifier buildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root);
+    struct CarrierIdentifier BuildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root);
 private:
     std::map<int32_t, FileProcessFunc> memberFuncMap_;
     std::atomic_int nextSerialId_ = 0;

@@ -37,6 +37,10 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char *KEY_IMEI = "kIMEI";
+static constexpr const char *KEY_IMEI2 = "kIMEI2";
+static constexpr const char *KEY_NONCE = "kNonce";
+static constexpr const char *KEY_TIMESTAMP = "kTimestamp";
 EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId,
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner) : AppExecFwk::EventHandler(eventRunner)
 {
@@ -45,6 +49,7 @@ EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId
     currentChannelId_ = 0;
     InitMemberFunc();
     InitChanneMemberFunc();
+    TELEPHONY_LOGI("esimFile init end");
 }
 
 AppExecFwk::InnerEvent::Pointer EsimFile::BuildCallerInfo(int eventId)
@@ -158,9 +163,9 @@ std::string EsimFile::ObtainEid()
         SyncCloseChannel();
         return "";
     }
+    std::unique_lock<std::mutex> lock(getEidMutex_);
     // wait profileInfo is ready
     isEidReady_ = false;
-    std::unique_lock<std::mutex> lock(getEidMutex_);
     if (!getEidCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEidReady_; })) {
         SyncCloseChannel();
@@ -187,8 +192,8 @@ GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
         euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return euiccProfileInfoList_;
     }
-    isAllProfileInfoReady_ = false;
     std::unique_lock<std::mutex> lock(allProfileInfoMutex_);
+    isAllProfileInfoReady_ = false;
     if (!allProfileInfoCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isAllProfileInfoReady_; })) {
         SyncCloseChannel();
@@ -213,8 +218,8 @@ EuiccInfo EsimFile::GetEuiccInfo()
         SyncCloseChannel();
         return EuiccInfo();
     }
-    isEuiccInfo1Ready_ = false;
     std::unique_lock<std::mutex> lock(euiccInfo1Mutex_);
+    isEuiccInfo1Ready_ = false;
     if (!euiccInfo1Cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccInfo1Ready_; })) {
         TELEPHONY_LOGE("close channal due to timeout");
@@ -524,7 +529,6 @@ bool EsimFile::ProcessObtainEuiccInfo1Done(const AppExecFwk::InnerEvent::Pointer
     }
     std::string responseHexStr = rawData.resultData;
     eUiccInfo_.response_ = Str8ToStr16(responseHexStr);
-    TELEPHONY_LOGI("obtain eUiccInfo_ len:%{public}lu", eUiccInfo_.response_.length());
     NotifyReady(euiccInfo1Mutex_, isEuiccInfo1Ready_, euiccInfo1Cv_);
     return true;
 }
@@ -806,8 +810,8 @@ int32_t EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
         SyncCloseChannel();
         return disableProfileResult_;
     }
-    isDisableProfileReady_ = false;
     std::unique_lock<std::mutex> lock(disableProfileMutex_);
+    isDisableProfileReady_ = false;
     if (!disableProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDisableProfileReady_; })) {
         SyncCloseChannel();
@@ -831,8 +835,8 @@ std::string EsimFile::ObtainSmdsAddress(int32_t portIndex)
         SyncCloseChannel();
         return "";
     }
-    isSmdsAddressReady_ = false;
     std::unique_lock<std::mutex> lock(smdsAddressMutex_);
+    isSmdsAddressReady_ = false;
     if (!smdsAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSmdsAddressReady_; })) {
         SyncCloseChannel();
@@ -856,8 +860,8 @@ EuiccRulesAuthTable EsimFile::ObtainRulesAuthTable(int32_t portIndex)
         SyncCloseChannel();
         return EuiccRulesAuthTable();
     }
-    isRulesAuthTableReady_ = false;
     std::unique_lock<std::mutex> lock(rulesAuthTableMutex_);
+    isRulesAuthTableReady_ = false;
     if (!rulesAuthTableCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRulesAuthTableReady_; })) {
         SyncCloseChannel();
@@ -885,8 +889,8 @@ ResponseEsimInnerResult EsimFile::ObtainEuiccChallenge(int32_t portIndex)
             static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return responseChallengeResult_;
     }
-    isEuiccChallengeReady_ = false;
     std::unique_lock<std::mutex> lock(euiccChallengeMutex_);
+    isEuiccChallengeReady_ = false;
     if (!euiccChallengeCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccChallengeReady_; })) {
         SyncCloseChannel();
@@ -1054,7 +1058,7 @@ struct CarrierIdentifier EsimFile::CarrierIdentifiers(const std::vector<uint8_t>
     return carrierId;
 }
 
-struct CarrierIdentifier EsimFile::buildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root)
+struct CarrierIdentifier EsimFile::BuildCarrierIdentifiers(const std::shared_ptr<Asn1Node> &root)
 {
     std::u16string gid1;
     std::u16string gid2;
@@ -1115,18 +1119,18 @@ bool EsimFile::RequestRulesAuthTableParseTagCtxComp0(std::shared_ptr<Asn1Node> &
             if (curNode == nullptr) {
                 return false;
             }
-            eUiccRulesAuthTable_.carrierIds_.push_back(buildCarrierIdentifiers(curNode));
+            eUiccRulesAuthTable_.carrierIds_.push_back(BuildCarrierIdentifiers(curNode));
         }
         grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_0);
         if (grandson == nullptr) {
             return false;
         }
-        int32_t policyRules = grandson->Asn1AsInteger();
+        int32_t policyRules = grandson->Asn1AsBits();
         grandson = node->Asn1GetGrandson(TAG_ESIM_SEQUENCE, TAG_ESIM_CTX_2);
         if (grandson == nullptr) {
             return false;
         }
-        int32_t policyRuleFlags = grandson->Asn1AsInteger();
+        int32_t policyRuleFlags = grandson->Asn1AsBits();
         eUiccRulesAuthTable_.policyRules_.push_back(policyRules);
         eUiccRulesAuthTable_.policyRuleFlags_.push_back(policyRuleFlags);
     }
@@ -1191,8 +1195,8 @@ std::string EsimFile::ObtainDefaultSmdpAddress()
         SyncCloseChannel();
         return "";
     }
-    isObtainDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(obtainDefaultSmdpAddressMutex_);
+    isObtainDefaultSmdpAddressReady_ = false;
     if (!obtainDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
@@ -1220,8 +1224,8 @@ ResponseEsimInnerResult EsimFile::CancelSession(const std::u16string &transactio
         cancelSessionResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return cancelSessionResult_;
     }
-    isCancelSessionReady_ = false;
     std::unique_lock<std::mutex> lock(cancelSessionMutex_);
+    isCancelSessionReady_ = false;
     if (!cancelSessionCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isCancelSessionReady_; })) {
         SyncCloseChannel();
@@ -1248,8 +1252,8 @@ EuiccProfile EsimFile::ObtainProfile(int32_t portIndex, const std::u16string &ic
         SyncCloseChannel();
         return eUiccProfile_;
     }
-    isObtainProfileReady_ = false;
     std::unique_lock<std::mutex> lock(obtainProfileMutex_);
+    isObtainProfileReady_ = false;
     if (!obtainProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isObtainProfileReady_; })) {
         SyncCloseChannel();
@@ -1467,8 +1471,8 @@ int32_t EsimFile::ResetMemory(ResetOption resetOption)
         SyncCloseChannel();
         return resetResult_;
     }
-    isResetMemoryReady_ = false;
     std::unique_lock<std::mutex> lock(resetMemoryMutex_);
+    isResetMemoryReady_ = false;
     if (!resetMemoryCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isResetMemoryReady_; })) {
         SyncCloseChannel();
@@ -1494,8 +1498,8 @@ int32_t EsimFile::SetDefaultSmdpAddress(const std::u16string &defaultSmdpAddress
         SyncCloseChannel();
         return setDpAddressResult_;
     }
-    isSetDefaultSmdpAddressReady_ = false;
     std::unique_lock<std::mutex> lock(setDefaultSmdpAddressMutex_);
+    isSetDefaultSmdpAddressReady_ = false;
     if (!setDefaultSmdpAddressCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetDefaultSmdpAddressReady_; })) {
         SyncCloseChannel();
@@ -1601,8 +1605,8 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
             static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return transApduDataResponse_;
     }
-    isSendApduDataReady_ = false;
     std::unique_lock<std::mutex> lock(sendApduDataMutex_);
+    isSendApduDataReady_ = false;
     if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel();
@@ -1785,8 +1789,8 @@ EuiccNotificationList EsimFile::ListNotifications(int32_t portIndex, EsimEvent e
         SyncCloseChannel();
         return EuiccNotificationList();
     }
-    isListNotificationsReady_ = false;
     std::unique_lock<std::mutex> lock(listNotificationsMutex_);
+    isListNotificationsReady_ = false;
     if (!listNotificationsCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isListNotificationsReady_; })) {
         SyncCloseChannel();
@@ -2263,10 +2267,10 @@ bool EsimFile::ProcessListNotifications(
     return true;
 }
 
-void EsimFile::createNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
+void EsimFile::CreateNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc)
 {
     if (node == nullptr) {
-        TELEPHONY_LOGE("createNotification node is nullptr");
+        TELEPHONY_LOGE("CreateNotification node is nullptr");
         return;
     }
     std::shared_ptr<Asn1Node> metadataNode;
@@ -2336,7 +2340,7 @@ bool EsimFile::ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &r
     for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
-        createNotification(curNode, euicc);
+        CreateNotification(curNode, euicc);
         euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
@@ -2396,8 +2400,8 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Esim
         SyncCloseChannel();
         return EuiccNotificationList();
     }
-    isRetrieveNotificationListReady_ = false;
     std::unique_lock<std::mutex> lock(retrieveNotificationListMutex_);
+    isRetrieveNotificationListReady_ = false;
     if (!retrieveNotificationListCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRetrieveNotificationListReady_; })) {
         SyncCloseChannel();
@@ -2423,8 +2427,8 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
         SyncCloseChannel();
         return EuiccNotification();
     }
-    isRetrieveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(retrieveNotificationMutex_);
+    isRetrieveNotificationReady_ = false;
     if (!retrieveNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRetrieveNotificationReady_; })) {
         SyncCloseChannel();
@@ -2452,8 +2456,8 @@ int32_t EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumbe
         SyncCloseChannel();
         return removeNotifResult_;
     }
-    isRemoveNotificationReady_ = false;
     std::unique_lock<std::mutex> lock(removeNotificationMutex_);
+    isRemoveNotificationReady_ = false;
     if (!removeNotificationCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isRemoveNotificationReady_; })) {
         SyncCloseChannel();
@@ -2535,7 +2539,7 @@ bool EsimFile::RetrieveNotificationParseCompTag(std::shared_ptr<Asn1Node> &root)
     for (auto it = ls.begin(); it != ls.end(); ++it) {
         curNode = *it;
         EuiccNotification euicc;
-        createNotification(curNode, euicc);
+        CreateNotification(curNode, euicc);
         euiccList.euiccNotification_.push_back(euicc);
     }
     eUiccNotificationList_ = euiccList;
@@ -2627,7 +2631,7 @@ bool EsimFile::RetrieveNotificatioParseTagCtxComp0(std::shared_ptr<Asn1Node> &ro
 
     EuiccNotification notification;
     std::shared_ptr<Asn1Node> firstNode = nodes.front();
-    createNotification(firstNode, notification);
+    CreateNotification(firstNode, notification);
     notification_.seq_ = notification.seq_;
     notification_.targetAddr_ = notification.targetAddr_;
     notification_.event_ = notification.event_;
@@ -2700,8 +2704,8 @@ int32_t EsimFile::DeleteProfile(const std::u16string &iccId)
         SyncCloseChannel();
         return delProfile_;
     }
-    isDeleteProfileReady_ = false;
     std::unique_lock<std::mutex> lock(deleteProfileMutex_);
+    isDeleteProfileReady_ = false;
     if (!deleteProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isDeleteProfileReady_; })) {
         SyncCloseChannel();
@@ -2729,8 +2733,8 @@ int32_t EsimFile::SwitchToProfile(int32_t portIndex, const std::u16string &iccId
         SyncCloseChannel();
         return switchResult_;
     }
-    isSwitchToProfileReady_ = false;
     std::unique_lock<std::mutex> lock(switchToProfileMutex_);
+    isSwitchToProfileReady_ = false;
     if (!switchToProfileCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSwitchToProfileReady_; })) {
         SyncCloseChannel();
@@ -2757,8 +2761,8 @@ int32_t EsimFile::SetProfileNickname(const std::u16string &iccId, const std::u16
         SyncCloseChannel();
         return setNicknameResult_;
     }
-    isSetNicknameReady_ = false;
     std::unique_lock<std::mutex> lock(setNicknameMutex_);
+    isSetNicknameReady_ = false;
     if (!setNicknameCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSetNicknameReady_; })) {
         SyncCloseChannel();
@@ -2933,8 +2937,8 @@ EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
         euiccInfo2Result_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return euiccInfo2Result_;
     }
-    isEuiccInfo2Ready_ = false;
     std::unique_lock<std::mutex> lock(euiccInfo2Mutex_);
+    isEuiccInfo2Ready_ = false;
     if (!euiccInfo2Cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isEuiccInfo2Ready_; })) {
         SyncCloseChannel();
@@ -3411,7 +3415,7 @@ void EsimFile::NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable 
 }
 
 std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
-    uint32_t kTag, std::string &key, uint32_t vTag, std::string &value)
+    uint32_t kTag, const std::string &key, uint32_t vTag, std::string &value)
 {
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
     builder->Asn1AddChildAsString(kTag, key);
@@ -3421,39 +3425,31 @@ std::shared_ptr<Asn1Node> EsimFile::GetKeyValueSequenceNode(
     } else {
         builder->Asn1AddChildAsString(vTag, value);
     }
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return nullptr;
-    }
     return builder->Asn1Build();
 }
 
 std::shared_ptr<Asn1Node> EsimFile::GetMapMetaDataNode()
 {
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_SEQUENCE);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return nullptr;
-    }
-    std::string keyIMEI = "kIMEI";
+    // add imei node
     std::string imeiStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei);
     std::shared_ptr<Asn1Node> imeiNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyIMEI, TAG_ESIM_TARGET_ADDR, imeiStr);
+        TAG_ESIM_TARGET_ADDR, KEY_IMEI, TAG_ESIM_TARGET_ADDR, imeiStr);
     builder->Asn1AddChild(imeiNode);
-    std::string keyIMEI2 = "kIMEI2";
+    // add imei2 node
     std::string imei2Str = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.imei2);
     std::shared_ptr<Asn1Node> imei2Node = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyIMEI2, TAG_ESIM_TARGET_ADDR, imei2Str);
+        TAG_ESIM_TARGET_ADDR, KEY_IMEI2, TAG_ESIM_TARGET_ADDR, imei2Str);
     builder->Asn1AddChild(imei2Node);
-    std::string keyNonce = "kNonce";
+    // add nonce node
     std::string nonceStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.nonce);
     std::shared_ptr<Asn1Node> nonceNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyNonce, TAG_ESIM_OCTET_STRING_TYPE, nonceStr);
+        TAG_ESIM_TARGET_ADDR, KEY_NONCE, TAG_ESIM_OCTET_STRING_TYPE, nonceStr);
     builder->Asn1AddChild(nonceNode);
-    std::string keyTimestamp = "kTimestamp";
+    // add timestamp node
     std::string timestampStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.mapMetaData.timestamp);
     std::shared_ptr<Asn1Node> timestampNode = GetKeyValueSequenceNode(
-        TAG_ESIM_TARGET_ADDR, keyTimestamp, TAG_ESIM_TARGET_ADDR, timestampStr);
+        TAG_ESIM_TARGET_ADDR, KEY_TIMESTAMP, TAG_ESIM_TARGET_ADDR, timestampStr);
     builder->Asn1AddChild(timestampNode);
     return builder->Asn1Build();
 }
@@ -3464,10 +3460,6 @@ bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &res
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_CONTRACT_INFO);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return false;
-    }
     // euiccCiPkidToBeUsed
     std::string pkidStr = OHOS::Telephony::ToUtf8(getContractInfoRequest_.euiccCiPkidToBeUsed);
     std::vector<uint8_t> pkidVec = Asn1Utils::HexStrToBytes(pkidStr);
@@ -3498,12 +3490,6 @@ bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &res
 
 bool EsimFile::ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr");
-        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
-        return false;
-    }
-
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("receive message is nullptr");
@@ -3550,8 +3536,8 @@ std::string EsimFile::GetContractInfo(const GetContractInfoRequest &getContractI
         SyncCloseChannel();
         return getContractInfoResult_;
     }
-    isGetContractInfoReady_ = false;
     std::unique_lock<std::mutex> lock(getContractInfoMutex_);
+    isGetContractInfoReady_ = false;
     if (!getContractInfoCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isGetContractInfoReady_; })) {
         SyncCloseChannel();
