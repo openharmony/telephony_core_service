@@ -86,7 +86,7 @@ std::shared_ptr<DataShare::DataShareResultSet> VCardEncoder::QueryContactData(
     DataShare::DataSharePredicates predicates;
     for (size_t i = 0; i< rawContactIdList.size(); i++) {
         predicates.EqualTo(ContactData::RAW_CONTACT_ID, rawContactIdList[i]);
-        if (i != rawContactIdList.size() -1) {
+        if (i != rawContactIdList.size() - 1) {
             predicates.Or();
         }
     }
