@@ -24,14 +24,173 @@ ohos_unittest("tel_ril_gtest") {
   sources = [
     "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
     "tel_ril_call_test.cpp",
-    "tel_ril_common_test.cpp",
     "tel_ril_data_test.cpp",
-    "tel_ril_handler_test.cpp",
     "tel_ril_modem_test.cpp",
     "tel_ril_network_test.cpp",
     "tel_ril_sim_test.cpp",
     "tel_ril_sms_test.cpp",
     "tel_ril_test_util.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/utils/common/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/sim/include",
+  ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "drivers_interface_ril:libril_proxy_1.2",
+    "drivers_interface_ril:libril_proxy_1.3",
+    "drivers_interface_ril:libril_proxy_1.4",
+    "drivers_interface_ril:libril_proxy_1.5",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  # defines += [ "TEL_TEST_PIN_PUK" ]
+}
+
+ohos_unittest("tel_ril_common_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
+    "tel_ril_common_test.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/utils/common/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/sim/include",
+  ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "drivers_interface_ril:libril_proxy_1.2",
+    "drivers_interface_ril:libril_proxy_1.3",
+    "drivers_interface_ril:libril_proxy_1.4",
+    "drivers_interface_ril:libril_proxy_1.5",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  # defines += [ "TEL_TEST_PIN_PUK" ]
+}
+
+ohos_unittest("tel_ril_handler_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
+    "tel_ril_handler_test.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/utils/common/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/sim/include",
+  ]
+
+  deps = [
+    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "drivers_interface_ril:libril_proxy_1.1",
+    "drivers_interface_ril:libril_proxy_1.2",
+    "drivers_interface_ril:libril_proxy_1.3",
+    "drivers_interface_ril:libril_proxy_1.4",
+    "drivers_interface_ril:libril_proxy_1.5",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+
+  # defines += [ "TEL_TEST_PIN_PUK" ]
+}
+
+ohos_unittest("tel_ril_zero_branch_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "$SOURCE_DIR/frameworks/native/src/i_network_search_callback_stub.cpp",
     "zero_branch_test_tel_ril.cpp",
   ]
 
@@ -79,5 +238,10 @@ ohos_unittest("tel_ril_gtest") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":tel_ril_gtest" ]
+  deps = [
+    ":tel_ril_gtest" ,
+    ":tel_ril_common_gtest",
+    ":tel_ril_zero_branch_gtest",
+    ":tel_ril_handler_gtest",
+  ]
 }
