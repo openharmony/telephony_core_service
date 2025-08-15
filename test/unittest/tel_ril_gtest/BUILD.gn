@@ -202,7 +202,7 @@ ohos_unittest("tel_ril_zero_branch_gtest") {
   ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
   ]
