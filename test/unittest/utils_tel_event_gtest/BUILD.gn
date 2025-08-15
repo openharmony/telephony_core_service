@@ -34,7 +34,7 @@ ohos_unittest("utils_tel_event_gtest") {
         "$SOURCE_DIR/utils/common/include",
     ]
     deps = [
-        "$SOURCE_DIR/utils:libtel_common",
+        "$SOURCE_DIR/test:core_service_test_base",
         "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     ]
     external_deps = [

@@ -337,7 +337,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_CellInfo_005, Function | MediumTest 
     cellListCurrentInfo->cellCurrentInfo.push_back(cellInfoCurrent);
     cellInfo->ProcessNeighboringCellInfo(eventNearby);
     cellInfo->ProcessCurrentCellInfo(eventCurrent);
- 
     cellInfo = std::make_shared<CellInfo>(networkSearchManager, SLOT_ID_0);
     cellInfo->UpdateCellLocation(1, 1, 1);
     sptr<CellInformation> gsmCellInfo = new GsmCellInformation;
