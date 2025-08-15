@@ -32,7 +32,7 @@ public:
     Base64() = delete;
     ~Base64() = delete;
     static std::shared_ptr<std::string> Encode(const std::vector<unsigned char> &input);
-    static std::shared_ptr<std::string> EncodeNoCopy(const std::string &input);
+    static std::shared_ptr<std::string> Encode(const std::string &input);
     static std::shared_ptr<std::vector<unsigned char>> Decode(const std::string &input);
 };
 }
