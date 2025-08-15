@@ -75,14 +75,16 @@ std::shared_ptr<DataShare::DataShareHelper> GetDataShareHelper(napi_env env, nap
             TELEPHONY_LOGE("Failed to get native context instance");
             return nullptr;
         }
-        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI, "", DB_CONNECT_MAX_WAIT_TIME);
+        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI,
+            "", DB_CONNECT_MAX_WAIT_TIME);
     } else {
         auto context = AbilityRuntime::GetStageModeContext(env, argv[0]);
         if (context == nullptr) {
             TELEPHONY_LOGE("Failed to get native stage context instance");
             return nullptr;
         }
-        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI, "", DB_CONNECT_MAX_WAIT_TIME);
+        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI,
+            "", DB_CONNECT_MAX_WAIT_TIME);
         if (context->GetToken() == nullptr) {
             TELEPHONY_LOGE("Failed to get native GetToken instance");
         }
