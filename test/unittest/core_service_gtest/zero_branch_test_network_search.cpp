@@ -1566,6 +1566,10 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_RadioInfo, Function | MediumTest | L
     radioInfo->SetRadioOnIfNeeded();
     radioInfo->slotId_ = SLOT_ID_0;
     radioInfo->SetRadioOnIfNeeded();
+    system::SetParameter("telephony.dynamic_poweroff_modem", "true");
+    radioInfo->SetRadioOnIfNeeded();
+    system::SetParameter("telephony.dynamic_poweroff_modem", "false");
+    radioInfo->SetRadioOnIfNeeded();
     nsm->simManager_ = nullptr;
     radioInfo->SetRadioOnIfNeeded();
     nsm.reset();
