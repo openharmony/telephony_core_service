@@ -42,6 +42,7 @@ constexpr int32_t THREE_PARAMETERS = 3;
 constexpr int32_t FOUR_PARAMETERS = 4;
 constexpr int32_t PARAMETERS_INDEX_TWO = 2;
 constexpr int32_t PARAMETERS_INDEX_THREE = 3;
+constexpr int32_t DB_CONNECT_MAX_WAIT_TIME = 10;
 
 static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
 {
@@ -74,14 +75,14 @@ std::shared_ptr<DataShare::DataShareHelper> GetDataShareHelper(napi_env env, nap
             TELEPHONY_LOGE("Failed to get native context instance");
             return nullptr;
         }
-        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI);
+        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI, "", DB_CONNECT_MAX_WAIT_TIME);
     } else {
         auto context = AbilityRuntime::GetStageModeContext(env, argv[0]);
         if (context == nullptr) {
             TELEPHONY_LOGE("Failed to get native stage context instance");
             return nullptr;
         }
-        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI);
+        dataShareHelper = DataShare::DataShareHelper::Creator(context->GetToken(), CONTACT_URI, "", DB_CONNECT_MAX_WAIT_TIME);
         if (context->GetToken() == nullptr) {
             TELEPHONY_LOGE("Failed to get native GetToken instance");
         }
