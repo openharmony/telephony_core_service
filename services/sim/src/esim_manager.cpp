@@ -37,10 +37,12 @@ bool EsimManager::OnInit(int32_t slotCount)
     }
     slotCount_ = slotCount;
     esimFiles_.resize(slotCount_);
+    esimFilesLowPriority_.resize(slotCount_);
     for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
         if (DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId) == TELEPHONY_ERR_SUCCESS) {
             TELEPHONY_LOGI("esimFiles_[%{public}d] to be init", slotId);
             esimFiles_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
+            esimFilesLowPriority_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
         }
     }
     return true;
