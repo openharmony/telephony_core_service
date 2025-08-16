@@ -241,7 +241,7 @@ int32_t EsimManager::ListNotifications(
         TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    notificationList = esimFiles_[slotId]->ListNotifications(portIndex, events);
+    notificationList = esimFilesLowPriority_[slotId]->ListNotifications(portIndex, events);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -252,7 +252,7 @@ int32_t EsimManager::RetrieveNotificationList(
         TELEPHONY_LOGE("RetrieveNotificationList simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    notificationList = esimFiles_[slotId]->RetrieveNotificationList(portIndex, events);
+    notificationList = esimFilesLowPriority_[slotId]->RetrieveNotificationList(portIndex, events);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -263,7 +263,7 @@ int32_t EsimManager::RetrieveNotification(
         TELEPHONY_LOGE("RetrieveNotification simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    notification = esimFiles_[slotId]->ObtainRetrieveNotification(portIndex, seqNumber);
+    notification = esimFilesLowPriority_[slotId]->ObtainRetrieveNotification(portIndex, seqNumber);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -274,7 +274,7 @@ int32_t EsimManager::RemoveNotificationFromList(
         TELEPHONY_LOGE("RemoveNotificationFromList simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    enumResult = esimFiles_[slotId]->RemoveNotificationFromList(portIndex, seqNumber);
+    enumResult = esimFilesLowPriority_[slotId]->RemoveNotificationFromList(portIndex, seqNumber);
     return TELEPHONY_ERR_SUCCESS;
 }
 
