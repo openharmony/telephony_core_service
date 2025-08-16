@@ -22,6 +22,7 @@ ohos_unittest("sim_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
+    "core_manager_inner_gtest.cpp",
     "csim_file_controller_gtest.cpp",
     "isim_file_gtest.cpp",
     "multi_sim_controller_gtest.cpp",
