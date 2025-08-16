@@ -63,7 +63,7 @@ private:
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
     bool hasEventDone_ = false;
-    bool hasQueryEventDone_ = true;
+    bool hasQueryEventDone_ = false;
     std::condition_variable processWait_;
     void ProcessSimStateChanged();
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
