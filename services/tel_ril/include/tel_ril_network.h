@@ -191,10 +191,18 @@ inline int32_t TelRilNetwork::Request(const char *funcName, const AppExecFwk::In
         TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+<<<<<<< HEAD
 
     if (GetDynamicPowerOffModeSwitchWithStr() ||
         system::GetBoolParameter("persist.telephony.network_search_atblock", false)) {
             TELEPHONY_LOGE("in str mode %{public}s() is blocked", funcName);
+=======
+ 
+    if ((GetDynamicPowerOffModeSwitchWithStr() ||
+        system::GetBoolParameter("persist.telephony.network_search_atblock", false)) &&
+        std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end()) {
+            TELEPHONY_LOGE("%{public}s() not in white list req", funcName);
+>>>>>>> 4073b9742b13cd3f269171a97201282171ddebd6
             return TELEPHONY_ERR_PERMISSION_ERR;
     }
  
