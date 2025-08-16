@@ -362,18 +362,6 @@ HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_001, Function | MediumTe
     }
 }
 
-// HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_002, Function | MediumTest | Level3)
-// {
-//     VCardManager manager;
-//     vector<std::shared_ptr<VCardContact>> contacts;
-//     for (int i = 0; i < 3; ++i) {
-//         contacts.push_back(std::make_shared<VCardContact>());
-//     }
-//     size_t step = 0;
-//     auto result = manager.SplitContactsVector(contacts, step);
-//     EXPECT_EQ(result.size(), 0);
-// }
-
 HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_003, Function | MediumTest | Level3)
 {
     VCardManager manager;
