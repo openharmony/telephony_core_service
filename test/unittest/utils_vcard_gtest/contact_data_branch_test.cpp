@@ -422,7 +422,7 @@ HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_001, Function |
     EXPECT_EQ(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 
-HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_001, Function | MediumTest | Level3)
+HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_002, Function | MediumTest | Level3)
 {
     VCardManager manager;
     int32_t cardType = VERSION_21_NUM + 1;
@@ -489,6 +489,16 @@ HWTEST_F(ContactDataBranchTest, Exporttest_001, Function | MediumTest | Level3)
 
     EXPECT_NE(result, TELEPHONY_SUCCESS);
     EXPECT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    string path = "";
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = DEFAULT_CHARSET;
 
     path = "";
     predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
