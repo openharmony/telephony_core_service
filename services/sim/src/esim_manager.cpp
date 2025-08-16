@@ -237,7 +237,7 @@ int32_t EsimManager::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
 int32_t EsimManager::ListNotifications(
     int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList)
 {
-    if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
+    if ((!IsValidSlotId(slotId, esimFilesLowPriority_)) || (esimFilesLowPriority_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -248,7 +248,7 @@ int32_t EsimManager::ListNotifications(
 int32_t EsimManager::RetrieveNotificationList(
     int32_t slotId, int32_t portIndex, EsimEvent events, EuiccNotificationList &notificationList)
 {
-    if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
+    if ((!IsValidSlotId(slotId, esimFilesLowPriority_)) || (esimFilesLowPriority_[slotId] == nullptr)) {
         TELEPHONY_LOGE("RetrieveNotificationList simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -259,7 +259,7 @@ int32_t EsimManager::RetrieveNotificationList(
 int32_t EsimManager::RetrieveNotification(
     int32_t slotId, int32_t portIndex, int32_t seqNumber, EuiccNotification &notification)
 {
-    if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
+    if ((!IsValidSlotId(slotId, esimFilesLowPriority_)) || (esimFilesLowPriority_[slotId] == nullptr)) {
         TELEPHONY_LOGE("RetrieveNotification simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -270,7 +270,7 @@ int32_t EsimManager::RetrieveNotification(
 int32_t EsimManager::RemoveNotificationFromList(
     int32_t slotId, int32_t portIndex, int32_t seqNumber, int32_t &enumResult)
 {
-    if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
+    if ((!IsValidSlotId(slotId, esimFilesLowPriority_)) || (esimFilesLowPriority_[slotId] == nullptr)) {
         TELEPHONY_LOGE("RemoveNotificationFromList simFileManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
