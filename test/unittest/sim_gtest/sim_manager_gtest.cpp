@@ -340,7 +340,6 @@ HWTEST_F(SimManagerTest, SetLockStatetest, Function | MediumTest | Level1)
     simManager_->simStateManager_[slotId] = nullptr;
     int32_t result = simManager_->SetLockState(slotId, options, response);
     EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
-
 }
 
 HWTEST_F(SimManagerTest, RefreshSimStatetest, Function | MediumTest | Level1)
