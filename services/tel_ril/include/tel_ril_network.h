@@ -197,12 +197,8 @@ inline int32_t TelRilNetwork::Request(const char *funcName, const AppExecFwk::In
             TELEPHONY_LOGE("in str mode %{public}s() is blocked", funcName);
             return TELEPHONY_ERR_PERMISSION_ERR;
     }
- 
+
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
-    if (telRilRequest == nullptr) {
-        TELEPHONY_LOGE("%{public}s() telRilRequest is null", funcName);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     return (rilInterface->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
 }
 } // namespace Telephony
