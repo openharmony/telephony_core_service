@@ -505,7 +505,7 @@ HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
     cardType = VERSION_21_NUM + 1;
     charset = "invalid_charset";
 
-    result = manager.Export(path, predicates, cardType, charset);
+    int result = manager.Export(path, predicates, cardType, charset);
 
     EXPECT_NE(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
