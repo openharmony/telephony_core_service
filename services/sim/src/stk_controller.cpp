@@ -309,7 +309,11 @@ void StkController::OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("StkController[%{public}d]::OnIccStateChanged() simStateManager is nullptr", slotId_);
         return;
     }
-    int32_t newState = simStateManager->HasSimCard() ? ICC_CARD_STATE_PRESENT : ICC_CARD_STATE_ABSENT;
+    int32_t newState =
+        static_cast<int32_t>(simStateManager->GetSimIccStatus()) >
+                ICC_CARD_STATE_ABSENT
+            ? ICC_CARD_STATE_PRESENT
+            : ICC_CARD_STATE_ABSENT;
     int32_t oldState = iccCardState_;
     iccCardState_ = newState;
     TELEPHONY_LOGI("StkController[%{public}d]::OnIccStateChanged(), oldState: %{public}d newState: %{public}d",
