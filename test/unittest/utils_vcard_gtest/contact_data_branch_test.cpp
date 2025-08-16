@@ -295,12 +295,11 @@ HWTEST_F(ContactDataBranchTest, BatchInsertContactDbAbilityrest_001, Function | 
     manager.BatchInsertContactDbAbility(accountId, errorCode);
     EXPECT_NE(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
 
-    const int BATCH_SIZE = 10;
-    for (int i = 0; i < BATCH_SIZE * 2; ++i) {
+    for (int i = 0; i < 20; ++i) {
         std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
         manager.listener_->GetContacts();
     }
-    EXPECT_GE(manager.listener_->GetContacts().size(), BATCH_SIZE);
+    EXPECT_GE(manager.listener_->GetContacts().size(), 10);
     manager.BatchInsertContactDbAbility(accountId, errorCode);
     
     EXPECT_NE(errorCode, TELEPHONY_SUCCESS);
@@ -310,7 +309,7 @@ HWTEST_F(ContactDataBranchTest, InsertContactDbAbilityrest_001, Function | Mediu
 {
     VCardManager manager;
     int32_t errorCode = 0;
-    manager.InsertContactDbAbility(1,errorCode);
+    manager.InsertContactDbAbility(1, errorCode);
     EXPECT_NE(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
@@ -382,7 +381,6 @@ HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_003, Function | MediumTe
     EXPECT_EQ(result.size(), 1);
     EXPECT_NE(result[0].size(), 4);
 
-
     contacts.push_back(std::make_shared<VCardContact>());
     step = 1;
     result = manager.SplitContactsVector(contacts, step);
@@ -422,10 +420,18 @@ HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_001, Function |
     result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
     EXPECT_FALSE(result);
     EXPECT_EQ(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = "";
+    int32_t errorCode = 0;
 
     cardType = VERSION_40_NUM + 1;
     charset = "";
-    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    bool result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
     EXPECT_FALSE(result);
     EXPECT_EQ(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
 
