@@ -164,10 +164,6 @@ private:
     bool hasRetryGetImsi_ = false;
     static const uint8_t CPHS_VOICE_MAIL_MASK = 0x30;
     static const uint8_t CPHS_VOICE_MAIL_EXSIT = 0x30;
-    static const int CFIS_BCD_NUMBER_LENGTH_OFFSET = 2;
-    static const int CFIS_TON_NPI_OFFSET = 3;
-    static const int CFIS_ADN_CAPABILITY_ID_OFFSET = 14;
-    static const int CFIS_ADN_EXTENSION_ID_OFFSET = 15;
     int ObtainExtensionElementaryFile(int ef);
     bool CphsVoiceMailAvailable();
     bool EfCfisAvailable(int32_t size);
