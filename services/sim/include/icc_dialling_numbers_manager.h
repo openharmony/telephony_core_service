@@ -72,6 +72,7 @@ private:
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcesAdvanceLoadPbr();
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
 
     void ClearRecords();
