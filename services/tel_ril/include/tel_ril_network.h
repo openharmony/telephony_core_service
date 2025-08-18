@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char *AT_BLOCK_STATE = "persist.telephony.network_search_atblock";
 class TelRilNetwork : public TelRilBase {
 public:
     TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
@@ -188,13 +189,11 @@ inline int32_t TelRilNetwork::Request(const char *funcName, const AppExecFwk::In
 {
     sptr<HDI::Ril::V1_5::IRil> rilInterface = GetRilInterface();
     if (rilInterface == nullptr) {
-        TELEPHONY_LOGE("%{public}s() rilInterface_ is null", funcName);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    if (GetDynamicPowerOffModeSwitchWithStr() ||
-        system::GetBoolParameter("persist.telephony.network_search_atblock", false)) {
-        TELEPHONY_LOGE("in str mode %{public}s() is blocked", funcName);
+    if (GetDynamicPowerOffModeSwitchWithStr() || system::GetBoolParameter(AT_BLOCK_STATE, false)) {
+        TELEPHONY_LOGE("%{public}s() is blocked in str mode", funcName);
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
 
