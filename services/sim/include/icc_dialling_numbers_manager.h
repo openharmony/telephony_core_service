@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace Telephony {
 enum DiallingNumbersMessageType {
+    MSG_SIM_ADVENCE_LOAD_PBR = 0,
     MSG_SIM_DIALLING_NUMBERS_GET_DONE  = 1,
     MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE,
     MSG_SIM_DIALLING_NUMBERS_WRITE_DONE,
@@ -62,6 +63,7 @@ private:
     std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
+    std::mutex queryMtx_;
     bool hasEventDone_ = false;
     bool hasQueryEventDone_ = false;
     std::condition_variable processWait_;
