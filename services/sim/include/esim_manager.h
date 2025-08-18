@@ -80,7 +80,7 @@ private:
     bool IsValidSlotId(int32_t slotId, std::vector<N> vec);
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
-    int32_t slotCount_ = ESIM_MAX_SLOT_COUNT;
+    [[maybe_unused]] int32_t slotCount_ = ESIM_MAX_SLOT_COUNT;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     std::vector<std::shared_ptr<Telephony::EsimFile>> esimFiles_;
 #endif
