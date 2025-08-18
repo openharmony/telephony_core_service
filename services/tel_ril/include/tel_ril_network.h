@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char *AT_BLOCK_STATE = "persist.telephony.network_search_atblock";
 class TelRilNetwork : public TelRilBase {
 public:
     TelRilNetwork(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
@@ -173,9 +174,32 @@ private:
     void BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
         const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
 
+protected:
+    template<typename FuncType, typename... ParamTypes>
+    inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, FuncType &&_func,
+        ParamTypes &&... _args);
+
 private:
     const int32_t MAX_NBCELL_COUNT = 4;
 };
+
+template<typename FuncType, typename... ParamTypes>
+inline int32_t TelRilNetwork::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
+    FuncType &&_func, ParamTypes &&... _args)
+{
+    sptr<HDI::Ril::V1_5::IRil> rilInterface = GetRilInterface();
+    if (rilInterface == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    if (GetDynamicPowerOffModeSwitchWithStr() || system::GetBoolParameter(AT_BLOCK_STATE, false)) {
+        TELEPHONY_LOGE("%{public}s() is blocked in str mode", funcName);
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
+    return (rilInterface->*(_func))(slotId_, telRilRequest->serialId_, std::forward<ParamTypes>(_args)...);
+}
 } // namespace Telephony
 } // namespace OHOS
 #endif // TEL_RIL_NETWORK_H
