@@ -194,8 +194,8 @@ inline int32_t TelRilNetwork::Request(const char *funcName, const AppExecFwk::In
 
     if (GetDynamicPowerOffModeSwitchWithStr() ||
         system::GetBoolParameter("persist.telephony.network_search_atblock", false)) {
-            TELEPHONY_LOGE("in str mode %{public}s() is blocked", funcName);
-            return TELEPHONY_ERR_PERMISSION_ERR;
+        TELEPHONY_LOGE("in str mode %{public}s() is blocked", funcName);
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
 
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
