@@ -354,8 +354,9 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_0013
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, objectUnique, eventParam);
     ASSERT_NE(event, nullptr);
     diallingNumberHandler->ProcessEvent(event);
-    diallingNumberHandler->ProcessLinearSizeDone(event, 1);
-    diallingNumberHandler->ProcessUpdateRecordDone(event, 1);
+    int id = 1;
+    diallingNumberHandler->ProcessLinearSizeDone(event, id);
+    diallingNumberHandler->ProcessUpdateRecordDone(event, id);
     bool ret = diallingNumberHandler->SendBackResult(1);
     EXPECT_FALSE(ret);
 }
