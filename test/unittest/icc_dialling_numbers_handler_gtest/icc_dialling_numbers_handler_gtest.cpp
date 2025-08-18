@@ -308,5 +308,57 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_011,
     EXPECT_NE(loadRequest, nullptr);
 }
 
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_0012
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_0012, Function | MediumTest | Level1)
+{
+    int ef = 1;
+    int exid = 1;
+    int index = 1;
+    DiallingNumberUpdateInfor infor;
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(1, 1);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    ASSERT_NE(iccFileController, nullptr);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+    diallingNumberHandler->GetDiallingNumbers(ef, exid, index, response);
+    diallingNumberHandler->fileController_ = iccFileController;
+    diallingNumberHandler->UpdateDiallingNumbers(infor, response);
+    int loadId = 1;
+    bool ret = diallingNumberHandler->IsAdnHasExtRecord(MSG_SIM_OBTAIN_ADN_DONE, loadId);
+    EXPECT_TRUE(ret);
+    ret = diallingNumberHandler->IsAdnHasExtRecord(MSG_SIM_OBTAIN_ALL_ADN_DONE, loadId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.number   Telephony_IccDiallingNumbersHandler_0013
+ * @tc.name     test IccDiallingNumbersHandler
+ * @tc.desc     Function test
+ */
+HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_0013, Function | MediumTest | Level1)
+{
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create("test");
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+    ASSERT_NE(iccFileController, nullptr);
+    auto diallingNumberHandler = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+
+    IccFileData fd;
+    fd.resultData = "0203112233FFFFFFFFFFFFFFFF";
+    auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, &fd);
+    int eventParam = 1;
+
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, objectUnique, eventParam);
+    ASSERT_NE(event, nullptr);
+    diallingNumberHandler->ProcessEvent(event);
+    int id = 1;
+    diallingNumberHandler->ProcessLinearSizeDone(event, id);
+    diallingNumberHandler->ProcessUpdateRecordDone(event, id);
+    bool ret = diallingNumberHandler->SendBackResult(1);
+    EXPECT_FALSE(ret);
+}
 }
 }

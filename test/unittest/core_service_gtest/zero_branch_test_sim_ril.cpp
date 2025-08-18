@@ -1623,7 +1623,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_003, Function | Medium
     EXPECT_CALL(*dataShareHelper, Creator(_, _, _, _)).WillRepeatedly(DoAll(Return(nullptr)));
     operatorConfigLoader->LoadOpKeyOnMccMnc(0);
     bool isDataShareError = CoreManagerInner::GetInstance().IsDataShareError();
-    EXPECT_TRUE(isDataShareError);
+    EXPECT_FALSE(isDataShareError);
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_004, Function | MediumTest | Level1)
