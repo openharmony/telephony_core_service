@@ -204,7 +204,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     isVSimEnabled_ = (IS_VSIM_ENABLED) dlsym(telephonyVSimWrapperHandle_, "IsVSimEnabled");
     updateSubState_ = (UPDATE_SUB_STATE) dlsym(telephonyVSimWrapperHandle_, "UpdateSubState");
     isInEnaDisableVSim_ = (IS_IN_ENABLE_DISABLE_VSIM) dlsym(telephonyVSimWrapperHandle_, "IsInEnableDisableVSim");
-    isVSimInDisableProcess_ = (IS_VSIM_IN_DISABLE_PROCESS) dlsym(telephonyVSimWrapperHandle_, "IsVsimInDisableProcess");
+    isVSimInDisableProcess_ = (IS_VSIM_IN_DISABLE_PROCESS) dlsym(telephonyVSimWrapperHandle_, "IsVSimInDisableProcess");
     bool hasFuncNull = (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
         putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
         getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr || isHandleVSim_ == nullptr || isVSimEnabled_ == nullptr ||
