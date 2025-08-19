@@ -151,6 +151,7 @@ private:
     bool SetPrimarySlotToRil(int32_t slotId);
     void SendSetPrimarySlotEvent(int32_t slotId);
     void ProcessRilSetPrimarySlotResponse(bool result);
+    bool IsSetPrimarySlotIdAllowed();
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
