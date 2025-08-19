@@ -51,7 +51,7 @@ void IccDiallingNumbersManager::Init()
     diallingNumbersCache_->Init();
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     TELEPHONY_LOGI("Init() end");
-    SendEvent(MSG_SIM_ADVENCE_LOAD_PBR, 0, DELAY_LOAD_PBR_MS);
+    SendEvent(MSG_SIM_ADVANCE_LOAD_PBR, 0, DELAY_LOAD_PBR_MS);
 }
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -63,8 +63,8 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
     switch (id) {
-        case MSG_SIM_ADVENCE_LOAD_PBR:
-            ProcesAdvanceLoadPbr();
+        case MSG_SIM_ADVANCE_LOAD_PBR:
+            ProcessAdvanceLoadPbr();
             break;
         case MSG_SIM_DIALLING_NUMBERS_GET_DONE:
             ProcessLoadDone(event);
@@ -86,7 +86,7 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
     }
 }
 
-void IccDiallingNumbersManager::ProcesAdvanceLoadPbr()
+void IccDiallingNumbersManager::ProcessAdvanceLoadPbr()
 {
     ffrt::submit([manager = std::static_pointer_cast<IccDiallingNumbersManager>(shared_from_this())] {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
