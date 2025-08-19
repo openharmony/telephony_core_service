@@ -204,11 +204,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVSim()
     isVSimEnabled_ = (IS_VSIM_ENABLED) dlsym(telephonyVSimWrapperHandle_, "IsVSimEnabled");
     updateSubState_ = (UPDATE_SUB_STATE) dlsym(telephonyVSimWrapperHandle_, "UpdateSubState");
     isInEnaDisableVSim_ = (IS_IN_ENABLE_DISABLE_VSIM) dlsym(telephonyVSimWrapperHandle_, "IsInEnableDisableVSim");
-
+    isVsimInDisableProcess_ = (IS_VSIM_IN_DISABLE_PROCESS) dlsym(telephonyVSimWrapperHandle_, "IsVsimInDisableProcess");
     bool hasFuncNull = (isVSimInStatus_ == nullptr || getVSimSlotId_ == nullptr || onAllFilesFetchedExt_ == nullptr ||
         putVSimExtraInfo_ == nullptr || changeSpnAndRuleExt_ == nullptr || getVSimCardState_ == nullptr ||
         getSimIdExt_ == nullptr || getSlotIdExt_ == nullptr || isHandleVSim_ == nullptr || isVSimEnabled_ == nullptr ||
-        updateSubState_ == nullptr || isInEnaDisableVSim_ == nullptr);
+        updateSubState_ == nullptr || isInEnaDisableVSim_ == nullptr || isVsimInDisableProcess_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[VSIM] telephony ext wrapper symbol failed, error: %{public}s", dlerror());
         return;

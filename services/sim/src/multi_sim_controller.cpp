@@ -60,6 +60,7 @@ static const std::string MAIN_CARD_ICCID_KEY = "persist.telephony.MainCard.Iccid
 static const std::string PRIMARY_SLOTID_KEY = "persist.telephony.MainSlotId";
 static const std::string MAIN_CELLULAR_DATA_SLOTID_KEY = "persist.telephony.MainCellularDataSlotId";
 static const std::string PRIMARY_SLOTID = "0";
+constexpr int32_t THREE_MODEMS = 3;
 constexpr int32_t SLOT_ID_1 = 1;
 constexpr int32_t RIL_SET_PRIMARY_SLOT_TIMEOUT = 45 * 1000; // 45 second
 const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
@@ -1166,13 +1167,26 @@ void MultiSimController::SetPrimarySlotIdDone()
     activeSimConn_.notify_all();
 }
 
+bool MultiSimController::IsSetPrimarySlotIdAllowed()
+{
+    bool isHandleVsim = TELEPHONY_EXT_WRAPPER.isHandleVsim_ && TELEPHONY_EXT_WRAPPER.isHandleVsim_();
+    bool isVsimOutDisableProcess =
+        TELEPHONY_EXT_WRAPPER.isVsimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVsimInDisableProcess_();
+    if (VSIM_MODEM_COUNT != THREE_MODEMS && isHandleVsim && isVsimOutDisableProcess) {
+        return false;
+    }
+    if (VSIM_MODEM_COUNT == THREE_MODEMS && isHandleVsim) {
+        return false;
+    }
+    return true;
+}
+
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
     if (isUserSet && isRilSetPrimarySlotSupport_) {
         return SetPrimarySlotIdWithoutModemReboot(slotId);
     }
-    TELEPHONY_LOGD("slotId = %{public}d", slotId);
-    if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
+    if (!IsSetPrimarySlotIdAllowed()) {
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
         return TELEPHONY_ERR_FAIL;
     }
