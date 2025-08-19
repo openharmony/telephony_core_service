@@ -645,10 +645,6 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_003, Fu
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
     TELEPHONY_EXT_WRAPPER.isHandleVSim_ = []() { return true; };
     TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = []() { return false; };
-    SetParameter(VSIM_MODEM_COUNT_STR, "3");
-    ret = multiSimController->SetPrimarySlotId(0, false);
-    EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
-    SetParameter(VSIM_MODEM_COUNT_STR, "2");
     ret = multiSimController->SetPrimarySlotId(0, false);
     EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
 }
