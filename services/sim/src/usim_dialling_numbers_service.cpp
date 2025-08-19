@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t ANR_RECORD_TYPE_ADDITIONAL_DATA = 2;
 constexpr int32_t MIN_ANR_RECORD_LENGTH_BYTES = 15;
 constexpr int32_t ANR_ADDITION_NUMBER_LENGTH_OFFSET = 1;
 constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
