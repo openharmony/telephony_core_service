@@ -18,11 +18,13 @@
 #include "core_service_errors.h"
 #include "radio_event.h"
 #include "telephony_errors.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
-constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 30;
+constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 60;
+constexpr static const int32_t DELAY_LOAD_PBR_MS = 5 * 1000;
 
 IccDiallingNumbersManager::IccDiallingNumbersManager(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
@@ -49,6 +51,7 @@ void IccDiallingNumbersManager::Init()
     diallingNumbersCache_->Init();
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     TELEPHONY_LOGI("Init() end");
+    SendEvent(MSG_SIM_ADVANCE_LOAD_PBR, 0, DELAY_LOAD_PBR_MS);
 }
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -60,6 +63,9 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
     switch (id) {
+        case MSG_SIM_ADVANCE_LOAD_PBR:
+            ProcessAdvanceLoadPbr();
+            break;
         case MSG_SIM_DIALLING_NUMBERS_GET_DONE:
             ProcessLoadDone(event);
             break;
@@ -78,6 +84,14 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
         default:
             break;
     }
+}
+
+void IccDiallingNumbersManager::ProcessAdvanceLoadPbr()
+{
+    ffrt::submit([manager = std::static_pointer_cast<IccDiallingNumbersManager>(shared_from_this())] {
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+        manager->QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_ADN, result);
+    });
 }
 
 void IccDiallingNumbersManager::ProcessSimStateChanged()
@@ -250,6 +264,7 @@ int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
 int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
+    std::unique_lock<std::mutex> queryLock(queryMtx_);
     std::unique_lock<std::mutex> lock(mtx_);
     if (diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -261,14 +276,13 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
-    if (hasQueryEventDone_) {
-        ClearRecords();
-        int fileId = ELEMENTARY_FILE_PBR;
-        int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
-        AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
-        hasQueryEventDone_ = false;
-        diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
-    }
+    ClearRecords();
+    int fileId = ELEMENTARY_FILE_PBR;
+    int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
+    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
+    hasQueryEventDone_ = false;
+    diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
+    
     processWait_.wait_for(
         lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
     TELEPHONY_LOGI("QueryIccDiallingNumbers: end");
