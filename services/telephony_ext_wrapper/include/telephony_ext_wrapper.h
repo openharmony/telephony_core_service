@@ -169,7 +169,7 @@ public:
     GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
     IS_HANDLE_VSIM isHandleVSim_ = nullptr;
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
-    IS_VSIM_IN_DISABLE_PROCESS isVsimInDisableProcess_ = nullptr;
+    IS_VSIM_IN_DISABLE_PROCESS isVSimInDisableProcess_ = nullptr;
     UPDATE_SUB_STATE updateSubState_ = nullptr;
     IS_IN_ENABLE_DISABLE_VSIM isInEnaDisableVSim_ = nullptr;
     /* add for vsim end */
