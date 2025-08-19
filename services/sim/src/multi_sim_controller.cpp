@@ -1169,13 +1169,13 @@ void MultiSimController::SetPrimarySlotIdDone()
 
 bool MultiSimController::IsSetPrimarySlotIdAllowed()
 {
-    bool isHandleVsim = TELEPHONY_EXT_WRAPPER.isHandleVsim_ && TELEPHONY_EXT_WRAPPER.isHandleVsim_();
-    bool isVsimOutDisableProcess =
-        TELEPHONY_EXT_WRAPPER.isVsimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVsimInDisableProcess_();
-    if (VSIM_MODEM_COUNT != THREE_MODEMS && isHandleVsim && isVsimOutDisableProcess) {
+    bool isHandleVSim = TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_();
+    bool isVSimOutDisableProcess =
+        TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ && !TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_();
+    if (VSIM_MODEM_COUNT != THREE_MODEMS && isHandleVSim && isVSimOutDisableProcess) {
         return false;
     }
-    if (VSIM_MODEM_COUNT == THREE_MODEMS && isHandleVsim) {
+    if (VSIM_MODEM_COUNT == THREE_MODEMS && isHandleVSim) {
         return false;
     }
     return true;
