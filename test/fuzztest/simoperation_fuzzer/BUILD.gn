@@ -55,6 +55,7 @@ ohos_fuzztest("SimOperationFuzzTest") {
     "ffrt:libffrt",
     "hdf_core:libpub_utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "libxml2:libxml2",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
