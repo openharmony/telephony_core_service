@@ -50,7 +50,7 @@ void CellInformation::Init(int32_t mcc, int32_t mnc, int32_t cellId)
     }
     mcc_ = std::to_string(mcc);
     cellId_ = cellId;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 void CellInformation::Init(std::string mcc, std::string mnc, int32_t cellId)
@@ -58,7 +58,7 @@ void CellInformation::Init(std::string mcc, std::string mnc, int32_t cellId)
     mnc_ = mnc;
     mcc_ = mcc;
     cellId_ = cellId;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 int32_t CellInformation::GetCellId() const
@@ -89,7 +89,7 @@ int32_t CellInformation::GetSignalIntensity() const
 void CellInformation::SetSignalIntensity(int32_t signalIntensity)
 {
     signalIntensity_ = signalIntensity;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 int32_t CellInformation::GetSignalLevel() const
@@ -100,7 +100,7 @@ int32_t CellInformation::GetSignalLevel() const
 void CellInformation::SetSignalLevel(int32_t signalLevel)
 {
     signalLevel_ = signalLevel;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 bool CellInformation::GetIsCamped() const
@@ -111,7 +111,7 @@ bool CellInformation::GetIsCamped() const
 void CellInformation::SetIsCamped(bool isCamped)
 {
     isCamped_ = isCamped;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 CellInformation *CellInformation::Unmarshalling(Parcel &parcel)
@@ -302,7 +302,7 @@ void GsmCellInformation::UpdateLocation(int32_t cellId, int32_t lac)
 {
     cellId_ = cellId;
     lac_ = lac;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 void LteCellInformation::SetLteParam(int32_t pci, int32_t tac, int32_t arfcn)
@@ -475,7 +475,7 @@ void LteCellInformation::UpdateLocation(int32_t cellId, int32_t tac)
 {
     cellId_ = cellId;
     tac_ = tac;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 std::string LteCellInformation::ToString() const
@@ -659,7 +659,7 @@ void WcdmaCellInformation::UpdateLocation(int32_t cellId, int32_t lac)
 {
     cellId_ = cellId;
     lac_ = lac;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 std::string WcdmaCellInformation::ToString() const
@@ -843,7 +843,7 @@ void TdscdmaCellInformation::UpdateLocation(int32_t cellId, int32_t lac)
 {
     cellId_ = cellId;
     lac_ = lac;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 std::string TdscdmaCellInformation::ToString() const
@@ -1029,7 +1029,7 @@ void CdmaCellInformation::UpdateLocation(int32_t baseId, int32_t latitude, int32
     baseId_ = baseId;
     latitude_ = latitude;
     longitude_ = longitude;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 std::string CdmaCellInformation::ToString() const
@@ -1261,7 +1261,7 @@ void NrCellInformation::UpdateLocation(int32_t pci, int32_t tac)
 {
     pci_ = pci;
     tac_ = tac;
-    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance->GetBootTimeMs();
+    timeStamp_ = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
 }
 
 std::string NrCellInformation::ToString() const
