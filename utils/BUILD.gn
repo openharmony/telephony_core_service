@@ -218,6 +218,7 @@ ohos_shared_library("libtel_vcard") {
     "hilog:libhilog",
     "init:libbegetutil",
     "i18n:intl_util",
+    "ipc:ipc_single",
   ]
 
   innerapi_tags = [ "platformsdk" ]
