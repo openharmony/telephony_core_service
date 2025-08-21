@@ -24,6 +24,7 @@
 #include "new"
 #include "parcel.h"
 #include "string"
+#inlede "time_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
