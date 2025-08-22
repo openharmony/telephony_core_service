@@ -128,6 +128,8 @@ ohos_shared_library("tel_core_service_api") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
@@ -137,6 +139,7 @@ ohos_shared_library("tel_core_service_api") {
     "ipc:ipc_single",
     "resource_management:global_resmgr",
     "samgr:samgr_proxy",
+    "time_service:time_client",
   ]
 
   if (core_service_support_esim) {
