@@ -109,6 +109,7 @@ void IccDiallingNumbersManager::ProcessSimStateChanged()
             ProcessAdvanceLoadPbr();
         }
     }
+    currentSimState_ == simStateManager_->GetSimState();
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
