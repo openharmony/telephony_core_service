@@ -23,7 +23,6 @@ constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 const std::u16string NUMBER_SPLIT = u";";
 constexpr int64_t PROCESS_PBR_DELAY_MS = 10 * 1000;
-constexpr int32_t NUMBERS_NUM_PER_ADN = 250;
 
 std::mutex UsimDiallingNumbersService::mtx_;
 
@@ -50,7 +49,7 @@ void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Poin
 
 void UsimDiallingNumbersService::InitFuncMap()
 {
-    memberFuncMap_[MSG_USIM_PBR_LOAD_DONE] =
+    memberFuncMap_[MSG_USIM_LOAD_PBR] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { LoadPbrFiles(); };
     memberFuncMap_[MSG_USIM_PBR_LOAD_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessPbrLoadDone(event); };
