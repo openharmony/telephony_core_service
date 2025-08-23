@@ -103,6 +103,11 @@ void IccDiallingNumbersManager::ProcessSimStateChanged()
     if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
         diallingNumbersCache_->ClearDiallingNumberCache();
+    } else {
+        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready")
+        if (currentSimState_ == SimState::SIM_STATE_NOT_PRESENT) {
+            ProcessAdvanceLoadPbr();
+        }
     }
 }
 
@@ -277,7 +282,13 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     }
     TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
     ClearRecords();
-    int fileId = ELEMENTARY_FILE_PBR;
+    auto simFM = simFileManager_.lock();
+    if (simFM == nullptr) {
+        TELEPHONY_LOGE("QueryIccDiallingNumbers no sim card");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    bool isCardUicc = simFM->IsUiccCard();
+    int fileId = isCardUicc ? ELEMENTARY_FILE_PBR : GetFileIdForType(type);
     int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
     hasQueryEventDone_ = false;

@@ -114,6 +114,7 @@ private:
     bool IsValidType(IccType type);
     bool IsCTCardType(CardType type);
     bool IsCTIccId(std::string iccId);
+    bool IsUiccCard();
     std::string opName_;
     std::string opKey_;
     std::string opKeyExt_;
