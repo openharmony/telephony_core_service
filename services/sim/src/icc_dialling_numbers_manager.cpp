@@ -104,7 +104,7 @@ void IccDiallingNumbersManager::ProcessSimStateChanged()
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
         diallingNumbersCache_->ClearDiallingNumberCache();
     } else {
-        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready")
+        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready");
         if (currentSimState_ == SimState::SIM_STATE_NOT_PRESENT) {
             ProcessAdvanceLoadPbr();
         }
