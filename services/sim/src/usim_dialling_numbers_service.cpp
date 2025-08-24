@@ -157,7 +157,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
         std::vector<std::string> &dataList = object->fileResults;
         std::vector<std::u16string> number2s;
         for (const auto &item : dataList) {
-            number2s.push_back(FetchAnrContent(dataList[i]));
+            number2s.push_back(FetchAnrContent(item));
         }
         anrs_[event->GetParam()] = number2s;
     }
