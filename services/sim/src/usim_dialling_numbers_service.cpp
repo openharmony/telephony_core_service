@@ -194,7 +194,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
         return false;
     }
 
-    TELEPHONY_LOGI("usimservice load adn recId: %{public}ld", recId);
+    TELEPHONY_LOGI("usimservice load adn recId: %{public}zu", recId);
     std::unique_lock<std::mutex> lock(mtx_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     if (files.find(TAG_SIM_USIM_EXT1) == files.end() || files.find(TAG_SIM_USIM_ADN) == files.end()) {
@@ -230,7 +230,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
         anrs_[recId] = {};
         return false;
     }
-    TELEPHONY_LOGI("usimservice load anr recId: %{public}ld", recId);
+    TELEPHONY_LOGI("usimservice load anr recId: %{public}zu", recId);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     auto anrIter = files.find(TAG_SIM_USIM_ANR);
     if (anrIter == files.end()) {
