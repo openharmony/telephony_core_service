@@ -99,7 +99,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         TELEPHONY_LOGE("process adn file: object is nullptr");
         return;
     }
-    TELEPHONY_LOGI("wdb load adn done, fileId=%{public}d", resultObject->fileID);
+    TELEPHONY_LOGI("usimservice load adn done, fileId=%{public}d", resultObject->fileID);
     adns_[resultObject->fileID] = std::vector<std::shared_ptr<DiallingNumbersInfo>>();
     if (resultObject->exception != nullptr) {
         auto exception = std::static_pointer_cast<RadioResponseInfo>(resultObject->exception);
@@ -164,28 +164,10 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
     CheckQueryDone();
 }
 
-void UsimDiallingNumbersService::FillDiallingNumbersRecords(
-    const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list)
-{
-    if (list != nullptr) {
-        for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = list->begin(); it != list->end(); ++it) {
-            diallingNumbersFiles_.push_back(*it);
-        }
-        TELEPHONY_LOGI(
-            "UsimDiallingNumbersService::FillDiallingNumbersRecords  %{public}zu", diallingNumbersFiles_.size());
-    } else {
-        TELEPHONY_LOGE("FillDiallingNumbersRecords: get null vectors!!!");
-    }
-}
-
 void UsimDiallingNumbersService::ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer)
 {
     callerPointer_ = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(pointer));
-    if (diallingNumbersFiles_.empty()) {
-        if (pbrFiles_.empty()) {
-            LoadPbrFiles();
-        }
-    }
+    LoadPbrFiles();
 }
 
 void UsimDiallingNumbersService::LoadPbrFiles()
@@ -212,7 +194,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
         return false;
     }
 
-    TELEPHONY_LOGI("wdb load adn recId: %{public}ld", recId);
+    TELEPHONY_LOGI("usimservice load adn recId: %{public}ld", recId);
     std::unique_lock<std::mutex> lock(mtx_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     if (files.find(TAG_SIM_USIM_EXT1) == files.end() || files.find(TAG_SIM_USIM_ADN) == files.end()) {
@@ -248,7 +230,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
         anrs_[recId] = {};
         return false;
     }
-    TELEPHONY_LOGI("wdb load anr recId: %{public}ld", recId);
+    TELEPHONY_LOGI("usimservice load anr recId: %{public}ld", recId);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     auto anrIter = files.find(TAG_SIM_USIM_ANR);
     if (anrIter == files.end()) {
