@@ -103,13 +103,10 @@ void IccDiallingNumbersManager::ProcessSimStateChanged()
     if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
         diallingNumbersCache_->ClearDiallingNumberCache();
-    } else {
+    } else if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_READY) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready");
-        if (currentSimState_ == SimState::SIM_STATE_NOT_PRESENT) {
-            ProcessAdvanceLoadPbr();
-        }
+        ProcessAdvanceLoadPbr();
     }
-    currentSimState_ = simStateManager_->GetSimState();
 }
 
 void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
