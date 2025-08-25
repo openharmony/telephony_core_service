@@ -284,10 +284,6 @@ bool EsimFile::ProcessObtainEid(int32_t slotId, const AppExecFwk::InnerEvent::Po
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_EID);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return false;
-    }
     std::vector<uint8_t> eidTags;
     eidTags.push_back(static_cast<unsigned char>(TAG_ESIM_EID));
     builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, eidTags, eidTags.size());
@@ -321,10 +317,6 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
         return false;
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_GET_PROFILES);
-    if (builder == nullptr) {
-        TELEPHONY_LOGE("builder is nullptr");
-        return false;
-    }
     unsigned char EUICC_PROFILE_TAGS[] = {
         static_cast<unsigned char>(TAG_ESIM_ICCID),
         static_cast<unsigned char>(TAG_ESIM_NICKNAME),
@@ -908,10 +900,6 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
     }
     std::shared_ptr<Asn1Builder> builder = std::make_shared<Asn1Builder>(TAG_ESIM_DISABLE_PROFILE);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
-    if (builder == nullptr || subBuilder == nullptr) {
-        TELEPHONY_LOGE("get builder failed");
-        return false;
-    }
     std::vector<uint8_t> iccidBytes;
     std::string str = OHOS::Telephony::ToUtf8(esimProfile_.iccId);
     Asn1Utils::BcdToBytes(str, iccidBytes);
@@ -3040,10 +3028,6 @@ bool EsimFile::ProcessAuthenticateServer(int32_t slotId)
     Asn1AddChildAsBase64(builder, authRespData.serverCertificate);
     std::shared_ptr<Asn1Builder> ctxParams1Builder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_0);
     AddCtxParams1(ctxParams1Builder, authRespData);
-    if (ctxParams1Builder == nullptr) {
-        TELEPHONY_LOGE("AddCtxParams1 failed");
-        return false;
-    }
     std::shared_ptr<Asn1Node> ctxNode = ctxParams1Builder->Asn1Build();
     if (ctxNode == nullptr) {
         TELEPHONY_LOGE("ctxNode is nullptr");
@@ -3105,17 +3089,9 @@ void EsimFile::AddCtxParams1(std::shared_ptr<Asn1Builder> &ctxParams1Builder, Es
     std::vector<uint8_t> tacBytes(tmpBytes.begin(), tmpBytes.begin() + AUTH_SERVER_TAC_LEN);
     GetImeiBytes(imeiBytes, authRespData.imei);
     std::shared_ptr<Asn1Builder> subBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
-    if (subBuilder == nullptr) {
-        TELEPHONY_LOGE("AddCtxParams1 subBuilder is nullptr");
-        return;
-    }
     subBuilder->Asn1AddChildAsBytes(TAG_ESIM_CTX_0, tacBytes, tacBytes.size());
     // add devCap
     std::shared_ptr<Asn1Builder> devCapsBuilder = std::make_shared<Asn1Builder>(TAG_ESIM_CTX_COMP_1);
-    if (devCapsBuilder == nullptr) {
-        TELEPHONY_LOGE("AddCtxParams1 devCapsBuilder is nullptr");
-        return;
-    }
     AddDeviceCapability(devCapsBuilder);
     std::shared_ptr<Asn1Node> devCapNode = devCapsBuilder->Asn1Build();
     if (devCapNode == nullptr) {

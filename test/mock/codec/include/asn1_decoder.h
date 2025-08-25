@@ -28,16 +28,16 @@ namespace OHOS {
 namespace Telephony {
 class Asn1Decoder {
 public:
+    virtual ~Asn1Decoder() = default;
     Asn1Decoder(const std::vector<uint8_t> &src, uint32_t offset, uint32_t decodeLen);
-    virtual ~Asn1Decoder () = default;
-    bool Asn1HasNextNode();
-    std::shared_ptr<Asn1Node> Asn1NextNode();
-    std::shared_ptr<Asn1Node> BuildAsn1Node(const uint32_t tag, uint32_t offset, uint32_t tagStart);
+    virtual bool Asn1HasNextNode();
+    virtual std::shared_ptr<Asn1Node> Asn1NextNode();
+    virtual std::shared_ptr<Asn1Node> BuildAsn1Node(const uint32_t tag, uint32_t offset, uint32_t tagStart);
 
 private:
-    std::vector<uint8_t> srcData_ = {};
-    uint32_t position_ = 0;
-    uint32_t end_ = 0;
+    [[maybe_unused]] std::vector<uint8_t> srcData_ = {};
+    [[maybe_unused]] uint32_t position_ = 0;
+    [[maybe_unused]] uint32_t end_ = 0;
 };
 
 class MockAsn1Decoder : public Asn1Decoder {
