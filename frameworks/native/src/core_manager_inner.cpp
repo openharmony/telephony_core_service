@@ -1786,6 +1786,15 @@ int32_t CoreManagerInner::UpdateOperatorName(int32_t slotId)
     return networkSearchManager_->UpdateOperatorName(slotId);
 }
 
+std::string CoreManagerInner::GetResidentNetworkNumeric(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return "";
+    }
+    return networkSearchManager_->GetResidentNetworkNumeric(slotId);
+}
+
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/
 
