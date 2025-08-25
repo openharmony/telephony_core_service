@@ -17,6 +17,7 @@ import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 import("$SUBSYSTEM_DIR/core_service/test/core_service_test.gni")
 
 group("telephony_mock_deps") {
+  testonly = true
   deps = []
   if (use_clang_coverage) {
     deps += [
@@ -31,6 +32,7 @@ config("core_service_test_config") {
 }
 
 ohos_static_library("core_service_test_base") {
+  testonly = true
   use_exceptions = true
   sources = core_service_base_src
   branch_protector_ret = "pac_ret"

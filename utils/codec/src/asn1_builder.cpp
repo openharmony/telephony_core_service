@@ -132,10 +132,6 @@ std::shared_ptr<Asn1Node> Asn1Builder::Asn1Build()
     TELEPHONY_LOGD("enter Asn1Build");
     std::vector<uint8_t> byteStream = {};
     std::shared_ptr<Asn1Node> newNode = std::make_shared<Asn1Node>(tag_, byteStream, 0, 0);
-    if (newNode == nullptr) {
-        TELEPHONY_LOGE("newNode is nullptr.");
-        return nullptr;
-    }
     // calculate newNode's length, and move asn1Node from builder to newNode
     std::shared_ptr<Asn1Node> asn1Node = nullptr;
     uint32_t dataLen = 0;

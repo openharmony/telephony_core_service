@@ -168,18 +168,19 @@ if (core_service_support_esim) {
     "$TELEPHONY_SIM_ROOT/src/esim_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/esim_file.cpp",
     "$TELEPHONY_SIM_ROOT/src/start_osu_result_callback.cpp",
-    "$TELEPHONY_UTILS/codec/src/asn1_builder.cpp",
-    "$TELEPHONY_UTILS/codec/src/asn1_decoder.cpp",
-    "$TELEPHONY_UTILS/codec/src/asn1_node.cpp",
-    "$TELEPHONY_UTILS/codec/src/asn1_utils.cpp",
-    "$TELEPHONY_UTILS/codec/src/request_apdu_build.cpp",
-    "$TELEPHONY_UTILS/codec/src/reset_response.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/asn1_builder.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/asn1_decoder.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/asn1_node.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/asn1_utils.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/request_apdu_build.cpp",
+    "$CORE_SERVICE_ROOT/test/mock/codec/src/reset_response.cpp",
   ]
 }
 
 core_service_base_src = common_src + vcard_src + tel_core_service_src
 
 core_service_incluedirs = [
+  "$CORE_SERVICE_ROOT/test/mock/codec/include",
   "$TELEPHONY_SIM_ROOT/include",
   "$TELEPHONY_TEL_RIL_ROOT/include",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
@@ -188,7 +189,6 @@ core_service_incluedirs = [
   "$CORE_SERVICE_ROOT/services/satellite_service_interaction/include",
   "$CORE_SERVICE_ROOT/interfaces/innerkits/include/",
   "$TELEPHONY_UTILS/log/include",
-  "$TELEPHONY_UTILS/codec/include",
   "$TELEPHONY_UTILS/vcard/include",
   "$TELEPHONY_UTILS/vcard/include/contact_data",
   "$TELEPHONY_UTILS/common/include",
@@ -253,6 +253,8 @@ core_service_external_deps = [
   "samgr:samgr_proxy",
   "telephony_data:tel_telephony_data",
   "time_service:time_client",
+  "googletest:gmock_main",
+  "googletest:gtest_main"
 ]
 
 if (defined(global_parts_info) &&
