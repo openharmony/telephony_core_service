@@ -74,8 +74,7 @@ void SimStateHandleTest::SetUpTestCase()
     telRilManager_ = new MockTelRilManager();
     std::shared_ptr<MockTelRilManager> telRilManager(telRilManager_);
     simStateManager_ = std::make_shared<SimStateManager>(telRilManager);
-    constexpr int initial = 10;
-    simStateManager_->Init(initial);
+    simStateManager_->Init(10);//初始化时传入参数10作为值。
     EXPECT_CALL(*telRilManager_, UnRegisterCoreNotify(_, _, _))
         .WillRepeatedly(Return(0));
 }
