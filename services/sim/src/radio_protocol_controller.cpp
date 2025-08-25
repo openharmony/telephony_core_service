@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr static const int32_t WAIT_TIME_LONG_SECOND = 60;
 static const int64_t COMMUNICATION_TIMEOUT = 45 * 1000; // Set the timeout millisecond for radio protocol communication
 static const int64_t SET_ACTIVE_OUT_TIME = 10 * 1000;
 ffrt::mutex RadioProtocolController::ctx_;
@@ -101,7 +102,10 @@ bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
     ExecuteCheckCommunication();
     while (isCommunicating_) {
         TELEPHONY_LOGI("wait for the communication to finish");
-        radioProtocolCv_.wait(radioProtocolLock);
+        if (radioProtocolCv_.wait(radioProtocolLock, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) ==
+                ffrt::cv_status::timeout) {
+                break;
+            }
     }
     return communicationResponseResult_;
 }
