@@ -170,6 +170,7 @@ ohos_unittest("tel_network_search_gtest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
@@ -1035,9 +1036,9 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
-    "$SOURCE_DIR/utils:libtel_common",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
   ]
 
   external_deps = [
@@ -1142,12 +1143,10 @@ ohos_unittest("tel_satellite_service_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
