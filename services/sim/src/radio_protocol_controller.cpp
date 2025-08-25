@@ -103,9 +103,9 @@ bool RadioProtocolController::SetRadioProtocol(int32_t slotId)
     while (isCommunicating_) {
         TELEPHONY_LOGI("wait for the communication to finish");
         if (radioProtocolCv_.wait_for(radioProtocolLock, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) ==
-                ffrt::cv_status::timeout) {
-                break;
-            }
+            ffrt::cv_status::timeout) {
+            break;
+        }
     }
     return communicationResponseResult_;
 }
