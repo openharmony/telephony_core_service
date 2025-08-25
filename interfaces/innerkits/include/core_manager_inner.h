@@ -246,6 +246,7 @@ public:
     int32_t ProcessSignalIntensity(int32_t slotId, const Rssi &signalIntensity);
     int32_t UpdateOperatorName(int32_t slotId);
     bool SetForcePreferredNetwork(int32_t slotId, int32_t networkMode);
+    std::string GetResidentNetworkNumeric(int32_t slotId);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);
