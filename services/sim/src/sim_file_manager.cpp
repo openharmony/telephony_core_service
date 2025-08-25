@@ -1034,5 +1034,10 @@ void SimFileManager::ClearData()
     }
     simFile_->ClearData();
 }
+
+bool SimFileManager::IsUiccCard()
+{
+    return (iccType_ == IccType::ICC_TYPE_USIM || iccType_ == IccType::ICC_TYPE_IMS);
+}
 } // namespace Telephony
 } // namespace OHOS

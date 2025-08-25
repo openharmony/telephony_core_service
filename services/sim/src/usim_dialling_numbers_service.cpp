@@ -22,6 +22,8 @@ constexpr int32_t ANR_ADDITION_NUMBER_LENGTH_OFFSET = 1;
 constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 const std::u16string NUMBER_SPLIT = u";";
+constexpr int64_t PROCESS_PBR_DELAY_MS = 10 * 1000;
+
 std::mutex UsimDiallingNumbersService::mtx_;
 
 UsimDiallingNumbersService::UsimDiallingNumbersService() : TelEventHandler("UsimDiallingNumbersService")
@@ -47,6 +49,8 @@ void UsimDiallingNumbersService::ProcessEvent(const AppExecFwk::InnerEvent::Poin
 
 void UsimDiallingNumbersService::InitFuncMap()
 {
+    memberFuncMap_[MSG_USIM_LOAD_PBR] =
+        [this](const AppExecFwk::InnerEvent::Pointer &event) { LoadPbrFiles(); };
     memberFuncMap_[MSG_USIM_PBR_LOAD_DONE] =
         [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessPbrLoadDone(event); };
     memberFuncMap_[MSG_USIM_ADN_LOAD_DONE] =
@@ -62,14 +66,13 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
         return;
     }
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
-    if (object != nullptr) {
-        TELEPHONY_LOGI("UsimDiallingNumbersService::ProcessPbrLoadDone: %{public}d", object->resultLength);
-        if (object->exception == nullptr) {
-            std::vector<std::string> &files = object->fileResults;
-            GeneratePbrFile(files);
-        }
-    } else {
+    if (object == nullptr) {
         TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
+        return;
+    }
+    if (object->exception == nullptr) {
+        std::vector<std::string> &files = object->fileResults;
+        GeneratePbrFile(files);
     }
     TELEPHONY_LOGI("ProcessPbrLoadDone start load %{public}zu", pbrFiles_.size());
     if (pbrFiles_.empty()) {
@@ -77,9 +80,11 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
             std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
         SendBackResult(list);
         TELEPHONY_LOGI("ProcessPbrLoadDone empty pbr");
-    } else {
-        pbrIndex_ = 0;
-        LoadDiallingNumberFiles(pbrIndex_);
+        return;
+    }
+    for (size_t i = 0; i < pbrFiles_.size(); i++) {
+        LoadDiallingNumberFiles(i);
+        LoadDiallingNumber2Files(i);
     }
 }
 
@@ -89,36 +94,31 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         return;
     }
 
-    if (pbrIndex_ >= pbrFiles_.size()) {
-        TELEPHONY_LOGI("loadEfFilesFromUsim: finished");
-        SendLocalBack();
-        return;
-    }
-
     std::unique_ptr<DiallingNumbersHandlerResult> resultObject = event->GetUniqueObject<DiallingNumbersHandlerResult>();
     if (resultObject == nullptr) {
         TELEPHONY_LOGE("process adn file: object is nullptr");
-        LoadDiallingNumberFiles(++pbrIndex_);
         return;
     }
+    TELEPHONY_LOGI("usimservice load adn done, fileId=%{public}d", resultObject->fileID);
+    adns_[resultObject->fileID] = std::vector<std::shared_ptr<DiallingNumbersInfo>>();
     if (resultObject->exception != nullptr) {
         auto exception = std::static_pointer_cast<RadioResponseInfo>(resultObject->exception);
         TELEPHONY_LOGE("process adn file exception occured, errno: %{public}d",
             static_cast<uint32_t>(exception->error));
-        LoadDiallingNumberFiles(++pbrIndex_);
+        CheckQueryDone();
         return;
     }
  
     if (resultObject->result == nullptr) {
         TELEPHONY_LOGE("process adn file result nullptr");
-        LoadDiallingNumberFiles(++pbrIndex_);
+        CheckQueryDone();
         return;
     }
  
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(resultObject->result);
-    diallingNumbersFromAdn_ = *diallingNumberList;
-    LoadDiallingNumber2Files(pbrIndex_);
+    adns_[resultObject->fileID] =  *diallingNumberList;
+    CheckQueryDone();
 }
 std::u16string UsimDiallingNumbersService::FetchAnrContent(const std::string &recordData)
 {
@@ -146,21 +146,6 @@ std::u16string UsimDiallingNumbersService::FetchAnrContent(const std::string &re
     return Str8ToStr16(number2);
 }
 
-void UsimDiallingNumbersService::MergeDiallingNumbers(const std::vector<std::u16string> &number2s)
-{
-    if (diallingNumbersFromAdn_.size() != number2s.size()) {
-        TELEPHONY_LOGE(
-            "adn size [%{public}zu] not equal anr size [%{public}zu]", diallingNumbersFromAdn_.size(), number2s.size());
-        return;
-    }
-    for (size_t i = 0; i < number2s.size(); i++) {
-        if (!number2s[i].empty()) {
-            auto numbers = diallingNumbersFromAdn_[i]->GetNumber() + NUMBER_SPLIT + number2s[i];
-            diallingNumbersFromAdn_[i]->UpdateNumber(numbers);
-        }
-    }
-}
-
 void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -171,47 +156,28 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
         std::vector<std::u16string> number2s;
-        for (size_t i = 0; i < dataList.size(); i++) {
-            number2s.push_back(FetchAnrContent(dataList[i]));
+        for (const auto &item : dataList) {
+            number2s.push_back(FetchAnrContent(item));
         }
-        MergeDiallingNumbers(number2s);
+        anrs_[event->GetParam()] = number2s;
     }
-    auto tmp = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
-    tmp->swap(diallingNumbersFromAdn_);
-    FillDiallingNumbersRecords(tmp);
-    
-    TELEPHONY_LOGI("load pbr files to Tap: %{public}d %{public}zu", pbrIndex_, pbrFiles_.size());
-    LoadDiallingNumberFiles(++pbrIndex_);
-}
-
-void UsimDiallingNumbersService::FillDiallingNumbersRecords(
-    const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &list)
-{
-    if (list != nullptr) {
-        for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = list->begin(); it != list->end(); ++it) {
-            diallingNumbersFiles_.push_back(*it);
-        }
-        TELEPHONY_LOGI(
-            "UsimDiallingNumbersService::FillDiallingNumbersRecords  %{public}zu", diallingNumbersFiles_.size());
-    } else {
-        TELEPHONY_LOGE("FillDiallingNumbersRecords: get null vectors!!!");
-    }
+    CheckQueryDone();
 }
 
 void UsimDiallingNumbersService::ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer)
 {
     callerPointer_ = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(pointer));
-    if (diallingNumbersFiles_.empty()) {
-        if (pbrFiles_.empty()) {
-            LoadPbrFiles();
-        }
-    }
+    LoadPbrFiles();
 }
 
 void UsimDiallingNumbersService::LoadPbrFiles()
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    diallingNumbersFiles_.clear();
+    if (isProcessingPbr) {
+        SendEvent(MSG_USIM_LOAD_PBR, 0, PROCESS_PBR_DELAY_MS);
+        return;
+    }
+    isProcessingPbr = true;
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("LoadPbrFiles fileController_ is nullptr");
@@ -228,6 +194,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
         return false;
     }
 
+    TELEPHONY_LOGI("usimservice load adn recId: %{public}zu", recId);
     std::unique_lock<std::mutex> lock(mtx_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     if (files.find(TAG_SIM_USIM_EXT1) == files.end() || files.find(TAG_SIM_USIM_ADN) == files.end()) {
@@ -260,25 +227,27 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
     std::unique_lock<std::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGE("load number anr files error: recId over");
-        NextStep(MSG_USIM_ANR_LOAD_DONE);
+        anrs_[recId] = {};
         return false;
     }
+    TELEPHONY_LOGI("usimservice load anr recId: %{public}zu", recId);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     auto anrIter = files.find(TAG_SIM_USIM_ANR);
     if (anrIter == files.end()) {
         TELEPHONY_LOGE("load number anr files error: have not anr file");
-        NextStep(MSG_USIM_ANR_LOAD_DONE);
+        anrs_[recId] = {};
         return false;
     }
     std::shared_ptr<TagData> anrTag = anrIter->second;
     if (anrTag == nullptr) {
         TELEPHONY_LOGE("load number anr files error: anr file is nullptr");
-        NextStep(MSG_USIM_ANR_LOAD_DONE);
+        anrs_[recId] = {};
         return false;
     }
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_ANR_LOAD_DONE);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("LoadPbrFiles fileController_ is nullptr");
+        anrs_[recId] = {};
         return false;
     }
     fileController_->ObtainAllLinearFixedFile(anrTag->fileId, event);
@@ -416,9 +385,44 @@ void UsimDiallingNumbersService::StorePbrDetailInfo(
     }
 }
 
+void UsimDiallingNumbersService::CheckQueryDone()
+{
+    bool done = adns_.size() == pbrFiles_.size() && anrs_.size() == pbrFiles_.size();
+    if (!done) {
+        return;
+    }
+    auto result = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+    auto adnIter = adns_.begin();
+    auto anrIter = anrs_.begin();
+    for (; adnIter != adns_.end() && anrIter != anrs_.end(); ++adnIter, ++anrIter) {
+        MergeNumbers(adnIter->second, anrIter->second);
+        result->insert(result->end(), adnIter->second.begin(), adnIter->second.end());
+    }
+    adns_.clear();
+    anrs_.clear();
+    SendBackResult(result);
+}
+
+void UsimDiallingNumbersService::MergeNumbers(
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> &adn, const std::vector<std::u16string> &anr)
+{
+    if (adn.size() != anr.size()) {
+        TELEPHONY_LOGE(
+            "adn size [%{public}zu] not equal anr size [%{public}zu]", adn.size(), anr.size());
+        return;
+    }
+    for (size_t i = 0; i < adn.size(); i++) {
+        if (!anr[i].empty()) {
+            auto numbers = adn[i]->GetNumber() + NUMBER_SPLIT + anr[i];
+            adn[i]->UpdateNumber(numbers);
+        }
+    }
+}
+
 void UsimDiallingNumbersService::SendBackResult(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers)
 {
+    isProcessingPbr = false;
     if (callerPointer_ == nullptr) {
         TELEPHONY_LOGE("callerPointer_ is nullptr");
         return;
@@ -438,12 +442,6 @@ void UsimDiallingNumbersService::SendBackResult(
     data->result = static_cast<std::shared_ptr<void>>(diallingnumbers);
     TelEventHandler::SendTelEvent(owner, id, data);
     TELEPHONY_LOGI("UsimDiallingNumbersService::SendBackResult send end");
-}
-
-void UsimDiallingNumbersService::UsimDiallingNumbersService::SendLocalBack()
-{
-    auto diallingnumbers = std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(diallingNumbersFiles_);
-    SendBackResult(diallingnumbers);
 }
 
 void UsimDiallingNumbersService::NextStep(int msgId)

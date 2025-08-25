@@ -621,7 +621,6 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_001, Function | 
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
     usimDiallingNumbersService->ProcessEvent(event);
-    usimDiallingNumbersService->FillDiallingNumbersRecords(nullptr);
     std::string record = "record";
     std::vector<std::string> records;
     records.push_back(record);
@@ -749,7 +748,6 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
     diallingNumber->name_ = Str8ToStr16("SimAdnZhang");
     diallingNumber->number_ = Str8ToStr16("12345678901");
     diallingNumberList->push_back(diallingNumber);
-    usimDiallingNumbersService->FillDiallingNumbersRecords(diallingNumberList);
     std::string record = "record";
     std::vector<std::string> records;
     records.push_back(record);
@@ -989,7 +987,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     auto event5 = AppExecFwk::InnerEvent::Get(0);
     iccFileController->SendEfLinearResult(event5, val, size);
     auto event6 = AppExecFwk::InnerEvent::Get(0);
-    iccFileController->SendMultiRecordResult(event6, strValue);
+    iccFileController->SendMultiRecordResult(event6, strValue, 0);
     unsigned char *data1;
     iccFileController->ParseFileSize(val, size, data1);
     iccFileController->IsValidRecordSizeData(data1);
@@ -1355,7 +1353,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_002, Function | MediumTes
     iccFileController->SendEfLinearResult(respone, fileSize, testLenNum);
     std::vector<std::string> strValue;
 
-    iccFileController->SendMultiRecordResult(respone, strValue);
+    iccFileController->SendMultiRecordResult(respone, strValue, 0);
     unsigned char data[] = {0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1};
     iccFileController->ParseFileSize(fileSize, testLenNum, data);
     EXPECT_EQ(fileSize[0], 1);
