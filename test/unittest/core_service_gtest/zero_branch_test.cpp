@@ -952,6 +952,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_009, Function | MediumTest | Lev
 
     EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 0));
     mInner.networkSearchManager_ = networkSearchManager;
+    mInner.UpdateOperatorName(SLOT_ID_0);
     EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 1));
 }
 
