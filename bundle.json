@@ -83,8 +83,7 @@
                     "//base/telephony/core_service/interfaces/innerkits:tel_core_service_api",
                     "//base/telephony/core_service/frameworks/js/network_search:radio",
                     "//base/telephony/core_service/frameworks/js/sim:sim",
-                    "//base/telephony/core_service/frameworks/js/vcard:vcard",
-                    "//base/telephony/core_service/test:telephony_mock_deps"
+                    "//base/telephony/core_service/frameworks/js/vcard:vcard"
                 ],
                 "service_group": [
                     "//base/telephony/core_service:tel_core_service",

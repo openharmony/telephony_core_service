@@ -111,7 +111,6 @@ ohos_unittest("tel_esim_gtest") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -196,7 +195,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -286,7 +284,6 @@ ohos_unittest("core_manager_inner_test") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -368,23 +365,9 @@ ohos_unittest("esim_file_branch_test") {
 
   sources = [
     "$SOURCE_DIR/test/unittest/esim_gtest/esim_file_branch_test.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/enum_convert.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/str_convert.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/tel_event_handler.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/tel_event_queue.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_common_utils.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_config.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_ext_utils_wrapper.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_builder.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_decoder.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_node.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_utils.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/request_apdu_build.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/reset_response.cpp",
   ]
 
   include_dirs = [
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/mock/include",
     "$SOURCE_DIR/utils/log/include",

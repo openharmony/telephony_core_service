@@ -33,6 +33,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 class EsimTest : public testing::Test {
 public:
@@ -432,10 +433,9 @@ HWTEST_F(EsimTest, ObtainEuiccInfo1ParseTagCtx2_001, Function | MediumTest | Lev
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
-    int32_t tag = 0;
-    std::vector<uint8_t> src;
-    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
-    asn1Node->constructed_ = false;
+    std::shared_ptr<MockAsn1Node> mockAsn1Node = std::make_shared<MockAsn1Node>();
+    EXPECT_CALL(*mockAsn1Node, Asn1GetChild(_)).WillOnce(Return(nullptr));
+    std::shared_ptr<Asn1Node> asn1Node = std::static_pointer_cast<Asn1Node>(mockAsn1Node);
     bool ret = esimFile->ObtainEuiccInfo1ParseTagCtx2(asn1Node);
     EXPECT_EQ(ret, false);
 }
