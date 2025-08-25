@@ -28,6 +28,7 @@ namespace Telephony {
 class Asn1Node {
 public:
     Asn1Node() = default;
+    Asn1Node(const uint32_t tag, const std::vector<uint8_t> &src, uint32_t offset, uint32_t length);
     virtual ~Asn1Node() = default;
     virtual uint32_t Asn1NodeToHexStr(std::string &destStr);
     virtual uint32_t Asn1NodeToBytes(std::vector<uint8_t> &dest);
@@ -50,6 +51,15 @@ public:
     virtual uint32_t GetNodeTag();
     virtual int32_t Asn1BuildChildren();
     virtual void Asn1Write(std::vector<uint8_t> &dest);
+private:
+    [[maybe_unused]] uint32_t tag_ = 0;
+    [[maybe_unused]] std::list<std::shared_ptr<Asn1Node>> children_;
+    [[maybe_unused]] bool constructed_ = false;
+    [[maybe_unused]] std::vector<uint8_t> dataBytes_ = {};
+    [[maybe_unused]] uint32_t dataOffset_ = 0;
+    [[maybe_unused]] uint32_t dataLength_ = 0;
+    [[maybe_unused]] uint32_t encodedLength_ = 0;
+    [[maybe_unused]] std::mutex mutex_;
 };
 
 class MockAsn1Node : public Asn1Node {
@@ -88,4 +98,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // ASN1_NODE_MOCK_H
+#endif // ASN1_NODE_MOCK_H
