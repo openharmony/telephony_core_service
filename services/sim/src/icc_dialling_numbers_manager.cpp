@@ -87,10 +87,11 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
 
 void IccDiallingNumbersManager::ProcessAdvanceLoadPbr()
 {
-    ffrt::submit([manager = std::static_pointer_cast<IccDiallingNumbersManager>(shared_from_this())] {
+    std::thread t([manager = std::static_pointer_cast<IccDiallingNumbersManager>(shared_from_this())] {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
         manager->QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_ADN, result);
     });
+    t.detach();
 }
 
 void IccDiallingNumbersManager::ProcessSimStateChanged()
@@ -102,7 +103,7 @@ void IccDiallingNumbersManager::ProcessSimStateChanged()
     if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
         diallingNumbersCache_->ClearDiallingNumberCache();
-    } else if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_READY) {
+    } else if (simStateManager_->GetSimState() == SimState::SIM_STATE_READY) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready");
         ProcessAdvanceLoadPbr();
     }
@@ -291,13 +292,17 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     hasQueryEventDone_ = false;
     diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
     
-    processWait_.wait_for(
+    bool success = processWait_.wait_for(
         lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
-    TELEPHONY_LOGI("QueryIccDiallingNumbers: end");
+    if (success) {
+        TELEPHONY_LOGI("QueryIccDiallingNumbers wait success");
+    } else {
+        TELEPHONY_LOGI("QueryIccDiallingNumbers wait timeout");
+    }
     if (!diallingNumbersList_.empty()) {
         result = diallingNumbersList_;
     }
-    return hasQueryEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
+    return success ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
 }
 
 AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
