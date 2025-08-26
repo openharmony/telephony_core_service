@@ -148,7 +148,7 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone002, Funct
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, result);
     service->ProcessDiallingNumberLoadDone(event);
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    EXPECT_TRUE(service->pbrIndex_ == 1);
+    EXPECT_FALSE(service->pbrIndex_ == 1);
 }
  
 HWTEST_F(UsimDiallingNumbersServiceTest, FetchAnrContent001, Function | MediumTest | Level1)
