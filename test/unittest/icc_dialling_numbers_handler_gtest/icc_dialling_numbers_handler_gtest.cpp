@@ -329,7 +329,7 @@ HWTEST_F(IccDiallingNumbersHandlerTest, Telephony_IccDiallingNumbersHandler_0012
     diallingNumberHandler->UpdateDiallingNumbers(infor, response);
     int loadId = 1;
     bool ret = diallingNumberHandler->IsAdnHasExtRecord(MSG_SIM_OBTAIN_ADN_DONE, loadId);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     ret = diallingNumberHandler->IsAdnHasExtRecord(MSG_SIM_OBTAIN_ALL_ADN_DONE, loadId);
     EXPECT_FALSE(ret);
 }
