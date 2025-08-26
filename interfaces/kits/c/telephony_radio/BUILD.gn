@@ -33,7 +33,6 @@ ohos_shared_library("telephony_radio") {
   cflags_cc = [
     "-Wall",
     "-Werror",
-    "-fstack-protector-strong",
     "-D_FORTIFY_SOURCE=2",
     "-O2",
   ]
