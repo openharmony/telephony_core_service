@@ -35,7 +35,7 @@ ohos_static_library("core_service_test_base") {
   cflags = [
     "-O1",
     "-w",
-    "-fno-omit-fram-pointer",
+    "-fno-omit-frame-pointer",
     "-fno-optimize-sibling-calls",
     "-fno-exceptions",
   ]
