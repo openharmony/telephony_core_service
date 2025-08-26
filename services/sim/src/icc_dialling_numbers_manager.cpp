@@ -18,7 +18,6 @@
 #include "core_service_errors.h"
 #include "radio_event.h"
 #include "telephony_errors.h"
-#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
