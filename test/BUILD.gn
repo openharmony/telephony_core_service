@@ -17,6 +17,7 @@ import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 import("$SUBSYSTEM_DIR/core_service/test/core_service_test.gni")
 
 group("telephony_mock_deps") {
+  testonly = true
   deps = []
   if (use_clang_coverage) {
     deps += [
