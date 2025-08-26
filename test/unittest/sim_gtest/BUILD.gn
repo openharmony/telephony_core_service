@@ -14,49 +14,13 @@
 import("//build/test.gni")
 SOURCE_DIR = "../../../"
 
-ohos_unittest("sim_gtest") {
-  install_enable = true
-  subsystem_name = "telephony"
-  part_name = "core_service"
-  test_module = "core_service"
-  module_out_path = part_name + "/" + test_module
-
-  sources = [
-    "core_manager_inner_gtest.cpp",
-    "csim_file_controller_gtest.cpp",
-    "isim_file_gtest.cpp",
-    "multi_sim_controller_gtest.cpp",
-    "operator_config_loader_gtest.cpp",
-    "operator_matching_rule_test.cpp",
-    "pdp_profile_rdb_helper_test.cpp",
-    "ruim_file_gtest.cpp",
-    "sim_file_gtest.cpp",
-    "sim_manager_gtest.cpp",
-    "sim_sms_controller_gtest.cpp",
-    "sim_utils_gtest.cpp",
-    #"usim_dialling_numbers_service_gtest.cpp",
-  ]
-
-  include_dirs = [
-    "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/log/include",
-    "$SOURCE_DIR/utils/preferences/include",
-    "$SOURCE_DIR/services/sim/include",
-    "$SOURCE_DIR/services/network_search/include",
-    "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
-    "$SOURCE_DIR/test/mock",
-  ]
-
-  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
-
-  deps = [
+declare_args() {
+  sim_unittest_deps = [
     "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
   ]
-
-  external_deps = [
+  sim_unittest_external_deps = [
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
@@ -91,30 +55,84 @@ ohos_unittest("sim_gtest") {
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
   ]
-  defines = [
+  core_service_sim_test_sources = []
+  sim_unittest_targets = []
+}
+
+config("sim_unittest_config") {
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+    "$SOURCE_DIR/test/mock",
+  ]
+}
+
+core_service_sim_test_sources += [
+  "core_manager_inner_gtest.cpp",
+  "csim_file_controller_gtest.cpp",
+  "isim_file_gtest.cpp",
+  "multi_sim_controller_gtest.cpp",
+  "operator_config_loader_gtest.cpp",
+  "operator_matching_rule_test.cpp",
+  "pdp_profile_rdb_helper_test.cpp",
+  "ruim_file_gtest.cpp",
+  "sim_file_gtest.cpp",
+  "sim_manager_gtest.cpp",
+  "sim_sms_controller_gtest.cpp",
+  "sim_utils_gtest.cpp",
+]
+
+template("sim_unittest_suite") {
+  ohos_unittest(target_name) {
+    use_exceptions = true
+    install_enable = true
+    module_out_path = "core_service/core_service_sim"
+    sources = invoker.sources
+    deps = sim_unittest_deps
+    external_deps = sim_unittest_external_deps
+    subsystem_name = "telephony"
+    part_name = "core_service"
+    configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+    configs += [ ":sim_unittest_config" ]
+    defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
 
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.location_location) &&
-      global_parts_info.location_location) {
-    external_deps += [
-      "location:lbsservice_common",
-      "location:locator_sdk",
+
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.location_location) &&
+        global_parts_info.location_location) {
+      external_deps += [
+        "location:lbsservice_common",
+        "location:locator_sdk",
+      ]
+      defines += [ "ABILITY_LOCATION_SUPPORT" ]
+    }
+
+    cflags = [
+      "-flto",
+      "-fvisibility=hidden",
     ]
-    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+
+    ldflags = [ "-flto" ]
   }
-
-  cflags = [
-    "-flto",
-    "-fvisibility=hidden",
-  ]
-
-  ldflags = [ "-flto" ]
 }
 
-group("unittest") {
+foreach(source, core_service_sim_test_sources) {
+  name = get_path_info(source, "name")
+  sim_unittest_suite("sim_unittest_$name") {
+    sources = [ source ]
+  }
+  sim_unittest_targets += [ ":sim_unittest_$name" ]
+}
+
+group("sim_gtest") {
   testonly = true
-  deps = [ ":sim_gtest" ]
+  deps = sim_unittest_targets
 }
