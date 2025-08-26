@@ -51,7 +51,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(const AppExecFwk:
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
     TELEPHONY_LOGD("CreateTelRilRequest serialId : %{public}d", static_cast<int32_t>(telRilRequest->serialId_));
     if (handler_ != nullptr) {
-        handler_->ApplyRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK);
+        handler_->ApplyRunningLock(TelRilHandler::NORMAL_RUNNING_LOCK, telRilRequest->serialId_);
     } else {
         TELEPHONY_LOGE("handler_ is nullptr!!!");
     }
