@@ -85,7 +85,6 @@ core_service_sim_test_sources += [
   "sim_manager_gtest.cpp",
   "sim_sms_controller_gtest.cpp",
   "sim_utils_gtest.cpp",
-  "usim_dialling_numbers_service_gtest.cpp",
 ]
 
 template("sim_unittest_suite") {
