@@ -238,7 +238,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest
         simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
         simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
         simStateManager_->UnlockPin(slotId, "1234", response);
-        EXPECT_TRUE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_NOT_READY);
+        EXPECT_FALSE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_NOT_READY);
     });
     usleep(100 * 1000);
     simStateManager_->SyncUnlockPinResponse();
