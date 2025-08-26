@@ -32,8 +32,15 @@ config("core_service_test_config") {
 }
 
 ohos_static_library("core_service_test_base") {
+  cflags = [
+    "-O1",
+    "-w",
+    "-fno-omit-frame-pointer",
+    "-fno-optimize-sibling-calls",
+    "-fno-exceptions",
+  ]
+  cflags_cc= cflags
   testonly = true
-  use_exceptions = true
   sources = core_service_base_src
   branch_protector_ret = "pac_ret"
   public_configs = [ ":core_service_test_config" ]
@@ -71,10 +78,7 @@ group("unittest") {
     "unittest/raw_parcel_core_service_gtest:raw_parcel_core_service_test",
     "unittest/sim_gtest:sim_gtest",
     "unittest/sim_state_handle_gtest:sim_state_handle_gtest",
-    "unittest/tel_ril_gtest:tel_ril_gtest",
-    "unittest/tel_ril_gtest:tel_ril_common_gtest",
-    "unittest/tel_ril_gtest:tel_ril_zero_branch_gtest",
-    "unittest/tel_ril_gtest:tel_ril_handler_gtest",
+    "unittest/tel_ril_gtest:tel_ril_unittest",
     "unittest/utils_vcard_gtest:utils_vcard_branch_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_gtest",
     "unittest/utils_vcard_gtest:utils_vcard_constructor_gtest",
