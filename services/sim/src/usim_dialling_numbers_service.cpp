@@ -406,12 +406,8 @@ void UsimDiallingNumbersService::CheckQueryDone()
 void UsimDiallingNumbersService::MergeNumbers(
     std::vector<std::shared_ptr<DiallingNumbersInfo>> &adn, const std::vector<std::u16string> &anr)
 {
-    if (adn.size() != anr.size()) {
-        TELEPHONY_LOGE(
-            "adn size [%{public}zu] not equal anr size [%{public}zu]", adn.size(), anr.size());
-        return;
-    }
-    for (size_t i = 0; i < adn.size(); i++) {
+    TELEPHONY_LOGI("adn size [%{public}zu], anr size [%{public}zu]", adn.size(), anr.size());
+    for (size_t i = 0; i < adn.size() && i < anr.size(); i++) {
         if (!anr[i].empty()) {
             auto numbers = adn[i]->GetNumber() + NUMBER_SPLIT + anr[i];
             adn[i]->UpdateNumber(numbers);
