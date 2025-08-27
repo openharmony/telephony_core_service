@@ -69,7 +69,7 @@ void EsimFileTest::TearDown() {}
 HWTEST_F(EsimFileTest, SyncCloseChannel001, TestSize.Level1)
 {
     esimFile->currentChannelId_ = 1;
-    esimFile->SyncCloseChannel();
+    esimFile->SyncCloseChannel(MSG_ESIM_CLOSE_CHANNEL_DONE);
     ASSERT_TRUE(esimFile != nullptr);
 }
 
@@ -115,29 +115,29 @@ HWTEST_F(EsimFileTest, CopyApdCmdToReqInfo002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ObtainChannelSuccessAlllowSameAidReuse001
- * @tc.desc: Test EsimFileTest ObtainChannelSuccessAlllowSameAidReuse.
+ * @tc.name: ObtainChannelSuccessAllowSameAidReuse001
+ * @tc.desc: Test EsimFileTest ObtainChannelSuccessAllowSameAidReuse.
  * @tc.type: FUNC
  */
-HWTEST_F(EsimFileTest, ObtainChannelSuccessAlllowSameAidReuse001, TestSize.Level1)
+HWTEST_F(EsimFileTest, ObtainChannelSuccessAllowSameAidReuse001, TestSize.Level1)
 {
     std::u16string aid = u"";
     esimFile->aidStr_ = u"test";
-    ResultInnerCode ret = esimFile->ObtainChannelSuccessAlllowSameAidReuse(aid);
+    ResultInnerCode ret = esimFile->ObtainChannelSuccessAllowSameAidReuse(aid);
     ASSERT_TRUE(ret == ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_OTHER_AID);
 }
 
 /**
- * @tc.name: ObtainChannelSuccessAlllowSameAidReuse002
- * @tc.desc: Test EsimFileTest ObtainChannelSuccessAlllowSameAidReuse.
+ * @tc.name: ObtainChannelSuccessAllowSameAidReuse002
+ * @tc.desc: Test EsimFileTest ObtainChannelSuccessAllowSameAidReuse.
  * @tc.type: FUNC
  */
-HWTEST_F(EsimFileTest, ObtainChannelSuccessAlllowSameAidReuse002, TestSize.Level1)
+HWTEST_F(EsimFileTest, ObtainChannelSuccessAllowSameAidReuse002, TestSize.Level1)
 {
     esimFile->currentChannelId_ = 0;
     std::u16string aid = u"test";
     esimFile->aidStr_ = u"test";
-    esimFile->ObtainChannelSuccessAlllowSameAidReuse(aid);
+    esimFile->ObtainChannelSuccessAllowSameAidReuse(aid);
     ASSERT_TRUE(esimFile != nullptr);
 }
 
@@ -1057,7 +1057,7 @@ HWTEST_F(EsimFileTest, ObtainChannelSuccessAlllowSameAidReuse0001, TestSize.Leve
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(nullptr);
     esimFile->aidStr_ = u"testAid";
     std::u16string testAid = u"testAid1";
-    auto ret = esimFile->ObtainChannelSuccessAlllowSameAidReuse(testAid);
+    auto ret = esimFile->ObtainChannelSuccessAllowSameAidReuse(testAid);
     EXPECT_EQ(ret, ResultInnerCode::RESULT_EUICC_CARD_CHANNEL_OTHER_AID);
 }
 
@@ -1066,7 +1066,7 @@ HWTEST_F(EsimFileTest, SyncCloseChannel0001, TestSize.Level1)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(nullptr);
     esimFile->currentChannelId_.store(2);
     esimFile->telRilManager_ = nullptr;
-    esimFile->SyncCloseChannel();
+    esimFile->SyncCloseChannel(MSG_ESIM_CLOSE_CHANNEL_DONE);
     EXPECT_EQ(esimFile->currentChannelId_.load(), 0);
 }
 
