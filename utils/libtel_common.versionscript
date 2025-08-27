@@ -25,6 +25,7 @@
       OHOS::Telephony::TelProfileUtil*;
       OHOS::Telephony::TelAesCryptoUtils*;
       OHOS::Telephony::ToUtf*;
+      OHOS::Telephony::Base64*;
       "OHOS::Telephony::GetBoolValue(int)";
       "OHOS::Telephony::GetBundleName()";
       "OHOS::Telephony::GetTokenID()";

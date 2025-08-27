@@ -147,7 +147,6 @@ ohos_shared_library("tel_core_service") {
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/libpng:libpng",
     "//third_party/libxml2:libxml2",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   external_deps = [
@@ -183,6 +182,7 @@ ohos_shared_library("tel_core_service") {
     "ipc:ipc_single",
     "netmanager_base:net_conn_manager_if",
     "netmanager_ext:net_tether_manager_if",
+    "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
