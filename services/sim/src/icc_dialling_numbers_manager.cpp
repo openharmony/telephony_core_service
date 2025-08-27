@@ -23,7 +23,6 @@ namespace OHOS {
 namespace Telephony {
 constexpr static const int32_t WAIT_TIME_SECOND = 1;
 constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 60;
-constexpr static const int32_t DELAY_LOAD_PBR_MS = 5 * 1000;
 
 IccDiallingNumbersManager::IccDiallingNumbersManager(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
@@ -50,7 +49,6 @@ void IccDiallingNumbersManager::Init()
     diallingNumbersCache_->Init();
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     TELEPHONY_LOGI("Init() end");
-    SendEvent(MSG_SIM_ADVANCE_LOAD_PBR, 0, DELAY_LOAD_PBR_MS);
 }
 
 void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -62,9 +60,6 @@ void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Point
     uint32_t id = event->GetInnerEventId();
     TELEPHONY_LOGD("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
     switch (id) {
-        case MSG_SIM_ADVANCE_LOAD_PBR:
-            ProcessAdvanceLoadPbr();
-            break;
         case MSG_SIM_DIALLING_NUMBERS_GET_DONE:
             ProcessLoadDone(event);
             break;
