@@ -1052,7 +1052,7 @@ HWTEST_F(EsimFileTest, ProcessObtainEuiccInfo2Done004, TestSize.Level1)
     ASSERT_TRUE(esimFile != nullptr);
 }
 
-HWTEST_F(EsimFileTest, ObtainChannelSuccessAlllowSameAidReuse0001, TestSize.Level1)
+HWTEST_F(EsimFileTest, ObtainChannelSuccessAllowSameAidReuse0001, TestSize.Level1)
 {
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(nullptr);
     esimFile->aidStr_ = u"testAid";

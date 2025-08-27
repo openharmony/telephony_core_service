@@ -351,7 +351,7 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
 bool EsimFile::IsLogicChannelOpen(const SimMessage msgType)
 {
     if (currentChannelId_ > 0) {
-        TELEPHONY_LOGI("opened channel id:%{public}d, msgType is %{public}d,", currentChannelId_.load(), msgType);
+        TELEPHONY_LOGI("opened channel id:%{public}d, msgType is %{public}d", currentChannelId_.load(), msgType);
         return true;
     }
     return false;
@@ -364,7 +364,7 @@ void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid, const SimMessag
     if (telRilManager_ == nullptr) {
         return;
     }
-    TELEPHONY_LOGI("req to open channel:%{public}d, msgType is %{public}d,", currentChannelId_.load(), msgType);
+    TELEPHONY_LOGI("req to open channel:%{public}d, msgType is %{public}d", currentChannelId_.load(), msgType);
     telRilManager_->SimOpenLogicalChannel(slotId_, appId, PARAMETER_TWO, response);
     return;
 }
