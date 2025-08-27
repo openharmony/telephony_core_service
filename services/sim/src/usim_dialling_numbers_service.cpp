@@ -200,7 +200,7 @@ void UsimDiallingNumbersService::ProcessIapLoadDone(const AppExecFwk::InnerEvent
         return;
     }
     iaps_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load iap done, fileId=%{public}zu", event->GetParam());
+    TELEPHONY_LOGI("usimservice load iap done, fileId=%{public}lld", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
