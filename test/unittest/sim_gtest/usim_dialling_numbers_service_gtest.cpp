@@ -445,10 +445,29 @@ HWTEST_F(UsimDiallingNumbersServiceTest, SendBackResultFullBranch, Function | Me
 HWTEST_F(UsimDiallingNumbersServiceTest, FetchAnrContent001, Function | MediumTest | Level1)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    std::u16string result;
+ 
+    result = service->FetchAnrContent(""); // 码流为空
+    EXPECT_TRUE(result == u"");
+ 
+    result = service->FetchAnrContent("000"); // 16 进制码流长度为奇数
+    EXPECT_TRUE(result == u"");
+ 
+    std::string str = "000500";
+    str += "12345678901234567890"; // 不到 15 位
+    result = service->FetchAnrContent(str);
+    EXPECT_TRUE(result == u"");
+ 
+    str = "000500";
+    str += "123456789012345678901234"; // 刚好 15 位，号码不超长
+    result = service->FetchAnrContent(str);
+    EXPECT_TRUE(result == u"2143658709");
+ 
+    str = "000D00";
+    str += "12345678901234567890123456"; // 号码（0D: 13 * 2 = 26）超过 20 位，只截取 20 位
     result = service->FetchAnrContent(str);
     EXPECT_TRUE(result == u"21436587092143658709");
 }
- 
-
 }
 }
