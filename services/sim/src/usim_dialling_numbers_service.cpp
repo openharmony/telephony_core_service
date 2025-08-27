@@ -537,7 +537,7 @@ void UsimDiallingNumbersService::ProcessQueryDone()
             }
             int numberIndexOfAnr = static_cast<size_t>(mapping[anrIndexOfIap]);
             if (numberIndexOfAnr < anrList.size()) {
-                MergeNumber(adnList[j], anrList[numberIndexOfAnr]);
+                MergeSingleNumber(adnList[j], anrList[numberIndexOfAnr]);
             }
         }
         result->insert(result->end(), adnList.begin(), adnList.end());
@@ -550,11 +550,11 @@ void UsimDiallingNumbersService::MergeNumbers(
 {
     TELEPHONY_LOGI("adn size [%{public}zu], anr size [%{public}zu]", adn.size(), anr.size());
     for (size_t i = 0; i < adn.size() && i < anr.size(); i++) {
-        MergeNumber(adn[i], anr[i]);
+        MergeSingleNumber(adn[i], anr[i]);
     }
 }
 
-void UsimDiallingNumbersService::MergeNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr)
+void UsimDiallingNumbersService::MergeSingleNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr)
 {
     if (!anr.empty()) {
         auto numbers = adn->GetNumber() + NUMBER_SPLIT + anr;

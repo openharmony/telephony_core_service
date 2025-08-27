@@ -78,7 +78,7 @@ private:
     void CheckQueryDone();
     void ProcessQueryDone();
     void MergeNumbers(std::vector<std::shared_ptr<DiallingNumbersInfo>> &adn, const std::vector<std::u16string> &anr);
-    void MergeNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr);
+    void MergeSingleNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr);
     void StartLoadByPbrFiles();
     bool LoadDiallingNumberFiles(size_t index);
     bool LoadDiallingNumber2Files(size_t index);

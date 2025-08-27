@@ -411,8 +411,8 @@ HWTEST_F(UsimDiallingNumbersServiceTest, MergeNumber001, Function | MediumTest |
     auto adn = std::make_shared<DiallingNumbersInfo>();
     adn->UpdateNumber(u"123");
 
-    service->MergeNumber(adn, u""); // 空字符串，不修改
-    service->MergeNumber(adn, u"456"); // 拼接号码
+    service->MergeSingleNumber(adn, u""); // 空字符串，不修改
+    service->MergeSingleNumber(adn, u"456"); // 拼接号码
     EXPECT_TRUE(adn->GetNumber() == u"123;456");
 }
 
