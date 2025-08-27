@@ -29,7 +29,6 @@
 namespace OHOS {
 namespace Telephony {
 enum DiallingNumbersMessageType {
-    MSG_SIM_ADVANCE_LOAD_PBR = 0,
     MSG_SIM_DIALLING_NUMBERS_GET_DONE  = 1,
     MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE,
     MSG_SIM_DIALLING_NUMBERS_WRITE_DONE,
