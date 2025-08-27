@@ -536,7 +536,7 @@ void UsimDiallingNumbersService::ProcessQueryDone()
                 continue; // 跳过非法映射
             }
             int numberIndexOfAnr = static_cast<size_t>(mapping[anrIndexOfIap]);
-            if (numberIndexOfAnr < anrList.size()) {
+            if (numberIndexOfAnr < static_cast<int>(anrList.size()) {
                 MergeSingleNumber(adnList[j], anrList[numberIndexOfAnr]);
             }
         }
