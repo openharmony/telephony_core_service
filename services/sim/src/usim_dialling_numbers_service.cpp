@@ -168,7 +168,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
         return;
     }
     anrs_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load anr done, fileId=%{public}zu", event->GetParam());
+    TELEPHONY_LOGI("usimservice load anr done, fileId=%{public}lld", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
