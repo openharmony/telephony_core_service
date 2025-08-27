@@ -73,6 +73,7 @@ private:
     void ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessAdvanceLoadPbr();
+    int QueryIccDiallingNumbersPreLoad(int type);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
 
     void ClearRecords();
