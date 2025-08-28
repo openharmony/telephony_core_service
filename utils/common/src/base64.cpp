@@ -34,23 +34,6 @@ std::shared_ptr<std::string> Base64::Encode(const std::vector<unsigned char> &in
     return std::make_shared<std::string>(outBuffer.begin(), outBuffer.end());
 }
 
-std::shared_ptr<std::string> Base64::Encode(const std::string &input)
-{
-    size_t inputSize = input.size();
-    size_t encodeSize = BASE64_ENCODED_UNIT * ((inputSize + BASE64_INPUT_UNIT_PAD) / BASE64_INPUT_UNIT) +
-        BASE64_OUTPUT_PADDING;
-    auto outStr = std::make_shared<std::string>(encodeSize, '\0');
-    auto inputPtr = reinterpret_cast<const unsigned char*>(input.data());
-    auto outStrPtr = reinterpret_cast<unsigned char*>(outStr->data());
-
-    int actualSize = EVP_EncodeBlock(outStrPtr, inputPtr, static_cast<int>(inputSize));
-    if (actualSize < 0) {
-        return nullptr;
-    }
-    outStr->resize(actualSize);
-    return outStr;
-}
-
 std::shared_ptr<std::vector<unsigned char>> Base64::Decode(const std::string &input)
 {
     auto size = input.size();
