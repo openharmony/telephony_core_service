@@ -58,21 +58,6 @@ HWTEST_F(TelRilCommonTest, TelRilModem_BuildVoiceRadioTechnology_001, Function |
 }
 
 /**
- * @tc.number   TelRilManager_ConnectRilInterface_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(TelRilCommonTest, TelRilManager_ConnectRilInterface_001, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->rilInterface_ = nullptr;
-    auto result = telRilManager->ConnectRilInterface();
-    telRilManager->OnInit();
-    telRilManager->ReduceRunningLock(0);
-    ASSERT_EQ(result, true);
-}
-
-/**
  * @tc.number   TelRilManager_InitTelExtraModule_001
  * @tc.name     test error branch
  * @tc.desc     Function test

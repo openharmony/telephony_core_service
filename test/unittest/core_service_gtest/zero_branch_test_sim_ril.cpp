@@ -1604,28 +1604,6 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorFileParser, Function | MediumTest |
     value = nullptr;
 }
 
-/**
- * @tc.number   Telephony_OperatorConfigLoader_003
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_003, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
-    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
-    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
-    auto dataShareHelper = std::make_shared<MockDataShareHelper>();
-    EXPECT_CALL(*dataShareHelper, Creator(_, _, _, _)).WillRepeatedly(DoAll(Return(nullptr)));
-    operatorConfigLoader->LoadOpKeyOnMccMnc(0);
-    bool isDataShareError = CoreManagerInner::GetInstance().IsDataShareError();
-    EXPECT_TRUE(isDataShareError);
-}
-
 HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_004, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();

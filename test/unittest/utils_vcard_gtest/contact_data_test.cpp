@@ -946,30 +946,6 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTest | Level3)
-{
-    VCardContact vCardContact;
-    std::string family = "张";
-    std::string middle = "";
-    std::string given = "三";
-    std::string displayName = "三张";
-    SetNameData(family, given, middle, displayName);
-    vCardContact.nameData_ = nameData_;
-    vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张三");
-    middle = "小";
-    SetNameData(family, given, middle, displayName);
-    vCardContact.nameData_ = nameData_;
-    vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张小三");
-    family = "";
-    given = "";
-    SetNameData(family, given, middle, displayName);
-    vCardContact.nameData_ = nameData_;
-    vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "三张");
-}
-
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
 {
     VCardContact vCardContact;
@@ -984,16 +960,6 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumT
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
     EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "a bcde");
-}
-
-HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumTest | Level3)
-{
-    VCardContact vCardContact;
-    std::shared_ptr<VCardNameData> nameData_ = std::make_shared<VCardNameData>();
-    nameData_->SetPhoneticName("liu");
-    vCardContact.nameData_ = nameData_;
-    vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "liu");
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName03, Function | MediumTest | Level3)

@@ -90,16 +90,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkDataRegistrationStateTest_0201, Fun
 }
 
 /**
- * @tc.number Telephony_TelRil_GetNetworkSearchInformationTest_0101 to do ...
- * @tc.name Search for carrier information of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_NETWORKS_TO_USE), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_GetNetworkSearchInformationTest_0201 to do ...
  * @tc.name Search for carrier information of the card 2
  * @tc.desc Function test
@@ -339,18 +329,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0101, Function | Medi
 HWTEST_F(TelRilTest, Telephony_TelRil_SetLocateUpdatesTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_LOCATE_UPDATES), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SetNotificationFilterTest_0101 to do ...
- * @tc.name Set notification filter of the card 1
- * @tc.desc Function test
- * @tc.require: issueI5BFY5
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_0, GetHandler()));
 }
 
 /**

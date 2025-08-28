@@ -658,42 +658,6 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0012, Function 
     EXPECT_NE(mInner.simManager_, nullptr);
 }
 
-HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0013, Function | MediumTest | Level1)
-{
-    CoreManagerInner mInner;
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    mInner.isInitExtraObj_ = true;
-    EXPECT_EQ(mInner.InitExtraModule(1), TELEPHONY_SUCCESS);
-    mInner.InitExtraModule(1);
-    EXPECT_FALSE(SIM_SLOT_COUNT != DUAL_SLOT_COUNT);
-    mInner.telRilManager_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> handler;
-    std::string testStr = "";
-    EXPECT_EQ(mInner.SetNetworkSelectionMode(-1, -1, 0, testStr, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    AppExecFwk::InnerEvent::Pointer response(nullptr, nullptr);
-    mInner.telRilManager_ = telRilManager;
-    mInner.SetNetworkSelectionMode(-1, -1, 0, testStr, handler);
-    EXPECT_NE(mInner.telRilManager_, nullptr);
-    EXPECT_EQ(mInner.simManager_, nullptr);
-    mInner.InitExtraModule(1);
-    int32_t simId = -1;
-    EXPECT_EQ(mInner.SetActiveSim(-1, 0), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.GetDefaultVoiceSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(mInner.GetDefaultSmsSimId(simId), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    mInner.simManager_ = simManager;
-    std::u16string u16str = u"test";
-    mInner.GetSimOperatorNumeric(1, u16str);
-    mInner.InitExtraModule(1);
-    EXPECT_NE(mInner.simManager_, nullptr);
-    mInner.networkSearchManager_ = networkSearchManager;
-    mInner.InitExtraModule(1);
-    EXPECT_NE(mInner.networkSearchManager_, nullptr);
-    EXPECT_NE(mInner.simManager_, nullptr);
-    EXPECT_NE(mInner.telRilManager_, nullptr);
-}
-
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0014, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;

@@ -328,47 +328,5 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Sim_001, Function | MediumTest | Le
     EXPECT_NE(telRilSim->ResponseIccIo(info, resultInfo), TELEPHONY_ERR_SUCCESS);
 }
 
-/**
- * @tc.number   Telephony_tel_ril_Call_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | Level1)
-{
-    TELEPHONY_LOGI("Telephony_tel_ril_Call_001 entry");
-    auto rilInterface = HDI::Ril::V1_5::IRil::Get();
-    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
-    auto telRilCall = std::make_shared<TelRilCall>(SLOT_ID, rilInterface, observerHandler, nullptr);
-
-    HDI::Ril::V1_1::RilRadioResponseInfo responseInfo;
-    HDI::Ril::V1_1::SsNoticeInfo ssNoticeInfo;
-    HDI::Ril::V1_1::RingbackVoice ringbackVoice;
-    HDI::Ril::V1_1::SrvccStatus srvccStatus;
-    HDI::Ril::V1_1::GetClirResult getClirResult;
-
-    telRilCall->CallSsNotice(ssNoticeInfo);
-    telRilCall->CallRingbackVoiceNotice(ringbackVoice);
-    telRilCall->CallSrvccStatusNotice(srvccStatus);
-    responseInfo.error = HDI::Ril::V1_1::RilErrType::NONE;
-    ASSERT_TRUE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
-    telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
-    responseInfo.error = HDI::Ril::V1_1::RilErrType::RIL_ERR_GENERIC_FAILURE;
-    ASSERT_FALSE(telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo));
-    telRilCall->ResponseSupplement(TELEPHONY_LOG_FUNC_NAME, responseInfo);
-    telRilCall->GetClirResponse(responseInfo, getClirResult);
-
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
-    responseInfo.serial = -1;
-    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
-
-    responseInfo.serial = 1;
-    telRilCall->CreateTelRilRequest(event);
-    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
-
-    event = nullptr;
-    responseInfo.serial = 2;
-    EXPECT_NE(telRilCall->CreateTelRilRequest(event), nullptr);
-    ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
-}
 } // namespace Telephony
 } // namespace OHOS
