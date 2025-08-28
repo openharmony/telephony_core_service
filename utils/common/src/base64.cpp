@@ -23,8 +23,7 @@ constexpr unsigned int MAX_BASE64_BUF_PADDING_SIZE = 2;
 std::shared_ptr<std::string> Base64::Encode(const std::vector<unsigned char> &input)
 {
     auto size = input.size();
-    size_t bufLen = BASE64_ENCODED_UNIT * ((size + BASE64_INPUT_UNIT_PAD) / BASE64_INPUT_UNIT) +
-        BASE64_OUTPUT_PADDING;
+    size_t bufLen = size / 3 * 4 + (size % 3 == 0 ? 0 : 4) +1;
     std::vector<unsigned char> outBuffer(bufLen, 0);
     auto outLen = EVP_EncodeBlock(outBuffer.data(), input.data(), size);
     if (outLen < 0) {
@@ -37,7 +36,7 @@ std::shared_ptr<std::string> Base64::Encode(const std::vector<unsigned char> &in
 std::shared_ptr<std::vector<unsigned char>> Base64::Decode(const std::string &input)
 {
     auto size = input.size();
-    size_t bufLen = size / BASE64_ENCODED_UNIT * BASE64_INPUT_UNIT;
+    size_t bufLen = size / 4 * 3;
     auto outBuffer = std::make_shared<std::vector<unsigned char>>(bufLen, 0);
     auto outLen = EVP_DecodeBlock(reinterpret_cast<unsigned char *>(outBuffer->data()),
                                   reinterpret_cast<const unsigned char *>(input.c_str()), size);
