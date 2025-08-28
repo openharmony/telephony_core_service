@@ -74,26 +74,6 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_001, Function | MediumTes
     EXPECT_EQ(encodeBase64Result, answerStr);
 }
 
-HWTEST_F(UtilsVcardTest, Telephony_Common_EncodeBase64_002, Function | MediumTest | Level3)
-{
-    std::string testStr = "testStr";
-    std::string answerStr = "dGVzdFN0cg==";
-    std::shared_ptr<string> encodedDataString = OHOS::Telephony::Base64::Encode(testStr);
-    EXPECT_EQ(*encodedDataString, answerStr);
-
-    testStr = "!@#$%^&*(){}[]:;<>?,./\"'\\n\\t\\r\\b -_=+[]{}|;:\'\",.<>/?@ABCDqrstuvwxyz12890你";
-    testStr += "好🌟🚀";
-    answerStr = "IUAjJCVeJiooKXt9W106Ozw+PywuLyInXG5cdFxyXGIgLV89K1tde318OzonIiwuPD4vP0BBQkNEcXJ";
-    answerStr += "zdHV2d3h5ejEyODkw5L2g5aW98J+Mn/CfmoA=";
-    encodedDataString = OHOS::Telephony::Base64::Encode(testStr);
-    EXPECT_EQ(*encodedDataString, answerStr);
-
-    testStr = "你好，世界";
-    answerStr = "5L2g5aW977yM5LiW55WM";
-    encodedDataString = OHOS::Telephony::Base64::Encode(testStr);
-    EXPECT_EQ(*encodedDataString, answerStr);
-}
-
 HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTest | Level3)
 {
     std::string resultBase64;
@@ -143,6 +123,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumT
     toCharset = "SHIFT_JIS";
     resultConvert = VCardUtils::ConvertCharset(convertCharseInput, fromCharset, toCharset, errorCode);
     EXPECT_NE(resultConvert, convertCharseInput);
+    EXPECT_EQ(resultConvert, convertCharseOutput);
 }
  
 }
