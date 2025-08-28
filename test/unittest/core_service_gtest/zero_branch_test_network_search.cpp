@@ -89,48 +89,6 @@ static void UpdateOperatorNameParamsTest(
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
 }
  
-static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
-{
-    using ::testing::_;
-    EXPECT_CALL(*simManager, GetSimOperatorNumeric(_, _))
-        .WillOnce([=](int32_t arg1, std::u16string &outParam) { return -1; })
-        .WillOnce([=](int32_t arg1, std::u16string &outParam) { return -1; })
-        .WillOnce([=](int32_t arg1, std::u16string &outParam) {
-            outParam = Str8ToStr16("46000");
-            return 0;
-        })
-        .WillRepeatedly([=](int32_t arg1, std::u16string &outParam) {
-            outParam = Str8ToStr16("46001");
-            return 0;
-        });
-    EXPECT_CALL(*simManager, GetEhPlmns(_, _))
-        .WillOnce([=](int32_t arg1, std::set<std::string> &outParam) {
-            outParam = {"46000"};
-            return 0;
-        })
-        .WillRepeatedly([=](int32_t arg1, std::set<std::string> &outParam) {
-            outParam = {"46001"};
-            return 0;
-        });
-    EXPECT_CALL(*simManager, GetSpdiPlmns(_, _))
-        .WillOnce([=](int32_t arg1, std::set<std::string> &outParam) {
-            outParam = {"46000"};
-            return 0;
-        })
-        .WillRepeatedly([=](int32_t arg1, std::set<std::string> &outParam) {
-            outParam = {"46001"};
-            return 0;
-        });
-    EXPECT_CALL(*simManager, GetSimEons(_, _, _, _))
-        .WillRepeatedly([=](int32_t slotId, const std::string &plmn, int32_t lac, bool longNameRequired) {
-            return std::u16string(u"46000");
-        });
-    EXPECT_CALL(*simManager, GetSimSpn(_, _)).WillRepeatedly([=](int32_t arg1, std::u16string &outParam) {
-        outParam = u"46001";
-        return 0;
-    });
-}
- 
 /**
  * @tc.number   Telephony_CellInfo_001
  * @tc.name     test error branch
