@@ -192,8 +192,8 @@ HWTEST_F(EsimTest, SyncOpenChannel_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     esimFile->currentChannelId_ = 2;
-    esimFile->ObtainChannelSuccessExclusive();
-    EXPECT_TRUE(esimFile->IsLogicChannelOpen());
+    esimFile->ObtainChannelSuccessExclusive(MSG_ESIM_OPEN_CHANNEL_DONE);
+    EXPECT_TRUE(esimFile->IsLogicChannelOpen(MSG_ESIM_OPEN_CHANNEL_DONE));
 }
 
 HWTEST_F(EsimTest, SyncOpenChannel_002, Function | MediumTest | Level2)
@@ -203,8 +203,8 @@ HWTEST_F(EsimTest, SyncOpenChannel_002, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     std::u16string aid = Str8ToStr16("123");
     esimFile->currentChannelId_ = 2;
-    esimFile->ObtainChannelSuccessAlllowSameAidReuse(aid);
-    EXPECT_TRUE(esimFile->IsLogicChannelOpen());
+    esimFile->ObtainChannelSuccessAllowSameAidReuse(aid);
+    EXPECT_TRUE(esimFile->IsLogicChannelOpen(MSG_ESIM_OPEN_CHANNEL_DONE));
 }
 
 HWTEST_F(EsimTest, SyncCloseChannel_001, Function | MediumTest | Level2)
@@ -213,8 +213,8 @@ HWTEST_F(EsimTest, SyncCloseChannel_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     esimFile->currentChannelId_ = 0;
-    esimFile->SyncCloseChannel();
-    EXPECT_FALSE(esimFile->IsLogicChannelOpen());
+    esimFile->SyncCloseChannel(MSG_ESIM_CLOSE_CHANNEL_DONE);
+    EXPECT_FALSE(esimFile->IsLogicChannelOpen(MSG_ESIM_OPEN_CHANNEL_DONE));
 }
 
 HWTEST_F(EsimTest, SyncCloseChannel_002, Function | MediumTest | Level2)
@@ -223,8 +223,8 @@ HWTEST_F(EsimTest, SyncCloseChannel_002, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     esimFile->currentChannelId_ = 0;
-    esimFile->SyncCloseChannel();
-    EXPECT_FALSE(esimFile->IsLogicChannelOpen());
+    esimFile->SyncCloseChannel(MSG_ESIM_CLOSE_CHANNEL_DONE);
+    EXPECT_FALSE(esimFile->IsLogicChannelOpen(MSG_ESIM_OPEN_CHANNEL_DONE));
 }
 
 HWTEST_F(EsimTest, ObtainEid_001, Function | MediumTest | Level2)
@@ -387,11 +387,7 @@ HWTEST_F(EsimTest, ProcessEsimOpenChannel_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     std::u16string aid = Str8ToStr16("123");
-    int32_t slotId = 0;
-    esimFile->ProcessEsimOpenChannel(aid);
-    std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
-    std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
-    esimFile->ProcessEsimOpenChannel(aid);
+    esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
     EXPECT_NE(telRilManager, nullptr);
 }
 
@@ -411,11 +407,7 @@ HWTEST_F(EsimTest, ProcessEsimCloseChannel_001, Function | MediumTest | Level2)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
-    int32_t slotId = 0;
-    esimFile->ProcessEsimCloseChannel();
-    std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
-    std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
-    esimFile->ProcessEsimCloseChannel();
+    esimFile->ProcessEsimCloseChannel(MSG_ESIM_CLOSE_CHANNEL_DONE);
     EXPECT_NE(telRilManager, nullptr);
 }
 
