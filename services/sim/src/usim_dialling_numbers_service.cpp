@@ -68,7 +68,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("event is nullptr!");
         return;
     }
-    TELEPHONY_LOGI("usimservice load pbr done %{public}#lX", event->GetParam());
+    TELEPHONY_LOGI("usimservice load pbr done %{public}#llx", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
         TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
@@ -171,7 +171,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
         return;
     }
     anrs_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load anr done, fileId=%{public}#lX", event->GetParam());
+    TELEPHONY_LOGI("usimservice load anr done, fileId=%{public}#llx", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
@@ -203,7 +203,7 @@ void UsimDiallingNumbersService::ProcessIapLoadDone(const AppExecFwk::InnerEvent
         return;
     }
     iaps_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load iap done, fileId=%{public}#lX", event->GetParam());
+    TELEPHONY_LOGI("usimservice load iap done, fileId=%{public}#llx", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
