@@ -117,7 +117,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
             hd->countFiles = size / hd->fileSize;
         }
     }
-    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}d %{public}d %{public}d %{public}d", hd->fileId, size,
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#X %{public}d %{public}d %{public}d", hd->fileId, size,
         hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
         SimIoRequestInfo msg;

@@ -29,7 +29,6 @@
 namespace OHOS {
 namespace Telephony {
 enum DiallingNumbersMessageType {
-    MSG_SIM_ADVANCE_LOAD_PBR = 0,
     MSG_SIM_DIALLING_NUMBERS_GET_DONE  = 1,
     MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE,
     MSG_SIM_DIALLING_NUMBERS_WRITE_DONE,
@@ -67,6 +66,7 @@ private:
     bool hasEventDone_ = false;
     bool hasQueryEventDone_ = false;
     std::condition_variable processWait_;
+    SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;
     void ProcessSimStateChanged();
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
