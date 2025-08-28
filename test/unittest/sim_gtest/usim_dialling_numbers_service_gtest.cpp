@@ -56,23 +56,23 @@ void UsimDiallingNumbersServiceTest::TearDown() {}
 HWTEST_F(UsimDiallingNumbersServiceTest, ProcessPbrLoadDone001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
- 
+
     AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
     service->ProcessPbrLoadDone(event);
- 
+
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_PBR_LOAD_DONE);
     service->ProcessPbrLoadDone(event);
- 
+
     auto multiRecord = std::make_shared<MultiRecordResult>(nullptr);
     multiRecord->exception = std::make_shared<int>(0);
- 
+
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_PBR_LOAD_DONE, multiRecord);
     service->ProcessPbrLoadDone(event);
- 
+
     multiRecord = std::make_shared<MultiRecordResult>(nullptr);
     multiRecord->exception = nullptr;
     multiRecord->fileResults = {"file1", "file2"};
- 
+
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_PBR_LOAD_DONE, multiRecord);
     service->ProcessPbrLoadDone(event);
     EXPECT_TRUE(service->pbrFileLoaded_);
@@ -81,17 +81,17 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessPbrLoadDone001, Function | Mediu
 HWTEST_F(UsimDiallingNumbersServiceTest, StartLoadByPbrFiles001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
- 
+
     service->pbrFiles_.clear();
     service->StartLoadByPbrFiles();
- 
+
     auto file1 = std::make_shared<UsimDiallingNumberFile>();
     file1->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] =
         UsimDiallingNumbersService::TYPE2_FLAG;
     auto file2 = std::make_shared<UsimDiallingNumberFile>();
     file2->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] =
         UsimDiallingNumbersService::TYPE1_FLAG;
- 
+
     service->pbrFiles_.clear();
     service->pbrFiles_.push_back(file1);
     service->pbrFiles_.push_back(file2);
@@ -103,7 +103,9 @@ HWTEST_F(UsimDiallingNumbersServiceTest, StartLoadByPbrFiles001, Function | Medi
 HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
+
     service->ProcessDiallingNumberLoadDone(AppExecFwk::InnerEvent::Pointer(nullptr, nullptr));
+
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE);
     service->ProcessDiallingNumberLoadDone(event);
 
@@ -346,13 +348,9 @@ HWTEST_F(UsimDiallingNumbersServiceTest, CheckQueryDoneFullBranch, Function | Me
 
     service->anrs_[0] = {};
     service->iaps_.clear();
-    file->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE2_FLAG;
     service->CheckQueryDone();
 
     service->iaps_[0] = {};
-    service->CheckQueryDone();
-
-    file->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE1_FLAG;
     service->CheckQueryDone();
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
@@ -363,7 +361,7 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDoneFullBranchSplit, Functi
 
     auto file = std::make_shared<UsimDiallingNumberFile>();
     service->pbrFiles_.push_back(file);
-
+    
     service->ProcessQueryDone(); // 无有效 tag: TAG_SIM_USIM_ADN, TAG_SIM_USIM_ANR, TAG_SIM_USIM_IAP
 
     auto tagAdn = std::make_shared<TagData>(0, 0, 0, 0); tagAdn->fileId = 1;
@@ -411,8 +409,8 @@ HWTEST_F(UsimDiallingNumbersServiceTest, MergeNumber001, Function | MediumTest |
     auto adn = std::make_shared<DiallingNumbersInfo>();
     adn->UpdateNumber(u"123");
 
-    service->MergeSingleNumber(adn, u""); // 空字符串，不修改
-    service->MergeSingleNumber(adn, u"456"); // 拼接号码
+    service->MergeNumber(adn, u""); // 空字符串，不修改
+    service->MergeNumber(adn, u"456"); // 拼接号码
     EXPECT_TRUE(adn->GetNumber() == u"123;456");
 }
 
@@ -441,6 +439,7 @@ HWTEST_F(UsimDiallingNumbersServiceTest, SendBackResultFullBranch, Function | Me
     service->SendBackResult(diallingNumbers); // 正常路径
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
+
 
 HWTEST_F(UsimDiallingNumbersServiceTest, FetchAnrContent001, Function | MediumTest | Level1)
 {
