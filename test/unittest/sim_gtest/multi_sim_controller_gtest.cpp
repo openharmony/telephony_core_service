@@ -587,7 +587,7 @@ HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Functio
 }
 
 HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsValidValue, Function | MediumTest | Level1)
-{   
+{
     MockSimRdbHelper mockSimRdbHelper;
     EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
         .WillRepeatedly(Return(1));
@@ -600,7 +600,7 @@ HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsValidValue, Function | 
 }
 
 HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsInvalidValue, Function | MediumTest | Level1)
-{      
+{
     MockSimRdbHelper mockSimRdbHelper;
     EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
         .WillRepeatedly(Return(0));
