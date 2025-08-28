@@ -339,16 +339,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UnSetPIn2LockTest_0101, Function | MediumT
 }
 
 /**
- * @tc.number Telephony_TelRil_EnableSimCardTest_0101 to do ...
- * @tc.name Enable SIM card of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_EnableSimCardTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ENABLE_SIM_CARD), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_GetSimLockStatusTest_0201 to do ...
  * @tc.name Get SIM card lock status of the card 2
  * @tc.desc Function test

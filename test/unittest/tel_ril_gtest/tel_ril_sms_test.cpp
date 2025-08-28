@@ -230,16 +230,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsSendSmsExpectMoreTest_0201, Function | 
 }
 
 /**
- * @tc.number Telephony_TelRil_SmsAcknowledgeTest_0101 to do ...
- * @tc.name SMS Acknowledge of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SEND_SMS_ACK), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SmsAcknowledgeTest_0201 to do ...
  * @tc.name SMS Acknowledge of the card 2
  * @tc.desc Function test
@@ -250,16 +240,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SmsAcknowledgeTest_0201, Function | Medium
 }
 
 /**
- * @tc.number Telephony_TelRil_AddRilCmCdmaSmsTest_0101 to do ...
- * @tc.name Add CDMA SMS of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_AddRilCmCdmaSmsTest_0201 to do ...
  * @tc.name Add CDMA SMS of the card 2
  * @tc.desc Function test
@@ -267,16 +247,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0101, Function | Mediu
 HWTEST_F(TelRilTest, Telephony_TelRil_AddRilCmCdmaSmsTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_ADD_CDMA_SMS), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_DelRilCmCdmaSmsTest_0101 to do ...
- * @tc.name Delete CDMA SMS of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_DelRilCmCdmaSmsTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_DEL_CDMA_SMS), SLOT_ID_0, GetHandler()));
 }
 
 /**

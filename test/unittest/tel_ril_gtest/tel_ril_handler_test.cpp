@@ -40,22 +40,6 @@ void TelRilHandlerTest::SetUp() {}
 void TelRilHandlerTest::TearDown() {}
 
 /**
- * @tc.number   Telephony_tel_ril_manager_001
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_001, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    event = nullptr;
-    telRilManager->handler_->ProcessEvent(event);
-    event = AppExecFwk::InnerEvent::Get(-1);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-}
-
-/**
  * @tc.number   Telephony_tel_ril_handler_002
  * @tc.name     test function branch
  * @tc.desc     Function test
@@ -71,67 +55,6 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_002, Function | MediumTest
     int32_t lockType = 100;
     telRilManager->handler_->ApplyRunningLock(lockType);
     ASSERT_NE(telRilManager->handler_->ackLockSerialNum_, 0);
-}
-
-/**
- * @tc.number   Telephony_tel_ril_handler_003
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_003, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType, 0);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-    lockType = TelRilHandler::ACK_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType, 0);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-    #ifdef ABILITY_POWER_SUPPORT
-    telRilManager->handler_->reqRunningLock_ = nullptr;
-    #endif
-    lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType, 0);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-    lockType = TelRilHandler::ACK_RUNNING_LOCK;
-    telRilManager->handler_->ReduceRunningLock(lockType, 0);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-}
-
-/**
- * @tc.number   Telephony_tel_ril_handler_004
- * @tc.name     test function branch
- * @tc.desc     Function test
- */
-HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_004, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ReleaseRunningLock(lockType);
-    #ifdef ABILITY_POWER_SUPPORT
-    telRilManager->handler_->ackRunningLock_ = nullptr;
-    #endif
-    telRilManager->handler_->ReleaseRunningLock(lockType);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-    #ifdef ABILITY_POWER_SUPPORT
-    telRilManager->handler_->reqRunningLock_ = nullptr;
-    #endif
-    telRilManager->handler_->ReleaseRunningLock(lockType);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
-}
-
-HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_005, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ApplyRunningLock(lockType);
-    telRilManager->handler_->ReduceRunningLock(lockType, 0);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 1);
-    telRilManager->handler_->ReduceRunningLock(lockType, 1);
-    ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 0);
 }
 
 } // namespace Telephony

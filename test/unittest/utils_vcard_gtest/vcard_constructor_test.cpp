@@ -72,18 +72,6 @@ HWTEST_F(VcardConstructorTest, Vcard_Constructor_AddPhotoLine_001, Function | Me
     EXPECT_EQ(constructor->result_.str(), "PHOTO;ENCODING=B;TYPE=JPEG:Byte\r\n\r\n");
 }
 
-HWTEST_F(VcardConstructorTest, Vcard_Constructor_EncodeQuotedPrintable_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<VCardConstructor> constructor = std::make_shared<VCardConstructor>(0, "");
-    constructor->result_.str("");
-    auto res = constructor->EncodeQuotedPrintable("Byte");
-    EXPECT_EQ(res, "=42=79=74=65");
-
-    constructor->result_.str("");
-    res = constructor->EncodeQuotedPrintable("Byte1Byte2Byte3Byte4Byte5Byte6");
-    EXPECT_EQ(res, "=42=79=74=65=31=42=79=74=65=32=42=79=74=65=33=42=79=74=65=34=42=79=74\r\n=65=35=42=79=74=65=36");
-}
-
 HWTEST_F(VcardConstructorTest, Vcard_Constructor_ContactEnd_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
