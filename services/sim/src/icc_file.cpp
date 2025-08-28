@@ -957,7 +957,7 @@ void IccFile::UpdateOpkeyConfig()
             key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId_));
         key = "";
         std::string isUpdateOperatorConfigProp = key.append(IS_UPDATE_OPERATORCONFIG).append(std::to_string(slotId_));
-        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = {0};
+        char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
         GetParameter(isBlockLoadOperatorConfigProp.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
         if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
             SetParameter(isUpdateOperatorConfigProp.c_str(), "true");
