@@ -66,6 +66,7 @@ private:
     bool hasEventDone_ = false;
     bool hasQueryEventDone_ = false;
     std::condition_variable processWait_;
+    SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;
     void ProcessSimStateChanged();
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
