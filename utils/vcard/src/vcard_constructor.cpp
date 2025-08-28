@@ -766,7 +766,7 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
         AddParamTypes(paramTypes);
     } else if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENTGH + 1) {
         auto phoneType = static_cast<PhoneVcType>(std::stoll(labelId));
-        if (phoneType == PhoneVcType::CUSTOM_LABEL && VCardUtils::IsPrintableAscii({ labelName })) {
+        if (phoneType == PhoneVcType::CUSTOM_LABEL && !VCardUtils::IsContainsInvisibleChar(labelName)) {
             paramTypes.push_back("X-" + labelName);
             AddParamTypes(paramTypes);
         }
