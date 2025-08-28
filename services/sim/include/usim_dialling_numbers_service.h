@@ -74,11 +74,11 @@ private:
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
     std::list<AppExecFwk::InnerEvent::Pointer> callers_;
-
+    uint32_t iapNum_ = 0;
     void CheckQueryDone();
     void ProcessQueryDone();
     void MergeNumbers(std::vector<std::shared_ptr<DiallingNumbersInfo>> &adn, const std::vector<std::u16string> &anr);
-    void MergeSingleNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr);
+    void MergeNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr);
     void StartLoadByPbrFiles();
     bool LoadDiallingNumberFiles(size_t index);
     bool LoadDiallingNumber2Files(size_t index);
@@ -92,10 +92,9 @@ private:
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumber2LoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessIapLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
-    bool IsValidTag(std::map<int, std::shared_ptr<TagData>> tags, int tag);
     std::u16string FetchAnrContent(const std::string &recordData);
     std::vector<uint8_t> FetchIapContent(const std::string &recordData);
-
+    bool IsValidTag(std::map<int, std::shared_ptr<TagData>> tags, int tag);
     std::shared_ptr<UsimDiallingNumberFile> BuildNumberFileByRecord(const std::string &record);
     void StorePbrDetailInfo(std::shared_ptr<UsimDiallingNumberFile> file,
         std::shared_ptr<TagService> tlv, int parentTag);
