@@ -63,7 +63,8 @@ std::map<std::string, PhoneVcType> typeToPhoneTypeMap = { { VCARD_PARAM_TYPE_CAR
 
 std::string VCardUtils::EncodeBase64(const std::string &input)
 {
-    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(input);
+    std::vector<unsigned char> tempInput(input.begin(), input.end());
+    std::shared_ptr<std::string> encodedDataString = OHOS::Telephony::Base64::Encode(tempInput);
     if (encodedDataString == nullptr) {
         return "";
     }
