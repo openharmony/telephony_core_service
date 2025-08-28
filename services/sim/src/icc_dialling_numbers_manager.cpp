@@ -13,298 +13,537 @@
  * limitations under the License.
  */
 
-#include "icc_dialling_numbers_manager.h"
+#include "icc_file_controller.h"
 
-#include "core_service_errors.h"
-#include "radio_event.h"
-#include "telephony_errors.h"
+using namespace std;
+using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
-constexpr static const int32_t WAIT_TIME_SECOND = 1;
-constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 60;
+IccFileController::IccFileController(const std::string &name, int slotId) : TelEventHandler(name), slotId_(slotId) {}
 
-IccDiallingNumbersManager::IccDiallingNumbersManager(
-    std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simState)
-    : TelEventHandler("IccDiallingNumbersManager"), simFileManager_(simFileManager), simStateManager_(simState)
-{}
-
-void IccDiallingNumbersManager::Init()
-{
-    TELEPHONY_LOGI("IccDiallingNumbersManager::Init() started ");
-    if (stateDiallingNumbers_ == HandleRunningState::STATE_RUNNING) {
-        TELEPHONY_LOGI("IccDiallingNumbersManager::Init eventLoopDiallingNumbers_ started.");
-        return;
-    }
-
-    auto simFileManager = simFileManager_.lock();
-    if (simFileManager == nullptr) {
-        TELEPHONY_LOGE("SimFileManager null pointer");
-        return;
-    }
-    diallingNumbersCache_ = std::make_shared<IccDiallingNumbersCache>(simFileManager);
-
-    stateDiallingNumbers_ = HandleRunningState::STATE_RUNNING;
-
-    diallingNumbersCache_->Init();
-    simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
-    TELEPHONY_LOGI("Init() end");
-}
-
-void IccDiallingNumbersManager::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return;
     }
     uint32_t id = event->GetInnerEventId();
-    TELEPHONY_LOGD("IccDiallingNumbersManager ProcessEvent Id is %{public}d", id);
+    TELEPHONY_LOGD("IccFileController ProcessEvent Id is %{public}d", id);
+    if (ProcessErrorResponse(event)) {
+        return;
+    }
     switch (id) {
-        case MSG_SIM_DIALLING_NUMBERS_GET_DONE:
-            ProcessLoadDone(event);
+        case MSG_SIM_OBTAIN_SIZE_OF_LINEAR_ELEMENTARY_FILE_DONE:
+            ProcessLinearRecordSize(event);
             break;
-        case MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE:
-            ProcessUpdateDone(event);
+        case MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE:
+            ProcessRecordSize(event);
             break;
-        case MSG_SIM_DIALLING_NUMBERS_WRITE_DONE:
-            ProcessWriteDone(event);
+        case MSG_SIM_OBTAIN_SIZE_OF_TRANSPARENT_ELEMENTARY_FILE_DONE:
+            ProcessBinarySize(event);
             break;
-        case MSG_SIM_DIALLING_NUMBERS_DELETE_DONE:
-            ProcessDeleteDone(event);
+        case MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE:
+            ProcessReadRecord(event);
             break;
-        case RadioEvent::RADIO_SIM_STATE_CHANGE:
-            ProcessSimStateChanged();
+        case MSG_SIM_OBTAIN_ICON_DONE:
+        case MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE:
+        case MSG_SIM_UPDATE_TRANSPARENT_ELEMENTARY_FILE_DONE:
+        case MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE:
+            ProcessReadBinary(event);
             break;
         default:
             break;
     }
 }
 
-void IccDiallingNumbersManager::ProcessAdvanceLoadPbr()
+void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::thread t([manager = std::static_pointer_cast<IccDiallingNumbersManager>(shared_from_this())] {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
-        manager->QueryIccDiallingNumbers(DiallingNumbersInfo::SIM_ADN, result);
-    });
-    t.detach();
-}
-
-void IccDiallingNumbersManager::ProcessSimStateChanged()
-{
-    if (simStateManager_ == nullptr || diallingNumbersCache_ == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessSimStateChanged simStateManager_ is nullptr");
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
         return;
     }
-    if (simStateManager_->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) {
-        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged clear data when sim is absent");
-        diallingNumbersCache_->ClearDiallingNumberCache();
-    } else if (simStateManager_->GetSimState() == SimState::SIM_STATE_READY) {
-        TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessSimStateChanged reload when sim is ready");
-        ProcessAdvanceLoadPbr();
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("result or hd is nullptr");
+        return;
+    }
+    const AppExecFwk::InnerEvent::Pointer &process = hd->fileLoaded;
+    TELEPHONY_LOGI("ProcessLinearRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
+    int recordLen = 0;
+    int fileSize[] = { 0, 0, 0 };
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (recordLen > LENGTH_OF_RECORD) {
+        unsigned char *fileData = rawData.get();
+        ParseFileSize(fileSize, RECORD_NUM, fileData);
+    }
+    SendEfLinearResult(process, fileSize, RECORD_NUM);
+}
+
+void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int size = 0;
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("result or hd is nullptr");
+        return;
+    }
+    TELEPHONY_LOGI("ProcessRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("rawData is nullptr");
+        SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+        return;
+    }
+    unsigned char *fileData = rawData.get();
+    std::string path = CheckRightPath(hd->filePath, hd->fileId);
+    if (recordLen > LENGTH_OF_RECORD) {
+        if (!IsValidRecordSizeData(fileData)) {
+            TELEPHONY_LOGE("ProcessRecordSize get error filetype");
+            SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+            return;
+        }
+        GetFileAndDataSize(fileData, hd->fileSize, size);
+        if (hd->fileSize != 0) {
+            hd->countFiles = size / hd->fileSize;
+        }
+    }
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#X %{public}d %{public}d %{public}d", hd->fileId, size,
+        hd->fileSize, hd->countFiles);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_READ_RECORD;
+        msg.fileId = hd->fileId;
+        msg.p1 = hd->fileNum;
+        msg.p2 = ICC_FILE_CURRENT_MODE;
+        msg.p3 = hd->fileSize;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = path;
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
     }
 }
 
-void IccDiallingNumbersManager::ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: start");
-    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object != nullptr) {
-        if (object->exception == nullptr) {
-            std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
-                std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(object->result);
-            if (diallingNumberList != nullptr) {
-                FillResults(diallingNumberList);
-            } else {
-                TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null vectors!!!");
-            }
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize result or hd is nullptr");
+        return;
+    }
+    TELEPHONY_LOGI("ProcessBinarySize --- resultData: --- %{public}s", result->resultData.c_str());
+    int binaryLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, binaryLen);
+    if (rawData == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize rawData is nullptr");
+        SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+        return;
+    }
+    unsigned char *fileData = rawData.get();
+    int size = 0;
+    if (binaryLen > STRUCTURE_OF_DATA) {
+        if (!IsValidBinarySizeData(fileData)) {
+            TELEPHONY_LOGE("ProcessBinarySize get error filetype");
+            SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+            return;
+        }
+        GetDataSize(fileData, size);
+    }
+    int fileId = rcvMsg->arg1;
+    TELEPHONY_LOGI("ProcessBinarySize fileId:%{public}d size:%{public}d", fileId, size);
+    const AppExecFwk::InnerEvent::Pointer &evt = hd->fileLoaded;
+    if (evt == nullptr) {
+        TELEPHONY_LOGE("ProcessBinarySize isNull is null pointer");
+        return;
+    }
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, evt);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_READ_BINARY;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = static_cast<int32_t>(size);
+        msg.data = IccFileController::NULLSTR;
+        msg.path = ObtainElementFilePath(fileId);
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string str = IccFileController::NULLSTR;
+    std::string path = IccFileController::NULLSTR;
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
+    const AppExecFwk::InnerEvent::Pointer &process = rcvMsg->controlHolder->fileLoaded;
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (hd == nullptr) {
+        TELEPHONY_LOGE("hd is nullptr");
+        return;
+    }
+    TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
+        hd->countFiles, result->resultData.c_str());
+    path = CheckRightPath(hd->filePath, hd->fileId);
+    if (hd->getAllFile) {
+        hd->fileResults.push_back(result->resultData);
+        hd->fileNum++;
+        if (hd->fileNum > hd->countFiles) {
+            SendMultiRecordResult(process, hd->fileResults, hd->fileId);
         } else {
-            TELEPHONY_LOGE("ProcessLoadDone: icc diallingnumbers get exception result");
+            SimIoRequestInfo msg;
+            msg.command = CONTROLLER_REQ_READ_RECORD;
+            msg.fileId = hd->fileId;
+            msg.p1 = hd->fileNum;
+            msg.p2 = ICC_FILE_CURRENT_MODE;
+            msg.p3 = hd->fileSize;
+            msg.data = IccFileController::NULLSTR;
+            msg.path = path;
+            msg.pin2 = "";
+            telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
         }
     } else {
-        TELEPHONY_LOGE("ProcessDiallingNumberLoadDone: get null pointer!!!");
+        SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessLoadDone: end");
-    hasQueryEventDone_ = true;
-    processWait_.notify_all();
 }
 
-void IccDiallingNumbersManager::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<RadioResponseInfo> responseInfo =
-            std::static_pointer_cast<RadioResponseInfo>(object->exception);
-        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessUpdateDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == ErrType::NONE);
+    TELEPHONY_LOGD("IccFileController MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE");
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
+        TELEPHONY_LOGE("rcvMsg or rcvMsg->controlHolder is nullptr");
+        return;
+    }
+    SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
+}
+
+std::string IccFileController::ObtainElementFileForPublic(int efId)
+{
+    std::string mf = MASTER_FILE_SIM;
+    if (efId == ELEMENTARY_FILE_ICCID || efId == ELEMENTARY_FILE_PL) {
+        return mf;
+    }
+    mf.append(DEDICATED_FILE_TELECOM);
+    if (efId == ELEMENTARY_FILE_ADN || efId == ELEMENTARY_FILE_FDN || efId == ELEMENTARY_FILE_MSISDN ||
+        efId == ELEMENTARY_FILE_SDN || efId == ELEMENTARY_FILE_EXT1 || efId == ELEMENTARY_FILE_EXT2 ||
+        efId == ELEMENTARY_FILE_EXT3) {
+        return mf;
+    }
+    if (efId == ELEMENTARY_FILE_PBR) {
+        mf.append(DEDICATED_FILE_DIALLING_NUMBERS);
+        return mf;
+    }
+    if (efId == ELEMENTARY_FILE_IMG) {
+        mf.append(DEDICATED_FILE_GRAPHICS);
+        return mf;
+    }
+    return IccFileController::NULLSTR;
+}
+
+// implementation ObtainBinaryFile
+void IccFileController::ObtainBinaryFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    TELEPHONY_LOGD("IccFileController::ObtainBinaryFile start");
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, event);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_GET_RESPONSE;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = ObtainElementFilePath(fileId);
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+    TELEPHONY_LOGD("IccFileController::ObtainBinaryFile end");
+}
+
+void IccFileController::ObtainBinaryFile(int fileId, int size, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_TRANSPARENT_ELEMENTARY_FILE_DONE, fileId, 0, event);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_READ_BINARY;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = size;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = ObtainElementFilePath(fileId);
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+// implementation ObtainLinearFixedFile
+void IccFileController::ObtainLinearFixedFile(
+    int fileId, const std::string &path, int fileNum, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, fileNum, filePath);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_GET_RESPONSE;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = filePath;
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::ObtainLinearFixedFile(int fileId, int fileNum, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    ObtainLinearFixedFile(fileId, ObtainElementFilePath(fileId), fileNum, event);
+}
+
+// implementation ObtainAllLinearFixedFile
+void IccFileController::ObtainAllLinearFixedFile(
+    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, filePath);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_GET_RESPONSE;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = filePath;
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::ObtainAllLinearFixedFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    ObtainAllLinearFixedFile(fileId, ObtainElementFilePath(fileId), event);
+}
+
+void IccFileController::ObtainLinearFileSize(
+    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, filePath);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_LINEAR_ELEMENTARY_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_GET_RESPONSE;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = GET_RESPONSE_ELEMENTARY_FILE_SIZE_BYTES;
+        msg.data = IccFileController::NULLSTR;
+        msg.path = filePath;
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::ObtainLinearFileSize(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
+{
+    ObtainLinearFileSize(fileId, ObtainElementFilePath(fileId), event);
+}
+
+void IccFileController::UpdateLinearFixedFile(int fileId, const std::string &path, int fileNum, std::string data,
+    int dataLength, const std::string pin2, const AppExecFwk::InnerEvent::Pointer &onComplete)
+{
+    std::string filePath = CheckRightPath(path, fileId);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process = BuildCallerInfo(MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_UPDATE_RECORD;
+        msg.fileId = fileId;
+        msg.p1 = fileNum;
+        msg.p2 = ICC_FILE_CURRENT_MODE;
+        msg.p3 = dataLength;
+        msg.data = data;
+        msg.path = filePath;
+        msg.pin2 = pin2;
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::UpdateLinearFixedFile(int fileId, int fileNum, const std::string data, int dataLength,
+    const std::string pin2, const AppExecFwk::InnerEvent::Pointer &onComplete)
+{
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process = BuildCallerInfo(MSG_SIM_UPDATE_LINEAR_FIXED_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_UPDATE_RECORD;
+        msg.fileId = fileId;
+        msg.p1 = fileNum;
+        msg.p2 = ICC_FILE_CURRENT_MODE;
+        msg.p3 = dataLength;
+        msg.data = data;
+        msg.path = ObtainElementFilePath(fileId);
+        msg.pin2 = pin2;
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::UpdateBinaryFile(
+    int fileId, const std::string data, int dataLength, const AppExecFwk::InnerEvent::Pointer &onComplete)
+{
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId);
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(onComplete));
+    AppExecFwk::InnerEvent::Pointer process =
+        BuildCallerInfo(MSG_SIM_UPDATE_TRANSPARENT_ELEMENTARY_FILE_DONE, ctrlHolder);
+    if (telRilManager_ != nullptr) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_UPDATE_BINARY;
+        msg.fileId = fileId;
+        msg.p1 = 0;
+        msg.p2 = 0;
+        msg.p3 = dataLength;
+        msg.data = data;
+        msg.path = ObtainElementFilePath(fileId);
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg, process);
+    }
+}
+
+void IccFileController::SendResponse(std::shared_ptr<IccControllerHolder> holder, const IccFileData *fd)
+{
+    if (holder == nullptr || fd == nullptr) {
+        TELEPHONY_LOGE("IccFileController::SendResponse  result is null");
+        return;
+    }
+    AppExecFwk::InnerEvent::Pointer &response = holder->fileLoaded;
+    bool isNull = (response == nullptr);
+    auto owner = response->GetOwner();
+    if (owner == nullptr) {
+        TELEPHONY_LOGE("owner is nullptr");
+        return;
+    }
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    uint32_t id = response->GetInnerEventId();
+    bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
+    std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;
+    std::shared_ptr<ControllerToFileMsg> objectShare = nullptr;
+    TELEPHONY_LOGD("IccFileController::SendResponse start response %{public}d %{public}d", isNull, needShare);
+    if (needShare) {
+        objectShare = std::make_shared<ControllerToFileMsg>(cmdData.get(), fd);
     } else {
-        hasEventDone_ = true;
+        objectUnique = std::make_unique<ControllerToFileMsg>(cmdData.get(), fd);
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessUpdateDone: end");
-    processWait_.notify_all();
+
+    if ((objectUnique == nullptr) && (objectShare == nullptr)) {
+        TELEPHONY_LOGE("IccFileController::SendResponse  create ControllerToFileMsg is null");
+        return;
+    }
+
+    isNull = (owner == nullptr);
+    TELEPHONY_LOGD("IccFileController::SendResponse owner: %{public}d evtId: %{public}d", isNull, id);
+    SendEvent(owner, id, needShare, objectShare, objectUnique);
+    TELEPHONY_LOGD("IccFileController::SendResponse send end");
 }
 
-void IccDiallingNumbersManager::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len)
 {
-    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<RadioResponseInfo> responseInfo =
-            std::static_pointer_cast<RadioResponseInfo>(object->exception);
-        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessWriteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == ErrType::NONE);
-    } else {
-        hasEventDone_ = true;
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is nullptr!");
+        return;
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessWriteDone: end");
-    processWait_.notify_all();
-}
-
-void IccDiallingNumbersManager::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    std::unique_ptr<ResponseResult> object = event->GetUniqueObject<ResponseResult>();
-    if (object != nullptr && object->exception != nullptr) {
-        std::shared_ptr<RadioResponseInfo> responseInfo =
-            std::static_pointer_cast<RadioResponseInfo>(object->exception);
-        TELEPHONY_LOGE("IccDiallingNumbersManager::ProcessDeleteDone error %{public}d", responseInfo->error);
-        hasEventDone_ = (responseInfo->error == ErrType::NONE);
-    } else {
-        hasEventDone_ = true;
+    std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is nullptr!");
+        return;
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::ProcessDeleteDone: end");
-    processWait_.notify_all();
-}
-
-int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
-    int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
-{
-    std::unique_lock<std::mutex> lock(mtx_);
-    if (diallingNumber == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!HasSimCard()) {
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    int index = diallingNumber->GetIndex();
-    TELEPHONY_LOGI("UpdateIccDiallingNumbers start: %{public}d %{public}d", type, index);
-    int fileId = GetFileIdForType(type);
-    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_UPDATE_DONE);
-    hasEventDone_ = false;
-    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, false, response);
-    while (!hasEventDone_) {
-        TELEPHONY_LOGI("UpdateIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-            break;
-        }
-    }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::UpdateIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
-}
-
-int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
-    int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
-{
-    std::unique_lock<std::mutex> lock(mtx_);
-    if (diallingNumber == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!HasSimCard()) {
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    int index = diallingNumber->GetIndex();
-    TELEPHONY_LOGI("DelIccDiallingNumbers start: %{public}d %{public}d", type, index);
-    int fileId = GetFileIdForType(type);
-    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_DELETE_DONE);
-    hasEventDone_ = false;
-    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, true, response);
-    while (!hasEventDone_) {
-        TELEPHONY_LOGI("DelIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-            break;
-        }
-    }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::DelIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
-}
-
-int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
-    int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
-{
-    std::unique_lock<std::mutex> lock(mtx_);
-    TELEPHONY_LOGI("AddIccDiallingNumbers start:%{public}d", type);
-    if (diallingNumber == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!HasSimCard()) {
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if (!IsValidType(type) || !IsValidParam(type, diallingNumber)) {
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_WRITE_DONE);
-    int fileId = GetFileIdForType(type);
-    hasEventDone_ = false;
-    diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
-    while (!hasEventDone_) {
-        TELEPHONY_LOGI("AddIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
-            break;
-        }
-    }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::AddIccDiallingNumbers OK return %{public}d", hasEventDone_);
-    return hasEventDone_ ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_UPDATE_FAILED;
-}
-
-int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
-    int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
-{
-    std::unique_lock<std::mutex> queryLock(queryMtx_);
-    std::unique_lock<std::mutex> lock(mtx_);
-    if (diallingNumbersCache_ == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!HasSimCard()) {
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    if (!IsValidType(type)) {
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
-    ClearRecords();
-    auto simFM = simFileManager_.lock();
-    if (simFM == nullptr) {
-        TELEPHONY_LOGE("QueryIccDiallingNumbers no sim card");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    bool isCardUicc = simFM->IsUiccCard();
-    int fileId = isCardUicc ? ELEMENTARY_FILE_PBR : GetFileIdForType(type);
-    int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
-    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
-    hasQueryEventDone_ = false;
-    diallingNumbersCache_->ObtainAllDiallingNumberFiles(fileId, extensionEf, event);
-    
-    bool success = processWait_.wait_for(
-        lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
-    if (success) {
-        TELEPHONY_LOGI("QueryIccDiallingNumbers wait success");
-    } else {
-        TELEPHONY_LOGI("QueryIccDiallingNumbers wait timeout");
-    }
-    if (!diallingNumbersList_.empty()) {
-        result = diallingNumbersList_;
-    }
-    return success ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
-}
-
-AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int eventId)
-{
-    std::unique_ptr<ResultObtain> object = std::make_unique<ResultObtain>();
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<EfLinearResult> object = std::make_shared<EfLinearResult>(cmdData.get());
+    object->valueData[0] = val[0];
+    object->valueData[1] = val[1];
+    object->valueData[MAX_FILE_INDEX] = val[MAX_FILE_INDEX];
+    uint32_t id = response->GetInnerEventId();
     int eventParam = 0;
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object, eventParam);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
+    TelEventHandler::SendTelEvent(handler, event);
+}
+
+void IccFileController::SendMultiRecordResult(
+    const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue, int fileId)
+{
+    if (response == nullptr) {
+        TELEPHONY_LOGE("response is nullptr!");
+        return;
+    }
+    std::shared_ptr<AppExecFwk::EventHandler> handler = response->GetOwner();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is nullptr!");
+        return;
+    }
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    std::shared_ptr<MultiRecordResult> object = std::make_shared<MultiRecordResult>(cmdData.get());
+    object->fileResults.assign(strValue.begin(), strValue.end());
+    object->resultLength = static_cast<int>(strValue.size());
+    uint32_t id = response->GetInnerEventId();
+    TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, fileId);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return;
+    }
+    TelEventHandler::SendTelEvent(handler, event);
+}
+
+AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
+    int eventId, std::shared_ptr<IccControllerHolder> &holderObject)
+{
+    std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(holderObject);
+    if (msgTo == nullptr) {
+        TELEPHONY_LOGE("IccFileController::BuildCallerInfo1  create null pointer");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    int64_t eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
@@ -313,71 +552,209 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersManager::BuildCallerInfo(int e
     return event;
 }
 
-void IccDiallingNumbersManager::ClearRecords()
+AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
+    int eventId, int arg1, int arg2, std::shared_ptr<IccControllerHolder> &holderObject)
 {
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> nullVector;
-    diallingNumbersList_.swap(nullVector);
-}
-
-int IccDiallingNumbersManager::GetFileIdForType(int fileType)
-{
-    int fileId = 0;
-    if (fileType == DiallingNumbersInfo::SIM_ADN) {
-        fileId = ELEMENTARY_FILE_ADN; //  ELEMENTARY_FILE_PBR  for usim
-    } else if (fileType == DiallingNumbersInfo::SIM_FDN) {
-        fileId = ELEMENTARY_FILE_FDN;
+    std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(holderObject);
+    if (msgTo == nullptr) {
+        TELEPHONY_LOGE("IccFileController::BuildCallerInfo2  create null pointer");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     }
-    return fileId;
+    msgTo->arg1 = arg1;
+    msgTo->arg2 = arg2;
+    int64_t eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    event->SetOwner(shared_from_this());
+    return event;
 }
 
-void IccDiallingNumbersManager::FillResults(
-    const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &listInfo)
+AppExecFwk::InnerEvent::Pointer IccFileController::BuildCallerInfo(
+    int eventId, int arg1, int arg2, const AppExecFwk::InnerEvent::Pointer &msg)
 {
-    TELEPHONY_LOGI("IccDiallingNumbersManager::FillResults  %{public}zu", listInfo->size());
-    for (auto it = listInfo->begin(); it != listInfo->end(); it++) {
-        std::shared_ptr<DiallingNumbersInfo> item = *it;
-        if (!item->IsEmpty()) {
-            diallingNumbersList_.push_back(item);
+    std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(arg1);
+    if (ctrlHolder == nullptr) {
+        TELEPHONY_LOGE("ctrlHolder is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(msg));
+    if (ctrlHolder->fileLoaded == nullptr) {
+        TELEPHONY_LOGE("ctrlHolder->fileLoaded is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    bool isNull = ctrlHolder->fileLoaded->GetOwner() == nullptr;
+    TELEPHONY_LOGD("IccFileController::BuildCallerInfo stage init owner: %{public}d", isNull);
+    std::unique_ptr<IccToRilMsg> msgTo = std::make_unique<IccToRilMsg>(ctrlHolder);
+    if (msgTo == nullptr) {
+        TELEPHONY_LOGE("IccFileController::BuildCallerInfo3  create null pointer");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    TELEPHONY_LOGD("IccFileController::BuildCallerInfo stage end");
+    msgTo->arg1 = arg1;
+    msgTo->arg2 = arg2;
+    int64_t eventParam = 0;
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, msgTo, eventParam);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
+        return AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
+    }
+    event->SetOwner(shared_from_this());
+    return event;
+}
+
+void IccFileController::ParseFileSize(int val[], int len, const unsigned char *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("ParseFileSize null data");
+        return;
+    }
+    if (len > MAX_FILE_INDEX) {
+        GetFileAndDataSize(data, val[0], val[1]);
+        if (val[0] != 0) {
+            val[MAX_FILE_INDEX] = val[1] / val[0];
         }
     }
-    TELEPHONY_LOGI("IccDiallingNumbersManager::FillResults %{public}zu", diallingNumbersList_.size());
+    TELEPHONY_LOGD("ParseFileSize result %{public}d, %{public}d %{public}d", val[0], val[1], val[MAX_FILE_INDEX]);
+}
+bool IccFileController::IsValidRecordSizeData(const unsigned char *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
+        return false;
+    }
+    if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
+        return false;
+    }
+    if (ELEMENTARY_FILE_TYPE_LINEAR_FIXED != data[STRUCTURE_OF_DATA]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
+        return false;
+    }
+    return true;
+}
+bool IccFileController::IsValidBinarySizeData(const unsigned char *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR nullptr");
+        return false;
+    }
+    if (ICC_ELEMENTARY_FILE != data[TYPE_OF_FILE]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR TYPE_OF_FILE");
+        return false;
+    }
+    if (ELEMENTARY_FILE_TYPE_TRANSPARENT != data[STRUCTURE_OF_DATA]) {
+        TELEPHONY_LOGE("IccFileTypeMismatch ERROR STRUCTURE_OF_DATA");
+        return false;
+    }
+    return true;
+}
+void IccFileController::GetFileAndDataSize(const unsigned char *data, int &fileSize, int &dataSize)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("GetFileAndDataSize null data");
+        return;
+    }
+    fileSize = data[LENGTH_OF_RECORD] & BYTE_NUM;
+    dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
+}
+void IccFileController::GetDataSize(const unsigned char *data, int &dataSize)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("GetDataSize null data");
+        return;
+    }
+    dataSize = ((data[SIZE_ONE_OF_FILE] & BYTE_NUM) << OFFSET) + (data[SIZE_TWO_OF_FILE] & BYTE_NUM);
 }
 
-bool IccDiallingNumbersManager::IsValidType(int type)
+void IccFileController::SetRilManager(std::shared_ptr<Telephony::ITelRilManager> ril)
 {
-    switch (type) {
-        case DiallingNumbersInfo::SIM_ADN:
-        case DiallingNumbersInfo::SIM_FDN:
-            return true;
-        default:
-            return false;
+    telRilManager_ = ril;
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("IccFileController set NULL TelRilManager!!");
     }
 }
 
-std::shared_ptr<IccDiallingNumbersManager> IccDiallingNumbersManager::CreateInstance(
-    std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState)
+std::string IccFileController::CheckRightPath(const std::string &path, int fileId)
 {
-    if (simFile.lock() == nullptr) {
-        TELEPHONY_LOGE("IccDiallingNumbersManager::Init SimFileManager null pointer");
-        return nullptr;
-    }
-    return std::make_shared<IccDiallingNumbersManager>(simFile, simState);
-}
-
-bool IccDiallingNumbersManager::HasSimCard()
-{
-    return (simStateManager_ != nullptr) ? simStateManager_->HasSimCard() : false;
-}
-
-bool IccDiallingNumbersManager::IsValidParam(int type, const std::shared_ptr<DiallingNumbersInfo> &info)
-{
-    if (type == DiallingNumbersInfo::SIM_FDN) {
-        return !(info->pin2_.empty());
+    if (path.empty()) {
+        return ObtainElementFilePath(fileId);
     } else {
+        return path;
+    }
+}
+
+bool IccFileController::ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::shared_ptr<IccFromRilMsg> rcvMsg = event->GetSharedObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr || rcvMsg->controlHolder == nullptr) {
+        return false;
+    }
+    AppExecFwk::InnerEvent::Pointer &response = rcvMsg->controlHolder->fileLoaded;
+    if (response == nullptr) {
+        return false;
+    }
+    auto owner = response->GetOwner();
+    if (owner == nullptr) {
+        TELEPHONY_LOGE("owner is nullptr");
+        return false;
+    }
+    uint32_t id = response->GetInnerEventId();
+    std::unique_ptr<FileToControllerMsg> cmdData = response->GetUniqueObject<FileToControllerMsg>();
+    bool needShare = (id == MSG_SIM_OBTAIN_ICC_FILE_DONE);
+    std::unique_ptr<ControllerToFileMsg> objectUnique = nullptr;
+    std::shared_ptr<ControllerToFileMsg> objectShare = nullptr;
+    TELEPHONY_LOGD("ProcessErrorResponse start response %{public}d", needShare);
+    if (needShare) {
+        objectShare = std::make_shared<ControllerToFileMsg>(cmdData.get(), nullptr);
+        if (objectShare == nullptr) {
+            return false;
+        }
+        objectShare->exception = rcvMsg->fileData.exception;
+    } else {
+        objectUnique = std::make_unique<ControllerToFileMsg>(cmdData.get(), nullptr);
+        objectUnique->exception = rcvMsg->fileData.exception;
+    }
+
+    if ((objectUnique == nullptr) && (objectShare == nullptr)) {
+        TELEPHONY_LOGE("ProcessErrorResponse  create ControllerToFileMsg is null");
         return true;
     }
+
+    TELEPHONY_LOGI("ProcessErrorResponse owner: evtId: %{public}d", id);
+    SendEvent(owner, id, needShare, objectShare, objectUnique);
+    TELEPHONY_LOGD("ProcessErrorResponse send end");
+    return true;
 }
 
-IccDiallingNumbersManager::~IccDiallingNumbersManager() {}
+void IccFileController::SendEvent(std::shared_ptr<AppExecFwk::EventHandler> handler, uint32_t id, bool needShare,
+    std::shared_ptr<ControllerToFileMsg> objectShare, std::unique_ptr<ControllerToFileMsg> &objectUnique)
+{
+    if (needShare) {
+        TelEventHandler::SendTelEvent(handler, id, objectShare);
+        return;
+    }
+    TelEventHandler::SendTelEvent(handler, id, objectUnique);
+}
+
+bool IccFileController::IsFixedNumberType(int efId)
+{
+    bool fixed = false;
+    switch (efId) {
+        case ELEMENTARY_FILE_ADN:
+        case ELEMENTARY_FILE_FDN:
+        case ELEMENTARY_FILE_USIM_ADN:
+        case ELEMENTARY_FILE_USIM_IAP:
+            fixed = true;
+            return fixed;
+        default:
+            break;
+    }
+    return fixed;
+}
+
+IccFileController::~IccFileController() {}
 } // namespace Telephony
 } // namespace OHOS
