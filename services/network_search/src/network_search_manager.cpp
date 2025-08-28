@@ -882,18 +882,18 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, filterMode);
 }
 
-bool NetworkSearchManager::SetForcePreferredNetwork(int32_t slotId, int32_t networkMode) 
+bool NetworkSearchManager::SetForcePreferredNetwork(int32_t slotId, int32_t networkMode)
 {
     if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
-        return false; 
-    } 
+        return false;
+    }
     if (eventSender_ == nullptr) {
-        return false; 
-    } 
+        return false;
+    }
     int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode)); 
     if (raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
-        return false; 
-    } 
+        return false;
+    }
     TELEPHONY_LOGI("raf: %{public}d, networkMode: %{public}d slotId: %{public}d", raf, networkMode, slotId); 
     SetCachePreferredNetworkValue(slotId, networkMode);
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, networkMode);
