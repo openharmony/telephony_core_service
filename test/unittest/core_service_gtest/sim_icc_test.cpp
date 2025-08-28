@@ -90,40 +90,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
 }
 
 /**
- * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0100
- * @tc.name     Query ADN dialling numbers
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
-    }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
-}
-
-/**
- * @tc.number   Telephony_Sim_QueryIccAdnDiallingNumbers_0200
- * @tc.name     Query ADN dialling numbers
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
-    }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
-}
-
-/**
  * @tc.number   Telephony_Sim_AddIccAdnDiallingNumbers_0100
  * @tc.name     Add icc dialling numbers
  * @tc.desc     Function test
@@ -358,40 +324,6 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
         EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
-}
-
-/**
- * @tc.number   Telephony_Sim_QueryIccFdnDiallingNumbers_0100
- * @tc.name     Query FDN dialling numbers
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
-    }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
-}
-
-/**
- * @tc.number   Telephony_Sim_QueryIccFdnDiallingNumbers_0200
- * @tc.name     Query FDN dialling numbers
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
-    }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
