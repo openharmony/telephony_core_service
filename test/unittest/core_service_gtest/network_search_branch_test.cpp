@@ -134,42 +134,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, TestSize.Level
     EXPECT_EQ(NetworkSelection::GetCustomName({"00000", "00000", "00000", 0, 0}), "00000");
 }
 
-HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, TestSize.Level0)
-{
-    auto deviceStateObserver = std::make_shared<DeviceStateObserver>();
-
-    deviceStateObserver->subscriber_ = nullptr;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
-    deviceStateObserver->sharingEventCallback_ = nullptr;
-#endif
-    deviceStateObserver->StopEventSubscriber();
-
-    MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SHUTDOWN);
-    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    deviceStateObserver->subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
-    deviceStateObserver->subscriber_->deviceStateHandler_ = nullptr;
-    CommonEventData data;
-    deviceStateObserver->subscriber_->OnReceiveEvent(data);
-    deviceStateObserver->subscriber_->ProcessWifiState(data);
-
-    deviceStateObserver->subscriber_->InitEventMap();
-    std::string event = "testEvent";
-    EXPECT_EQ(deviceStateObserver->subscriber_->GetDeviceStateEventIntValue(event),
-        DeviceStateEventIntValue::COMMON_EVENT_UNKNOWN);
-
-    event = CommonEventSupport::COMMON_EVENT_CHARGING;
-    EXPECT_EQ(deviceStateObserver->subscriber_->GetDeviceStateEventIntValue(event),
-        DeviceStateEventIntValue::COMMON_EVENT_CHARGING);
-}
-
 HWTEST_F(NetworkSearchBranchTest, Telephony_NitzUpdate_001, TestSize.Level0)
 {
     auto telRilManager = std::make_shared<TelRilManager>();

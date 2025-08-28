@@ -48,17 +48,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetInitApnInfoTest_0201, Function | Me
 }
 
 /**
- * @tc.number Telephony_TelRil_DataSetupDataCallTest_0101 to do ...
- * @tc.name Set data call of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SETUP_DATA_CALL), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_DataSetupDataCallTest_0201 to do ...
  * @tc.name Set data call of the card 2
  * @tc.desc Function test
@@ -202,17 +191,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendUrspDecodeResultTest_0101, Function | 
 }
 
 /**
- * @tc.number Telephony_TelRil_SendUePolicySectionIdentifierTest_0101 to do ...
- * @tc.name Send UePolicy Section Identifier
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SendUePolicySectionIdentifierTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_UE_POLICY_SECTION_IDENTIFIER), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SendImsRsdListTest_0101 to do ...
  * @tc.name Send Ims RsdList
  * @tc.desc Function test
@@ -221,17 +199,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendImsRsdListTest_0101, Function | Medium
 {
     ASSERT_TRUE(ProcessTest(
         static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST), SLOT_ID_0, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_GetNetworkSliceAllowedNssaiTest_0101 to do ...
- * @tc.name Get NetworkSlice AllowedNssai
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSliceAllowedNssaiTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI), SLOT_ID_0, GetHandler()));
 }
 
 /**

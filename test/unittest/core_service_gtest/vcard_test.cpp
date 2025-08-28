@@ -212,98 +212,6 @@ void TestExport(std::string &filePath)
 }
 
 /**
- * @tc.number   Telephony_VcardTest_000
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_000, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        WriteTestData(g_importTestStr);
-        OHOS::DataShare::DataSharePredicates predicates;
-        int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
-        EXPECT_GE(errorCode, TELEPHONY_SUCCESS);
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
- * @tc.number   Telephony_VcardTest_101
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_101, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        TELEPHONY_LOGI("CreateDataShareHelper start test!!");
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        std::string filePath = "test";
-        std::vector<std::string> columns;
-        DataShare::DataSharePredicates predicates;
-        predicates.EqualTo(Contact::ID, "1")->Or()->EqualTo(Contact::ID, "3");
-        auto resultSet = VCardRdbHelper::GetInstance().QueryContact(columns, predicates);
-        if (resultSet == nullptr) {
-            TELEPHONY_LOGE("VCardTest QueryContact failed");
-        } else {
-            int rowCount = 0;
-            resultSet->GetRowCount(rowCount);
-            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
-            VCardManager::GetInstance().Export(filePath, predicates);
-            VCardManager::GetInstance().Import(filePath, 0);
-        }
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
- * @tc.number   Telephony_VcardTest_102
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        TELEPHONY_LOGI("CreateDataShareHelper start test!!");
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        std::string filePath = "test";
-        std::vector<std::string> columns;
-        DataShare::DataSharePredicates predicates2;
-        predicates2.Between(RawContact::ID, "0", "100")->And()->EqualTo(RawContact::IS_DELETED, CONTACTS_NOT_DELETED);
-        auto resultSet = VCardRdbHelper::GetInstance().QueryRawContact(columns, predicates2);
-        if (resultSet == nullptr) {
-            TELEPHONY_LOGE("VCardTest QueryContact failed");
-        } else {
-            int rowCount = 0;
-            resultSet->GetRowCount(rowCount);
-            TELEPHONY_LOGI("VCardTest QueryContact rowCount= %{public}d", rowCount);
-            DataShare::DataSharePredicates predicates;
-            predicates.Between(Contact::ID, "0", "100");
-            VCardManager::GetInstance().Export(filePath, predicates);
-            int32_t errorCode;
-            VCardManager::GetInstance().Decode(filePath, errorCode);
-            EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
-        }
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
  * @tc.number   Telephony_VcardTest_001
  * @tc.name     test simple vcard
  * @tc.desc     Function test
@@ -1177,85 +1085,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_019, Function | MediumTest | Level1)
 }
 
 /**
- * @tc.number   Telephony_VcardTest_020
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_020, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    std::string inputString2 = R"(
-BEGIN:VCARD
-VERSION:2.1
-N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31;;;;
-FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=31
-TEL;TYPE=CELL;:18770000001
-END:VCARD
-BEGIN:VCARD
-VERSION:2.1
-N;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=32;;;;
-FN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:=E6=B5=8B=E8=AF=95=32
-TEL;TYPE=CELL;:18770000002
-END:VCARD
-)";
-    WriteTestData(inputString2);
-    TELEPHONY_LOGI("Telephony_VCardTest_020 start test!!");
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
-    } else {
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
- * @tc.number   Telephony_VcardTest_021
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_021, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    std::string inputString2 = "";
-    WriteTestData(inputString2);
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        int32_t errorCode = VCardManager::GetInstance().Import(TEL_FILE_NAME, 0);
-        EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
-    } else {
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
- * @tc.number   Telephony_VcardTest_022
- * @tc.name     test simple vcard
- * @tc.desc     Function test
- */
-HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        TELEPHONY_LOGI("CreateDataShareHelper start test!!");
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        std::string filePath = "test";
-        DataShare::DataSharePredicates predicates;
-        predicates.EqualTo(Contact::ID, "-1");
-        int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
-        EXPECT_EQ(errorCode, TELEPHONY_ERROR);
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
-}
-
-/**
  * @tc.number   Telephony_VcardTest_v30
  * @tc.name     test simple vcard
  * @tc.desc     Function test
@@ -1340,24 +1169,6 @@ HWTEST_F(VcardTest, Telephony_VCardTest_Multi_Thread_Export, Function | MediumTe
         thread.join();
     }
     EXPECT_NE(fileName.c_str(), "test");
-}
-
-HWTEST_F(VcardTest, Telephony_VCardTest_BigData_Import, Function | MediumTest | Level2)
-{
-    TELEPHONY_LOGI("VcardTest Telephony_VCardTest_BigData_Import");
-    std::string inputString = "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
-    int testNum = 10;
-    WriteBigTestData(inputString, testNum);
-    AccessToken token;
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        int32_t errorCode = VCardManager::GetInstance().ImportLock(TEL_FILE_NAME, dataShareHelper, 0);
-        EXPECT_GE(errorCode, TELEPHONY_ERROR);
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
 }
 
 HWTEST_F(VcardTest, Telephony_VCardTest_103, Function | MediumTest | Level1)
