@@ -48,7 +48,7 @@ void NetworkSearchNotify::NotifySignalInfoUpdated(
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGD("NotifySignalInfoUpdated ret %{public}d", result);
     if (result != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
+        HILOG_COMM_ERROR("NotifySignalInfoUpdated TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID not found");
     }
 }
 
