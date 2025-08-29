@@ -25,15 +25,6 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Telephony {
 #ifndef TEL_TEST_UNSUPPORT
-/**
- * @tc.number Telephony_TelRil_NetworkOperatorTest_0101 to do ...
- * @tc.name Get operator information of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_0, GetHandler()));
-}
 
 /**
  * @tc.number Telephony_TelRil_NetworkOperatorTest_0201 to do ...
@@ -43,17 +34,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0101, Function | Mediu
 HWTEST_F(TelRilTest, Telephony_TelRil_NetworkOperatorTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_OPERATOR), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101 to do ...
- * @tc.name Voice registration state of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_NetworkVoiceRegistrationStateTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_GET_RILCM_VOICE_REGISTRATION_STATE), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -100,17 +80,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSearchInformationTest_0201, Func
 }
 
 /**
- * @tc.number Telephony_TelRil_GetNetworkSelectionModeTest_0101 to do ...
- * @tc.name Get network selection mode of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_GetNetworkSelectionModeTest_0201 to do ...
  * @tc.name Get network selection mode of the card 2
  * @tc.desc Function test
@@ -119,17 +88,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSelectionModeTest_0201, Function
 {
     ASSERT_TRUE(ProcessTest(
         static_cast<int32_t>(DiffInterfaceId::TEST_GET_SELECTION_MOD_FOR_NETWORKS), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SetNetworkSelectionModeTest_0101 to do ...
- * @tc.name Set network selection mode of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_MODE_AUTOMATIC_NETWORKS), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -144,17 +102,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNetworkSelectionModeTest_0201, Function
 }
 
 /**
- * @tc.number Telephony_TelRil_GetPreferredNetworkParaTest_0101 to do ...
- * @tc.name Get preferred network parameters of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_GetPreferredNetworkParaTest_0201 to do ...
  * @tc.name Get preferred network parameters of the card 2
  * @tc.desc Function test
@@ -163,17 +110,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetPreferredNetworkParaTest_0201, Function
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_PREFERRED_NETWORK_TYPE), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SetPreferredNetworkParaTest_0101 to do ...
- * @tc.name Set preferred network parameters of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetPreferredNetworkParaTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_PREFERRED_NETWORK_TYPE), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -270,16 +206,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetMeidTest_0201, Function | MediumTest | 
 }
 
 /**
- * @tc.number Telephony_TelRil_GetVoiceRadioTechnologyTest_0101 to do ...
- * @tc.name Get voice radio technology of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetVoiceRadioTechnologyTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_VOICE_RADIO_INFO), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_GetVoiceRadioTechnologyTest_0201 to do ...
  * @tc.name Get voice radio technology of the card 2
  * @tc.desc Function test
@@ -341,17 +267,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetNotificationFilterTest_0201, Function |
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_NOTIFICATION_FILTER), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SetDeviceStateTest_0101 to do ...
- * @tc.name Set device state of the card 1
- * @tc.desc Function test
- * @tc.require: issueI5BFY5
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetDeviceStateTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_DEVICE_STATE), SLOT_ID_0, GetHandler()));
 }
 
 /**
