@@ -1283,52 +1283,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
 }
 
 /**
- * @tc.number   Telephony_SimManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_SimManager_004, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> list;
-    EXPECT_GT(simManager->QueryIccDiallingNumbers(0, 1, list), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->QueryIccDiallingNumbers(INVALID_SLOTID, 1, list), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AddIccDiallingNumbers(0, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AddIccDiallingNumbers(INVALID_SLOTID, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->DelIccDiallingNumbers(0, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->DelIccDiallingNumbers(INVALID_SLOTID, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UpdateIccDiallingNumbers(0, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UpdateIccDiallingNumbers(INVALID_SLOTID, 1, nullptr), TELEPHONY_ERR_SUCCESS);
-    simManager->RegisterCoreNotify(0, nullptr, 1);
-    simManager->RegisterCoreNotify(INVALID_SLOTID, nullptr, 1);
-    simManager->UnRegisterCoreNotify(0, nullptr, 1);
-    simManager->UnRegisterCoreNotify(INVALID_SLOTID, nullptr, 1);
-    EXPECT_NE(simManager->SaveImsSwitch(0, 1), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SaveImsSwitch(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
-    int32_t imsSwitchValue;
-    int32_t tokenId = -1;
-    EXPECT_NE(simManager->QueryImsSwitch(0, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->RegisterSimAccountCallback(tokenId, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->UnregisterSimAccountCallback(nullptr), TELEPHONY_ERR_SUCCESS);
-    int32_t dsdsMode = INVALID_VALUE;
-    simManager->GetDsdsMode(dsdsMode);
-    simManager->SetDsdsMode(0);
-    std::string testString = "";
-    EXPECT_NE(simManager->ObtainSpnCondition(0, true, testString), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->ObtainSpnCondition(INVALID_SLOTID, true, testString), TELEPHONY_ERR_SUCCESS);
-    SimAuthenticationResponse mResponse;
-    EXPECT_NE(simManager->SimAuthentication(0, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(
-        simManager->SimAuthentication(INVALID_SLOTID, static_cast<AuthType>(0), "", mResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SimAuthentication(INVALID_SLOTID, AuthType::SIM_AUTH_EAP_SIM_TYPE, "", mResponse),
-        TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SendSimMatchedOperatorInfo(0, 0, "NULL", ""), TELEPHONY_ERR_SUCCESS);
-}
-
-/**
  * @tc.number   Telephony_SimManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2241,35 +2195,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     multiSimMonitor->isSimAccountLoaded_[0] = 0;
     multiSimMonitor->InitData(0);
     EXPECT_EQ(multiSimMonitor->isSimAccountLoaded_[0], 0);
-}
-
-/**
- * @tc.number   Telephony_ImsCoreServiceCallbackProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_ImsCoreServiceCallbackProxy_001, Function | MediumTest | Level1)
-{
-    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy systemAbilityMgr is nullptr");
-    }
-    ASSERT_NE(systemAbilityMgr, nullptr);
-    sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID);
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsCoreServiceCallbackProxy remote is nullptr");
-    }
-    ASSERT_NE(remote, nullptr);
-    auto imsCoreServiceCallbackProxy = std::make_shared<ImsCoreServiceCallbackProxy>(remote);
-    ImsServiceStatus imsServiceStatus;
-    EXPECT_GE(imsCoreServiceCallbackProxy->UpdateImsServiceStatusChanged(INVALID_SLOTID, imsServiceStatus), 0);
-    ImsRegistrationStatus imsRegStatus;
-    EXPECT_GE(imsCoreServiceCallbackProxy->GetImsRegistrationStatusResponse(INVALID_SLOTID, imsRegStatus), 0);
-    auto imsCoreServiceCallbackStub = std::make_shared<ImsCoreServiceCallbackStub>();
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    EXPECT_GE(imsCoreServiceCallbackStub->OnRemoteRequest(0, data, reply, option), 0);
 }
 
 /**

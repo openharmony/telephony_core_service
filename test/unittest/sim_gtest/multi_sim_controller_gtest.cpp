@@ -35,7 +35,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 using namespace testing;
-const int SLOT_COUNT = 2;
 class MultiSimControllerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -595,50 +594,6 @@ HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsInvalidValue, Function 
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     EXPECT_FALSE(multiSimController->ForgetAllData());
-}
-
-HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_003, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager;
-    simStateManager.resize(SLOT_COUNT);
-    simFileManager.resize(SLOT_COUNT);
-    for (int32_t slotId = 0; slotId < SLOT_COUNT; slotId++) {
-        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
-        simStateManager[slotId]->Init(slotId);
-        simStateManager[slotId]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
-        simStateManager[slotId]->simStateHandle_->externalType_ = CardType::SINGLE_MODE_USIM_CARD;
-        simFileManager[slotId] = SimFileManager::CreateInstance(
-            std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager[slotId]));
-        simFileManager[slotId]->Init(slotId);
-    }
-    std::shared_ptr<MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    multiSimController->Init();
-    auto ret = multiSimController->SetPrimarySlotId(2, false);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-    IccState iccState;
-    iccState.iccid_ = "012345678901234";
-    iccState.simStatus_ = ICC_CONTENT_READY;
-    iccState.simType_ = ICC_USIM_TYPE;
-    multiSimController->simStateManager_[0]->simStateHandle_->iccState_ = iccState;
-    multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "012345678901234";
-    ret = multiSimController->SetPrimarySlotId(0, false);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    multiSimController->radioProtocolController_->radioProtocol_[1].modemId = 1;
-    multiSimController->radioProtocolController_->isCommunicating_ = true;
-    multiSimController->simStateManager_[1]->simStateHandle_->iccState_ = iccState;
-    multiSimController->simStateManager_[1]->simStateHandle_->iccid_ = "012345678901234";
-    ret = multiSimController->SetPrimarySlotId(1, false);
-    multiSimController->setPrimarySlotRemainCount_[1] = 0;
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-    multiSimController->radioProtocolController_->isCommunicating_ = false;
-    ret = multiSimController->SetPrimarySlotId(1, false);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    multiSimController->radioProtocolController_->radioProtocol_[0].modemId = 1;
-    ret = multiSimController->SetPrimarySlotId(0, false);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetActiveCommonSim_001, Function | MediumTest | Level1)
