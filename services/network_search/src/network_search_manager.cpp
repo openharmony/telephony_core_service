@@ -890,11 +890,11 @@ bool NetworkSearchManager::SetForcePreferredNetwork(int32_t slotId, int32_t netw
     if (eventSender_ == nullptr) {
         return false;
     }
-    int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode)); 
+    int32_t raf = NetworkUtils::GetRafFromNetworkMode(static_cast<PreferredNetworkMode>(networkMode));
     if (raf == static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN)) {
         return false;
     }
-    TELEPHONY_LOGI("raf: %{public}d, networkMode: %{public}d slotId: %{public}d", raf, networkMode, slotId); 
+    TELEPHONY_LOGI("raf: %{public}d, networkMode: %{public}d slotId: %{public}d", raf, networkMode, slotId);
     SetCachePreferredNetworkValue(slotId, networkMode);
     return eventSender_->SendBase(slotId, RadioEvent::RADIO_SET_PREFERRED_NETWORK_MODE, networkMode);
 }
