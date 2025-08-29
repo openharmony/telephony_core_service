@@ -706,8 +706,7 @@ bool CellInfo::ProcessCurrentCellNr(CurrentCellInformation *cellInfo)
         cellInfos_.emplace_back(cell);
 
         TELEPHONY_LOGI(
-            "CellInfo::ProcessCurrentCellNr arfcn:%{private}d pci:%{private}d slotId:%{public}d rsrp:%{public}d "
-            "rsrq:%{public}d", nrArfcn, pci, slotId_, rsrp, rsrq);
+            "CellInfo::ProcessCurrentCellNr slotId:%{public}d rsrp:%{public}d", slotId_, rsrp);
         ret = true;
     }
     return ret;
