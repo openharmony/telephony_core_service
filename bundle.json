@@ -65,7 +65,7 @@
                 "telephony_data",
                 "time_service",
                 "huks",
-                "openssl",
+                "openssl"
             ],
             "third_party": [
                 "libphonenumber",
