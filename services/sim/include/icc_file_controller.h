@@ -51,8 +51,8 @@ public:
     void ObtainLinearFixedFile(int fileId, int fileNum, const AppExecFwk::InnerEvent::Pointer &event);
 
     void ObtainAllLinearFixedFile(
-        int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event);
-    void ObtainAllLinearFixedFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event);
+        int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event, bool isUseSeek = false);
+    void ObtainAllLinearFixedFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event, bool isUseSeek = false);
     void ObtainLinearFileSize(int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event);
     void ObtainLinearFileSize(int fileId, const AppExecFwk::InnerEvent::Pointer &event);
 
@@ -81,6 +81,7 @@ protected:
         int eventId, int arg1, int arg2, const AppExecFwk::InnerEvent::Pointer &msg);
     void ProcessBinarySize(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessInvalidRecord(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessReadBinary(const AppExecFwk::InnerEvent::Pointer &event);
@@ -101,6 +102,7 @@ private:
     std::string CheckRightPath(const std::string &path, int fileId);
     bool ProcessErrorResponse(const AppExecFwk::InnerEvent::Pointer &event);
     bool IsFixedNumberType(int);
+    void SendFixedRecordRequest(std::shared_ptr<IccControllerHolder> hd);
 };
 } // namespace Telephony
 } // namespace OHOS

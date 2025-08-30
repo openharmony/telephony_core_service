@@ -20,6 +20,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace Telephony {
+constexpr int HEX_TO_BYTES_LEN = 2;
 IccFileController::IccFileController(const std::string &name, int slotId) : TelEventHandler(name), slotId_(slotId) {}
 
 void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -39,6 +40,9 @@ void IccFileController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &even
             break;
         case MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE:
             ProcessRecordSize(event);
+            break;
+        case MSG_SIM_OBTAIN_INVALID_RECORD_OF_FIXED_ELEMENTARY_FILE_DONE:
+            ProcessInvalidRecord(event);
             break;
         case MSG_SIM_OBTAIN_SIZE_OF_TRANSPARENT_ELEMENTARY_FILE_DONE:
             ProcessBinarySize(event);
@@ -82,6 +86,38 @@ void IccFileController::ProcessLinearRecordSize(const AppExecFwk::InnerEvent::Po
     SendEfLinearResult(process, fileSize, RECORD_NUM);
 }
 
+void IccFileController::SendFixedRecordRequest(std::shared_ptr<IccControllerHolder> hd)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("SendFixedRecordRequest telRilManager_ is nullptr");
+        return;
+    }
+    if (hd->isUseSeek) {
+        SimIoRequestInfo msg;
+        msg.command = CONTROLLER_REQ_SEEK;
+        msg.fileId = hd->fileId;
+        msg.p1 = 0x01;
+        msg.p2 = 0x04;
+        msg.p3 = hd->fileSize;
+        msg.data = std::string(hd->fileSize * HEX_TO_BYTES_LEN, 'F');
+        msg.path = CheckRightPath(hd->filePath, hd->fileId);
+        msg.pin2 = "";
+        telRilManager_->GetSimIO(slotId_, msg,
+            BuildCallerInfo(MSG_SIM_OBTAIN_INVALID_RECORD_OF_FIXED_ELEMENTARY_FILE_DONE, hd));
+        return;
+    }
+    SimIoRequestInfo msg;
+    msg.command = CONTROLLER_REQ_READ_RECORD;
+    msg.fileId = hd->fileId;
+    msg.p1 = hd->fileNum;
+    msg.p2 = ICC_FILE_CURRENT_MODE;
+    msg.p3 = hd->fileSize;
+    msg.data = IccFileController::NULLSTR;
+    msg.path = CheckRightPath(hd->filePath, hd->fileId);
+    msg.pin2 = "";
+    telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
+}
+
 void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer &event)
 {
     int size = 0;
@@ -96,7 +132,8 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("result or hd is nullptr");
         return;
     }
-    TELEPHONY_LOGI("ProcessRecordSize --- resultData: --- %{public}s", result->resultData.c_str());
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#llX --- resultData: --- %{public}s",
+        static_cast<unsigned long long>(hd->fileId), result->resultData.c_str());
     int recordLen = 0;
     std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
     if (rawData == nullptr) {
@@ -108,7 +145,6 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::string path = CheckRightPath(hd->filePath, hd->fileId);
     if (recordLen > LENGTH_OF_RECORD) {
         if (!IsValidRecordSizeData(fileData)) {
-            TELEPHONY_LOGE("ProcessRecordSize get error filetype");
             SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
             return;
         }
@@ -117,8 +153,39 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
             hd->countFiles = size / hd->fileSize;
         }
     }
-    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#X %{public}d %{public}d %{public}d", hd->fileId, size,
-        hd->fileSize, hd->countFiles);
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#llX %{public}d %{public}d %{public}d",
+        static_cast<unsigned long long>(hd->fileId), size, hd->fileSize, hd->countFiles);
+    SendFixedRecordRequest(hd);
+}
+
+void IccFileController::ProcessInvalidRecord(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    int size = 0;
+    std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
+    if (rcvMsg == nullptr) {
+        TELEPHONY_LOGE("rcvMsg is nullptr");
+        return;
+    }
+    IccFileData *result = &(rcvMsg->fileData);
+    std::shared_ptr<IccControllerHolder> hd = rcvMsg->controlHolder;
+    if (result == nullptr || hd == nullptr) {
+        TELEPHONY_LOGE("result or hd is nullptr");
+        return;
+    }
+    TELEPHONY_LOGI("ProcessInvalidRecord --- %{public}#llX %{public}d %{public}zu resultData: --- %{public}s",
+        static_cast<unsigned long long>(hd->fileId), hd->fileNum, result->resultData.size() / HEX_TO_BYTES_LEN,
+        result->resultData.c_str());
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> rawData = SIMUtils::HexStringConvertToBytes(result->resultData, recordLen);
+    if (rawData != nullptr) {
+        for (int i = 0; i < recordLen; i++) {
+            hd->invalidRecored.insert(static_cast<int>(rawData.get()[i]));
+        }
+    }
+    while (hd->invalidRecored.find(hd->fileNum) != hd->invalidRecored.end()) {
+        hd->fileResults.push_back(std::string(hd->fileSize * HEX_TO_BYTES_LEN, 'F'));
+        hd->fileNum++;
+    }
     if (telRilManager_ != nullptr) {
         SimIoRequestInfo msg;
         msg.command = CONTROLLER_REQ_READ_RECORD;
@@ -127,7 +194,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
         msg.p2 = ICC_FILE_CURRENT_MODE;
         msg.p3 = hd->fileSize;
         msg.data = IccFileController::NULLSTR;
-        msg.path = path;
+        msg.path = CheckRightPath(hd->filePath, hd->fileId);
         msg.pin2 = "";
         telRilManager_->GetSimIO(slotId_, msg, BuildCallerInfo(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE, hd));
     }
@@ -203,12 +270,17 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("hd is nullptr");
         return;
     }
-    TELEPHONY_LOGI("ProcessReadRecord %{public}d %{public}d %{public}d %{public}s", hd->getAllFile, hd->fileNum,
+    TELEPHONY_LOGI("ProcessReadRecord %{public}#llX %{public}d %{public}d %{public}d %{public}s",
+        static_cast<unsigned long long>(hd->fileId), hd->getAllFile, hd->fileNum,
         hd->countFiles, result->resultData.c_str());
     path = CheckRightPath(hd->filePath, hd->fileId);
     if (hd->getAllFile) {
         hd->fileResults.push_back(result->resultData);
         hd->fileNum++;
+        while (hd->invalidRecored.find(hd->fileNum) != hd->invalidRecored.end()) {
+            hd->fileResults.push_back(std::string(hd->fileSize * HEX_TO_BYTES_LEN, 'F'));
+            hd->fileNum++;
+        }
         if (hd->fileNum > hd->countFiles) {
             SendMultiRecordResult(process, hd->fileResults, hd->fileId);
         } else {
@@ -331,10 +403,11 @@ void IccFileController::ObtainLinearFixedFile(int fileId, int fileNum, const App
 
 // implementation ObtainAllLinearFixedFile
 void IccFileController::ObtainAllLinearFixedFile(
-    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event)
+    int fileId, const std::string &path, const AppExecFwk::InnerEvent::Pointer &event, bool isUseSeek)
 {
     std::string filePath = CheckRightPath(path, fileId);
     std::shared_ptr<IccControllerHolder> ctrlHolder = std::make_shared<IccControllerHolder>(fileId, filePath);
+    ctrlHolder->isUseSeek = isUseSeek;
     ctrlHolder->fileLoaded = std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(event));
     AppExecFwk::InnerEvent::Pointer process =
         BuildCallerInfo(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE, ctrlHolder);
@@ -352,9 +425,10 @@ void IccFileController::ObtainAllLinearFixedFile(
     }
 }
 
-void IccFileController::ObtainAllLinearFixedFile(int fileId, const AppExecFwk::InnerEvent::Pointer &event)
+void IccFileController::ObtainAllLinearFixedFile(
+    int fileId, const AppExecFwk::InnerEvent::Pointer &event, bool isUseSeek)
 {
-    ObtainAllLinearFixedFile(fileId, ObtainElementFilePath(fileId), event);
+    ObtainAllLinearFixedFile(fileId, ObtainElementFilePath(fileId), event, isUseSeek);
 }
 
 void IccFileController::ObtainLinearFileSize(

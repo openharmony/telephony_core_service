@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "event_handler.h"
 #include "event_runner.h"
@@ -33,6 +34,8 @@ struct IccControllerHolder {
     int countFiles = 0;
     bool getAllFile = false;
     std::string filePath = "";
+    std::set<int> invalidRecored;
+    bool isUseSeek = false;
     AppExecFwk::InnerEvent::Pointer fileLoaded = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
     std::vector<std::string> fileResults {};
     IccControllerHolder(int efId, int recordNum) : fileId(efId), fileNum(recordNum), getAllFile(false) {}
