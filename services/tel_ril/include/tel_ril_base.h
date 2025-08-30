@@ -115,8 +115,8 @@ private:
 
 inline bool TelRilBase::IsNeedBlockTelRilRequest(const char* funcName)
 {
-    return (GetDynamicPowerOffModeSwitchWithStr()
-        && std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end());
+    return (GetDynamicPowerOffModeSwitchWithStr() &&
+        std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end());
 }
 
 template<typename FuncType, typename... ParamTypes>
