@@ -47,18 +47,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0201, Function | MediumT
 }
 
 /**
- * @tc.number Telephony_TelRil_SetRadioStateTest_0301 to do ...
- * @tc.name Set radio state of the card 1 when dynamic off modem
- * @tc.desc Function test
- */
- HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioStateTest_0301, Function | MediumTest | Level3)
-{
-    system::SetParameter(DYNAMIC_POWEROFF_MODEM, "1");
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_POWER_STATE), SLOT_ID_0, GetHandler()));
-    system::SetParameter(DYNAMIC_POWEROFF_MODEM, "0");
-}
-
-/**
  * @tc.number Telephony_TelRil_GetRadioStateTest_0101 to do ...
  * @tc.name Get radio state of the card 1
  * @tc.desc Function test

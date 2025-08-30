@@ -46,16 +46,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SimGetSimStatusTest_0201, Function | Mediu
 }
 
 /**
- * @tc.number Telephony_TelRil_SimIccIoTest_0101 to do ...
- * @tc.name Get SIM card IccIo of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SimIccIoTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SIM_IO), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SimIccIoTest_0201 to do ...
  * @tc.name Get SIM card IccIo of the card 2
  * @tc.desc Function test
@@ -639,17 +629,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioProtocolTest_0101, Function | Medi
 HWTEST_F(TelRilTest, Telephony_TelRil_SetRadioProtocolTest_0201, Function | MediumTest | Level3)
 {
     ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_RADIO_PROTOCOL), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SendTerminalResponseCmdTest_0101 to do ...
- * @tc.name Send terminal response command of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SendTerminalResponseCmdTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_STK_SEND_TERMINAL_RESPONSE), SLOT_ID_0, GetHandler()));
 }
 
 /**

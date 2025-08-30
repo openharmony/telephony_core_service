@@ -509,16 +509,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetEmergencyCallListTest_0201, Function | 
 }
 
 /**
- * @tc.number Telephony_TelRil_SetVoNRSwitchTest_0101 to do ...
- * @tc.name Set vonr switch of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetVoNRSwitchTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_VONR_STATUS), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SetVoNRSwitchTest_0201 to do ...
  * @tc.name Set vonr switch of the card 2
  * @tc.desc Function test

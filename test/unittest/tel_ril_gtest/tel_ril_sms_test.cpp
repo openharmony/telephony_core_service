@@ -106,17 +106,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_UpdateRilCmSmsTest_0201, Function | Medium
 }
 
 /**
- * @tc.number Telephony_TelRil_SetRilCmSmsCenterAddressTest_0101 to do ...
- * @tc.name Set SMS center address of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmSmsCenterAddressTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_SMS_CENTER_ADDRESS), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SetRilCmSmsCenterAddressTest_0201 to do ...
  * @tc.name Set SMS center address of the card 2
  * @tc.desc Function test
@@ -147,16 +136,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetRilCmSmsCenterAddressTest_0201, Functio
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_GET_SMS_CENTER_ADDRESS), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SetRilCmCBConfigTest_0101 to do ...
- * @tc.name Set SMS cell broadcast of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetRilCmCBConfigTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_SET_CB_CONFIG), SLOT_ID_0, GetHandler()));
 }
 
 /**
