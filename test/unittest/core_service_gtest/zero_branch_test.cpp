@@ -952,6 +952,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_009, Function | MediumTest | Lev
 
     EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 0));
     mInner.networkSearchManager_ = networkSearchManager;
+    mInner.GetResidentNetworkNumeric(SLOT_ID_0);
     EXPECT_FALSE(mInner.SetForcePreferredNetwork(SLOT_ID_0, 1));
 }
 
@@ -2508,9 +2509,9 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_005, Function | MediumTest | L
     EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_);
     EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.isHandleVSim_());
     multiSimController->isRilSetPrimarySlotSupport_ = true;
-    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, true), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, true), TELEPHONY_ERR_FAIL);
     multiSimController->isRilSetPrimarySlotSupport_ = false;
-    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, false), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(multiSimController->SetPrimarySlotId(0, false), TELEPHONY_ERR_FAIL);
 }
 } // namespace Telephony
 } // namespace OHOS

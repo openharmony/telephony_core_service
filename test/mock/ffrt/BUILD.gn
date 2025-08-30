@@ -24,14 +24,10 @@ config("ffrt_mocked_config") {
 }
 
 ohos_shared_library("ffrt_mocked") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
+  use_exceptions = true
   branch_protector_ret = "pac_ret"
   public_configs = [ ":ffrt_mocked_config" ]
- 
+
   part_name = "core_service"
   subsystem_name = "telephony"
 }

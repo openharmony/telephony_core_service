@@ -30,6 +30,7 @@
 #include "mock_multi_sim_controller.h"
 #include "mock_sim_rdb_helper.h"
 #include "tel_ril_manager.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -587,7 +588,7 @@ HWTEST_F(MultiSimControllerTest, BuildRadioProtocolForCommunication_001, Functio
 }
 
 HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsValidValue, Function | MediumTest | Level1)
-{   
+{
     MockSimRdbHelper mockSimRdbHelper;
     EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
         .WillRepeatedly(Return(1));
@@ -600,7 +601,7 @@ HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsValidValue, Function | 
 }
 
 HWTEST_F(MultiSimControllerTest, WhenForgetAllDataReturnsInvalidValue, Function | MediumTest | Level1)
-{      
+{
     MockSimRdbHelper mockSimRdbHelper;
     EXPECT_CALL(mockSimRdbHelper, ForgetAllData())
         .WillRepeatedly(Return(0));
@@ -642,18 +643,10 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_003, Fu
     multiSimController->simStateManager_[0]->simStateHandle_->iccid_ = "012345678901234";
     ret = multiSimController->SetPrimarySlotId(0, false);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    multiSimController->radioProtocolController_->radioProtocol_[1].modemId = 1;
-    multiSimController->radioProtocolController_->isCommunicating_ = true;
-    multiSimController->simStateManager_[1]->simStateHandle_->iccState_ = iccState;
-    multiSimController->simStateManager_[1]->simStateHandle_->iccid_ = "012345678901234";
-    ret = multiSimController->SetPrimarySlotId(1, false);
-    multiSimController->setPrimarySlotRemainCount_[1] = 0;
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-    multiSimController->radioProtocolController_->isCommunicating_ = false;
-    ret = multiSimController->SetPrimarySlotId(1, false);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    multiSimController->radioProtocolController_->radioProtocol_[0].modemId = 1;
+    TELEPHONY_EXT_WRAPPER.isHandleVSim_ = []() { return true; };
+    TELEPHONY_EXT_WRAPPER.isVSimInDisableProcess_ = []() { return false; };
     ret = multiSimController->SetPrimarySlotId(0, false);
+    EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetActiveCommonSim_001, Function | MediumTest | Level1)

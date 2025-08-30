@@ -34,6 +34,9 @@
 #include "tel_ril_manager.h"
 #include "mock_tel_ril_manager.h"
 #include "mock_sim_manager.h"
+#include "sim_state_type.h"
+#include "sim_rdb_helper.h"
+#include "icc_file.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -265,6 +268,144 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_012, Function | MediumTest | L
     simManager_->ResetSimLoadAccount(slotId);
     simManager_->SetDefaultCellularDataSlotId(slotId);
     EXPECT_TRUE(simManager_->simFileManager_.empty());
+}
+
+HWTEST_F(SimManagerTest, GetSimIccStatustest, Function | MediumTest | Level1)
+{
+    IccSimStatus status;
+    int32_t result = simManager_->GetSimIccStatus(-1, status);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+
+    simManager_->simStateManager_.resize(MAX_SLOT_COUNT);
+    result = simManager_->InitTelExtraModule(SIM_SLOT_2);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+
+    result = simManager_->InitTelExtraModule(SIM_SLOT_2);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(SimManagerTest, SetModemInittest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    bool state = true;
+    int32_t result = simManager_->SetModemInit(slotId, state);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    slotId = -1;
+    state = true;
+    result = simManager_->SetModemInit(slotId, state);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    slotId = 1;
+    state = true;
+    simManager_->simStateManager_[slotId] = nullptr;
+    result = simManager_->SetModemInit(slotId, state);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(SimManagerTest, UnlockPintest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::string pin = "1234";
+    LockStatusResponse response;
+    simManager_->simStateManager_[slotId] = nullptr;
+    int32_t result = simManager_->UnlockPin(slotId, pin, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+    result = simManager_->UnlockPin2(slotId, pin, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    slotId = 0;
+    std::string correctPin = "1234";
+    
+    result = simManager_->UnlockPin(slotId, correctPin, response);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+    result = simManager_->UnlockPin2(slotId, correctPin, response);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+
+    slotId = 0;
+    std::string wrongPin = "1235";
+    
+    result = simManager_->UnlockPin(slotId, wrongPin, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+    result = simManager_->UnlockPin2(slotId, wrongPin, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(SimManagerTest, SetLockStatetest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    LockInfo options;
+    LockStatusResponse response;
+    
+    simManager_->simStateManager_[slotId] = nullptr;
+    int32_t result = simManager_->SetLockState(slotId, options, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(SimManagerTest, RefreshSimStatetest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    int32_t result = simManager_->RefreshSimState(slotId);
+    EXPECT_EQ(result, TELEPHONY_ERROR);
+
+    slotId = -1;
+    result = simManager_->RefreshSimState(slotId);
+    EXPECT_EQ(result, TELEPHONY_ERROR);
+
+    slotId = 1;
+    simManager_->simStateManager_[slotId] = nullptr;
+    result = simManager_->RefreshSimState(slotId);
+    EXPECT_EQ(result, TELEPHONY_ERROR);
+}
+
+HWTEST_F(SimManagerTest, UnlockPuktest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    std::string newPin = "1234";
+    std::string correctPuk = "123456";
+    LockStatusResponse response;
+    int32_t result = simManager_->UnlockPuk(slotId, newPin, correctPuk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+    result = simManager_->UnlockPuk2(slotId, newPin, correctPuk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    slotId = 0;
+    newPin = "1234";
+    std::string wrongPuk = "123457";
+    
+    result = simManager_->UnlockPuk(slotId, newPin, wrongPuk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+    result = simManager_->UnlockPuk2(slotId, newPin, wrongPuk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    slotId = -1;
+    newPin = "1234";
+    std::string puk = "123456";
+    
+    result = simManager_->UnlockPuk(slotId, newPin, puk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+    result = simManager_->UnlockPuk(slotId, newPin, puk, response);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(SimManagerTest, GetLockStatetest, Function | MediumTest | Level1)
+{
+    int32_t slotId = 0;
+    // LockType lockType;
+    LockState lockState;
+    
+    int32_t result = simManager_->GetLockState(slotId, LockType::PIN_LOCK, lockState);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+
+    slotId = -1;
+    result = simManager_->GetLockState(slotId, LockType::PIN_LOCK, lockState);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    slotId = 0;
+    
+    simManager_->simStateManager_[slotId] = nullptr;
+    result = simManager_->GetLockState(slotId, LockType::PIN_LOCK, lockState);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
 }
 }
 }

@@ -72,7 +72,8 @@ protected:
     std::string ObtainElementFileForPublic(int efId);
     void SendResponse(std::shared_ptr<IccControllerHolder> holder, const IccFileData *fd);
     void SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer &response, const int val[], int len);
-    void SendMultiRecordResult(const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue);
+    void SendMultiRecordResult(
+        const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue, int fileId);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId, std::shared_ptr<IccControllerHolder> &holderObject);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(
         int eventId, int arg1, int arg2, std::shared_ptr<IccControllerHolder> &holderObject);
