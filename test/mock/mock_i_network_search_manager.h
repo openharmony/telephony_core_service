@@ -108,6 +108,7 @@ public:
     MOCK_METHOD(int32_t, IsGsm, (int32_t slotId, bool &isGsm), (override));
     MOCK_METHOD(int32_t, IsCdma, (int32_t slotId, bool &isCdma), (override));
     MOCK_METHOD(int32_t, UpdateOperatorName, (int32_t slotId), (override));
+    MOCK_METHOD(void, UpdateDeviceState, (int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState), (override));
 };
 
 }
