@@ -181,7 +181,6 @@ private:
     const int32_t MAX_NBCELL_COUNT = 4;
 };
 
-template<typename FuncType, typename... ParamTypes>
 inline bool TelRilNetwork::IsNeedBlockTelRilRequest(const char *funcName)
 {
     return (system::GetBoolParameter(AT_BLOCK_STATE, false) || TelRilBase::IsNeedBlockTelRilRequest(funcName));
