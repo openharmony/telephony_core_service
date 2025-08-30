@@ -145,6 +145,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
     std::string path = CheckRightPath(hd->filePath, hd->fileId);
     if (recordLen > LENGTH_OF_RECORD) {
         if (!IsValidRecordSizeData(fileData)) {
+            TELEPHONY_LOGE("ProcessRecordSize get error filetype");
             SendResponse(rcvMsg->controlHolder, &(rcvMsg->fileData));
             return;
         }
