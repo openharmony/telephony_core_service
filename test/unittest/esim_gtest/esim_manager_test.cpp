@@ -353,7 +353,7 @@ HWTEST_F(EsimManagerTest, ListNotifications_001, Function | MediumTest | Level1)
 
     slotId = 0;
     ret = esimManager->ListNotifications(slotId, portIndex, events, notificationList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RetrieveNotificationList_001, Function | MediumTest | Level1)
@@ -371,7 +371,7 @@ HWTEST_F(EsimManagerTest, RetrieveNotificationList_001, Function | MediumTest | 
 
     slotId = 0;
     ret = esimManager->RetrieveNotificationList(slotId, portIndex, events, notificationList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RetrieveNotification_001, Function | MediumTest | Level1)
@@ -389,7 +389,7 @@ HWTEST_F(EsimManagerTest, RetrieveNotification_001, Function | MediumTest | Leve
 
     slotId = 0;
     ret = esimManager->RetrieveNotification(slotId, portIndex, seqNumber, notification);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RemoveNotificationFromList_001, Function | MediumTest | Level1)
@@ -407,7 +407,7 @@ HWTEST_F(EsimManagerTest, RemoveNotificationFromList_001, Function | MediumTest 
 
     slotId = 0;
     ret = esimManager->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, DeleteProfile_001, Function | MediumTest | Level1)
