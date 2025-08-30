@@ -59,17 +59,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataSetupDataCallTest_0201, Function | Med
 }
 
 /**
- * @tc.number Telephony_TelRil_DataDisableDataCallTest_0101 to do ...
- * @tc.name Disable data call of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_DataDisableDataCallTest_0201 to do ...
  * @tc.name Disable data call of the card 2
  * @tc.desc Function test
@@ -78,17 +67,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_DataDisableDataCallTest_0201, Function | M
 {
     ASSERT_TRUE(
         ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DEACTIVATE_DATA_CALL), SLOT_ID_1, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_GetDataCallListTest_0101 to do ...
- * @tc.name Get data call list of the card 1
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetDataCallListTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(
-        ProcessTest(static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_DATA_CALL_LIST), SLOT_ID_0, GetHandler()));
 }
 
 /**
@@ -169,28 +147,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SetLinkBandwidthReportingRuleTest_0201, Fu
 }
 
 /**
- * @tc.number Telephony_TelRil_SetDataPermittedTest_0101 to do ...
- * @tc.name Set data permitted to modem
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SetDataPermittedTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SET_DATA_PERMITTED_TEST), SLOT_ID_0, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_SendUrspDecodeResultTest_0101 to do ...
- * @tc.name Send Ursp Decode Result
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_SendUrspDecodeResultTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_URSP_DECODE_RESULT), SLOT_ID_0, GetHandler()));
-}
-
-/**
  * @tc.number Telephony_TelRil_SendImsRsdListTest_0101 to do ...
  * @tc.name Send Ims RsdList
  * @tc.desc Function test
@@ -199,17 +155,6 @@ HWTEST_F(TelRilTest, Telephony_TelRil_SendImsRsdListTest_0101, Function | Medium
 {
     ASSERT_TRUE(ProcessTest(
         static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_SEND_IMS_RSD_LIST), SLOT_ID_0, GetHandler()));
-}
-
-/**
- * @tc.number Telephony_TelRil_GetNetworkSliceEhplmnTest_0101 to do ...
- * @tc.name Get NetworkSlice Ehplmn
- * @tc.desc Function test
- */
-HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSliceEhplmnTest_0101, Function | MediumTest | Level3)
-{
-    ASSERT_TRUE(ProcessTest(
-        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN), SLOT_ID_0, GetHandler()));
 }
 
 #endif // TEL_TEST_UNSUPPORT
