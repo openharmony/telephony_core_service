@@ -69,7 +69,8 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_002, Function | MediumTest
     telRilManager->handler_->reqRunningLock_  = nullptr;
     #endif
     int32_t lockType = 100;
-    telRilManager->handler_->ApplyRunningLock(lockType);
+    int32_t serialId = 1;
+    telRilManager->handler_->ApplyRunningLock(lockType, serialId);
     ASSERT_NE(telRilManager->handler_->ackLockSerialNum_, 0);
 }
 
@@ -127,7 +128,8 @@ HWTEST_F(TelRilHandlerTest, Telephony_tel_ril_handler_005, Function | MediumTest
     auto telRilManager = std::make_shared<TelRilManager>();
     telRilManager->OnInit();
     int32_t lockType = TelRilHandler::NORMAL_RUNNING_LOCK;
-    telRilManager->handler_->ApplyRunningLock(lockType);
+    int32_t serialId = 1;
+    telRilManager->handler_->ApplyRunningLock(lockType, serialId);
     telRilManager->handler_->ReduceRunningLock(lockType, 0);
     ASSERT_NE(telRilManager->handler_->reqSerialSet_.size(), 1);
     telRilManager->handler_->ReduceRunningLock(lockType, 1);

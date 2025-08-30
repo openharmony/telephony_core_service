@@ -97,13 +97,16 @@ HWTEST_F(SimTest, Telephony_Sim_GetActiveSimAccountInfoList_0300, Function | Med
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+        }
+        ASSERT_FALSE(helper.boolResult_);
+        ASSERT_EQ(helper.result_, 0);
     }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -114,13 +117,16 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+        }
+        ASSERT_FALSE(helper.boolResult_);
+        ASSERT_EQ(helper.result_, 0);
     }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -368,13 +374,16 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
+    if (!SimTest::HasSimCard(slotId_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+        }
+        ASSERT_FALSE(helper.boolResult_);
+        ASSERT_EQ(helper.result_, 0);
     }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
 }
 
 /**
@@ -385,13 +394,16 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
-    CoreServiceTestHelper helper;
-    if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
-        TELEPHONY_LOGI("Interface out of time");
+    if (!SimTest::HasSimCard(slotId1_)) {
+        TELEPHONY_LOGI("TelephonyTestService has no sim card");
+    } else {
+        CoreServiceTestHelper helper;
+        if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
+            TELEPHONY_LOGI("Interface out of time");
+        }
+        ASSERT_FALSE(helper.boolResult_);
+        ASSERT_EQ(helper.result_, 0);
     }
-    ASSERT_FALSE(helper.boolResult_);
-    ASSERT_EQ(helper.result_, 0);
 }
 
 /**

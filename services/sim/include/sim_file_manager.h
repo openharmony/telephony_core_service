@@ -86,6 +86,7 @@ public:
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void UpdateOpkeyConfig();
     bool IsCTSimCard();
+    bool IsUiccCard();
     static std::shared_ptr<SimFileManager> CreateInstance(
         std::weak_ptr<Telephony::ITelRilManager> ril, std::weak_ptr<SimStateManager> simState);
     enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };

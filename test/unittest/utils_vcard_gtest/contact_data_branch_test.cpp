@@ -251,5 +251,296 @@ HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_006, Function | MediumTes
     contact->ConvertHarmonyEvents(VCARD_TYPE_X_MOBILE_EVENTS, value);
     EXPECT_EQ((contact->sips_).size(), 0);
 }
+
+HWTEST_F(ContactDataBranchTest, Importtest, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t accountId = 123;
+    int32_t errorCode = 0;
+    std::string invalidPath = "path/to/invalid.vcf";
+    EXPECT_NE(manager.Import(invalidPath, accountId), TELEPHONY_SUCCESS);
+
+    accountId = -1;
+    EXPECT_NE(manager.Import(invalidPath, accountId), TELEPHONY_SUCCESS);
+
+    errorCode = 0;
+    std::string emptyPath = "";
+    EXPECT_NE(manager.Import(invalidPath, accountId), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataBranchTest, Decodetest, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    std::string invalidPath = "nonexistent_file.vcf";
+    manager.Decode(invalidPath, errorCode);
+    EXPECT_NE(errorCode, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataBranchTest, BatchInsertContactDbAbilityrest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = 0;
+    manager.BatchInsertContactDbAbility(1, errorCode);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    std::shared_ptr<VCardManager::DecodeListener> listener = std::make_shared<VCardManager::DecodeListener>();
+    listener->contacts_.push_back(std::make_shared<VCardContact>());
+    manager.listener_ = listener;
+    manager.BatchInsertContactDbAbility(1, errorCode);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    int32_t accountId = 123;
+    EXPECT_NE(manager.listener_->GetContacts().size(), 0);
+    manager.BatchInsertContactDbAbility(accountId, errorCode);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
+
+    for (int i = 0; i < 20; ++i) {
+        std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
+        manager.listener_->GetContacts();
+    }
+    EXPECT_GE(manager.listener_->GetContacts().size(), 10);
+    manager.BatchInsertContactDbAbility(accountId, errorCode);
+    
+    EXPECT_NE(errorCode, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ContactDataBranchTest, InsertContactDbAbilityrest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = 0;
+    manager.InsertContactDbAbility(1, errorCode);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ContactDataBranchTest, BatchInsertContactDatatest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = 0;
+    vector<int32_t> rawIds = {1, 2};
+    vector<std::shared_ptr<VCardContact>> contactList;
+    contactList.push_back(std::make_shared<VCardContact>());
+    contactList.push_back(std::make_shared<VCardContact>());
+    manager.BatchInsertContactData(rawIds, contactList, errorCode);
+    EXPECT_NE(errorCode, 0);
+}
+
+HWTEST_F(ContactDataBranchTest, BatchInsertContactDatatest_002, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = 0;
+    vector<int32_t> rawIds = {1};
+    vector<std::shared_ptr<VCardContact>> contactList;
+    contactList.push_back(nullptr);
+    manager.BatchInsertContactData(rawIds, contactList, errorCode);
+    EXPECT_NE(errorCode, 0);
+}
+
+HWTEST_F(ContactDataBranchTest, BatchInsertContactDatatest_003, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t errorCode = 0;
+    vector<int32_t> rawIds;
+    vector<std::shared_ptr<VCardContact>> contactList;
+    manager.BatchInsertContactData(rawIds, contactList, errorCode);
+    EXPECT_NE(errorCode, 0);
+}
+
+HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    vector<std::shared_ptr<VCardContact>> contacts;
+    for (int i = 0; i < 6; ++i) {
+        contacts.push_back(std::make_shared<VCardContact>());
+    }
+    size_t step = 2;
+    auto result = manager.SplitContactsVector(contacts, step);
+    EXPECT_EQ(result.size(), 3);
+    for (const auto& vec : result) {
+        EXPECT_EQ(vec.size(), 2);
+    }
+}
+
+HWTEST_F(ContactDataBranchTest, SplitContactsVectortest_003, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    vector<std::shared_ptr<VCardContact>> contacts;
+    size_t step = 2;
+    auto result = manager.SplitContactsVector(contacts, step);
+    EXPECT_NE(result.size(), 0);
+
+    contacts.push_back(std::make_shared<VCardContact>());
+    step = 5;
+    result = manager.SplitContactsVector(contacts, step);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_NE(result[0].size(), 3);
+
+    contacts.push_back(std::make_shared<VCardContact>());
+    step = 4;
+    result = manager.SplitContactsVector(contacts, step);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_NE(result[0].size(), 4);
+
+    contacts.push_back(std::make_shared<VCardContact>());
+    step = 1;
+    result = manager.SplitContactsVector(contacts, step);
+    EXPECT_NE(result.size(), 5);
+    for (const auto& vec : result) {
+        EXPECT_EQ(vec.size(), 1);
+    }
+}
+
+HWTEST_F(ContactDataBranchTest, IsContactsIdExittest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t accountId = 123;
+
+    auto result = manager.IsContactsIdExit(accountId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = "";
+    int32_t errorCode = 0;
+
+    bool result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+
+    charset = DEFAULT_CHARSET;
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+
+    cardType = VERSION_21_NUM - 1;
+    charset = "";
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(ContactDataBranchTest, ParameterTypeAndCharsetChecktest_002, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = "";
+    int32_t errorCode = 0;
+
+    cardType = VERSION_40_NUM + 1;
+    charset = "";
+    bool result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    cardType = VERSION_21_NUM + 1;
+    charset = "";
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    cardType = VERSION_21_NUM;
+    charset = "";
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    cardType = VERSION_40_NUM;
+    charset = "";
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    cardType = VERSION_21_NUM + 1;
+    charset = "UTF-8";
+    result = manager.ParameterTypeAndCharsetCheck(cardType, charset, errorCode);
+    EXPECT_TRUE(result);
+    EXPECT_NE(errorCode, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(ContactDataBranchTest, Exporttest_001, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    string path = "";
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = DEFAULT_CHARSET;
+
+    int32_t result = manager.Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_TRUE(path.empty());
+
+    cardType = VERSION_21_NUM - 1;
+    charset = DEFAULT_CHARSET;
+    result = manager.Export(path, predicates, cardType, charset);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    path = "";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "999");
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+
+    manager.VCardManager::Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
+{
+    VCardManager manager;
+    string path = "";
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    int32_t cardType = VERSION_21_NUM + 1;
+    string charset = DEFAULT_CHARSET;
+
+    path = "";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    cardType = VERSION_21_NUM + 1;
+    charset = "invalid_charset";
+
+    int result = manager.Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    path = "";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+
+    result = manager.Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_ERROR);
+
+    path = "";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+
+    result = manager.Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_TRUE(path.empty());
+    EXPECT_FALSE(path.find(VCARD_EXPORT_FILE_PATH) != string::npos);
+
+    path = "/tmp/test_";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+
+    result = manager.Export(path, predicates, cardType, charset);
+
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_FALSE(path.empty());
+    EXPECT_TRUE(path.find("/tmp/test_") != string::npos);
+}
 } // namespace Telephony
 } // namespace OHOS

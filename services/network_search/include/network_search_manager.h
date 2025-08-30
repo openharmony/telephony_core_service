@@ -284,7 +284,7 @@ public:
     int32_t StartGetRilSignalIntensity(int32_t slotId) override;
     int32_t UpdateOperatorName(int32_t slotId) override;
     void UpdateDeviceId(int32_t slotId);
-    void UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState);
+    void UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState) override;
 
     inline void InitMsgNum(int32_t slotId)
     {

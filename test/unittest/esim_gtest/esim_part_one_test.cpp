@@ -93,9 +93,8 @@ HWTEST_F(EsimPartOneTest, RetrieveNotificatioParseTagCtxComp0_001, Function | Me
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
-    std::string resultData = "BF2B16A014BF2F118001010C08646464642E63606081020410";
-    std::vector<uint8_t> responseByte = Asn1Utils::HexStrToBytes(resultData);
-    std::shared_ptr<Asn1Node> root = esimFile->Asn1ParseResponse(responseByte, responseByte.size());
+    std::vector<uint8_t> src;
+    std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(0, src, 0, 0);
     EXPECT_FALSE(esimFile->RetrieveNotificatioParseTagCtxComp0(root));
 }
 

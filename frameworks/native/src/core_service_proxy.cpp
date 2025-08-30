@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAX_SIZE = 1000;
+constexpr int32_t MAX_NUMBERS_SIZE = 2000;
 bool CoreServiceProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(CoreServiceProxy::GetDescriptor())) {
@@ -2264,7 +2265,7 @@ int32_t CoreServiceProxy::QueryIccDiallingNumbers(
     }
     int32_t size = reply.ReadInt32();
     TELEPHONY_LOGI("CoreServiceProxy::QueryIccDiallingNumbers size:%{public}d", size);
-    if (size >= MAX_SIZE) {
+    if (size >= MAX_NUMBERS_SIZE) {
         TELEPHONY_LOGE("CoreServiceProxy::QueryIccDiallingNumbers over max size");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
