@@ -129,7 +129,7 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    if (IsNeedBlockTelRilRequest) {
+    if (IsNeedBlockTelRilRequest(funcName)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
 
