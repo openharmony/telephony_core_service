@@ -100,6 +100,7 @@ public:
     typedef bool (*GET_SLOT_ID_EXT)(int32_t simId, int32_t &slotId);
     typedef bool (*IS_HANDLE_VSIM)(void);
     typedef bool (*IS_VSIM_ENABLED)(void);
+    typedef bool (*IS_VSIM_IN_DISABLE_PROCESS)(void);
     typedef void (*UPDATE_SUB_STATE)(int32_t slotId, int32_t subState);
     typedef bool (*IS_IN_ENABLE_DISABLE_VSIM)(void);
     /* add for vsim end */
@@ -168,6 +169,7 @@ public:
     GET_SLOT_ID_EXT getSlotIdExt_ = nullptr;
     IS_HANDLE_VSIM isHandleVSim_ = nullptr;
     IS_VSIM_ENABLED isVSimEnabled_ = nullptr;
+    IS_VSIM_IN_DISABLE_PROCESS isVSimInDisableProcess_ = nullptr;
     UPDATE_SUB_STATE updateSubState_ = nullptr;
     IS_IN_ENABLE_DISABLE_VSIM isInEnaDisableVSim_ = nullptr;
     /* add for vsim end */

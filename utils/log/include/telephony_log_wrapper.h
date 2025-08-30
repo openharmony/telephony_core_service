@@ -67,14 +67,14 @@ inline constexpr const char *GetRawFileName(const char *path)
 }
 
 #define TELEPHONY_LOGE(fmt, ...)                                                                                      \
-    (void)HILOG_IMPL(LOG_CORE, LOG_ERROR, LOG_DOMAIN, TELEPHONY_LOG_TAG, "[%{public}s-(%{public}s:%{public}d)] " fmt, \
-    __FUNCTION__, GetRawFileName(__FILE__), __LINE__, ##__VA_ARGS__)
+    (void)HILOG_IMPL(LOG_CORE, LOG_ERROR, LOG_DOMAIN, TELEPHONY_LOG_TAG, fmt, \
+    ##__VA_ARGS__)
 #define TELEPHONY_LOGW(fmt, ...)                                                                                     \
     (void)HILOG_IMPL(LOG_CORE, LOG_WARN, LOG_DOMAIN, TELEPHONY_LOG_TAG, "[%{public}s-(%{public}s:%{public}d)] " fmt, \
     __FUNCTION__, GetRawFileName(__FILE__), __LINE__, ##__VA_ARGS__)
 #define TELEPHONY_LOGI(fmt, ...)                                                                                     \
-    (void)HILOG_IMPL(LOG_CORE, LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, "[%{public}s-(%{public}s:%{public}d)] " fmt, \
-    __FUNCTION__, GetRawFileName(__FILE__), __LINE__, ##__VA_ARGS__)
+    (void)HILOG_IMPL(LOG_CORE, LOG_INFO, LOG_DOMAIN, TELEPHONY_LOG_TAG, fmt, \
+    ##__VA_ARGS__)
 #define TELEPHONY_LOGF(fmt, ...)                                                                                      \
     (void)HILOG_IMPL(LOG_CORE, LOG_FATAL, LOG_DOMAIN, TELEPHONY_LOG_TAG, "[%{public}s-(%{public}s:%{public}d)] " fmt, \
     __FUNCTION__, GetRawFileName(__FILE__), __LINE__, ##__VA_ARGS__)

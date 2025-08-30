@@ -42,6 +42,7 @@ ohos_unittest("esim_service_client_branch_gtest") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
   ]
@@ -59,7 +60,6 @@ ohos_unittest("esim_service_client_branch_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
@@ -111,7 +111,6 @@ ohos_unittest("tel_esim_gtest") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -125,10 +124,9 @@ ohos_unittest("tel_esim_gtest") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -144,7 +142,6 @@ ohos_unittest("tel_esim_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
@@ -198,7 +195,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -212,10 +208,9 @@ ohos_unittest("esim_core_service_client_branch_test") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -231,7 +226,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
@@ -251,6 +245,7 @@ ohos_unittest("esim_core_service_client_branch_test") {
 
   deps = [
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+    "$SOURCE_DIR/test:core_service_test_base",
   ]
 
   defines = [
@@ -289,7 +284,6 @@ ohos_unittest("core_manager_inner_test") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -303,8 +297,9 @@ ohos_unittest("core_manager_inner_test") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
-    "$SOURCE_DIR/utils:libtel_common",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
   ]
 
   external_deps = [
@@ -320,12 +315,10 @@ ohos_unittest("core_manager_inner_test") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -372,24 +365,9 @@ ohos_unittest("esim_file_branch_test") {
 
   sources = [
     "$SOURCE_DIR/test/unittest/esim_gtest/esim_file_branch_test.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/enum_convert.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/str_convert.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/tel_event_handler.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/tel_event_queue.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_common_utils.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_config.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/src/telephony_ext_utils_wrapper.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_builder.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_decoder.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_node.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/asn1_utils.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/request_apdu_build.cpp",
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/src/reset_response.cpp",
-    "$SOURCE_DIR/services/sim/src/esim_file.cpp",
   ]
 
   include_dirs = [
-    "$SOURCE_DIR/test/unittest/esim_gtest/utils/codec/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/utils/common/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/mock/include",
     "$SOURCE_DIR/utils/log/include",

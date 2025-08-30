@@ -35,9 +35,10 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t SIM_STATUS_NUM = 5;
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
-[[maybe_unused]] static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
+static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
 {
     size_t typeSize = sizeof(int32_t);
     uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
@@ -50,8 +51,10 @@ constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
 void VoiceMailConstantseFunc(const uint8_t *data, size_t size)
 {
+    int index = 0;
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     auto voiceMailConstants = std::make_shared<VoiceMailConstants>(slotId);
+    int32_t simState = *data % SIM_STATUS_NUM + 1;
     std::string key(reinterpret_cast<const char *>(data), size);
     voiceMailConstants->GetStringValueFromCust(slotId, key);
     voiceMailConstants->ResetVoiceMailLoadedFlag();

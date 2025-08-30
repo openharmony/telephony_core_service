@@ -247,7 +247,7 @@ public:
     int32_t UpdateOperatorName(int32_t slotId);
     bool SetForcePreferredNetwork(int32_t slotId, int32_t networkMode);
     void UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState);
-
+    std::string GetResidentNetworkNumeric(int32_t slotId);
     /******************** networkSearchManager end *******************/
     /******************** simManager start ***************************/
     int32_t ObtainSpnCondition(int32_t slotId, bool roaming, std::string operatorNum);

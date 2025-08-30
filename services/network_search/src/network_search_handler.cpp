@@ -779,7 +779,7 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
     }
 
     ModemPowerState radioState = static_cast<ModemPowerState>(networkSearchManager->GetRadioState(slotId_));
-    TELEPHONY_LOGI("NetworkSearchHandler GetRadioState : %{public}d slotId:%{public}d", radioState, slotId_);
+    HILOG_COMM_INFO("NetworkSearchHandler GetRadioState : %{public}d slotId:%{public}d", radioState, slotId_);
     switch (radioState) {
         case CORE_SERVICE_POWER_NOT_AVAILABLE:
         case CORE_SERVICE_POWER_OFF:

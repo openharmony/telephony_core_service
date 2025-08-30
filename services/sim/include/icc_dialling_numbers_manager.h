@@ -62,14 +62,18 @@ private:
     std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
     std::mutex mtx_;
+    std::mutex queryMtx_;
     bool hasEventDone_ = false;
-    bool hasQueryEventDone_ = true;
+    bool hasQueryEventDone_ = false;
     std::condition_variable processWait_;
+    SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;
     void ProcessSimStateChanged();
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessAdvanceLoadPbr();
+    int QueryIccDiallingNumbersPreLoad(int type);
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
 
     void ClearRecords();
