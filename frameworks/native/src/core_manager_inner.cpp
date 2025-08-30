@@ -1786,6 +1786,13 @@ int32_t CoreManagerInner::UpdateOperatorName(int32_t slotId)
     return networkSearchManager_->UpdateOperatorName(slotId);
 }
 
+void CoreManagerInner::UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState)
+{
+    if (networkSearchManager_ != nullptr) {
+        return networkSearchManager_->UpdateDeviceState(slotId, isEnterStrMode, isNeedUpdateNetworkState);
+    }
+}
+
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/
 

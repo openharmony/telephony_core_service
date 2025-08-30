@@ -96,6 +96,12 @@ void DeviceStateHandler::ProcessShutDown()
     nsm->SetRadioState(slotId_, false, 0);
 }
 
+void DeviceStateHandler::UpdateDeviceState(bool isEnterStrMode)
+{
+    isEnterStrMode_ = isEnterStrMode;
+    ProcessDeviceState();
+}
+
 void DeviceStateHandler::ProcessDeviceState()
 {
     uint32_t newCellRequestMinInterval = GetCellRequestMinInterval();
@@ -111,6 +117,10 @@ void DeviceStateHandler::ProcessDeviceState()
     if (isLowData_ != IsLowPowerConsumption()) {
         isLowData_ = !isLowData_;
         SetDeviceState(TEL_LOW_DATA_STATE, isLowData_);
+    }
+
+    if (isEnterStrMode_) {
+        return SetNotificationFilter(NOTIFICATION_FILTER_ENTER_STR_MODE, false);
     }
 
     int32_t newFilter = NOTIFICATION_FILTER_NONE;
