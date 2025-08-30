@@ -74,8 +74,7 @@ private:
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
     std::list<AppExecFwk::InnerEvent::Pointer> callers_;
-    uint32_t iapNum_ = 0;
-    void CheckQueryDone();
+    uint32_t currentIndex_;
     void ProcessQueryDone();
     void MergeNumbers(std::vector<std::shared_ptr<DiallingNumbersInfo>> &adn, const std::vector<std::u16string> &anr);
     void MergeNumber(std::shared_ptr<DiallingNumbersInfo> &adn, const std::u16string &anr);
