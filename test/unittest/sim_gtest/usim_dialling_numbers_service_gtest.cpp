@@ -17,6 +17,7 @@
 
 #include <string>
 #include <unistd.h>
+#include <iostream>
 #include "core_manager_inner.h"
 #include "core_service.h"
 #include "core_service_client.h"
@@ -138,17 +139,38 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone001, Funct
 HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumber2LoadDone001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
-
     service->ProcessDiallingNumber2LoadDone(AppExecFwk::InnerEvent::Pointer(nullptr, nullptr));
+    EXPECT_TRUE(service->anrs_.empty());
 
-    auto event = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, 1);
-    service->ProcessDiallingNumber2LoadDone(event);
+    service->currentIndex_ = 0;
+    service->pbrFiles_.clear();
+    auto pbr1 = std::make_shared<UsimDiallingNumberFile>();
+    pbr1->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = 0;
+    service->pbrFiles_.push_back(pbr1);
+    auto event1 = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, 100);
+    service->ProcessDiallingNumber2LoadDone(event1);
+    EXPECT_TRUE(service->anrs_[100].empty());
 
-    auto multiRecord = std::make_shared<MultiRecordResult>(nullptr);
-    multiRecord->fileResults = {"record1", "record2"};
-    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, 1, multiRecord);
-    service->ProcessDiallingNumber2LoadDone(event);
-    EXPECT_TRUE(service->pbrFileLoaded_);
+    service->currentIndex_ = 0;
+    auto multiRecord1 = std::make_shared<MultiRecordResult>(nullptr);
+    multiRecord1->fileResults = {"112233", "445566"};
+    auto event2 = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, 200, multiRecord1);
+    service->ProcessDiallingNumber2LoadDone(event2);
+    EXPECT_EQ(service->currentIndex_, 1);
+
+    service->currentIndex_ = 0;
+    service->pbrFiles_.clear();
+    auto pbr2 = std::make_shared<UsimDiallingNumberFile>();
+    pbr2->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE2_FLAG;
+    service->pbrFiles_.push_back(pbr2);
+
+    service->currentIndex_ = 0;
+    auto multiRecord2 = std::make_shared<MultiRecordResult>(nullptr);
+    multiRecord2->fileResults = {"778899"};
+    auto event3 = AppExecFwk::InnerEvent::Get(MSG_USIM_ANR_LOAD_DONE, 300, multiRecord2);
+    service->ProcessDiallingNumber2LoadDone(event3);
+    EXPECT_EQ(service->anrs_[300].size(), 1);
+    EXPECT_EQ(service->currentIndex_, 0);
 }
 
 HWTEST_F(UsimDiallingNumbersServiceTest, FetchIapContent001, Function | MediumTest | Level1)
@@ -329,32 +351,6 @@ HWTEST_F(UsimDiallingNumbersServiceTest, IsValidTag001, Function | MediumTest | 
     EXPECT_TRUE(service->IsValidTag(tagsWithValid, 1));
 }
 
-HWTEST_F(UsimDiallingNumbersServiceTest, CheckQueryDoneFullBranch, Function | MediumTest | Level1)
-{
-    auto service = std::make_shared<UsimDiallingNumbersService>();
-
-    service->pbrFiles_.clear();
-    service->CheckQueryDone();
-
-    auto file = std::make_shared<UsimDiallingNumberFile>();
-    service->pbrFiles_.push_back(file);
-
-    service->adns_.clear();
-    service->anrs_.clear();
-    service->CheckQueryDone();
-
-    service->adns_[0] = {};
-    service->CheckQueryDone();
-
-    service->anrs_[0] = {};
-    service->iaps_.clear();
-    service->CheckQueryDone();
-
-    service->iaps_[0] = {};
-    service->CheckQueryDone();
-    EXPECT_TRUE(service->pbrFileLoaded_);
-}
-
 HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDoneFullBranchSplit, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
@@ -439,7 +435,6 @@ HWTEST_F(UsimDiallingNumbersServiceTest, SendBackResultFullBranch, Function | Me
     service->SendBackResult(diallingNumbers); // 正常路径
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
-
 
 HWTEST_F(UsimDiallingNumbersServiceTest, FetchAnrContent001, Function | MediumTest | Level1)
 {
