@@ -96,8 +96,8 @@ void IccFileController::SendFixedRecordRequest(std::shared_ptr<IccControllerHold
         SimIoRequestInfo msg;
         msg.command = CONTROLLER_REQ_SEEK;
         msg.fileId = hd->fileId;
-        msg.p1 = 0x01;
-        msg.p2 = 0x04;
+        msg.p1 = 1;
+        msg.p2 = ICC_FILE_CURRENT_MODE;
         msg.p3 = hd->fileSize;
         msg.data = std::string(hd->fileSize * HEX_TO_BYTES_LEN, 'F');
         msg.path = CheckRightPath(hd->filePath, hd->fileId);
