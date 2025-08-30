@@ -384,5 +384,19 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_002, TestSize.Lev
     networkSearchState->CsRadioTechChange();
     EXPECT_TRUE(networkSearchState->networkSearchManager_.expired());
 }
+
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_003, TestSize.Level0)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    std::weak_ptr<TelRilManager> weakTelRilManager = telRilManager;
+    std::weak_ptr<NetworkSearchManager> weakNetworkSearchManager = networkSearchManager;
+    auto deviceStateHandler = std::make_shared<DeviceStateHandler>(weakNetworkSearchManager, weakTelRilManager, 0);
+    deviceStateHandler->UpdateDeviceState(true);
+    EXPECT_EQ(deviceStateHandler->isEnterStrMode_, true);
+    deviceStateHandler->UpdateDeviceState(false);
+    EXPECT_EQ(deviceStateHandler->isEnterStrMode_, false);
+}
 } // namespace Telephony
 } // namespace OHOS
