@@ -1799,7 +1799,7 @@ HWTEST_F(EsimTest, EuiccInfo2ParseEuiccCiPKIdListForVerification_001, Function |
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     EuiccInfo2 euiccInfo2;
-   std::vector<uint8_t> src;
+    std::vector<uint8_t> src;
     std::shared_ptr<Asn1Node> root = std::make_shared<Asn1Node>(0, src, 0, 0);
     esimFile->EuiccInfo2ParseEuiccCiPKIdListForVerification(euiccInfo2, root);
     bool bRet = euiccInfo2.euiccCiPKIdListForVerification_.empty() ? false : true;
