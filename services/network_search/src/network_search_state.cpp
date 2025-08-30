@@ -416,7 +416,7 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    TELEPHONY_LOGI("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
+    HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
         return;

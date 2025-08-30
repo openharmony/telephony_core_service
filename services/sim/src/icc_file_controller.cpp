@@ -117,7 +117,7 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
             hd->countFiles = size / hd->fileSize;
         }
     }
-    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}d %{public}d %{public}d %{public}d", hd->fileId, size,
+    TELEPHONY_LOGI("ProcessRecordSize fileId:%{public}#X %{public}d %{public}d %{public}d", hd->fileId, size,
         hd->fileSize, hd->countFiles);
     if (telRilManager_ != nullptr) {
         SimIoRequestInfo msg;
@@ -210,7 +210,7 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
         hd->fileResults.push_back(result->resultData);
         hd->fileNum++;
         if (hd->fileNum > hd->countFiles) {
-            SendMultiRecordResult(process, hd->fileResults);
+            SendMultiRecordResult(process, hd->fileResults, hd->fileId);
         } else {
             SimIoRequestInfo msg;
             msg.command = CONTROLLER_REQ_READ_RECORD;
@@ -509,7 +509,7 @@ void IccFileController::SendEfLinearResult(const AppExecFwk::InnerEvent::Pointer
 }
 
 void IccFileController::SendMultiRecordResult(
-    const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue)
+    const AppExecFwk::InnerEvent::Pointer &response, std::vector<std::string> &strValue, int fileId)
 {
     if (response == nullptr) {
         TELEPHONY_LOGE("response is nullptr!");
@@ -525,9 +525,8 @@ void IccFileController::SendMultiRecordResult(
     object->fileResults.assign(strValue.begin(), strValue.end());
     object->resultLength = static_cast<int>(strValue.size());
     uint32_t id = response->GetInnerEventId();
-    int eventParam = 0;
     TELEPHONY_LOGI("IccFileController::SendMultiRecordResult send end");
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, eventParam);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(id, object, fileId);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         return;

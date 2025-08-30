@@ -14,8 +14,8 @@
  */
 
 #include "icc_dialling_numbers_cache.h"
-#include "usim_dialling_numbers_service.h"
 #include "icc_dialling_numbers_handler.h"
+#include "usim_dialling_numbers_service.h"
 
 namespace OHOS {
 namespace Telephony {

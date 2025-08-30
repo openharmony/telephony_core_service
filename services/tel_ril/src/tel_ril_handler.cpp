@@ -72,7 +72,7 @@ void TelRilHandler::OnInit(void)
     ackLockSerialNum_ = 0;
 }
 
-void TelRilHandler::ApplyRunningLock(int32_t lockType)
+void TelRilHandler::ApplyRunningLock(int32_t lockType, int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
     std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
@@ -90,7 +90,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType)
         reqLockSerialNum_ = 0;
     }
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
-        reqLockSerialNum_++;
+        reqLockSerialNum_ = serialId;
         reqSerialSet_.insert(reqLockSerialNum_);
         if (!reqRunningLock_->IsUsed()) {
             reqRunningLock_->Lock();

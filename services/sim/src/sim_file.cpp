@@ -1463,7 +1463,8 @@ bool SimFile::IsAvailable(uint8_t offset, uint8_t mask)
     if (offset * HEX_TO_BYTE_LEN >= serviceTable_.length()) {
         return false;
     }
-    uint8_t num = static_cast<uint8_t>(strtoul(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN).c_str(), nullptr, HEX_TYPE));
+    uint8_t num = static_cast<uint8_t>(
+        strtoul(serviceTable_.substr(offset * HEX_TO_BYTE_LEN, HEX_TO_BYTE_LEN).c_str(), nullptr, HEX_TYPE));
     return ((num & mask) == mask);
 }
 

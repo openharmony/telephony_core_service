@@ -1793,6 +1793,15 @@ void CoreManagerInner::UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bo
     }
 }
 
+std::string CoreManagerInner::GetResidentNetworkNumeric(int32_t slotId)
+{
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is null!");
+        return "";
+    }
+    return networkSearchManager_->GetResidentNetworkNumeric(slotId);
+}
+
 /******************** networkSearchManager end ************************/
 /******************** simManager_ start *******************/
 

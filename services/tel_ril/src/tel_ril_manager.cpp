@@ -94,7 +94,7 @@ void TelRilManager::ReleaseRunningLock()
 void TelRilManager::SendAckAndLock(void)
 {
     if (handler_ != nullptr) {
-        handler_->ApplyRunningLock(TelRilHandler::ACK_RUNNING_LOCK);
+        handler_->ApplyRunningLock(TelRilHandler::ACK_RUNNING_LOCK, 0);
     }
     std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if (rilInterface_ == nullptr) {
