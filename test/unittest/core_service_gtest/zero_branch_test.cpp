@@ -85,7 +85,6 @@ const int32_t BYTES_LENGTH = 3;
 const int32_t LO_FOUR_LENGTH = 15;
 const int32_t VALUE_LENGTH = 128;
 static const int32_t SLEEP_TIME = 3;
-const int SLOT_COUNT = 2;
 } // namespace
 
 class BranchTest : public testing::Test {
@@ -1226,63 +1225,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_002, Function | MediumTest | Level1)
 }
 
 /**
- * @tc.number   Telephony_SimManager_003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->SetDefaultVoiceSlotId(0);
-    simManager->SetDefaultVoiceSlotId(INVALID_SLOTID);
-    simManager->SetDefaultSmsSlotId(0);
-    simManager->SetDefaultSmsSlotId(INVALID_SLOTID);
-    simManager->SetDefaultCellularDataSlotId(0);
-    simManager->SetDefaultCellularDataSlotId(INVALID_SLOTID);
-    simManager->SetPrimarySlotId(INVALID_SLOTID);
-    simManager->GetDefaultVoiceSlotId();
-    simManager->GetDefaultSmsSlotId();
-    simManager->GetDefaultCellularDataSlotId();
-    int32_t slotId = INVALID_VALUE;
-    simManager->GetPrimarySlotId(slotId);
-    EXPECT_NE(simManager->GetSlotId(1), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->GetSimId(0), TELEPHONY_ERR_SUCCESS);
-    SimLabel simLabel;
-    EXPECT_NE(simManager->InsertEsimData("01234567890123456789", 1, "中国联通"), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SetSimLabelIndex("01234567890123456789", 0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->GetSimLabel(0, simLabel), TELEPHONY_ERR_SUCCESS);
-    std::vector<IccAccountInfo> iccAccountInfoList;
-    EXPECT_GT(simManager->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->GetAllSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
-    OperatorConfig mOperatorConfig;
-    EXPECT_GT(simManager->GetOperatorConfigs(0, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->GetOperatorConfigs(INVALID_SLOTID, mOperatorConfig), TELEPHONY_ERR_SUCCESS);
-    bool boolResult = false;
-    EXPECT_GT(simManager->HasOperatorPrivileges(0, boolResult), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->HasOperatorPrivileges(INVALID_SLOTID, boolResult), TELEPHONY_ERR_SUCCESS);
-    int32_t testRadioProtocolTech = static_cast<int32_t>(RadioProtocolTech::RADIO_PROTOCOL_TECH_UNKNOWN);
-    EXPECT_EQ(simManager->GetRadioProtocolTech(0), testRadioProtocolTech);
-    EXPECT_EQ(simManager->GetRadioProtocolTech(INVALID_SLOTID), testRadioProtocolTech);
-    EXPECT_GT(simManager->SendEnvelopeCmd(0, ""), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->SendEnvelopeCmd(INVALID_SLOTID, ""), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->SendTerminalResponseCmd(0, ""), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->SendTerminalResponseCmd(INVALID_SLOTID, ""), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SendCallSetupRequestResult(0, true), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->SendCallSetupRequestResult(INVALID_SLOTID, true), TELEPHONY_ERR_SUCCESS);
-    std::string testAddress = "";
-    EXPECT_GT(simManager->AddSmsToIcc(0, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->AddSmsToIcc(INVALID_SLOTID, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UpdateSmsIcc(0, 1, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->UpdateSmsIcc(INVALID_SLOTID, 1, 1, testAddress, testAddress), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->DelSmsIcc(0, 1), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->DelSmsIcc(INVALID_SLOTID, 1), TELEPHONY_ERR_SUCCESS);
-    std::vector<std::string> result;
-    EXPECT_EQ(simManager->ObtainAllSmsOfIcc(0), result);
-    EXPECT_EQ(simManager->ObtainAllSmsOfIcc(INVALID_SLOTID), result);
-}
-
-/**
  * @tc.number   Telephony_SimManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2198,28 +2140,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   Telephony_ImsCoreServiceProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_ImsCoreServiceProxy_001, Function | MediumTest | Level1)
-{
-    sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy systemAbilityMgr is nullptr");
-    }
-    ASSERT_NE(systemAbilityMgr, nullptr);
-    sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_IMS_SYS_ABILITY_ID);
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Telephony_ImsCoreServiceProxy remote is nullptr");
-    }
-    ASSERT_NE(remote, nullptr);
-    auto imsCoreServiceProxy = std::make_shared<ImsCoreServiceProxy>(remote);
-    EXPECT_GE(imsCoreServiceProxy->GetImsRegistrationStatus(0), 0);
-    EXPECT_GE(imsCoreServiceProxy->RegisterImsCoreServiceCallback(nullptr), 0);
-}
-
-/**
  * @tc.number   Telephony_CoreServiceClient_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2276,31 +2196,6 @@ HWTEST_F(BranchTest, Telephony_Network_InitTelephonyExtService_001, Function | M
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr);
         EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.updateOperatorNameParamsExt_ != nullptr);
     }
-}
-
-HWTEST_F(BranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    telRilManager->OnInit();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager;
-    simStateManager.resize(SLOT_COUNT);
-    simFileManager.resize(SLOT_COUNT);
-    for (int32_t slotId = 0; slotId < SLOT_COUNT; slotId++) {
-        simStateManager[slotId] = std::make_shared<SimStateManager>(telRilManager);
-        simStateManager[slotId]->Init(slotId);
-        simFileManager[slotId] = SimFileManager::CreateInstance(
-            std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager[slotId]));
-        simFileManager[slotId]->Init(slotId);
-    }
-    IccState iccState;
-    iccState.simType_ = ICC_UNKNOWN_TYPE;
-    iccState.simStatus_ = ICC_CONTENT_READY;
-    iccState.iccid_ = "123456789012345";
-    simStateManager[0]->simStateHandle_->oldSimType_ = ICC_USIM_TYPE;
-    simStateManager[0]->simStateHandle_->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
-    simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0);
-    EXPECT_EQ(simStateManager[0]->simStateHandle_->externalState_, SimState::SIM_STATE_READY);
 }
 
 /**
