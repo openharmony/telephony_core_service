@@ -87,7 +87,7 @@ void IccDiallingNumbersHandler::GetAllDiallingNumbers(int ef, int exid, AppExecF
     }
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberReadAll =
         BuildCallerInfo(MSG_SIM_OBTAIN_ALL_ADN_DONE, loadRequest->GetLoadId());
-    fileController_->ObtainAllLinearFixedFile(ef, GetFilePath(ef), ptDiallingNumberReadAll);
+    fileController_->ObtainAllLinearFixedFile(ef, GetFilePath(ef), ptDiallingNumberReadAll, true);
 }
 
 void IccDiallingNumbersHandler::UpdateDiallingNumbers(
