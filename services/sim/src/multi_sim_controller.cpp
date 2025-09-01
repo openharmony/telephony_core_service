@@ -1294,7 +1294,6 @@ bool MultiSimController::IsSetActiveSimInProgress(int32_t slotId)
 
 bool MultiSimController::IsSetPrimarySlotIdInProgress()
 {
-    TELEPHONY_LOGD("isSetPrimarySlotIdInProgress_ is %{public}d", isSetPrimarySlotIdInProgress_);
     return isSetPrimarySlotIdInProgress_;
 }
 
