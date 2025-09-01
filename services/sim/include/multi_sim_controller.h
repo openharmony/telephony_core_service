@@ -134,7 +134,7 @@ private:
     std::mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
-    bool isSetPrimarySlotIdInProgress_ = false;
+    std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
 };
 } // namespace Telephony
 } // namespace OHOS
