@@ -2054,5 +2054,19 @@ void NetworkSearchManager::UpdateDeviceId(int32_t slotId)
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_BASEBAND_VERSION);
 }
+
+void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState)
+{
+    auto inner = FindManagerInner(slotId);
+    if (inner == nullptr) {
+        return;
+    }
+    if (isNeedUpdateNetworkState && inner->networkSearchHandler_ != nullptr) {
+        inner->networkSearchHandler_->RadioOnState();
+    }
+    if (inner->deviceStateHandler_ != nullptr) {
+        inner->deviceStateHandler_->UpdateDeviceState(isEnterStrMode);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

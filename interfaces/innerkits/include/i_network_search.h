@@ -218,6 +218,7 @@ public:
     virtual int32_t StartGetRilSignalIntensity(int32_t slotId) = 0;
     virtual int32_t ProcessSignalIntensity(int32_t slotId, const struct Rssi &signalIntensity) = 0;
     virtual int32_t UpdateOperatorName(int32_t slotId) = 0;
+    virtual void UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
