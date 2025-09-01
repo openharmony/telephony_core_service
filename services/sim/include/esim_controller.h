@@ -19,11 +19,13 @@
 #include <singleton.h>
 #include <string.h>
 #include "sim_rdb_helper.h"
+#include <atomic>
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
 
-typedef int (*VerifyBind)(int slotId, const char* command, size_t commandLen);
+typedef bool (*VerifyBind)(int slotId, const char* command, size_t commandLen);
 
 class EsimController : public DelayedRefSingleton<EsimController> {
     DECLARE_DELAYED_REF_SINGLETON(EsimController);
@@ -32,9 +34,12 @@ public:
     bool ChecIsVerifyBindCommand(const std::string &cmdData);
     void ProcessCommandMessage(int slotId, const std::string &cmdData);
     void ProcessCommandByCa(int slotId, const std::string &cmdData);
+    void SetVerifyResult(int slotId, bool isVerifySuccess);
+    bool GetVerifyResult(int slotId);
 private:
     std::mutex caMutex_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
+    std::atomic<bool> isVerifySuccess_[MAX_SLOT_COUNT] = {}; // use default value - false
 };
 } // namespace Telephony
 } // namespace OHOS

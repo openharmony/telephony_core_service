@@ -1902,5 +1902,16 @@ HWTEST_F(EsimTest, ProcessGetContractInfo_001, Function | MediumTest | Level2)
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     EXPECT_FALSE(esimFile->ProcessGetContractInfo(eventGetContractInfo));
 }
+
+HWTEST_F(EsimTest, EsimController_001, Function | MediumTest | Level2)
+{
+    int slotId = -1;
+    EsimController::GetInstance().SetVerifyResult(slotId, true);
+    EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), false);
+
+    slotId = 0;
+    EsimController::GetInstance().SetVerifyResult(slotId, true);
+    EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), true);
+}
 } // namespace Telephony
 } // namespace OHOS
