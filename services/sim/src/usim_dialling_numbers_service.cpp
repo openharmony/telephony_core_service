@@ -211,7 +211,7 @@ void UsimDiallingNumbersService::ProcessIapLoadDone(const AppExecFwk::InnerEvent
         }
         iaps_[event->GetParam()] = iaps;
     }
-    LoadDiallingNumberFiles(currentIndex_++);
+    LoadDiallingNumberFiles(++currentIndex_);
 }
 
 void UsimDiallingNumbersService::ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer)
