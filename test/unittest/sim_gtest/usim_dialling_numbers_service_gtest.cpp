@@ -396,6 +396,16 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDone001, Function | MediumT
     service->adns_[5] = {std::make_shared<DiallingNumbersInfo>()};
     service->anrs_[6] = {u"10086"};
     service->ProcessQueryDone();
+    EXPECT_TRUE(service->pbrFileLoaded_);
+}
+
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDone002, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    service->pbrFiles_.clear();
+    service->adns_.clear();
+    service->anrs_.clear();
+    service->iaps_.clear();
 
     // case6: ANR TYPE2, IAP tag 无效
     auto pbr6 = std::make_shared<UsimDiallingNumberFile>();
