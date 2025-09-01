@@ -1617,5 +1617,29 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkStateReport, Function | Mediu
     networkSearchHandler->RadioOnState(false);
     EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 3);
 }
+
+HWTEST_F(NetworkSearchBranchTest, Telephony_UpdateDeviceState, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, 0);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->UpdateDeviceState(0, true, true);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchManager->UpdateDeviceState(0, true, true);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
+    networkSearchManager->UpdateDeviceState(0, true, false);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
+    EXPECT_TRUE(networkSearchManager->InitPointer(inner, 0));
+    networkSearchManager->UpdateDeviceState(0, true, true);
+    EXPECT_TRUE(inner->deviceStateHandler_->isEnterStrMode_);
+    inner->deviceStateHandler_ = nullptr;
+    networkSearchManager->UpdateDeviceState(0, true, false);
+    EXPECT_TRUE(inner->networkSearchHandler_ != nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS

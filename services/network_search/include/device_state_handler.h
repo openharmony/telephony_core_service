@@ -35,6 +35,7 @@ public:
     void ProcessNetSharingState(bool isNetSharingOn);
     void ProcessRadioState();
     void ProcessShutDown();
+    void UpdateDeviceState(bool isEnterStrMode);
 
 private:
     uint32_t GetCellRequestMinInterval() const;
@@ -59,6 +60,7 @@ private:
     bool isCharging_ = false;
     bool isScreenOn_ = false;
     bool isNetSharingOn_ = false;
+    bool isEnterStrMode_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

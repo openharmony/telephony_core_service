@@ -62,6 +62,7 @@ public:
     int32_t ErrorResponse(std::shared_ptr<TelRilRequest> telRilRequest, const RadioResponseInfo &responseInfo);
 
 protected:
+    inline virtual bool IsNeedBlockTelRilRequest(const char *funcName);
     template<typename FuncType, typename... ParamTypes>
     inline int32_t Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response, FuncType &&_func,
         ParamTypes &&... _args);
@@ -112,6 +113,12 @@ private:
     static std::shared_ptr<TelRilHandler> handler_;
 };
 
+inline bool TelRilBase::IsNeedBlockTelRilRequest(const char* funcName)
+{
+    return (GetDynamicPowerOffModeSwitchWithStr() &&
+        std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end());
+}
+
 template<typename FuncType, typename... ParamTypes>
 inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::InnerEvent::Pointer &response,
     FuncType &&_func, ParamTypes &&... _args)
@@ -122,10 +129,8 @@ inline int32_t TelRilBase::Request(const char *funcName, const AppExecFwk::Inner
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    if (GetDynamicPowerOffModeSwitchWithStr()
-        && std::find(whiteReqList_.begin(), whiteReqList_.end(), funcName) == whiteReqList_.end()) {
-            TELEPHONY_LOGE("%{public}s() not in white list req", funcName);
-            return TELEPHONY_ERR_PERMISSION_ERR;
+    if (IsNeedBlockTelRilRequest(funcName)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
 
     std::shared_ptr<TelRilRequest> telRilRequest = CreateTelRilRequest(response);
