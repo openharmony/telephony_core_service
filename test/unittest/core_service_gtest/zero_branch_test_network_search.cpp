@@ -1627,12 +1627,19 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_UpdateDeviceState, Function | Medium
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
     auto inner = std::make_shared<NetworkSearchManagerInner>();
-    EXPECT_TRUE(networkSearchManager->InitPointer(inner, 0));
     networkSearchManager->UpdateDeviceState(0, true, true);
-    EXPECT_FALSE(inner->deviceStateHandler_->isEnterStrMode_);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
     networkSearchManager->AddManagerInner(0, inner);
     networkSearchManager->UpdateDeviceState(0, true, true);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
+    networkSearchManager->UpdateDeviceState(0, true, false);
+    EXPECT_TRUE(inner->deviceStateHandler_ == nullptr);
+    EXPECT_TRUE(networkSearchManager->InitPointer(inner, 0));
+    networkSearchManager->UpdateDeviceState(0, true, true);
     EXPECT_TRUE(inner->deviceStateHandler_->isEnterStrMode_);
+    inner->deviceStateHandler_ = nullptr;
+    networkSearchManager->UpdateDeviceState(0, true, false);
+    EXPECT_TRUE(inner->networkSearchHandler_ != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
