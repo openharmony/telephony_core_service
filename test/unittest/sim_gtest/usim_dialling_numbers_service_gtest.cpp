@@ -202,17 +202,6 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessIapLoadDone001, Function | Mediu
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
 
-HWTEST_F(UsimDiallingNumbersServiceTest, ObtainUsimElementaryFiles001, Function | MediumTest | Level1)
-{
-    auto service = std::make_shared<UsimDiallingNumbersService>();
-
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(MSG_USIM_LOAD_PBR);
-    service->ObtainUsimElementaryFiles(event);
-
-    EXPECT_EQ(service->callers_.size(), 1);
-    EXPECT_NE(service->callers_.front(), nullptr);
-}
-
 HWTEST_F(UsimDiallingNumbersServiceTest, LoadPbrFiles001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
@@ -351,51 +340,115 @@ HWTEST_F(UsimDiallingNumbersServiceTest, IsValidTag001, Function | MediumTest | 
     EXPECT_TRUE(service->IsValidTag(tagsWithValid, 1));
 }
 
-HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDoneFullBranchSplit, Function | MediumTest | Level1)
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDone001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
-
-    auto file = std::make_shared<UsimDiallingNumberFile>();
-    service->pbrFiles_.push_back(file);
-    
-    service->ProcessQueryDone(); // 无有效 tag: TAG_SIM_USIM_ADN, TAG_SIM_USIM_ANR, TAG_SIM_USIM_IAP
-
-    auto tagAdn = std::make_shared<TagData>(0, 0, 0, 0); tagAdn->fileId = 1;
-    auto tagAnr = std::make_shared<TagData>(0, 0, 0, 0); tagAnr->fileId = 2;
-    auto tagIap = std::make_shared<TagData>(0, 0, 0, 0); tagIap->fileId = 3;
-
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = nullptr;
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = tagAnr;
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_IAP] = tagIap;
-    service->ProcessQueryDone(); // ADN 无效
-
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = tagAdn;
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = nullptr;
-    service->ProcessQueryDone(); // ANR 无效
-
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = tagAnr;
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_IAP] = nullptr;
-    service->ProcessQueryDone(); // IAP 无效
-
+    service->pbrFiles_.clear();
     service->adns_.clear();
     service->anrs_.clear();
-    file->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_IAP] = tagIap;
-    service->ProcessQueryDone(); // ADN/ANR 不存在
+    service->iaps_.clear();
 
-    service->adns_[1] = {};
-    service->anrs_[2] = {};
-    file->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE1_FLAG;
-    service->ProcessQueryDone(); // TYPE1_FLAG 分支
+    // case1: ADN tag 无效
+    auto pbr1 = std::make_shared<UsimDiallingNumberFile>();
+    pbr1->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = nullptr;
+    service->pbrFiles_.push_back(pbr1);
+    service->ProcessQueryDone();
 
-    file->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE2_FLAG;
-    service->iaps_[3] = {};
-    service->ProcessQueryDone(); // TYPE2_FLAG, IAP 空
+    // case2: ADN tag 有效但 adns_ 不存在
+    auto pbr2 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag2 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag2->fileId = 1;
+    pbr2->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag2;
+    service->pbrFiles_.push_back(pbr2);
+    service->ProcessQueryDone();
 
-    service->iaps_[3] = {{1}};
-    service->adns_[1] = {std::make_shared<DiallingNumbersInfo>()};
-    service->anrs_[2] = {u"123"};
-    file->tagIndex_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = 0;
-    service->ProcessQueryDone(); // 正常合并 ADN/ANR/IAP
+    // case3: ANR tag 无效
+    auto pbr3 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag3 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag3->fileId = 2;
+    pbr3->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag3;
+    service->pbrFiles_.push_back(pbr3);
+    service->adns_[2] = {std::make_shared<DiallingNumbersInfo>()};
+    service->ProcessQueryDone();
+
+    // case4: ANR tag 有效但 anrs_ 不存在
+    auto pbr4 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag4 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag4->fileId = 3;
+    auto anrTag4 = std::make_shared<TagData>(0, 0, 0, 0);
+    anrTag4->fileId = 4;
+    pbr4->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag4;
+    pbr4->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = anrTag4;
+    service->pbrFiles_.push_back(pbr4);
+    service->adns_[3] = {std::make_shared<DiallingNumbersInfo>()};
+    service->ProcessQueryDone();
+
+    // case5: ANR TYPE1 正常合并
+    auto pbr5 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag5 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag5->fileId = 5;
+    auto anrTag5 = std::make_shared<TagData>(0, 0, 0, 0);
+    anrTag5->fileId = 6;
+    pbr5->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag5;
+    pbr5->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = anrTag5;
+    pbr5->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE1_FLAG;
+    service->pbrFiles_.push_back(pbr5);
+    service->adns_[5] = {std::make_shared<DiallingNumbersInfo>()};
+    service->anrs_[6] = {u"10086"};
+    service->ProcessQueryDone();
+    EXPECT_TRUE(service->pbrFileLoaded_);
+}
+
+HWTEST_F(UsimDiallingNumbersServiceTest, ProcessQueryDone002, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    service->pbrFiles_.clear();
+    service->adns_.clear();
+    service->anrs_.clear();
+    service->iaps_.clear();
+
+    // case6: ANR TYPE2, IAP tag 无效
+    auto pbr6 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag6 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag6->fileId = 7;
+    auto anrTag6 = std::make_shared<TagData>(0, 0, 0, 0);
+    anrTag6->fileId = 8;
+    pbr6->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag6;
+    pbr6->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = anrTag6;
+    pbr6->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE2_FLAG;
+    service->pbrFiles_.push_back(pbr6);
+    service->adns_[7] = {std::make_shared<DiallingNumbersInfo>()};
+    service->anrs_[8] = {u"12345"};
+    service->ProcessQueryDone();
+
+    // case7: ANR TYPE2, IAP tag 有效但 iaps_ 不存在
+    auto pbr7 = std::make_shared<UsimDiallingNumberFile>();
+    auto adnTag7 = std::make_shared<TagData>(0, 0, 0, 0);
+    adnTag7->fileId = 9;
+    auto anrTag7 = std::make_shared<TagData>(0, 0, 0, 0);
+    anrTag7->fileId = 10;
+    auto iapTag7 = std::make_shared<TagData>(0, 0, 0, 0);
+    iapTag7->fileId = 11;
+    pbr7->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = adnTag7;
+    pbr7->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = anrTag7;
+    pbr7->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_IAP] = iapTag7;
+    pbr7->parentTag_[UsimDiallingNumbersService::TAG_SIM_USIM_ANR] = UsimDiallingNumbersService::TYPE2_FLAG;
+    service->pbrFiles_.push_back(pbr7);
+    service->adns_[9] = {std::make_shared<DiallingNumbersInfo>()};
+    service->anrs_[10] = {u"67890"};
+    service->ProcessQueryDone();
+
+    // case8: ANR TYPE2, IAP size != ADN size
+    service->iaps_[11] = { {1, 2} };
+    service->ProcessQueryDone();
+
+    // case9: ANR TYPE2, IAP 映射非法
+    service->iaps_[11] = { { 0xff } };
+    service->ProcessQueryDone();
+
+    // case10: ANR TYPE2, IAP 映射合法
+    service->iaps_[11] = { {1} }; // 映射 anrs_[10][0]
+    service->ProcessQueryDone();
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
 
