@@ -111,6 +111,7 @@ ohos_unittest("tel_esim_gtest") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/codec/include"
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",
@@ -124,9 +125,10 @@ ohos_unittest("tel_esim_gtest") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR:tel_core_service",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
