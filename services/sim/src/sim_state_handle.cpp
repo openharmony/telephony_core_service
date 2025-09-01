@@ -22,6 +22,7 @@
 #include "enum_convert.h"
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
+#include "esim_controller.h"
 #endif
 #include "hilog/log.h"
 #include "if_system_ability_manager.h"
@@ -393,6 +394,9 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         if (newSimStatus == ICC_CARD_ABSENT) {
             TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
             CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+            EsimController::GetInstance().SetVerifyResult(slotId, false);
+#endif
             if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
                 TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
                     slotId, GetIccid(), PinOperationType::SIM_ABSENT, "");
