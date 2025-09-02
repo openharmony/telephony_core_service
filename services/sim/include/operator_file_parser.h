@@ -30,7 +30,7 @@ public:
     bool ParseFromCustomSystem(int32_t slotId, OperatorConfig &opc, cJSON *root);
     bool ParseOperatorConfigFromFile(
         OperatorConfig &poc, const std::string &path, cJSON *root, bool needSaveTempOpc = false);
-    bool WriteOperatorConfigJson(std::string filename, const cJSON *root);
+    bool WriteOperatorConfigJson(const char *filePath, const cJSON *root);
     std::string GetOperatorConfigFilePath(std::string filename);
     static void ClearFilesCache();
     static bool isCachePathExit();
