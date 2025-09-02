@@ -66,7 +66,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("event is nullptr!");
         return;
     }
-    TELEPHONY_LOGI("usimservice load pbr done %{public}#llx", static_cast<unsigned long long>(event->GetParam()));
+    TELEPHONY_LOGI("usimservice load pbr done (%{public} " PRId64 ")", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
         TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
@@ -105,7 +105,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         LoadDiallingNumber2Files(currentIndex_);
         return;
     }
-    TELEPHONY_LOGI("usimservice load adn done, fileId=%{public}#llX",
+    TELEPHONY_LOGI("usimservice load adn done, fileId=(%{public} " PRId64 ")",
         static_cast<unsigned long long>(resultObject->fileID));
     adns_[resultObject->fileID] = std::vector<std::shared_ptr<DiallingNumbersInfo>>();
     if (resultObject->exception != nullptr) {
@@ -161,8 +161,8 @@ void UsimDiallingNumbersService::ProcessDiallingNumber2LoadDone(const AppExecFwk
         return;
     }
     anrs_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load anr done, fileId=%{public}#llx",
-        static_cast<unsigned long long>(event->GetParam()));
+    TELEPHONY_LOGI("usimservice load anr done, fileId=(%{public} " PRId64 ")",
+        event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
@@ -200,8 +200,8 @@ void UsimDiallingNumbersService::ProcessIapLoadDone(const AppExecFwk::InnerEvent
         return;
     }
     iaps_[event->GetParam()] = {};
-    TELEPHONY_LOGI("usimservice load iap done, fileId=%{public}#llx",
-        static_cast<unsigned long long>(event->GetParam()));
+    TELEPHONY_LOGI("usimservice load iap done, fileId=(%{public} " PRId64 ")",
+        event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object != nullptr) {
         std::vector<std::string> &dataList = object->fileResults;
