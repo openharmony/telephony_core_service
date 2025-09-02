@@ -87,9 +87,29 @@ void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
     if (func == NULL) {
         TELEPHONY_LOGE("dlsym CAEsimStartEuiccCheckBinding failed, error:%{public}s", dlerror());
     } else {
-        func(slotId, cmdData.c_str(), cmdData.length());
+        SetVerifyResult(slotId, func(slotId, cmdData.c_str(), cmdData.length()));
     }
     dlclose(handler);
 }
+
+void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)
+{
+    if (slotId < 0 || slotId >= MAX_SLOT_COUNT) {
+        return;
+    }
+
+    TELEPHONY_LOGI("SetVerifyResult slot%{public}d, %{public}d", slotId, isVerifySuccess);
+    isVerifySuccess_[slotId] = isVerifySuccess;
+}
+
+bool EsimController::GetVerifyResult(int slotId)
+{
+    if (slotId < 0 || slotId >= MAX_SLOT_COUNT) {
+        return false;
+    }
+
+    return isVerifySuccess_[slotId];
+}
+
 } // namespace Telephony
 } // namespace OHOS

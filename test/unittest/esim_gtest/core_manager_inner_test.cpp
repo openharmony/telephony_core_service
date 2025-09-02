@@ -443,5 +443,19 @@ HWTEST_F(CoreManagerInnerTest, GetContractInfo_001, Function | MediumTest | Leve
     ret = mInner.GetContractInfo(slotId, request, response);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(CoreManagerInnerTest, GetEsimCaVerifyResult_001, Function | MediumTest | Level1)
+{
+    mInner.esimManager_ = nullptr;
+    int32_t slotId = 0;
+    bool verifyResult = false;
+    int32_t ret = mInner.GetEsimCaVerifyResult(slotId, verifyResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    mInner.esimManager_ = mockesimManager;
+    EXPECT_CALL(*mockesimManager, GetEsimCaVerifyResult(_, _)).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    ret = mInner.GetEsimCaVerifyResult(slotId, verifyResult);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 } // Telephony
-} // OHOS
+} // OHOS
