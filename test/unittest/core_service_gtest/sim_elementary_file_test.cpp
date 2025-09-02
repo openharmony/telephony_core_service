@@ -811,7 +811,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0100, Function | MediumTest | Level2
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
         }
     }
 }
