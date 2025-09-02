@@ -54,6 +54,7 @@ ohos_shared_library("libtel_common") {
   version_script = "libtel_common.versionscript"
   sources = [
     "../frameworks/js/napi/napi_util.cpp",
+    "common/src/base64.cpp",
     "common/src/enum_convert.cpp",
     "common/src/str_convert.cpp",
     "common/src/tel_aes_crypto_util.cpp",
@@ -101,6 +102,7 @@ ohos_shared_library("libtel_common") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "openssl:libcrypto_shared",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
   ]
@@ -168,14 +170,9 @@ ohos_shared_library("libtel_vcard") {
   include_dirs = [
     ":tel_contact_config",
     "../interfaces/innerkits/include/",
-    "//third_party/glib/glib",
-    "//third_party/glib",
   ]
 
-  deps = [
-    ":libtel_common",
-    "//third_party/glib:glib_packages",
-  ]
+  deps = [ ":libtel_common" ]
 
   external_deps = [
     "ability_base:want",
