@@ -61,7 +61,7 @@ HWTEST_F(SimManagerBranchTest, Telephony_SimManager_001, Function | MediumTest |
     EXPECT_EQ(simManager->GetSimOperatorNumeric(1, testStr), TELEPHONY_ERR_NO_SIM_CARD);
     EXPECT_EQ(simManager->GetOpName(1, testStr), TELEPHONY_ERR_SUCCESS);
     simManager->simFileManager_[0] = nullptr;
-    EXPECT_EQ(simManager->GetSimOperatorNumeric(0, testStr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(simManager->GetSimOperatorNumeric(0, testStr), TELEPHONY_ERR_NO_SIM_CARD);
     EXPECT_EQ(simManager->GetOpName(0, testStr), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 

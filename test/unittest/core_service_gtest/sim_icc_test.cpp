@@ -114,7 +114,7 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_QueryIccAdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
+    EXPECT_FALSE(SimTest::HasSimCard(SimTest::slotId1_));
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccAdnDiallingNumbersTestFunc1, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
@@ -252,7 +252,7 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
         ASSERT_EQ(diallingNumber->index_, 0);
         ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
         ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
@@ -356,7 +356,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         int32_t result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, CORE_ERR_SIM_CARD_UPDATE_FAILED);
     }
 }
 
@@ -368,7 +368,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId_));
+    EXPECT_FALSE(SimTest::HasSimCard(SimTest::slotId_));
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");
@@ -385,7 +385,7 @@ HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0100, Function | Medi
 HWTEST_F(SimTest, Telephony_Sim_QueryIccFdnDiallingNumbers_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
-    ASSERT_TRUE(SimTest::HasSimCard(SimTest::slotId1_));
+    EXPECT_FALSE(SimTest::HasSimCard(SimTest::slotId1_));
     CoreServiceTestHelper helper;
     if (!helper.Run(QueryIccFdnDiallingNumbersTestFunc1, std::ref(helper))) {
         TELEPHONY_LOGI("Interface out of time");

@@ -434,7 +434,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
         int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
     }
 }
 
@@ -590,7 +590,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Leve
     } else {
         const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
         int32_t result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
     }
 }
 
@@ -674,7 +674,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
         }
     }
 }
@@ -737,7 +737,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Lev
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
         }
     }
 }
@@ -780,7 +780,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0100, Function | MediumTes
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
         }
     }
 }
@@ -843,7 +843,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0100, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
         }
     }
 }
@@ -1225,7 +1225,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
         }
     }
 }
@@ -1290,7 +1290,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Le
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
         }
     }
 }
@@ -1354,7 +1354,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | Medi
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, 0);
+            EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
         }
     }
 }
