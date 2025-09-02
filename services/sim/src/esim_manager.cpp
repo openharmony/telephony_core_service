@@ -19,6 +19,7 @@
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
+#include "esim_controller.h"
 namespace OHOS {
 namespace Telephony {
 EsimManager::EsimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilManager_(telRilManager)
@@ -342,6 +343,17 @@ int32_t EsimManager::GetContractInfo(
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t EsimManager::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
+{
+    if (slotId < ESIM_SLOT_ID_ZERO || slotId >= ESIM_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGE("bad slotId: %{public}d", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+
+    verifyResult = EsimController::GetInstance().GetVerifyResult(slotId);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 } // namespace Telephony
 } // namespace OHOS
 
@@ -508,6 +520,11 @@ int32_t EsimManager::AuthenticateServer(
 
 int32_t EsimManager::GetContractInfo(
     int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response)
+{
+    return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
+}
+
+int32_t EsimManager::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
 {
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }

@@ -2958,6 +2958,15 @@ int32_t CoreManagerInner::GetContractInfo(
     }
     return esimManager_->GetContractInfo(slotId, getContractInfoRequest, response);
 }
+ 
+int32_t CoreManagerInner::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("GetEsimCaVerifyResult esimManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return esimManager_->GetEsimCaVerifyResult(slotId, verifyResult);
+}
 
 /******************** esimManager_ end ************************/
 
