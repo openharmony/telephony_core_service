@@ -928,6 +928,7 @@ int32_t CoreServiceStub::OnGetSimEons(MessageParcel &data, MessageParcel &reply)
 
 int32_t CoreServiceStub::OnGetSimSubscriptionInfo(MessageParcel &data, MessageParcel &reply)
 {
+    TELEPHONY_LOGI("OnGetSimSubscriptionInfo");
     int32_t slotId = data.ReadInt32();
     IccAccountInfo iccAccountInfo;
     int32_t result = GetSimAccountInfo(slotId, iccAccountInfo);
@@ -940,6 +941,7 @@ int32_t CoreServiceStub::OnGetSimSubscriptionInfo(MessageParcel &data, MessagePa
         TELEPHONY_LOGE("OnGetSimSubscriptionInfo write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    TELEPHONY_LOGI("GetSimAccountInfo result = %{public}d", result);
     return NO_ERROR;
 }
 
