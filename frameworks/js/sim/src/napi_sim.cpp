@@ -3005,20 +3005,23 @@ void NativeGetSimLabel(napi_env env, void *data)
     if (data == nullptr) {
         return;
     }
-    AsyncSimLabelInfo *asyncContext = static_cast<AsyncSimLabelInfo *>(data);
-    if (!IsValidSlotId(asyncContext->asyncContext.slotId)) {
+    AsyncSimLabelInfo *simLabelContext = static_cast<AsyncSimLabelInfo *>(data);
+    if (!IsValidSlotId(simLabelContext->asyncContext.slotId)) {
         TELEPHONY_LOGE("slotId is invalid");
-        asyncContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        simLabelContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
+    SimLabel simLabel;
     int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(
-        asyncContext->asyncContext.slotId, asyncContext->simLabel);
+        simLabelContext->asyncContext.slotId, simLabel);
     if (errorCode == ERROR_NONE) {
-        asyncContext->asyncContext.context.resolved = true;
+        simLabelContext->asyncContext.context.resolved = true;
+        simLabelContext->simLabel.simType = simLabel.simType;
+        simLabelContext->simLabel.index = simLabel.index;
     } else {
-        asyncContext->asyncContext.context.resolved = false;
+        simLabelContext->asyncContext.context.resolved = false;
     }
-    asyncContext->asyncContext.context.errorCode = errorCode;
+    simLabelContext->asyncContext.context.errorCode = errorCode;
 }
 
 void GetSimLabelCallback(napi_env env, napi_status status, void *data)
@@ -3033,13 +3036,30 @@ void GetSimLabelCallback(napi_env env, napi_status status, void *data)
         NapiUtil::SetPropertyInt32(env, value, "index", context->simLabel.index);
         asyncContext.callbackVal = value;
     }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "GetSimLabel", Permission::GET_TELEPHONY_STATE });
     TELEPHONY_LOGI("GetSimLabelCallback end");
 }
 
 napi_value GetSimLabel(napi_env env, napi_callback_info info)
 {
     TELEPHONY_LOGI("GetSimLabel start");
-    return NapiCreateAsyncWork<int32_t, NativeGetSimLabel, GetSimLabelCallback>(env, info, "GetSimLabel");
+    auto simLabelContext = new AsyncSimLabelInfo();
+    BaseContext &context = simLabelContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&simLabelContext->asyncContext.slotId, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetSimLabel",
+        .env = env,
+        .info = info,
+        .execute = NativeGetSimLabel,
+        .complete = GetSimLabelCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncSimLabelInfo>(para, simLabelContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+    }
+    return result;
 }
 
 napi_value GetSimLabelSync(napi_env env, napi_callback_info info)
