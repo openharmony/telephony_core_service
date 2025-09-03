@@ -3013,9 +3013,9 @@ void NativeGetSimLabel(napi_env env, void *data)
     }
     SimLabel simLabel;
     int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(
-        simLabelContext->asyncContext.slotId, asyncContext->simLabel);
+        simLabelContext->asyncContext.slotId, simLabel);
     if (errorCode == ERROR_NONE) {
-        asyncContext->asyncContext.context.resolved = true;
+        simLabelContext->asyncContext.context.resolved = true;
         simLabelContext->simLabel.simType = simLabel.simType;
         simLabelContext->simLabel.index = simLabel.index;
     } else {
@@ -3052,7 +3052,7 @@ napi_value GetSimLabel(napi_env env, napi_callback_info info)
         .funcName = "GetSimLabel",
         .env = env,
         .info = info,
-        .excute = NativeGetSimLabel,
+        .execute = NativeGetSimLabel,
         .complete = GetSimLabelCallback,
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSimLabelInfo>(para, simLabelContext, initPara);
