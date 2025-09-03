@@ -1302,6 +1302,7 @@ void GetSimAccountInfoCallback(napi_env env, napi_status status, void *data)
     if (asyncContext.context.resolved) {
         asyncContext.callbackVal = IccAccountInfoConversion(env, info->vecInfo.at(0));
     }
+    TELEPHONY_LOGI("NAPI GetSimAccountInfoCallback %{public}d", asyncContext.context.resolved);
     NapiAsyncPermissionCompleteCallback(
         env, status, asyncContext, false, { "GetSimAccountInfo", Permission::GET_TELEPHONY_STATE });
 }
