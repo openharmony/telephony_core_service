@@ -1146,7 +1146,7 @@ std::u16string CoreServiceProxy::GetSimEons(int32_t slotId, const std::string &p
 
 int32_t CoreServiceProxy::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
 {
-    TELEPHONY_LOGD("GetSimAccountInfo slotId = %{public}d", slotId);
+    TELEPHONY_LOGI("GetSimAccountInfo slotId = %{public}d", slotId);
     if (!IsValidSlotIdEx(slotId)) {
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
