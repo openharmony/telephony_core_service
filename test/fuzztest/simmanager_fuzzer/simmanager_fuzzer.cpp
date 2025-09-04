@@ -61,7 +61,6 @@ void SimManagerFunc(const uint8_t *data, size_t size)
     simManager->multiSimController_ = multiSimController;
     simManager->multiSimMonitor_ = multiSimMonitor;
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM + 2);
-    int32_t slotCount = GetInt(data, size, index++);
     int32_t voiceMailCount = GetInt(data, size, index++);
     bool hasOperatorPrivileges = true;
     simManager->SetDefaultVoiceSlotId(slotId);

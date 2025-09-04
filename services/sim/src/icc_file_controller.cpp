@@ -161,7 +161,6 @@ void IccFileController::ProcessRecordSize(const AppExecFwk::InnerEvent::Pointer 
 
 void IccFileController::ProcessInvalidRecord(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    int size = 0;
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("rcvMsg is nullptr");

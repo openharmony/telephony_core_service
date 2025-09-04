@@ -22,7 +22,6 @@ constexpr int32_t ANR_ADDITION_NUMBER_LENGTH_OFFSET = 1;
 constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 const std::u16string NUMBER_SPLIT = u";";
-constexpr int64_t PROCESS_PBR_DELAY_MS = 10 * 1000;
 constexpr uint8_t INVALID_SIM_BYTE_VALUE = 0xff;
 
 std::mutex UsimDiallingNumbersService::mtx_;
