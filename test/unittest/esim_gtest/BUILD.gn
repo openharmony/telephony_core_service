@@ -111,7 +111,7 @@ ohos_unittest("tel_esim_gtest") {
 
   include_dirs = [
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/utils/codec/include"
+    "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/utils/preferences/include",
     "$SOURCE_DIR/services/sim/include",

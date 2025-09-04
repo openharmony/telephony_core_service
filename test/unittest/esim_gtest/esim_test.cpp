@@ -426,7 +426,7 @@ HWTEST_F(EsimTest, ObtainEuiccInfo1ParseTagCtx2_001, Function | MediumTest | Lev
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     int32_t tag = 0;
     std::vector<uint8_t> src;
-    std::shared_ptr<Asn1Node> asnNode = std::make_shared<Asn1Node>(tag, src, 0, 0);
+    std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>(tag, src, 0, 0);
     asn1Node->constructed_ = false;
     bool ret = esimFile->ObtainEuiccInfo1ParseTagCtx2(asn1Node);
     EXPECT_EQ(ret, false);
