@@ -115,3 +115,234 @@ impl From<i32> for ResultCode {
         }
     }
 }
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResultCode")]
+#[repr(i32)]
+pub enum CancelReason {
+    CancelReasonEndUserRejection = 0,
+    CancelReasonPostponed = 1,
+    CancelReasonTimeout = 2,
+    CancelReasonPprNotAllowed = 3,
+}
+
+impl From<CancelReason> for i32 {
+    fn from(cancel_reason: CancelReason) -> Self {
+        cancel_reason as i32
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/EuiccInfoInner")]
+#[derive(Debug, Clone)]
+pub struct EuiccInfo {
+    os_version: String,
+}
+
+impl EuiccInfo {
+    pub fn new(os_version: String) -> Self {
+        Self {
+            os_version,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ProfileState")]
+#[repr(i32)]
+pub enum ProfileState {
+    ProfileStateUnspecified = -1,
+    ProfileStateDisabled = 0,
+    ProfileStateEnabled = 1,
+}
+
+impl From<i32> for ProfileState {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ProfileState::ProfileStateDisabled,
+            1 => ProfileState::ProfileStateEnabled,
+            _ => ProfileState::ProfileStateUnspecified,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ProfileClass")]
+#[repr(i32)]
+pub enum ProfileClass {
+    ProfileClassUnspecified = -1,
+    ProfileClassTest = 0,
+    ProfileClassProvisioning = 1,
+    ProfileClassOperational = 2,
+}
+
+impl From<i32> for ProfileClass {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => ProfileClass::ProfileClassTest,
+            1 => ProfileClass::ProfileClassProvisioning,
+            2 => ProfileClass::ProfileClassOperational,
+            _ => ProfileClass::ProfileClassUnspecified,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/OperatorIdInner")]
+#[derive(Debug, Clone)]
+pub struct OperatorId {
+    pub mcc: String,
+    pub mnc: String,
+    pub gid1: String,
+    pub gid2: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/PolicyRules")]
+#[repr(i32)]
+pub enum PolicyRules {
+    PolicyRuleDisableNotAllowed = 1,
+    PolicyRuleDeleteNotAllowed = 1 << 1,
+    PolicyRuleDisableAndDelete = 1 << 2,
+}
+
+impl From<i32> for PolicyRules {
+    fn from(value: i32) -> Self {
+        match value {
+            1 => PolicyRules::PolicyRuleDisableNotAllowed,
+            2 => PolicyRules::PolicyRuleDeleteNotAllowed,
+            4 => PolicyRules::PolicyRuleDisableAndDelete,
+            _ => PolicyRules::PolicyRuleDisableNotAllowed,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/AccessRuleInner")]
+#[derive(Debug, Clone)]
+pub struct AccessRule {
+    pub certificate_hash_hex_str: String,
+    pub package_name: String,
+    pub access_type: i32,
+}
+
+impl AccessRule { 
+    pub fn new() -> Self {
+        Self {
+            certificate_hash_hex_str: "".to_string(),
+            package_name: "".to_string(),
+            access_type: 0,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/EuiccProfileInner")]
+pub struct EuiccProfile {
+    pub iccid: String,
+    pub nick_name: String,
+    pub service_provider_name: String,
+    pub profile_name: String,
+    pub state: ProfileState,
+    pub profile_class: ProfileClass,
+    pub operator_id: OperatorId,
+    pub policy_rules: PolicyRules,
+    pub access_rules: Vec<AccessRule>,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetEuiccProfileInfoListResultInner")]
+pub struct GetEuiccProfileInfoListResult {
+    pub response_result: ResultCode,
+    pub profiles: Vec<EuiccProfile>,
+    pub is_removable: bool,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadableProfileInner")]
+pub struct DownloadableProfile {
+    pub activation_code: String,
+    pub confirmation_code: Option<String>,
+    pub carrier_name: Option<String>,
+    pub access_rules: Option<Vec<AccessRule>>,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadConfigurationInner")]
+#[derive(Debug, Clone)]
+pub struct DownloadConfiguration {
+    pub switch_after_download: bool,
+    pub force_disable_profile: bool,
+    pub is_ppr_allowed: bool,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/SolvableErrors")]
+#[repr(i32)]
+pub enum SolvableErrors {
+    SolvableErrorNeedConfirmationCode = 1,
+    SolvableErrorNeedPolicyRule = 2,
+}
+
+impl From<SolvableErrors> for i32 {
+    fn from(value: SolvableErrors) -> Self {
+        value as i32
+    }
+}
+
+impl From<i32> for SolvableErrors {
+    fn from(value: i32) -> Self {
+        match value {
+            1 => SolvableErrors::SolvableErrorNeedConfirmationCode,
+            2 => SolvableErrors::SolvableErrorNeedPolicyRule,
+            _ => SolvableErrors::SolvableErrorNeedConfirmationCode,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadProfileResultInner")]
+pub struct DownloadProfileResult {
+    pub response_result: ResultCode,
+    pub solvable_errors: SolvableErrors,
+    pub card_id: i32,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetDownloadableProfilesResultInner")]
+pub struct GetDownloadableProfilesResult {
+    pub response_result: ResultCode,
+    pub downloadable_profiles: Vec<DownloadableProfile>,
+}
+
+impl GetDownloadableProfilesResult {
+    pub fn new(response_result: i32, profiles: Vec<DownloadableProfile>) -> Self {
+        Self {
+            response_result: ResultCode::from(response_result),
+            downloadable_profiles: profiles,
+        }
+    }
+}
+
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetDownloadableProfileMetadataResultInner")]
+pub struct GetDownloadableProfileMetadataResult {
+    pub downloadable_profile: DownloadableProfile,
+    pub ppr_type: i32,
+    pub ppr_flag: bool,
+    pub iccid: String,
+    pub service_provider_name: String,
+    pub profile_name: String,
+    pub profile_class: ProfileClass,
+    pub solvable_errors: SolvableErrors,
+    pub response_result: ResultCode,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/OsuStatus")]
+#[repr(i32)]
+pub enum OsuStatus {
+    EuiccUpgradeInProgress = 1,
+    EuiccUpgradeFailed = 2,
+    EuiccUpgradeSuccessful = 3,
+    EuiccUpgradeAlreadyLatest = 4,
+    EuiccUpgradeServiceUnavailable = 5,
+}
+
+impl From<i32> for OsuStatus {
+    fn from(value: i32) -> Self {
+        match value {
+            1 => OsuStatus::EuiccUpgradeInProgress,
+            2 => OsuStatus::EuiccUpgradeFailed,
+            3 => OsuStatus::EuiccUpgradeSuccessful,
+            4 => OsuStatus::EuiccUpgradeAlreadyLatest,
+            5 => OsuStatus::EuiccUpgradeServiceUnavailable,
+            _ => panic!("Invalid value for OsuStatus"),
+        }
+    }
+}

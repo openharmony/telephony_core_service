@@ -40,6 +40,7 @@ ohos_static_library("esim_ani_cxx") {
   sources = [
     "src/cxx/ani_esim.cpp",
     "src/cxx/ani_reset_memory_callback.cpp",
+    "src/cxx/ani_esim_service_callback.cpp",
   ]
   sources += get_target_outputs(":esim_ani_cxx_gen")
 
@@ -56,6 +57,7 @@ ohos_static_library("esim_ani_cxx") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "ffrt:libffrt",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"
