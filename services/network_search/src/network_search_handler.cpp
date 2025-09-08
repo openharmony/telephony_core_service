@@ -24,6 +24,7 @@
 #include "satellite_service_client.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "time_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +34,7 @@ std::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
 const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
+constexpr int64_t SECOND_TO_MILLI = 1000;
 const std::string PERMISSION_PUBLISH_SYSTEM_EVENT = "ohos.permission.PUBLISH_SYSTEM_COMMON_EVENT";
 const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandler::memberFuncMap_ = {
     { RadioEvent::RADIO_SIM_STATE_CHANGE,
@@ -1194,7 +1196,8 @@ int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
     if (cellInfo_ != nullptr) {
         cellInfo_->GetCellInfoList(cells);
     }
-    uint32_t curTime = static_cast<uint32_t>(time(0));
+    uint32_t curTime = static_cast<uint32_t>(OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs()
+                       / SECOND_TO_MILLI);
     if ((curTime < cellRequestMinInterval_ + lastCellRequestTime_) && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return TELEPHONY_ERR_SUCCESS;
