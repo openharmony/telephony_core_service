@@ -87,8 +87,6 @@ public:
     typedef void (*GET_ROAMINGBROKER_NUMERIC)(int32_t slotId, std::string &numeric);
     typedef void (*GET_ROAMINGBROKER_IMSI)(int32_t slotId, std::string &imsi);
     typedef bool (*SET_NR_OPTION_MODE_EXT)(int32_t slotId, int32_t masterSlotId, int32_t mode, int32_t &errCode);
-    typedef void (*UpdatePlmnExt)(int32_t slotId, const std::string &plmn);
-    typedef bool (*IsInModem2Optimization)(int32_t slotId);
     /* add for vsim begin */
     typedef void (*IS_VSIM_IN_STATUS)(int32_t slotId, int32_t type, bool &status);
     typedef void (*GET_VSIM_SLOT_ID)(int32_t &slotId);
@@ -155,8 +153,6 @@ public:
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
     SET_NR_OPTION_MODE_EXT setNrOptionModeExt_ = nullptr;
-    UpdatePlmnExt updatePlmnExt_ = nullptr;
-    IsInModem2Optimization isInModem2Optimization_ = nullptr;
 
     /* add for vsim begin */
     IS_VSIM_IN_STATUS isVSimInStatus_ = nullptr;
