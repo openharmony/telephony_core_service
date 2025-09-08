@@ -32,7 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
-#define NONULL_HANDLE reinterpret_cast<void*>(0x4)
+#define NONULL_HANDLE (reinterpret_cast<void*>(0x4))
 enum class SimSlotType {
     INVALID_SLOT_ID = -1,
     VSIM_SLOT_ID = 2,
