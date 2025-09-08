@@ -30,7 +30,6 @@ ohos_unittest("icc_file_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
