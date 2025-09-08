@@ -33,11 +33,12 @@ config("core_service_test_config") {
 
 ohos_static_library("core_service_test_base") {
   cflags = [
-    "-O1",
+    "-O0",
     "-w",
     "-fno-omit-frame-pointer",
     "-fno-optimize-sibling-calls",
     "-fno-exceptions",
+    "-fno-access-control",
   ]
   cflags_cc= cflags
   testonly = true
