@@ -24,6 +24,7 @@
 #include "satellite_service_client.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "time_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1197,7 +1198,7 @@ int32_t NetworkSearchHandler::SendUpdateCellLocationRequest()
     if (cellInfo_ != nullptr) {
         cellInfo_->GetCellInfoList(cells);
     }
-    uint32_t curTime = static_cast<uint32_t>(time(0));
+    uint32_t curTime = OHOS::MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
     if ((curTime < cellRequestMinInterval_ + lastCellRequestTime_) && cells.size() != 0) {
         TELEPHONY_LOGE("NetworkSearchHandler::SendUpdateCellLocationRequest interval is too short");
         return TELEPHONY_ERR_SUCCESS;
