@@ -157,7 +157,6 @@ private:
     void RadioOnWhenHasSim(std::shared_ptr<NetworkSearchManager> &networkSearchManager, int32_t radioState) const;
     void UpdateNetworkState();
     void GetDeviceId();
-    bool CheckRegistrationState(const std::shared_ptr<NetworkSearchManager> &networkSearchManager);
 
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
