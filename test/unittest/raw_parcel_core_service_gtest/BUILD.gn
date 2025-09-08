@@ -41,7 +41,6 @@ ohos_unittest("raw_parcel_core_service_test") {
     # tested src
     "$SOURCE_DIR/services/core/src/core_service.cpp",
     # deps src
-    "$SOURCE_DIR/services/telephony_ext_wrapper/src/telephony_ext_wrapper.cpp",
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_callback_stub.cpp",
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_client.cpp",
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_proxy.cpp",
@@ -58,7 +57,7 @@ ohos_unittest("raw_parcel_core_service_test") {
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/test/mock",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
+    "$SOURCE_DIR/test/mock/telephony_ext_wrapper",
     "$SOURCE_DIR/utils/common/include",
   ]
 
@@ -72,7 +71,6 @@ ohos_unittest("raw_parcel_core_service_test") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",

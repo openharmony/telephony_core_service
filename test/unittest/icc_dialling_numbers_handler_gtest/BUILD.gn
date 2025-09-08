@@ -30,7 +30,6 @@ ohos_unittest("icc_dialling_numbers_handler_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -52,7 +51,6 @@ ohos_unittest("icc_dialling_numbers_handler_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",

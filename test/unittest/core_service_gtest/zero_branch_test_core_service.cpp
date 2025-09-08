@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <string_ex.h>
 
+#include "global_guard_init.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_service.h"
