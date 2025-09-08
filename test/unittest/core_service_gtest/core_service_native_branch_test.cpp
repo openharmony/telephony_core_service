@@ -16,6 +16,7 @@
 #define private public
 #define protected public
 
+#include "global_guard_init.h"
 #include "gtest/gtest.h"
 #include "core_manager_inner.h"
 #include "core_service_proxy.h"
@@ -34,7 +35,6 @@
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
 #include "tel_ril_sim_parcel.h"
-#include "global_guard_init.h"
 
 namespace OHOS {
 namespace Telephony {
