@@ -15,9 +15,8 @@
 
 #include "operator_name.h"
 
-#include <common_event.h>
-#include <common_event_manager.h>
-
+#include "common_event.h"
+#include "common_event_manager.h"
 #include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "tel_ril_network_parcel.h"
