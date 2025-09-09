@@ -25,7 +25,6 @@ declare_args() {
     "ability_base:want",
     "ability_base:zuri",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "drivers_interface_ril:libril_proxy_1.1",
     "drivers_interface_ril:libril_proxy_1.2",
     "drivers_interface_ril:libril_proxy_1.3",
