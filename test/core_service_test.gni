@@ -183,9 +183,9 @@ mock_src = [
 core_service_base_src = mock_src + common_src + vcard_src + tel_core_service_src
 
 core_service_incluedirs = [
+  "$CORE_SERVICE_ROOT/test/mock/common_event_service",
   "$CORE_SERVICE_ROOT/test/guard",
   "$CORE_SERVICE_ROOT/test/mock",
-  "$CORE_SERVICE_ROOT/test/mock/common_event_service",
   "$CORE_SERVICE_ROOT/test/mock/codec/include",
   "$CORE_SERVICE_ROOT/test/mock/telephony_ext_wrapper",
   "$TELEPHONY_SIM_ROOT/include",
