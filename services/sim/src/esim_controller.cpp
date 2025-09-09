@@ -19,7 +19,6 @@
 #include <dlfcn.h>
 #include <thread>
 
-#include "ffrt.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -76,7 +75,7 @@ void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdDat
 
 void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
 {
-    std::lock_guard<std::mutex> locker(caMutex_);
+    std::lock_guard<ffrt::mutex> locker(caMutex_);
     void *handler = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
     if (handler == NULL) {
         TELEPHONY_LOGE("open lib: %{public}s failed", ESIM_CA_LIBPATH.c_str());

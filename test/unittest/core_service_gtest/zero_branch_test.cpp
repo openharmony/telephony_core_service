@@ -2144,6 +2144,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->InitData(0);
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
+    multiSimMonitor->IsSwitchToProfileFromAnother(INVALID_SLOTID);
+    multiSimMonitor->IsSwitchToProfileFromAnother(0);
     multiSimMonitor->NotifySimAccountChanged();
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
