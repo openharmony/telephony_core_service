@@ -115,6 +115,7 @@ public:
     IccSimStatus GetSimIccStatus();
     CardType GetCardType();
     std::string GetIccid();
+    std::string GetOldIccid();
     bool HasSimCard();
     void ObtainRealtimeIccStatus(int32_t slotId);
     void UnlockPin(int32_t slotId, const std::string &pin);
@@ -191,6 +192,7 @@ private:
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
     std::string iccid_ = "";
+    std::string oldIccid_ = "";
     int32_t esimSwitchState_ = 0;
 };
 } // namespace Telephony
