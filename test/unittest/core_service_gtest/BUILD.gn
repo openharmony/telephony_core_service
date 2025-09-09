@@ -34,7 +34,6 @@ ohos_unittest("tel_core_service_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
@@ -57,7 +56,6 @@ ohos_unittest("tel_core_service_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -129,7 +127,6 @@ ohos_unittest("tel_network_search_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -151,7 +148,6 @@ ohos_unittest("tel_network_search_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -221,7 +217,6 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -243,7 +238,6 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -312,7 +306,6 @@ ohos_unittest("tel_sim_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
@@ -335,7 +328,6 @@ ohos_unittest("tel_sim_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -407,7 +399,6 @@ ohos_unittest("tel_sim_manager_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
@@ -430,7 +421,6 @@ ohos_unittest("tel_sim_manager_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -502,7 +492,6 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
@@ -525,7 +514,6 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -588,7 +576,6 @@ ohos_unittest("tel_network_search_zero_branch_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
  
@@ -611,7 +598,6 @@ ohos_unittest("tel_network_search_zero_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -680,7 +666,6 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
@@ -703,7 +688,6 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -763,7 +747,6 @@ ohos_unittest("tel_core_service_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -785,7 +768,6 @@ ohos_unittest("tel_core_service_test") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -847,7 +829,6 @@ ohos_unittest("tel_core_service_common_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -869,7 +850,6 @@ ohos_unittest("tel_core_service_common_test") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -938,7 +918,6 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -960,7 +939,6 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -1030,7 +1008,6 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/utils/codec/include",
     "$SOURCE_DIR/interfaces/innerkits/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
@@ -1052,14 +1029,11 @@ ohos_unittest("tel_core_service_native_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
@@ -1117,17 +1091,15 @@ ohos_unittest("tel_satellite_service_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1141,7 +1113,6 @@ ohos_unittest("tel_satellite_service_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -1211,17 +1182,15 @@ ohos_unittest("tel_sim_core_service_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1235,14 +1204,11 @@ ohos_unittest("tel_sim_core_service_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -1309,17 +1275,15 @@ ohos_unittest("tel_sim_elementary_file_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1333,14 +1297,11 @@ ohos_unittest("tel_sim_elementary_file_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -1407,17 +1368,15 @@ ohos_unittest("tel_sim_icc_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1431,14 +1390,11 @@ ohos_unittest("tel_sim_icc_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -1505,17 +1461,15 @@ ohos_unittest("tel_sim_type_convert_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1529,14 +1483,11 @@ ohos_unittest("tel_sim_type_convert_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -1603,17 +1554,15 @@ ohos_unittest("tel_vcard_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1627,14 +1576,11 @@ ohos_unittest("tel_vcard_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
@@ -1701,17 +1647,15 @@ ohos_unittest("tel_vsim_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/test/mock",
   ]
 
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR/test:core_service_test_base",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-    "$SOURCE_DIR/utils:libtel_common",
   ]
 
   external_deps = [
@@ -1725,14 +1669,11 @@ ohos_unittest("tel_vsim_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
-    "core_service:libtel_vcard",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",

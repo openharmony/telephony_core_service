@@ -58,7 +58,6 @@ ohos_unittest("esim_service_client_branch_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -117,7 +116,6 @@ ohos_unittest("tel_esim_gtest") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/interfaces/innerkits/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/mock/include",
   ]
@@ -142,7 +140,6 @@ ohos_unittest("tel_esim_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -202,7 +199,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/interfaces/innerkits/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/mock/include",
   ]
@@ -226,7 +222,6 @@ ohos_unittest("esim_core_service_client_branch_test") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -291,7 +286,6 @@ ohos_unittest("core_manager_inner_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
     "$SOURCE_DIR/interfaces/innerkits/include",
     "$SOURCE_DIR/test/unittest/esim_gtest/mock/include",
   ]
@@ -315,7 +309,6 @@ ohos_unittest("core_manager_inner_test") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -376,7 +369,6 @@ ohos_unittest("esim_file_branch_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/tel_ril/include",
     "$SOURCE_DIR/services/core/include",
-    "$SOURCE_DIR/services/telephony_ext_wrapper/include",
   ]
 
   version_script = "libtel_common_esim.versionscript"

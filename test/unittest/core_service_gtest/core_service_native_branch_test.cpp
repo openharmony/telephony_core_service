@@ -16,6 +16,7 @@
 #define private public
 #define protected public
 
+#include "global_guard_init.h"
 #include "gtest/gtest.h"
 #include "core_manager_inner.h"
 #include "core_service_proxy.h"
