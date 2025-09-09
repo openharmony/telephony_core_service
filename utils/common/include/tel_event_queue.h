@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class TelEventQueue {
+class TelEventQueue : public std::enable_shared_from_this<TelEventQueue> {
 public:
     explicit TelEventQueue(const std::string &name);
     ~TelEventQueue();
