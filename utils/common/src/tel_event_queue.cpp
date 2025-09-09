@@ -177,7 +177,7 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
                 TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", thiz->name_.c_str(),
                     static_cast<uint32_t>(event->GetInnerEventId()));
                 handler->ProcessEvent(event);
-                thiz->ventStats_.CalculationExecutedEvents();
+                thiz->eventStats_.CalculationExecutedEvents();
             }
             if (!isNeedSubmit) {
                 TELEPHONY_LOGD("%{public}s task no need to submit", thiz->name_.c_str());
