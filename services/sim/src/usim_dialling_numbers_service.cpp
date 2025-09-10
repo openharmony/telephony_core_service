@@ -104,7 +104,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         LoadDiallingNumber2Files(currentIndex_);
         return;
     }
-    TELEPHONY_LOGI("usimservice load adn done, fileId=(%{public} " PRId64 ")",
+    TELEPHONY_LOGI("usimservice load adn done, fileId=%{public}#llX",
         static_cast<unsigned long long>(resultObject->fileID));
     adns_[resultObject->fileID] = std::vector<std::shared_ptr<DiallingNumbersInfo>>();
     if (resultObject->exception != nullptr) {
