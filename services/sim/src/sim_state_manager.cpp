@@ -147,6 +147,15 @@ std::string SimStateManager::GetIccid()
     return "";
 }
 
+std::string SimStateManager::GetOldIccid()
+{
+    if (simStateHandle_ != nullptr) {
+        std::lock_guard<std::mutex> lck(mtx_);
+        return simStateHandle_->GetOldIccid();
+    }
+    return "";
+}
+
 int32_t SimStateManager::SetModemInit(bool state)
 {
     if (simStateHandle_ != nullptr) {

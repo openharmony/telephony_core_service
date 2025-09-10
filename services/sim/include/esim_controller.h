@@ -18,8 +18,9 @@
 
 #include <singleton.h>
 #include <string.h>
-#include "sim_rdb_helper.h"
 #include <atomic>
+#include "ffrt.h"
+#include "sim_rdb_helper.h"
 #include "telephony_types.h"
 
 namespace OHOS {
@@ -37,7 +38,7 @@ public:
     void SetVerifyResult(int slotId, bool isVerifySuccess);
     bool GetVerifyResult(int slotId);
 private:
-    std::mutex caMutex_;
+    ffrt::mutex caMutex_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
     std::atomic<bool> isVerifySuccess_[MAX_SLOT_COUNT] = {}; // use default value - false
 };

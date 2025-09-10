@@ -38,6 +38,7 @@ public:
     IccSimStatus GetSimIccStatus();
     CardType GetCardType();
     std::string GetIccid();
+    std::string GetOldIccid();
     int32_t SetModemInit(bool state);
     int32_t UnlockPin(int32_t slotId, const std::string &pin, LockStatusResponse &response);
     int32_t UnlockPuk(int32_t slotId, const std::string &newPin, const std::string &puk, LockStatusResponse &response);

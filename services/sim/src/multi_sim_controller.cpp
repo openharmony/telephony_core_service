@@ -1810,6 +1810,9 @@ void MultiSimController::ProcessRilSetPrimarySlotResponse(bool result)
 bool MultiSimController::IsEsim(int32_t slotId)
 {
 #ifdef CORE_SERVICE_SUPPORT_ESIM
+    if (!CoreManagerInner::GetInstance().IsSupported(slotId)) {
+        return false;
+    }
     if ((radioProtocolController_ == nullptr) ||
         (slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
             TELEPHONY_LOGE("slotId[%{public}d] invalid or radioProtocolController_ is null", slotId);

@@ -77,6 +77,7 @@ public:
     MOCK_METHOD1(SetRemainCount, void(int remainCount));
     MOCK_METHOD1(SetBlockLoadOperatorConfig, void(bool isBlockLoadOperatorConfig));
     MOCK_METHOD0(GetBlockLoadOperatorConfig, void());
+    MOCK_METHOD1(IsSwitchToProfileFromAnother, void(int32_t slotId));
 };
 } // namespace Telephony
 } // namespace OHOS

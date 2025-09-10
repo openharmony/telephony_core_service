@@ -180,6 +180,11 @@ std::string SimStateHandle::GetIccid()
     return iccid_;
 }
 
+std::string SimStateHandle::GetOldIccid()
+{
+    return oldIccid_;
+}
+
 void SimStateHandle::UnlockPin(int32_t slotId, const std::string &pin)
 {
     TELEPHONY_LOGI("SimStateHandle::UnlockPin1() slotId = %{public}d", slotId);
@@ -384,6 +389,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     // When esim switches from one active profile to another, the card only report a ready status
     // and we can only detect the change by comparing the iccid before and after
     if ((oldSimStatus_ != newSimStatus) || (iccid_ != ar.iccid_)) {
+        oldIccid_ = iccid_;
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;
