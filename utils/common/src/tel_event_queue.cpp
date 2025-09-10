@@ -157,10 +157,15 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
         return;
     }
     SetCurHandleTime(handleTime);
+    std::weak_ptr<TelEventQueue> weak = shared_from_this();
     curTask_ = queue_->submit_h(
-        [this, queueId = queueId]() {
+        [weak, queueId = queueId]() {
+            auto thiz = weak.lock();
+            if (thiz == nullptr) {
+                return;
+            }
             bool isNeedSubmit = true;
-            auto event = PopEvent(queueId, isNeedSubmit);
+            auto event = thiz->PopEvent(queueId, isNeedSubmit);
             std::shared_ptr<TelEventHandler> handler = nullptr;
             if (event) {
                 handler = std::static_pointer_cast<TelEventHandler>(event->GetOwner());
@@ -169,16 +174,16 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
                 }
             }
             if (event && handler) {
-                TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", name_.c_str(),
+                TELEPHONY_LOGD("%{public}s ProcessEvent eventId %{public}d", thiz->name_.c_str(),
                     static_cast<uint32_t>(event->GetInnerEventId()));
                 handler->ProcessEvent(event);
-                eventStats_.CalculationExecutedEvents();
+                thiz->eventStats_.CalculationExecutedEvents();
             }
             if (!isNeedSubmit) {
-                TELEPHONY_LOGD("%{public}s task no need to submit", name_.c_str());
+                TELEPHONY_LOGD("%{public}s task no need to submit", thiz->name_.c_str());
                 return;
             }
-            SubmitInner(queueId);
+            thiz->SubmitInner(queueId);
         },
         ffrt::task_attr().delay(delayTime));
         eventStats_.CalculationSubmitToFFRTEvents();
