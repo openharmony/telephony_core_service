@@ -39,6 +39,7 @@ public:
         ON_CFU_INDICATOR_UPDATED,
         ON_VOICE_MAIL_MSG_INDICATOR_UPDATED,
         ON_ICC_ACCOUNT_UPDATED,
+        ON_CALL_STATE_EX_UPDATED,
     };
 
     virtual void OnCellularDataConnectStateUpdated(
@@ -58,9 +59,11 @@ public:
     virtual void OnCfuIndicatorUpdated(int32_t slotId, bool cfuResult) = 0;
     virtual void OnVoiceMailMsgIndicatorUpdated(int32_t slotId, bool voiceMailMsgResult) = 0;
     virtual void OnIccAccountUpdated() = 0;
+    virtual void OnCallStateUpdatedEx(int32_t slotId, int32_t callState) = 0;
 
 public:
     static const uint32_t OBSERVER_MASK_NETWORK_STATE = 0x00000001;
+    static const uint32_t OBSERVER_MASK_CALL_STATE_EX = 0x00000002;
     static const uint32_t OBSERVER_MASK_CALL_STATE = 0x00000004;
     static const uint32_t OBSERVER_MASK_CELL_INFO = 0x00000008;
     static const uint32_t OBSERVER_MASK_SIGNAL_STRENGTHS = 0x00000010;

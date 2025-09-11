@@ -57,6 +57,7 @@ public:
     static void Handle2ValueCallback(napi_env env, BaseContext *context, napi_value callbackValue);
     static void DefineEnumClassByName(napi_env env, napi_value exports, std::string_view enumName,
         size_t arrSize, const napi_property_descriptor *desc);
+    static JsError ConverErrorMessageCallStateExForJs(int32_t errorCode);
     static JsError ConverErrorMessageForJs(int32_t errorCode);
     static JsError ConverErrorMessageWithPermissionForJs(
         int32_t errorCode, const std::string &funcName, const std::string &permission);
@@ -71,6 +72,7 @@ public:
 
 private:
     static bool CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
+    static bool CreateStateRegistryErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateNetworkSearchErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateSimErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);
     static bool CreateSmsErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode);

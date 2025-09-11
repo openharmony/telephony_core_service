@@ -95,6 +95,10 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_ESIM_SUCCESS, JS_ERROR_ESIM_SUCCESS_STRING },
     { JsErrorCode::JS_ERROR_ESIM_SERVICE_ERROR, JS_ERROR_ESIM_SERVICE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_ESIM_SYSTEM_ERROR, JS_ERROR_ESIM_SYSTEM_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_STATE_REGISTRY_ARGUMENT_ERROR, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_STATE_REGISTRY_SERVICE_ERROR, JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_STATE_REGISTRY_SYSTEM_ERROR, JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_STATE_REGISTRY_UNKNOW_ERROR, JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING },
 };
 const std::string ERROR_STRING = "error";
 const std::u16string ERROR_USTRING = u"error";
@@ -491,6 +495,25 @@ void NapiUtil::DefineEnumClassByName(
     }
 }
 
+JsError NapiUtil::ConverErrorMessageCallStateExForJs(int32_t errorCode)
+{
+    JsError error = {};
+    if (errorCode == TELEPHONY_ERR_SUCCESS) {
+        error.errorCode = JS_ERROR_TELEPHONY_SUCCESS;
+        error.errorMessage = GetErrorMessage(JS_ERROR_TELEPHONY_SUCCESS);
+        return error;
+    }
+
+    if (!CreateStateRegistryErrorMessageForJs(errorCode, error.errorCode)) {
+        error.errorCode = JS_ERROR_STATE_REGISTRY_UNKNOW_ERROR;
+        TELEPHONY_LOGE("NapiUtil::ConverErrorMessageCallStateExForJs errorCode is out of range");
+    }
+
+    error.errorMessage = GetErrorMessage(error.errorCode);
+    TELEPHONY_LOGI("errorCode from %{public}d to %{public}d", errorCode, error.errorCode);
+    return error;
+}
+
 JsError NapiUtil::ConverErrorMessageForJs(int32_t errorCode)
 {
     JsError error = {};
@@ -635,6 +658,32 @@ bool NapiUtil::CreateParameterErrorMessageForJs(int32_t errorCode, JsErrorCode &
             break;
         case ERROR_SLOT_ID_INVALID:
             jsErrorCode = JS_ERROR_TELEPHONY_ARGUMENT_ERROR;
+            break;
+        default:
+            flag = false;
+            break;
+    }
+
+    return flag;
+}
+
+bool NapiUtil::CreateStateRegistryErrorMessageForJs(int32_t errorCode, JsErrorCode &jsErrorCode)
+{
+    bool flag = true;
+    switch (errorCode) {
+        case TELEPHONY_ERR_LOCAL_PTR_NULL:
+        case TELEPHONY_ERR_FAIL:
+        case TELEPHONY_STATE_REGISTRY_DATA_NOT_EXIST:
+            jsErrorCode = JS_ERROR_STATE_REGISTRY_SYSTEM_ERROR;
+            break;
+        case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
+            jsErrorCode = JS_ERROR_STATE_REGISTRY_SERVICE_ERROR;
+            break;
+        case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
+            jsErrorCode = JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API;
+            break;
+        case ERROR_SLOT_ID_INVALID:
+            jsErrorCode = JS_ERROR_STATE_REGISTRY_ARGUMENT_ERROR;
             break;
         default:
             flag = false;
