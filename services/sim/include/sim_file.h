@@ -47,6 +47,9 @@ public:
     void SetVoiceMailNumber(const std::string mailNumber);
     void ClearData();
     static std::vector<std::string> indiaMcc_;
+    void RegisterParamsListener();
+    void UnRegisterParamsListener();
+    static void OnParamChanged(const char *key, const char *value, void *context);
 
 public:
     enum {
@@ -85,6 +88,7 @@ protected:
     int displayConditionOfSpn_ = 0;
     std::vector<std::string> spdiNetworks_;
     std::shared_ptr<UsimFunctionHandle> UsimFunctionHandle_ = nullptr;
+    int sateState_ = 0;
 
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;

@@ -49,6 +49,7 @@ const uint8_t SST_PNN_OFFSET = 12;
 const uint8_t SST_PNN_MASK = 0x30;
 const int CFIS_ADN_CAPABILITY_ID_OFFSET = 14;
 const int CFIS_ADN_EXTENSION_ID_OFFSET = 15;
+std::string PROP_SATE_STATUS = "persist.telephony.satellite.satelliteStatus";
 std::mutex IccFile::mtx_;
 std::vector<std::string> SimFile::indiaMcc_;
 SimFile::SimFile(std::shared_ptr<SimStateManager> simStateManager) : IccFile("SimFile", simStateManager)
@@ -2084,7 +2085,63 @@ void SimFile::ClearData()
     spnStatus_ = OBTAIN_SPN_NONE;
     reloadIccidCount_ = RELOAD_ICCID_COUNT;
     hasRetryGetImsi_ = false;
+    RemoveEvent(SimFile::RELOAD_IMSI_EVENT);
     IccFile::ClearData();
+}
+
+void SimFile::RegisterParamsListener()
+{
+    int ret = WatchParameter(PROP_SATE_STATUS.c_str(), OnParamChanged, this);
+    TELEPHONY_LOGD("ret is %{public}d", ret);
+}
+ 
+void SimFile::UnRegisterParamsListener()
+{
+    int ret = RemoveParameterWatcher(PROP_SATE_STATUS.c_str(), OnParamChanged, this);
+    TELEPHONY_LOGD("ret is %{public}d", ret);
+}
+ 
+void SimFile::OnParamChanged(const char *key, const char *value, void *context)
+{
+    if (key == nullptr || value == nullptr || context == nullptr) {
+        TELEPHONY_LOGE("invalid param!");
+        return;
+    }
+    if (strcmp(key, PROP_SATE_STATUS.c_str()) != 0) {
+        TELEPHONY_LOGE("key: %{public}s is error!", key);
+        return;
+    }
+    SimFile* instance = reinterpret_cast<SimFile*>(context);
+    if (instance == nullptr) {
+        TELEPHONY_LOGE("invalid instance");
+        return;
+    }
+    int propValue = 1;
+    if (strcmp(value, "0") == 0) {
+        propValue = 0;
+    }
+    TELEPHONY_LOGD("propValue:%{public}d", propValue);
+    if (propValue == instance->sateState_) {
+        return;
+    }
+    instance->sateState_ = propValue;
+    if (instance->sateState_ == 1) {
+        return;
+    }
+    if (instance->slotId_ != 0 && instance->slotId_ != 1) {
+        return;
+    }
+    std::string imsi = instance->imsi_;
+    if (!imsi.empty()) {
+        TELEPHONY_LOGI("imsi loaded, do not reloaded");
+        return;
+    }
+    if (instance->stateManager_ == nullptr) {
+        return;
+    }
+    if (instance->stateManager_->HasSimCard()) {
+        instance->DelayGetImsi();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
