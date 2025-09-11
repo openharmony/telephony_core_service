@@ -57,7 +57,6 @@ ohos_unittest("icc_file_gtest") {
     "data_share:datashare_consumer",
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
-    "googletest:gmock_main",
     "googletest:gtest_main",
     "hdf_core:libhdi",
     "hilog:libhilog",

@@ -382,8 +382,10 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_DumpHelper_001, Function |
     ASSERT_NE(telRilManager, nullptr);
     telRilManager->OnInit();
     DelayedSingleton<CoreService>::GetInstance()->telRilManager_ = telRilManager;
+    int32_t slotCount = DelayedSingleton<CoreService>::GetInstance()->GetMaxSimCount();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     ASSERT_NE(simManager, nullptr);
+    simManager->OnInit(slotCount);
     DelayedSingleton<CoreService>::GetInstance()->simManager_ = simManager;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     ASSERT_NE(networkSearchManager, nullptr);
