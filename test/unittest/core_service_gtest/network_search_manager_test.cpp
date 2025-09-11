@@ -144,7 +144,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager2_001, Function 
     networkSearchManager->UnRegisterCellularCallObject(nullptr);
     networkSearchManager->SavePreferredNetworkValue(SLOT_ID_0,
         static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA));
-    EXPECT_EQ(networkSearchManager->UpdateRadioOn(SLOT_ID_0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->UpdateRadioOn(SLOT_ID_0), TELEPHONY_ERR_DATABASE_WRITE_FAIL);
 
     Rssi signalIntensity;
     signalIntensity.lte.rsrp = LTE_RSSI_GOOD;
