@@ -87,6 +87,7 @@ void IccFile::Init()
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
+    RegisterParamsListener();
 }
 
 void IccFile::StartLoad()
@@ -865,6 +866,7 @@ void IccFile::UnInit()
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
         stateManager_->UnRegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_SIMLOCK);
     }
+    UnRegisterParamsListener();
     ClearData();
 }
 
@@ -968,5 +970,16 @@ void IccFile::UpdateOpkeyConfig()
         CoreManagerInner::GetInstance().ResetDataShareError();
     }
 }
+
+void IccFile::RegisterParamsListener()
+{
+    TELEPHONY_LOGD("RegisterParamsListener");
+}
+ 
+void IccFile::UnRegisterParamsListener()
+{
+    TELEPHONY_LOGD("UnRegisterParamsListener");
+}
+
 } // namespace Telephony
 } // namespace OHOS
