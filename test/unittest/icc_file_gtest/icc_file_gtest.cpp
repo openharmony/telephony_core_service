@@ -32,7 +32,7 @@
 #include "ims_reg_info_callback_proxy.h"
 #include "isim_file_controller.h"
 #include "multi_sim_controller.h"
-#include "mock_multi_sim_monitor.h"
+#include "multi_sim_monitor.h"
 #include "network_register.h"
 #include "network_search_manager.h"
 #include "network_search_state.h"
