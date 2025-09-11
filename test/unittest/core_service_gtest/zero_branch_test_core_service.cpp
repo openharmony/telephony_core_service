@@ -964,7 +964,7 @@ HWTEST_F(CoreServiceBranchTest, GetSimIdtest_003, Function | MediumTest | Level1
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<MultiSimControllerMock> multiSimControllerMock =
-        std::make_shared<MultiSimControllerMock>(telRilManager,simStateManager, simFileManager);
+        std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     EXPECT_CALL(*multiSimControllerMock, GetSimAccountInfo(-1, true, _))
