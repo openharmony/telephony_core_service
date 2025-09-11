@@ -37,6 +37,7 @@
 #include "sim_state_type.h"
 #include "sim_rdb_helper.h"
 #include "icc_file.h"
+#include "mock_sim_rdb_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -406,6 +407,102 @@ HWTEST_F(SimManagerTest, GetLockStatetest, Function | MediumTest | Level1)
     simManager_->simStateManager_[slotId] = nullptr;
     result = simManager_->GetLockState(slotId, LockType::PIN_LOCK, lockState);
     EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(SimManagerTest, InsertEsimDatatest, Function | MediumTest | Level1)
+{
+    simManager_->multiSimController_ = nullptr;
+    std::string iccId = "test_icc_id";
+    int32_t esimLabel = 0;
+    std::string operatorName = "test_operator";
+    int32_t result = simManager_->InsertEsimData(iccId, esimLabel, operatorName);
+    EXPECT_EQ(result, INVALID_VALUE);
+}
+
+HWTEST_F(SimManagerTest, SetSimLabelIndex, Function | MediumTest | Level1)
+{
+    simManager_->multiSimController_ = nullptr;
+    std::string iccId = "test_icc_id";
+    int32_t labelIndex = 0;
+    int32_t result = simManager_->SetSimLabelIndex(iccId, labelIndex);
+    EXPECT_EQ(result, INVALID_VALUE);
+}
+
+HWTEST_F(SimManagerTest, Inserttest, Function | MediumTest | Level1)
+{
+    auto dataShareHelper = std::shared_ptr<DataShare::DataShareHelper>(nullptr);
+    DataShare::DataShareValuesBucket values;
+    SimRdbHelper simrdbhelper;
+    int result = simrdbhelper.Insert(dataShareHelper, values);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    DataShare::DataSharePredicates predicates;
+    result = simrdbhelper.Delete(dataShareHelper, predicates);
+    EXPECT_EQ(result, INVALID_VALUE);
+}
+
+HWTEST_F(SimManagerTest, GetDefaultMainCardSlotId_01, Function | MediumTest | Level1)
+{
+    SimRdbHelper simrdbhelper;
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = nullptr;
+
+    int32_t result = simrdbhelper.GetDefaultMainCardSlotId();
+    EXPECT_EQ(result, 0);
+
+    result = simrdbhelper.GetDefaultMainCardSlotId();
+    EXPECT_EQ(result, 0);
+
+    result = simrdbhelper.GetDefaultCellularDataCardSlotId();
+    EXPECT_NE(result, 0);
+
+    result = simrdbhelper.GetDefaultVoiceCardSlotId();
+    EXPECT_NE(result, 0);
+
+    result = simrdbhelper.SetDefaultMainCard(-1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultMainCard(1);
+    EXPECT_EQ(result, INVALID_VALUE);
+}
+
+HWTEST_F(SimManagerTest, GetDefaultMainCardSlotId_02, Function | MediumTest | Level1)
+{
+    SimRdbHelper simrdbhelper;
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = nullptr;
+    int32_t result = simrdbhelper.SetDefaultVoiceCard(-1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultVoiceCard(1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultMessageCard(-1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultMessageCard(1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultCellularData(-1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.SetDefaultCellularData(1);
+    EXPECT_EQ(result, INVALID_VALUE);
+
+    result = simrdbhelper.ClearData();
+    EXPECT_EQ(result, INVALID_VALUE);
+}
+
+HWTEST_F(SimManagerTest, InsertDatatest, Function | MediumTest | Level1)
+{
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mocksimrdbhelper, CreateDataHelper(_)).WillOnce(Return(nullptr));
+
+    EXPECT_CALL(*mocksimrdbhelper, Insert(_, _)).WillOnce(Return(1)); 
+
+    SimRdbHelper simRdbHelper;
+    int64_t id = 123;
+    DataShare::DataShareValuesBucket values;
+    int32_t result = simRdbHelper.InsertData(id, values);
+    EXPECT_NE(result, 1); 
 }
 }
 }

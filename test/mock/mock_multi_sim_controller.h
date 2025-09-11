@@ -87,6 +87,7 @@ public:
     MOCK_METHOD3(InsertEsimData, int32_t(const std::string &iccId, int32_t esimLabel, const std::string &operatorName));
     MOCK_METHOD2(GetSimLabel, int32_t(int32_t slotId, SimLabel &simLabel));
     MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &iccId, int32_t &labelIndex));
+    MOCK_METHOD0(GetAllListFromDataBase, bool());
 };
 } // namespace Telephony
 } // namespace OHOS
