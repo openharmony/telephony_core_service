@@ -110,6 +110,8 @@ public:
     void DeleteOperatorCache();
     void UpdateOpkeyConfig();
     virtual void ProcessExtGetFileResponse();
+    virtual void RegisterParamsListener();
+    virtual void UnRegisterParamsListener();
 
 protected:
     virtual void ProcessFileLoaded(bool response) = 0;
