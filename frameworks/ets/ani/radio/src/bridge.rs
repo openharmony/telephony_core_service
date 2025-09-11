@@ -241,17 +241,22 @@ pub fn signal_information_push_data(
 #[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct CellInformation {
-    network_type: NetworkType,
-    signal_information: SignalInformationAni,
+    pub network_type: NetworkType,
+    pub is_camped: bool,
+    pub time_stamp: i64,
+    pub signal_information: SignalInformationAni,
+    pub data: CellInformationData,
 }
 
-impl CellInformation {
-    pub fn new(network_type: i32, signal_information: SignalInformationAni) -> Self {
-        Self {
-            network_type: NetworkType::from(network_type),
-            signal_information,
-        }
-    }
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CellInformationInner")]
+#[derive(Debug, Clone)]
+pub enum CellInformationData {
+    Cdma(CdmaCellInformation),
+    Gsm(GsmCellInformation),
+    Lte(LteCellInformation),
+    Nr(NrCellInformation),
+    Tdscdma(TdscdmaCellInformation),
+    Wcdma(WcdmaCellInformation),
 }
 
 #[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkStateInner")]
@@ -270,5 +275,324 @@ pub struct NetworkState {
 #[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkRadioTechInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkRadioTech {
-    ps_radio_tech: RadioTechnology,
+    pub ps_radio_tech: RadioTechnology,
+    pub cs_radio_tech: RadioTechnology,
+}
+
+impl NetworkRadioTech {
+    pub fn new(ps: i32, cs: i32) -> Self {
+        Self {
+            ps_radio_tech: RadioTechnology::from(ps),
+            cs_radio_tech: RadioTechnology::from(cs),
+        }
+    }   
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/PreferredNetworkMode")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum PreferredNetworkMode {
+    PreferredNetworkModeGsm = 1,
+    PreferredNetworkModeWcdma = 2,
+    PreferredNetworkModeLte = 3,
+    PreferredNetworkModeLteWcdma = 4,
+    PreferredNetworkModeLteWcdmaGsm = 5,
+    PreferredNetworkModeWcdmaGsm = 6,
+    PreferredNetworkModeCdma = 7,
+    PreferredNetworkModeEvdo = 8,
+    PreferredNetworkModeEvdoCdma = 9,
+    PreferredNetworkModeWcdmaGsmEvdoCdma = 10,
+    PreferredNetworkModeLteEvdoCdma = 11,
+    PreferredNetworkModeLteWcdmaGsmEvdoCdma = 12,
+    PreferredNetworkModeTdscdma = 13,
+    PreferredNetworkModeTdscdmaGsm = 14,
+    PreferredNetworkModeTdscdmaWcdma = 15,
+    PreferredNetworkModeTdscdmaWcdmaGsm = 16,
+    PreferredNetworkModeLteTdscdma = 17,
+    PreferredNetworkModeLteTdscdmaGsm = 18,
+    PreferredNetworkModeLteTdscdmaWcdma = 19,
+    PreferredNetworkModeLteTdscdmaWcdmaGsm = 20,
+    PreferredNetworkModeTdscdmaWcdmaGsmEvdoCdma = 21,
+    PreferredNetworkModeLteTdscdmaWcdmaGsmEvdoCdma = 22,
+    PreferredNetworkModeNr = 31,
+    PreferredNetworkModeNrLte = 32,
+    PreferredNetworkModeNrLteWcdma = 33,
+    PreferredNetworkModeNrLteWcdmaGsm = 34,
+    PreferredNetworkModeNrLteEvdoCdma = 35,
+    PreferredNetworkModeNrLteWcdmaGsmEvdoCdma = 36,
+    PreferredNetworkModeNrLteTdscdma = 37,
+    PreferredNetworkModeNrLteTdscdmaGsm = 38,
+    PreferredNetworkModeNrLteTdscdmaWcdma = 39,
+    PreferredNetworkModeNrLteTdscdmaWcdmaGsm = 40,
+    PreferredNetworkModeNrLteTdscdmaWcdmaGsmEvdoCdma = 41,
+    PreferredNetworkModeMaxValue = 99,
+}
+
+impl From<PreferredNetworkMode> for i32 {
+    fn from(mode: PreferredNetworkMode) -> Self {
+        mode as i32
+    }
+}
+
+impl From<i32> for PreferredNetworkMode {
+    fn from(value: i32) -> Self {
+        match value {
+            1 =>  PreferredNetworkMode::PreferredNetworkModeGsm,
+            2 =>  PreferredNetworkMode::PreferredNetworkModeWcdma,
+            3 =>  PreferredNetworkMode::PreferredNetworkModeLte,
+            4 =>  PreferredNetworkMode::PreferredNetworkModeLteWcdma,
+            5 =>  PreferredNetworkMode::PreferredNetworkModeLteWcdmaGsm,
+            6 =>  PreferredNetworkMode::PreferredNetworkModeWcdmaGsm,
+            7 =>  PreferredNetworkMode::PreferredNetworkModeCdma,
+            8 =>  PreferredNetworkMode::PreferredNetworkModeEvdo,
+            9 =>  PreferredNetworkMode::PreferredNetworkModeEvdoCdma,
+            10 =>  PreferredNetworkMode::PreferredNetworkModeWcdmaGsmEvdoCdma,
+            11 =>  PreferredNetworkMode::PreferredNetworkModeLteEvdoCdma,
+            12 =>  PreferredNetworkMode::PreferredNetworkModeLteWcdmaGsmEvdoCdma,
+            13 =>  PreferredNetworkMode::PreferredNetworkModeTdscdma,
+            14 =>  PreferredNetworkMode::PreferredNetworkModeTdscdmaGsm,
+            15 =>  PreferredNetworkMode::PreferredNetworkModeTdscdmaWcdma,
+            16 =>  PreferredNetworkMode::PreferredNetworkModeTdscdmaWcdmaGsm,
+            17 =>  PreferredNetworkMode::PreferredNetworkModeLteTdscdma,
+            18 =>  PreferredNetworkMode::PreferredNetworkModeLteTdscdmaGsm,
+            19 =>  PreferredNetworkMode::PreferredNetworkModeLteTdscdmaWcdma,
+            20 =>  PreferredNetworkMode::PreferredNetworkModeLteTdscdmaWcdmaGsm,
+            21 =>  PreferredNetworkMode::PreferredNetworkModeTdscdmaWcdmaGsmEvdoCdma,
+            22 =>  PreferredNetworkMode::PreferredNetworkModeLteTdscdmaWcdmaGsmEvdoCdma,
+            31 =>  PreferredNetworkMode::PreferredNetworkModeNr,
+            32 =>  PreferredNetworkMode::PreferredNetworkModeNrLte,
+            33 =>  PreferredNetworkMode::PreferredNetworkModeNrLteWcdma,
+            34 =>  PreferredNetworkMode::PreferredNetworkModeNrLteWcdmaGsm,
+            35 =>  PreferredNetworkMode::PreferredNetworkModeNrLteEvdoCdma,
+            36 =>  PreferredNetworkMode::PreferredNetworkModeNrLteWcdmaGsmEvdoCdma,
+            37 =>  PreferredNetworkMode::PreferredNetworkModeNrLteTdscdma,
+            38 =>  PreferredNetworkMode::PreferredNetworkModeNrLteTdscdmaGsm,
+            39 =>  PreferredNetworkMode::PreferredNetworkModeNrLteTdscdmaWcdma,
+            40 =>  PreferredNetworkMode::PreferredNetworkModeNrLteTdscdmaWcdmaGsm,
+            41 =>  PreferredNetworkMode::PreferredNetworkModeNrLteTdscdmaWcdmaGsmEvdoCdma,
+            99 =>  PreferredNetworkMode::PreferredNetworkModeMaxValue,
+            _ =>  PreferredNetworkMode::PreferredNetworkModeMaxValue,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkInformationState")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum NetworkInformationState {
+    NetworkUnknown = 0,
+    NetworkAvailable,
+    NetworkCurrent,
+    NetworkForbidden
+}
+
+impl From<NetworkInformationState> for i32 {
+    fn from(state: NetworkInformationState) -> i32 {
+        state as i32
+    }
+}
+
+impl From<i32> for NetworkInformationState {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => NetworkInformationState::NetworkUnknown,
+            1 => NetworkInformationState::NetworkAvailable,
+            2 => NetworkInformationState::NetworkCurrent,
+            3 => NetworkInformationState::NetworkForbidden,
+            _ => NetworkInformationState::NetworkUnknown,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkInformationInner")]
+#[derive(Debug, Clone)]
+pub struct NetworkInformation {
+    pub operator_name: String,
+    pub operator_numeric: String,
+    pub state: NetworkInformationState,
+    pub radio_tech: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSearchResultInner")]
+#[derive(Debug, Clone)]
+pub struct NetworkSearchResult {
+    pub is_network_search_success: bool,
+    pub network_search_result: Vec<NetworkInformation>,
+}
+
+impl NetworkSearchResult {
+    pub fn new() -> Self {
+        Self {
+            is_network_search_success: false,
+            network_search_result: vec![],
+        }
+    }   
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSelectionMode")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum NetworkSelectionMode {
+    NetworkSelectionModeUnknown,
+    NetworkSelectionModeAutomatic,
+    NetworkSelectionModeManual,
+}
+
+impl From<NetworkSelectionMode> for i32 {
+    fn from(mode: NetworkSelectionMode) -> Self {
+        mode as i32
+    }
+}
+
+impl From<i32> for NetworkSelectionMode {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => NetworkSelectionMode::NetworkSelectionModeUnknown,
+            1 => NetworkSelectionMode::NetworkSelectionModeAutomatic,
+            2 => NetworkSelectionMode::NetworkSelectionModeManual,
+            _ => NetworkSelectionMode::NetworkSelectionModeUnknown,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSelectionModeOptionsInner")]
+#[derive(Debug, Clone)]
+pub struct NetworkSelectionModeOptions {
+    pub slot_id: i32,
+    pub select_mode: NetworkSelectionMode,
+    pub network_information: NetworkInformation,
+    pub resume_selection: bool,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CdmaCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct CdmaCellInformation {
+    pub base_id: i32,
+    pub latitude: i32,
+    pub longitude: i32,
+    pub nid: i32,
+    pub sid: i32,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/GsmCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct GsmCellInformation {
+    pub lac: i32,
+    pub cell_id: i32,
+    pub arfcn: i32,
+    pub bsic: i32,
+    pub mcc: String,
+    pub mnc: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/LteCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct LteCellInformation {
+    pub cgi: i32,
+    pub pci: i32,
+    pub tac: i32,
+    pub earfcn: i32,
+    pub bandwidth: i32,
+    pub mcc: String,
+    pub mnc: String,
+    pub is_support_endc: bool,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NrCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct NrCellInformation {
+    pub nr_arfcn: i32,
+    pub pci: i32,
+    pub tac: i32,
+    pub nci: i32,
+    pub mcc: String,
+    pub mnc: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/TdscdmaCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct TdscdmaCellInformation {
+    pub lac: i32,
+    pub cell_id: i32,
+    pub cpid: i32,
+    pub uarfcn: i32,
+    pub mcc: String,
+    pub mnc: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/WcdmaCellInformationInner")]
+#[derive(Debug, Clone)]
+pub struct WcdmaCellInformation {
+    pub lac: i32,
+    pub cell_id: i32,
+    pub psc: i32,
+    pub uarfcn: i32,
+    pub mcc: String,
+    pub mnc: String,
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkCapabilityType")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum NetworkCapabilityType {
+    ServiceTypeLte,
+    ServiceTypeNr,
+}
+
+impl From<NetworkCapabilityType> for i32 {
+    fn from(value: NetworkCapabilityType) -> Self {
+        value as i32
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkCapabilityState")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum NetworkCapabilityState {
+    ServiceCapabilityOff,
+    ServiceCapabilityOn,
+}
+
+impl From<NetworkCapabilityState> for i32 {
+    fn from(value: NetworkCapabilityState) -> Self {
+        value as i32
+    }
+}
+
+impl From<i32> for NetworkCapabilityState {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => NetworkCapabilityState::ServiceCapabilityOff,
+            1 => NetworkCapabilityState::ServiceCapabilityOn,
+            _ => NetworkCapabilityState::ServiceCapabilityOff,
+        }
+    }
+}
+
+#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NROptionMode")]
+#[repr(i32)]
+#[derive(Debug, Clone)]
+pub enum NROptionMode {
+    NROptionUnknown,
+    NROptionNsaOnly,
+    NROptionSaOnly,
+    NROptionNsaAndSa,
+}
+
+impl From<NROptionMode> for i32 {
+    fn from(value: NROptionMode) -> Self {
+        value as i32
+    }
+}
+
+impl From<i32> for NROptionMode {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => NROptionMode::NROptionUnknown,
+            1 => NROptionMode::NROptionNsaOnly,
+            2 => NROptionMode::NROptionSaOnly,
+            3 => NROptionMode::NROptionNsaAndSa,
+            _ => NROptionMode::NROptionUnknown,
+        }
+    }
 }
