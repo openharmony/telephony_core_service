@@ -37,6 +37,7 @@ ohos_static_library("telephony_radio_ani_cxx") {
 
   sources = [
     "src/cxx/ani_radio.cpp",
+    "src/cxx/network_search_callback.cpp",
   ]
   sources += get_target_outputs(":telephony_radio_ani_cxx_gen")
   deps = [
@@ -51,6 +52,7 @@ ohos_static_library("telephony_radio_ani_cxx") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "ffrt:libffrt",
   ]
 
   defines = [
