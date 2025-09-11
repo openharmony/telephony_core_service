@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "ani_sim.h"
 #include <cstdint>
 #include <iostream>
-#include "ani_sim.h"
+#include <string>
 #include "cxx.h"
 #include "telephony_errors.h"
 #include "wrapper.rs.h"
@@ -27,8 +29,9 @@
 using namespace std;
 
 namespace OHOS {
-using namespace Telephony;
+namespace Telephony {
 namespace SimAni {
+constexpr const char *CHINA_TELE_COM_CARD = "china_telecom_card";
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
@@ -47,25 +50,25 @@ static inline ArktsError ConvertArktsErrorWithPermission(int32_t errorCode, cons
     JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
         errorCode, funcName, permission);
 
-    ArktsError ArktsErr = {
+    ArktsError arktsErr = {
         .errorCode = error.errorCode,
         .errorMessage = rust::string(error.errorMessage),
     };
-    return ArktsErr;
+    return arktsErr;
 }
 
 static inline ArktsError ConvertArktsError(int32_t errorCode)
 {
     JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
 
-    ArktsError ArktsErr = {
+    ArktsError arktsErr = {
         .errorCode = error.errorCode,
         .errorMessage = rust::string(error.errorMessage),
     };
-    return ArktsErr;
+    return arktsErr;
 }
 
-ArktsError getLockState(int32_t slotId, int32_t lockType, int32_t &lockState)
+ArktsError GetLockState(int32_t slotId, int32_t lockType, int32_t &lockState)
 {
     int32_t errorCode;
     LockState state = LockState::LOCK_ERROR;
@@ -86,7 +89,7 @@ ArktsError getLockState(int32_t slotId, int32_t lockType, int32_t &lockState)
                                            Permission::GET_TELEPHONY_STATE);
 }
 
-ArktsError unlockPuk(int32_t slotId, rust::String newPin,
+ArktsError UnlockPuk(int32_t slotId, rust::String newPin,
                      rust::String puk, AniLockStatusResponse &lockStatusResponse)
 {
     int32_t errorCode;
@@ -111,7 +114,7 @@ ArktsError unlockPuk(int32_t slotId, rust::String newPin,
                                            Permission::SET_TELEPHONY_STATE);
 }
 
-ArktsError unlockPin(int32_t slotId, rust::String pin,
+ArktsError UnlockPin(int32_t slotId, rust::String pin,
                      AniLockStatusResponse &lockStatusResponse)
 {
     int32_t errorCode;
@@ -135,7 +138,7 @@ ArktsError unlockPin(int32_t slotId, rust::String pin,
                                            Permission::SET_TELEPHONY_STATE);
 }
 
-ArktsError hasSimCard(int32_t slotId, bool &hasCard)
+ArktsError HasSimCard(int32_t slotId, bool &hasCard)
 {
     int32_t errorCode;
 
@@ -144,11 +147,11 @@ ArktsError hasSimCard(int32_t slotId, bool &hasCard)
     } else {
         errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasCard);
     }
-    
+
     return ConvertArktsError(errorCode);
 }
 
-ArktsError isSimActive(int32_t slotId, bool &isActive)
+ArktsError IsSimActive(int32_t slotId, bool &isActive)
 {
     int32_t errorCode = TELEPHONY_SUCCESS;
 
@@ -160,13 +163,13 @@ ArktsError isSimActive(int32_t slotId, bool &isActive)
     return ConvertArktsError(errorCode);
 }
 
-ArktsError getDefaultVoiceSlotId(int32_t &slotId)
+ArktsError GetDefaultVoiceSlotId(int32_t &slotId)
 {
     slotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
     return ConvertArktsError(TELEPHONY_SUCCESS);
 }
 
-ArktsError getOperatorConfigs(int32_t slotId, rust::Vec<AniOperatorConfig> &configValues)
+ArktsError GetOperatorConfigs(int32_t slotId, rust::Vec<AniOperatorConfig> &configValues)
 {
     int32_t errorCode;
 
@@ -190,7 +193,7 @@ ArktsError getOperatorConfigs(int32_t slotId, rust::Vec<AniOperatorConfig> &conf
                                            Permission::GET_TELEPHONY_STATE);
 }
 
-ArktsError getActiveSimAccountInfoList(rust::Vec<AniIccAccountInfo> &accountInfoValues)
+ArktsError GetActiveSimAccountInfoList(rust::Vec<AniIccAccountInfo> &accountInfoValues)
 {
     std::vector<IccAccountInfo> activeInfo;
     int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance()
@@ -213,7 +216,7 @@ ArktsError getActiveSimAccountInfoList(rust::Vec<AniIccAccountInfo> &accountInfo
                                            Permission::GET_TELEPHONY_STATE);
 }
 
-ArktsError getSimAccountInfo(int32_t slotId, AniIccAccountInfo &accountInfoValue)
+ArktsError GetSimAccountInfo(int32_t slotId, AniIccAccountInfo &accountInfoValue)
 {
     int32_t errorCode;
     IccAccountInfo operInfo;
@@ -242,7 +245,7 @@ ArktsError getSimAccountInfo(int32_t slotId, AniIccAccountInfo &accountInfoValue
                                            Permission::GET_TELEPHONY_STATE);
 }
 
-ArktsError getSimState(int32_t slotId, int32_t &simState)
+ArktsError GetSimState(int32_t slotId, int32_t &simState)
 {
     int32_t errorCode;
     if (!IsValidSlotId(slotId)) {
@@ -259,7 +262,7 @@ ArktsError getSimState(int32_t slotId, int32_t &simState)
     return ConvertArktsError(errorCode);
 }
 
-ArktsError getISOCountryCodeForSim(int32_t slotId, rust::String &countryCode)
+ArktsError GetISOCountryCodeForSim(int32_t slotId, rust::String &countryCode)
 {
     int32_t errorCode;
     if (!IsValidSlotId(slotId)) {
@@ -275,10 +278,495 @@ ArktsError getISOCountryCodeForSim(int32_t slotId, rust::String &countryCode)
     return ConvertArktsError(errorCode);
 }
 
-int32_t getMaxSimCount()
+int32_t GetMaxSimCount()
 {
     return DelayedRefSingleton<CoreServiceClient>::GetInstance().GetMaxSimCount();
 }
 
+ArktsError GetSimAuthentication(int32_t slotId, int32_t authType, rust::String authData,
+    AniSimAuthenticationResponse &simAuthenticationResponse)
+{
+    SimAuthenticationResponse response;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(slotId,
+        static_cast<AuthType>(authType), std::string(authData), response);
+    if (errorCode == ERROR_NONE) {
+        sim_authentication_response_conversion(simAuthenticationResponse, response.sw1, response.sw2,
+            response.response);
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetSimAuthentication", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError GetDsdsMode(int32_t &dsdsMode)
+{
+    dsdsMode = DSDS_MODE_V2;
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    return ConvertArktsErrorWithPermission(errorCode, "GetDsdsMode", Permission::GET_TELEPHONY_STATE);
+}
+
+
+ArktsError GetDefaultVoiceSimId(int32_t &simId)
+{
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSimId(simId);
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError GetOpName(int32_t slotId, rust::String &opName)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    std::u16string name;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpName(slotId, name);
+    if (errorCode == ERROR_NONE) {
+        opName = rust::String(NapiUtil::ToUtf8(name));
+    }
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError GetOpKey(int32_t slotId, rust::String &opKey)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    std::u16string key;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOpKey(slotId, key);
+    if (errorCode == ERROR_NONE) {
+        opKey = rust::String(NapiUtil::ToUtf8(key));
+    }
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError UnlockSimLock(int32_t slotId, int32_t persoLocktype, rust::String password,
+    AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "UnlockSimLock", Permission::SET_TELEPHONY_STATE);
+    }
+
+    PersoLockInfo info{ static_cast<PersoLockType>(persoLocktype),
+        NapiUtil::ToUtf16(std::string(password)) };
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockSimLock(slotId, info, response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "UnlockSimLock", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError SendTerminalResponseCmd(int32_t slotId, rust::String cmd)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SendTerminalResponseCmd", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendTerminalResponseCmd(slotId, std::string(cmd));
+    return ConvertArktsErrorWithPermission(errorCode, "SendTerminalResponseCmd", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError SendEnvelopeCmd(int32_t slotId, rust::String cmd)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SendEnvelopeCmd", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SendEnvelopeCmd(slotId, std::string(cmd));
+    return ConvertArktsErrorWithPermission(errorCode, "SendEnvelopeCmd", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError AlterPin2(int32_t slotId, const rust::String newPin2, const rust::String oldPin2,
+    AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "AlterPin2", Permission::SET_TELEPHONY_STATE);
+    }
+
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin2(slotId,
+        NapiUtil::ToUtf16(std::string(newPin2)), NapiUtil::ToUtf16(std::string(oldPin2)), response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "AlterPin2", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError UnlockPuk2(int32_t slotId, const rust::String newPin2, const rust::String puk2,
+    AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "UnlockPuk2", Permission::SET_TELEPHONY_STATE);
+    }
+
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPuk2(slotId,
+        NapiUtil::ToUtf16(std::string(newPin2)), NapiUtil::ToUtf16(std::string(puk2)), response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "UnlockPuk2", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError UnlockPin2(int32_t slotId, const rust::String pin2, AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "UnlockPin2", Permission::SET_TELEPHONY_STATE);
+    }
+
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().UnlockPin2(slotId,
+        NapiUtil::ToUtf16(std::string(pin2)), response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "UnlockPin2", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError SetLockState(int32_t slotId, int32_t lockType, const rust::String password, int32_t state,
+    AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SetLockState", Permission::SET_TELEPHONY_STATE);
+    }
+
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    const LockInfo info{ static_cast<LockType>(lockType), NapiUtil::ToUtf16(std::string(password)),
+        static_cast<LockState>(state) };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetLockState(slotId, info, response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "SetLockState", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError AlterPin(int32_t slotId, const rust::String newPin, const rust::String oldPin,
+    AniLockStatusResponse &lockStatusResponse)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "AlterPin", Permission::SET_TELEPHONY_STATE);
+    }
+
+    LockStatusResponse response{ UNLOCK_FAIL, ERROR_DEFAULT };
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().AlterPin(slotId,
+        NapiUtil::ToUtf16(std::string(newPin)), NapiUtil::ToUtf16(std::string(oldPin)), response);
+    if (errorCode == ERROR_NONE) {
+        lock_status_response_conversion(lockStatusResponse, response.result, response.remain);
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "AlterPin", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError GetShowNumber(int32_t slotId, rust::String &showNumber)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetShowNumber", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string showNumber16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(slotId, showNumber16);
+    if (errorCode == ERROR_NONE) {
+        showNumber = rust::String(NapiUtil::ToUtf8(showNumber16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetShowNumber", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError SetShowNumber(int32_t slotId, rust::String showNumber)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SetShowNumber", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowNumber(slotId,
+        NapiUtil::ToUtf16(std::string(showNumber)));
+    return ConvertArktsErrorWithPermission(errorCode, "SetShowNumber", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError GetShowName(int32_t slotId, rust::String &showName)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetShowName", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string showName16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowName(slotId, showName16);
+    if (errorCode == ERROR_NONE) {
+        showName = rust::String(NapiUtil::ToUtf8(showName16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetShowName", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError SetShowName(int32_t slotId, rust::String showName)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SetShowName", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetShowName(slotId,
+        NapiUtil::ToUtf16(std::string(showName)));
+    return ConvertArktsErrorWithPermission(errorCode, "SetShowName", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError DeactivateSim(int32_t slotId)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "DeactivateSim", Permission::SET_TELEPHONY_STATE);
+    }
+
+    int32_t enable = 0;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetActiveSim(slotId, enable);
+    return ConvertArktsErrorWithPermission(errorCode, "DeactivateSim", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError ActivateSim(int32_t slotId)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "ActivateSim", Permission::SET_TELEPHONY_STATE);
+    }
+
+    int32_t enable = 1;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetActiveSim(slotId, enable);
+    return ConvertArktsErrorWithPermission(errorCode, "ActivateSim", Permission::SET_TELEPHONY_STATE);
+}
+
+
+ArktsError SetDefaultVoiceSlotId(int32_t slotId)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SetDefaultVoiceSlotId", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetDefaultVoiceSlotId(slotId);
+    return ConvertArktsErrorWithPermission(errorCode, "SetDefaultVoiceSlotId", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError GetImsi(int32_t slotId, rust::String &imsi)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetIMSI", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string imsi16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetIMSI(slotId, imsi16);
+    if (errorCode == ERROR_NONE) {
+        imsi = rust::String(NapiUtil::ToUtf8(imsi16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetIMSI", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError IsOperatorSimCard(int32_t slotId, rust::String operatorName, bool &isOperatorCard)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+    }
+
+    if (!std::string(operatorName).compare(CHINA_TELE_COM_CARD)) {
+        errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isOperatorCard);
+    } else {
+        errorCode = TELEPHONY_ERR_ARGUMENT_MISMATCH;
+    }
+
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError GetSimGid1(int32_t slotId, rust::String &sigGid1)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetSimGid1", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string simGid116;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimGid1(slotId, simGid116);
+    if (errorCode == ERROR_NONE) {
+        sigGid1 = rust::String(NapiUtil::ToUtf8(simGid116));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetSimGid1", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError GetSimTelephoneNumber(int32_t slotId, rust::String &simTelephoneNumber)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetSimTelephoneNumber", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string simTelephoneNumber16;
+    errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimTelephoneNumber(slotId, simTelephoneNumber16);
+    if (errorCode == ERROR_NONE) {
+        simTelephoneNumber = rust::String(NapiUtil::ToUtf8(simTelephoneNumber16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetSimTelephoneNumber", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError SetVoiceMailInfo(int32_t slotId, rust::String mailName, rust::String mailNumber)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "SetVoiceMailInfo", Permission::SET_TELEPHONY_STATE);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetVoiceMailInfo(slotId,
+        NapiUtil::ToUtf16(std::string(mailName)), NapiUtil::ToUtf16(std::string(mailNumber)));
+    return ConvertArktsErrorWithPermission(errorCode, "SetVoiceMailInfo", Permission::SET_TELEPHONY_STATE);
+}
+
+ArktsError GetVoiceMailNumber(int32_t slotId, rust::String &voiceMailNumber)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetVoiceMailNumber", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string voiceMailNumber16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetVoiceMailNumber(slotId, voiceMailNumber16);
+    if (errorCode == ERROR_NONE) {
+        voiceMailNumber = rust::String(NapiUtil::ToUtf8(voiceMailNumber16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetVoiceMailNumber", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError GetVoiceMailIdentifier(int32_t slotId, rust::String &voiceMailIdentifier)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetVoiceMailIdentifier", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string voiceMailIdentifier16;
+    errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetVoiceMailIdentifier(slotId, voiceMailIdentifier16);
+    if (errorCode == ERROR_NONE) {
+        voiceMailIdentifier = rust::String(NapiUtil::ToUtf8(voiceMailIdentifier16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetVoiceMailIdentifier", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError GetSimIccId(int32_t slotId, rust::String &simIccId)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetSimIccId", Permission::GET_TELEPHONY_STATE);
+    }
+
+    std::u16string simIccId16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimIccId(slotId, simIccId16);
+    if (errorCode == ERROR_NONE) {
+        simIccId = rust::String(NapiUtil::ToUtf8(simIccId16));
+    }
+    return ConvertArktsErrorWithPermission(errorCode, "GetSimIccId", Permission::GET_TELEPHONY_STATE);
+}
+
+ArktsError GetCardType(int32_t slotId, int32_t &cardType)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    CardType type = CardType::UNKNOWN_CARD;
+
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCardType(slotId, type);
+    if (errorCode == ERROR_NONE) {
+        cardType = static_cast<int32_t>(type);
+    }
+
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError GetSimSpn(int32_t slotId, rust::String &simSpn)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    std::u16string simSpn16;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimSpn(slotId, simSpn16);
+    if (errorCode == ERROR_NONE) {
+        simSpn = rust::String(NapiUtil::ToUtf8(simSpn16));
+    }
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError GetSimOperatorNumeric(int32_t slotId, rust::String &simOperatorNumeric)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    std::u16string simOperatorNumeric16;
+    errorCode =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, simOperatorNumeric16);
+    if (errorCode == ERROR_NONE) {
+        simOperatorNumeric = rust::String(NapiUtil::ToUtf8(simOperatorNumeric16));
+    }
+    return ConvertArktsError(errorCode);
+}
+
+ArktsError HasOperatorPrivileges(int32_t slotId, bool &hasPrivileges)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotIdEx(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+    } else {
+        errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().HasOperatorPrivileges(slotId, hasPrivileges);
+    }
+
+    return ConvertArktsError(errorCode);
+}
 } // namespace SimAni
+} // namespace Telephony
 } // namespace OHOS
