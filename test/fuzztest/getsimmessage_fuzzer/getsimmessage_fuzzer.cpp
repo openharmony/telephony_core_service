@@ -63,7 +63,10 @@ void GetSimMessageFunc(const uint8_t *data, size_t size)
     int32_t enable = GetInt(data, size, index++);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
     std::string pin(reinterpret_cast<const char *>(data), size);
-    std::u16string number(reinterpret_cast<const char16_t *>(data), size);
+    if (size < sizeof(char16_t)) {
+        return;
+    }
+    std::u16string number(reinterpret_cast<const char16_t *>(data), size / sizeof(char16_t));
     simManager->GetIMSI(slotId, number);
     simManager->GetLocaleFromDefaultSim(slotId);
     simManager->GetSimGid1(slotId, number);
