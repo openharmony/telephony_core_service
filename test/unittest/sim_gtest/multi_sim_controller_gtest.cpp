@@ -768,7 +768,7 @@ HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_024, Function | Me
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t imsSwitchValue = 0;
-    int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
+    const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
     int32_t result = multiSimController->QueryImsSwitch(0, imsSwitchValue);
     EXPECT_EQ(result, TELEPHONY_ERROR);
     EXPECT_EQ(imsSwitchValue, IMS_SWITCH_VALUE_UNKNOWN);
