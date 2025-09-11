@@ -46,6 +46,9 @@ public:
     MOCK_METHOD0(UpdateOpKeyInfo, int32_t());
     MOCK_METHOD0(IsDataShareError, bool());
     MOCK_METHOD0(ResetDataShareError, void());
+    MOCK_METHOD1(CreateDataHelper, std::shared_ptr<DataShare::DataShareHelper>(const int waitTime));
+    MOCK_METHOD2(Insert, int(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+        const DataShare::DataShareValuesBucket &values));
 };
 } // namespace Telephony
 } // namespace OHOS
