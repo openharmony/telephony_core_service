@@ -932,7 +932,7 @@ HWTEST_F(CoreServiceBranchTest, GetSimIdtest_001, Function | MediumTest | Level1
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<MultiSimControllerMock> multiSimControllerMock =
-        std::make_shared<MultiSimControllerMock>(telRilManager,simStateManager, simFileManager);
+        std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     IccAccountInfo iccAccountInfo;
@@ -948,7 +948,7 @@ HWTEST_F(CoreServiceBranchTest, GetSimIdtest_002, Function | MediumTest | Level1
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<MultiSimControllerMock> multiSimControllerMock =
-        std::make_shared<MultiSimControllerMock>(telRilManager,simStateManager, simFileManager);
+        std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     IccAccountInfo iccAccountInfo;
