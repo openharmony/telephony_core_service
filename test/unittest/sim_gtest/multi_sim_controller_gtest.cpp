@@ -713,10 +713,10 @@ HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_020, Function | Me
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t imsSwitchValue = 0;
-    int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
+    const int32_t imsSwitchValueUnknown = -1;
     int32_t result = multiSimController->QueryImsSwitch(-1, imsSwitchValue);
     EXPECT_EQ(result, TELEPHONY_ERROR);
-    EXPECT_EQ(imsSwitchValue, IMS_SWITCH_VALUE_UNKNOWN);
+    EXPECT_EQ(imsSwitchValue, imsSwitchValueUnknown);
 }
  
 HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_021, Function | MediumTest | Level1)
@@ -727,10 +727,10 @@ HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_021, Function | Me
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t imsSwitchValue = 0;
-    int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
+    const int32_t imsSwitchValueUnknown = -1;
     int32_t result =  multiSimController->QueryImsSwitch(0, imsSwitchValue);
     EXPECT_EQ(result, TELEPHONY_ERROR);
-    EXPECT_EQ(imsSwitchValue, IMS_SWITCH_VALUE_UNKNOWN);
+    EXPECT_EQ(imsSwitchValue, imsSwitchValueUnknown);
 }
  
 HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_022, Function | MediumTest | Level1)
@@ -744,7 +744,7 @@ HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_022, Function | Me
     const int32_t imsSwitchValueUnknown = -1;
     int32_t result = multiSimController->QueryImsSwitch(0, imsSwitchValue);
     EXPECT_EQ(result, TELEPHONY_ERROR);
-    EXPECT_EQ(imsSwitchValue, IMS_SWITCH_VALUE_UNKNOWN);
+    EXPECT_EQ(imsSwitchValue, imsSwitchValueUnknown);
 }
  
 HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_023, Function | MediumTest | Level1)
