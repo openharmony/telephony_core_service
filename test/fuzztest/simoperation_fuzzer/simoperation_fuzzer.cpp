@@ -63,11 +63,10 @@ void SimOperationFunc(const uint8_t *data, size_t size)
     int32_t enable = GetInt(data, size, index++);
     std::string pin(reinterpret_cast<const char *>(data), size);
     std::string puk(reinterpret_cast<const char *>(data), size);
-    if (size >= sizeof(char16_t)) {
-        std::u16string number(reinterpret_cast<const char16_t *>(data), size / sizeof(char16_t));
-    } else {
+    if (size < sizeof(char16_t)) {
         return;
     }
+    std::u16string number(reinterpret_cast<const char16_t *>(data), size / sizeof(char16_t));
     LockStatusResponse lockResponse;
     int32_t lockType = *data % LOCK_TYPE_NUM + 1;
     LockType lockEnum = static_cast<LockType>(lockType);
