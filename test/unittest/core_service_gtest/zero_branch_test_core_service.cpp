@@ -35,7 +35,6 @@
 #include "mock_i_raw_parcel_callback.h"
 #include "mock_sim_rdb_helper.h"
 
-
 namespace OHOS {
 namespace Telephony {
 using namespace testing;
