@@ -771,7 +771,7 @@ HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_024, Function | Me
     const int32_t imsSwitchValueUnknown = -1;
     int32_t result = multiSimController->QueryImsSwitch(0, imsSwitchValue);
     EXPECT_EQ(result, TELEPHONY_ERROR);
-    EXPECT_EQ(imsSwitchValue, IMS_SWITCH_VALUE_UNKNOWN);
+    EXPECT_EQ(imsSwitchValue, imsSwitchValueUnknown);
 }
  
 HWTEST_F(MultiSimControllerTest, Telephony_MultiSimController_025, Function | MediumTest | Level1)
