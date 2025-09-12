@@ -168,6 +168,26 @@ enum JsErrorCode {
     JS_ERROR_SMS_MMS_BASE_ERROR = 8701000,
 
     /**
+     * The input parameter value is out of range.
+     */
+    JS_ERROR_STATE_REGISTRY_ARGUMENT_ERROR = 8800001,
+
+    /**
+     * Operation failed. Cannot connect to service.
+     */
+    JS_ERROR_STATE_REGISTRY_SERVICE_ERROR,
+
+    /**
+     * System internal error.
+     */
+    JS_ERROR_STATE_REGISTRY_SYSTEM_ERROR,
+
+    /**
+     * Unknown error code.
+     */
+    JS_ERROR_STATE_REGISTRY_UNKNOW_ERROR = 8800999,
+
+    /**
      * State registry module base error code.
      */
     JS_ERROR_STATE_REGISTRY_BASE_ERROR = 8801000,

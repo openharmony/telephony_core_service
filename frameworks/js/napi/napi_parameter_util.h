@@ -183,7 +183,7 @@ std::optional<NapiError> MatchParameters(
     int32_t typeSize = sizeof...(Ts);
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, argv[typeSize - 1], &valueType);
-    if (valueType != napi_function) {
+    if (valueType == napi_undefined || valueType == napi_null) {
         typeSize--;
     }
     std::vector<napi_valuetype> typeStd(typeSize, napi_undefined);
