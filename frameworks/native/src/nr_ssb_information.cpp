@@ -146,9 +146,6 @@ bool NrSsbInformation::ReadFromParcelForNbCell(Parcel &parcel)
         return false;
     }
     nbCellCount_ = (item_32 > MAX_NBCELL_COUNT) ? MAX_NBCELL_COUNT : item_32;
-    if (nbCellCount_ < 0 || nbCellCount_ > MAX_NBCELL_COUNT) {
-        return false;
-    }
     for (int32_t i = 0; i < nbCellCount_; ++i) {
         NeighboringCellSsbInformation nbCellSsbInfo;
         if (!parcel.ReadInt32(item_32)) {
