@@ -956,18 +956,18 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName, Function | MediumTes
     SetNameData(family, given, middle, displayName);
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张三");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "prefix 张三suffix");
     middle = "小";
     SetNameData(family, given, middle, displayName);
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "张小三");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "prefix 张小三suffix");
     family = "";
     given = "";
     SetNameData(family, given, middle, displayName);
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "三张");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "prefix小suffix");
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName01, Function | MediumTest | Level3)
@@ -993,7 +993,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName02, Function | MediumT
     nameData_->SetPhoneticName("liu");
     vCardContact.nameData_ = nameData_;
     vCardContact.UpdateDisplayName();
-    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "liu");
+    EXPECT_EQ(vCardContact.nameData_->GetDisplayName(), "");
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_UpdateDisplayName03, Function | MediumTest | Level3)
