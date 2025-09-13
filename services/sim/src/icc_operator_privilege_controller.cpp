@@ -85,7 +85,7 @@ static AppExecFwk::InnerEvent::Pointer GenCallBackEvent(
 }
 
 class IccOperatorPrivilegeController::LogicalStateMachine {
-    static constexpr size_t CALL_TIMEOUT = 60;
+    static constexpr size_t CALL_TIMEOUT = 5;
     static constexpr size_t TRANSMIT_TIMEOUT = CALL_TIMEOUT * 3;
     static constexpr size_t TIME_SLICE = 100;
     bool isTransmitting_ = false;
@@ -207,7 +207,7 @@ int32_t IccOperatorPrivilegeController::HasOperatorPrivileges(
     const std::string_view &certHash, const std::string_view &packageName, bool &hasOperatorPrivileges)
 {
     TELEPHONY_LOGI("IccOperatorPrivilegeController::HasOperatorPrivileges begin");
-    constexpr int32_t RETRY_TIMES = 3;
+    constexpr int32_t RETRY_TIMES = 1;
     for (int32_t i = INT32_ZERO; i < RETRY_TIMES; ++i) {
         const bool isLoaded = state_->SuccessLoaded();
         if (isLoaded) {

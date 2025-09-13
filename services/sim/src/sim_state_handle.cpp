@@ -146,9 +146,10 @@ int32_t SimStateHandle::IsSatelliteSupported()
 
 bool SimStateHandle::HasSimCard()
 {
-    bool has = false;
-    if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
-        has = true;
+    bool has = true;
+    if (iccState_.simStatus_ == ICC_CARD_ABSENT ||
+        (iccState_.simStatus_ == ICC_CONTENT_UNKNOWN && CoreManagerInner::GetInstance().IsEsim(slotId_))) {
+        has = false;
     }
     TELEPHONY_LOGD("SimStateHandle::HasSimCard(), has = %{public}d", has);
     return has;
@@ -374,22 +375,21 @@ void SimStateHandle::GetLockState(int32_t slotId, LockType lockType)
 
 void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
 {
-    TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId = %{public}d", slotId);
     LockReason reason = LockReason::SIM_NONE;
     const int32_t newSimType = ar.simType_;
     const int32_t newSimStatus = ar.simStatus_;
     iccState_ = ar;
     auto iter = simIccStatusMap_.find(newSimStatus);
-    TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState newSimType[%{public}d], newSimStatus[%{public}s](%{public}d), "
-        "oldSimStatus_%{public}d", newSimType, iter->second.c_str(), newSimStatus, oldSimStatus_);
+    TELEPHONY_LOGI("ProcessIccCardState slotId:%{public}d, newSimType:%{public}d, newSimStatus:%{public}s(%{public}d),"
+        "oldSimStatus_%{public}d", slotId, newSimType, iter->second.c_str(), newSimStatus, oldSimStatus_);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
     }
+    ProcessNewSimStatus(newSimStatus);
     // When esim switches from one active profile to another, the card only report a ready status
     // and we can only detect the change by comparing the iccid before and after
     if ((oldSimStatus_ != newSimStatus) || (iccid_ != ar.iccid_)) {
-        oldIccid_ = iccid_;
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;
@@ -418,6 +418,19 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
             slotId, externalType_, externalState_, reason);
         if (TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_(slotId, externalState_);
+        }
+    }
+}
+
+void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
+{
+    if (newSimStatus == ICC_CONTENT_UNKNOWN) {
+        if (CoreManagerInner::GetInstance().IsEsim(slotId_)) {
+            if (oldSimStatus_ == ICC_CONTENT_READY) {
+                CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(true);
+            }
+        } else {
+            modemInitDone_ = false;
         }
     }
 }
@@ -559,6 +572,10 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
     std::shared_ptr<RadioResponseInfo> response = event->GetSharedObject<RadioResponseInfo>();
     if ((param == nullptr) && (response == nullptr)) {
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
+        return;
+    }
+    if (OHOS::system::GetBoolParameter("persist.telephony.is_simslots_mapping", false)) {
+        TELEPHONY_LOGW("simslots is mapping, no need fetch files");
         return;
     }
     if (param != nullptr) {
