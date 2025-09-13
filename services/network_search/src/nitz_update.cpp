@@ -222,6 +222,8 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
         TELEPHONY_LOGE("NitzUpdate::ProcessTime offset invalid, slotId:%{public}d", slotId_);
         return;
     }
+    lastNetworkTime_ = nitzTime;
+    lastSystemTime_ = currentTime / (NANO_TO_MILLI * MILLI_TO_BASE);
     TELEPHONY_LOGI("slotId:%{public}d, currentTime:%{public}lld, offset:%{public}lld, nitzTime:%{public}lld",
         slotId_, static_cast<long long>(currentTime), static_cast<long long>(offset), static_cast<long long>(nitzTime));
     bool autoTime = IsAutoTime();
