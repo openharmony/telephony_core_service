@@ -146,19 +146,14 @@ void NativeImportVCard(napi_env env, void *data)
         return;
     }
     int32_t errorCode = TELEPHONY_SUCCESS;
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("App is not systemapp");
-        errorCode = TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    std::shared_ptr<DataShare::DataShareHelper> datashareHelper = asyncContext->datashareHelper;
+    std::string filePath = asyncContext->filePath;
+    if (datashareHelper == nullptr) {
+        TELEPHONY_LOGE("DatashareHelper is nullptr");
+        errorCode = TELEPHONY_ERR_PERMISSION_ERR;
     } else {
-        std::shared_ptr<DataShare::DataShareHelper> datashareHelper = asyncContext->datashareHelper;
-        std::string filePath = asyncContext->filePath;
-        if (datashareHelper == nullptr) {
-            TELEPHONY_LOGE("DatashareHelper is nullptr");
-            errorCode = TELEPHONY_ERR_PERMISSION_ERR;
-        } else {
-            errorCode = VCardManager::GetInstance().ImportLock(filePath, datashareHelper, asyncContext->accountId);
-            TELEPHONY_LOGI("Import finish errorCode : %{public}d", errorCode);
-        }
+        errorCode = VCardManager::GetInstance().ImportLock(filePath, datashareHelper, asyncContext->accountId);
+        TELEPHONY_LOGI("Import finish errorCode : %{public}d", errorCode);
     }
     asyncContext->errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
@@ -232,21 +227,17 @@ void NativeExportVCard(napi_env env, void *data)
         return;
     }
     int32_t errorCode = TELEPHONY_SUCCESS;
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        errorCode = TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    std::shared_ptr<DataShare::DataShareHelper> datashareHelper = asyncContext->datashareHelper;
+    if (datashareHelper == nullptr) {
+        errorCode = TELEPHONY_ERR_PERMISSION_ERR;
     } else {
-        std::shared_ptr<DataShare::DataShareHelper> datashareHelper = asyncContext->datashareHelper;
-        if (datashareHelper == nullptr) {
-            errorCode = TELEPHONY_ERR_PERMISSION_ERR;
-        } else {
-            std::shared_ptr<DataShare::DataSharePredicates> datasharePredicates = asyncContext->predicates;
-            std::string charset = asyncContext->charset;
-            std::string filePath = "";
-            errorCode = VCardManager::GetInstance().ExportLock(
-                filePath, datashareHelper, *datasharePredicates, asyncContext->cardType, charset);
-            TELEPHONY_LOGI("Export finish errorCode : %{public}d", errorCode);
-            asyncContext->result = filePath;
-        }
+        std::shared_ptr<DataShare::DataSharePredicates> datasharePredicates = asyncContext->predicates;
+        std::string charset = asyncContext->charset;
+        std::string filePath = "";
+        errorCode = VCardManager::GetInstance().ExportLock(
+            filePath, datashareHelper, *datasharePredicates, asyncContext->cardType, charset);
+        TELEPHONY_LOGI("Export finish errorCode : %{public}d", errorCode);
+        asyncContext->result = filePath;
     }
     asyncContext->errorCode = errorCode;
     if (errorCode == TELEPHONY_SUCCESS) {
