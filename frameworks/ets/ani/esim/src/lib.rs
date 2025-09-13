@@ -19,7 +19,7 @@ mod esim;
 
 
 ani_constructor!(
-    namespace "L@ohos/telephony/esim/eSIM"
+    namespace "@ohos.telephony.esim.eSIM"
     [
         "nativeResetMemory": esim::reset_memory,
         "nativeIsSupported": esim::is_supported,
