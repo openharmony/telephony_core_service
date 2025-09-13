@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/LockState")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.LockState")]
 #[repr(i32)]
 pub enum LockState {
     LockOff = 0,
@@ -38,7 +38,7 @@ impl From<LockState> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/LockType")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.LockType")]
 #[repr(i32)]
 pub enum LockType {
     PinLock = 1,
@@ -54,7 +54,7 @@ impl From<LockType> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/LockStatusResponseInner")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.LockStatusResponseInner")]
 pub struct AniLockStatusResponse {
     result: i32,
     remain: Option<i32>,
@@ -84,7 +84,7 @@ pub fn lock_status_response_conversion(
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/OperatorConfigInner")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.OperatorConfigInner")]
 pub struct AniOperatorConfig {
     field: String,
     value: String,
@@ -105,7 +105,7 @@ pub fn operator_config_push_kv(
     config_values.push(config);
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/IccAccountInfoInner")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.IccAccountInfoInner")]
 pub struct AniIccAccountInfo {
     sim_id: i32,
     slot_index: i32,
@@ -171,7 +171,7 @@ pub fn icc_account_info_conversion(
     account_info.show_number = show_number;
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/SimState")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.SimState")]
 #[repr(i32)]
 pub enum SimState {
     SimStateUnknown = 0,
@@ -196,7 +196,7 @@ impl From<i32> for SimState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/PersoLockType")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.PersoLockType")]
 #[repr(i32)]
 pub enum PersoLockType {
     PnPinLock = 0,
@@ -229,7 +229,7 @@ impl From<PersoLockType> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/PersoLockInfoInner")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.PersoLockInfoInner")]
 pub struct AniPersoLockInfo {
     pub lock_type: PersoLockType,
     pub password: String,
@@ -244,7 +244,7 @@ impl AniPersoLockInfo {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/ContactType")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.ContactType")]
 #[repr(i32)]
 pub enum ContactType {
     GeneralContact = 1,
@@ -261,7 +261,7 @@ impl From<ContactType> for i32 {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/LockInfoInner")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.LockInfoInner")]
 pub struct AniLockInfo {
     pub lock_type: LockType,
     pub password: String,
@@ -278,7 +278,7 @@ impl AniLockInfo {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/CardType")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.CardType")]
 #[repr(i32)]
 pub enum CardType {
     UnknownCard = -1,
@@ -320,7 +320,7 @@ impl From<i32> for CardType {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/OperatorSimCard")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.OperatorSimCard")]
 #[repr(i32)]
 pub enum OperatorSimCard {
     ChinaTelecomCard = 0,
@@ -334,7 +334,7 @@ impl OperatorSimCard {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/DsdsMode")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.DsdsMode")]
 #[repr(i32)]
 pub enum DsdsMode {
     DsdsModeV1 = 0,
@@ -358,7 +358,7 @@ impl From<i32> for DsdsMode {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/AuthType")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.AuthType")]
 #[repr(i32)]
 pub enum AuthType {
     SimAuthEapSimtype = 128,
@@ -376,7 +376,7 @@ impl From<AuthType> for i32 {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/SimAuthenticationResponseInner")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.SimAuthenticationResponseInner")]
 pub struct AniSimAuthenticationResponse {
     pub sim_status_word1: i32,
 
