@@ -46,6 +46,9 @@ public:
     MOCK_METHOD0(UpdateOpKeyInfo, int32_t());
     MOCK_METHOD0(IsDataShareError, bool());
     MOCK_METHOD0(ResetDataShareError, void());
+    MOCK_METHOD1(ClearSimLabel, int32_t(SimType));
+    MOCK_METHOD1(ClearData, int32_t(const std::string &iccId));
+    MOCK_METHOD2(UpdateEsimOpName, int32_t(const std::string &, const std::string &));
     MOCK_METHOD1(CreateDataHelper, std::shared_ptr<DataShare::DataShareHelper>(const int waitTime));
     MOCK_METHOD2(Insert, int(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
         const DataShare::DataShareValuesBucket &values));

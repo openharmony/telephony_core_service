@@ -347,6 +347,11 @@ public:
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
     int32_t NotifySimSlotsMapping(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
+    bool IsEsim(int32_t slotId);
+    int32_t ClearSimLabel(SimType simType);
+    int32_t UpdateSim2Present(bool isShowPresent);
+    int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
+    void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);

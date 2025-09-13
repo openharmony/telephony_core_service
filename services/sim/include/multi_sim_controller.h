@@ -88,10 +88,14 @@ public:
     }
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
-    bool IsEsim(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
+    bool IsEsim(int32_t slotId);
+    int32_t ClearSimLabel(SimType simType);
+    int32_t UpdateSim2Present(bool isShowPresent);
+    int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
+    void CheckIfNeedSwitchMainSlotId(bool isInit = true);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -124,7 +128,6 @@ private:
     bool UpdateIccAccountInfoList(std::vector<IccAccountInfo> &accountInfoList,
         std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo);
     std::string EncryptIccId(const std::string iccid);
-    void CheckIfNeedSwitchMainSlotId(bool isInit = true);
     bool IsValidSlotId(int32_t slotId);
     bool InitPrimary();
     bool IsAllCardsReady();
@@ -151,6 +154,7 @@ private:
     bool SetPrimarySlotToRil(int32_t slotId);
     void SendSetPrimarySlotEvent(int32_t slotId);
     void ProcessRilSetPrimarySlotResponse(bool result);
+    bool IsSimSlotsMapping();
     bool IsSetPrimarySlotIdAllowed();
 
 private:
@@ -174,7 +178,7 @@ private:
     std::vector<SimRdbInfo> localCacheInfo_;
     std::vector<IccAccountInfo> allIccAccountInfoList_;
     std::vector<SimRdbInfo> allLocalCacheInfo_;
-    ffrt::mutex mutex_;
+    ffrt::shared_mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;

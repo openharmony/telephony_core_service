@@ -34,7 +34,7 @@ const int64_t DELAY_THREE_SECONDS = 3000;
 const int64_t RETRY_TIME = 3 * 60 * 1000;
 const int32_t ACTIVE_USER_ID = 100;
 const int INIT_TIMES = 15;
-const int INIT_DATA_TIMES = 5;
+const int INIT_DATA_TIMES = 10;
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -55,6 +55,7 @@ MultiSimMonitor::~MultiSimMonitor()
 
 void MultiSimMonitor::Init()
 {
+    TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
@@ -62,7 +63,7 @@ void MultiSimMonitor::Init()
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
-    InitEsimData();
+    SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -88,45 +89,41 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     }
     auto eventCode = event->GetInnerEventId();
     switch (eventCode) {
-        case MultiSimMonitor::INIT_DATA_RETRY_EVENT:{
+        case MultiSimMonitor::INIT_DATA_RETRY_EVENT:
             InitData(event->GetParam());
             break;
-        }
-        case MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT:{
+        case MultiSimMonitor::INIT_ESIM_DATA_EVENT:
+            RemoveEvent(MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT);
             InitEsimData();
             break;
-        }
+        case MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT:
+            InitEsimData();
+            break;
         case RadioEvent::RADIO_QUERY_ICCID_DONE:
         case RadioEvent::RADIO_SIM_STATE_LOCKED:
-        case RadioEvent::RADIO_SIM_STATE_READY: {
+        case RadioEvent::RADIO_SIM_STATE_READY:
             RemoveEvent(MultiSimMonitor::INIT_DATA_RETRY_EVENT);
             InitData(event->GetParam());
             break;
-        }
-        case RadioEvent::RADIO_SIM_STATE_CHANGE: {
+        case RadioEvent::RADIO_SIM_STATE_CHANGE:
             RefreshData(event->GetParam());
             break;
-        }
-        case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT: {
+        case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT:
             RemoveEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT);
             RegisterSimNotify();
             break;
-        }
-        case MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT: {
+        case MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT:
             RegisterSimNotify();
             break;
-        }
-        case MultiSimMonitor::RESET_OPKEY_CONFIG: {
+        case MultiSimMonitor::RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             UpdateAllOpkeyConfigs();
             break;
-        }
-        case MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG: {
+        case MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             CheckDataShareError();
             CheckSimNotifyRegister();
             break;
-        }
         default:
             break;
     }
