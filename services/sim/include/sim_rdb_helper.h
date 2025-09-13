@@ -26,6 +26,7 @@
 #include "result_set.h"
 #include "sim_constant.h"
 #include "sim_rdb_info.h"
+#include "sim_state_type.h"
 #include "sim_utils.h"
 #include "system_ability_definition.h"
 #include "telephony_data_helper.h"
@@ -54,7 +55,10 @@ public:
     int32_t UpdateDataBySimId(int32_t simId, const DataShare::DataShareValuesBucket &values);
     int32_t UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values);
     int32_t ForgetAllData();
-    int32_t ForgetAllData(int32_t slotId, bool isUpdateSimLabel);
+    int32_t ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel);
+    int32_t ClearSimLabel(SimType simType);
+    int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
+
     int32_t ClearData();
     int32_t UpdateOpKeyInfo();
     bool IsDataShareError();

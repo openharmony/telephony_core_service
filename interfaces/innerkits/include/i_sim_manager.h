@@ -158,6 +158,11 @@ public:
     virtual int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex) = 0;
     virtual int32_t NotifySimSlotsMapping(int32_t slotId) = 0;
     virtual int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName) = 0;
+    virtual bool IsEsim(int32_t slotId) = 0;
+    virtual int32_t ClearSimLabel(SimType simType) = 0;
+    virtual int32_t UpdateSim2Present(bool isShowPresent) = 0;
+    virtual int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName) = 0;
+    virtual void CheckIfNeedSwitchMainSlotId(bool isUserSet) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
