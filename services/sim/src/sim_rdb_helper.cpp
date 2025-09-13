@@ -28,7 +28,6 @@ SimRdbHelper::~SimRdbHelper() {}
 
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
 {
-    TELEPHONY_LOGD("start");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateDataHelper Failed");
         return nullptr;
@@ -38,7 +37,6 @@ std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper()
 
 std::shared_ptr<DataShare::DataShareHelper> SimRdbHelper::CreateDataHelper(const int waitTime)
 {
-    TELEPHONY_LOGD("start");
     if (mTelephonyDatahelper == nullptr) {
         TELEPHONY_LOGE("get CreateDataHelper Failed");
         return nullptr;
@@ -141,7 +139,6 @@ int SimRdbHelper::Delete(
 
 int32_t SimRdbHelper::GetDefaultMainCardSlotId()
 {
-    TELEPHONY_LOGD("start");
     int32_t mainCardSlotId = 0;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
@@ -175,7 +172,6 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
 
 int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
 {
-    TELEPHONY_LOGD("start");
     int32_t messageCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
@@ -209,7 +205,6 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
 
 int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
 {
-    TELEPHONY_LOGD("start");
     int32_t cellularDataCardSlotId = INVALID_VALUE;
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
@@ -357,7 +352,6 @@ int32_t SimRdbHelper::SetDefaultCellularData(int32_t simId)
 
 int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values)
 {
-    TELEPHONY_LOGD("start");
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
         CreateDataHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);
     if (dataShareHelper == nullptr) {
@@ -375,7 +369,6 @@ int32_t SimRdbHelper::InsertData(int64_t &id, const DataShare::DataShareValuesBu
 
 void SimRdbHelper::SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean)
 {
-    TELEPHONY_LOGD("start");
     int index = 0;
     result->GetColumnIndex(SimData::SIM_ID, index);
     result->GetInt(index, simBean.simId);
@@ -419,7 +412,6 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet>
 
 int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
 {
-    TELEPHONY_LOGD("start");
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccId);
@@ -455,7 +447,6 @@ int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
 
 int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
 {
-    TELEPHONY_LOGD("start");
     std::vector<std::string> colume;
     DataShare::DataSharePredicates predicates;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
@@ -483,7 +474,6 @@ int32_t SimRdbHelper::QueryAllData(std::vector<SimRdbInfo> &vec)
 
 int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
 {
-    TELEPHONY_LOGD("start");
     std::vector<std::string> colume;
     std::string id = std::to_string(INVALID_VALUE);
     DataShare::DataSharePredicates predicates;
@@ -518,7 +508,6 @@ int32_t SimRdbHelper::QueryAllValidData(std::vector<SimRdbInfo> &vec)
 
 int32_t SimRdbHelper::UpdateDataBySimId(int32_t simId, const DataShare::DataShareValuesBucket &values)
 {
-    TELEPHONY_LOGD("simId = %{public}d", simId);
     std::string sim = std::to_string(simId);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::SIM_ID, sim);
@@ -534,7 +523,6 @@ int32_t SimRdbHelper::UpdateDataBySimId(int32_t simId, const DataShare::DataShar
 
 int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values)
 {
-    TELEPHONY_LOGI("start");
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::ICC_ID, iccId);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
@@ -544,13 +532,13 @@ int32_t SimRdbHelper::UpdateDataByIccId(std::string iccId, const DataShare::Data
         return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, values, predicates);
+    TELEPHONY_LOGI("UpdateDataByIccId result:%{public}d", result);
     dataShareHelper->Release();
     return result;
 }
 
 int32_t SimRdbHelper::ForgetAllData()
 {
-    TELEPHONY_LOGD("start");
     DataShare::DataSharePredicates predicates1;
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(INVALID_VALUE);
@@ -570,14 +558,13 @@ int32_t SimRdbHelper::ForgetAllData()
     DataShare::DataShareValuesBucket simLabelValue;
     simLabelValue.Put(SimData::SIM_LABEL_INDEX, valueObj);
     result = Update(dataShareHelper, simLabelValue, predicates2);
+    TELEPHONY_LOGI("ForgetAllData result:%{public}d", result);
     dataShareHelper->Release();
-    TELEPHONY_LOGD("result = %{public}d", result);
     return result;
 }
 
-int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isUpdateSimLabel)
+int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel)
 {
-    TELEPHONY_LOGD("slotId = %{public}d", slotId);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::SLOT_INDEX, std::to_string(slotId));
     DataShare::DataShareValuesBucket value;
@@ -590,7 +577,7 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isUpdateSimLabel)
     }
     DataShare::DataShareValueObject valueIndex(INVALID_VALUE);
     value.Put(SimData::SLOT_INDEX, valueIndex);
-    if (isUpdateSimLabel) {
+    if (isNeedUpdateSimLabel) {
         value.Put(SimData::SIM_LABEL_INDEX, valueIndex);
     }
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreateDataHelper();
@@ -599,8 +586,51 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isUpdateSimLabel)
         return INVALID_VALUE;
     }
     int result = Update(dataShareHelper, value, predicates);
+    if (result == INVALID_VALUE) {
+        TELEPHONY_LOGE("ForgetAllData fail");
+    }
     dataShareHelper->Release();
-    TELEPHONY_LOGD("result = %{public}d", result);
+    TELEPHONY_LOGI("ForgetAllData slotId:%{public}d, result:%{public}d", slotId, result);
+    return result;
+}
+
+int32_t SimRdbHelper::ClearSimLabel(SimType simType)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return INVALID_VALUE;
+    }
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValueObject valueObj(INVALID_VALUE);
+    int isEsim = simType == SimType::ESIM ? 1 : 0;
+    predicates.EqualTo(SimData::IS_ESIM, std::to_string(isEsim));
+    predicates.GreaterThan(SimData::SIM_LABEL_INDEX, 0);
+    DataShare::DataShareValuesBucket simLabelValue;
+    simLabelValue.Put(SimData::SIM_LABEL_INDEX, valueObj);
+    int32_t result = Update(dataShareHelper, simLabelValue, predicates);
+    TELEPHONY_LOGI("ClearSimLabel result:%{public}d", result);
+    dataShareHelper->Release();
+    return result;
+}
+
+int32_t SimRdbHelper::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return INVALID_VALUE;
+    }
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValueObject valueObj(operatorName);
+    predicates.EqualTo(SimData::ICC_ID, iccId);
+    valuesBucket.Put(SimData::OPERATOR_NAME, valueObj);
+    int32_t result = Update(dataShareHelper, valuesBucket, predicates);
+    TELEPHONY_LOGI("UpdateEsimOpName result:%{public}d", result);
+    dataShareHelper->Release();
     return result;
 }
 

@@ -64,6 +64,7 @@ public:
         INIT_DATA_RETRY_EVENT = 3,
         RETRY_RESET_OPKEY_CONFIG = 4,
         INIT_ESIM_DATA_RETRY_EVENT = 5,
+        INIT_ESIM_DATA_EVENT = 6,
     };
 
 private:

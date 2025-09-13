@@ -241,6 +241,10 @@ void SimFile::ProcessFileLoaded(bool response)
 
 void SimFile::OnAllFilesFetched()
 {
+    if (OHOS::system::GetBoolParameter("persist.telephony.is_simslots_mapping", false)) {
+        TELEPHONY_LOGW("simslots is mapping, no need fetch files");
+        return;
+    }
     UpdateSimLanguage();
     UpdateLoaded(true);
     TELEPHONY_LOGI("SimFile::OnAllFilesFetched: start notify slotId = %{public}d", slotId_);
@@ -302,7 +306,7 @@ void SimFile::ObtainCallForwardFiles()
 void SimFile::LoadSimOtherFile()
 {
     if (serviceTable_.empty()) {
-        TELEPHONY_LOGE("get sst fail, serviceTable_ is null");
+        TELEPHONY_LOGI("get sst fail, serviceTable_ is null");
         return;
     }
     if (IsServiceAvailable(UsimService::USIM_PLMN_NETWORK_NAME)) {

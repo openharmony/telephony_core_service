@@ -2936,7 +2936,9 @@ int32_t CoreManagerInner::SwitchToProfile(int32_t slotId, int32_t portIndex, con
         TELEPHONY_LOGE("SwitchToProfile esimManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return esimManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
+    int32_t ret = esimManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
+    CheckIfNeedSwitchMainSlotId(true);
+    return ret;
 }
 
 int32_t CoreManagerInner::SetProfileNickname(
@@ -2970,5 +2972,49 @@ int32_t CoreManagerInner::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResu
 
 /******************** esimManager_ end ************************/
 
+bool CoreManagerInner::IsEsim(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return false;
+    }
+    return simManager_->IsEsim(slotId);
+}
+
+int32_t CoreManagerInner::ClearSimLabel(SimType simType)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->ClearSimLabel(simType);
+}
+
+int32_t CoreManagerInner::UpdateSim2Present(bool isShowPresent)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->UpdateSim2Present(isShowPresent);
+}
+
+int32_t CoreManagerInner::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->UpdateEsimOpName(iccId, operatorName);
+}
+
+void CoreManagerInner::CheckIfNeedSwitchMainSlotId(bool isUserSet)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    simManager_->CheckIfNeedSwitchMainSlotId(isUserSet);
+}
 } // namespace Telephony
 } // namespace OHOS

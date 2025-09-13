@@ -46,7 +46,7 @@ void SimManager::InitMultiSimObject()
 {
     // Program memory
     std::lock_guard<ffrt::shared_mutex> lck(mtx_);
-    if (slotCount_ <0 || slotCount_ > MAX_SLOT_COUNT) {
+    if (slotCount_ < 0 || slotCount_ > MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("SimManager InitMultiSimObject, slotCount = %{public}d is out of range", slotCount_);
         return;
     }
@@ -1365,10 +1365,6 @@ int32_t SimManager::GetDefaultMainSlotByIccId()
 
 int32_t SimManager::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
-    if (!HasSimCardInner(slotId)) {
-        simLabel.index = slotId + 1;
-        return TELEPHONY_ERR_SUCCESS;
-    }
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;
@@ -1419,6 +1415,51 @@ int32_t SimManager::GetAllSimAccountInfoList(bool denied, std::vector<IccAccount
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return multiSimController_->GetAllSimAccountInfoList(denied, iccAccountInfoList);
+}
+
+bool SimManager::IsEsim(int32_t slotId)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return false;
+    }
+    return multiSimController_->IsEsim(slotId);
+}
+
+int32_t SimManager::ClearSimLabel(SimType simType)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimController_->ClearSimLabel(simType);
+}
+
+int32_t SimManager::UpdateSim2Present(bool isShowPresent)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimController_->UpdateSim2Present(isShowPresent);
+}
+
+int32_t SimManager::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimController_->UpdateEsimOpName(iccId, operatorName);
+}
+
+void SimManager::CheckIfNeedSwitchMainSlotId(bool isUserSet)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr.");
+        return;
+    }
+    multiSimController_->CheckIfNeedSwitchMainSlotId(!isUserSet);
 }
 } // namespace Telephony
 } // namespace OHOS
