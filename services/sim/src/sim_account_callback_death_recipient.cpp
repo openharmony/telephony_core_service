@@ -32,7 +32,6 @@ void SimAccountCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &r
                 return;
             }
             std::static_pointer_cast<MultiSimMonitor>(handler)->UnregisterSimAccountCallback(callback);
-
         }
     }
 }
