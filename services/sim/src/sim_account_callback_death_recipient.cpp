@@ -26,7 +26,13 @@ void SimAccountCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &r
         sptr<SimAccountCallback> callback = iface_cast<SimAccountCallback>(remote.promote());
         if (callback != nullptr) {
             TELEPHONY_LOGE("OnRemoteDied remote server death");
-            handler_.UnregisterSimAccountCallback(callback);
+            auto handler = handler_.lock();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("handle is invalid");
+                return;
+            }
+            std::static_pointer_cast<MultiSimMonitor>(handler)->UnregisterSimAccountCallback(callback);
+
         }
     }
 }

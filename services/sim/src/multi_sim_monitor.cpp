@@ -363,7 +363,7 @@ void MultiSimMonitor::UnSubscribeListeners()
 void MultiSimMonitor::InitListener()
 {
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(shared_from_this());
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
@@ -379,8 +379,13 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int3
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
-            handler_.SubscribeDataShareReady();
-            handler_.SubscribeUserSwitch();
+            auto handler = handler_.lock();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("handler is invalid");
+                return;
+            }
+            std::static_pointer_cast<MultiSimMonitor>(handler)->SubscribeDataShareReady();
+            std::static_pointer_cast<MultiSimMonitor>(handler)->SubscribeUserSwitch();
             break;
         }
         default:
@@ -395,7 +400,12 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(i
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped");
-            handler_.UnSubscribeListeners();
+            auto handler = handler_.lock();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("handler is invalid");
+                return;
+            }
+            std::static_pointer_cast<MultiSimMonitor>(handler)->UnSubscribeListeners();
             break;
         }
         default:
@@ -451,10 +461,15 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
     std::vector<int32_t> activeList = { 0 };
     DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (action == DATASHARE_READY_EVENT) {
-        handler_.isDataShareReady_ = true;
-        if (activeList.size() > 0 && activeList[0] == ACTIVE_USER_ID) {
-            handler_.CheckDataShareError();
-            handler_.CheckSimNotifyRegister();
+        auto handler = handler_.lock();
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("handler is invalid");
+            return;
+        }
+        std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_ = true;
+        if (activeList[0] == ACTIVE_USER_ID) {
+            std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
+            std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
         }
     }
 }
@@ -467,9 +482,14 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEven
     if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         int32_t userId = data.GetCode();
         TELEPHONY_LOGI("current user id is :%{public}d", userId);
-        if (userId == ACTIVE_USER_ID && handler_.isDataShareReady_) {
-            handler_.CheckDataShareError();
-            handler_.CheckSimNotifyRegister();
+        auto handler = handler_.lock();
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("handler is invalid");
+            return;
+        }
+        if (userId == ACTIVE_USER_ID && std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_) {
+            std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
+            std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
         }
     }
 }
