@@ -884,5 +884,25 @@ HWTEST_F(MultiSimControllerTest, SetSimLabelIndextest, Function | MediumTest | L
     multiSimController->allLocalCacheInfo_.clear();
     EXPECT_EQ(multiSimController->SetSimLabelIndex("iccId", 1), INVALID_VALUE);
 }
+
+HWTEST_F(MultiSimControllerTest, SetActiveSimSatellitetest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = {};
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).WillOnce(Return(false)).Times(AnyNumber());
+    EXPECT_EQ(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).WillOnce(Return(true)).Times(AnyNumber());
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetSimId(_, _))
+        .WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID)).Times(AnyNumber());
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
 }
 }
