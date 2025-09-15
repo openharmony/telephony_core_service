@@ -424,7 +424,7 @@ void MultiSimMonitor::SubscribeDataShareReady()
     matchingSkills.AddEvent(DATASHARE_READY_EVENT);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-    dataShareSubscriber_ = std::make_shared<DataShareEventSubscriber>(subscriberInfo, *this);
+    dataShareSubscriber_ = std::make_shared<DataShareEventSubscriber>(subscriberInfo, shared_from_this());
     if (CommonEventManager::SubscribeCommonEvent(dataShareSubscriber_)) {
         TELEPHONY_LOGI("Subscribe datashare ready success");
     } else {
@@ -540,7 +540,7 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
     SimAccountCallbackRecord simAccountRecord;
     simAccountRecord.tokenId = tokenId;
     simAccountRecord.simAccountCallback = callback;
-    deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(*this);
+    deathRecipient_ = new (std::nothrow) SimAccountCallbackDeathRecipient(shared_from_this());
     if (deathRecipient_ == nullptr) {
         TELEPHONY_LOGE("deathRecipient is null");
         return TELEPHONY_ERR_STRCPY_FAIL;
