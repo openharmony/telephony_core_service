@@ -88,6 +88,10 @@ public:
     MOCK_METHOD2(GetSimLabel, int32_t(int32_t slotId, SimLabel &simLabel));
     MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &iccId, int32_t &labelIndex));
     MOCK_METHOD0(GetAllListFromDataBase, bool());
+    MOCK_METHOD2(GetTargetSimId, int32_t(int32_t slotId, int &simId));
+    MOCK_METHOD1(AnnounceDefaultVoiceSimIdChanged, bool(int simId));
+    MOCK_METHOD2(GetTargetDefaultSimId, int32_t(int32_t slotId, int &simId));
+    MOCK_METHOD1(AnnounceDefaultSmsSimIdChanged, bool(int simId));
 };
 } // namespace Telephony
 } // namespace OHOS
