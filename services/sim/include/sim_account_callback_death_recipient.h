@@ -23,12 +23,13 @@ namespace OHOS {
 namespace Telephony {
 class SimAccountCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    explicit SimAccountCallbackDeathRecipient(MultiSimMonitor &handler): handler_(handler) {}
+    explicit SimAccountCallbackDeathRecipient(std::shared_ptr<AppExecFwk::EventHandler> handler)
+        : handler_(handler) {};
     ~SimAccountCallbackDeathRecipient() override = default;
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 
 private:
-    MultiSimMonitor &handler_;
+    std::weak_ptr<AppExecFwk::EventHandler> handler_;
 };
 } // namespace Telephony
 } // namespace OHOS

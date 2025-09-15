@@ -96,7 +96,7 @@ void StkController::UnSubscribeListeners()
 void StkController::InitListener()
 {
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(*this);
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(shared_from_this());
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
@@ -111,7 +111,12 @@ void StkController::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
-            handler_.SubscribeBundleScanFinished();
+            auto handler = handler_.lock();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("handle is invalid");
+                return;
+            }
+            std::static_pointer_cast<StkController>(handler)->SubscribeBundleScanFinished();
             break;
         }
         default:
@@ -125,7 +130,12 @@ void StkController::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(int
 {
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
-            handler_.UnSubscribeListeners();
+            auto handler = handler_.lock();
+            if (handler == nullptr) {
+                TELEPHONY_LOGE("handler is invalid");
+                return;
+            }
+            std::static_pointer_cast<StkController>(handler)->UnSubscribeListeners();
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID stopped");
             break;
         }
@@ -145,7 +155,8 @@ void StkController::SubscribeBundleScanFinished()
     matchingSkills.AddEvent(BUNDLE_SCAN_FINISHED_EVENT);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-    bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo, *this);
+    bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo,
+                                                                                        shared_from_this());
     if (CommonEventManager::SubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
         TELEPHONY_LOGI("Subscribe Bundle Scan Finished success");
     } else {
@@ -160,7 +171,12 @@ void StkController::BundleScanFinishedEventSubscriber::OnReceiveEvent(const Comm
     std::string action = want.GetAction();
     TELEPHONY_LOGI("action = %{public}s", action.c_str());
     if (action == BUNDLE_SCAN_FINISHED_EVENT) {
-        handler_.OnReceiveBms();
+        auto handler = handler_.lock();
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("handler is invalid");
+            return;
+        }
+        std::static_pointer_cast<StkController>(handler)->OnReceiveBms();
     }
 }
 
