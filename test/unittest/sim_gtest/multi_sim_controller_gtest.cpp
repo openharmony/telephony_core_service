@@ -893,7 +893,7 @@ HWTEST_F(MultiSimControllerTest, SetActiveSimSatellitetest_001, Function | Mediu
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = {};
-    auto mockmultisimcontroller = std::make_shared<MockSimRdbHelper>();
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
     EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).WillOnce(Return(false)).Times(AnyNumber());
     EXPECT_EQ(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_NO_SIM_CARD);
 
