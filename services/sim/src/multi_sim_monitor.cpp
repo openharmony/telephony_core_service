@@ -444,7 +444,7 @@ void MultiSimMonitor::SubscribeUserSwitch()
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-    userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, *this);
+    userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo, shared_from_this());
     if (CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_)) {
         TELEPHONY_LOGI("Subscribe UserSwitch success");
     } else {
