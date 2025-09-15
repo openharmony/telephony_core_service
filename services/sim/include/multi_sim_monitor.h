@@ -100,32 +100,33 @@ private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
     public:
         explicit DataShareEventSubscriber(
-            const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
-            : CommonEventSubscriber(info), handler_(handler) {}
+            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : CommonEventSubscriber(info), handler_(handler) {};
         ~DataShareEventSubscriber() = default;
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-        MultiSimMonitor &handler_;
+        std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
     class UserSwitchEventSubscriber : public CommonEventSubscriber {
     public:
         explicit UserSwitchEventSubscriber(
-            const CommonEventSubscribeInfo &info, MultiSimMonitor &handler)
-            : CommonEventSubscriber(info), handler_(handler) {}
+            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : CommonEventSubscriber(info), handler_(handler) {};
         ~UserSwitchEventSubscriber() = default;
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-        MultiSimMonitor &handler_;
+        std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityStatusChangeListener(MultiSimMonitor &handler) : handler_(handler) {};
+        explicit SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     
     private:
-        MultiSimMonitor &handler_;
+        std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
 private:

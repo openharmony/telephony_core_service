@@ -95,22 +95,23 @@ private:
     class BundleScanFinishedEventSubscriber : public CommonEventSubscriber {
     public:
         explicit BundleScanFinishedEventSubscriber(
-            const CommonEventSubscribeInfo &info, StkController &handler)
-            : CommonEventSubscriber(info), handler_(handler) {}
+            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : CommonEventSubscriber(info), handler_(handler) {};
         ~BundleScanFinishedEventSubscriber() = default;
         void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
-        StkController &handler_;
+        std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityStatusChangeListener(StkController &handler) : handler_(handler) {};
+        explicit SystemAbilityStatusChangeListener(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
-        StkController &handler_;
+        std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
 private:
