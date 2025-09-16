@@ -69,7 +69,7 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
             auto networkSearchManager = networkSearchManager_.lock();
             if (networkSearchManager == nullptr) {
-                TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_)
+                TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
                 return;
             }
             if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
