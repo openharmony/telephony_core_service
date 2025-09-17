@@ -26,7 +26,6 @@
 #include "telephony_types.h"
 #include "want.h"
 #include "operator_name_params.h"
-#include "ffrt_inner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -78,7 +77,6 @@ private:
     void UpdateVSimSpn(OperatorNameParams &params);
     void SetOperatorName(const std::string &operatorName);
     void SetOperatorNameByParams(OperatorNameParams &params);
-    bool IsShouldNotify(const RegServiceState &regStatus, const OperatorNameParams &params, bool isForce);
 
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
@@ -103,7 +101,6 @@ private:
     std::vector<std::shared_ptr<PlmnNetworkName>> pnnCust_;
     std::vector<std::shared_ptr<OperatorPlmnInfo>> oplCust_;
     std::string longName_ = "";
-    ffrt::shared_mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
