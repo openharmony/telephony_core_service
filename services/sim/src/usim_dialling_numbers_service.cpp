@@ -70,6 +70,9 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     if (object == nullptr) {
         TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
         isProcessingPbr = false;
+        std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> list =
+            std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+        SendBackResult(list);
         return;
     }
     if (object->exception == nullptr) {
