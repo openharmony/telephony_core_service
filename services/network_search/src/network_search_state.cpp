@@ -455,7 +455,11 @@ void NetworkSearchState::NotifyStateChange()
         NotifyPsRoamingStatusChange();
         NotifyEmergencyChange();
         NotifyNrStateChange();
-        
+
+        auto networkSearchManager = networkSearchManager_.lock();
+        if (networkSearchManager != nullptr) {
+            networkSearchManager->UpdateOperatorName(slotId_);
+        }
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
@@ -493,11 +497,6 @@ void NetworkSearchState::SetLongOperatorName(const std::string &longName, Domain
         networkState_->SetLongOperatorName(longName, domainType);
         TELEPHONY_LOGD("NetworkSearchState::SetLongOperatorName longName : %{public}s", longName.c_str());
     }
-}
-
-bool NetworkSearchState::IsProcessNetworkState()
-{
-    return processNetworkState_;
 }
 } // namespace Telephony
 } // namespace OHOS
