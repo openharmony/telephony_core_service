@@ -27,6 +27,7 @@ struct ArktsError;
 struct AniLockStatusResponse;
 struct AniOperatorConfig;
 struct AniIccAccountInfo;
+struct ArktsDiallingNumbersInfo;
 struct AniSimAuthenticationResponse;
 
 ArktsError GetLockState(int32_t slotId, int32_t lockType, int32_t &lockState);
@@ -72,6 +73,16 @@ ArktsError UnlockSimLock(int32_t slotId, int32_t persoLocktype, rust::String pas
 ArktsError SendTerminalResponseCmd(int32_t slotId, rust::String cmd);
 
 ArktsError SendEnvelopeCmd(int32_t slotId, rust::String cmd);
+
+ArktsError UpdateIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError DelIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError AddIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError QueryIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    rust::Vec<ArktsDiallingNumbersInfo> &diallingNumbers);
 
 ArktsError AlterPin2(int32_t slotId, const rust::String newPin2, const rust::String oldPin2,
     AniLockStatusResponse &lockStatusResponse);

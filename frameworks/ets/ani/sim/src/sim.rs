@@ -13,7 +13,7 @@
 
 use crate::{
     bridge::{
-        AniIccAccountInfo, AniLockInfo, AniLockStatusResponse, AniOperatorConfig, AniPersoLockInfo,
+        AniDiallingNumbersInfo, AniIccAccountInfo, AniLockInfo, AniLockStatusResponse, AniOperatorConfig, AniPersoLockInfo,
         AniSimAuthenticationResponse, CardType, ContactType, DsdsMode, LockState, LockType, OperatorSimCard, SimState, AuthType,
     },
     wrapper,
@@ -245,6 +245,63 @@ pub fn send_envelope_cmd(slot_id: i32, cmd: String) -> Result<(), BusinessError>
     }
     Ok(())
 }
+
+#[ani_rs::native]
+pub fn update_icc_dialling_numbers(
+        slot_id: i32,
+        contact_type: ContactType,
+        dialling_numbers: AniDiallingNumbersInfo
+    ) -> Result<(), BusinessError> {
+    let dialling_number_info = wrapper::ffi::ArktsDiallingNumbersInfo::from(dialling_numbers);
+    let arkts_error = wrapper::ffi::UpdateIccDiallingNumbers(slot_id, contact_type.into(), &dialling_number_info);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn del_icc_dialling_numbers(
+        slot_id: i32,
+        contact_type: ContactType,
+        dialling_numbers: AniDiallingNumbersInfo
+    ) -> Result<(), BusinessError> {
+    let dialling_number_info = wrapper::ffi::ArktsDiallingNumbersInfo::from(dialling_numbers);
+    let arkts_error = wrapper::ffi::DelIccDiallingNumbers(slot_id, contact_type.into(), &dialling_number_info);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+    Ok(())
+ }
+
+ #[ani_rs::native]
+ pub fn add_icc_dialling_numbers(
+        slot_id: i32,
+        contact_type: ContactType,
+        dialling_numbers: AniDiallingNumbersInfo
+    ) -> Result<(), BusinessError> {
+    let dialling_number_info = wrapper::ffi::ArktsDiallingNumbersInfo::from(dialling_numbers);
+    let arkts_error = wrapper::ffi::AddIccDiallingNumbers(slot_id, contact_type.into(), &dialling_number_info);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn query_icc_dialling_numbers(slot_id: i32, contact_type: ContactType) -> Result<Vec<AniDiallingNumbersInfo>, BusinessError> {
+    let mut dialling_numbers: Vec<wrapper::ffi::ArktsDiallingNumbersInfo> = Vec::new();
+    let arkts_error = wrapper::ffi::QueryIccDiallingNumbers(slot_id, contact_type.into(), &mut dialling_numbers);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+
+    let dialling_numbers_info: Vec<AniDiallingNumbersInfo> = dialling_numbers
+        .into_iter()
+        .map(|dialling_number| dialling_number.into())
+        .collect();
+    Ok(dialling_numbers_info)
+ }
 
  #[ani_rs::native]
  pub fn alter_pin2(slot_id: i32, new_pin2: String, old_pin2: String) -> Result<AniLockStatusResponse, BusinessError>

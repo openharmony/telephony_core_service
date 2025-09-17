@@ -14,10 +14,11 @@
 use crate::bridge::{
     icc_account_info_conversion, icc_account_info_push_data, lock_status_response_conversion,
     sim_authentication_response_conversion, operator_config_push_kv, AniIccAccountInfo, AniLockStatusResponse,
-    AniOperatorConfig, AniSimAuthenticationResponse,
+    AniOperatorConfig, AniDiallingNumbersInfo, AniSimAuthenticationResponse,
 };
 use ani_rs::business_error::BusinessError;
 use ffi::ArktsError;
+use ffi::ArktsDiallingNumbersInfo;
 
 pub const TELEPHONY_SUCCESS: i32 = 8300000;
 
@@ -26,6 +27,13 @@ pub mod ffi {
     struct ArktsError {
         errorCode: i32,
         errorMessage: String,
+    }
+
+    struct ArktsDiallingNumbersInfo {
+        recordNumber: i32,
+        alphaTag: String,
+        teleNumber: String,
+        pin2: String,
     }
 
     unsafe extern "C++" {
@@ -86,6 +94,14 @@ pub mod ffi {
         fn SendTerminalResponseCmd(slotId: i32, cmd: String) -> ArktsError;
 
         fn SendEnvelopeCmd(slotId: i32, cmd: String) -> ArktsError;
+
+        fn UpdateIccDiallingNumbers(slotId: i32, contactType: i32, diallingNumbers: &ArktsDiallingNumbersInfo) -> ArktsError;
+
+        fn DelIccDiallingNumbers(slotId: i32, contactType: i32, diallingNumbers: &ArktsDiallingNumbersInfo) -> ArktsError;
+
+        fn AddIccDiallingNumbers(slotId: i32, contactType: i32, diallingNumbers: &ArktsDiallingNumbersInfo) -> ArktsError;
+
+        fn QueryIccDiallingNumbers(slotId: i32, contactType: i32, diallingNumbers: &mut Vec<ArktsDiallingNumbersInfo>) -> ArktsError;
 
         fn AlterPin2(slotId: i32, newPin2: String, oldPin2: String, lockStatusResponse: &mut AniLockStatusResponse) -> ArktsError;
 
@@ -202,5 +218,27 @@ impl ArktsError {
 impl From<ArktsError> for BusinessError {
     fn from(value: ArktsError) -> Self {
         BusinessError::new(value.errorCode, value.errorMessage)
+    }
+}
+
+impl From<AniDiallingNumbersInfo> for ArktsDiallingNumbersInfo {
+    fn from(value: AniDiallingNumbersInfo) -> Self {
+        Self {
+            recordNumber: value.record_number.unwrap_or(0),
+            alphaTag: value.alpha_tag,
+            teleNumber: value.tele_number,
+            pin2: value.pin2.unwrap_or_default(),
+        }
+    }
+}
+
+impl From<ArktsDiallingNumbersInfo> for AniDiallingNumbersInfo {
+    fn from(value: ArktsDiallingNumbersInfo) -> Self {
+        Self {
+            record_number:(value.recordNumber != 0).then_some(value.recordNumber),
+            alpha_tag: value.alphaTag,
+            tele_number: value.teleNumber,
+            pin2: (!value.pin2.is_empty()).then_some(value.pin2),
+        }
     }
 }
