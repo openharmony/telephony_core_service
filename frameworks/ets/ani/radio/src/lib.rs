@@ -18,7 +18,7 @@ mod register;
 mod log;
 
 ani_rs::ani_constructor! {
-    namespace "L@ohos/telephony/radio/radio"
+    namespace "@ohos.telephony.radio.radio"
     [
         "nativeGetBasebandVersion": radio::get_baseband_version,
         "nativeSetNROptionMode": radio::set_nr_option_mode,
