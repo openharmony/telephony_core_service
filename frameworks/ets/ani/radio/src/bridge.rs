@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/ImsServiceType")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.ImsServiceType")]
 #[repr(i32)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImsServiceType {
@@ -33,7 +33,7 @@ impl From<i32> for ImsServiceType {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/ImsRegState")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.ImsRegState")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 enum ImsRegState {
@@ -51,7 +51,7 @@ impl From<i32> for ImsRegState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/ImsRegTech")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.ImsRegTech")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 enum ImsRegTech {
@@ -73,7 +73,7 @@ impl From<i32> for ImsRegTech {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkType")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkType")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkType {
@@ -101,7 +101,7 @@ impl From<i32> for NetworkType {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/RegState")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.RegState")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum RegState {
@@ -123,7 +123,7 @@ impl From<i32> for RegState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/RadioTechnology")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.RadioTechnology")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum RadioTechnology {
@@ -163,7 +163,7 @@ impl From<i32> for RadioTechnology {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NsaState")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NsaState")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NsaState {
@@ -189,7 +189,7 @@ impl From<i32> for NsaState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/ImsRegInfoInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.ImsRegInfoInner")]
 #[derive(Debug, Clone)]
 pub struct ImsRegInfoAni {
     ims_reg_state: ImsRegState,
@@ -210,7 +210,7 @@ pub fn ims_reg_info_conversion(info: &mut ImsRegInfoAni, ims_reg_state: i32, ims
     info.ims_reg_tech = ImsRegTech::from(ims_reg_tech);
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/SignalInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.SignalInformationInner")]
 #[derive(Debug, Clone)]
 pub struct SignalInformationAni {
     signal_type: NetworkType,
@@ -238,7 +238,7 @@ pub fn signal_information_push_data(
     signal_info.push(info);
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.CellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct CellInformation {
     pub network_type: NetworkType,
@@ -248,7 +248,7 @@ pub struct CellInformation {
     pub data: CellInformationData,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.CellInformationInner")]
 #[derive(Debug, Clone)]
 pub enum CellInformationData {
     Cdma(CdmaCellInformation),
@@ -259,7 +259,7 @@ pub enum CellInformationData {
     Wcdma(WcdmaCellInformation),
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkStateInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkStateInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkState {
     pub long_operator_name: String,
@@ -272,7 +272,7 @@ pub struct NetworkState {
     pub is_emergency: bool,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkRadioTechInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkRadioTechInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkRadioTech {
     pub ps_radio_tech: RadioTechnology,
@@ -288,7 +288,7 @@ impl NetworkRadioTech {
     }   
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/PreferredNetworkMode")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.PreferredNetworkMode")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum PreferredNetworkMode {
@@ -376,7 +376,7 @@ impl From<i32> for PreferredNetworkMode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkInformationState")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkInformationState")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkInformationState {
@@ -404,7 +404,7 @@ impl From<i32> for NetworkInformationState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkInformationInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkInformation {
     pub operator_name: String,
@@ -413,7 +413,7 @@ pub struct NetworkInformation {
     pub radio_tech: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSearchResultInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkSearchResultInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkSearchResult {
     pub is_network_search_success: bool,
@@ -429,7 +429,7 @@ impl NetworkSearchResult {
     }   
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSelectionMode")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkSelectionMode")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkSelectionMode {
@@ -455,7 +455,7 @@ impl From<i32> for NetworkSelectionMode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkSelectionModeOptionsInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkSelectionModeOptionsInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkSelectionModeOptions {
     pub slot_id: i32,
@@ -464,7 +464,7 @@ pub struct NetworkSelectionModeOptions {
     pub resume_selection: bool,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/CdmaCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.CdmaCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct CdmaCellInformation {
     pub base_id: i32,
@@ -474,7 +474,7 @@ pub struct CdmaCellInformation {
     pub sid: i32,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/GsmCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.GsmCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct GsmCellInformation {
     pub lac: i32,
@@ -485,7 +485,7 @@ pub struct GsmCellInformation {
     pub mnc: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/LteCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.LteCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct LteCellInformation {
     pub cgi: i32,
@@ -498,7 +498,7 @@ pub struct LteCellInformation {
     pub is_support_endc: bool,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NrCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NrCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct NrCellInformation {
     pub nr_arfcn: i32,
@@ -509,7 +509,7 @@ pub struct NrCellInformation {
     pub mnc: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/TdscdmaCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.TdscdmaCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct TdscdmaCellInformation {
     pub lac: i32,
@@ -520,7 +520,7 @@ pub struct TdscdmaCellInformation {
     pub mnc: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/WcdmaCellInformationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.WcdmaCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct WcdmaCellInformation {
     pub lac: i32,
@@ -531,7 +531,7 @@ pub struct WcdmaCellInformation {
     pub mnc: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkCapabilityType")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkCapabilityType")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkCapabilityType {
@@ -545,7 +545,7 @@ impl From<NetworkCapabilityType> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NetworkCapabilityState")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkCapabilityState")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkCapabilityState {
@@ -569,7 +569,7 @@ impl From<i32> for NetworkCapabilityState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/radio/radio/NROptionMode")]
+#[ani_rs::ani(path = "@ohos.telephony.radio.radio.NROptionMode")]
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NROptionMode {
