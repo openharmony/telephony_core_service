@@ -884,5 +884,496 @@ HWTEST_F(MultiSimControllerTest, SetSimLabelIndextest, Function | MediumTest | L
     multiSimController->allLocalCacheInfo_.clear();
     EXPECT_EQ(multiSimController->SetSimLabelIndex("iccId", 1), INVALID_VALUE);
 }
+
+HWTEST_F(MultiSimControllerTest, SetActiveSimSatellitetest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = {};
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(false));
+    EXPECT_EQ(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetSimId(_, _))
+        .Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID));
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(MultiSimControllerTest, SetActiveSimSatellitetest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = {};
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetSimId(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_NE(multiSimController->SetActiveSimSatellite(1, 1, false), TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultVoiceSlotIdtest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultVoiceCard(0)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    int32_t result = multiSimController->SetDefaultVoiceSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+
+    multiSimController->localCacheInfo_.clear();
+    result = multiSimController->SetDefaultVoiceSlotId(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    result = multiSimController->SetDefaultVoiceSlotId(10);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    multiSimController->defaultVoiceSimId_ = 0;
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultVoiceCard(0)).WillOnce(Return(0));
+    result = multiSimController->SetDefaultVoiceSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultVoiceSlotIdtest_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+
+    multiSimController->defaultVoiceSimId_ = 1;
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultVoiceCard(0)).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_CALL(*mockmultisimcontroller, AnnounceDefaultVoiceSimIdChanged(0)).Times(AnyNumber())
+        .WillOnce(Return(false));
+    int32_t result = multiSimController->SetDefaultVoiceSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultVoiceSlotIdtest_004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetDefaultSimId(0, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_NO_SIM_CARD));
+    int32_t result = multiSimController->SetDefaultVoiceSlotId(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultSmsSlotIdtest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetDefaultSimId(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    int32_t result = multiSimController->SetDefaultSmsSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    multiSimController->simDbHelper_ = {};
+    EXPECT_CALL(*mockmultisimcontroller, GetTargetDefaultSimId(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultMessageCard(_)).Times(AnyNumber())
+        .WillOnce(Return(INVALID_VALUE));
+    result = multiSimController->SetDefaultSmsSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+
+    multiSimController->localCacheInfo_.clear();
+    result = multiSimController->SetDefaultSmsSlotId(0);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultSmsSlotIdtest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultMessageCard(_)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+    multiSimController->defaultSmsSimId_ = 1;
+    int32_t result = multiSimController->SetDefaultSmsSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, SetDefaultSmsSlotIdtest_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultMessageCard(_)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+    multiSimController->defaultSmsSimId_ = 2;
+    EXPECT_CALL(*mockmultisimcontroller, AnnounceDefaultSmsSimIdChanged(_)).Times(AnyNumber()).WillOnce(Return(false));
+
+    int32_t result = multiSimController->SetDefaultSmsSlotId(0);
+    EXPECT_NE(result, TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL);
+}
+
+HWTEST_F(MultiSimControllerTest, GetShowNumbertest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    std::u16string showNumber;
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(false));
+    EXPECT_EQ(multiSimController->GetShowNumber(0, showNumber), TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*mockmultisimcontroller, GetSimTelephoneNumber(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_LOCAL_PTR_NULL));
+    EXPECT_NE(multiSimController->GetShowNumber(0, showNumber), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(MultiSimControllerTest, GetShowNumbertest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+
+    std::u16string showNumber = u"1234567890";
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*mockmultisimcontroller, GetSimTelephoneNumber(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_CALL(*mocksimfilemanager, GetSimTelephoneNumber()).Times(AnyNumber()).WillOnce(Return(showNumber));
+
+    EXPECT_NE(multiSimController->GetShowNumber(0, showNumber), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(showNumber, u"1234567890");
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumbertest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(false));
+
+    int32_t slotId = 1;
+    std::u16string number = u"1234567890";
+    bool force = false;
+
+    int32_t result = multiSimController->SetShowNumber(slotId, number, force);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+
+    slotId = 0;
+    number = u"1234567890";
+
+    result = multiSimController->SetShowNumber(slotId, number, force);
+    EXPECT_NE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumbertest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+    EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
+    multiSimController->simFileManager_.push_back(mocksimfilemanager);
+
+    EXPECT_CALL(*mocksimfilemanager, GetSimTeleNumberIdentifier()).Times(AnyNumber()).WillOnce(Return(u"AlphaTag"));
+    EXPECT_CALL(*mocksimfilemanager, SetSimTelephoneNumber(_, _)).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*mockmultisimcontroller, SetShowNumberToDB(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_SUCCESS));
+
+    int32_t slotId = 0;
+    std::u16string number = u"1234567890";
+    bool force = false;
+
+    int32_t result = multiSimController->SetShowNumber(slotId, number, force);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+
+    force = true;
+    result = multiSimController->SetShowNumber(slotId, number, force);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumbertest_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+    multiSimController->simFileManager_.push_back(mocksimfilemanager);
+
+    EXPECT_CALL(*mocksimfilemanager, GetSimTeleNumberIdentifier()).Times(AnyNumber()).WillOnce(Return(u"AlphaTag"));
+    EXPECT_CALL(*mocksimfilemanager, SetSimTelephoneNumber(_, _)).Times(AnyNumber()).WillOnce(Return(false));
+
+    int32_t slotId = 0;
+    std::u16string number = u"1234567890";
+    bool force = false;
+
+    int32_t result = multiSimController->SetShowNumber(slotId, number, force);
+    EXPECT_NE(result, TELEPHONY_ERR_FAIL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumberToDBtest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_EQ(multiSimController->SetShowNumberToDB(-1, u"1234567890"), false);
+    EXPECT_NE(multiSimController->SetShowNumberToDB(0, u"1234567890"), TELEPHONY_ERR_ARGUMENT_INVALID);
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_NE(multiSimController->SetShowNumberToDB(0, u"1234567890"), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumberToDBtest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_NE(multiSimController->SetShowNumberToDB(0, u"1234567890"), TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_EQ(multiSimController->SetShowNumberToDB(0, u"1234567890"), TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNumberToDBtest_003, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    int32_t slotId = 0;
+    std::u16string number = u"1234567890";
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_EQ(multiSimController->SetShowNumberToDB(slotId, number), TELEPHONY_ERR_SUCCESS);
+
+    slotId = multiSimController->localCacheInfo_.size();
+    EXPECT_EQ(multiSimController->SetShowNumberToDB(slotId, number), false);
+
+    slotId = 0;
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID));
+    EXPECT_NE(multiSimController->SetShowNumberToDB(slotId, number), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_NE(multiSimController->SetShowNumberToDB(slotId, number), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    multiSimController->simDbHelper_ = {};
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_NE(multiSimController->SetShowNumberToDB(slotId, number), TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    multiSimController->allLocalCacheInfo_.clear();
+    EXPECT_NE(multiSimController->SetShowNumberToDB(slotId, number), TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+}
+
+HWTEST_F(MultiSimControllerTest, GetShowNametest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::u16string showName;
+    int32_t result = multiSimController->GetShowName(-1, showName);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    result = multiSimController->GetShowName(0, showName);
+    EXPECT_NE(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNametest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_EQ(multiSimController->SetShowName(-1, u"Test", false), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber())
+        .WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID));
+    EXPECT_NE(multiSimController->SetShowName(0, u"Test", false), TELEPHONY_ERR_ARGUMENT_INVALID);
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_NE(multiSimController->SetShowName(0, u"Test", false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(MultiSimControllerTest, SetShowNametest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_NE(multiSimController->SetShowName(0, u"Test", false), TELEPHONY_ERR_DATABASE_WRITE_FAIL);
+
+    multiSimController->localCacheInfo_.resize(2);
+    EXPECT_NE(multiSimController->SetShowName(3, u"Test", false), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+    EXPECT_NE(multiSimController->SetShowName(0, u"Test", false), TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+
+    EXPECT_CALL(*mocksimrdbhelper, UpdateDataBySimId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    EXPECT_NE(multiSimController->SetShowName(0, u"Test", false), TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(MultiSimControllerTest, GetAllSimAccountInfoListtest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    vector<IccAccountInfo> iccAccountInfoList;
+    EXPECT_CALL(*mockmultisimcontroller, UpdateIccAccountInfoList(_, _, _)).Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = multiSimController->GetAllSimAccountInfoList(false, iccAccountInfoList);
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+
+    EXPECT_CALL(*mockmultisimcontroller, UpdateIccAccountInfoList(_, _, _)).Times(AnyNumber()).WillOnce(Return(true));
+    result = multiSimController->GetAllSimAccountInfoList(true, iccAccountInfoList);
+    EXPECT_NE(result, iccAccountInfoList.size());
+    for (const auto& info : iccAccountInfoList) {
+        EXPECT_EQ(info.iccId, u"");
+        EXPECT_EQ(info.showNumber, u"");
+    }
+}
+
+HWTEST_F(MultiSimControllerTest, GetAllSimAccountInfoListtest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    vector<IccAccountInfo> iccAccountInfoList;
+    EXPECT_CALL(*mockmultisimcontroller, UpdateIccAccountInfoList(_, _, _)).Times(AnyNumber()).WillOnce(Return(true));
+    int32_t result = multiSimController->GetAllSimAccountInfoList(false, iccAccountInfoList);
+    EXPECT_NE(result, iccAccountInfoList.size());
+    EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
+HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    multiSimController->simDbHelper_ = nullptr;
+    EXPECT_EQ(multiSimController->UpdateSim2Present(true), INVALID_VALUE);
+    SimRdbInfo simRdbInfo;
+    EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
+    EXPECT_EQ(multiSimController->UpdateSim2Present(true), INVALID_VALUE);
+
+    simRdbInfo.iccId = "12345678901234567890";
+    EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_NE(multiSimController->UpdateSim2Present(true), 0);
+}
+
+HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
+    auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
+    SimRdbInfo simRdbInfo;
+    EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_NE(multiSimController->UpdateSim2Present(true), 0);
+
+    EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_NE(multiSimController->UpdateSim2Present(false), 0);
+}
 }
 }

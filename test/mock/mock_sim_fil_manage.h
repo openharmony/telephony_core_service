@@ -42,6 +42,9 @@ public:
     MOCK_METHOD0(GetISOCountryCodeForSim, std::u16string());
     MOCK_METHOD0(GetSimSpn, std::u16string());
     MOCK_METHOD0(GetSimIccId, std::u16string());
+    MOCK_METHOD0(GetSimTelephoneNumber, std::u16string());
+    MOCK_METHOD0(GetSimTeleNumberIdentifier, std::u16string());
+    MOCK_METHOD2(SetSimTelephoneNumber, bool(const std::u16string &alphaTag, const std::u16string &phoneNumber));
     // 根据需要mock其他方法
 };
 } // namespace Telephony
