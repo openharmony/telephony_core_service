@@ -386,6 +386,94 @@ ArktsError SendEnvelopeCmd(int32_t slotId, rust::String cmd)
     return ConvertArktsErrorWithPermission(errorCode, "SendEnvelopeCmd", Permission::SET_TELEPHONY_STATE);
 }
 
+static void GetDiallingNumberInfo(const std::shared_ptr<DiallingNumbersInfo> &telNumber,
+    const ArktsDiallingNumbersInfo &info)
+{
+    if (!telNumber) {
+        return;
+    }
+
+    telNumber->index_ = info.recordNumber;
+    telNumber->name_ = NapiUtil::ToUtf16(std::string(info.alphaTag));
+    telNumber->number_ = NapiUtil::ToUtf16(std::string(info.teleNumber));
+    telNumber->pin2_ = NapiUtil::ToUtf16(std::string(info.pin2));
+}
+
+ArktsError UpdateIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    const ArktsDiallingNumbersInfo &diallingNumbers)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "UpdateIccDiallingNumbers", Permission::WRITE_CONTACTS);
+    }
+
+    std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
+    GetDiallingNumberInfo(telNumber, diallingNumbers);
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().UpdateIccDiallingNumbers(
+        slotId, contactType, telNumber);
+
+    return ConvertArktsErrorWithPermission(errorCode, "UpdateIccDiallingNumbers", Permission::WRITE_CONTACTS);
+}
+
+ArktsError DelIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "DelIccDiallingNumbers", Permission::WRITE_CONTACTS);
+    }
+
+    std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
+    GetDiallingNumberInfo(telNumber, diallingNumbers);
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().DelIccDiallingNumbers(
+        slotId, contactType, telNumber);
+
+    return ConvertArktsErrorWithPermission(errorCode, "DelIccDiallingNumbers", Permission::WRITE_CONTACTS);
+}
+
+ArktsError AddIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "AddIccDiallingNumbers", Permission::WRITE_CONTACTS);
+    }
+
+    std::shared_ptr<DiallingNumbersInfo> telNumber = std::make_shared<DiallingNumbersInfo>();
+    GetDiallingNumberInfo(telNumber, diallingNumbers);
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().AddIccDiallingNumbers(
+        slotId, contactType, telNumber);
+
+    return ConvertArktsErrorWithPermission(errorCode, "AddIccDiallingNumbers", Permission::WRITE_CONTACTS);
+}
+
+ArktsError QueryIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    rust::Vec<ArktsDiallingNumbersInfo> &diallingNumbers)
+{
+    int32_t errorCode = TELEPHONY_ERR_SUCCESS;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "QueryIccDiallingNumbers", Permission::READ_CONTACTS);
+    }
+
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersResult;
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(
+        slotId, contactType, diallingNumbersResult);
+    if (!diallingNumbersResult.empty()) {
+        for (const auto &dialNumber : diallingNumbersResult) {
+            ArktsDiallingNumbersInfo info = {};
+            info.recordNumber = dialNumber->index_;
+            info.alphaTag = NapiUtil::ToUtf8(dialNumber->name_);
+            info.teleNumber = NapiUtil::ToUtf8(dialNumber->number_);
+            info.pin2 = NapiUtil::ToUtf8(dialNumber->pin2_);
+            diallingNumbers.push_back(std::move(info));
+        }
+    }
+
+    return ConvertArktsErrorWithPermission(errorCode, "QueryIccDiallingNumbers", Permission::READ_CONTACTS);
+}
+
 ArktsError AlterPin2(int32_t slotId, const rust::String newPin2, const rust::String oldPin2,
     AniLockStatusResponse &lockStatusResponse)
 {

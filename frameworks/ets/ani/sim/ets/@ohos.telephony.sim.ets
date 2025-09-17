@@ -841,6 +841,98 @@ export default namespace sim {
     })
   }
 
+  export native function nativeQueryIccDiallingNumbers(slotId: int, type: ContactType): Array<DiallingNumbersInfo>;
+
+  export function queryIccDiallingNumbers(slotId: int, type: ContactType, callback: AsyncCallback<Array<DiallingNumbersInfo>>): void {
+    let p1 = taskpool.execute(nativeQueryIccDiallingNumbers, slotId, type)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as Array<DiallingNumbersInfo>);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new Array<DiallingNumbersInfo>());
+    });
+  }
+
+  export function queryIccDiallingNumbers(slotId: int, type: ContactType): Promise<Array<DiallingNumbersInfo>> {
+    return new Promise<Array<DiallingNumbersInfo>>((resolve, reject) => {
+      let p = taskpool.execute(nativeQueryIccDiallingNumbers, slotId, type)
+      p.then((e: NullishType) => {
+          let r = e as Array<DiallingNumbersInfo>
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeAddIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function addIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeAddIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function addIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeAddIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeDelIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function delIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeDelIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function delIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeDelIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeUpdateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function updateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeUpdateIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function updateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeUpdateIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
   export native function nativeSendEnvelopeCmd(slotId: int, cmd: string): void;
 
   export function sendEnvelopeCmd(slotId: int, cmd: string, callback: AsyncCallback<void>): void {
@@ -1166,6 +1258,26 @@ export native function nativeGetDsdsMode(): DsdsMode;
     GENERAL_CONTACT = 1,
 
     FIXED_DIALING = 2,
+  }
+
+  export interface DiallingNumbersInfo {
+    alphaTag: string;
+
+    teleNumber: string;
+
+    recordNumber?: int;
+
+    pin2?: string;
+  }
+
+  export class DiallingNumbersInfoInner implements DiallingNumbersInfo {
+    alphaTag: string;
+
+    teleNumber: string;
+
+    recordNumber?: int;
+
+    pin2?: string;
   }
 
 export interface LockInfo {
