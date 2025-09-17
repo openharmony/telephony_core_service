@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResetOption")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResetOption")]
 #[repr(i32)]
 pub enum ResetOption {
     DeleteOperationalProfiles = 1,
@@ -29,7 +29,7 @@ impl From<ResetOption> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResultCode")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResultCode")]
 #[repr(i32)]
 pub enum ResultCode {
     ResultSolvableErrors = -2,
@@ -116,7 +116,7 @@ impl From<i32> for ResultCode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ResultCode")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResultCode")]
 #[repr(i32)]
 pub enum CancelReason {
     CancelReasonEndUserRejection = 0,
@@ -131,7 +131,7 @@ impl From<CancelReason> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/EuiccInfoInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.EuiccInfoInner")]
 #[derive(Debug, Clone)]
 pub struct EuiccInfo {
     os_version: String,
@@ -145,7 +145,7 @@ impl EuiccInfo {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ProfileState")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ProfileState")]
 #[repr(i32)]
 pub enum ProfileState {
     ProfileStateUnspecified = -1,
@@ -163,7 +163,7 @@ impl From<i32> for ProfileState {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/ProfileClass")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ProfileClass")]
 #[repr(i32)]
 pub enum ProfileClass {
     ProfileClassUnspecified = -1,
@@ -183,7 +183,7 @@ impl From<i32> for ProfileClass {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/OperatorIdInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.OperatorIdInner")]
 #[derive(Debug, Clone)]
 pub struct OperatorId {
     pub mcc: String,
@@ -192,7 +192,7 @@ pub struct OperatorId {
     pub gid2: String,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/PolicyRules")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.PolicyRules")]
 #[repr(i32)]
 pub enum PolicyRules {
     PolicyRuleDisableNotAllowed = 1,
@@ -211,7 +211,7 @@ impl From<i32> for PolicyRules {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/AccessRuleInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.AccessRuleInner")]
 #[derive(Debug, Clone)]
 pub struct AccessRule {
     pub certificate_hash_hex_str: String,
@@ -229,7 +229,7 @@ impl AccessRule {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/EuiccProfileInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.EuiccProfileInner")]
 pub struct EuiccProfile {
     pub iccid: String,
     pub nick_name: String,
@@ -242,14 +242,14 @@ pub struct EuiccProfile {
     pub access_rules: Vec<AccessRule>,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetEuiccProfileInfoListResultInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.GetEuiccProfileInfoListResultInner")]
 pub struct GetEuiccProfileInfoListResult {
     pub response_result: ResultCode,
     pub profiles: Vec<EuiccProfile>,
     pub is_removable: bool,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadableProfileInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.DownloadableProfileInner")]
 pub struct DownloadableProfile {
     pub activation_code: String,
     pub confirmation_code: Option<String>,
@@ -257,7 +257,7 @@ pub struct DownloadableProfile {
     pub access_rules: Option<Vec<AccessRule>>,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadConfigurationInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.DownloadConfigurationInner")]
 #[derive(Debug, Clone)]
 pub struct DownloadConfiguration {
     pub switch_after_download: bool,
@@ -265,7 +265,7 @@ pub struct DownloadConfiguration {
     pub is_ppr_allowed: bool,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/SolvableErrors")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.SolvableErrors")]
 #[repr(i32)]
 pub enum SolvableErrors {
     SolvableErrorNeedConfirmationCode = 1,
@@ -288,14 +288,14 @@ impl From<i32> for SolvableErrors {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/DownloadProfileResultInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.DownloadProfileResultInner")]
 pub struct DownloadProfileResult {
     pub response_result: ResultCode,
     pub solvable_errors: SolvableErrors,
     pub card_id: i32,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetDownloadableProfilesResultInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.GetDownloadableProfilesResultInner")]
 pub struct GetDownloadableProfilesResult {
     pub response_result: ResultCode,
     pub downloadable_profiles: Vec<DownloadableProfile>,
@@ -311,7 +311,7 @@ impl GetDownloadableProfilesResult {
 }
 
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/GetDownloadableProfileMetadataResultInner")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.GetDownloadableProfileMetadataResultInner")]
 pub struct GetDownloadableProfileMetadataResult {
     pub downloadable_profile: DownloadableProfile,
     pub ppr_type: i32,
@@ -324,7 +324,7 @@ pub struct GetDownloadableProfileMetadataResult {
     pub response_result: ResultCode,
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/esim/eSIM/OsuStatus")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.OsuStatus")]
 #[repr(i32)]
 pub enum OsuStatus {
     EuiccUpgradeInProgress = 1,

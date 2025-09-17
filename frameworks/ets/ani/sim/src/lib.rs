@@ -18,7 +18,7 @@ mod sim;
 mod wrapper;
 
 ani_constructor!(
-    namespace "L@ohos/telephony/sim/sim"
+    namespace "@ohos.telephony.sim.sim"
     [
         "nativeGetLockState": sim::get_lock_state,
         "nativeUnlockPuk": sim::unlock_puk,
