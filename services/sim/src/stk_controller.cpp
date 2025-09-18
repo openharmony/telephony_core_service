@@ -426,7 +426,9 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {
-        EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
+        if (iccCardState_ == ICC_CARD_STATE_PRESENT) {
+            EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
+        }
         return;
     }
 #endif
