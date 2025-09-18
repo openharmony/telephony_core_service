@@ -261,7 +261,26 @@ impl From<ContactType> for i32 {
     }
 }
 
-#[ani_rs::ani(path="@ohos.telephony.sim.sim.LockInfoInner")]
+#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/DiallingNumbersInfoInner")]
+pub struct AniDiallingNumbersInfo {
+    pub alpha_tag: String,
+    pub tele_number: String,
+    pub record_number: Option<i32>,
+    pub pin2: Option<String>,
+}
+
+impl AniDiallingNumbersInfo {
+    pub fn new() -> Self {
+        Self {
+            alpha_tag: String::new(),
+            tele_number: String::new(),
+            record_number: None,
+            pin2: None,
+        }
+    }
+}
+
+#[ani_rs::ani(path="L@ohos/telephony/sim/sim/LockInfoInner")]
 pub struct AniLockInfo {
     pub lock_type: LockType,
     pub password: String,
