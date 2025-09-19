@@ -261,7 +261,7 @@ impl From<ContactType> for i32 {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/telephony/sim/sim/DiallingNumbersInfoInner")]
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.DiallingNumbersInfoInner")]
 pub struct AniDiallingNumbersInfo {
     pub alpha_tag: String,
     pub tele_number: String,
@@ -280,7 +280,7 @@ impl AniDiallingNumbersInfo {
     }
 }
 
-#[ani_rs::ani(path="L@ohos/telephony/sim/sim/LockInfoInner")]
+#[ani_rs::ani(path="@ohos.telephony.sim.sim.LockInfoInner")]
 pub struct AniLockInfo {
     pub lock_type: LockType,
     pub password: String,
@@ -356,7 +356,7 @@ impl OperatorSimCard {
 #[ani_rs::ani(path="@ohos.telephony.sim.sim.DsdsMode")]
 #[repr(i32)]
 pub enum DsdsMode {
-    DsdsModeV1 = 0,
+    DsdsModeV2 = 0,
 
     DsdsModeV3 = 1,
 
@@ -368,11 +368,11 @@ pub enum DsdsMode {
 impl From<i32> for DsdsMode {
     fn from(value: i32) -> Self {
         match value {
-            0 => DsdsMode::DsdsModeV1,
+            0 => DsdsMode::DsdsModeV2,
             1 => DsdsMode::DsdsModeV3,
             2 => DsdsMode::DsdsModeV5Tdm,
             3 => DsdsMode::DsdsModeV5Dsda,
-            _ => DsdsMode::DsdsModeV1,
+            _ => DsdsMode::DsdsModeV2,
         }
     }
 }

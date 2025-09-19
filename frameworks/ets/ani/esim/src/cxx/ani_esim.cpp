@@ -132,7 +132,7 @@ ArktsError ResetMemory(int32_t slotId, int32_t options, int32_t &resultCode)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "resetMemory", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 
@@ -164,7 +164,7 @@ ArktsError IsSupported(int32_t slotId, bool &isSupportedResult)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "isSupported", Permission::GET_TELEPHONY_ESIM_STATE);
     }
 
@@ -194,7 +194,7 @@ ArktsError GetEid(int32_t slotId, rust::String &eid)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getEid", Permission::GET_TELEPHONY_ESIM_STATE);
     }
 
@@ -218,7 +218,7 @@ ArktsError GetOsuStatus(int32_t slotId, int32_t &osuStatus)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getOsuStatus", Permission::GET_TELEPHONY_ESIM_STATE);
     }
 
@@ -230,7 +230,7 @@ ArktsError StartOsu(int32_t slotId, int32_t &osuStatus)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "startOsu", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 
@@ -255,7 +255,7 @@ ArktsError GetDownloadableProfileMetadata(int32_t slotId, int32_t portIndex, con
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getDownloadableProfileMetadata",
             Permission::GET_TELEPHONY_ESIM_STATE);
     }
@@ -284,7 +284,7 @@ ArktsError GetDownloadableProfiles(int32_t slotId, int32_t portIndex, bool force
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getDownloadableProfiles",
             Permission::GET_TELEPHONY_ESIM_STATE);
     }
@@ -314,7 +314,7 @@ ArktsError DownloadProfile(int32_t slotId, int32_t portIndex, const Downloadable
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "downloadProfile",
             Permission::GET_TELEPHONY_ESIM_STATE);
     }
@@ -351,7 +351,7 @@ ArktsError GetEuiccProfileInfoList(int32_t slotId, GetEuiccProfileInfoListResult
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getEuiccProfileInfoList",
             Permission::GET_TELEPHONY_ESIM_STATE);
     }
@@ -377,7 +377,7 @@ ArktsError GetEuiccInfo(int32_t slotId, rust::String &euiccInfo)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getEuiccInfo", Permission::GET_TELEPHONY_ESIM_STATE);
     }
 
@@ -402,7 +402,7 @@ ArktsError DeleteProfile(int32_t slotId, rust::String iccid, int32_t &resultCode
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "deleteProfile", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 
@@ -429,7 +429,7 @@ ArktsError SwitchToProfile(int32_t slotId, int32_t portIndex, rust::String iccid
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "switchToProfile", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 
@@ -455,7 +455,7 @@ ArktsError SetProfileNickname(int32_t slotId, rust::String iccid, rust::String n
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setProfileNickname", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 
@@ -481,7 +481,7 @@ ArktsError ReserveProfilesForFactoryRestore(int32_t slotId, int32_t &resultCode)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "reserveProfilesForFactoryRestore",
             Permission::SET_TELEPHONY_ESIM_STATE);
     }
@@ -500,7 +500,7 @@ ArktsError SetDefaultSmdpAddress(int32_t slotId, rust::String address, int32_t &
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setDefaultSmdpAddress",
             Permission::SET_TELEPHONY_ESIM_STATE);
     }
@@ -527,7 +527,7 @@ ArktsError GetDefaultSmdpAddress(int32_t slotId, rust::String &address)
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getDefaultSmdpAddress",
             Permission::GET_TELEPHONY_ESIM_STATE);
     }
@@ -553,7 +553,7 @@ ArktsError CancelSession(int32_t slotId, rust::String transactionId, int32_t can
 {
     int32_t errorCode = TELEPHONY_ERR_FAIL;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "cancelSession", Permission::SET_TELEPHONY_ESIM_STATE);
     }
 

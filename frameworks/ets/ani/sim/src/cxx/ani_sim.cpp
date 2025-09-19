@@ -44,6 +44,11 @@ static inline bool IsValidSlotIdEx(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
 }
 
+static inline bool IsValidSlotIdForDefault(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < SIM_SLOT_COUNT));
+}
+
 static inline ArktsError ConvertArktsErrorWithPermission(int32_t errorCode, const std::string &funcName,
                                                          const std::string &permission)
 {
@@ -286,8 +291,14 @@ int32_t GetMaxSimCount()
 ArktsError GetSimAuthentication(int32_t slotId, int32_t authType, rust::String authData,
     AniSimAuthenticationResponse &simAuthenticationResponse)
 {
+    int32_t errorCode;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "GetSimAuthentication", Permission::GET_TELEPHONY_STATE);
+    }
+
     SimAuthenticationResponse response;
-    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(slotId,
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SimAuthentication(slotId,
         static_cast<AuthType>(authType), std::string(authData), response);
     if (errorCode == ERROR_NONE) {
         sim_authentication_response_conversion(simAuthenticationResponse, response.sw1, response.sw2,
@@ -657,7 +668,7 @@ ArktsError ActivateSim(int32_t slotId)
 ArktsError SetDefaultVoiceSlotId(int32_t slotId)
 {
     int32_t errorCode = TELEPHONY_ERR_SUCCESS;
-    if (!IsValidSlotId(slotId)) {
+    if (!IsValidSlotIdForDefault(slotId)) {
         errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "SetDefaultVoiceSlotId", Permission::SET_TELEPHONY_STATE);
     }
@@ -847,7 +858,7 @@ ArktsError GetSimOperatorNumeric(int32_t slotId, rust::String &simOperatorNumeri
 ArktsError HasOperatorPrivileges(int32_t slotId, bool &hasPrivileges)
 {
     int32_t errorCode = TELEPHONY_ERR_SUCCESS;
-    if (!IsValidSlotIdEx(slotId)) {
+    if (!IsValidSlotId(slotId)) {
         errorCode = ERROR_SLOT_ID_INVALID;
     } else {
         errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().HasOperatorPrivileges(slotId, hasPrivileges);

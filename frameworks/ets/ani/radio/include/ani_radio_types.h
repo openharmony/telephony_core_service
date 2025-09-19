@@ -40,6 +40,16 @@ enum EtsNetworkSelectionMode {
     ETS_NETWORK_SELECTION_MANUAL
 };
 
+enum NetworkCapabilityType {
+    SERVICE_TYPE_LTE,
+    SERVICE_TYPE_NR,
+};
+
+enum NetworkCapabilityState {
+    SERVICE_CAPABILITY_OFF,
+    SERVICE_CAPABILITY_ON,
+};
+
 using AniCallbackResultType = std::variant<bool, int32_t, std::string, sptr<NetworkSearchResult>>;
 
 struct AniCallbackContext {
