@@ -47,6 +47,18 @@ static inline bool IsValidSlotIdEx(int32_t slotId)
     return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
 }
 
+static inline bool IsValidNetworkCapabilityType(int32_t networkCapabilityType)
+{
+    return ((networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_LTE)) ||
+        (networkCapabilityType == static_cast<int32_t>(NetworkCapabilityType::SERVICE_TYPE_NR)));
+}
+
+static inline bool IsValidNetworkCapabilityState(int32_t networkCapabilityState)
+{
+    return ((networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_OFF)) ||
+        (networkCapabilityState == static_cast<int32_t>(NetworkCapabilityState::SERVICE_CAPABILITY_ON)));
+}
+
 static inline ArktsError ConvertArktsErrorWithPermission(int32_t errorCode, const std::string &funcName,
                                                          const std::string &permission)
 {
@@ -269,7 +281,7 @@ ArktsError GetBasebandVersion(int32_t slotId, rust::String &basebandVersion)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getBasebandVersion", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -286,7 +298,7 @@ ArktsError SetNrOptionMode(int32_t slotId, int32_t nrMode)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setNrOptionMode", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -308,8 +320,8 @@ ArktsError GetNrOptionMode(int32_t slotId, int32_t &nrMode)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
-        return ConvertArktsErrorWithPermission(errorCode, "getNrOptionMode", Permission::GET_TELEPHONY_STATE);
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
     }
 
     auto context = std::make_shared<AniCallbackContext>();
@@ -325,26 +337,36 @@ ArktsError GetNrOptionMode(int32_t slotId, int32_t &nrMode)
         errorCode = context->errorCode;
     }
 
-    return ConvertArktsErrorWithPermission(errorCode, "getNrOptionMode", Permission::GET_TELEPHONY_STATE);
+    return ConvertArktsError(errorCode);
 }
 
 ArktsError SetNetworkCapability(int32_t slotId, int32_t capType, int32_t capState)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
-        return ConvertArktsErrorWithPermission(errorCode, "setNetworkCapability", Permission::SET_TELEPHONY_STATE);
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+
+    if (!IsValidNetworkCapabilityType(capType) || !IsValidNetworkCapabilityState(capState)) {
+        errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
+        return ConvertArktsError(errorCode);
     }
 
     errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetNetworkCapability(slotId, capType, capState);
-    return ConvertArktsErrorWithPermission(errorCode, "setNetworkCapability", Permission::SET_TELEPHONY_STATE);
+    return ConvertArktsError(errorCode);
 }
 
 ArktsError GetNetworkCapability(int32_t slotId, int32_t capType, int32_t &capState)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsErrorWithPermission(errorCode, "getNetworkCapability", Permission::GET_TELEPHONY_STATE);
+    }
+
+    if (!IsValidNetworkCapabilityType(capType)) {
+        errorCode = TELEPHONY_ERR_ARGUMENT_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getNetworkCapability", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -356,7 +378,7 @@ ArktsError FactoryReset(int32_t slotId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "factoryReset", Permission::SET_TELEPHONY_STATE);
     }
     errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().FactoryReset(slotId);
@@ -367,7 +389,7 @@ ArktsError GetRadioTech(int32_t slotId, int32_t &psRadioTech, int32_t &csRadioTe
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getRadioTech", Permission::GET_NETWORK_INFO);
     }
 
@@ -385,7 +407,7 @@ ArktsError SendUpdateCellLocationRequest(int32_t slotId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "sendUpdateCellLocationRequest", Permission::CELL_LOCATION);
     }
 
@@ -397,8 +419,8 @@ ArktsError GetCellInformation(int32_t slotId, rust::Vec<CellInformationAni> &cel
 {
     cellInfoVec.clear();
     int errorCode;
-    if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+    if (!IsValidSlotIdEx(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getCellInformation", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -423,8 +445,8 @@ ArktsError GetNetworkSelectionMode(int32_t slotId, int32_t &networkSelectionMode
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
-        return ConvertArktsErrorWithPermission(errorCode, "getNetworkSelectionMode", Permission::GET_TELEPHONY_STATE);
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
     }
 
     auto context = std::make_shared<AniCallbackContext>();
@@ -441,14 +463,14 @@ ArktsError GetNetworkSelectionMode(int32_t slotId, int32_t &networkSelectionMode
         errorCode = context->errorCode;
     }
 
-    return ConvertArktsErrorWithPermission(errorCode, "getNetworkSelectionMode", Permission::GET_TELEPHONY_STATE);
+    return ConvertArktsError(errorCode);
 }
 
 ArktsError SetNetworkSelectionMode(int32_t slotId, int32_t mode, const NetworkInformationAni &info, bool selection)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setNetworkSelectionMode", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -473,7 +495,7 @@ ArktsError GetNetworkSearchInformation(int32_t slotId, rust::Vec<NetworkInformat
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getNetworkSearchInformation",
             Permission::GET_TELEPHONY_STATE);
     }
@@ -511,9 +533,8 @@ ArktsError GetIsoCountryCodeForNetwork(int32_t slotId, rust::String &countryCode
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
-        return ConvertArktsErrorWithPermission(errorCode, "getIsoCountryCodeForNetwork",
-            Permission::GET_TELEPHONY_STATE);
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
     }
 
     std::u16string countryCodeStr = u"";
@@ -523,14 +544,14 @@ ArktsError GetIsoCountryCodeForNetwork(int32_t slotId, rust::String &countryCode
         countryCode = NapiUtil::ToUtf8(countryCodeStr);
     }
 
-    return ConvertArktsErrorWithPermission(errorCode, "getIsoCountryCodeForNetwork", Permission::GET_TELEPHONY_STATE);
+    return ConvertArktsError(errorCode);
 }
 
 ArktsError GetImeiSv(int32_t slotId, rust::String &imeiSv)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getImeiSv", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -547,7 +568,7 @@ ArktsError GetImei(int32_t slotId, rust::String &imei)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getImei", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -564,7 +585,7 @@ ArktsError GetMeid(int32_t slotId, rust::String &meid)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getMeid", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -581,7 +602,7 @@ ArktsError GetUniqueDeviceId(int32_t slotId, rust::String &uniqueDeviceId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getUniqueDeviceId", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -598,7 +619,7 @@ ArktsError SetPrimarySlotId(int32_t slotId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setPrimarySlotId", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -610,7 +631,7 @@ ArktsError IsRadioOn(int32_t slotId, bool &isRadioOn)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "isRadioOn", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -634,7 +655,7 @@ ArktsError TurnOnRadio(int32_t slotId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "turnOnRadio", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -656,7 +677,7 @@ ArktsError TurnOffRadio(int32_t slotId)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "turnOffRadio", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -677,8 +698,8 @@ ArktsError GetOperatorName(int32_t slotId, rust::String &operatorName)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
-        return ConvertArktsErrorWithPermission(errorCode, "getOperatorName", Permission::GET_TELEPHONY_STATE);
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
     }
 
     std::u16string operatorNameStr = u"";
@@ -687,14 +708,14 @@ ArktsError GetOperatorName(int32_t slotId, rust::String &operatorName)
         operatorName = NapiUtil::ToUtf8(operatorNameStr);
     }
 
-    return ConvertArktsErrorWithPermission(errorCode, "getOperatorName", Permission::GET_TELEPHONY_STATE);
+    return ConvertArktsError(errorCode);
 }
 
 ArktsError SetPreferredNetwork(int32_t slotId, int32_t preferredNetworkMode)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "setPreferredNetwork", Permission::SET_TELEPHONY_STATE);
     }
 
@@ -715,7 +736,7 @@ ArktsError GetPreferredNetwork(int32_t slotId, int32_t &preferredNetworkMode)
 {
     int errorCode;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getPreferredNetwork", Permission::GET_TELEPHONY_STATE);
     }
 
@@ -740,7 +761,7 @@ ArktsError GetImsRegInfo(int32_t slotId, int32_t imsSrvType, ImsRegInfoAni &imsR
     int32_t errorCode;
     ImsRegInfo info;
     if (!IsValidSlotId(slotId)) {
-        errorCode = TELEPHONY_ERR_SLOTID_INVALID;
+        errorCode = ERROR_SLOT_ID_INVALID;
         return ConvertArktsErrorWithPermission(errorCode, "getImsRegInfo",
                                                Permission::GET_TELEPHONY_STATE);
     }
