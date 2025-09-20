@@ -171,7 +171,7 @@ public:
     int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) override;
     bool IsEsim(int32_t slotId) override;
     int32_t ClearSimLabel(SimType simType) override;
-    int32_t UpdateSim2Present(bool isShowPresent) override;
+    int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent) override;
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName) override;
     void CheckIfNeedSwitchMainSlotId(bool isUserSet) override;
 
