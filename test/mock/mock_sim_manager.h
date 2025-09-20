@@ -133,7 +133,7 @@ public:
     MOCK_METHOD1(NotifySimSlotsMapping, int32_t(int32_t));
     MOCK_METHOD1(IsEsim, bool(int32_t));
     MOCK_METHOD1(ClearSimLabel, int32_t(SimType));
-    MOCK_METHOD1(UpdateSim2Present, int32_t(bool));
+    MOCK_METHOD2(UpdateSimPresent, int32_t(int32_t, bool));
     MOCK_METHOD2(UpdateEsimOpName, int32_t(const std::string &, const std::string &));
     MOCK_METHOD1(CheckIfNeedSwitchMainSlotId, void(bool));
 };

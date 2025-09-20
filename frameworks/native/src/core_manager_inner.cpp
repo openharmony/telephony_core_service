@@ -2990,13 +2990,13 @@ int32_t CoreManagerInner::ClearSimLabel(SimType simType)
     return simManager_->ClearSimLabel(simType);
 }
 
-int32_t CoreManagerInner::UpdateSim2Present(bool isShowPresent)
+int32_t CoreManagerInner::UpdateSimPresent(int32_t slotId, bool isShowPresent)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->UpdateSim2Present(isShowPresent);
+    return simManager_->UpdateSimPresent(slotId, isShowPresent);
 }
 
 int32_t CoreManagerInner::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)

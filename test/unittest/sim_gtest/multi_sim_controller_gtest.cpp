@@ -1337,7 +1337,7 @@ HWTEST_F(MultiSimControllerTest, GetAllSimAccountInfoListtest_002, Function | Me
     EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
 }
 
-HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_001, Function | MediumTest | Level1)
+HWTEST_F(MultiSimControllerTest, UpdateSimPresenttest_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
@@ -1347,18 +1347,18 @@ HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_001, Function | MediumTes
     auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
     auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
     multiSimController->simDbHelper_ = nullptr;
-    EXPECT_EQ(multiSimController->UpdateSim2Present(true), INVALID_VALUE);
+    EXPECT_EQ(multiSimController->UpdateSimPresent(0, true), INVALID_VALUE);
     SimRdbInfo simRdbInfo;
     EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(INVALID_VALUE));
-    EXPECT_EQ(multiSimController->UpdateSim2Present(true), INVALID_VALUE);
+    EXPECT_EQ(multiSimController->UpdateSimPresent(1, true), INVALID_VALUE);
 
     simRdbInfo.iccId = "12345678901234567890";
     EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
     EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
-    EXPECT_NE(multiSimController->UpdateSim2Present(true), 0);
+    EXPECT_NE(multiSimController->UpdateSimPresent(0, true), 0);
 }
 
-HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_002, Function | MediumTest | Level1)
+HWTEST_F(MultiSimControllerTest, UpdateSimPresenttest_002, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
@@ -1370,10 +1370,10 @@ HWTEST_F(MultiSimControllerTest, UpdateSim2Presenttest_002, Function | MediumTes
     SimRdbInfo simRdbInfo;
     EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
     EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillOnce(Return(0));
-    EXPECT_NE(multiSimController->UpdateSim2Present(true), 0);
+    EXPECT_NE(multiSimController->UpdateSimPresent(1, true), 0);
 
     EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
-    EXPECT_NE(multiSimController->UpdateSim2Present(false), 0);
+    EXPECT_NE(multiSimController->UpdateSimPresent(1, false), 0);
 }
 }
 }

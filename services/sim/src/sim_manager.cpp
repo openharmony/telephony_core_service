@@ -1435,13 +1435,13 @@ int32_t SimManager::ClearSimLabel(SimType simType)
     return multiSimController_->ClearSimLabel(simType);
 }
 
-int32_t SimManager::UpdateSim2Present(bool isShowPresent)
+int32_t SimManager::UpdateSimPresent(in32_t slotId, bool isShowPresent)
 {
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->UpdateSim2Present(isShowPresent);
+    return multiSimController_->UpdateSimPresent(slotId, isShowPresent);
 }
 
 int32_t SimManager::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)
