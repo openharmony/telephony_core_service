@@ -93,7 +93,7 @@ public:
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
     bool IsEsim(int32_t slotId);
     int32_t ClearSimLabel(SimType simType);
-    int32_t UpdateSim2Present(bool isShowPresent);
+    int32_t UpdateSimPresent(in32_t slotId, bool isShowPresent);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isInit = true);
 

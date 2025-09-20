@@ -22,7 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr static const int32_t WAIT_TIME_SECOND = 1;
+constexpr static const int32_t WAIT_ONE_SECOND = 1;
+constexpr static const int32_t WAIT_THREE_SECOND = 3;
 constexpr static const int32_t WAIT_QUERY_TIME_SECOND = 60;
 
 IccDiallingNumbersManager::IccDiallingNumbersManager(
@@ -197,7 +198,7 @@ int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, false, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("UpdateIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_THREE_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -227,7 +228,7 @@ int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, true, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("DelIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }
@@ -256,7 +257,7 @@ int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("AddIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == std::cv_status::timeout) {
             break;
         }
     }

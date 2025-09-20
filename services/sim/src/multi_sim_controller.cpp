@@ -1894,30 +1894,35 @@ bool MultiSimController::IsSimSlotsMapping()
     return OHOS::system::GetBoolParameter(IS_SIMSLOTS_MAPPING_PROP, false);
 }
 
-int32_t MultiSimController::UpdateSim2Present(bool isShowPresent)
+int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
 {
-    TELEPHONY_LOGE("UpdateSim2Present isShowPresent: %{public}d", isShowPresent);
+    TELEPHONY_LOGE("UpdateSimPresent slotId:%{public}d isShowPresent:%{public}d", slotId, isShowPresent);
     int64_t id;
+    std::string invalidIccId = INVALID_ICCID + std::to_string(slotId);
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("failed by nullptr");
+        TELEPHONY_LOGE("UpdateSimPresent failed by nullptr");
         return INVALID_VALUE;
+    }
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("UpdateSimPresent invalid slotId %{public}d", slotId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (isShowPresent) {
         SimRdbInfo simRdbInfo;
         std::unique_lock<ffrt::mutex> dbLock(writeDbMutex_);
-        if (simDbHelper_->QueryDataByIccId(INVALID_ICCID, simRdbInfo) == INVALID_VALUE) {
-            TELEPHONY_LOGE("query fail");
+        if (simDbHelper_->QueryDataByIccId(invalidIccId, simRdbInfo) == INVALID_VALUE) {
+            TELEPHONY_LOGE("UpdateSimPresent query fail");
             return INVALID_VALUE;
         }
         if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
-            TELEPHONY_LOGI("exist INVALID_ICCID");
-            return SetSimLabelIndex(INVALID_ICCID, PSIM2);
+            TELEPHONY_LOGI("UpdateSimPresent exist INVALID_ICCID");
+            return SetSimLabelIndex(invalidIccId, slotId + 1);
         } else {
             DataShare::DataShareValuesBucket values;
             DataShare::DataShareValueObject slotObj(INVALID_VALUE);
-            DataShare::DataShareValueObject iccidObj(INVALID_ICCID);
+            DataShare::DataShareValueObject iccidObj(invalidIccId);
             DataShare::DataShareValueObject valueObj(ACTIVE);
-            DataShare::DataShareValueObject simLabelIndexObj(PSIM2);
+            DataShare::DataShareValueObject simLabelIndexObj(slotId + 1);
             DataShare::DataShareValueObject isEsimObj(false);
             DataShare::DataShareValueObject notMainCardObj(NOT_MAIN);
             values.Put(SimData::SLOT_INDEX, slotObj);
@@ -1934,7 +1939,7 @@ int32_t MultiSimController::UpdateSim2Present(bool isShowPresent)
             return ret > SIMID_INDEX0 ? TELEPHONY_SUCCESS : INVALID_VALUE;
         }
     } else {
-        return SetSimLabelIndex(INVALID_ICCID, INVALID_VALUE);
+        return SetSimLabelIndex(invalidIccId, INVALID_VALUE);
     }
 }
 } // namespace Telephony
