@@ -1435,7 +1435,7 @@ int32_t SimManager::ClearSimLabel(SimType simType)
     return multiSimController_->ClearSimLabel(simType);
 }
 
-int32_t SimManager::UpdateSimPresent(in32_t slotId, bool isShowPresent)
+int32_t SimManager::UpdateSimPresent(int32_t slotId, bool isShowPresent)
 {
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
