@@ -33,6 +33,9 @@ public:
 
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<EsimManager> esimManager = std::make_shared<EsimManager>(telRilManager);
+    esimManager->esimFilesLowPriority_.resize(ESIM_MAX_SLOT_COUNT);
+    esimManager->esimFilesLowPriority_[0] = std::make_shared<EsimFile>(telRilManager, 0);
+    esimManager->esimFilesLowPriority_[1] = nullptr;
 };
 
 void EsimManagerTest::SetUpTestCase() {}
@@ -353,7 +356,7 @@ HWTEST_F(EsimManagerTest, ListNotifications_001, Function | MediumTest | Level1)
 
     slotId = 0;
     ret = esimManager->ListNotifications(slotId, portIndex, events, notificationList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RetrieveNotificationList_001, Function | MediumTest | Level1)
@@ -371,7 +374,7 @@ HWTEST_F(EsimManagerTest, RetrieveNotificationList_001, Function | MediumTest | 
 
     slotId = 0;
     ret = esimManager->RetrieveNotificationList(slotId, portIndex, events, notificationList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RetrieveNotification_001, Function | MediumTest | Level1)
@@ -389,7 +392,7 @@ HWTEST_F(EsimManagerTest, RetrieveNotification_001, Function | MediumTest | Leve
 
     slotId = 0;
     ret = esimManager->RetrieveNotification(slotId, portIndex, seqNumber, notification);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, RemoveNotificationFromList_001, Function | MediumTest | Level1)
@@ -407,7 +410,7 @@ HWTEST_F(EsimManagerTest, RemoveNotificationFromList_001, Function | MediumTest 
 
     slotId = 0;
     ret = esimManager->RemoveNotificationFromList(slotId, portIndex, seqNumber, enumResult);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(EsimManagerTest, DeleteProfile_001, Function | MediumTest | Level1)
