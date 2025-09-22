@@ -33,9 +33,6 @@ public:
 
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<EsimManager> esimManager = std::make_shared<EsimManager>(telRilManager);
-    esimManager->esimFilesLowPriority_.resize(ESIM_MAX_SLOT_COUNT);
-    esimManager->esimFilesLowPriority_[0] = std::make_shared<EsimFile>(telRilManager, 0);
-    esimManager->esimFilesLowPriority_[1] = nullptr;
 };
 
 void EsimManagerTest::SetUpTestCase() {}
@@ -47,6 +44,9 @@ void EsimManagerTest::SetUp()
     esimManager->esimFiles_.resize(ESIM_MAX_SLOT_COUNT);
     esimManager->esimFiles_[0] = std::make_shared<EsimFile>(telRilManager);
     esimManager->esimFiles_[1] = nullptr;
+    esimManager->esimFilesLowPriority_.resize(ESIM_MAX_SLOT_COUNT);
+    esimManager->esimFilesLowPriority_[0] = std::make_shared<EsimFile>(telRilManager, 0);
+    esimManager->esimFilesLowPriority_[1] = nullptr;
 }
 
 void EsimManagerTest::TearDown() {}
