@@ -2002,5 +2002,28 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_007, Function | MediumTest |
     std::string authData = "test";
     EXPECT_EQ(simStateHandle->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, authData), SIM_AUTH_FAIL);
 }
+
+/**
+ * @tc.number   Telephony_SimStateHandle_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_008, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->Init(0);
+    IccState ar;
+    ar.simType_ = ICC_UNKNOWN_TYPE;
+    ar.simStatus_ = ICC_CONTENT_UNKNOWN;
+    int32_t slotId = 0;
+    simStateHandle->needReupdate_ = true;
+    simStateHandle->ProcessIccCardState(ar, slotId);
+ 
+    simStateHandle->needReupdate_ = false;
+    simStateHandle->ProcessIccCardState(ar, slotId);
+    EXPECT_EQ(simStateHandle->observerHandler_, nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
