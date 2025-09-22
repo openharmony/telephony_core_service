@@ -2021,7 +2021,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_008, Function | MediumTest |
     int32_t slotId = 0;
     simStateHandle->oldSimType_ = ICC_UNKNOWN_TYPE;
     simStateHandle->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
-    simStateHandle->iccid_ = "89000000";
+    simStateHandle->iccid_ = "";
     simStateHandle->needReupdate_ = true;
     simStateHandle->ProcessIccCardState(ar, slotId);
  
