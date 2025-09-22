@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-r
+
 #include "network_search_handler.h"
 
 #include "core_service_errors.h"
@@ -1506,8 +1506,6 @@ void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEve
     if (CheckRegistrationState(networkSearchManager)) {
         TELEPHONY_LOGE("RadioResidentNetworkChange RegState is in service");
         return;
- 
- 
     }
     std::string countryCode = "";
     if (plmn.length() >= MCC_LEN) {
