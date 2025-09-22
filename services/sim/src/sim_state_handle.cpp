@@ -414,11 +414,14 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
                 observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ICCID_LOADED, slotId);
             }
         }
-        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
-            slotId, externalType_, externalState_, reason);
+        UpdateSimStateToStateRegistry(slotId, reason);
         if (TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.updateHotPlugCardState_(slotId, externalState_);
         }
+        return;
+    }
+    if (needReupdate_) {
+        UpdateSimStateToStateRegistry(slotId, reason);
     }
 }
 
@@ -433,6 +436,14 @@ void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
             modemInitDone_ = false;
         }
     }
+}
+
+void SimStateHandle::UpdateSimStateToStateRegistry(int32_t slotId, LockReason reason)
+{
+    int32_t ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
+        slotId, externalType_, externalState_, reason);
+    needReupdate_ = (ret == TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    TELEPHONY_LOGI("SimStateHandle::UpdateSimStateToStateRegistry slotId: %{public}d ret: %{public}d", slotId, ret);
 }
 
 void SimStateHandle::UnInit()
