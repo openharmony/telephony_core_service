@@ -2017,7 +2017,11 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_008, Function | MediumTest |
     IccState ar;
     ar.simType_ = ICC_UNKNOWN_TYPE;
     ar.simStatus_ = ICC_CONTENT_UNKNOWN;
+    ar.iccid_ = "";
     int32_t slotId = 0;
+    simStateHandle->oldSimType_ = ICC_UNKNOWN_TYPE;
+    simStateHandle->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
+    simStateHandle->iccid_ = "89000000";
     simStateHandle->needReupdate_ = true;
     simStateHandle->ProcessIccCardState(ar, slotId);
  
