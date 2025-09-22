@@ -124,6 +124,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     if (setNrOptionModeExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    updatePlmnExt_ = (UpdatePlmnExt)dlsym(telephonyExtWrapperHandle_, "UpdatePlmnExt");
+    isInModem2Optimization_ = (IsInModem2Optimization)dlsym(telephonyExtWrapperHandle_, "IsInModem2Optimization");
+    if (updatePlmnExt_ == nullptr || isInModem2Optimization_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
