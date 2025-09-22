@@ -159,7 +159,6 @@ private:
     void GetDeviceId();
     bool CheckRegistrationState(const std::shared_ptr<NetworkSearchManager> &networkSearchManager);
 
-
 private:
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkRegister> networkRegister_ = nullptr;
