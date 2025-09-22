@@ -444,8 +444,8 @@ static napi_value CreateEnumVCardType(napi_env env, napi_value exports)
 napi_status InitVcardInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("importVCard", ImportVCard),
-        DECLARE_NAPI_FUNCTION("exportVCard", ExportVCard),
+        DECLARE_NAPI_WRITABLE_FUNCTION("importVCard", ImportVCard),
+        DECLARE_NAPI_WRITABLE_FUNCTION("exportVCard", ExportVCard),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
