@@ -280,7 +280,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
         ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId)) ||
         IsSwitchToProfileFromAnother(slotId)) {
-        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
+        HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         simFileManager->ClearData();
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
@@ -296,7 +296,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         }
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
                 !controller_->IsSetPrimarySlotIdInProgress()) {
-        TELEPHONY_LOGI("MultiSimMonitor::RefreshData clear data when sim is unknown");
+        HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when sim is unknown");
         simFileManager->ClearData();
         isSimAccountLoaded_[slotId] = 0;
     }
