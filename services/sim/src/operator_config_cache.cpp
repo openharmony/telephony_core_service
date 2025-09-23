@@ -311,6 +311,9 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
         }
+    } else if (event->GetInnerEventId() == OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY) {
+        TELEPHONY_LOGI("Batch insert apn retry");
+        notifyInitApnConfigs(slotId_);
     }
 }
 
@@ -368,7 +371,17 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         return;
     }
     TELEPHONY_LOGI("notifyInitApnConfigs end");
-    helper->notifyInitApnConfigs(slotId);
+    if (!helper->notifyInitApnConfigs(slotId)) {
+        if (retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES) {
+            SendEvent(OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY, OperatorConfigCache::
+                BATCH_INSERT_APN_RETRY_DEALY, Priority::HIGH);
+            TELEPHONY_LOGI("Batch insert apn retry time = %{public}d, delay = %{public}d",
+                retryBatchInsertApnTimes_, OperatorConfigCache::BATCH_INSERT_APN_RETRY_DEALY);
+            retryBatchInsertApnTimes_++;
+        }
+    } else {
+        retryBatchInsertApnTimes_ = 0;
+    }
 }
 
 bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t state)
@@ -379,6 +392,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
     TELEPHONY_LOGI("isOpkeyDbError = %{public}d, state = %{public}d",
         isOpkeyDbError, state);
     std::string opkey = GetOpKey(slotId);
+    retryBatchInsertApnTimes_ = 0;
     notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId, state);
     if ((opkey != std::string(INITIAL_OPKEY) && !isOpkeyDbError && state >= STATE_PARA_LOADED) ||
