@@ -31,7 +31,7 @@ class PdpProfileRdbHelper : public DelayedSingleton<PdpProfileRdbHelper> {
     DECLARE_DELAYED_SINGLETON(PdpProfileRdbHelper);
 
 public:
-    void notifyInitApnConfigs(int32_t slotId);
+    bool notifyInitApnConfigs(int32_t slotId);
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreatePdpProfileDataHelper();
 };
