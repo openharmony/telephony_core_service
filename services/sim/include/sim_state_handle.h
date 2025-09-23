@@ -176,6 +176,7 @@ private:
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void UpdateEsimOSVersion(int32_t slotId);
 #endif
+    void UpdateSimStateToStateRegistry(int32_t slotId, LockReason reason);
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
@@ -195,6 +196,7 @@ private:
     std::string iccid_ = "";
     std::string oldIccid_ = "";
     int32_t esimSwitchState_ = 0;
+    bool needReupdate_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
