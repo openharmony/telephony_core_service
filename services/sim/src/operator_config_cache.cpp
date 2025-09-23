@@ -375,7 +375,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         if (retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES) {
             SendEvent(OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY, OperatorConfigCache::
                 BATCH_INSERT_APN_RETRY_DEALY, Priority::HIGH);
-            TELEPHONY_LOGI("Batch insert apn retry time = %{public}d, delay = %{public}ld",
+            TELEPHONY_LOGI("Batch insert apn retry time = %{public}d, delay = %{public}d",
                 retryBatchInsertApnTimes_, OperatorConfigCache::BATCH_INSERT_APN_RETRY_DEALY);
             retryBatchInsertApnTimes_++;
         }
