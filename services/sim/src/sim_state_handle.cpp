@@ -380,7 +380,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     const int32_t newSimStatus = ar.simStatus_;
     iccState_ = ar;
     auto iter = simIccStatusMap_.find(newSimStatus);
-    TELEPHONY_LOGI("ProcessIccCardState slotId:%{public}d, newSimType:%{public}d, newSimStatus:%{public}s(%{public}d),"
+    HILOG_COMM_INFO("ProcessIccCardState slotId:%{public}d, newSimType:%{public}d, newSimStatus:%{public}s(%{public}d),"
         "oldSimStatus_%{public}d", slotId, newSimType, iter->second.c_str(), newSimStatus, oldSimStatus_);
     if (oldSimType_ != newSimType) {
         CardTypeEscape(newSimType, slotId);
