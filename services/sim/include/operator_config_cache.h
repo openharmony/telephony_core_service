@@ -75,6 +75,12 @@ private:
     bool isLoadingConfig_ = false;
     std::mutex mutex_;
     bool isUpdateImsCapFromChipDone_ = false;
+    int32_t retryBatchInsertApnTimes_ = 0;
+    static const int32_t BATCH_INSERT_APN_RETRY_TIMES = 5;
+    static const int32_t BATCH_INSERT_APN_RETRY_DEALY = 10*1000;
+    enum {
+        RADIO_BATCH_INSERT_APN_RETRY = 0,
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

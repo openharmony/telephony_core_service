@@ -38,12 +38,12 @@ std::shared_ptr<DataShare::DataShareHelper> PdpProfileRdbHelper::CreatePdpProfil
     return helper->CreatePdpHelper();
 }
 
-void PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
+bool PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatePdpProfileDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is nullptr");
-        return;
+        return false;
     }
     std::vector<DataShare::DataShareValuesBucket> values;
     DataShare::DataShareValuesBucket value;
@@ -53,6 +53,7 @@ void PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
     dataShareHelper->BatchInsert(pdpProfileUri, values);
     dataShareHelper->Release();
     dataShareHelper = nullptr;
+    return true;
 }
 }  // namespace Telephony
 }  // namespace OHOS
