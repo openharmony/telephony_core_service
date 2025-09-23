@@ -298,7 +298,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     GetSimState(slotId_, simState);
     if (event->GetInnerEventId() == RadioEvent::RADIO_SIM_STATE_CHANGE) {
-        TELEPHONY_LOGI("Sim state change, slotId = %{public}d, simstate = %{public}d",
+        HILOG_COMM_INFO("Sim state change, slotId = %{public}d, simstate = %{public}d",
             slotId_, static_cast<int>(simState));
         if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED ||
             simState == SimState::SIM_STATE_UNKNOWN) {
@@ -395,7 +395,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         EventFwk::CommonEventPublishInfo publishInfo;
         publishInfo.SetOrdered(false);
         bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-        TELEPHONY_LOGI("result = %{public}d, opkey: %{public}s, slotId: %{public}d, state: %{public}d",
+        HILOG_COMM_INFO("result = %{public}d, opkey: %{public}s, slotId: %{public}d, state: %{public}d",
             publishResult, opkey.data(), slotId, state);
         auto simFileManager = simFileManager_.lock();
         if (simFileManager != nullptr) {
