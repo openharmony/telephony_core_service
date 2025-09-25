@@ -1560,7 +1560,7 @@ int32_t MultiSimController::GetSimTelephoneNumber(int32_t slotId, std::u16string
     std::string result = "";
     imsCoreServiceClient->GetPhoneNumberFromIMPU(slotId, result);
     telephoneNumber = Str8ToStr16(result);
-    HILOG_COMM_INFO("impu result is empty:%{public}s, slot%{public}d", (telephoneNumber.empty() ? "true" : "false"),
+    TELEPHONY_LOGI("impu result is empty:%{public}s, slot%{public}d", (telephoneNumber.empty() ? "true" : "false"),
         slotId);
     std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if ((static_cast<uint32_t>(slotId) >= localCacheInfo_.size())) {
