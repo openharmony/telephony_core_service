@@ -142,9 +142,6 @@
                         "header_files": []
                     },
                     "name": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked"
-                },
-                {
-                    "name": "//base/telephony/core_service/frameworks/js/taihe/network_search:copy_telephony_radio"
                 }
             ],
             "test": [
