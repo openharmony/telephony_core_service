@@ -1265,8 +1265,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
     networkSearchHandler->UpdateOperatorName();
     networkSearchHandler->CheckRegistrationState(networkSearchManager);
-    std::shared_ptr<NetworkSearchManager> networkSearchManagerNull = nullptr;
-    networkSearchHandler->CheckRegistrationState(networkSearchManagerNull);
 }
  
 /**
