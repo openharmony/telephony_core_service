@@ -477,9 +477,24 @@ void SimStateHandle::UnregisterSatelliteCallback()
     }
 }
 
+void SimStateHandle::SetInSenseSwitchPhase(bool flag)
+{
+    isInSenseSwitchPhase_ = flag;
+}
+ 
+void SimStateHandle::ObtainIccStatus()
+{
+    ObtainIccStatus(slotId_);
+}
+
 void SimStateHandle::ObtainIccStatus(int32_t slotId)
 {
-    TELEPHONY_LOGI("SimStateHandle::ObtainIccStatus() slotId = %{public}d", slotId);
+    TELEPHONY_LOGI("SimStateHandle::ObtainIccStatus slotId = %{public}d", slotId);
+    if (isInSenseSwitchPhase_) {
+        TELEPHONY_LOGI("ObtainIccStatus slotId: %{public}d inSenseSwitchPhase, return", slotId);
+        return;
+    }
+
     auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_ICC_STATUS_DONE);
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
@@ -577,6 +592,12 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
 void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGD("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
+    if (isInSenseSwitchPhase_) {
+        // In sense switching, response data may be fault
+        TELEPHONY_LOGI("GetSimCardData slotId: %{public}d inSenseSwitchPhase, return", slotId);
+        return;
+    }
+    
     int32_t error = 0;
     IccState iccState;
     std::shared_ptr<SimCardStatusInfo> param = event->GetSharedObject<SimCardStatusInfo>();

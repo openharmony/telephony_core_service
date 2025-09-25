@@ -2517,5 +2517,30 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_005, Function | MediumTest | L
     multiSimController->isRilSetPrimarySlotSupport_ = false;
     EXPECT_EQ(multiSimController->SetPrimarySlotId(0, false), TELEPHONY_ERR_FAIL);
 }
+
+/**
+ * @tc.number   Telephony_MultiSimController_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimController_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->ObtainDualSimCardStatus();
+    bool flag = true;
+    multiSimController->SetInSenseSwitchPhase(flag);
+    EXPECT_EQ(multiSimController->simStateManager_[0], nullptr);
+ 
+    for (int32_t slotId = 0; slotId < SLOT_COUNT; slotId++) {
+        multiSimController->simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager);
+    }
+    multiSimController->ObtainDualSimCardStatus();
+    multiSimController->SetInSenseSwitchPhase(flag);
+    EXPECT_NE(multiSimController->simStateManager_[0], nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
