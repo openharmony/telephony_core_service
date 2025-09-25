@@ -156,6 +156,8 @@ private:
     void ProcessRilSetPrimarySlotResponse(bool result);
     bool IsSimSlotsMapping();
     bool IsSetPrimarySlotIdAllowed();
+    void ObtainDualSimCardStatus();
+    void SetInSenseSwitchPhase(bool flag);
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;

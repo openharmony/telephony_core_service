@@ -145,6 +145,8 @@ public:
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo);
     SimAuthenticationResponse GetSimIOResponse();
     int32_t NotifySimSlotsMapping(int32_t slotId);
+    void ObtainIccStatus();
+    void SetInSenseSwitchPhase(bool flag);
 
 public:
     bool modemInitDone_ = false;
@@ -197,6 +199,7 @@ private:
     std::string oldIccid_ = "";
     int32_t esimSwitchState_ = 0;
     bool needReupdate_ = false;
+    bool isInSenseSwitchPhase_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
