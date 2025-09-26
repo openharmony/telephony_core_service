@@ -65,6 +65,8 @@ public:
     void SyncSimMatchResponse();
     void SyncUnlockPinResponse();
     int32_t NotifySimSlotsMapping(int32_t slotId);
+    void SetInSenseSwitchPhase(bool flag);
+    void ObtainIccStatus();
 
 public:
     bool responseReady_ = false;
