@@ -1995,10 +1995,17 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_007, Function | MediumTest |
     simStateHandle->GetLockState(0, options.lockType);
     PersoLockInfo lockInfo;
     simStateHandle->UnlockSimLock(0, lockInfo);
+    simStateHandle->ProcessEvent(event);
+
+    event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_ICC_STATUS_DONE);
+    simStateHandle->isInSenseSwitchPhase_ = true;
     simStateHandle->ObtainIccStatus(0);
+    simStateHandle->GetSimCardData(0, event);
+    simStateHandle->isInSenseSwitchPhase_ = false;
+    simStateHandle->ObtainIccStatus(0);
+    simStateHandle->GetSimCardData(0, event);
     simStateHandle->ObtainRealtimeIccStatus(0);
     simStateHandle->SendSimMatchedOperatorInfo(0, 0, "", "");
-    simStateHandle->ProcessEvent(event);
     std::string authData = "test";
     EXPECT_EQ(simStateHandle->SimAuthentication(0, AuthType::SIM_AUTH_EAP_SIM_TYPE, authData), SIM_AUTH_FAIL);
 }
@@ -2028,6 +2035,24 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_008, Function | MediumTest |
     simStateHandle->needReupdate_ = false;
     simStateHandle->ProcessIccCardState(ar, slotId);
     EXPECT_EQ(simStateHandle->observerHandler_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_SimStateManager_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_005, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    bool flag = true;
+    simStateManager->simStateHandle_  = std::make_shared<SimStateHandle>(simStateManager);
+    simStateManager->SetInSenseSwitchPhase(flag);
+    simStateManager->ObtainIccStatus();
+    simStateManager->simStateHandle_.reset();
+    simStateManager->SetInSenseSwitchPhase(flag);
+    simStateManager->ObtainIccStatus();
 }
 } // namespace Telephony
 } // namespace OHOS

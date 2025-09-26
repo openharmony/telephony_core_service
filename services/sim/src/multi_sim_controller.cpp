@@ -1207,7 +1207,30 @@ void MultiSimController::SetPrimarySlotIdDone()
     PublishSetPrimaryEvent(true);
     std::unique_lock<ffrt::mutex> lock(activeSimMutex_);
     isSetPrimarySlotIdInProgress_ = false;
+    SetInSenseSwitchPhase(false);
     activeSimConn_.notify_all();
+ 
+    // trigger to obtain sim card status
+    ObtainDualSimCardStatus();
+}
+
+void MultiSimController::ObtainDualSimCardStatus()
+{
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        if (simStateManager_[i] != nullptr) {
+            simStateManager_[i]->ObtainIccStatus();
+        }
+    }
+}
+ 
+void MultiSimController::SetInSenseSwitchPhase(bool flag)
+{
+    TELEPHONY_LOGI("SetInSenseSwitchPhase to %{public}d", flag);
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        if (simStateManager_[i] != nullptr) {
+            simStateManager_[i]->SetInSenseSwitchPhase(flag);
+        }
+    }
 }
 
 bool MultiSimController::IsSetPrimarySlotIdAllowed()
@@ -1248,6 +1271,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     }
     // change protocol for default cellulardata slotId
     isSetPrimarySlotIdInProgress_ = true;
+    SetInSenseSwitchPhase(true);
     PublishSetPrimaryEvent(false);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
