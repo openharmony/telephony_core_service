@@ -16,12 +16,14 @@
 #include "esim_manager.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
+#include "core_manager_inner.h"
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
 #include "esim_controller.h"
 namespace OHOS {
 namespace Telephony {
+static constexpr const char* LAST_DEACTIVE_PROFILE = "persist.telephony.last_deactive_profile";
 EsimManager::EsimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilManager_(telRilManager)
 {
     TELEPHONY_LOGI("EsimManager::EsimManager()");
@@ -97,6 +99,8 @@ int32_t EsimManager::DisableProfile(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->DisableProfile(portIndex, iccId);
+    int32_t simId = CoreManagerInner::GetInstance().GetSimId(slotId);
+    SetParameter(LAST_DEACTIVE_PROFILE, std::to_string(simId).c_str());
     return TELEPHONY_ERR_SUCCESS;
 }
 
