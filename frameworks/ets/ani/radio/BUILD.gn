@@ -43,7 +43,6 @@ ohos_static_library("telephony_radio_ani_cxx") {
     ":telephony_radio_ani_cxx_gen",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
-    "//third_party/rust/crates/cxx:cxx_cppdeps",
   ]
   external_deps = [
     "c_utils:utils",
@@ -51,6 +50,7 @@ ohos_static_library("telephony_radio_ani_cxx") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "rust_cxx:cxx_cppdeps",
   ]
 
   defines = [
@@ -80,11 +80,11 @@ ohos_rust_shared_library("telephony_radio_ani") {
     "hilog:hilog_rust",
     "hilog:libhilog",
     "netmanager_base:ani_rs",
+    "rust_cxx:lib"
   ]
   deps = [
     ":telephony_radio_ani_cxx",
     "//third_party/rust/crates/serde/serde:lib",
-    "//third_party/rust/crates/cxx:lib",
   ]
 
   clippy_lints = "none"

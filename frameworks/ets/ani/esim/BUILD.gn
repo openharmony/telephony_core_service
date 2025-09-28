@@ -47,7 +47,6 @@ ohos_static_library("esim_ani_cxx") {
     ":esim_ani_cxx_gen",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
-    "//third_party/rust/crates/cxx:cxx_cppdeps",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -56,6 +55,7 @@ ohos_static_library("esim_ani_cxx") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "rust_cxx:cxx_cppdeps",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"
@@ -75,11 +75,11 @@ ohos_rust_shared_library("esim_ani") {
   external_deps = [
     "runtime_core:ani",
     "netmanager_base:ani_rs",
+    "rust_cxx:lib"
   ]
   deps = [
     ":esim_ani_cxx",
     "//third_party/rust/crates/serde/serde:lib",
-    "//third_party/rust/crates/cxx:lib",
   ]
 
   clippy_lints = "none"

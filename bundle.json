@@ -72,7 +72,8 @@
                 "libphonenumber",
                 "libpng",
                 "libxml2",
-                "openssl"
+                "openssl",
+                "rust_cxx"
             ]
         },
         "build": {
