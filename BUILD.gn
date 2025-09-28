@@ -153,7 +153,7 @@ ohos_shared_library("tel_core_service") {
   configs = [ "utils:telephony_log_config" ]
 
   defines = [
-    "TELEPHONY_LOG_TAG = \"CoreService\"",
+    "LOG_TAG = \"CoreService\"",
     "LOG_DOMAIN = 0xD001F04",
     "OPENSSL_SUPPRESS_DEPRECATED",
   ]

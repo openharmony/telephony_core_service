@@ -184,17 +184,17 @@ void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateMan
 
 bool MultiSimController::InitData(int32_t slotId)
 {
-    TELEPHONY_LOGI("slotId is %{public}d start", slotId);
+    HILOG_COMM_INFO("slotId is %{public}d start", slotId);
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("has no sim card, abandon");
         return false;
     }
     if (!InitIccId(slotId)) { // check if we insert or reactive a data
-        TELEPHONY_LOGE("Can not init IccId");
+        HILOG_COMM_ERROR("Can not init IccId");
         return false;
     }
     if (!GetListFromDataBase()) { // init data base to local cache
-        TELEPHONY_LOGE("Can not get dataBase");
+        HILOG_COMM_ERROR("Can not get dataBase");
         return false;
     }
     GetAllListFromDataBase();
@@ -216,7 +216,7 @@ bool MultiSimController::InitData(int32_t slotId)
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     loadedSimCardInfo_[slotId] = iccid;
-    TELEPHONY_LOGI("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_.size %{public}zu",
+    HILOG_COMM_INFO("sim account loaded, slotId %{public}d, simId %{public}d, loadedSimCardInfo_.size %{public}zu",
         slotId, localCacheInfo_[slotId].simId, loadedSimCardInfo_.size());
     return true;
 }
@@ -356,7 +356,7 @@ bool MultiSimController::InitIccId(int slotId)
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
         TELEPHONY_LOGI("old sim insert, slotId%{public}d", slotId);
         result = UpdateDataByIccId(slotId, newIccId);
-        TELEPHONY_LOGI("result is %{public}d", result);
+        HILOG_COMM_INFO("result is %{public}d", result);
     } else { // insert a new data for new IccId
         TELEPHONY_LOGI("new sim insert, slotId%{public}d", slotId);
         result = InsertData(slotId, newIccId);
@@ -365,7 +365,7 @@ bool MultiSimController::InitIccId(int slotId)
         TELEPHONY_LOGE("failed to init data");
         return false;
     }
-    TELEPHONY_LOGI("result is %{public}d", result);
+    HILOG_COMM_INFO("result is %{public}d", result);
     return true;
 }
 
@@ -608,7 +608,7 @@ void MultiSimController::SortCache()
         sortCache.emplace_back(emptyUnit);
     }
     for (size_t j = 0; j < count; j++) {
-        TELEPHONY_LOGI(
+        HILOG_COMM_INFO(
             "index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
@@ -823,7 +823,7 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
 
 int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool force)
 {
-    TELEPHONY_LOGI("enable = %{public}d slotId = %{public}d", enable, slotId);
+    HILOG_COMM_INFO("enable = %{public}d slotId = %{public}d", enable, slotId);
     if ((!IsValidData(slotId)) && !IsEsim(slotId)) {
         TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
