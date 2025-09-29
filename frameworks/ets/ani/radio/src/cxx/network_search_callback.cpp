@@ -47,8 +47,8 @@ void AniNetworkSearchCallback::OnGetPreferredNetworkCallback(const int32_t netwo
         context_->result = WrapNativeNetworkMode(networkMode);
     } else {
         context_->result = static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO);
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -66,8 +66,8 @@ void AniNetworkSearchCallback::OnSetPreferredNetworkCallback(const bool setResul
         context_->result = setResult;
     } else {
         context_->result = false;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -84,8 +84,8 @@ void AniNetworkSearchCallback::OnSetRadioStateCallback(const bool setResult, con
         context_->result = setResult;
     } else {
         context_->result = false;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -102,8 +102,8 @@ void AniNetworkSearchCallback::OnGetRadioStateCallback(const bool isOn, const in
         context_->result = isOn;
     } else {
         context_->result = false;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -121,8 +121,8 @@ void AniNetworkSearchCallback::OnGetNetworkSearchInformation(const sptr<NetworkS
         context_->result = networkSearchResult;
     } else {
         context_->result = OHOS::sptr<NetworkSearchResult>::MakeSptr();
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -139,8 +139,8 @@ void AniNetworkSearchCallback::OnSetNetworkModeCallback(const bool setResult, co
         context_->result = setResult;
     } else {
         context_->result = false;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -158,9 +158,8 @@ void AniNetworkSearchCallback::OnGetNetworkModeCallback(const int32_t searchMode
         context_->result = searchModel;
     } else {
         context_->result = static_cast<int32_t>(SelectionMode::MODE_TYPE_UNKNOWN);
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -177,9 +176,8 @@ void AniNetworkSearchCallback::OnGetNrOptionModeCallback(const int32_t mode, con
         context_->result = mode;
     } else {
         context_->result = 0;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }
@@ -196,9 +194,8 @@ void AniNetworkSearchCallback::OnSetNrOptionModeCallback(const bool setResult, c
         context_->result = setResult;
     } else {
         context_->result = false;
+        context_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
     }
-
-    context_->errorCode = errorCode;
     context_->isCallbackComplete = true;
     context_->cv.notify_all();
 }

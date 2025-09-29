@@ -53,7 +53,9 @@ export default namespace radio {
     export native function nativeSendUpdateCellLocationRequest(slotId?: int): void;
 
     export function sendUpdateCellLocationRequest(slotId: int, callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeSendUpdateCellLocationRequest, slotId);
+      let p1 = taskpool.execute((): void => {
+          return nativeSendUpdateCellLocationRequest(slotId)
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -63,7 +65,9 @@ export default namespace radio {
 
     export function sendUpdateCellLocationRequest(slotId?: int): Promise<void> {
       return new Promise<void>((resolve, reject) => {
-        let p = taskpool.execute(nativeSendUpdateCellLocationRequest, slotId);
+        let p = taskpool.execute((): void => {
+            return nativeSendUpdateCellLocationRequest(slotId)
+        })
         p.then((e: NullishType) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
@@ -73,7 +77,9 @@ export default namespace radio {
     }
 
     export function sendUpdateCellLocationRequest(callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeSendUpdateCellLocationRequest);
+      let p1 = taskpool.execute((): void => {
+          return nativeSendUpdateCellLocationRequest()
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -408,7 +414,9 @@ export default namespace radio {
     export native function nativeTurnOnRadio(slotId?: int): void;
 
     export function turnOnRadio(slotId: int, callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeTurnOnRadio, slotId);
+      let p1 = taskpool.execute((): void => {
+          return nativeTurnOnRadio(slotId)
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -418,7 +426,9 @@ export default namespace radio {
 
     export function turnOnRadio(slotId?: int): Promise<void>{
       return new Promise<void>((resolve, reject) => {
-        let p = taskpool.execute(nativeTurnOnRadio, slotId);
+        let p = taskpool.execute((): void => {
+            return nativeTurnOnRadio(slotId)
+        })
         p.then((e: NullishType) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
@@ -428,7 +438,9 @@ export default namespace radio {
     }
 
     export function turnOnRadio(callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeTurnOnRadio);
+      let p1 = taskpool.execute((): void => {
+          return nativeTurnOnRadio()
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -439,7 +451,9 @@ export default namespace radio {
     export native function nativeTurnOffRadio(slotId?: int): void;
 
     export function turnOffRadio(slotId: int, callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeTurnOffRadio, slotId);
+      let p1 = taskpool.execute((): void => {
+          return nativeTurnOffRadio(slotId)
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -449,7 +463,9 @@ export default namespace radio {
 
     export function turnOffRadio(slotId?: int): Promise<void>{
       return new Promise<void>((resolve, reject) => {
-        let p = taskpool.execute(nativeTurnOffRadio, slotId);
+        let p = taskpool.execute((): void => {
+            return nativeTurnOffRadio(slotId);
+        })
         p.then((e: NullishType) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
@@ -459,7 +475,9 @@ export default namespace radio {
     }
 
     export function turnOffRadio(callback: AsyncCallback<void>): void {
-      let p1 = taskpool.execute(nativeTurnOffRadio);
+      let p1 = taskpool.execute((): void => {
+          return nativeTurnOffRadio()
+      })
       p1.then((content: NullishType) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
@@ -1095,7 +1113,7 @@ export default namespace radio {
     }
 
     export interface LteCellInformation {
-      cgi: int;
+      cgi: long;
       pci: int;
       tac: int;
       earfcn: int;
@@ -1106,7 +1124,7 @@ export default namespace radio {
     }
 
     export class LteCellInformationInner implements LteCellInformation {
-      cgi: int;
+      cgi: long;
       pci: int;
       tac: int;
       earfcn: int;
