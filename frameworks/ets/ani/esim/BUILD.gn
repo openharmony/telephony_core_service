@@ -37,6 +37,8 @@ ohos_static_library("esim_ani_cxx") {
     "${target_gen_dir}/src",
   ]
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/cxx/ani_esim.cpp",
     "src/cxx/ani_reset_memory_callback.cpp",
