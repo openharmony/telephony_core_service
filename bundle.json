@@ -50,6 +50,7 @@
                 "eventhandler",
                 "ffrt",
                 "runtime_core",
+                "rust_cxx",
                 "hdf_core",
                 "hicollie",
                 "hilog",
@@ -72,8 +73,7 @@
                 "libphonenumber",
                 "libpng",
                 "libxml2",
-                "openssl",
-                "rust_cxx"
+                "openssl"
             ]
         },
         "build": {

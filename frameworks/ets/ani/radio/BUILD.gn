@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../../../.."
@@ -34,6 +35,8 @@ ohos_static_library("telephony_radio_ani_cxx") {
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
     "${target_gen_dir}/src",
   ]
+
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "src/cxx/ani_radio.cpp",
