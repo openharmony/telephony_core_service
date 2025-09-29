@@ -266,7 +266,7 @@ static rust::Vec<CellInformationAni> ConvertCellInformation(const std::vector<sp
         CellInformationAni cell;
         cell.network_type = static_cast<int32_t>(item->GetNetworkType());
         cell.is_camped = item->GetIsCamped();
-        cell.time_stamp = item->GetTimeStamp();
+        cell.time_stamp = static_cast<int64_t>(item->GetTimeStamp());
         cell.signal_type = static_cast<int32_t>(item->GetNetworkType());
         cell.signal_level = item->GetSignalLevel();
         cell.dbm = item->GetSignalIntensity();

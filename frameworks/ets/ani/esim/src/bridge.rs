@@ -219,7 +219,7 @@ pub struct AccessRule {
     pub access_type: i32,
 }
 
-impl AccessRule { 
+impl AccessRule {
     pub fn new() -> Self {
         Self {
             certificate_hash_hex_str: "".to_string(),
