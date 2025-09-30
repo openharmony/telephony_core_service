@@ -37,7 +37,7 @@ ani_rs::ani_constructor! {
         "nativeGetIMEI": radio::get_imei,
         "nativeGetMEID": radio::get_meid,
         "nativeGetUniqueDeviceId": radio::get_unique_device_id,
-        "nativeSetPrimarySlotId": radio::set_primary_slot_id,    
+        "nativeSetPrimarySlotId": radio::set_primary_slot_id,
         "nativeIsRadioOn": radio::is_radio_on,
         "nativeTurnOnRadio": radio::turn_on_radio,
         "nativeTurnOffRadio": radio::turn_off_radio,

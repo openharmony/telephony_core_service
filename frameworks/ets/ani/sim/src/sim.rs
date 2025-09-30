@@ -311,7 +311,7 @@ pub fn query_icc_dialling_numbers(slot_id: i32, contact_type: ContactType) -> Re
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }
-    Ok(lock_status)   
+    Ok(lock_status)
  }
 
  #[ani_rs::native]

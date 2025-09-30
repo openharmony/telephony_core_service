@@ -56,7 +56,7 @@ struct AniCallbackContext {
     ffrt::mutex callbackMutex;
     ffrt::condition_variable cv;
     bool isCallbackComplete = false;
-    int32_t errorCode = OHOS::Telephony::TELEPHONY_ERR_FAIL;
+    int32_t errorCode = OHOS::Telephony::TELEPHONY_ERR_SUCCESS;
     AniCallbackResultType result;
 };
 }

@@ -76,6 +76,7 @@ ohos_rust_shared_library("esim_ani") {
   
   external_deps = [
     "runtime_core:ani",
+    "hilog:libhilog",
     "netmanager_base:ani_rs",
   ]
   deps = [

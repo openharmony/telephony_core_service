@@ -97,7 +97,7 @@ pub mod ffi {
         pub lac: i32,
         pub arfcn: i32,
         pub bsic: i32,
-        pub cgi: i32,
+        pub cgi: i64,
         pub pci: i32,
         pub tac: i32,
         pub earfcn: i32,
@@ -250,7 +250,7 @@ impl CellInformationAni {
             nci: 0,
             cpid: 0,
             uarfcn: 0,
-            psc: 0,     
+            psc: 0,
         }
     }
 }
@@ -314,7 +314,7 @@ impl From<CellInformationAni> for bridge::CellInformation {
                     mcc: value.mcc,
                     mnc: value.mnc,
                 }),
-                _ => CellInformationData::Gsm(bridge::GsmCellInformation { 
+                _ => CellInformationData::Gsm(bridge::GsmCellInformation {
                     lac: value.lac,
                     cell_id: value.cell_id,
                     arfcn: value.arfcn,

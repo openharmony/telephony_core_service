@@ -220,7 +220,7 @@ pub fn get_default_smdp_address(slot_id: i32) -> Result<String, BusinessError> {
 }
 
 #[ani_rs::native]
-pub fn cancel_session(slot_id: i32, transaction_id: String, cancel_reason: CancelReason) -> 
+pub fn cancel_session(slot_id: i32, transaction_id: String, cancel_reason: CancelReason) ->
     Result<ResultCode, BusinessError> {
     let mut result_code = 0;
     let arkts_error = wrapper::ffi::CancelSession(slot_id, transaction_id, cancel_reason.into(), &mut result_code);
