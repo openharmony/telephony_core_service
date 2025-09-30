@@ -188,7 +188,7 @@ impl GetEuiccProfileInfoListResultAni {
     }
 }
 
-impl From<GetEuiccProfileInfoListResultAni> for GetEuiccProfileInfoListResult { 
+impl From<GetEuiccProfileInfoListResultAni> for GetEuiccProfileInfoListResult {
     fn from(value: GetEuiccProfileInfoListResultAni) -> Self {
         Self {
             response_result: ResultCode::from(value.responseResult),

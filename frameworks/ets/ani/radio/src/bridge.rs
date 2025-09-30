@@ -285,7 +285,7 @@ impl NetworkRadioTech {
             ps_radio_tech: RadioTechnology::from(ps),
             cs_radio_tech: RadioTechnology::from(cs),
         }
-    }   
+    }
 }
 
 #[ani_rs::ani(path = "@ohos.telephony.radio.radio.PreferredNetworkMode")]
@@ -433,9 +433,9 @@ impl NetworkSearchResult {
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NetworkSelectionMode {
-    NetworkSelectionModeUnknown,
-    NetworkSelectionModeAutomatic,
-    NetworkSelectionModeManual,
+    NetworkSelectionUnknown,
+    NetworkSelectionAutomatic,
+    NetworkSelectionManual,
 }
 
 impl From<NetworkSelectionMode> for i32 {
@@ -447,10 +447,10 @@ impl From<NetworkSelectionMode> for i32 {
 impl From<i32> for NetworkSelectionMode {
     fn from(value: i32) -> Self {
         match value {
-            0 => NetworkSelectionMode::NetworkSelectionModeUnknown,
-            1 => NetworkSelectionMode::NetworkSelectionModeAutomatic,
-            2 => NetworkSelectionMode::NetworkSelectionModeManual,
-            _ => NetworkSelectionMode::NetworkSelectionModeUnknown,
+            0 => NetworkSelectionMode::NetworkSelectionUnknown,
+            1 => NetworkSelectionMode::NetworkSelectionAutomatic,
+            2 => NetworkSelectionMode::NetworkSelectionManual,
+            _ => NetworkSelectionMode::NetworkSelectionUnknown,
         }
     }
 }
@@ -488,7 +488,7 @@ pub struct GsmCellInformation {
 #[ani_rs::ani(path = "@ohos.telephony.radio.radio.LteCellInformationInner")]
 #[derive(Debug, Clone)]
 pub struct LteCellInformation {
-    pub cgi: i32,
+    pub cgi: i64,
     pub pci: i32,
     pub tac: i32,
     pub earfcn: i32,
@@ -573,10 +573,10 @@ impl From<i32> for NetworkCapabilityState {
 #[repr(i32)]
 #[derive(Debug, Clone)]
 pub enum NROptionMode {
-    NROptionUnknown,
-    NROptionNsaOnly,
-    NROptionSaOnly,
-    NROptionNsaAndSa,
+    NrOptionUnknown,
+    NrOptionNsaOnly,
+    NrOptionSaOnly,
+    NrOptionNsaAndSa,
 }
 
 impl From<NROptionMode> for i32 {
@@ -588,11 +588,11 @@ impl From<NROptionMode> for i32 {
 impl From<i32> for NROptionMode {
     fn from(value: i32) -> Self {
         match value {
-            0 => NROptionMode::NROptionUnknown,
-            1 => NROptionMode::NROptionNsaOnly,
-            2 => NROptionMode::NROptionSaOnly,
-            3 => NROptionMode::NROptionNsaAndSa,
-            _ => NROptionMode::NROptionUnknown,
+            0 => NROptionMode::NrOptionUnknown,
+            1 => NROptionMode::NrOptionNsaOnly,
+            2 => NROptionMode::NrOptionSaOnly,
+            3 => NROptionMode::NrOptionNsaAndSa,
+            _ => NROptionMode::NrOptionUnknown,
         }
     }
 }

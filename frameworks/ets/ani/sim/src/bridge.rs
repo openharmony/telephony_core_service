@@ -307,7 +307,7 @@ pub enum CardType {
     SingleModeUsimCard = 20,
 
     SingleModeRuimCard = 30,
-    
+
     DualModeCgCard = 40,
 
     CtNationalRoamingCard = 41,
@@ -380,7 +380,7 @@ impl From<i32> for DsdsMode {
 #[ani_rs::ani(path="@ohos.telephony.sim.sim.AuthType")]
 #[repr(i32)]
 pub enum AuthType {
-    SimAuthEapSimtype = 128,
+    SimAuthEapSimType = 128,
 
     SimAuthEapAkaType = 129,
 }
@@ -388,7 +388,7 @@ pub enum AuthType {
 impl From<AuthType> for i32 {
     fn from(value: AuthType) -> Self {
         match value {
-            AuthType::SimAuthEapSimtype => 128,
+            AuthType::SimAuthEapSimType => 128,
             AuthType::SimAuthEapAkaType => 129,
             _ => 128,
         }

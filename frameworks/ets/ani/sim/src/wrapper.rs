@@ -150,9 +150,9 @@ pub mod ffi {
         fn GetSimIccId(slotId: i32, simIccId: &mut String) -> ArktsError;
 
         fn GetCardType(slotId: i32, cardType: &mut i32) -> ArktsError;
-        
+
         fn GetSimSpn(slotId: i32, simSpn: &mut String) -> ArktsError;
-        
+
         fn GetSimOperatorNumeric(slotId: i32, simOperatorNumeric: &mut String) -> ArktsError;
 
         fn HasOperatorPrivileges(slotId: i32, hasPrivileges: &mut bool) -> ArktsError;
