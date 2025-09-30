@@ -894,15 +894,11 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
     }
     int32_t defaultSlotId = GetDefaultMainSlotByIccId();
     if (IsSimActive(defaultSlotId)) {
-        if (IsAllCardsReady() && defaultSlotId != lastPrimarySlotId_) {
+        if (IsAllCardsReady()) {
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
-            if (radioProtocolController_ != nullptr &&
-                radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) == MODEM_ID_0) {
-                isInit = false;
-            }
-            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isInit = isInit]() {
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, !isInit);
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, true);
             });
             initDataTask.detach();
         } else if (radioProtocolController_ != nullptr &&
