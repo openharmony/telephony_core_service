@@ -17,24 +17,21 @@
 #define ANI_RS_RESET_MEMORY_CALLBACK_H
 
 #include <cstdint>
-#include <mutex>
-#include <condition_variable>
+#include <ffrt.h>
 #include "iesim_service_callback_stub.h"
 #include "telephony_napi_common_error.h"
 
 namespace OHOS {
-using namespace Telephony;
 namespace EsimAni {
-
 struct AniAsyncResetMemory {
-    std::mutex callbackMutex;
-    std::condition_variable cv;
+    ffrt::mutex callbackMutex;
+    ffrt::condition_variable cv;
     bool isCallbackEnd = false;
     int32_t callbackVal;
     int32_t errorCode = ERROR_DEFAULT;
 };
 
-class AniResetMemoryCallback : public IEsimServiceCallbackStub {
+class AniResetMemoryCallback : public Telephony::IEsimServiceCallbackStub {
 public:
     explicit AniResetMemoryCallback(AniAsyncResetMemory *context);
     void OnResetMemory(const int32_t &result, const int32_t errorCode) override;

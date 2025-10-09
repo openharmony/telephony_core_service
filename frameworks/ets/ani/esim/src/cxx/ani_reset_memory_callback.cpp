@@ -29,7 +29,7 @@ void AniResetMemoryCallback::OnResetMemory(const int32_t &result, const int32_t 
         return;
     }
 
-    std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
+    std::lock_guard<ffrt::mutex> callbackLock(asyncContext_->callbackMutex);
     if (errorCode == TELEPHONY_ERR_SUCCESS) {
         asyncContext_->callbackVal = result;
     } else {
