@@ -103,6 +103,7 @@ void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> c
         TELEPHONY_LOGE("NetworkRegister::ProcessCsRegister networkSearchState_ is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    UpdateCfgTech();
     UpdateCellularCall(regStatus, CS_TYPE);
     RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(csRegStateResult->radioTechnology));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
