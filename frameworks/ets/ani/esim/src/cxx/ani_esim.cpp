@@ -50,7 +50,7 @@ static inline ArktsError ConvertArktsErrorWithPermission(int32_t errorCode, cons
     return ArktsErr;
 }
 
-ArktsError resetMemory(int32_t slotId, int32_t options, int32_t &resultCode)
+ArktsError ResetMemory(int32_t slotId, int32_t options, int32_t &resultCode)
 {
     int32_t errorCode = ERROR_DEFAULT;
     if (!IsValidSlotId(slotId)) {
@@ -63,14 +63,12 @@ ArktsError resetMemory(int32_t slotId, int32_t options, int32_t &resultCode)
     AniAsyncResetMemory *profileContext = profileContextUnique.get();
 
     std::unique_ptr<AniResetMemoryCallback> callback = std::make_unique<AniResetMemoryCallback>(profileContext);
-
     std::unique_lock<std::mutex> callbackLock(profileContext->callbackMutex);
     errorCode = DelayedRefSingleton<EsimServiceClient>::GetInstance().ResetMemory(
         slotId, options, callback.release());
     profileContext->errorCode = errorCode;
-
     if (errorCode == TELEPHONY_SUCCESS) {
-        profileContext->cv.wait_for(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
+        profileContext->cv.wait_until(callbackLock, std::chrono::seconds(WAIT_TIME_SECOND),
             [profileContext] { return profileContext->isCallbackEnd; });
     }
 

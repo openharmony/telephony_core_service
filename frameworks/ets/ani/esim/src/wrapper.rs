@@ -26,7 +26,7 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("ani_esim.h");
 
-        fn resetMemory(slotId: i32, options: i32, resultCode: &mut i32) -> ArktsError;
+        fn ResetMemory(slotId: i32, options: i32, resultCode: &mut i32) -> ArktsError;
     }
 }
 

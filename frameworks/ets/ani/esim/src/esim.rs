@@ -21,7 +21,7 @@ pub fn reset_memory(slot_id: i32, options: Option<ResetOption>) -> Result<Result
     let mut result_code = 0;
 
     let opts = options.unwrap_or(ResetOption::DeleteOperationalProfiles);
-    let arkts_error = wrapper::ffi::resetMemory(slot_id, opts.into(), &mut result_code);
+    let arkts_error = wrapper::ffi::ResetMemory(slot_id, opts.into(), &mut result_code);
     if arkts_error.is_error() {
         return Err(BusinessError::from(arkts_error));
     }

@@ -20,10 +20,9 @@
 
 namespace OHOS {
 namespace EsimAni {
-
     struct ArktsError;
     constexpr int WAIT_TIME_SECOND = 30;
-    ArktsError resetMemory(int32_t slotId, int32_t options, int32_t &resultCode);
+    ArktsError ResetMemory(int32_t slotId, int32_t options, int32_t &resultCode);
 } // namespace EsimAni
 } // namespace OHOS
 
