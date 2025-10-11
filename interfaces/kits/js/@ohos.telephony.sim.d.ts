@@ -631,6 +631,7 @@ declare namespace sim {
    * The MSISDN is recorded in the EFMSISDN file of the SIM card.
    *
    * @permission ohos.permission.GET_PHONE_NUMBERS
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @returns { Promise<string> } Returns the MSISDN; returns an empty string if no SIM card is inserted or
