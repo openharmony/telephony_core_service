@@ -68,7 +68,7 @@ pub enum ResultCode {
     ResultCatBusy = 283,
     ResultProfileEidInvalid = 284,
     ResultDownloadTimeout = 287,
-    ResultSgp22Other = 400,
+    ResultSgp_22Other = 400,
 }
 
 impl From<i32> for ResultCode {
@@ -110,13 +110,13 @@ impl From<i32> for ResultCode {
             283 => ResultCode::ResultCatBusy,
             284 => ResultCode::ResultProfileEidInvalid,
             287 => ResultCode::ResultDownloadTimeout,
-            400 => ResultCode::ResultSgp22Other,
-            _ => panic!("Invalid value for ResultCode"),
+            400 => ResultCode::ResultSgp_22Other,
+            _ => ResultCode::ResultSolvableErrors,
         }
     }
 }
 
-#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.ResultCode")]
+#[ani_rs::ani(path = "@ohos.telephony.esim.eSIM.CancelReason")]
 #[repr(i32)]
 pub enum CancelReason {
     CancelReasonEndUserRejection = 0,
@@ -342,7 +342,7 @@ impl From<i32> for OsuStatus {
             3 => OsuStatus::EuiccUpgradeSuccessful,
             4 => OsuStatus::EuiccUpgradeAlreadyLatest,
             5 => OsuStatus::EuiccUpgradeServiceUnavailable,
-            _ => panic!("Invalid value for OsuStatus"),
+            _ => OsuStatus::EuiccUpgradeFailed,
         }
     }
 }
