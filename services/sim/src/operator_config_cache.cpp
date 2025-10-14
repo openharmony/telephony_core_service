@@ -29,6 +29,9 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr int32_t BATCH_INSERT_APN_RETRY_TIMES = 5;
+static constexpr int64_t BATCH_INSERT_APN_RETRY_DEALY = 10 * 1000;
+static const std::string TASK_ID = "batch_insert_apn_retry";
 OperatorConfigCache::OperatorConfigCache(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
     : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), simStateManager_(simStateManager),
@@ -311,9 +314,6 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
         }
-    } else if (event->GetInnerEventId() == OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY) {
-        TELEPHONY_LOGI("Batch insert apn retry");
-        notifyInitApnConfigs(slotId_);
     }
 }
 
