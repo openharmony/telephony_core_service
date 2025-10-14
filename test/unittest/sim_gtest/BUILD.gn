@@ -78,6 +78,7 @@ core_service_sim_test_sources += [
   "operator_config_loader_gtest.cpp",
   "operator_matching_rule_test.cpp",
   "pdp_profile_rdb_helper_test.cpp",
+  "operator_config_cache_test.cpp",
   "ruim_file_gtest.cpp",
   "sim_file_gtest.cpp",
   "sim_manager_gtest.cpp",
