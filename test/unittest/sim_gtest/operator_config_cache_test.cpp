@@ -14,7 +14,7 @@
  */
 #define private public
 #define protected public
-
+#define BATCH_INSERT_APN_RETRY_DEALY 1
 #include "operator_config_cache.h"
 #include "mock_datashare_helper.h"
 #include "tel_ril_manager.h"
@@ -60,9 +60,10 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest001, Function | Medium
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
-    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_)).WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
+    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->notifyInitApnConfigs(0);
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
 
@@ -76,10 +77,11 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest002, Function | Medium
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
-    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_)).WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
+    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->notifyInitApnConfigs(0);
     operatorConfigCache->batchInsertApnRetryHandler_ = nullptr;
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
 
@@ -93,11 +95,12 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest003, Function | Medium
     auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
-    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_)).WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
-    operatorConfigCache->notifyInitApnConfigs(0);
+    EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
+        .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->retryBatchInsertApnTimes_ = 5;
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    operatorConfigCache->notifyInitApnConfigs(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
 }
-}
+}
