@@ -68,7 +68,7 @@ HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function |
     std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
     VCardManager vCardManager;
     int errorCode;
-    EXPECT_CALL(*resultSet,GetColumnIndex(Contact::ID, _))
+    EXPECT_CALL(*resultSet, GetColumnIndex(Contact::ID, _))
         .WillOnce(DoAll(SetArgReferee<1>(0), Return(TELEPHONY_SUCCESS)));
     EXPECT_CALL(*resultSet, GoToFirstRow()).WillOnce(Return(TELEPHONY_SUCCESS));
     EXPECT_CALL(*resultSet, GoToNextRow()).Times(100).WillRepeatedly(Return(0));
