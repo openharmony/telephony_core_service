@@ -381,7 +381,7 @@ int32_t VCardManager::ExportToStr(
 }
 
 std::string VCardManager::ConstructVCardString(
-    std::shared_ptr<DataShare::DataShareResultSet> &resultSet, int32_t cardType, const std::string &charset,
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet, int32_t cardType, const std::string &charset,
     int32_t &errorCode)
 {
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -408,7 +408,9 @@ std::string VCardManager::ConstructVCardString(
             contactIdList.clear();
         }
     }
-    contactIdLists.push_back(contactIdList);
+    if(!contactIdList.empty()) {
+        contactIdLists.push_back(contactIdList);
+    }
     TELEPHONY_LOGI("before contstructVCard, contactIdList size : %{public}d", (int32_t)contactIdLists.size());
     resultSet->Close();
     result += encoder.ContructVCard(contactIdLists, errorCode);
