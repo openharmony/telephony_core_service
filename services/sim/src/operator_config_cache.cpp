@@ -377,17 +377,17 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
     batchInsertApnRetryTask_ = [weakThis, helper, slotId]() {
         bool notifyRet = helper->notifyInitApnConfigs(slotId);
         auto strongThis = weakThis.lock();
-        if (!notifyRet && strongThis) {
-            AppExecFwk::EventHandler* rawPtr = strongThis.get();
-            OperatorConfigCache* configCachePtr = static_cast<OperatorConfigCache*>(rawPtr);
-            if (configCachePtr->retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES) {
-                TELEPHONY_LOGI("batch insert apn retry times = %{public}d", configCachePtr->retryBatchInsertApnTimes_);
-                if (configCachePtr->batchInsertApnRetryHandler_ != nullptr) {
-                    configCachePtr->batchInsertApnRetryHandler_->PostTask(
-                        configCachePtr->batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
-                }
-                configCachePtr->retryBatchInsertApnTimes_++;
-            }
+        if (notifyRet || strongThis == nullptr) {
+            return;
+        }
+        AppExecFwk::EventHandler* rawPtr = strongThis.get();
+        OperatorConfigCache* configCachePtr = static_cast<OperatorConfigCache*>(rawPtr);
+        if (configCachePtr->retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES &&
+            configCachePtr->batchInsertApnRetryHandler_ != nullptr) {
+            TELEPHONY_LOGI("batch insert apn retry times = %{public}d", configCachePtr->retryBatchInsertApnTimes_);
+            configCachePtr->batchInsertApnRetryHandler_->PostTask(
+                configCachePtr->batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+            configCachePtr->retryBatchInsertApnTimes_++;
         }
     };
     if (!helper->notifyInitApnConfigs(slotId)) {
