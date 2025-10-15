@@ -23,6 +23,7 @@ ohos_unittest("utils_vcard_gtest") {
 
   sources = [
     "contact_data_test.cpp",
+    "vcard_manager_test.cpp",
     "vcard_utils_branch_test.cpp",
     "$SOURCE_DIR/utils/vcard/src/vcard_contact.cpp",
   ]
