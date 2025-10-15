@@ -32,6 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace testing;
 using namespace testing::ext;
 
 class VcardManagerTest : public testing::Test {
