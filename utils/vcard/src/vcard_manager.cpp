@@ -408,7 +408,7 @@ std::string VCardManager::ConstructVCardString(
             contactIdList.clear();
         }
     }
-    if(!contactIdList.empty()) {
+    if (!contactIdList.empty()) {
         contactIdLists.push_back(contactIdList);
     }
     TELEPHONY_LOGI("before contstructVCard, contactIdList size : %{public}d", (int32_t)contactIdLists.size());
