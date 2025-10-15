@@ -14,20 +14,17 @@
  */
 #define private public
 #define protected public
-#define BATCH_INSERT_APN_RETRY_DEALY 1
 #include "operator_config_cache.h"
 #include "mock_datashare_helper.h"
 #include "tel_ril_manager.h"
 #include "common_event_support.h"
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
-#include <thread>
-#include <chrono>
-
+ 
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-
+ 
 class OperatorConfigCacheTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -45,11 +42,6 @@ void OperatorConfigCacheTest::SetUp() {}
  
 void OperatorConfigCacheTest::TearDown() {}
 
-/**
- * @tc.number   Telephony_NotifyInitApnConfigs_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest001, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -63,10 +55,10 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest001, Function | Medium
     EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
         .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->notifyInitApnConfigs(0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    operatorConfigCache->batchInsertApnRetryTask_();
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
-
+ 
 HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest002, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -81,10 +73,10 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest002, Function | Medium
         .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->notifyInitApnConfigs(0);
     operatorConfigCache->batchInsertApnRetryHandler_ = nullptr;
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    operatorConfigCache->batchInsertApnRetryTask_();
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
-
+ 
 HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest003, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -99,7 +91,7 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest003, Function | Medium
         .WillRepeatedly(testing::DoAll(testing::Return(nullptr)));
     operatorConfigCache->retryBatchInsertApnTimes_ = 5;
     operatorConfigCache->notifyInitApnConfigs(0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    operatorConfigCache->batchInsertApnRetryTask_();
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
 }
 }
