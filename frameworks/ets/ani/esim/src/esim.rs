@@ -36,7 +36,7 @@ pub fn is_supported(slot_id: i32) -> Result<bool, BusinessError> {
     let mut is_supported_result = false;
     let arkts_error = wrapper::ffi::IsSupported(slot_id, &mut is_supported_result);
     if arkts_error.is_error() {
-        return Err(BusinessError::from(arkts_error));
+        return Ok(false);
     }
 
     Ok(is_supported_result)
