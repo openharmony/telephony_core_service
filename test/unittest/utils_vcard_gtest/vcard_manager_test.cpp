@@ -54,7 +54,17 @@ HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_001, Function |
     EXPECT_EQ(vCardManager.ConstructVCardString(resultSet, 0, "UTF-8", errorCode), "");
 }
 
-
+HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function | MediumTest | Level3) {
+    std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
+    VCardManager vCardManager;
+    int errorCode;
+    EXPECT_CALL(*resultSet,GetColumnIndex(Contact::ID, _))
+        .WillOnce(DoAll(SetArgReferee<1>(0), Return(TELEPHONY_SUCCESS)));
+    EXPECT_CALL(*resultSet, GoToFirstRow()).WillOnce(Return(TELEPHONY_SUCCESS));
+    EXPECT_CALL(*resultSet, GoToNextRow()).WillRepeatedly(Return(0));
+    EXPECT_CALL(*resultSet, GoToNextRow()).WillOnce(Return(1));
+    EXPECT_EQ(vCardManager.ConstructVCardString(resultSet, 0, "UTF-8", errorCode), "");
+}
 
 } // namespace Telephony
 } // namespace OHOS
