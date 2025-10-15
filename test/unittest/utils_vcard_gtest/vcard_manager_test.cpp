@@ -19,12 +19,16 @@
 
 #include "vcard_manager.h"
 
+#include "contact_data_test.h"
 #include "mock_datashare_helper.h"
 #include "mock_data_share_result_set.h"
 #include "telephony_errors.h"
+#include "vcard_utils.h"
+
 #include <fcntl.h>
-#include <iostream>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <iostream>
 
 namespace OHOS {
 namespace Telephony {
@@ -36,6 +40,12 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    void SetNameData(const std::string &family, const std::string &given, const std::string &middle,
+        const std::string &prefix, const std::string &suffix);
+    void SetNameData(const std::string &family, const std::string &given, const std::string &middle,
+        const std::string &displayName);
+    void SetNameDataInfo(const std::string &phoneticFamily, const std::string &phoneticGiven,
+        const std::string &phoneticMiddle);
 };
 
 void VcardManagerTest::SetUpTestCase() {}
@@ -61,8 +71,9 @@ HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function |
     EXPECT_CALL(*resultSet,GetColumnIndex(Contact::ID, _))
         .WillOnce(DoAll(SetArgReferee<1>(0), Return(TELEPHONY_SUCCESS)));
     EXPECT_CALL(*resultSet, GoToFirstRow()).WillOnce(Return(TELEPHONY_SUCCESS));
-    EXPECT_CALL(*resultSet, GoToNextRow()).WillRepeatedly(Return(0));
-    EXPECT_CALL(*resultSet, GoToNextRow()).WillOnce(Return(1));
+    EXPECT_CALL(*resultSet, GoToNextRow()).Times(100).WillRepeatedly(Return(0));
+    EXPECT_CALL(*resultSet, GoToNextRow()).Times(1).WillOnce(Return(1));
+    EXPECT_CALL(*resultSet, GetInt(0, _)).WillOnce(DoAll(SetArgReferee<1>(0)), Return(TELEPHONY_SUCCESS));
     EXPECT_EQ(vCardManager.ConstructVCardString(resultSet, 0, "UTF-8", errorCode), "");
 }
 
