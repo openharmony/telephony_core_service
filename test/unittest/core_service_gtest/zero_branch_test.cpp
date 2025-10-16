@@ -862,6 +862,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
     EXPECT_EQ(mInner.GetSmscAddr(INVALID_SLOTID, 1, handler), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(mInner.QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERROR);
     EXPECT_GT(mInner.SetVoNRSwitch(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mInner.SetIccCardState(0, 0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1369,6 +1370,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     EXPECT_GT(simManager->IsCTSimCard(0, isCTSimCard), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->IsCTSimCard(INVALID_SLOTID, isCTSimCard), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->NotifySimSlotsMapping(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    EXPECT_GT(simManager->SetIccCardState(INVALID_SLOTID, 0), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -2144,8 +2146,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->InitData(0);
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
-    multiSimMonitor->IsSwitchToProfileFromAnother(INVALID_SLOTID);
-    multiSimMonitor->IsSwitchToProfileFromAnother(0);
     multiSimMonitor->NotifySimAccountChanged();
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;

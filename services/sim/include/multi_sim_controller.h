@@ -147,7 +147,7 @@ private:
     int32_t UpdateDBSetActiveResult(int32_t slotId, int32_t enable, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void SetPrimarySlotIdDone();
+    void SetPrimarySlotIdDone(bool isUserSet);
     int32_t SetPrimarySlotIdWithoutModemReboot(int32_t slotId);
     void OnRilSetPrimarySlotDone(const AppExecFwk::InnerEvent::Pointer &event);
     void OnRilSetPrimarySlotTimeout(const AppExecFwk::InnerEvent::Pointer &event);

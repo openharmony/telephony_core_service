@@ -136,6 +136,7 @@ public:
     MOCK_METHOD2(UpdateSimPresent, int32_t(int32_t, bool));
     MOCK_METHOD2(UpdateEsimOpName, int32_t(const std::string &, const std::string &));
     MOCK_METHOD1(CheckIfNeedSwitchMainSlotId, void(bool));
+    MOCK_METHOD2(SetIccCardState, int32_t(int32_t, int32_t));
 };
 }
 }

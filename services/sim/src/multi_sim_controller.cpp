@@ -1198,7 +1198,7 @@ int32_t MultiSimController::GetPrimarySlotId()
     return lastPrimarySlotId_;
 }
 
-void MultiSimController::SetPrimarySlotIdDone()
+void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
 {
     PublishSetPrimaryEvent(true);
     std::unique_lock<ffrt::mutex> lock(activeSimMutex_);
@@ -1207,7 +1207,9 @@ void MultiSimController::SetPrimarySlotIdDone()
     activeSimConn_.notify_all();
  
     // trigger to obtain sim card status
-    ObtainDualSimCardStatus();
+    if (!isUserSet) {
+        ObtainDualSimCardStatus();
+    }
 }
 
 void MultiSimController::ObtainDualSimCardStatus()
@@ -1271,7 +1273,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     PublishSetPrimaryEvent(false);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
-        SetPrimarySlotIdDone();
+        SetPrimarySlotIdDone(false);
         if (setPrimarySlotRemainCount_[slotId] > 0) {
             SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
             TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
@@ -1281,7 +1283,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
-    SetPrimarySlotIdDone();
+    SetPrimarySlotIdDone(false);
     setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
@@ -1793,11 +1795,11 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
     PublishSetPrimaryEvent(false);
     if (!SetPrimarySlotToRil(slotId)) {
         TELEPHONY_LOGE("SetPrimarySlotToRil failed");
-        SetPrimarySlotIdDone();
+        SetPrimarySlotIdDone(true);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
-    SetPrimarySlotIdDone();
+    SetPrimarySlotIdDone(true);
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
     TELEPHONY_LOGD("SetPrimarySlotIdWithoutModemReboot finish");
     return TELEPHONY_ERR_SUCCESS;
