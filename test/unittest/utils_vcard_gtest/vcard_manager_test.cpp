@@ -57,7 +57,8 @@ void VcardManagerTest::SetUp() {}
 
 void VcardManagerTest::TearDown() {}
 
-HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_001, Function | MediumTest | Level3) {
+HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_001, Function | MediumTest | Level3)
+{
     std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
     VCardManager vCardManager;
     int errorCode;
@@ -65,7 +66,8 @@ HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_001, Function |
     EXPECT_EQ(vCardManager.ConstructVCardString(resultSet, 0, "UTF-8", errorCode), "");
 }
 
-HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function | MediumTest | Level3) {
+HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function | MediumTest | Level3)
+{
     std::shared_ptr<DataShareResultSetMock> resultSet = std::make_shared<DataShareResultSetMock>();
     VCardManager vCardManager;
     int errorCode;
