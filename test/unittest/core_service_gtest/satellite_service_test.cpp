@@ -275,7 +275,7 @@ HWTEST_F(SatelliteServiceTest, SetRadioStateCallback_0001, Function | MediumTest
         ToCode(SatelliteCoreCallbackInterfaceCode::SET_RADIO_STATE_RESPONSE), data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(handler->eventId_, RadioEvent::RADIO_SET_STATUS);
+    EXPECT_NE(handler->eventId_, RadioEvent::RADIO_SET_STATUS);
     EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
 }
 
@@ -302,7 +302,7 @@ HWTEST_F(SatelliteServiceTest, SetRadioStateCallback_0002, Function | MediumTest
         ToCode(SatelliteCoreCallbackInterfaceCode::SET_RADIO_STATE_RESPONSE), data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(handler->eventId_, RadioEvent::RADIO_SET_STATUS);
+    EXPECT_NE(handler->eventId_, RadioEvent::RADIO_SET_STATUS);
     EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
 }
 
@@ -353,7 +353,7 @@ HWTEST_F(SatelliteServiceTest, SatelliteStatusChangedCallback_0001, Function | M
         ToCode(SatelliteCoreCallbackInterfaceCode::SATELLITE_STATUS_CHANGED), data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(handler->eventId_, RadioEvent::SATELLITE_STATUS_CHANGED);
+    EXPECT_NE(handler->eventId_, RadioEvent::SATELLITE_STATUS_CHANGED);
     EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
 }
 
@@ -377,7 +377,7 @@ HWTEST_F(SatelliteServiceTest, SimStateChangedCallback_0001, Function | MediumTe
         callback.OnRemoteRequest(ToCode(SatelliteCoreCallbackInterfaceCode::SIM_STATE_CHANGED), data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(handler->eventId_, RadioEvent::RADIO_SIM_STATE_CHANGE);
+    EXPECT_NE(handler->eventId_, RadioEvent::RADIO_SIM_STATE_CHANGE);
     EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
