@@ -74,7 +74,7 @@ HWTEST_F(VcardManagerTest, Telephony_Common_ConstructVcardString_002, Function |
     EXPECT_CALL(*resultSet, GoToFirstRow()).WillOnce(Return(TELEPHONY_SUCCESS));
     EXPECT_CALL(*resultSet, GoToNextRow()).Times(100).WillRepeatedly(Return(0));
     EXPECT_CALL(*resultSet, GoToNextRow()).Times(1).WillOnce(Return(1));
-    EXPECT_CALL(*resultSet, GetInt(0, _)).WillOnce(DoAll(SetArgReferee<1>(0)), Return(TELEPHONY_SUCCESS));
+    EXPECT_CALL(*resultSet, GetInt(0, _)).WillOnce(DoAll(SetArgReferee<1>(0), Return(TELEPHONY_SUCCESS)));
     EXPECT_EQ(vCardManager.ConstructVCardString(resultSet, 0, "UTF-8", errorCode), "");
 }
 
