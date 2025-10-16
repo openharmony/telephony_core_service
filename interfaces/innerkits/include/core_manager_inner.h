@@ -352,6 +352,7 @@ public:
     int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
+    int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);

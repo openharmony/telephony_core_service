@@ -1461,5 +1461,14 @@ void SimManager::CheckIfNeedSwitchMainSlotId(bool isUserSet)
     }
     multiSimController_->CheckIfNeedSwitchMainSlotId(!isUserSet);
 }
+
+int32_t SimManager::SetIccCardState(int32_t slotId, int32_t simStatus)
+{
+    if (!HasSimCardInner(slotId)) {
+        TELEPHONY_LOGE("SetIccCardState has no sim card!");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    return simStateManager_[slotId]->SetIccCardState(slotId, simStatus);
+}
 } // namespace Telephony
 } // namespace OHOS

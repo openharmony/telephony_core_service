@@ -94,7 +94,6 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
-    bool IsSwitchToProfileFromAnother(int32_t slotId);
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {

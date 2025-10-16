@@ -644,7 +644,7 @@ int32_t SimStateManager::NotifySimSlotsMapping(int32_t slotId)
         TELEPHONY_LOGI("NotifySimSlotsMapping(), simStateHandle_ is nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simStateHandle_->NotifySimSlotsMapping(slotId);
+    return simStateHandle_->SetIccCardState(slotId, ICC_CARD_ABSENT);
 }
 
 void SimStateManager::SetInSenseSwitchPhase(bool flag)
@@ -663,6 +663,15 @@ void SimStateManager::ObtainIccStatus()
         return;
     }
     simStateHandle_->ObtainIccStatus();
+}
+
+int32_t SimStateManager::SetIccCardState(int32_t slotId, int32_t simStatus)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SetIccCardState(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->SetIccCardState(slotId, simStatus);
 }
 
 SimStateManager::~SimStateManager()
