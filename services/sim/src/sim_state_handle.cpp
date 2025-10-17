@@ -423,6 +423,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     if (needReupdate_) {
         UpdateSimStateToStateRegistry(slotId, reason);
     }
+    modemInitDone_ = true;
 }
 
 void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
@@ -430,7 +431,7 @@ void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
     if (newSimStatus == ICC_CONTENT_UNKNOWN) {
         if (CoreManagerInner::GetInstance().IsEsim(slotId_)) {
             if (oldSimStatus_ == ICC_CONTENT_READY) {
-                CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(true);
+                CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(false);
             }
         } else {
             modemInitDone_ = false;
@@ -614,7 +615,6 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
         iccState.iccid_ = param->iccid;
-        modemInitDone_ = true;
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
             slotId, iccState.simType_, iccState.simStatus_);
     } else {
@@ -850,7 +850,7 @@ bool SimStateHandle::ConnectService()
 
 bool SimStateHandle::IsIccReady()
 {
-    return externalState_ == SimState::SIM_STATE_READY;
+    return externalState_ >= SimState::SIM_STATE_READY;
 }
 
 bool SimStateHandle::IsIccLocked()
