@@ -95,6 +95,7 @@ private:
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
     bool IsSwitchToProfileFromAnother(int32_t slotId);
+    void CheckSimPresentWhenReboot();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
@@ -148,6 +149,7 @@ private:
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
+    bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
 };
 } // namespace Telephony
