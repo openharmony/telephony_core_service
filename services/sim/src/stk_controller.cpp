@@ -53,6 +53,8 @@ const std::string PARAM_REFRESH_RESULT = "refreshResult";
 const std::string STK_BUNDLE = "const.telephony.stk_bundle_name";
 const std::string ABILITY_NAME = "ServiceExtAbility";
 const std::string DEFAULT_BUNDLE = "";
+const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
+const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
 } // namespace
 
 StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
@@ -153,6 +155,8 @@ void StkController::SubscribeBundleScanFinished()
     }
     MatchingSkills matchingSkills;
     matchingSkills.AddEvent(BUNDLE_SCAN_FINISHED_EVENT);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SET_PRIMARY_SLOT_STATUS);
+
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
     bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo,
@@ -177,6 +181,13 @@ void StkController::BundleScanFinishedEventSubscriber::OnReceiveEvent(const Comm
             return;
         }
         std::static_pointer_cast<StkController>(handler)->OnReceiveBms();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SET_PRIMARY_SLOT_STATUS) {
+        auto handler = handler_.lock();
+        if (handler == nullptr) {
+            TELEPHONY_LOGE("handler is invalid");
+            return;
+        }
+        std::static_pointer_cast<StkController>(handler)->OnReceiveSetPrimarySlotStatus(want);
     }
 }
 
@@ -190,6 +201,28 @@ void StkController::OnReceiveBms()
         } else {
             remainTryCount_ = MAX_RETRY_COUNT;
         }
+    }
+}
+
+void StkController::OnReceiveSetPrimarySlotStatus(OHOS::EventFwk::Want want)
+{
+    if (want.GetBoolParam(PARAM_SET_PRIMARY_IS_USER_SET, true)) {
+        return;
+    }
+
+    if (want.GetBoolParam(PARAM_SET_PRIMARY_STATUS, false)) {
+        std::shared_ptr<SimStateManager> simStateManager = simStateManager_.lock();
+        if (simStateManager == nullptr) {
+            TELEPHONY_LOGE("OnReceiveSetPrimarySlotStatus simStateManager[%{public}d] is nullptr", slotId_);
+            return;
+        }
+        int32_t newState = static_cast<int32_t>(simStateManager->GetSimIccStatus()) > ICC_CARD_STATE_ABSENT ?
+            ICC_CARD_STATE_PRESENT : ICC_CARD_STATE_ABSENT;
+        if (!isStkRunning_ && newState == ICC_CARD_STATE_PRESENT && iccCardState_ == ICC_CARD_STATE_PRESENT) {
+            SendStkIsReady();
+        }
+    } else {
+        isStkRunning_ = false;
     }
 }
 
@@ -343,19 +376,7 @@ void StkController::OnIccStateChanged(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGI("StkController[%{public}d]::OnIccStateChanged() publishResult = %{public}d",
             slotId_, publishResult);
     } else if (oldState == ICC_CARD_STATE_ABSENT && newState == ICC_CARD_STATE_PRESENT) {
-        TELEPHONY_LOGI("StkController[%{public}d]::OnIccStateChanged(), call SimStkIsReady()", slotId_);
-        auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_IS_READY);
-        if (event == nullptr) {
-            TELEPHONY_LOGE("StkController[%{public}d]::OnIccStateChanged() event is nullptr", slotId_);
-            return;
-        }
-        event->SetOwner(shared_from_this());
-        std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
-        if (telRilManager == nullptr) {
-            TELEPHONY_LOGE("StkController[%{public}d]::OnIccStateChanged() telRilManager is nullptr", slotId_);
-            return;
-        }
-        telRilManager->SimStkIsReady(slotId_, event);
+        SendStkIsReady();
     }
 }
 
@@ -722,6 +743,24 @@ void StkController::OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &e
             "set to absent", slotId_, iccCardState_);
         iccCardState_ = ICC_CARD_STATE_ABSENT;
     }
+}
+
+void StkController::SendStkIsReady()
+{
+    TELEPHONY_LOGI("StkController[%{public}d]::SendStkIsReady(), call SimStkIsReady()", slotId_);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_IS_READY);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("StkController[%{public}d]::SendStkIsReady() event is nullptr", slotId_);
+        return;
+    }
+    event->SetOwner(shared_from_this());
+    std::shared_ptr<ITelRilManager> telRilManager = telRilManager_.lock();
+    if (telRilManager == nullptr) {
+        TELEPHONY_LOGE("StkController[%{public}d]::SendStkIsReady() telRilManager is nullptr", slotId_);
+        return;
+    }
+    telRilManager->SimStkIsReady(slotId_, event);
+    isStkRunning_ = true;
 }
 
 } // namespace Telephony

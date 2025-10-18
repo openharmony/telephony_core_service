@@ -2945,7 +2945,6 @@ int32_t CoreManagerInner::SwitchToProfile(int32_t slotId, int32_t portIndex, con
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = esimManager_->SwitchToProfile(slotId, portIndex, iccId, forceDisableProfile, enumResult);
-    CheckIfNeedSwitchMainSlotId(true);
     return ret;
 }
 
@@ -3023,6 +3022,15 @@ void CoreManagerInner::CheckIfNeedSwitchMainSlotId(bool isUserSet)
         return;
     }
     simManager_->CheckIfNeedSwitchMainSlotId(isUserSet);
+}
+
+int32_t CoreManagerInner::SetTargetPrimarySlotId(int32_t primarySlotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SetTargetPrimarySlotId(primarySlotId);
 }
 } // namespace Telephony
 } // namespace OHOS

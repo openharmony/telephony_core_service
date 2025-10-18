@@ -563,7 +563,7 @@ int32_t SimRdbHelper::ForgetAllData()
     return result;
 }
 
-int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel)
+int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState)
 {
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SimData::SLOT_INDEX, std::to_string(slotId));
@@ -571,6 +571,8 @@ int32_t SimRdbHelper::ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel)
     if (TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_() &&
         slotId != static_cast<int32_t>(SimSlotType::VSIM_SLOT_ID)) {
         TELEPHONY_LOGI("vsim enabled, not change slotId: %{public}d IS_ACTIVE state", slotId);
+    } else if (!isUpdateActiveState) {
+        TELEPHONY_LOGI("no need change slotId %{public}d active state", slotId);
     } else {
         DataShare::DataShareValueObject valueObj(ACTIVE);
         value.Put(SimData::IS_ACTIVE, valueObj);
