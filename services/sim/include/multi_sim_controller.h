@@ -96,6 +96,7 @@ public:
     int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isInit = true);
+    int32_t SetTargetPrimarySlotId(int32_t primarySlotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -104,7 +105,8 @@ public:
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
     enum {
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
-        RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT
+        RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT,
+        WAIT_FOR_ALL_CARDS_READY_EVENT,
     };
     std::vector<bool> isSimSlotsMapping_ = {false, false};
 
@@ -158,6 +160,7 @@ private:
     bool IsSetPrimarySlotIdAllowed();
     void ObtainDualSimCardStatus();
     void SetInSenseSwitchPhase(bool flag);
+    bool IsNeedSetTargetPrimarySlotId();
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -172,6 +175,8 @@ private:
     int32_t defaultVoiceSimId_ = 0;
     int32_t lastPrimarySlotId_ = 0;
     int32_t lastCellularDataSlotId_ = 0;
+    bool waitCardsReady_ = false;
+    int32_t targetPrimarySlotId_ = -1;
     static constexpr int32_t WAIT_REMOTE_TIME_SEC = 4;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
