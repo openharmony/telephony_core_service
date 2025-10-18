@@ -29,6 +29,9 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr int32_t BATCH_INSERT_APN_RETRY_TIMES = 5;
+static constexpr int64_t BATCH_INSERT_APN_RETRY_DEALY = 10 * 1000;
+static const std::string TASK_ID = "batch_insert_apn_retry";
 OperatorConfigCache::OperatorConfigCache(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
     : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), simStateManager_(simStateManager),
@@ -311,9 +314,6 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
         }
-    } else if (event->GetInnerEventId() == OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY) {
-        TELEPHONY_LOGI("Batch insert apn retry");
-        notifyInitApnConfigs(slotId_);
     }
 }
 
@@ -371,16 +371,27 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         return;
     }
     TELEPHONY_LOGI("notifyInitApnConfigs end");
-    if (!helper->notifyInitApnConfigs(slotId)) {
-        if (retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES) {
-            SendEvent(OperatorConfigCache::RADIO_BATCH_INSERT_APN_RETRY, OperatorConfigCache::
-                BATCH_INSERT_APN_RETRY_DEALY, Priority::HIGH);
-            TELEPHONY_LOGI("Batch insert apn retry time = %{public}d, delay = %{public}d",
-                retryBatchInsertApnTimes_, OperatorConfigCache::BATCH_INSERT_APN_RETRY_DEALY);
-            retryBatchInsertApnTimes_++;
+    auto runner = AppExecFwk::EventRunner::Create(TASK_ID);
+    batchInsertApnRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    std::weak_ptr<AppExecFwk::EventHandler> weakThis = shared_from_this();
+    batchInsertApnRetryTask_ = [weakThis, helper, slotId]() {
+        bool notifyRet = helper->notifyInitApnConfigs(slotId);
+        auto strongThis = weakThis.lock();
+        if (notifyRet || strongThis == nullptr) {
+            return;
         }
-    } else {
-        retryBatchInsertApnTimes_ = 0;
+        AppExecFwk::EventHandler* rawPtr = strongThis.get();
+        OperatorConfigCache* configCachePtr = static_cast<OperatorConfigCache*>(rawPtr);
+        if (configCachePtr->retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES &&
+            configCachePtr->batchInsertApnRetryHandler_ != nullptr) {
+            TELEPHONY_LOGI("batch insert apn retry times = %{public}d", configCachePtr->retryBatchInsertApnTimes_);
+            configCachePtr->batchInsertApnRetryHandler_->PostTask(
+                configCachePtr->batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+            configCachePtr->retryBatchInsertApnTimes_++;
+        }
+    };
+    if (!helper->notifyInitApnConfigs(slotId)) {
+        batchInsertApnRetryHandler_->PostTask(batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
     }
 }
 

@@ -94,6 +94,7 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
+    void CheckSimPresentWhenReboot();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
@@ -147,6 +148,7 @@ private:
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
+    bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
 };
 } // namespace Telephony

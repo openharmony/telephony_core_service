@@ -36,6 +36,7 @@ const int32_t ACTIVE_USER_ID = 100;
 const int INIT_TIMES = 15;
 const int INIT_DATA_TIMES = 10;
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
+const std::string PROP_REBOOT_DETECT_SIM = "persist.ril.reboot_detect_sim";
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
@@ -465,6 +466,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnReceiveEvent(const CommonEvent
         if (activeList[0] == ACTIVE_USER_ID) {
             std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
             std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
+            std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimPresentWhenReboot();
         }
     }
 }
@@ -487,6 +489,19 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnReceiveEvent(const CommonEven
             std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
         }
     }
+}
+
+void MultiSimMonitor::CheckSimPresentWhenReboot()
+{
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+        if (OHOS::system::GetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0") == "1" &&
+            !hasCheckedSimPresent_) {
+            TELEPHONY_LOGE("reboot detect true, need update sim present");
+            controller_->UpdateSimPresent(slotId, true);
+            OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
+        }
+    }
+    hasCheckedSimPresent_ = true;
 }
 
 void MultiSimMonitor::CheckSimNotifyRegister()

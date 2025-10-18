@@ -175,6 +175,7 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName) override;
     void CheckIfNeedSwitchMainSlotId(bool isUserSet) override;
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus) override;
+    int32_t SetTargetPrimarySlotId(int32_t primarySlotId) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);

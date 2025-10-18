@@ -1470,5 +1470,14 @@ int32_t SimManager::SetIccCardState(int32_t slotId, int32_t simStatus)
     }
     return simStateManager_[slotId]->SetIccCardState(slotId, simStatus);
 }
+
+int32_t SimManager::SetTargetPrimarySlotId(int32_t primarySlotId)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return multiSimController_->SetTargetPrimarySlotId(primarySlotId);
+}
 } // namespace Telephony
 } // namespace OHOS
