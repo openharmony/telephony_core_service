@@ -355,6 +355,7 @@ void MultiSimMonitor::UnSubscribeListeners()
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy != nullptr) {
             samgrProxy->UnSubscribeSystemAbility(OHOS::COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+            samgrProxy->UnSubscribeSystemAbility(OHOS::TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID, statusChangeListener_);
             statusChangeListener_ = nullptr;
             TELEPHONY_LOGI("Unsubscribe COMMON_EVENT_SERVICE_ID success");
         }
@@ -369,26 +370,32 @@ void MultiSimMonitor::InitListener()
         TELEPHONY_LOGE("samgrProxy or statusChangeListener_ is nullptr");
         return;
     }
-    auto ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", ret);
+    auto retComEvt = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", retComEvt);
+    auto retStaReg = samgrProxy->SubscribeSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID, statusChangeListener_);
+    TELEPHONY_LOGI("SubscribeSystemAbility TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID result is %{public}d", retStaReg);
     CheckOpcNeedUpdata(false);
 }
 
 void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
+    auto handler = handler_.lock();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is invalid");
+        return;
+    }
+
     switch (systemAbilityId) {
-        case COMMON_EVENT_SERVICE_ID: {
+        case COMMON_EVENT_SERVICE_ID:
             TELEPHONY_LOGI("COMMON_EVENT_SERVICE_ID is running");
-            auto handler = handler_.lock();
-            if (handler == nullptr) {
-                TELEPHONY_LOGE("handler is invalid");
-                return;
-            }
             std::static_pointer_cast<MultiSimMonitor>(handler)->SubscribeDataShareReady();
             std::static_pointer_cast<MultiSimMonitor>(handler)->SubscribeUserSwitch();
             break;
-        }
+        case TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID:
+            TELEPHONY_LOGI("TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID is running");
+            std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateSimStateToStateRegistry();
+            break;
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
@@ -709,5 +716,14 @@ bool MultiSimMonitor::IsSwitchToProfileFromAnother(int32_t slotId)
     return false;
 }
 
+void MultiSimMonitor::UpdateSimStateToStateRegistry()
+{
+    std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
+    for (size_t slotId = 0; slotId < simStateManager_.size(); slotId++) {
+        if (simStateManager_[slotId] != nullptr) {
+            simStateManager_[slotId]->UpdateSimStateToStateRegistry();
+        }
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

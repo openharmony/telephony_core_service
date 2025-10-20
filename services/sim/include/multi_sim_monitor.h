@@ -96,6 +96,7 @@ private:
     bool GetBlockLoadOperatorConfig();
     bool IsSwitchToProfileFromAnother(int32_t slotId);
     void CheckSimPresentWhenReboot();
+    void UpdateSimStateToStateRegistry();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {

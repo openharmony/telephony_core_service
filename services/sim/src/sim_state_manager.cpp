@@ -665,6 +665,15 @@ void SimStateManager::ObtainIccStatus()
     simStateHandle_->ObtainIccStatus();
 }
 
+void SimStateManager::UpdateSimStateToStateRegistry()
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGE("simStateHandle_ is nullptr");
+        return;
+    }
+    simStateHandle_->UpdateSimStateToStateRegistry();
+}
+
 SimStateManager::~SimStateManager()
 {
     if (simStateHandle_ != nullptr) {
