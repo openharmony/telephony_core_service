@@ -67,6 +67,7 @@ public:
     int32_t NotifySimSlotsMapping(int32_t slotId);
     void SetInSenseSwitchPhase(bool flag);
     void ObtainIccStatus();
+    void UpdateSimStateToStateRegistry();
 
 public:
     bool responseReady_ = false;
