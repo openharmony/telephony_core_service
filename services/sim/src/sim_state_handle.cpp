@@ -439,8 +439,15 @@ void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
     }
 }
 
+void SimStateHandle::UpdateSimStateToStateRegistry()
+{
+    LockReason reason = lockReason_;
+    UpdateSimStateToStateRegistry(slotId_, reason);
+}
+
 void SimStateHandle::UpdateSimStateToStateRegistry(int32_t slotId, LockReason reason)
 {
+    lockReason_ = reason;
     int32_t ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimState(
         slotId, externalType_, externalState_, reason);
     needReupdate_ = (ret == TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
