@@ -841,6 +841,7 @@ HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_001, Function | MediumTest |
     multiSimController->simDbHelper_ = {};
     result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
     EXPECT_EQ(result, INVALID_VALUE);
+    multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
     result = multiSimController->SetSimLabelIndex(iccId, labelIndex);
     EXPECT_NE(result, INVALID_VALUE);
 
@@ -850,7 +851,7 @@ HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_001, Function | MediumTest |
         simStateManager, simFileManager);
     EXPECT_CALL(*multiSimControllerMock, GetAllListFromDataBase()).WillRepeatedly(Return(false));
     result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
-    EXPECT_EQ(result, false);
+    EXPECT_EQ(result, INVALID_VALUE);
 }
 
 HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_002, Function | MediumTest | Level1)
