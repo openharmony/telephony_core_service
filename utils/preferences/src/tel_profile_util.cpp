@@ -66,7 +66,7 @@ int TelProfileUtil::ObtainInt(const std::string &key, int defValue)
 {
     std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
     if (ptr == nullptr) {
-        return NativePreferences::E_ERROR;
+        return defValue;
     }
     return ptr->GetInt(key, defValue);
 }
@@ -86,7 +86,7 @@ bool TelProfileUtil::ObtainBool(const std::string &key, bool defValue)
 {
     std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
     if (ptr == nullptr) {
-        return false;
+        return defValue;
     }
     return ptr->GetBool(key, defValue);
 }
@@ -106,7 +106,7 @@ int64_t TelProfileUtil::ObtainLong(const std::string &key, int64_t defValue)
 {
     std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
     if (ptr == nullptr) {
-        return NativePreferences::E_ERROR;
+        return defValue;
     }
     return ptr->GetLong(key, defValue);
 }
@@ -126,7 +126,7 @@ float TelProfileUtil::ObtainFloat(const std::string &key, float defValue)
 {
     std::shared_ptr<NativePreferences::Preferences> ptr = GetProfiles(path_, errCode_);
     if (ptr == nullptr) {
-        return NativePreferences::E_ERROR;
+        return defValue;
     }
     return ptr->GetFloat(key, defValue);
 }
