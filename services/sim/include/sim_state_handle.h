@@ -147,6 +147,7 @@ public:
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     void ObtainIccStatus();
     void SetInSenseSwitchPhase(bool flag);
+    void UpdateSimStateToStateRegistry();
 
 public:
     bool modemInitDone_ = false;
@@ -191,6 +192,7 @@ private:
     IccState iccState_; // icc card states
     SimState externalState_; // need to broadcast sim state;
     CardType externalType_ = CardType::UNKNOWN_CARD; // need to broadcast card type;
+    LockReason lockReason_ = LockReason::SIM_NONE; // need to broadcast lock reason
     std::weak_ptr<SimStateManager> simStateManager_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
