@@ -1003,5 +1003,19 @@ HWTEST_F(CoreManagerInnerTest, NotifySimSlotsMapping_001, Function | MediumTest 
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
 }
 
+HWTEST_F(CoreManagerInnerTest, SetIccCardState_001, Function | MediumTest | Level1)
+{
+    mInner.simManager_ = nullptr;
+    int32_t slotId = 0;
+    int32_t ret = mInner.SetIccCardState(slotId, 0);
+    EXPECT_EQ(ret, INVALID_VALUE);
+
+    mInner.simManager_ = mockeSimManager;
+    EXPECT_CALL(*mockeSimManager, SetIccCardState(_, _)).WillOnce(
+        Return(TELEPHONY_ERR_NO_SIM_CARD));
+    ret = mInner.SetIccCardState(slotId, 0);
+    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
+}
+
 } // Telephony
 } // OHOS

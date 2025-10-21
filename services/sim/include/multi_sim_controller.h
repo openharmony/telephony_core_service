@@ -137,7 +137,7 @@ private:
     void SendMainCardBroadCast(int32_t slotId);
     void SendDefaultCellularDataBroadCast(int32_t slotId);
     void InitMainCardSlotId();
-    void PublishSetPrimaryEvent(bool setDone);
+    void PublishSetPrimaryEvent(bool setDone, bool isUserSet);
     int32_t GetTargetDefaultSimId(int32_t slotId, int &simId);
     size_t GetLocalCacheSize();
     int32_t GetTargetSimId(int32_t slotId, int &simId);
@@ -149,7 +149,7 @@ private:
     int32_t UpdateDBSetActiveResult(int32_t slotId, int32_t enable, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void SetPrimarySlotIdDone();
+    void SetPrimarySlotIdDone(bool isUserSet);
     int32_t SetPrimarySlotIdWithoutModemReboot(int32_t slotId);
     void OnRilSetPrimarySlotDone(const AppExecFwk::InnerEvent::Pointer &event);
     void OnRilSetPrimarySlotTimeout(const AppExecFwk::InnerEvent::Pointer &event);

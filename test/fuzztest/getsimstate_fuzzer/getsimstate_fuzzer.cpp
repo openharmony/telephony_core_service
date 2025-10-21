@@ -79,6 +79,7 @@ void GetSimStateFunc(const uint8_t *data, size_t size)
     simManager->IsValidSlotIdForDefault(slotId);
     simManager->GetSimIst(slotId);
     simManager->NotifySimSlotsMapping(slotId);
+    simManager->SetIccCardState(slotId, static_cast<int32_t>(simState));
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

@@ -90,6 +90,8 @@ private:
     void OnReceiveBms();
     void ProcessEventExt(uint32_t id, const AppExecFwk::InnerEvent::Pointer &event);
     void OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
+    void SendStkIsReady();
+    void OnReceiveSetPrimarySlotStatus(OHOS::EventFwk::Want want);
 
 private:
     class BundleScanFinishedEventSubscriber : public CommonEventSubscriber {
@@ -131,6 +133,7 @@ private:
     bool isProactiveCommandSucc = false;
     std::shared_ptr<BundleScanFinishedEventSubscriber> bundleScanFinishedSubscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    bool isStkRunning_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
