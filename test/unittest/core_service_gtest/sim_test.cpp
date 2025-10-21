@@ -1442,7 +1442,8 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimLabel_0100, Function | MediumTest | Level3
 {
     int32_t slotId = 0;
     SimLabel simLabel;
-    int32_t result = CoreServiceClient::GetInstance().GetSimLabel(slotId, simLabel);
+    int64_t timeoutMs = 0;
+    int32_t result = CoreServiceClient::GetInstance().GetSimLabel(slotId, simLabel, timeoutMs);
     EXPECT_GT(result, 0);
 }
 

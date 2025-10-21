@@ -95,6 +95,7 @@ private:
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
     void CheckSimPresentWhenReboot();
+    void UpdateSimStateToStateRegistry();
 
 private:
     class DataShareEventSubscriber : public CommonEventSubscriber {
