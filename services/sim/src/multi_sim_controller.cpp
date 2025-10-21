@@ -56,6 +56,7 @@ constexpr int32_t EMPTY_ICCID_LEN = 10;
 constexpr int32_t OCT_TYPE = 10;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
+static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
 static const std::string DEFAULT_VOICE_SIMID_CHANGED = "defaultVoiceSimIdChanged";
 static const std::string DEFAULT_SMS_SIMID_CHANGED = "defaultSmsSimIdChanged";
 static const std::string DEFAULT_CELLULAR_DATA_SIMID_CHANGED = "defaultCellularDataSimIdChanged";
@@ -1252,16 +1253,18 @@ int32_t MultiSimController::GetPrimarySlotId()
     return lastPrimarySlotId_;
 }
 
-void MultiSimController::SetPrimarySlotIdDone()
+void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
 {
-    PublishSetPrimaryEvent(true);
+    PublishSetPrimaryEvent(true, isUserSet);
     std::unique_lock<ffrt::mutex> lock(activeSimMutex_);
     isSetPrimarySlotIdInProgress_ = false;
     SetInSenseSwitchPhase(false);
     activeSimConn_.notify_all();
  
     // trigger to obtain sim card status
-    ObtainDualSimCardStatus();
+    if (!isUserSet) {
+        ObtainDualSimCardStatus();
+    }
 }
 
 void MultiSimController::ObtainDualSimCardStatus()
@@ -1322,10 +1325,10 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     // change protocol for default cellulardata slotId
     isSetPrimarySlotIdInProgress_ = true;
     SetInSenseSwitchPhase(true);
-    PublishSetPrimaryEvent(false);
+    PublishSetPrimaryEvent(false, false);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
         TELEPHONY_LOGE("SetRadioProtocol failed");
-        SetPrimarySlotIdDone();
+        SetPrimarySlotIdDone(false);
         if (setPrimarySlotRemainCount_[slotId] > 0) {
             SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
             TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
@@ -1335,7 +1338,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
-    SetPrimarySlotIdDone();
+    SetPrimarySlotIdDone(false);
     setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
@@ -1384,18 +1387,19 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
     }
 }
 
-void MultiSimController::PublishSetPrimaryEvent(bool setDone)
+void MultiSimController::PublishSetPrimaryEvent(bool setDone, bool isUserSet)
 {
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SET_PRIMARY_SLOT_STATUS);
     want.SetParam(PARAM_SET_PRIMARY_STATUS, setDone);
+    want.SetParam(PARAM_SET_PRIMARY_IS_USER_SET, isUserSet);
     EventFwk::CommonEventData data;
     data.SetWant(want);
 
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("setDone: %{public}d, result: %{public}d", setDone, publishResult);
+    TELEPHONY_LOGI("setDone: %{public}d, isUserSet: %{public}d, result: %{public}d", setDone, isUserSet, publishResult);
 }
 
 void MultiSimController::SendMainCardBroadCast(int32_t slotId)
@@ -1847,14 +1851,14 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     isSetPrimarySlotIdInProgress_ = true;
-    PublishSetPrimaryEvent(false);
+    PublishSetPrimaryEvent(false, true);
     if (!SetPrimarySlotToRil(slotId)) {
         TELEPHONY_LOGE("SetPrimarySlotToRil failed");
-        SetPrimarySlotIdDone();
+        SetPrimarySlotIdDone(true);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SavePrimarySlotIdInfo(slotId);
-    SetPrimarySlotIdDone();
+    SetPrimarySlotIdDone(true);
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
     TELEPHONY_LOGD("SetPrimarySlotIdWithoutModemReboot finish");
     return TELEPHONY_ERR_SUCCESS;

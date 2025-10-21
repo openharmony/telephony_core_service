@@ -387,9 +387,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         oldSimType_ = newSimType;
     }
     ProcessNewSimStatus(newSimStatus);
-    // When esim switches from one active profile to another, the card only report a ready status
-    // and we can only detect the change by comparing the iccid before and after
-    if ((oldSimStatus_ != newSimStatus) || (iccid_ != ar.iccid_)) {
+    if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
         oldSimStatus_ = newSimStatus;
@@ -1120,12 +1118,12 @@ SimAuthenticationResponse SimStateHandle::GetSimIOResponse()
     return simIORespon_;
 }
 
-int32_t SimStateHandle::NotifySimSlotsMapping(int32_t slotId)
+int32_t SimStateHandle::SetIccCardState(int32_t slotId, int32_t simStatus)
 {
-    TELEPHONY_LOGI("SimStateHandle::NotifySimSlotsMapping slotId = %{public}d", slotId);
+    TELEPHONY_LOGI("SimStateHandle::SetIccCardState slotId: %{public}d, simStatus: %{public}d", slotId, simStatus);
     IccState iccState;
     iccState.simType_ = ICC_UNKNOWN_TYPE;
-    iccState.simStatus_ = ICC_CARD_ABSENT;
+    iccState.simStatus_ = simStatus;
     ProcessIccCardState(iccState, slotId);
     return TELEPHONY_ERR_SUCCESS;
 }

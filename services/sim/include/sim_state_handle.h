@@ -144,7 +144,7 @@ public:
     int32_t GetSendSimMatchedOperatorInfoResponse();
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo);
     SimAuthenticationResponse GetSimIOResponse();
-    int32_t NotifySimSlotsMapping(int32_t slotId);
+    int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     void ObtainIccStatus();
     void SetInSenseSwitchPhase(bool flag);
     void UpdateSimStateToStateRegistry();

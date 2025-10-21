@@ -67,6 +67,7 @@ public:
     int32_t NotifySimSlotsMapping(int32_t slotId);
     void SetInSenseSwitchPhase(bool flag);
     void ObtainIccStatus();
+    int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     void UpdateSimStateToStateRegistry();
 
 public:

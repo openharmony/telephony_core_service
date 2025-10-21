@@ -279,8 +279,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         return;
     }
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
-        ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId)) ||
-        IsSwitchToProfileFromAnother(slotId)) {
+        ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId))) {
         HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         simFileManager->ClearData();
         controller_->ForgetAllData(slotId);
@@ -291,10 +290,6 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
         controller_->loadedSimCardInfo_.erase(slotId);
-
-        if (IsSwitchToProfileFromAnother(slotId)) {
-            observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_READY, slotId);
-        }
     } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
                 !controller_->IsSetPrimarySlotIdInProgress()) {
         HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when sim is unknown");
@@ -701,21 +696,6 @@ void MultiSimMonitor::UnRegisterSimNotify()
     }
 }
 
-bool MultiSimMonitor::IsSwitchToProfileFromAnother(int32_t slotId)
-{
-    if (!IsValidSlotId(slotId) || simStateManager_[slotId] == nullptr) {
-        TELEPHONY_LOGE("MultiSimMonitor::IsSwitchToProfileFromAnother slotId is invalid or simStateManager null");
-        return false;
-    }
-
-    std::string oldIccid = simStateManager_[slotId]->GetOldIccid();
-    std::string newIccid = simStateManager_[slotId]->GetIccid();
-    if (!oldIccid.empty() && !newIccid.empty() && oldIccid != newIccid) {
-        return true;
-    }
-    return false;
-}
-
 void MultiSimMonitor::UpdateSimStateToStateRegistry()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateMgrMutex_);
@@ -725,5 +705,6 @@ void MultiSimMonitor::UpdateSimStateToStateRegistry()
         }
     }
 }
+
 } // namespace Telephony
 } // namespace OHOS
