@@ -941,6 +941,7 @@ export default namespace radio {
     }
 
     export interface NetworkState {
+      isCaActive: boolean;
       longOperatorName: string;
       shortOperatorName: string;
       plmnNumeric: string;
@@ -952,6 +953,7 @@ export default namespace radio {
     }
 
     export class NetworkStateInner implements NetworkState {
+      isCaActive: boolean;
       longOperatorName: string;
       shortOperatorName: string;
       plmnNumeric: string;

@@ -26,6 +26,7 @@ pub const TELEPHONY_SUCCESS: i32 = 8300000;
 impl From<ffi::NetworkStateAni> for bridge::NetworkState {
     fn from(value: ffi::NetworkStateAni) -> Self {
         Self {
+            is_ca_active: value.is_ca_active,
             long_operator_name: value.long_operator_name,
             short_operator_name: value.short_operator_name,
             plmn_numeric: value.plmn_numeric,
@@ -41,6 +42,7 @@ impl From<ffi::NetworkStateAni> for bridge::NetworkState {
 impl NetworkStateAni {
     pub fn new() -> Self {
         Self {
+            is_ca_active: false,
             long_operator_name: String::from(""),
             short_operator_name: String::from(""),
             plmn_numeric: String::from(""),
@@ -61,6 +63,7 @@ pub mod ffi {
     }
 
     struct NetworkStateAni {
+        pub is_ca_active: bool,
         pub long_operator_name: String,
         pub short_operator_name: String,
         pub plmn_numeric: String,
