@@ -86,6 +86,11 @@ void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::Inne
         TELEPHONY_LOGE("fd is nullptr!");
         return;
     }
+    if (!usimDiallingNumberSrv_->GetLoadDiallingNumResult()) {
+        TELEPHONY_LOGE("load DiallingNumbers failed!");
+        return;
+    }
+    usimDiallingNumberSrv_->SetLoadDiallingNumResult(false);
     int fileId = fd->fileID;
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(fd->result);
