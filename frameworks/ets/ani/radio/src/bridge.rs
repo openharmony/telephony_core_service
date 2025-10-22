@@ -262,6 +262,7 @@ pub enum CellInformationData {
 #[ani_rs::ani(path = "@ohos.telephony.radio.radio.NetworkStateInner")]
 #[derive(Debug, Clone)]
 pub struct NetworkState {
+    pub is_ca_active: bool,
     pub long_operator_name: String,
     pub short_operator_name: String,
     pub plmn_numeric: String,
