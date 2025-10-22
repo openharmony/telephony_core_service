@@ -59,24 +59,73 @@ void UsimDiallingNumbersService::InitFuncMap()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessIapLoadDone(event); };
 }
 
+bool UsimDiallingNumbersService::GetLoadDiallingNumResult()
+{
+    return loadDiallingNumResult_;
+}
+
+void UsimDiallingNumbersService::SetLoadDiallingNumResult(bool status)
+{
+    loadDiallingNumResult_ = status;
+}
+
+void UsimDiallingNumbersService::ReprocessPbrLoad(Telephony::ElementaryFile reEvent)
+{
+    ++reLoadNum_;
+    std::unique_lock<std::mutex> lock(mtx_);
+    TELEPHONY_LOGI("usimservice reload pbr start %{pubilc}d %{public}d",
+        reLoadNum_, static_cast<uint32_t>(reEvent));
+    AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("ReLoadPbrFiles fileController_ is nullptr");
+        isProcessingPbr = false;
+        return;
+    }
+    fileController_->ObtainAllLinearFixedFile(reEvent, event);
+}
+
+void UsimDiallingNumbersService::ReprocessAdnLoad(Telephony::ElementaryFile reEvent)
+{
+    ++reLoadNum_;
+    std::unique_lock<std::mutex> lock(mtx_);
+    TELEPHONY_LOGI("usimservice reload adn start %{pubilc}d", reLoadNum_);
+    std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
+    int extEf = files.at(TAG_SIM_USIM_EXT1) != nullptr ? files.at(TAG_SIM_USIM_EXT1)->fileId : 0;
+    TELEPHONY_LOGI("UsimDiallingNumbersService::LoadDiallingNumberFiles start %{public}zu", recId);
+    int efId = files.at(TAG_SIM_USIM_ADN)->fileId;
+    AppExecFwk::InnerEvent::Pointer event = CreateHandlerPointer(MSG_USIM_ADN_LOAD_DONE, efId, 0, nullptr);
+    diallingNumbersHandler_->GetAllDiallingNumbers(efId, extEf, event);
+}
+
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        TELEPHONY_LOGE("event is nullptr!");
+        if (reLoadNum_ < Max_RETRANSMIT_NUMBER) {
+            TELEPHONY_LOGE("event is nullptr!");
+            ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+        } else {
+            TELEPHONY_LOGE("event is nullptr!");
+        }
         return;
     }
     TELEPHONY_LOGI("usimservice load pbr done (%{public} " PRId64 ")", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
-        TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
-        isProcessingPbr = false;
-        std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> list =
-            std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
-        SendBackResult(list);
+        if (reLoadNum_ < Max_RETRANSMIT_NUMBER) {
+            TELEPHONY_LOGE("object is nullptr!");
+            ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+        } else {
+            TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
+            isProcessingPbr = false;
+            std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> list =
+                std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+            SendBackResult(list);
+        }
         return;
     }
     if (object->exception == nullptr) {
         std::vector<std::string> &files = object->fileResults;
+        reLoadNum_ = 0;
         GeneratePbrFile(files);
     }
     StartLoadByPbrFiles();
@@ -114,7 +163,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         auto exception = std::static_pointer_cast<RadioResponseInfo>(resultObject->exception);
         TELEPHONY_LOGE("process adn file exception occured, errno: %{public}d",
             static_cast<uint32_t>(exception->error));
-        LoadDiallingNumber2Files(currentIndex_);
+        ReProcessAdnLoad(currentIndex_);
         return;
     }
 
@@ -124,6 +173,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         return;
     }
 
+    reLoadNum_ = 0;
     std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> diallingNumberList =
         std::static_pointer_cast<std::vector<std::shared_ptr<DiallingNumbersInfo>>>(resultObject->result);
     adns_[resultObject->fileID] = *diallingNumberList;
@@ -245,6 +295,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
 {
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles finish %{public}zu", recId);
+        loadDiallingNumResult_ = true;
         ProcessQueryDone();
         return false;
     }
