@@ -132,13 +132,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_002, Function |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
     simStateManager.push_back(simStateManager0);
     
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -161,13 +159,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitData_003, Function |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
     simStateManager.push_back(simStateManager0);
     
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -255,13 +251,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function 
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
     simStateManager.push_back(simStateManager0);
     
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -284,13 +278,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_002, Function 
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
     simStateManager.push_back(simStateManager0);
     
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -316,13 +308,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_003, Function 
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
     
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
     simStateManager.push_back(simStateManager0);
     
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -357,10 +347,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetShowNumber_001, Funct
     simStateManager1->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
  
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_ = { simStateManager0, simStateManager1 };
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     simFileManager->simFile_->msisdn_ = "2164181618486135";
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_ = { simFileManager, nullptr };
@@ -543,10 +530,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimTelephoneNumber_00
     simStateManager1->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
  
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_ = { simStateManager0, simStateManager1 };
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager0);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
     simFileManager->simFile_->msisdn_ = "2164181618486135";
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_ = { simFileManager, nullptr };

@@ -21,6 +21,7 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "i_core_service_common_event_hub.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -58,6 +59,11 @@ void CoreManagerInner::SetTelRilMangerObj(std::shared_ptr<ITelRilManager> telRil
 void CoreManagerInner::SetEsimManagerObj(std::shared_ptr<IEsimManager> esimManager)
 {
     esimManager_ = esimManager;
+}
+
+void CoreManagerInner::SetCommonEventHubObj(std::shared_ptr<ICoreServiceCommonEventHub> commonEventHub)
+{
+    coreServiceCommonEventHub_ = commonEventHub;
 }
 
 bool CoreManagerInner::IsInitFinishedForTelRil(void)
@@ -227,6 +233,21 @@ int32_t CoreManagerInner::UnregisterSimAccountCallback(const sptr<SimAccountCall
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->UnregisterSimAccountCallback(callback);
+}
+
+void CoreManagerInner::RegisterCommonEventCallback(const std::shared_ptr<CoreServiceCommonEventCallback> &cb,
+    const std::vector<TelCommonEvent> &events)
+{
+    if (coreServiceCommonEventHub_ != nullptr) {
+        coreServiceCommonEventHub_->RegisterCallback(cb, events);
+    }
+}
+
+void CoreManagerInner::UnregisterCommonEventCallback(const std::shared_ptr<CoreServiceCommonEventCallback> &cb)
+{
+    if (coreServiceCommonEventHub_ != nullptr) {
+        coreServiceCommonEventHub_->UnregisterCallback(cb);
+    }
 }
 
 /******************** telRilManager start *******************/

@@ -18,14 +18,13 @@
 
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
-#include "common_event_subscriber.h"
 #include "telephony_state_registry_client.h"
 #include "i_tel_ril_manager.h"
 #include "inner_event.h"
 #include "sim_constant.h"
 #include "sim_state_manager.h"
 #include "tel_event_handler.h"
-#include "want.h"
+#include "core_service_common_event_callback.h"
 
 #define STK_CMD_CMD_LEN_INDEX 2
 #define STK_CMD_CMD_LEN_81 "81"
@@ -47,9 +46,6 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::EventFwk;
-using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
-using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class StkController : public TelEventHandler {
 public:
     explicit StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
@@ -91,16 +87,16 @@ private:
     void ProcessEventExt(uint32_t id, const AppExecFwk::InnerEvent::Pointer &event);
     void OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SendStkIsReady();
-    void OnReceiveSetPrimarySlotStatus(OHOS::EventFwk::Want want);
+    void OnReceiveSetPrimarySlotStatus(bool setDone);
 
 private:
-    class BundleScanFinishedEventSubscriber : public CommonEventSubscriber {
+    class BundleScanFinishedEventSubscriber : public CoreServiceCommonEventCallback {
     public:
-        explicit BundleScanFinishedEventSubscriber(
-            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
-            : CommonEventSubscriber(info), handler_(handler) {};
+        explicit BundleScanFinishedEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
         ~BundleScanFinishedEventSubscriber() = default;
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        void OnBundleScanFinished() override;
+        void OnSetPrimarySlotStatus(bool setDone) override;
         std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 

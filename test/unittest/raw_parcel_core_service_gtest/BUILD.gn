@@ -40,6 +40,7 @@ ohos_unittest("raw_parcel_core_service_test") {
     "$SOURCE_DIR/test/unittest/raw_parcel_core_service_gtest/mock/core_service_stub.cpp",
     # tested src
     "$SOURCE_DIR/services/core/src/core_service.cpp",
+    "$SOURCE_DIR/services/core/src/core_service_common_event_hub.cpp",
     # deps src
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_callback_stub.cpp",
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_client.cpp",

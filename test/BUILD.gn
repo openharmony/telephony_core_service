@@ -77,6 +77,7 @@ group("unittest") {
     "unittest/icc_dialling_numbers_handler_gtest:icc_dialling_numbers_handler_gtest",
     "unittest/icc_file_gtest:icc_file_gtest",
     "unittest/raw_parcel_core_service_gtest:raw_parcel_core_service_test",
+    "unittest/core_service_common_event_gtest:core_service_common_event_test",
     "unittest/sim_gtest:sim_gtest",
     "unittest/sim_state_handle_gtest:sim_state_handle_gtest",
     "unittest/tel_ril_gtest:tel_ril_unittest",
