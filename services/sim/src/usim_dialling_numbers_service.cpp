@@ -93,7 +93,6 @@ void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
         return;
     }
     std::unique_lock<std::mutex> lock(mtx_);
-    TELEPHONY_LOGI("usimservice reload adn start %{pubilc}d", reLoadNum_);
     const auto &files = pbrFiles_.at(recId)->fileIds_;
     int extEf = files.at(TAG_SIM_USIM_EXT1) != nullptr ? files.at(TAG_SIM_USIM_EXT1)->fileId : 0;
     TELEPHONY_LOGI("UsimDiallingNumbersService::LoadDiallingNumberFiles start %{public}zu", recId);
@@ -105,11 +104,9 @@ void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
         if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
-            TELEPHONY_LOGE("event is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
-        } else {
-            TELEPHONY_LOGE("event is nullptr!");
         }
         return;
     }
@@ -117,7 +114,6 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
         if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
-            TELEPHONY_LOGE("object is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
         } else {
             TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
