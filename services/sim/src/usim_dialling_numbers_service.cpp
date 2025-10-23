@@ -23,7 +23,7 @@ constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 const std::u16string NUMBER_SPLIT = u";";
 constexpr uint8_t INVALID_SIM_BYTE_VALUE = 0xff;
-constexpr int MAX_RETRANSMIT_NUMBER = 1;
+constexpr int MAX_RETRANSMIT_COUNT = 1;
 
 std::mutex UsimDiallingNumbersService::mtx_;
 
@@ -94,7 +94,7 @@ void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
     }
     std::unique_lock<std::mutex> lock(mtx_);
     TELEPHONY_LOGI("usimservice reload adn start %{pubilc}d", reLoadNum_);
-    std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
+    const auto &files = pbrFiles_.at(recId)->fileIds_;
     int extEf = files.at(TAG_SIM_USIM_EXT1) != nullptr ? files.at(TAG_SIM_USIM_EXT1)->fileId : 0;
     TELEPHONY_LOGI("UsimDiallingNumbersService::LoadDiallingNumberFiles start %{public}zu", recId);
     int efId = files.at(TAG_SIM_USIM_ADN)->fileId;
