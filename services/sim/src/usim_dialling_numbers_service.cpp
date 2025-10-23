@@ -69,7 +69,7 @@ void UsimDiallingNumbersService::SetLoadDiallingNumResult(bool status)
     loadDiallingNumResult_ = status;
 }
 
-void UsimDiallingNumbersService::ReprocessPbrLoad(Telephony::ElementaryFile reEvent)
+void UsimDiallingNumbersService::ReProcessPbrLoad(Telephony::ElementaryFile reEvent)
 {
     ++reLoadNum_;
     std::unique_lock<std::mutex> lock(mtx_);
@@ -84,7 +84,7 @@ void UsimDiallingNumbersService::ReprocessPbrLoad(Telephony::ElementaryFile reEv
     fileController_->ObtainAllLinearFixedFile(reEvent, event);
 }
 
-void UsimDiallingNumbersService::ReprocessAdnLoad(Telephony::ElementaryFile reEvent)
+void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
 {
     ++reLoadNum_;
     std::unique_lock<std::mutex> lock(mtx_);
@@ -100,7 +100,7 @@ void UsimDiallingNumbersService::ReprocessAdnLoad(Telephony::ElementaryFile reEv
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        if (reLoadNum_ < Max_RETRANSMIT_NUMBER) {
+        if (reLoadNum_ < MAX_RETRANSMIT_NUMBER) {
             TELEPHONY_LOGE("event is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
         } else {
