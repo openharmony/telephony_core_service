@@ -103,7 +103,7 @@ private:
     void SendBackResult(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers);
     void InitFuncMap();
     void NextStep(int msgId);
-    void ReprocessPbrLoad(enum Telephony::ElementaryFile reEvent);
+    void ReProcessPbrLoad(enum Telephony::ElementaryFile reEvent);
     void ReProcessAdnLoad(size_t recId);
     const int NEXT = 123;
     const int MAX_RETRANSMIT_NUMBER = 1;
