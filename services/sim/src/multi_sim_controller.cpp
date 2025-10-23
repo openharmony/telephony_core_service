@@ -1265,10 +1265,10 @@ void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
     if (!isUserSet) {
         ObtainDualSimCardStatus();
     }
-    ProcessAdVanceLoadPbr();
+    ProcessAdvanceLoadPbr();
 }
 
-void MultiSimController::ProcessAdVanceLoadPbr()
+void MultiSimController::ProcessAdvanceLoadPbr()
 {
     std::thread t([] {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
