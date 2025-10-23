@@ -23,6 +23,7 @@ constexpr int32_t ANR_ADDITION_NUMBER_OFFSET = 3;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 const std::u16string NUMBER_SPLIT = u";";
 constexpr uint8_t INVALID_SIM_BYTE_VALUE = 0xff;
+constexpr int MAX_RETRANSMIT_NUMBER = 1;
 
 std::mutex UsimDiallingNumbersService::mtx_;
 
@@ -59,7 +60,7 @@ void UsimDiallingNumbersService::InitFuncMap()
         [this](const AppExecFwk::InnerEvent::Pointer &event) { ProcessIapLoadDone(event); };
 }
 
-bool UsimDiallingNumbersService::GetLoadDiallingNumResult()
+bool UsimDiallingNumbersService::GetLoadDiallingNumResult() const
 {
     return loadDiallingNumResult_;
 }
@@ -87,6 +88,10 @@ void UsimDiallingNumbersService::ReProcessPbrLoad(Telephony::ElementaryFile reEv
 void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
 {
     ++reLoadNum_;
+    if (recId >= pbrFiles_.size()) {
+        TELEPHONY_LOGE("load number adn files error: recId over");
+        return;
+    }
     std::unique_lock<std::mutex> lock(mtx_);
     TELEPHONY_LOGI("usimservice reload adn start %{pubilc}d", reLoadNum_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
@@ -100,7 +105,7 @@ void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
 void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        if (reLoadNum_ < MAX_RETRANSMIT_NUMBER) {
+        if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
             TELEPHONY_LOGE("event is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
         } else {
@@ -111,7 +116,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     TELEPHONY_LOGI("usimservice load pbr done (%{public} " PRId64 ")", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
-        if (reLoadNum_ < MAX_RETRANSMIT_NUMBER) {
+        if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
             TELEPHONY_LOGE("object is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
         } else {
