@@ -111,7 +111,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     TELEPHONY_LOGI("usimservice load pbr done (%{public} " PRId64 ")", event->GetParam());
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
-        if (reLoadNum_ < Max_RETRANSMIT_NUMBER) {
+        if (reLoadNum_ < MAX_RETRANSMIT_NUMBER) {
             TELEPHONY_LOGE("object is nullptr!");
             ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
         } else {
