@@ -1275,7 +1275,7 @@ void MultiSimController::ProcessAdvanceLoadPbr()
         for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
             CoreManagerInner::GetInstance().QueryIccDiallingNumbers(i, DiallingNumbersInfo::SIM_ADN, result);
         }
-    })
+    });
     t.detach();
 }
 
