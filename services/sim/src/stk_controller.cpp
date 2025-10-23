@@ -193,7 +193,7 @@ void StkController::OnReceiveBms()
     }
 }
 
-void StkController::OnSetPrimarySlotStatus(bool setDone)
+void StkController::OnReceiveSetPrimarySlotStatus(bool setDone)
 {
     if (setDone) {
         std::shared_ptr<SimStateManager> simStateManager = simStateManager_.lock();

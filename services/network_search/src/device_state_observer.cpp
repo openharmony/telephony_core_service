@@ -48,7 +48,7 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
 
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(sharingEventCallback_);
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_, sharingEventCallback_);
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("StartEventSubscriber samgrProxy or statusChangeListener_ is nullptr");
         return;
