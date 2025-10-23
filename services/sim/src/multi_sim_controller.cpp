@@ -1264,8 +1264,8 @@ void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
     // trigger to obtain sim card status
     if (!isUserSet) {
         ObtainDualSimCardStatus();
+        ProcessAdvanceLoadPbr();
     }
-    ProcessAdvanceLoadPbr();
 }
 
 void MultiSimController::ProcessAdvanceLoadPbr()
