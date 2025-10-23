@@ -56,7 +56,7 @@ public:
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);
     void SetFileControllerAndDiallingNumberHandler(
         std::shared_ptr<IccFileController> &ctrl, std::shared_ptr<IccDiallingNumbersHandler> handler);
-    bool GetLoadDiallingNumResult();
+    bool GetLoadDiallingNumResult() const;
     void SetLoadDiallingNumResult(bool status);
 
 protected:
@@ -106,7 +106,6 @@ private:
     void ReProcessPbrLoad(enum Telephony::ElementaryFile reEvent);
     void ReProcessAdnLoad(size_t recId);
     const int NEXT = 123;
-    const int MAX_RETRANSMIT_NUMBER = 1;
     int reLoadNum_ = 0;
     enum UsimFileType {
         TYPE1_FLAG = 168, // 3gpp 31102-9j0 4.4.2.1
