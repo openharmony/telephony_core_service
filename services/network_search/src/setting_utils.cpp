@@ -43,9 +43,11 @@ const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE = "auto_ti
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE = "settings.telephony.airplanemode";
 const std::string SettingUtils::SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE =
     "settings.telephony.preferrednetworkmode";
-const std::string SettingUtils::COMMON_EVENT_DATA_SHARE_READY = "usual.event.DATA_SHARE_READY";
 
-SettingUtils::SettingUtils() = default;
+SettingUtils::SettingUtils()
+    :commonEventSubscriber_(std::make_shared<BroadcastSubscriber>())
+{
+}
 
 SettingUtils::~SettingUtils() = default;
 
@@ -247,15 +249,8 @@ int32_t SettingUtils::Update(Uri uri, const std::string &key, const std::string 
     return TELEPHONY_SUCCESS;
 }
 
-void SettingUtils::SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+std::shared_ptr<CoreServiceCommonEventCallback> SettingUtils::GetCommonEventSubscriber()
 {
-    std::lock_guard<ffrt::mutex> lock(mtx_);
-    commonEventSubscriber_ = std::make_shared<BroadcastSubscriber>(subscribeInfo);
-}
-
-std::shared_ptr<EventFwk::CommonEventSubscriber> SettingUtils::GetCommonEventSubscriber()
-{
-    std::lock_guard<ffrt::mutex> lock(mtx_);
     return commonEventSubscriber_;
 }
 
@@ -271,18 +266,8 @@ void SettingUtils::UpdateDdsState(bool isReady)
     }
 }
 
-SettingUtils::BroadcastSubscriber::BroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &sp)
-    : EventFwk::CommonEventSubscriber(sp)
-{}
-
-void SettingUtils::BroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+void SettingUtils::BroadcastSubscriber::OnDataShareReady()
 {
-    const AAFwk::Want &want = data.GetWant();
-    std::string action = want.GetAction();
-    if (action != COMMON_EVENT_DATA_SHARE_READY) {
-        TELEPHONY_LOGE("SettingUtils::CommonEventSubscriber event is not COMMON_EVENT_DATA_SHARE_READY");
-        return;
-    }
     SettingUtils::GetInstance()->RegisterSettingsObserver();
     TELEPHONY_LOGI("SettingUtils::OnReceiveEvent datashare is ready!");
 }

@@ -77,6 +77,7 @@ public:
     static inline constexpr const char *COMMON_EVENT_CELLULAR_DATA_STATE_CHANGED =
         "COMMON_EVENT_CELLULAR_DATA_STATE_CHANGED";
     static inline constexpr const char *COMMON_EVENT_SIGNAL_INFO_CHANGED = "COMMON_EVENT_SIGNAL_INFO_CHANGED";
+    static inline constexpr const char *COMMON_EVENT_BUNDLE_SCAN_FINISHED = "COMMON_EVENT_BUNDLE_SCAN_FINISHED";
 
 private:
     static inline const std::vector<std::string> commonEventVector_ = {COMMON_EVENT_RADIO_STATE_CHANGE,

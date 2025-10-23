@@ -37,10 +37,9 @@ constexpr const char *GC_ICCID = "8985231";
 constexpr const char *PREFIX_LOCAL_ICCID = "8986";
 constexpr const char *ROAMING_CPLMN = "20404";
 
-SimFileManager::SimFileManager(
-    const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<ITelRilManager> telRilManager,
+SimFileManager::SimFileManager(std::weak_ptr<ITelRilManager> telRilManager,
     std::weak_ptr<Telephony::SimStateManager> state)
-    : TelEventHandler("SimFileManager"), CommonEventSubscriber(sp), telRilManager_(telRilManager),
+    : TelEventHandler("SimFileManager"), telRilManager_(telRilManager),
     simStateManager_(state)
 {
     if (simStateManager_.lock() == nullptr) {
@@ -54,21 +53,6 @@ SimFileManager::~SimFileManager()
 {
     if (simFile_ != nullptr) {
         simFile_->UnInit();
-    }
-}
-
-void SimFileManager::OnReceiveEvent(const EventFwk::CommonEventData &data)
-{
-    const AAFwk::Want &want = data.GetWant();
-    std::string action = want.GetAction();
-    int32_t slotId = want.GetIntParam("slotId", 0);
-    TELEPHONY_LOGI("[slot%{public}d] action=%{public}s code=%{public}d", slotId, action.c_str(), data.GetCode());
-    if (EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED == action) {
-        if (slotId_ != slotId || simFile_ == nullptr) {
-            return;
-        }
-        TELEPHONY_LOGI("SimFileManager::OnReceiveEvent");
-        simFile_->LoadVoiceMail();
     }
 }
 
@@ -919,12 +903,7 @@ std::shared_ptr<SimFileManager> SimFileManager::CreateInstance(
         return nullptr;
     }
 
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-
-    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(subscribeInfo, ril, simState);
+    std::shared_ptr<SimFileManager> manager = std::make_shared<SimFileManager>(ril, simState);
     if (manager == nullptr) {
         TELEPHONY_LOGE("manager create nullptr.");
         return nullptr;

@@ -38,6 +38,7 @@
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_manager.h"
 #endif
+#include "core_service_common_event_hub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -112,6 +113,9 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
+    auto coreServiceCommonEventHub = std::make_shared<CoreServiceCommonEventHub>();
+    coreServiceCommonEventHub->Init();
+    CoreManagerInner::GetInstance().SetCommonEventHubObj(coreServiceCommonEventHub);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         networkSearchManager_->InitAirplaneMode(slotId);
     }

@@ -486,15 +486,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     std::string numeric = "";
     EXPECT_FALSE(operatorName->isCMCard(numeric));
     EXPECT_FALSE(operatorName->isCUCard(numeric));
@@ -513,15 +510,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorName_002, Function | MediumTes
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCMCC_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     std::string simPlmn = "46000";
     std::string netPlmn = "46031";
     EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
@@ -561,15 +555,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCMCC_001, Function | Mediu
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_OperatorCUCC_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     std::string simPlmn = "46001";
     std::string netPlmn = "46022";
     EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
@@ -609,15 +600,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorCUCC_001, Function | MediumTes
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCTCC_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     std::string simPlmn = "46003";
     std::string netPlmn = "46021";
     EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
@@ -657,15 +645,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCTCC_001, Function | Mediu
  */
 HWTEST_F(CoreServiceBranchTest, Telephony_OperatorNameCBCC_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     std::string simPlmn = "46015";
     std::string netPlmn = "46032";
     EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));

@@ -29,6 +29,11 @@
 
 namespace OHOS {
 namespace Telephony {
+
+class ICoreServiceCommonEventHub;
+class CoreServiceCommonEventCallback;
+enum class TelCommonEvent : int32_t;
+
 class CoreManagerInner final {
 public:
     ~CoreManagerInner() = default;
@@ -38,6 +43,7 @@ public:
         std::shared_ptr<Telephony::ISimManager> simManager, std::shared_ptr<ITelRilManager> telRilManager);
     void SetTelRilMangerObj(std::shared_ptr<ITelRilManager> telRilManager);
     void SetEsimManagerObj(std::shared_ptr<IEsimManager> esimManager);
+    void SetCommonEventHubObj(std::shared_ptr<ICoreServiceCommonEventHub> commonEventHub);
     int32_t RegisterCoreNotify(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what, int32_t *obj);
     int32_t UnRegisterCoreNotify(
@@ -53,6 +59,9 @@ public:
     int32_t GetMaxSimCount(void);
     int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback);
+    void RegisterCommonEventCallback(const std::shared_ptr<CoreServiceCommonEventCallback> &cb,
+        const std::vector<TelCommonEvent> &events);
+    void UnregisterCommonEventCallback(const std::shared_ptr<CoreServiceCommonEventCallback> &cb);
 
     /******************** telRilManager start *******************/
     int32_t SetRadioState(
@@ -410,6 +419,7 @@ private:
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IEsimManager> esimManager_ = nullptr;
+    std::shared_ptr<ICoreServiceCommonEventHub> coreServiceCommonEventHub_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

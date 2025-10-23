@@ -31,10 +31,9 @@ public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
     
     MockSimFileManager(
-        const EventFwk::CommonEventSubscribeInfo &sp,
         std::weak_ptr<Telephony::ITelRilManager> telRilManager,
         std::weak_ptr<Telephony::SimStateManager> state)
-        : SimFileManager(sp, telRilManager, state) {}
+        : SimFileManager(telRilManager, state) {}
 
     virtual ~MockSimFileManager() = default;
 

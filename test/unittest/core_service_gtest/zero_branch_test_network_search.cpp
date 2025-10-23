@@ -391,15 +391,12 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkType_001, Function | MediumTe
  */
 HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_001, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     auto operatorInfo = std::make_shared<OperatorInfoResult>();
     std::string numeric = "qwe";
     std::vector<std::string> pnnCust;
@@ -444,15 +441,12 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_001, Function | MediumT
  */
 HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_002, Function | MediumTest | Level1)
 {
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     operatorName->enableCust_ = true;
     std::string plmn = "46000";
     std::vector<std::string> pnnCust;
@@ -494,15 +488,12 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_003, Function | MediumT
 {
     auto simManager = std::make_shared<MockSimManager>();
     MockSimManagerFucTest(simManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager1 = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager1);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     operatorName->enableCust_ = true;
     std::string plmn = "46000";
     std::vector<std::string> pnnCust;
@@ -533,16 +524,13 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_003, Function | MediumT
 HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_004, Function | MediumTest | Level1)
 {
     std::string plmn = "46000";
-    EventFwk::MatchingSkills matchingSkills;
     OperatorNameParams params = {false, "", true, plmn, 1};
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
     auto operatorName = std::make_shared<OperatorName>(
-        subscriberInfo, networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     
     operatorName->displayConditionCust_  = SpnType::SPN_COND_PLMN;
     operatorName->GetCustSpnRule(false);

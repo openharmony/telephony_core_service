@@ -52,7 +52,6 @@ void NetworkSearchHandlerInit()
     networkSearchHandler->SubModuleInit();
     networkSearchHandler->RegisterEvents();
     networkSearchHandler->InitOperatorName();
-    networkSearchHandler->InitSettingUtils();
     networkSearchHandler->UnregisterEvents();
     networkSearchHandler->UpdateNetworkState();
     networkSearchHandler->UpdateOperatorName();

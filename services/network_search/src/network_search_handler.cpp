@@ -243,7 +243,7 @@ bool NetworkSearchHandler::Init()
         return false;
     }
     networkRegister_->InitNrConversionConfig();
-    if (!InitOperatorName() || !InitSettingUtils()) {
+    if (!InitOperatorName()) {
         return false;
     }
     SubscribeSystemAbility();
@@ -298,30 +298,13 @@ bool NetworkSearchHandler::SubModuleInit()
 bool NetworkSearchHandler::InitOperatorName()
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    operatorName_ = std::make_shared<OperatorName>(
-        subscriberInfo, nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
-    if (operatorName_ == nullptr) {
-        TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
+    if (nsm == nullptr) {
         return false;
     }
-    return true;
-}
-
-bool NetworkSearchHandler::InitSettingUtils()
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(SettingUtils::COMMON_EVENT_DATA_SHARE_READY);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfo.SetPermission(PERMISSION_PUBLISH_SYSTEM_EVENT);
-    SettingUtils::GetInstance()->SetCommonEventSubscribeInfo(subscriberInfo);
-    if (SettingUtils::GetInstance()->GetCommonEventSubscriber() == nullptr) {
-        TELEPHONY_LOGE("InitSettingUtils fail! slotId:%{public}d", slotId_);
+    operatorName_ = std::make_shared<OperatorName>(
+        nsm->GetNetworkSearchState(slotId_), nsm->GetSimManager(), networkSearchManager_, slotId_);
+    if (operatorName_ == nullptr) {
+        TELEPHONY_LOGE("failed to create new operatorName slotId:%{public}d", slotId_);
         return false;
     }
     return true;
@@ -1620,11 +1603,10 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnAddSystemAbility
                 return;
             }
             opName_->NotifySpnChanged(true);
-            bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(opName_);
-            bool settingsResult = EventFwk::CommonEventManager::SubscribeCommonEvent(
-                SettingUtils::GetInstance()->GetCommonEventSubscriber());
-            TELEPHONY_LOGI("NetworkSearchHandler::OnAddSystemAbility subscribeResult = %{public}d, %{public}d",
-                subscribeResult, settingsResult);
+            CoreManagerInner::GetInstance().RegisterCommonEventCallback(
+                opName_, {TelCommonEvent::OPERATOR_CONFIG_CHANGED, TelCommonEvent::LOCALE_CHANGED});
+            CoreManagerInner::GetInstance().RegisterCommonEventCallback(
+                SettingUtils::GetInstance()->GetCommonEventSubscriber(), {TelCommonEvent::DATA_SHARE_READY});
             break;
         }
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
@@ -1647,8 +1629,8 @@ void NetworkSearchHandler::SystemAbilityStatusChangeListener::OnRemoveSystemAbil
         TELEPHONY_LOGE("OnRemoveSystemAbility COMMON_EVENT_SERVICE_ID opName_ is nullptr");
         return;
     }
-    bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(opName_);
-    TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
+    CoreManagerInner::GetInstance().UnregisterCommonEventCallback(opName_);
+    TELEPHONY_LOGI("NetworkSearchHandler::OnRemoveSystemAbility");
 }
 
 bool NetworkSearchHandler::IsPowerOnPrimaryRadioWhenNoSim() const

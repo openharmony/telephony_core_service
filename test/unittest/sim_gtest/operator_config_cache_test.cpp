@@ -46,10 +46,7 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest001, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
     EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
@@ -63,10 +60,7 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest002, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
     EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))
@@ -81,10 +75,7 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest003, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
     EXPECT_CALL(*dataShareHelper, Creator(testing::_, testing::_, testing::_, testing::_))

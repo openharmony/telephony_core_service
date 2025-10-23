@@ -98,10 +98,7 @@ bool SimTest::ParseOperatorConf(int32_t slotId)
     }
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
+    auto simFileManager = std::make_shared<SimFileManager>(
         std::weak_ptr<ITelRilManager>(telRilManager), std::weak_ptr<SimStateManager>(simStateManager));
     OperatorConfigCache ofpc(std::weak_ptr<SimFileManager>(simFileManager), simStateManager, slotId);
     OperatorFileParser ofp;
@@ -583,11 +580,7 @@ std::shared_ptr<OperatorConfigCache> SimTest::CreateOperatorConfigCache(int32_t 
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo,
-                                                           std::weak_ptr<ITelRilManager>(telRilManager),
+    auto simFileManager = std::make_shared<SimFileManager>(std::weak_ptr<ITelRilManager>(telRilManager),
                                                            std::weak_ptr<SimStateManager>(simStateManager));
     return std::make_shared<OperatorConfigCache>(
         std::weak_ptr<SimFileManager>(simFileManager), simStateManager, slotId);
