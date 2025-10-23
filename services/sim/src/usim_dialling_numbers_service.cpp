@@ -74,8 +74,6 @@ void UsimDiallingNumbersService::ReProcessPbrLoad(Telephony::ElementaryFile reEv
 {
     ++reLoadNum_;
     std::unique_lock<std::mutex> lock(mtx_);
-    TELEPHONY_LOGI("usimservice reload pbr start %{pubilc}d %{public}d",
-        reLoadNum_, static_cast<uint32_t>(reEvent));
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("ReLoadPbrFiles fileController_ is nullptr");
