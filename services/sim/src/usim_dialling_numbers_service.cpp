@@ -76,7 +76,6 @@ void UsimDiallingNumbersService::ReProcessPbrLoad(Telephony::ElementaryFile reEv
     std::unique_lock<std::mutex> lock(mtx_);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
     if (fileController_ == nullptr) {
-        TELEPHONY_LOGE("ReLoadPbrFiles fileController_ is nullptr");
         isProcessingPbr = false;
         return;
     }
@@ -87,13 +86,11 @@ void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
 {
     ++reLoadNum_;
     if (recId >= pbrFiles_.size()) {
-        TELEPHONY_LOGE("load number adn files error: recId over");
         return;
     }
     std::unique_lock<std::mutex> lock(mtx_);
     const auto &files = pbrFiles_.at(recId)->fileIds_;
     int extEf = files.at(TAG_SIM_USIM_EXT1) != nullptr ? files.at(TAG_SIM_USIM_EXT1)->fileId : 0;
-    TELEPHONY_LOGI("UsimDiallingNumbersService::LoadDiallingNumberFiles start %{public}zu", recId);
     int efId = files.at(TAG_SIM_USIM_ADN)->fileId;
     AppExecFwk::InnerEvent::Pointer event = CreateHandlerPointer(MSG_USIM_ADN_LOAD_DONE, efId, 0, nullptr);
     diallingNumbersHandler_->GetAllDiallingNumbers(efId, extEf, event);
