@@ -379,6 +379,9 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     auto owner = event->GetOwner();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    diallingNumbersCache->usimDiallingNumberSrv_->loadDiallingNumResult_ = false;
+    diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
+    diallingNumbersCache->usimDiallingNumberSrv_->loadDiallingNumResult_ = true;
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
     diallingNumbersCache->ProcessObtainAdnDetailsDone(response);
     diallingNumbersCache->ProcessChangeDiallingNumbersDone(response);

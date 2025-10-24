@@ -54,14 +54,64 @@ void UsimDiallingNumbersServiceTest::SetUp() {}
 
 void UsimDiallingNumbersServiceTest::TearDown() {}
 
+HWTEST_F(UsimDiallingNumbersServiceTest, SetLoadDiallingNumResult001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    service->SetLoadDiallingNumResult(true);
+
+    auto xresult = service->GetLoadDiallingNumResult();
+    EXPECT_TRUE(xresult);
+}
+
+HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessPbrLoad001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+    service->fileController_ = nullptr;
+    service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+    EXPECT_FALSE(service->pbrFileLoaded_);
+
+    service->fileController_ = std::make_shared<UsimFileController>(0);
+    service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+    EXPECT_TRUE(xresult);
+}
+
+HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessAdnLoad001, Function | MediumTest | Level1)
+{
+    auto service = std::make_shared<UsimDiallingNumbersService>();
+
+    auto file1 = std::make_shared<UsimDiallingNumberFile>();
+
+    auto tagAdn = std::make_shared<TagData>(0, 0, 0, 0);
+    tagAdn->fileId = 1;
+    auto tagExt1 = std::make_shared<TagData>(0, 0, 0, 0);
+    tagExt1->fileId = 2;
+    file1->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_ADN] = tagAdn;
+    file1->fileIds_[UsimDiallingNumbersService::TAG_SIM_USIM_EXT1] = tagExt1;
+    service->pbrFiles_.push_back(file1);
+    service->diallingNumbersHandler_ = std::make_shared<IccDiallingNumbersHandler>(nullptr);
+
+    service->ReProcessAdnLoad(0);
+    EXPECT_TRUE(service->pbrFileLoaded_);
+}
+
 HWTEST_F(UsimDiallingNumbersServiceTest, ProcessPbrLoadDone001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
 
     AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    service->reLoadNum_ = 0;
+    service->ProcessPbrLoadDone(event);
+
+    service->reLoadNum_ = 1;
     service->ProcessPbrLoadDone(event);
 
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_PBR_LOAD_DONE);
+    service->ProcessPbrLoadDone(event);
+
+    service->reLoadNum_ = 0;
+    service->ProcessPbrLoadDone(event);
+
+    service->reLoadNum_ = 1;
     service->ProcessPbrLoadDone(event);
 
     auto multiRecord = std::make_shared<MultiRecordResult>(nullptr);
