@@ -67,10 +67,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_GetMccFromMccMnc_001, Function | Me
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     std::string mccmnc = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
@@ -88,10 +85,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_SetMatchResultToSimFileManager_001,
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->mccmncFromSim_ = Str16ToStr8(simFileManager->GetSimOperatorNumeric());
@@ -112,10 +106,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_CreateSimHelper_001, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     auto result = operatorConfigLoader->CreateSimHelper();
@@ -133,10 +124,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_UpdateIccidCache_001, Function | Me
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     simStateManager->Init(0);
     simStateManager->simStateHandle_->iccid_ = "86890000000000000001";
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigCache->iccidCache_ = "";
@@ -157,10 +145,7 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_GetMccFromMccMnc_002, Function | Me
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     std::string mccmnc = "123456";

@@ -16,7 +16,6 @@
 #ifndef OHOS_SIM_FILE_MANAGER_H
 #define OHOS_SIM_FILE_MANAGER_H
 
-#include "common_event_subscriber.h"
 #include "csim_file_controller.h"
 #include "event_handler.h"
 #include "event_runner.h"
@@ -35,11 +34,10 @@
 
 namespace OHOS {
 namespace Telephony {
-class SimFileManager : public TelEventHandler, public EventFwk::CommonEventSubscriber {
+class SimFileManager : public TelEventHandler {
 public:
     using HANDLE = std::shared_ptr<AppExecFwk::EventHandler>;
-    SimFileManager(
-        const EventFwk::CommonEventSubscribeInfo &sp, std::weak_ptr<Telephony::ITelRilManager> telRilManager,
+    SimFileManager(std::weak_ptr<Telephony::ITelRilManager> telRilManager,
         std::weak_ptr<Telephony::SimStateManager> state);
     virtual ~SimFileManager();
     void Init(int slotId);
@@ -83,7 +81,6 @@ public:
     bool SetSimTelephoneNumber(const std::u16string &alphaTag, const std::u16string &phoneNumber);
     bool HasSimCard();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void UpdateOpkeyConfig();
     bool IsCTSimCard();
     bool IsUiccCard();

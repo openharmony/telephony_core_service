@@ -455,8 +455,6 @@ enum class UsimService {
     USIM_FOR_5G_SECURITY_PARAMETERS_EXTENDED,
 };
 
-inline const std::string DATASHARE_READY_EVENT = "usual.event.DATA_SHARE_READY";
-inline const std::string BUNDLE_SCAN_FINISHED_EVENT = "usual.event.BUNDLE_SCAN_FINISHED";
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_CONSTANT_H

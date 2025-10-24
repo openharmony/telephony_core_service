@@ -29,6 +29,7 @@
 #endif
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "core_manager_inner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,19 +42,7 @@ const std::string NET_TYPE = "NetType";
 
 void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
 {
-    MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_CHARGING);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DISCHARGING);
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_SHUTDOWN);
-    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriber_ = std::make_shared<DeviceStateEventSubscriber>(subscriberInfo);
-    subscriber_->SetEventHandler(deviceStateHandler);
-    subscriber_->InitEventMap();
+    subscriber_ = std::make_shared<DeviceStateEventSubscriber>();
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
     sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
@@ -79,11 +68,8 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
 
 void DeviceStateObserver::StopEventSubscriber()
 {
-    if (subscriber_ != nullptr) {
-        bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(subscriber_);
-        subscriber_ = nullptr;
-        TELEPHONY_LOGI("DeviceStateObserver::StopEventSubscriber subscribeResult = %{public}d", subscribeResult);
-    }
+    CoreManagerInner::GetInstance().UnregisterCommonEventCallback(subscriber_);
+    subscriber_ = nullptr;
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
@@ -101,63 +87,70 @@ void DeviceStateObserver::StopEventSubscriber()
 #endif
 }
 
-void DeviceStateEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+void DeviceStateEventSubscriber::OnScreenOn()
 {
     if (deviceStateHandler_ == nullptr) {
-        TELEPHONY_LOGE("DeviceStateEventSubscriber::OnReceiveEvent: networkSearchHandler_ is nullptr");
         return;
     }
-    std::string action = data.GetWant().GetAction();
-    TELEPHONY_LOGI("DeviceStateEventSubscriber::OnReceiveEvent: action = %{public}s", action.c_str());
-    switch (GetDeviceStateEventIntValue(action)) {
-        case COMMON_EVENT_CONNECTIVITY_CHANGE:
-            ProcessWifiState(data);
-            break;
-        case COMMON_EVENT_SCREEN_ON:
-            deviceStateHandler_->ProcessScreenDisplay(true);
-            break;
-        case COMMON_EVENT_SCREEN_OFF:
-            deviceStateHandler_->ProcessScreenDisplay(false);
-            break;
-        case COMMON_EVENT_POWER_SAVE_MODE_CHANGED:
-            ProcessPowerSaveMode(data);
-            break;
-        case COMMON_EVENT_CHARGING:
-            deviceStateHandler_->ProcessChargingState(true);
-            break;
-        case COMMON_EVENT_DISCHARGING:
-            deviceStateHandler_->ProcessChargingState(false);
-            break;
-        case COMMON_EVENT_SHUTDOWN:
-            deviceStateHandler_->ProcessShutDown();
-            break;
-        default:
-            TELEPHONY_LOGE("DeviceStateEventSubscriber::OnReceiveEvent: invalid event");
-            break;
-    }
+    deviceStateHandler_->ProcessScreenDisplay(true);
 }
 
-void DeviceStateEventSubscriber::ProcessWifiState(const CommonEventData &data)
+void DeviceStateEventSubscriber::OnScreenOff()
 {
     if (deviceStateHandler_ == nullptr) {
-        TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessWifiState networkSearchHandler_ is nullptr");
         return;
     }
-    if (data.GetWant().GetIntParam(NET_TYPE, NetBearType::BEARER_DEFAULT) == NetBearType::BEARER_WIFI) {
-        bool isWifiConnected = data.GetCode() == NetConnState::NET_CONN_STATE_CONNECTED;
+    deviceStateHandler_->ProcessScreenDisplay(false);
+}
+
+void DeviceStateEventSubscriber::OnCharging(uint32_t chargeType)
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("deviceStateHandler_ is nullptr");
+        return;
+    }
+    deviceStateHandler_->ProcessChargingState(true);
+}
+
+void DeviceStateEventSubscriber::OnDischarging(uint32_t chargeType)
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("deviceStateHandler_ is nullptr");
+        return;
+    }
+    deviceStateHandler_->ProcessChargingState(false);
+}
+
+void DeviceStateEventSubscriber::OnShutdown()
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("deviceStateHandler_ is nullptr");
+        return;
+    }
+    deviceStateHandler_->ProcessShutDown();
+}
+
+void DeviceStateEventSubscriber::OnConnectivityChange(int32_t netType, int32_t netConnState)
+{
+    if (deviceStateHandler_ == nullptr) {
+        TELEPHONY_LOGE("deviceStateHandler_ is nullptr");
+        return;
+    }
+    if (netType == NetBearType::BEARER_WIFI) {
+        bool isWifiConnected = netConnState == NetConnState::NET_CONN_STATE_CONNECTED;
         deviceStateHandler_->ProcessWifiState(isWifiConnected);
         TELEPHONY_LOGI("DeviceStateEventSubscriber wifi %{public}s", isWifiConnected ? "connected" : "no connected");
     }
 }
 
-void DeviceStateEventSubscriber::ProcessPowerSaveMode(const CommonEventData &data)
+void DeviceStateEventSubscriber::OnPowerSaveModeChanged(uint32_t powerMode)
 {
 #ifdef ABILITY_POWER_SUPPORT
     if (deviceStateHandler_ == nullptr) {
-        TELEPHONY_LOGE("DeviceStateEventSubscriber::ProcessPowerSaveMode networkSearchHandler_ is nullptr");
+        TELEPHONY_LOGE("DeviceStateEventSubscriber::OnPowerSaveModeChanged networkSearchHandler_ is nullptr");
         return;
     }
-    PowerMode powerModeCode = static_cast<PowerMode>(data.GetCode());
+    PowerMode powerModeCode = static_cast<PowerMode>(powerMode);
     switch (powerModeCode) {
         case PowerMode::POWER_SAVE_MODE:
         case PowerMode::EXTREME_POWER_SAVE_MODE:
@@ -175,36 +168,9 @@ void DeviceStateEventSubscriber::ProcessPowerSaveMode(const CommonEventData &dat
 #endif
 }
 
-void DeviceStateEventSubscriber::SetEventHandler(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
-{
-    deviceStateHandler_ = deviceStateHandler;
-}
-
 std::shared_ptr<DeviceStateHandler> DeviceStateEventSubscriber::GetEventHandler()
 {
     return deviceStateHandler_;
-}
-
-DeviceStateEventIntValue DeviceStateEventSubscriber::GetDeviceStateEventIntValue(std::string &event) const
-{
-    auto iter = deviceStateEventMapIntValues_.find(event);
-    if (iter == deviceStateEventMapIntValues_.end()) {
-        return COMMON_EVENT_UNKNOWN;
-    }
-    return iter->second;
-}
-
-void DeviceStateEventSubscriber::InitEventMap()
-{
-    deviceStateEventMapIntValues_ = {
-        {CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE, COMMON_EVENT_CONNECTIVITY_CHANGE},
-        {CommonEventSupport::COMMON_EVENT_SCREEN_ON, COMMON_EVENT_SCREEN_ON},
-        {CommonEventSupport::COMMON_EVENT_SCREEN_OFF, COMMON_EVENT_SCREEN_OFF},
-        {CommonEventSupport::COMMON_EVENT_POWER_SAVE_MODE_CHANGED, COMMON_EVENT_POWER_SAVE_MODE_CHANGED},
-        {CommonEventSupport::COMMON_EVENT_CHARGING, COMMON_EVENT_CHARGING},
-        {CommonEventSupport::COMMON_EVENT_DISCHARGING, COMMON_EVENT_DISCHARGING},
-        {CommonEventSupport::COMMON_EVENT_SHUTDOWN, COMMON_EVENT_SHUTDOWN},
-    };
 }
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
@@ -241,8 +207,10 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(sub_);
-            TELEPHONY_LOGI("DeviceStateObserver::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+            CoreManagerInner::GetInstance().RegisterCommonEventCallback(sub_,
+                {TelCommonEvent::SCREEN_ON, TelCommonEvent::SCREEN_OFF, TelCommonEvent::CHARGING,
+                    TelCommonEvent::DISCHARGING, TelCommonEvent::SHUTDOWN, TelCommonEvent::CONNECTIVITY_CHANGE,
+                    TelCommonEvent::POWER_SAVE_MODE_CHANGED});
             break;
         }
         case COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID: {
@@ -274,8 +242,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbili
         TELEPHONY_LOGE("DeviceStateObserver::OnRemoveSystemAbility sub_ is nullptr");
         return;
     }
-    bool subscribeResult = CommonEventManager::UnSubscribeCommonEvent(sub_);
-    TELEPHONY_LOGI("DeviceStateObserver::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
+    CoreManagerInner::GetInstance().UnregisterCommonEventCallback(sub_);
 }
 
 SharingEventCallback::SharingEventCallback(

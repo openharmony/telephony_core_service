@@ -19,7 +19,6 @@
 #include <list>
 #include <ffrt.h>
 
-#include "common_event_subscriber.h"
 #include "iservice_registry.h"
 #include "multi_sim_controller.h"
 #include "os_account_manager_wrapper.h"
@@ -30,12 +29,10 @@
 #include "tel_event_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
+#include "core_service_common_event_callback.h"
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::EventFwk;
-using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
-using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 class MultiSimMonitor : public TelEventHandler {
 public:
     explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -98,23 +95,21 @@ private:
     void UpdateSimStateToStateRegistry();
 
 private:
-    class DataShareEventSubscriber : public CommonEventSubscriber {
+    class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
     public:
-        explicit DataShareEventSubscriber(
-            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
-            : CommonEventSubscriber(info), handler_(handler) {};
+        explicit DataShareEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
         ~DataShareEventSubscriber() = default;
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        void OnDataShareReady() override;
         std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
-    class UserSwitchEventSubscriber : public CommonEventSubscriber {
+    class UserSwitchEventSubscriber : public CoreServiceCommonEventCallback {
     public:
-        explicit UserSwitchEventSubscriber(
-            const CommonEventSubscribeInfo &info, std::shared_ptr<AppExecFwk::EventHandler> handler)
-            : CommonEventSubscriber(info), handler_(handler) {};
+        explicit UserSwitchEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
         ~UserSwitchEventSubscriber() = default;
-        void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+        void OnUserSwitched(int32_t userId) override;
         std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 

@@ -161,6 +161,7 @@ tel_core_service_src = [
   "$CORE_SERVICE_ROOT/services/core/src/core_service_hisysevent.cpp",
   "$CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
   "$CORE_SERVICE_ROOT/services/core/src/raw_parcel_callback_proxy.cpp",
+  "$CORE_SERVICE_ROOT/services/core/src/core_service_common_event_hub.cpp",
 ]
 if (core_service_support_esim) {
   tel_core_service_src += [

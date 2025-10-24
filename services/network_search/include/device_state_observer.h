@@ -27,6 +27,7 @@
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
 #include "system_ability_status_change_stub.h"
+#include "core_service_common_event_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,34 +40,21 @@ using MatchingSkills = OHOS::EventFwk::MatchingSkills;
 using NetBearType = OHOS::NetManagerStandard::NetBearType;
 using NetConnState = OHOS::NetManagerStandard::NetConnState;
 
-enum DeviceStateEventIntValue {
-    COMMON_EVENT_CONNECTIVITY_CHANGE,
-    COMMON_EVENT_SCREEN_ON,
-    COMMON_EVENT_SCREEN_OFF,
-    COMMON_EVENT_POWER_SAVE_MODE_CHANGED,
-    COMMON_EVENT_CHARGING,
-    COMMON_EVENT_DISCHARGING,
-    COMMON_EVENT_SHUTDOWN,
-    COMMON_EVENT_UNKNOWN,
-};
-
-class DeviceStateEventSubscriber : public CommonEventSubscriber {
+class DeviceStateEventSubscriber : public CoreServiceCommonEventCallback {
 public:
-    explicit DeviceStateEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    DeviceStateEventSubscriber() = default;
     ~DeviceStateEventSubscriber() = default;
-    void OnReceiveEvent(const CommonEventData &data) override;
-    void SetEventHandler(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
     std::shared_ptr<DeviceStateHandler> GetEventHandler();
-    void InitEventMap();
-
-private:
-    DeviceStateEventIntValue GetDeviceStateEventIntValue(std::string &event) const;
-    void ProcessWifiState(const CommonEventData &data);
-    void ProcessPowerSaveMode(const CommonEventData &data);
+    void OnScreenOn() override;
+    void OnScreenOff() override;
+    void OnCharging(uint32_t chargeType) override;
+    void OnDischarging(uint32_t chargeType) override;
+    void OnShutdown() override;
+    void OnConnectivityChange(int32_t netType, int32_t netConnState) override;
+    void OnPowerSaveModeChanged(uint32_t powerMode) override;
 
 private:
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_;
-    std::map<std::string, DeviceStateEventIntValue> deviceStateEventMapIntValues_;
 };
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT

@@ -34,9 +34,11 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_wrapper.h"
+#include "core_manager_inner.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 namespace {
 const int32_t ICC_CARD_STATE_ABSENT = 0;
 const int32_t ICC_CARD_STATE_PRESENT = 1;
@@ -80,10 +82,9 @@ void StkController::Init()
 
 void StkController::UnSubscribeListeners()
 {
-    if (bundleScanFinishedSubscriber_ != nullptr &&
-        CommonEventManager::UnSubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
+    if (bundleScanFinishedSubscriber_ != nullptr) {
+        CoreManagerInner::GetInstance().UnregisterCommonEventCallback(bundleScanFinishedSubscriber_);
         bundleScanFinishedSubscriber_ = nullptr;
-        TELEPHONY_LOGI("Unsubscribe Bundle Scan Finished success");
     }
     if (statusChangeListener_ != nullptr) {
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -153,42 +154,30 @@ void StkController::SubscribeBundleScanFinished()
         TELEPHONY_LOGW("Bundle Scan Finished has Subscribed");
         return;
     }
-    MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(BUNDLE_SCAN_FINISHED_EVENT);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SET_PRIMARY_SLOT_STATUS);
-
-    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(CommonEventSubscribeInfo::COMMON);
-    bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(subscriberInfo,
-                                                                                        shared_from_this());
-    if (CommonEventManager::SubscribeCommonEvent(bundleScanFinishedSubscriber_)) {
-        TELEPHONY_LOGI("Subscribe Bundle Scan Finished success");
-    } else {
-        bundleScanFinishedSubscriber_ = nullptr;
-        TELEPHONY_LOGE("Subscribe Bundle Scan Finished fail");
-    }
+    bundleScanFinishedSubscriber_ = std::make_shared<BundleScanFinishedEventSubscriber>(shared_from_this());
+    CoreManagerInner::GetInstance().RegisterCommonEventCallback(bundleScanFinishedSubscriber_, {
+        TelCommonEvent::BUNDLE_SCAN_FINISHED, TelCommonEvent::SET_PRIMARY_SLOT_STATUS
+    });
 }
 
-void StkController::BundleScanFinishedEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+void StkController::BundleScanFinishedEventSubscriber::OnSetPrimarySlotStatus(bool setDone)
 {
-    OHOS::EventFwk::Want want = data.GetWant();
-    std::string action = want.GetAction();
-    TELEPHONY_LOGI("action = %{public}s", action.c_str());
-    if (action == BUNDLE_SCAN_FINISHED_EVENT) {
-        auto handler = handler_.lock();
-        if (handler == nullptr) {
-            TELEPHONY_LOGE("handler is invalid");
-            return;
-        }
-        std::static_pointer_cast<StkController>(handler)->OnReceiveBms();
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SET_PRIMARY_SLOT_STATUS) {
-        auto handler = handler_.lock();
-        if (handler == nullptr) {
-            TELEPHONY_LOGE("handler is invalid");
-            return;
-        }
-        std::static_pointer_cast<StkController>(handler)->OnReceiveSetPrimarySlotStatus(want);
+    auto handler = handler_.lock();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is invalid");
+        return;
     }
+    std::static_pointer_cast<StkController>(handler)->OnReceiveSetPrimarySlotStatus(setDone);
+}
+
+void StkController::BundleScanFinishedEventSubscriber::OnBundleScanFinished()
+{
+    auto handler = handler_.lock();
+    if (handler == nullptr) {
+        TELEPHONY_LOGE("handler is invalid");
+        return;
+    }
+    std::static_pointer_cast<StkController>(handler)->OnReceiveBms();
 }
 
 void StkController::OnReceiveBms()
@@ -204,13 +193,9 @@ void StkController::OnReceiveBms()
     }
 }
 
-void StkController::OnReceiveSetPrimarySlotStatus(OHOS::EventFwk::Want want)
+void StkController::OnReceiveSetPrimarySlotStatus(bool setDone)
 {
-    if (want.GetBoolParam(PARAM_SET_PRIMARY_IS_USER_SET, true)) {
-        return;
-    }
-
-    if (want.GetBoolParam(PARAM_SET_PRIMARY_STATUS, false)) {
+    if (setDone) {
         std::shared_ptr<SimStateManager> simStateManager = simStateManager_.lock();
         if (simStateManager == nullptr) {
             TELEPHONY_LOGE("OnReceiveSetPrimarySlotStatus simStateManager[%{public}d] is nullptr", slotId_);

@@ -30,10 +30,9 @@
 #include "system_ability_definition.h"
 #include "uri.h"
 #include "system_ability_status_change_stub.h"
-#include "common_event_subscriber.h"
-#include <ffrt.h>
-
+#include "ffrt.h"
 #include "network_search_handler.h"
+#include "core_service_common_event_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,13 +49,11 @@ public:
     static const std::string SETTINGS_NETWORK_SEARCH_AUTO_TIMEZONE;
     static const std::string SETTINGS_NETWORK_SEARCH_AIRPLANE_MODE;
     static const std::string SETTINGS_NETWORK_SEARCH_PREFERRED_NETWORK_MODE;
-    static const std::string COMMON_EVENT_DATA_SHARE_READY;
 
     bool RegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     bool UnRegisterSettingsObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     void RegisterSettingsObserver();
-    void SetCommonEventSubscribeInfo(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
-    std::shared_ptr<EventFwk::CommonEventSubscriber> GetCommonEventSubscriber();
+    std::shared_ptr<CoreServiceCommonEventCallback> GetCommonEventSubscriber();
     int32_t Query(Uri uri, const std::string &key, std::string &value);
     int32_t Insert(Uri uri, const std::string &key, const std::string &value);
     int32_t Update(Uri uri, const std::string &key, const std::string &value);
@@ -73,15 +70,13 @@ private:
     const int32_t RDB_INVALID_VALUE = -1;
     ffrt::mutex mtx_;
     std::vector<std::pair<Uri, sptr<AAFwk::IDataAbilityObserver>>> registerInfos_;
-    std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ = nullptr;
+    std::shared_ptr<CoreServiceCommonEventCallback> commonEventSubscriber_;
     std::atomic<bool> isDdsReady_ = false;
 
 private:
-    class BroadcastSubscriber : public EventFwk::CommonEventSubscriber {
+    class BroadcastSubscriber : public CoreServiceCommonEventCallback {
     public:
-        BroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &sp);
-        ~BroadcastSubscriber() = default;
-        void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+        void OnDataShareReady() override;
     };
 };
 

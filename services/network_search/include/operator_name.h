@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "common_event_subscriber.h"
+#include "core_service_common_event_callback.h"
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "network_search_state.h"
@@ -29,16 +29,16 @@
 
 namespace OHOS {
 namespace Telephony {
-class OperatorName : public EventFwk::CommonEventSubscriber {
+class OperatorName : public CoreServiceCommonEventCallback {
 public:
-    OperatorName(const EventFwk::CommonEventSubscribeInfo &sp, std::shared_ptr<NetworkSearchState> networkSearchState,
+    OperatorName(std::shared_ptr<NetworkSearchState> networkSearchState,
         std::shared_ptr<ISimManager> simManager, std::weak_ptr<NetworkSearchManager> networkSearchManager,
         int32_t slotId);
-    virtual ~OperatorName() = default;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
     void NotifySpnChanged(bool isForce = false);
     void TrySetLongOperatorNameWithTranslation();
+    void OnOperatorConfigChanged(int32_t slotId, int32_t state) override;
+    void OnLocaleChanged() override;
 
 private:
     void GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);

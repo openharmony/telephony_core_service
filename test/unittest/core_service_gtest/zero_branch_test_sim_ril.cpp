@@ -135,10 +135,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_001, Function | MediumTes
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
     simAccountManager->Init(0);
     simAccountManager->Init(-1);
@@ -170,10 +167,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_002, Function | MediumTes
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
     simAccountManager->Init(0);
     simAccountManager->UpdateImsCapFromChip(0, {0, 0, 0, 0});
@@ -189,10 +183,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimAccountManager_003, Function | MediumTes
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto simAccountManager = std::make_shared<SimAccountManager>(telRilManager, simStateManager, simFileManager);
     simAccountManager->operatorConfigCache_ = nullptr;
     simAccountManager->UpdateImsCapFromChip(0, {0, 0, 0, 0});
@@ -208,10 +199,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_001, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->LoadOperatorConfig(0, 1);
@@ -286,10 +274,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_001, Function | MediumTest 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto simStateTracker =
         std::make_shared<SimStateTracker>(simFileManager, operatorConfigCache, 0);
@@ -326,11 +311,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_001, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     diallingNumbersCache->simFileManager_ = nullptr;
     diallingNumbersCache->Init();
@@ -357,10 +338,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -401,10 +379,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_003, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -425,10 +400,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -472,10 +444,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_005, Function | Med
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -549,13 +518,10 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager1 = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager1 = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     simFileManager1 = nullptr;
     IccDiallingNumbersManager::CreateInstance(simFileManager1, simStateManager);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_RUNNING;
     iccDiallingNumbersManager->Init();
@@ -597,10 +563,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_003, Function | M
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->ProcessSimStateChanged();
     iccDiallingNumbersManager->Init();
@@ -672,10 +635,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_003, Function | 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -707,10 +667,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_004, Function | 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -732,10 +689,7 @@ HWTEST_F(SimRilBranchTest, Telephony_UsimDiallingNumbersService_005, Function | 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto diallingNumbersCache = std::make_shared<IccDiallingNumbersCache>(simFileManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     diallingNumbersCache->simFileManager_ = nullptr;
@@ -1190,10 +1144,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_002, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     operatorConfigLoader->iccidFromSim_ = "";
@@ -1271,10 +1222,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | M
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     IccDiallingNumbersManager iccDiallingNumbersManager(simFileManager, nullptr);
     std::shared_ptr<DiallingNumbersInfo> diallingNumbers = std::make_shared<DiallingNumbersInfo>();
 
@@ -1298,10 +1246,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimSmsManager, Function | MediumTest | Leve
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
 
     SimSmsManager simSmsManager1(telRilManager, simFileManager, simStateManager);
     simSmsManager1.stateSms_ = SimSmsManager::HandleRunningState::STATE_RUNNING;
@@ -1615,10 +1560,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_003, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     auto dataShareHelper = std::make_shared<MockDataShareHelper>();
@@ -1632,10 +1574,7 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigLoader_004, Function | Medium
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
@@ -1657,10 +1596,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_002, Function | MediumTest 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto simStateTracker =
         std::make_shared<SimStateTracker>(simFileManager, operatorConfigCache, 0);
@@ -1687,10 +1623,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateTracker_003, Function | MediumTest 
 {
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     auto simStateTracker =
         std::make_shared<SimStateTracker>(simFileManager, operatorConfigCache, 0);
@@ -1782,11 +1715,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_001, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager);
     simFileManager->GetMCC();
     simFileManager->GetMNC();
@@ -1819,11 +1748,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_007, Function | Med
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->simStateManager_ = simStateManager;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> result = {};
@@ -1847,11 +1772,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_008, Function | Med
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->simStateManager_ = simStateManager;
     simStateManager->Init(0);
@@ -1868,11 +1789,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_002, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager);
     TELEPHONY_EXT_WRAPPER.setVoiceMailIccidParameter_ = nullptr;
     simFileManager->GetVoiceMailNumberKey();
@@ -1904,11 +1821,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_003, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     simStateManager->Init(0);
     simStateManager->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
     EXPECT_TRUE(simFileManager->HasSimCard());
@@ -1927,11 +1840,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_004, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     simFileManager->fileController_ = std::make_shared<RuimFileController>(0);
     simFileManager->diallingNumberHandler_ =
         std::make_shared<IccDiallingNumbersHandler>(simFileManager->fileController_);
@@ -1951,11 +1860,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_005, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     EXPECT_FALSE(simFileManager->IsCTIccId(""));
 }
 
