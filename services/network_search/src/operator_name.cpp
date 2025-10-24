@@ -15,9 +15,6 @@
 
 #include "operator_name.h"
 
-#include "common_event.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
 #include "core_manager_inner.h"
 #include "tel_ril_network_parcel.h"
 #include "network_search_manager.h"
@@ -41,10 +38,10 @@ constexpr const char *CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL =
     "persist.radio.cfg.display_rule_use_roaming_from_network_state";
 } // namespace
 
-OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
+OperatorName::OperatorName(
     std::shared_ptr<NetworkSearchState> networkSearchState, std::shared_ptr<ISimManager> simManager,
     std::weak_ptr<NetworkSearchManager> networkSearchManager, int32_t slotId)
-    : CommonEventSubscriber(sp), networkSearchState_(networkSearchState), simManager_(simManager),
+    : networkSearchState_(networkSearchState), simManager_(simManager),
       networkSearchManager_(networkSearchManager), slotId_(slotId)
 {
     std::vector<std::string> vecSpnFormats;
@@ -55,30 +52,14 @@ OperatorName::OperatorName(const EventFwk::CommonEventSubscribeInfo &sp,
     UpdateOperatorConfig();
 }
 
-void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
+void OperatorName::OnOperatorConfigChanged(int32_t slotId, int32_t state)
 {
-    const AAFwk::Want &want = data.GetWant();
-    std::string action = want.GetAction();
-    if (action == CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED) {
-        int32_t slotId = want.GetIntParam("slotId", 0);
-        if (slotId_ != slotId) {
-            return;
-        }
-        UpdateOperatorConfig();
-        sptr<NetworkState> networkState = GetNetworkStatus();
-        if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
-            auto networkSearchManager = networkSearchManager_.lock();
-            if (networkSearchManager == nullptr) {
-                TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
-                return;
-            }
-            if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-                networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-            }
-        }
-    } else if (action == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
-        TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
-        TrySetLongOperatorNameWithTranslation();
+    if (slotId_ != slotId) {
+        return;
+    }
+    UpdateOperatorConfig();
+    sptr<NetworkState> networkState = GetNetworkStatus();
+    if (networkState != nullptr && networkState->GetRegStatus() == RegServiceState::REG_STATE_IN_SERVICE) {
         auto networkSearchManager = networkSearchManager_.lock();
         if (networkSearchManager == nullptr) {
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
@@ -87,9 +68,20 @@ void OperatorName::OnReceiveEvent(const EventFwk::CommonEventData &data)
         if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
             networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
-    } else {
-        TELEPHONY_LOGI("OperatorName::OnReceiveEvent Slot%{public}d: action=%{public}s code=%{public}d", slotId_,
-            action.c_str(), data.GetCode());
+    }
+}
+
+void OperatorName::OnLocaleChanged()
+{
+    TELEPHONY_LOGI("locale changed Slot%{public}d", slotId_);
+    TrySetLongOperatorNameWithTranslation();
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
     }
 }
 

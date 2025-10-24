@@ -54,10 +54,7 @@ void OperatorConfigCacheFunc(const uint8_t *data, size_t size)
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto simFileManager = std::make_shared<SimFileManager>(subcribeInfo, telRilManager, simStateManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     int32_t simState = *data % SIM_STATUS_NUM + 1;
