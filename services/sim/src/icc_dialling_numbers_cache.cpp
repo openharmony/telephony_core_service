@@ -87,7 +87,6 @@ void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::Inne
         return;
     }
     if (!usimDiallingNumberSrv_->GetLoadDiallingNumResult()) {
-        TELEPHONY_LOGE("load DiallingNumbers failed");
         return;
     }
     usimDiallingNumberSrv_->SetLoadDiallingNumResult(false);
