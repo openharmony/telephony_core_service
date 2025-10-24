@@ -437,6 +437,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_001, Fu
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->ProcessAdvanceLoadPbr();
     auto radioProtocolController =
         std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
     multiSimController->simDbHelper_ = nullptr;

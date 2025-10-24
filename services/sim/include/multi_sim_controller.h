@@ -120,6 +120,7 @@ private:
     int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
     void SortAllCache();
+    void ProcessAdvanceLoadPbr();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
     bool AnnouncePrimarySimIdChanged(int32_t simId);

@@ -56,6 +56,8 @@ public:
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);
     void SetFileControllerAndDiallingNumberHandler(
         std::shared_ptr<IccFileController> &ctrl, std::shared_ptr<IccDiallingNumbersHandler> handler);
+    bool GetLoadDiallingNumResult() const;
+    void SetLoadDiallingNumResult(bool status);
 
 protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
@@ -70,6 +72,7 @@ private:
     using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     bool isProcessingPbr = false;
+    bool loadDiallingNumResult_ = false;
     std::map<int, std::vector<std::shared_ptr<DiallingNumbersInfo>>> adns_;
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
@@ -100,7 +103,10 @@ private:
     void SendBackResult(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers);
     void InitFuncMap();
     void NextStep(int msgId);
+    void ReProcessPbrLoad(enum Telephony::ElementaryFile reEvent);
+    void ReProcessAdnLoad(size_t recId);
     const int NEXT = 123;
+    int reLoadNum_ = 0;
     enum UsimFileType {
         TYPE1_FLAG = 168, // 3gpp 31102-9j0 4.4.2.1
         TYPE2_FLAG = 169,

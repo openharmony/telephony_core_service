@@ -1264,7 +1264,19 @@ void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
     // trigger to obtain sim card status
     if (!isUserSet) {
         ObtainDualSimCardStatus();
+        ProcessAdvanceLoadPbr();
     }
+}
+
+void MultiSimController::ProcessAdvanceLoadPbr()
+{
+    std::thread t([] {
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+        for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+            CoreManagerInner::GetInstance().QueryIccDiallingNumbers(i, DiallingNumbersInfo::SIM_ADN, result);
+        }
+    });
+    t.detach();
 }
 
 void MultiSimController::ObtainDualSimCardStatus()
