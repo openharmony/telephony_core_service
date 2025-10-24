@@ -170,7 +170,7 @@ void StkController::BundleScanFinishedEventSubscriber::OnSetPrimarySlotStatus(bo
     std::static_pointer_cast<StkController>(handler)->OnReceiveSetPrimarySlotStatus(setDone);
 }
 
-void StkController::BundleScanFinishedEventSubscriber::::OnBundleScanFinished()
+void StkController::BundleScanFinishedEventSubscriber::OnBundleScanFinished()
 {
     auto handler = handler_.lock();
     if (handler == nullptr) {
