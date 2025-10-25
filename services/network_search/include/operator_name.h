@@ -16,6 +16,7 @@
 #ifndef NETWORK_SEARCH_INCLUDE_OPERATOR_NAME_H
 #define NETWORK_SEARCH_INCLUDE_OPERATOR_NAME_H
 
+#include <ffrt.h>
 #include <memory>
 
 #include "core_service_common_event_callback.h"
@@ -81,6 +82,7 @@ private:
 private:
     std::shared_ptr<NetworkSearchState> networkSearchState_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
+    ffrt::mutex curParamsMutex_;
     OperatorNameParams curParams_ = {false, "", false, "", 0};
     RegServiceState curRegState_ = RegServiceState::REG_STATE_UNKNOWN;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
