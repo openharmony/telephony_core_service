@@ -421,7 +421,6 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     if (needReupdate_) {
         UpdateSimStateToStateRegistry(slotId, reason);
     }
-    modemInitDone_ = true;
 }
 
 void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
@@ -620,6 +619,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
         iccState.iccid_ = param->iccid;
+        modemInitDone_ = true;
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
             slotId, iccState.simType_, iccState.simStatus_);
     } else {
