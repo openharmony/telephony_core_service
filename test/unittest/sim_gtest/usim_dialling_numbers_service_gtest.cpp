@@ -67,10 +67,10 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ReLoadPbrFile001, Function | MediumTest
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
     service->fileController_ = nullptr;
-    service->ReLoadPbrFile(ELEMENTARY_FILE_PBR);
+    service->ReLoadPbrFile();
 
     service->fileController_ = std::make_shared<UsimFileController>(0);
-    service->ReLoadPbrFile(ELEMENTARY_FILE_PBR);
+    service->ReLoadPbrFile();
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
 
