@@ -357,10 +357,9 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     auto owner = event->GetOwner();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
-    diallingNumbersCache->usimDiallingNumberSrv_ = std::make_shared<usimDiallingNumbersService>();
-    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumResult(fasle);
+    diallingNumbersCache->usimDiallingNumberSrv_->isLoadDiallingNumResult = fasle;
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
-    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumResult(true);
+    diallingNumbersCache->usimDiallingNumberSrv_->isLoadDiallingNumResult = true;
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
     diallingNumbersCache->ProcessObtainAdnDetailsDone(response);
     diallingNumbersCache->ProcessChangeDiallingNumbersDone(response);
@@ -424,7 +423,6 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_004, Function | Med
     auto owner = event->GetOwner();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
-    diallingNumbersCache->usimDiallingNumberSrv_ = std::make_shared<usimDiallingNumbersService>();
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
     EXPECT_NE(diallingNumbersCache->diallingNumberFileList_.size(), 0);
     event = iccDiallingNumbersManager->BuildCallerInfo(-1);
