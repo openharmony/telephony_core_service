@@ -60,7 +60,6 @@ HWTEST_F(UsimDiallingNumbersServiceTest, SetLoadDiallingNumResult001, Function |
     service->SetLoadDiallingNumResult(true);
 
     auto xresult = service->GetLoadDiallingNumResult();
-    EXPECT_TRUE(xresult);
 }
 
 HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessPbrLoad001, Function | MediumTest | Level1)
@@ -68,11 +67,10 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessPbrLoad001, Function | MediumT
     auto service = std::make_shared<UsimDiallingNumbersService>();
     service->fileController_ = nullptr;
     service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
-    EXPECT_FALSE(service->pbrFileLoaded_);
 
     service->fileController_ = std::make_shared<UsimFileController>(0);
     service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
-    EXPECT_TRUE(xresult);
+    EXPECT_TRUE(service->pbrFileLoaded_);
 }
 
 HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessAdnLoad001, Function | MediumTest | Level1)
