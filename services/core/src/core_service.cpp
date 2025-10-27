@@ -88,6 +88,9 @@ void CoreService::OnStart()
 bool CoreService::Init()
 {
     TELEPHONY_LOGI("CoreService::Init");
+    auto coreServiceCommonEventHub = std::make_shared<CoreServiceCommonEventHub>();
+    coreServiceCommonEventHub->Init();
+    CoreManagerInner::GetInstance().SetCommonEventHubObj(coreServiceCommonEventHub);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
 #endif
@@ -113,9 +116,6 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
-    auto coreServiceCommonEventHub = std::make_shared<CoreServiceCommonEventHub>();
-    coreServiceCommonEventHub->Init();
-    CoreManagerInner::GetInstance().SetCommonEventHubObj(coreServiceCommonEventHub);
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         networkSearchManager_->InitAirplaneMode(slotId);
     }
