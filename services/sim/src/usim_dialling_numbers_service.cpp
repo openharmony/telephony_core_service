@@ -62,35 +62,35 @@ void UsimDiallingNumbersService::InitFuncMap()
 
 bool UsimDiallingNumbersService::GetLoadDiallingNumResult() const
 {
-    return loadDiallingNumResult_;
+    return isLoadDiallingNumResult_;
 }
 
 void UsimDiallingNumbersService::SetLoadDiallingNumResult(bool status)
 {
-    loadDiallingNumResult_ = status;
+    isLoadDiallingNumResult_ = status;
 }
 
-void UsimDiallingNumbersService::ReProcessPbrLoad(Telephony::ElementaryFile reEvent)
+void UsimDiallingNumbersService::ReLoadPbrFile()
 {
     ++reLoadNum_;
-    std::unique_lock<std::mutex> lock(mtx_);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_PBR_LOAD_DONE);
     if (fileController_ == nullptr) {
         isProcessingPbr = false;
         return;
     }
-    fileController_->ObtainAllLinearFixedFile(reEvent, event);
+    fileController_->ObtainAllLinearFixedFile(ELEMENTARY_FILE_PBR, event);
 }
 
-void UsimDiallingNumbersService::ReProcessAdnLoad(size_t recId)
+void UsimDiallingNumbersService::ReLoadAdnFile(size_t recId)
 {
     ++reLoadNum_;
+    std::unique_lock<std::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         return;
     }
-    std::unique_lock<std::mutex> lock(mtx_);
     const auto &files = pbrFiles_.at(recId)->fileIds_;
-    int extEf = files.at(TAG_SIM_USIM_EXT1) != nullptr ? files.at(TAG_SIM_USIM_EXT1)->fileId : 0;
+    auto feilext = files.at(TAG_SIM_USIM_EXT1);
+    int extEf = feilext != nullptr ? feilext->fileId : 0;
     int efId = files.at(TAG_SIM_USIM_ADN)->fileId;
     AppExecFwk::InnerEvent::Pointer event = CreateHandlerPointer(MSG_USIM_ADN_LOAD_DONE, efId, 0, nullptr);
     diallingNumbersHandler_->GetAllDiallingNumbers(efId, extEf, event);
@@ -101,7 +101,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr!");
         if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
-            ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+            ReLoadPbrFile();
         }
         return;
     }
@@ -109,7 +109,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
     std::shared_ptr<MultiRecordResult> object = event->GetSharedObject<MultiRecordResult>();
     if (object == nullptr) {
         if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
-            ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
+            ReLoadPbrFile();
         } else {
             TELEPHONY_LOGE("ProcessPbrLoadDone: get null pointer!!!");
             isProcessingPbr = false;
@@ -159,7 +159,7 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         auto exception = std::static_pointer_cast<RadioResponseInfo>(resultObject->exception);
         TELEPHONY_LOGE("process adn file exception occured, errno: %{public}d",
             static_cast<uint32_t>(exception->error));
-        ReProcessAdnLoad(currentIndex_);
+        ReLoadAdnFile(currentIndex_);
         return;
     }
 
@@ -291,7 +291,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
 {
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles finish %{public}zu", recId);
-        loadDiallingNumResult_ = true;
+        isLoadDiallingNumResult_ = true;
         ProcessQueryDone();
         return false;
     }
