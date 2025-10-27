@@ -63,19 +63,18 @@ HWTEST_F(UsimDiallingNumbersServiceTest, SetLoadDiallingNumResult001, Function |
     EXPECT_TRUE(xresult);
 }
 
-HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessPbrLoad001, Function | MediumTest | Level1)
+HWTEST_F(UsimDiallingNumbersServiceTest, ReLoadPbrFile001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
     service->fileController_ = nullptr;
-    service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
-    EXPECT_FALSE(service->pbrFileLoaded_);
+    service->ReLoadPbrFile();
 
     service->fileController_ = std::make_shared<UsimFileController>(0);
-    service->ReProcessPbrLoad(ELEMENTARY_FILE_PBR);
-    EXPECT_TRUE(xresult);
+    service->ReLoadPbrFile();
+    EXPECT_TRUE(service->pbrFileLoaded_);
 }
 
-HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessAdnLoad001, Function | MediumTest | Level1)
+HWTEST_F(UsimDiallingNumbersServiceTest, ReLoadAdnFile001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
 
@@ -90,7 +89,7 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ReProcessAdnLoad001, Function | MediumT
     service->pbrFiles_.push_back(file1);
     service->diallingNumbersHandler_ = std::make_shared<IccDiallingNumbersHandler>(nullptr);
 
-    service->ReProcessAdnLoad(0);
+    service->ReLoadAdnFile(0);
     EXPECT_TRUE(service->pbrFileLoaded_);
 }
 

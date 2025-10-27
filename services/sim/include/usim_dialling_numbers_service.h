@@ -72,7 +72,7 @@ private:
     using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     bool isProcessingPbr = false;
-    bool loadDiallingNumResult_ = false;
+    bool isLoadDiallingNumResult_ = false;
     std::map<int, std::vector<std::shared_ptr<DiallingNumbersInfo>>> adns_;
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
@@ -103,8 +103,8 @@ private:
     void SendBackResult(const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers);
     void InitFuncMap();
     void NextStep(int msgId);
-    void ReProcessPbrLoad(enum Telephony::ElementaryFile reEvent);
-    void ReProcessAdnLoad(size_t recId);
+    void ReLoadPbrFile();
+    void ReLoadAdnFile(size_t recId);
     const int NEXT = 123;
     int reLoadNum_ = 0;
     enum UsimFileType {
