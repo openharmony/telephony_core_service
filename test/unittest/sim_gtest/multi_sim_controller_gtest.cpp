@@ -1072,10 +1072,7 @@ HWTEST_F(MultiSimControllerTest, GetShowNumbertest_002, Function | MediumTest | 
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
     auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(telRilManager, simStateManagers);
 
     std::u16string showNumber = u"1234567890";
 
@@ -1123,10 +1120,7 @@ HWTEST_F(MultiSimControllerTest, SetShowNumbertest_002, Function | MediumTest | 
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     auto mockmultisimcontroller = std::make_shared<MultiSimControllerMock>();
     auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(telRilManager, simStateManagers);
     EXPECT_CALL(*mockmultisimcontroller, IsValidData(_)).Times(AnyNumber()).WillOnce(Return(true));
     multiSimController->simFileManager_.push_back(mocksimfilemanager);
 
@@ -1155,10 +1149,7 @@ HWTEST_F(MultiSimControllerTest, SetShowNumbertest_003, Function | MediumTest | 
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     auto simStateManagers = std::make_shared<SimStateManager>(telRilManager);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subcribeInfo(matchingSkills);
-    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(subcribeInfo, telRilManager, simStateManagers);
+    auto mocksimfilemanager = std::make_shared<MockSimFileManager>(telRilManager, simStateManagers);
     multiSimController->simFileManager_.push_back(mocksimfilemanager);
 
     EXPECT_CALL(*mocksimfilemanager, GetSimTeleNumberIdentifier()).Times(AnyNumber()).WillOnce(Return(u"AlphaTag"));
