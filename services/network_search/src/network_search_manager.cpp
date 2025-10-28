@@ -289,21 +289,25 @@ void NetworkSearchManager::UnRegisterCoreNotify(int32_t slotId, HANDLE &handler,
 
 void NetworkSearchManager::RegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(callBackMtx_);
     cellularDataCallBack_ = callback;
 }
 
 void NetworkSearchManager::UnRegisterCellularDataObject(const sptr<NetworkSearchCallBackBase> &callback)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(callBackMtx_);
     cellularDataCallBack_ = nullptr;
 }
 
 void NetworkSearchManager::RegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(callBackMtx_);
     cellularCallCallBack_ = callback;
 }
 
 void NetworkSearchManager::UnRegisterCellularCallObject(const sptr<NetworkSearchCallBackBase> &callback)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(callBackMtx_);
     cellularCallCallBack_ = nullptr;
 }
 
