@@ -363,6 +363,14 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
         slotId, operKey.data(), operName.data(), response);
 }
 
+void OperatorConfigCache::RetryBatchInsertApnPostTask()
+{
+    if (batchInsertApnRetryHandler_ == nullptr) {
+        return;
+        }
+        batchInsertApnRetryHandler_->PostTask(batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+}
+
 void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
 {
     auto helper = PdpProfileRdbHelper::GetInstance();
@@ -374,7 +382,8 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
     auto runner = AppExecFwk::EventRunner::Create(TASK_ID);
     batchInsertApnRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     std::weak_ptr<AppExecFwk::EventHandler> weakThis = shared_from_this();
-    batchInsertApnRetryTask_ = [weakThis, helper, slotId]() {
+    batchInsertApnRetryTask_ = [weakThis, slotId]() {
+        auto helper = PdpProfileRdbHelper::GetInstance();
         bool notifyRet = helper->notifyInitApnConfigs(slotId);
         auto strongThis = weakThis.lock();
         if (notifyRet || strongThis == nullptr) {
@@ -382,16 +391,14 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         }
         AppExecFwk::EventHandler* rawPtr = strongThis.get();
         OperatorConfigCache* configCachePtr = static_cast<OperatorConfigCache*>(rawPtr);
-        if (configCachePtr->retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES &&
-            configCachePtr->batchInsertApnRetryHandler_ != nullptr) {
+        if (configCachePtr->retryBatchInsertApnTimes_ < BATCH_INSERT_APN_RETRY_TIMES) {
             TELEPHONY_LOGI("batch insert apn retry times = %{public}d", configCachePtr->retryBatchInsertApnTimes_);
-            configCachePtr->batchInsertApnRetryHandler_->PostTask(
-                configCachePtr->batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+            configCachePtr->RetryBatchInsertApnPostTask();
             configCachePtr->retryBatchInsertApnTimes_++;
         }
     };
     if (!helper->notifyInitApnConfigs(slotId)) {
-        batchInsertApnRetryHandler_->PostTask(batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+        RetryBatchInsertApnPostTask();
     }
 }
 
