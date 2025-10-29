@@ -246,8 +246,6 @@ void CoreServiceStub::AddHandlerSimToMapExt()
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimIO(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_ALL_ACCOUNT_INFO_LIST)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetAllSimAccountInfoList(data, reply); };
-    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SIM_LABEL)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSimLabel(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerVoiceMailToMap()

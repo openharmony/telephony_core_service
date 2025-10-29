@@ -90,7 +90,6 @@ public:
     int32_t GetDefaultMainSlotByIccId();
     bool IsEsim(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
-    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
 
 public:

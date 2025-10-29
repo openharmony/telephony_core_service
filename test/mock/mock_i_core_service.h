@@ -160,8 +160,6 @@ public:
     MOCK_METHOD(int32_t, GetOpnameVersion, (std::string &versionInfo), (override));
     MOCK_METHOD(int32_t, GetSimIO, (int32_t slotId, int32_t command, int32_t fileId, const std::string &data,
         const std::string &path, SimAuthenticationResponse &response), (override));
-    MOCK_METHOD(int32_t, GetSimLabel, (int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback),
-        (override));
     MOCK_METHOD(int32_t, GetAllSimAccountInfoList, (std::vector<IccAccountInfo> & iccAccountInfoList), (override));
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     MOCK_METHOD(int32_t, SendApduData, (int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
