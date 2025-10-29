@@ -164,7 +164,6 @@ public:
     void ResetDataShareError() override;
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip) override;
     int32_t GetDefaultMainSlotByIccId() override;
-    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel) override;
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex) override;
     int32_t NotifySimSlotsMapping(int32_t slotId) override;
     int32_t InsertEsimData(const std::string &iccId, int32_t siLabel, const std::string &operatorName) override;

@@ -110,11 +110,6 @@ struct AsyncSimAuthInfo {
     std::string authData {};
     SimAuthenticationResponse responseResult;
 };
-
-struct AsyncSimLabelInfo {
-    AsyncContext<napi_value> asyncContext;
-    SimLabel simLabel;
-};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_SIM_H
