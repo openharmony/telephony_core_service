@@ -367,8 +367,8 @@ void OperatorConfigCache::RetryBatchInsertApnPostTask()
 {
     if (batchInsertApnRetryHandler_ == nullptr) {
         return;
-        }
-        batchInsertApnRetryHandler_->PostTask(batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
+    }
+    batchInsertApnRetryHandler_->PostTask(batchInsertApnRetryTask_, TASK_ID, BATCH_INSERT_APN_RETRY_DEALY);
 }
 
 void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
