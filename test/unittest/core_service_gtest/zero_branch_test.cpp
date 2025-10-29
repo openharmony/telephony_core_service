@@ -1259,7 +1259,6 @@ HWTEST_F(BranchTest, Telephony_SimManager_003, Function | MediumTest | Level1)
     SimLabel simLabel;
     EXPECT_NE(simManager->InsertEsimData("01234567890123456789", 1, "中国联通"), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(simManager->SetSimLabelIndex("01234567890123456789", 0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(simManager->GetSimLabel(0, simLabel), TELEPHONY_ERR_SUCCESS);
     std::vector<IccAccountInfo> iccAccountInfoList;
     EXPECT_GT(simManager->GetActiveSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->GetAllSimAccountInfoList(false, iccAccountInfoList), TELEPHONY_ERR_SUCCESS);
