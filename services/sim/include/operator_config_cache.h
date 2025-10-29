@@ -78,6 +78,7 @@ private:
     int32_t retryBatchInsertApnTimes_ = 0;
     std::shared_ptr<AppExecFwk::EventHandler> batchInsertApnRetryHandler_ = nullptr;
     std::function<void()> batchInsertApnRetryTask_;
+    void RetryBatchInsertApnPostTask();
 };
 } // namespace Telephony
 } // namespace OHOS
