@@ -3266,8 +3266,6 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDsdsMode", GetDsdsMode),
         DECLARE_NAPI_FUNCTION("getSimAuthentication", GetSimAuthentication),
         DECLARE_NAPI_FUNCTION("getAllSimAccountInfoList", GetAllSimAccountInfoList),
-        DECLARE_NAPI_FUNCTION("getSimLabel", GetSimLabel),
-        DECLARE_NAPI_FUNCTION("getSimLabelSync", GetSimLabelSync),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
