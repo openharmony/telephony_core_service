@@ -1916,24 +1916,6 @@ int32_t CoreServiceStub::OnGetAllSimAccountInfoList(MessageParcel &data, Message
     return NO_ERROR;
 }
 
-int32_t CoreServiceStub::OnGetSimLabel(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t slotId = data.ReadInt32();
-    SimLabel simLabel;
-    auto callback = iface_cast<IRawParcelCallback>(data.ReadRemoteObject());
-    int32_t result = GetSimLabel(slotId, simLabel, callback);
-    bool ret = reply.WriteInt32(result);
-    if (result == TELEPHONY_ERR_SUCCESS) {
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(simLabel.simType)));
-        ret = (ret && reply.WriteInt32(static_cast<int32_t>(simLabel.index)));
-    }
-    if (!ret) {
-        TELEPHONY_LOGE("OnRemoteRequest::GET_SIM_LABEL write reply failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return NO_ERROR;
-}
-
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &reply)
 {
