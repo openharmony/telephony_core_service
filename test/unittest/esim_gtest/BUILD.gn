@@ -123,7 +123,7 @@ ohos_unittest("tel_esim_gtest") {
   configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
 
   deps = [
-    "$SOURCE_DIR:tel_core_service",
+    "$SOURCE_DIR:tel_core_service_static",
     "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
     "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
     "$SOURCE_DIR/utils:libtel_common",
