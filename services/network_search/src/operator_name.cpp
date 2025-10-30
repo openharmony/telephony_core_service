@@ -283,6 +283,7 @@ void OperatorName::NotifyGsmSpnChanged(
         params.showSpn = false;
     }
     SetOperatorNameByParams(params);
+    std::unique_lock<ffrt::mutex> lock(curParamsMutex_);
     TELEPHONY_LOGI(
         "OperatorName::NotifyGsmSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s showPlmn:%{public}d "
         "curPlmn_:%{public}s plmn:%{public}s enableCust_:%{public}d "
@@ -342,6 +343,7 @@ void OperatorName::NotifyCdmaSpnChanged(
     }
     params.showPlmn = !params.plmn.empty();
     SetOperatorNameByParams(params);
+    std::unique_lock<ffrt::mutex> lock(curParamsMutex_);
     TELEPHONY_LOGI(
         "OperatorName::NotifyCdmaSpnChanged showSpn:%{public}d curSpn_:%{public}s spn:%{public}s "
         "showPlmn:%{public}d curPlmn_:%{public}s plmn:%{public}s slotId:%{public}d",
