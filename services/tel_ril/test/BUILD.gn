@@ -41,7 +41,7 @@ ohos_executable("tel_ril_test") {
   configs = [ "$TELEPHONY_CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
   deps = [
-    "$TELEPHONY_CORE_SERVICE_ROOT:tel_core_service_static",
+    "$TELEPHONY_CORE_SERVICE_ROOT/test:tel_core_service_static",
     "$TELEPHONY_CORE_SERVICE_ROOT/utils:libtel_common",
   ]
 
