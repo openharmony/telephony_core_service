@@ -1394,6 +1394,7 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         case WAIT_FOR_ALL_CARDS_READY_TIMEOUT:
             waitCardsReady_ = false;
             ReCheckPrimary();
+            break;
         default:
             break;
     }
