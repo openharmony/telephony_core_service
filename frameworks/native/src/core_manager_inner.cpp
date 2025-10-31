@@ -2647,15 +2647,6 @@ int32_t CoreManagerInner::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &
     return simManager_->GetAllSimAccountInfoList(false, iccAccountInfoList);
 }
 
-int32_t CoreManagerInner::GetSimLabel(int32_t slotId, SimLabel &simLabel)
-{
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null!");
-        return INVALID_VALUE;
-    }
-    return simManager_->GetSimLabel(slotId, simLabel);
-}
-
 int32_t CoreManagerInner::SetSimLabelIndex(const std::string &iccId, int32_t labelIndex)
 {
     if (simManager_ == nullptr) {
