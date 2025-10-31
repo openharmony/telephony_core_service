@@ -462,24 +462,6 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
     return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
 }
 
-int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
-{
-    if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("InValidData");
-        return TELEPHONY_ERR_NO_SIM_CARD;
-    }
-    std::unique_lock<ffrt::mutex> lock(mutex_);
-    if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
-        TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if (localCacheInfo_[slotId].isEsim) {
-        simLabel.simType = SimType::ESIM;
-    }
-    simLabel.index = localCacheInfo_[slotId].simLabelIndex;
-    return TELEPHONY_ERR_SUCCESS;
-}
-
 bool MultiSimController::InitShowNumber(int slotId)
 {
     std::u16string showNumber;
