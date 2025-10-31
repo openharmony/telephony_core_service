@@ -46,7 +46,6 @@ TagService::~TagService() {}
 
 int TagService::GetTagCode() const
 {
-    TELEPHONY_LOGI("GetTagCode : %{public}s", tag_.c_str());
     std::string tagTemp = tag_.c_str();
     if (!IsValidHexValue(tagTemp)) {
         TELEPHONY_LOGE("GetTagCode return ERR");
@@ -110,7 +109,6 @@ static int LengthFunc(const uint8_t arg, const size_t order, uint8_t &len)
 
 bool TagService::Next()
 {
-    TELEPHONY_LOGI("TagService::Next begin!!");
     if (!hasNext_ || offset_ >= data_.size()) {
         hasNext_ = false;
         return false;
@@ -129,7 +127,6 @@ bool TagService::Next()
             break;
         }
     }
-    TELEPHONY_LOGI("TagService::Next for tag : %{public}s", tag_.c_str());
     /* parse length */
     if (offset_ >= data_.size()) {
         hasNext_ = false;
@@ -147,16 +144,12 @@ bool TagService::Next()
             break;
         }
     }
-    TELEPHONY_LOGI("TagService::Next for length : %{public}d", length_);
     /* parse value */
     dataOffset_ = offset_;
     offset_ += static_cast<size_t>(length_);
     if (offset_ > data_.size()) {
         hasNext_ = false;
     }
-    TELEPHONY_LOGI("TagService::Next for value : %{public}s",
-        SIMUtils::HexVecToHexStr(std::vector<uint8_t>(data_.begin() + dataOffset_, data_.begin() +
-        dataOffset_ + length_)).c_str());
     return hasNext_;
 }
 } // namespace Telephony
