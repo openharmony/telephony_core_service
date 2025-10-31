@@ -176,6 +176,7 @@ private:
     int32_t IsSatelliteSupported();
     void GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessNewSimStatus(int newSimStatus);
+    void PublishHotZoneInd(int32_t newSimStatus, int32_t slotId);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void UpdateEsimOSVersion(int32_t slotId);
 #endif
