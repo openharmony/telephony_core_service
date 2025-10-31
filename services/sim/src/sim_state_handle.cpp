@@ -373,6 +373,18 @@ void SimStateHandle::GetLockState(int32_t slotId, LockType lockType)
     }
 }
 
+void SimStateHandle::PublishHotZoneInd(int32_t newSimStatus, int32_t slotId)
+{
+    if ((newSimStatus != oldSimStatus_) &&
+        (newSimStatus == ICC_CONTENT_UNKNOWN || newSimStatus == ICC_CARD_ABSENT) &&
+        !CoreManagerInner::GetInstance().IsEsim(slotId)) {
+        if (TELEPHONY_EXT_WRAPPER.publishContainerDisableHotZoneInd_ != nullptr) {
+            TELEPHONY_LOGI("ProcessIccCardState slotId:%{public}d, publishContainerDisableHotZoneInd_", slotId);
+            TELEPHONY_EXT_WRAPPER.publishContainerDisableHotZoneInd_(slotId);
+        }
+    }
+}
+
 void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
 {
     LockReason reason = LockReason::SIM_NONE;
@@ -386,6 +398,8 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
     }
+    
+    PublishHotZoneInd(newSimStatus, slotId);
     ProcessNewSimStatus(newSimStatus);
     if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;

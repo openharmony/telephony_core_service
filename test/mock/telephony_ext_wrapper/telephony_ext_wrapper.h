@@ -83,6 +83,7 @@ public:
     typedef int32_t (*UPDATE_NSA_STATE_EXT)(
         int32_t slotId, int32_t cellId, bool endcAvailable, bool dcNrRestricted, int32_t nsaState);
     typedef void (*PUBLISH_SPN_INFO_CHANGED_EXT)(OHOS::AAFwk::Want &want);
+    typedef void (*PUBLISH_AP_CONTAINER_IND)(int32_t slotId);
     typedef void (*GET_ROAMINGBROKER_NUMERIC)(int32_t slotId, std::string &numeric);
     typedef void (*GET_ROAMINGBROKER_IMSI)(int32_t slotId, std::string &imsi);
     typedef bool (*SET_NR_OPTION_MODE_EXT)(int32_t slotId, int32_t masterSlotId, int32_t mode, int32_t &errCode);
@@ -150,6 +151,7 @@ public:
     UPDATE_OPERATOR_NAME_PARAMS updateOperatorNameParamsExt_ = nullptr;
     UPDATE_NSA_STATE_EXT updateNsaStateExt_ = nullptr;
     PUBLISH_SPN_INFO_CHANGED_EXT publishSpnInfoChangedExt_ = nullptr;
+    PUBLISH_AP_CONTAINER_IND publishContainerDisableHotZoneInd_ = nullptr;
 
     UPDATE_COUNTRY_CODE_EXT updateCountryCodeExt_ = nullptr;
     UPDATE_TIME_ZONE_OFFSET_EXT updateTimeZoneOffsetExt_ = nullptr;
@@ -278,6 +280,8 @@ inline int32_t UpdateNsaStateExtImpl(int32_t, int32_t, bool, bool, int32_t)
     return 0;
 }
 inline void PublishSpnInfoChangedExtImpl(OHOS::AAFwk::Want &)
+{}
+inline void PublishContainerDisableHotZoneIndImpl(int32_t)
 {}
 inline void GetRoamingBrokerNumericImpl(int32_t, std::string &)
 {}
@@ -455,6 +459,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     updateNetworkStateExt_ = &UpdateNetworkStateExtImpl;
     publishSpnInfoChangedExt_ = &PublishSpnInfoChangedExtImpl;
     updateOperatorNameParamsExt_ = &UpdateOperatorNameParamsExtImpl;
+    publishContainerDisableHotZoneInd_ = &PublishContainerDisableHotZoneIndImpl;
     InitTelephonyExtWrapperForApnCust();
 }
 
