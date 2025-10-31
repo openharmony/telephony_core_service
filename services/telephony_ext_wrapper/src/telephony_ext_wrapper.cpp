@@ -181,6 +181,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForCust()
     if (updateOperatorNameParamsExt_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    publishContainerDisableHotZoneInd_ = (PUBLISH_AP_CONTAINER_IND)dlsym(telephonyExtWrapperHandle_,
+        "PublishContainerDisableHotZoneInd");
+    if (publishContainerDisableHotZoneInd_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
     InitTelephonyExtWrapperForApnCust();
 }
 
