@@ -465,7 +465,6 @@ std::shared_ptr<UsimDiallingNumberFile> UsimDiallingNumbersService::BuildNumberF
     TELEPHONY_LOGI("BuildNumberFileByRecord: start get tag");
     while (recTlv->Next()) {
         tag = recTlv->GetTagCode();
-        TELEPHONY_LOGI("front tag type: %{public}d", tag);
         if ((tag != TYPE1_FLAG) && (tag != TYPE2_FLAG) && (tag != TYPE3_FLAG)) {
             TELEPHONY_LOGE("the tag:'%{public}d' need in {%{public}d,%{public}d,%{public}d}", tag, TYPE1_FLAG,
                 TYPE2_FLAG, TYPE3_FLAG);
