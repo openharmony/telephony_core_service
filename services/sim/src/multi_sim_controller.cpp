@@ -2001,6 +2001,7 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         TELEPHONY_LOGE("UpdateSimPresent invalid slotId %{public}d", slotId);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    int32_t ret = TELEPHONY_SUCCESS;
     if (isShowPresent) {
         SimRdbInfo simRdbInfo;
         std::unique_lock<ffrt::mutex> dbLock(writeDbMutex_);
@@ -2010,7 +2011,9 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         }
         if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
             TELEPHONY_LOGI("UpdateSimPresent exist INVALID_ICCID");
-            return SetSimLabelIndex(invalidIccId, slotId + 1);
+            ret = simDbHelper_->UpdateSimPresent(invalidIccId, true, slotId + 1);
+            GetAllListFromDataBase();
+            return ret;
         } else {
             DataShare::DataShareValuesBucket values;
             DataShare::DataShareValueObject slotObj(INVALID_VALUE);
@@ -2029,11 +2032,14 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
             values.Put(SimData::IS_VOICE_CARD, notMainCardObj);
             values.Put(SimData::IS_MESSAGE_CARD, notMainCardObj);
             values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
-            int32_t ret = simDbHelper_->InsertData(id, values);
+            ret = simDbHelper_->InsertData(id, values);
+            GetAllListFromDataBase();
             return ret > SIMID_INDEX0 ? TELEPHONY_SUCCESS : INVALID_VALUE;
         }
     } else {
-        return SetSimLabelIndex(invalidIccId, INVALID_VALUE);
+        ret = simDbHelper_->UpdateSimPresent(INVALID_ICCID, false, INVALID_VALUE);
+        GetAllListFromDataBase();
+        return ret;
     }
 }
 } // namespace Telephony

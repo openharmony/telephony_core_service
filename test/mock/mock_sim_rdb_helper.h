@@ -52,6 +52,7 @@ public:
     MOCK_METHOD1(CreateDataHelper, std::shared_ptr<DataShare::DataShareHelper>(const int waitTime));
     MOCK_METHOD2(Insert, int(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
         const DataShare::DataShareValuesBucket &values));
+    MOCK_METHOD3(UpdateSimPresent, int32_t(const std::string &iccId, bool isShowPresent, int32_t labelIndex));
 };
 } // namespace Telephony
 } // namespace OHOS
