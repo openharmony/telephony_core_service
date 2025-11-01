@@ -195,12 +195,12 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_network.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sim.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sms.cpp",
-    "services/core/src/core_service.cpp",
-    "services/core/src/core_service_dump_helper.cpp",
-    "services/core/src/core_service_hisysevent.cpp",
-    "services/core/src/core_service_stub.cpp",
-    "services/core/src/raw_parcel_callback_proxy.cpp",
-    "services/core/src/core_service_common_event_hub.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/core_service.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/core_service_dump_helper.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/core_service_hisysevent.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/raw_parcel_callback_proxy.cpp",
+    "$CORE_SERVICE_ROOT/services/core/src/core_service_common_event_hub.cpp",
   ]
   if (core_service_support_esim) {
     sources += [
@@ -215,19 +215,19 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
-    "services/core/include",
-    "services/satellite_service_interaction/include",
-    "utils/log/include",
+    "$CORE_SERVICE_ROOT/services/core/include",
+    "$CORE_SERVICE_ROOT/services/satellite_service_interaction/include",
+    "$CORE_SERVICE_ROOT/utils/log/include",
   ]
 
   if (core_service_support_esim) {
     include_dirs += [
-      "utils/codec/include",
-      "utils/vcard/include",
+      "$CORE_SERVICE_ROOT/utils/codec/include",
+      "$CORE_SERVICE_ROOT/utils/vcard/include",
     ]
   }
 
-  configs = [ "utils:telephony_log_config" ]
+  configs = [ "$CORE_SERVICE_ROOT/utils:telephony_log_config" ]
 
   defines = [
     "LOG_TAG = \"CoreService\"",
@@ -238,12 +238,12 @@ ohos_static_library("tel_core_service_static") {
   defines += telephony_extra_defines
 
   deps = [
-    "interfaces/innerkits:tel_core_service_api",
-    "utils:libtel_common",
+    "$CORE_SERVICE_ROOT/interfaces/innerkits:tel_core_service_api",
+    "$CORE_SERVICE_ROOT/utils:libtel_common",
   ]
 
   if (core_service_support_esim) {
-    deps += [ "utils:libtel_vcard" ]
+    deps += [ "$CORE_SERVICE_ROOT/utils:libtel_vcard" ]
   }
 
   external_deps = [
