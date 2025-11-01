@@ -132,9 +132,6 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/setting_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/emc_rescue_mode_observer.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/emc_rescue_mode_control.cpp",
-    "$TELEPHONY_NETWORK_SEARCH_ROOT/src/emc_rescue_net_info_callback_proxy.cpp",
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
     "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
@@ -167,8 +164,8 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_SIM_ROOT/src/sim_account_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_char_decode.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file.cpp",
-    "$TELEPHONY_SIM_ROOT/src/sim_file_init.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_controller.cpp",
+    "$TELEPHONY_SIM_ROOT/src/sim_file_init.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_file_parse.cpp",
     "$TELEPHONY_SIM_ROOT/src/sim_manager.cpp",
@@ -198,12 +195,12 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_network.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sim.cpp",
     "$TELEPHONY_TEL_RIL_ROOT/src/tel_ril_sms.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/core_service.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/core_service_dump_helper.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/core_service_hisysevent.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/raw_parcel_callback_proxy.cpp",
-    "$CORE_SERVICE_ROOT/services/core/src/core_service_common_event_hub.cpp",
+    "services/core/src/core_service.cpp",
+    "services/core/src/core_service_dump_helper.cpp",
+    "services/core/src/core_service_hisysevent.cpp",
+    "services/core/src/core_service_stub.cpp",
+    "services/core/src/raw_parcel_callback_proxy.cpp",
+    "services/core/src/core_service_common_event_hub.cpp",
   ]
   if (core_service_support_esim) {
     sources += [
@@ -218,19 +215,19 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_TEL_RIL_ROOT/include",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/include",
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
-    "$CORE_SERVICE_ROOT/services/core/include",
-    "$CORE_SERVICE_ROOT/services/satellite_service_interaction/include",
-    "$CORE_SERVICE_ROOT/utils/log/include",
+    "services/core/include",
+    "services/satellite_service_interaction/include",
+    "utils/log/include",
   ]
 
   if (core_service_support_esim) {
     include_dirs += [
-      "$CORE_SERVICE_ROOT/utils/codec/include",
-      "$CORE_SERVICE_ROOT/utils/vcard/include",
+      "utils/codec/include",
+      "utils/vcard/include",
     ]
   }
 
-  configs = [ "$CORE_SERVICE_ROOT/utils:telephony_log_config" ]
+  configs = [ "utils:telephony_log_config" ]
 
   defines = [
     "LOG_TAG = \"CoreService\"",
@@ -241,12 +238,12 @@ ohos_static_library("tel_core_service_static") {
   defines += telephony_extra_defines
 
   deps = [
-    "$CORE_SERVICE_ROOT/interfaces/innerkits:tel_core_service_api",
-    "$CORE_SERVICE_ROOT/utils:libtel_common",
+    "interfaces/innerkits:tel_core_service_api",
+    "utils:libtel_common",
   ]
 
   if (core_service_support_esim) {
-    deps += [ "$CORE_SERVICE_ROOT/utils:libtel_vcard" ]
+    deps += [ "utils:libtel_vcard" ]
   }
 
   external_deps = [
@@ -286,13 +283,19 @@ ohos_static_library("tel_core_service_static") {
     "libpng:libpng",
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
-    "netmanager_ext:net_tether_manager_if",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "telephony_data:tel_telephony_data",
     "time_service:time_client",
   ]
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_netmanager_ext) &&
+      global_parts_info.communication_netmanager_ext) {
+    external_deps += [ "netmanager_ext:net_tether_manager_if" ]
+    defines += [ "ABILITY_NETMANAGER_EXT_SUPPORT" ]
+  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.powermgr_power_manager) &&
