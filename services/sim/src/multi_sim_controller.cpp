@@ -1994,11 +1994,9 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
     int64_t id;
     std::string invalidIccId = INVALID_ICCID + std::to_string(slotId);
     if (simDbHelper_ == nullptr) {
-        TELEPHONY_LOGE("UpdateSimPresent failed by nullptr");
         return INVALID_VALUE;
     }
     if (!IsValidSlotId(slotId)) {
-        TELEPHONY_LOGE("UpdateSimPresent invalid slotId %{public}d", slotId);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t ret = TELEPHONY_SUCCESS;
@@ -2006,7 +2004,6 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         SimRdbInfo simRdbInfo;
         std::unique_lock<ffrt::mutex> dbLock(writeDbMutex_);
         if (simDbHelper_->QueryDataByIccId(invalidIccId, simRdbInfo) == INVALID_VALUE) {
-            TELEPHONY_LOGE("UpdateSimPresent query fail");
             return INVALID_VALUE;
         }
         if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
