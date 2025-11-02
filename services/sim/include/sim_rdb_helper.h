@@ -58,6 +58,7 @@ public:
     int32_t ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState);
     int32_t ClearSimLabel(SimType simType);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
+    int32_t UpdateSimPresent(const std::string &iccId, bool isShowPresent, int32_t labelIndex);
 
     int32_t ClearData();
     int32_t UpdateOpKeyInfo();

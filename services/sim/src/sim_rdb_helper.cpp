@@ -636,6 +636,29 @@ int32_t SimRdbHelper::UpdateEsimOpName(const std::string &iccId, const std::stri
     return result;
 }
 
+int32_t SimRdbHelper::UpdateSimPresent(const std::string &iccId, bool isShowPresent, int32_t labelIndex)
+{
+    DataShare::DataSharePredicates predicates;
+    if (isShowPresent) {
+        predicates.EqualTo(SimData::ICC_ID, iccId);
+    } else {
+        predicates.Contains(SimData::ICC_ID, iccId);
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);
+    if (dataShareHelper == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return INVALID_VALUE;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject indexObj(labelIndex);
+    values.Put(SimData::SIM_LABEL_INDEX, indexObj);
+    int32_t result = Update(dataShareHelper, values, predicates);
+    TELEPHONY_LOGI("UpdateSimPresent result:%{public}d", result);
+    dataShareHelper->Release();
+    return result;
+}
+
 int32_t SimRdbHelper::ClearData()
 {
     std::string id = std::to_string(INVALID_VALUE);
