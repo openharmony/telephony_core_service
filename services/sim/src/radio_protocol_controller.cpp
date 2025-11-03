@@ -456,7 +456,7 @@ void RadioProtocolController::ProcessActiveSimTimeOutDone(const AppExecFwk::Inne
 
 bool RadioProtocolController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
 {
-    TELEPHONY_LOGI("SetActiveSim(), enable=%{public}d", enable);
+    TELEPHONY_LOGI("SetActiveSim(), slotId=%{public}d, enable=%{public}d", slotId, enable);
     auto telRilManager = telRilManager_.lock();
     if (telRilManager == nullptr) {
         TELEPHONY_LOGE("SetActiveSim nullptr");

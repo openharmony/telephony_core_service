@@ -148,7 +148,7 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     // conversion.
     bool isNeedUpdateSimLabel = !IsSimSlotsMapping() && !(slotId == 1 && simLabelState != PSIM1_PSIM2) &&
                                 !IsEsim(slotId) && !isSimSlotsMapping_[slotId];
-    bool isUpdateActiveState = !isSimSlotsMapping_[slotId];
+    bool isUpdateActiveState = !IsSimSlotsMapping();
     isSimSlotsMapping_[slotId] = false;
     TELEPHONY_LOGI("slotId %{public}d: isNeedUpdateSimLabel is %{public}d", slotId, isNeedUpdateSimLabel);
     return simDbHelper_->ForgetAllData(slotId, isNeedUpdateSimLabel, isUpdateActiveState) != INVALID_VALUE;
@@ -309,10 +309,12 @@ bool MultiSimController::IsAllModemInitDone()
     return true;
 }
 
-int32_t MultiSimController::SetTargetPrimarySlotId(int32_t primarySlotId)
+int32_t MultiSimController::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId)
 {
-    TELEPHONY_LOGI("SetTargetPrimarySlotId %{public}d", primarySlotId);
-    waitCardsReady_ = true;
+    TELEPHONY_LOGI("isDualCard:%{public}d, SetTargetPrimarySlotId:%{public}d",isDualCard, primarySlotId);
+    if (isDualCard) {
+        waitCardsReady_ = true;
+    }
     targetPrimarySlotId_ = primarySlotId;
     SendEvent(WAIT_FOR_ALL_CARDS_READY_EVENT, primarySlotId, WAIT_FOR_ALL_CARDS_READY_TIMEOUT);
     return TELEPHONY_SUCCESS;
@@ -551,14 +553,16 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
         std::shared_lock<ffrt::shared_mutex> lock(mutex_);
         if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
             TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
+            return TELEPHONY_ERR_SUCCESS;
         }
         if (localCacheInfo_[slotId].iccId.empty()) {
             int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, OCT_TYPE);
             if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
                 simLabel.index = ESIM1;
-            } else {
+            } else if (allLocalCacheInfo_[simId - 1].simLabelIndex > 0) {
                 simLabel.index = allLocalCacheInfo_[simId - 1].simLabelIndex;
+            } else {
+                simLabel.index = ESIM1;
             }
         } else {
             simLabel.index = localCacheInfo_[slotId].simLabelIndex;
