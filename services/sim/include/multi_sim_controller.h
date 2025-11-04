@@ -96,7 +96,7 @@ public:
     int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isInit = true);
-    int32_t SetTargetPrimarySlotId(int32_t primarySlotId);
+    int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;

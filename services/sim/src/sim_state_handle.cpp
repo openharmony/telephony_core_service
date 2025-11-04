@@ -625,10 +625,6 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
         return;
     }
-    if (OHOS::system::GetBoolParameter("persist.telephony.is_simslots_mapping", false)) {
-        TELEPHONY_LOGW("simslots is mapping, no need fetch files");
-        return;
-    }
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
