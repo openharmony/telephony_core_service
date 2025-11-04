@@ -311,7 +311,7 @@ bool MultiSimController::IsAllModemInitDone()
 
 int32_t MultiSimController::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId)
 {
-    TELEPHONY_LOGI("isDualCard:%{public}d, SetTargetPrimarySlotId:%{public}d",isDualCard, primarySlotId);
+    TELEPHONY_LOGI("isDualCard:%{public}d, SetTargetPrimarySlotId:%{public}d", isDualCard, primarySlotId);
     if (isDualCard) {
         waitCardsReady_ = true;
     }
