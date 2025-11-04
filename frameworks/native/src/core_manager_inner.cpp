@@ -3045,13 +3045,13 @@ void CoreManagerInner::CheckIfNeedSwitchMainSlotId(bool isUserSet)
     simManager_->CheckIfNeedSwitchMainSlotId(isUserSet);
 }
 
-int32_t CoreManagerInner::SetTargetPrimarySlotId(int32_t primarySlotId)
+int32_t CoreManagerInner::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SetTargetPrimarySlotId(primarySlotId);
+    return simManager_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
 }
 } // namespace Telephony
 } // namespace OHOS
