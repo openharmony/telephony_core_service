@@ -341,10 +341,12 @@ public:
     }
     inline sptr<NetworkSearchCallBackBase> GetCellularDataCallBack()
     {
+        std::shared_lock<ffrt::shared_mutex> lock(callBackMtx_);
         return cellularDataCallBack_;
     }
     inline sptr<NetworkSearchCallBackBase> GetCellularCallCallBack()
     {
+        std::shared_lock<ffrt::shared_mutex> lock(callBackMtx_);
         return cellularCallCallBack_;
     }
     inline std::shared_ptr<ISimManager> GetSimManager() const
@@ -377,6 +379,7 @@ private:
 
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
     sptr<NetworkSearchCallBackBase> cellularCallCallBack_ = nullptr;
+    ffrt::shared_mutex callBackMtx_{};
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::unique_ptr<EventSender> eventSender_ = nullptr;
