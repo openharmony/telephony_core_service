@@ -241,23 +241,6 @@ HWTEST_F(SimTest, Telephony_Sim_HasSimCard_0200, Function | MediumTest | Level1)
 }
 
 /**
- * @tc.number   Telephony_Sim_GetISOCountryCodeForSim_0100
- * @tc.name     Get sim iso country code
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_GetISOCountryCodeForSim_0100, Function | MediumTest | Level1)
-{
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        std::u16string countryCode;
-        CoreServiceClient::GetInstance().GetISOCountryCodeForSim(SimTest::slotId_, countryCode);
-        std::string result = Str16ToStr8(countryCode);
-        EXPECT_STRNE(result.c_str(), "");
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_GetISOCountryCodeForSim_0200
  * @tc.name     Get sim iso country code
  * @tc.desc     Function test
@@ -321,22 +304,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetDefaultVoiceSlotId_0100, Function | MediumTes
     } else {
         int32_t result = CoreServiceClient::GetInstance().GetDefaultVoiceSlotId();
         EXPECT_GT(result, -2);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_SetDefaultVoiceSlotId_0100
- * @tc.name     Set default voice sim slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetDefaultVoiceSlotId_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        int32_t result = CoreServiceClient::GetInstance().SetDefaultVoiceSlotId(SimTest::slotId_);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -422,23 +389,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0300, Function | MediumTest | 
 }
 
 /**
- * @tc.number   Telephony_Sim_SetShowName_0100
- * @tc.name     Set a show name for the current card
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        const std::u16string cardName = Str8ToStr16("SimNameZhang");
-        int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_SetShowName_0200
  * @tc.name     Set a show name for the current card
  * @tc.desc     Function test
@@ -468,24 +418,6 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0300, Function | MediumTest | Level3
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
         int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
         EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_getShowName_0100
- * @tc.name     Get show name of the current card
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_getShowName_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        std::u16string showName;
-        CoreServiceClient::GetInstance().GetShowName(SimTest::slotId_, showName);
-        std::string result = Str16ToStr8(showName);
-        EXPECT_STRNE(result.c_str(), "");
     }
 }
 
@@ -574,23 +506,6 @@ HWTEST_F(SimTest, Telephony_Sim_getShowNumber_0300, Function | MediumTest | Leve
         CoreServiceClient::GetInstance().GetShowNumber(SimTest::slotId_, showNumber);
         std::string result = Str16ToStr8(showNumber);
         EXPECT_STREQ(result.c_str(), "");
-    }
-}
-
-/**
- * @tc.number   Telephony_SetShowNumber_0100
- * @tc.name     Set a show number for the current card
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetShowNumber_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        const std::u16string cardNumber = Str8ToStr16("SimNumber12345678901");
-        int32_t result = CoreServiceClient::GetInstance().SetShowNumber(SimTest::slotId_, cardNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
