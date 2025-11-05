@@ -153,6 +153,11 @@ enum class RadioTech {
     RADIO_TECHNOLOGY_NR = 12,
 
     /**
+     * Indicates that RAT is 5GA
+     */
+    RADIO_TECHNOLOGY_5A = 13,
+
+    /**
      * Indicates the max value.
      */
     RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_NR,
