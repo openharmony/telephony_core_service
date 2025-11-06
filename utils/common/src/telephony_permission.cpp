@@ -37,16 +37,7 @@ using namespace Security::AccessToken;
  */
 bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleName)
 {
-    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager =
-        OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        TELEPHONY_LOGE("systemAbilityManager is nullptr");
-        return false;
-    }
-    OHOS::sptr<OHOS::IRemoteObject> remoteObject =
-        systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-
-    sptr<AppExecFwk::IBundleMgr> iBundleMgr = OHOS::iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    auto iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
         TELEPHONY_LOGE("iBundleMgr is nullptr");
         return false;
@@ -111,6 +102,42 @@ bool TelephonyPermission::CheckCallerIsSystemApp()
 
     auto selfToken = IPCSkeleton::GetCallingFullTokenID();
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
+}
+
+bool TelephonyPermission::GetAppIdentifier(const std::string &bundleName, std::string &appIdentifier, int32_t userId)
+{
+    auto bundleMgr = GetBundleMgr();
+    if (bundleMgr == nullptr) {
+        TELEPHONY_LOGE("GetAppIdentifier can not get bundleMgr.");
+        return false;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    ErrCode ret = bundleMgr->GetBundleInfoV9(bundleName,
+        (int)AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO, bundleInfo, userId);
+    if (ret != ERR_OK) {
+        return false;
+    }
+    if (bundleInfo.signatureInfo.appIdentifier.empty()) {
+        TELEPHONY_LOGE("GetAppIdentifier can not get appIdentifier.");
+        return false;
+    }
+    appIdentifier = bundleInfo.signatureInfo.appIdentifier;
+    return true;
+}
+ 
+sptr<AppExecFwk::IBundleMgr> TelephonyPermission::GetBundleMgr()
+{
+    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("GetBundleMgr GetSystemAbilityManager is null");
+        return nullptr;
+    }
+    sptr<IRemoteObject> bundleMgrSa = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (bundleMgrSa == nullptr) {
+        TELEPHONY_LOGE("GetBundleMgr GetSystemAbility is null");
+        return nullptr;
+    }
+    return iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
 }
 } // namespace Telephony
 } // namespace OHOS
