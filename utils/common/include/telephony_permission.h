@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "bundlemgr/bundle_mgr_client.h"
+
 namespace OHOS {
 namespace Telephony {
 namespace Permission {
@@ -145,6 +147,19 @@ public:
      * @return Return {@code true} if the caller is System App, return {@code false} otherwise.
      */
     static bool CheckCallerIsSystemApp();
+
+    /**
+     * @brief Get appIdentifier.
+     *
+     * @param bundleName.
+     * @param appIdentifier.
+     * @param userId.
+     * @return Return {@code true} on success, {@code false} on failure.
+     */
+    static bool GetAppIdentifier(const std::string &bundleName, std::string &appIdentifier, int32_t userId);
+
+private:
+    static sptr<OHOS::AppExecFwk::IBundleMgr> GetBundleMgr();
 };
 } // namespace Telephony
 } // namespace OHOS
