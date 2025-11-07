@@ -18,8 +18,7 @@
 #ifdef ABILITY_BATTERY_SUPPORT
 #include "battery_srv_client.h"
 #endif
-#include "iservice_registry.h"
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef TETHER_NETWORKSHARE
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
 #endif
@@ -45,10 +44,14 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>();
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
-    sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
-
+#ifdef TETHER_NETWORKSHARE
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+#ifdef TETHER_NETWORKSHARE
+    sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
     statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_, sharingEventCallback_);
+#else
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
+#endif
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("StartEventSubscriber samgrProxy or statusChangeListener_ is nullptr");
         return;
@@ -73,6 +76,7 @@ void DeviceStateObserver::StopEventSubscriber()
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
+#ifdef TETHER_NETWORKSHARE
     if (sharingEventCallback_ == nullptr) {
         TELEPHONY_LOGE("DeviceStateObserver::StopEventSubscriber sharingEventCallback_ is nullptr");
         return;
@@ -173,12 +177,15 @@ std::shared_ptr<DeviceStateHandler> DeviceStateEventSubscriber::GetEventHandler(
     return deviceStateHandler_;
 }
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef TETHER_NETWORKSHARE
 DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
     std::shared_ptr<DeviceStateEventSubscriber> &sub, sptr<NetManagerStandard::ISharingEventCallback> &callback)
     : sub_(sub), callback_(callback)
 {}
-
+#else
+DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<DeviceStateEventSubscriber> &sub) : sub_(sub) {}
+#endif
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -213,6 +220,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
                     TelCommonEvent::POWER_SAVE_MODE_CHANGED});
             break;
         }
+#ifdef TETHER_NETWORKSHARE
         case COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID: {
             auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
             if (networkShareClient == nullptr) {
@@ -225,6 +233,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             networkShareClient->RegisterSharingEvent(callback_);
             break;
         }
+#endif
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
@@ -245,6 +254,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbili
     CoreManagerInner::GetInstance().UnregisterCommonEventCallback(sub_);
 }
 
+#ifdef TETHER_NETWORKSHARE
 SharingEventCallback::SharingEventCallback(
     const std::shared_ptr<DeviceStateHandler> &deviceStateHandler) : handler_(deviceStateHandler)
 {}

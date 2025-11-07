@@ -21,7 +21,7 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef TETHER_NETWORKSHARE
 #include "sharing_event_callback_stub.h"
 #endif
 #include "net_all_capabilities.h"
@@ -57,7 +57,7 @@ private:
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_;
 };
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef TETHER_NETWORKSHARE
 class SharingEventCallback : public NetManagerStandard::SharingEventCallbackStub {
 public:
     explicit SharingEventCallback(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
@@ -81,28 +81,30 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef TETHER_NETWORKSHARE
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
 #endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     ffrt::mutex callbackMutex_;
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
+        #ifdef TETHER_NETWORKSHAR
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
             sptr<NetManagerStandard::ISharingEventCallback> &callback);
+        #else
+        SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
+        #endif
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
+#ifdef TETHER_NETWORKSHARE        
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
-    };
 #endif
-};
-} // namespace Telephony
-} // namespace OHOS
-#endif // NETWORK_SEARCH_DEVICE_STATE_OBSERVER_H
+    };
+}; // namespace Telephony
+}
