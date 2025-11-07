@@ -84,7 +84,6 @@ void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
         (regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     networkSearchState_->SetNetworkType(tech, type);
     networkSearchState_->SetNetworkStateToRoaming(roam, type);
-    networkSearchState_->SetCfgTech(tech);
 }
 
 void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> csRegStateResult)
