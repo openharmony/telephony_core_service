@@ -37,7 +37,17 @@ using namespace Security::AccessToken;
  */
 bool TelephonyPermission::GetBundleNameByUid(int32_t uid, std::string &bundleName)
 {
-    auto iBundleMgr = GetBundleMgr();
+    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("GetBundleNameByUid GetSystemAbilityManager is null");
+        return false;
+    }
+    sptr<IRemoteObject> bundleMgrSa = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (bundleMgrSa == nullptr) {
+        TELEPHONY_LOGE("GetBundleNameByUid GetSystemAbility is null");
+        return false;
+    }
+    auto iBundleMgr = iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
     if (iBundleMgr == nullptr) {
         TELEPHONY_LOGE("iBundleMgr is nullptr");
         return false;
@@ -106,7 +116,17 @@ bool TelephonyPermission::CheckCallerIsSystemApp()
 
 bool TelephonyPermission::GetAppIdentifier(const std::string &bundleName, std::string &appIdentifier, int32_t userId)
 {
-    auto bundleMgr = GetBundleMgr();
+    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("GetAppIdentifier GetSystemAbilityManager is null");
+        return false;
+    }
+    sptr<IRemoteObject> bundleMgrSa = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (bundleMgrSa == nullptr) {
+        TELEPHONY_LOGE("GetAppIdentifier GetSystemAbility is null");
+        return false;
+    }
+    auto bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
     if (bundleMgr == nullptr) {
         TELEPHONY_LOGE("GetAppIdentifier can not get bundleMgr.");
         return false;
@@ -123,21 +143,6 @@ bool TelephonyPermission::GetAppIdentifier(const std::string &bundleName, std::s
     }
     appIdentifier = bundleInfo.signatureInfo.appIdentifier;
     return true;
-}
- 
-sptr<AppExecFwk::IBundleMgr> TelephonyPermission::GetBundleMgr()
-{
-    auto systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        TELEPHONY_LOGE("GetBundleMgr GetSystemAbilityManager is null");
-        return nullptr;
-    }
-    sptr<IRemoteObject> bundleMgrSa = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (bundleMgrSa == nullptr) {
-        TELEPHONY_LOGE("GetBundleMgr GetSystemAbility is null");
-        return nullptr;
-    }
-    return iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
 }
 } // namespace Telephony
 } // namespace OHOS
