@@ -713,8 +713,8 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
 void NetworkSearchHandler::UpdateNetworkState()
 {
     if (networkRegister_ != nullptr) {
-        networkRegister_->ProcessCsRegister(csRegStatusInfo_);
         networkRegister_->ProcessPsRegister(psRegStatusResultInfo_);
+        networkRegister_->ProcessCsRegister(csRegStatusInfo_);
     }
     if (operatorName_ != nullptr) {
         operatorName_->HandleOperatorInfo(operatorInfoResult_);
