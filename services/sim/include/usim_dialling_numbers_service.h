@@ -56,8 +56,8 @@ public:
     void ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer);
     void SetFileControllerAndDiallingNumberHandler(
         std::shared_ptr<IccFileController> &ctrl, std::shared_ptr<IccDiallingNumbersHandler> handler);
-    bool GetLoadDiallingNumResult() const;
-    void SetLoadDiallingNumResult(bool status);
+    bool IsLoadDiallingNumSuccess() const;
+    void SetLoadDiallingNumStatus(bool status);
 
 protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
@@ -72,7 +72,7 @@ private:
     using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     bool isProcessingPbr = false;
-    bool isLoadDiallingNumResult_ = false;
+    bool isLoadDiallingNumSuccess_ = true;
     std::map<int, std::vector<std::shared_ptr<DiallingNumbersInfo>>> adns_;
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
