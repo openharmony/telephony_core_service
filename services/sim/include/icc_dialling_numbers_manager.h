@@ -44,7 +44,7 @@ public:
     int32_t AddIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     int32_t DelIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
     int32_t UpdateIccDiallingNumbers(int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber);
-    void Init();
+    void Init(int slotId);
     static std::shared_ptr<IccDiallingNumbersManager> CreateInstance(
         std::weak_ptr<SimFileManager> simFile, std::shared_ptr<SimStateManager> simState);
     enum class HandleRunningState {
@@ -65,6 +65,7 @@ private:
     std::mutex queryMtx_;
     bool hasEventDone_ = false;
     bool hasQueryEventDone_ = false;
+    int slotId_;
     std::condition_variable processWait_;
     SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;
     void ProcessSimStateChanged();
