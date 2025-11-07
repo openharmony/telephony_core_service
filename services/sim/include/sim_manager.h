@@ -38,7 +38,7 @@ const int32_t SIM_IO_DATA_P1_OFFSET = 0;
 const int32_t SIM_IO_DATA_P2_OFFSET = 2;
 const int32_t SIM_IO_DATA_P3_OFFSET = 4;
 const int32_t SIM_IO_HEX_SIGN = 16;
-class SimManager : public ISimManager {
+class SimManager : public std::enable_shared_from_this<SimManager>, public ISimManager {
 public:
     explicit SimManager(std::shared_ptr<ITelRilManager> telRilManager);
     virtual ~SimManager();
@@ -145,6 +145,7 @@ public:
         int slotId, int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber) override;
     int32_t QueryIccDiallingNumbers(
         int slotId, int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result) override;
+    void RefreshCache(int slotId);
     // Event register
     void RegisterCoreNotify(int32_t slotId, const HANDLE &handler, int what) override;
     void UnRegisterCoreNotify(int32_t slotId, const HANDLE &observerCallBack, int what) override;
