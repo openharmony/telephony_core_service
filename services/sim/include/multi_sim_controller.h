@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Telephony {
+class SimManager;
 class MultiSimController : public TelEventHandler {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
@@ -42,6 +43,7 @@ public:
         std::shared_ptr<Telephony::SimFileManager> simFileManager);
 
     void Init();
+    void SetSimManagerPtr(std::weak_ptr<SimManager> simManager);
     bool InitData(int32_t slotId);
     bool InitEsimData();
     int32_t GetDefaultVoiceSlotId();
@@ -120,7 +122,7 @@ private:
     int32_t InsertData(int slotId, const std::string &newIccId);
     void SortCache();
     void SortAllCache();
-    void ProcessAdvanceLoadPbr();
+    void RefreshSimManagerCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
     bool AnnouncePrimarySimIdChanged(int32_t simId);
@@ -189,6 +191,7 @@ private:
     ffrt::shared_mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
+    std::weak_ptr<SimManager> simManager_;
     std::vector<int> setPrimarySlotRemainCount_;
     std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
     ffrt::mutex setPrimarySlotToRilMutex_;
