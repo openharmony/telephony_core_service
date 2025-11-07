@@ -139,7 +139,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, TestSize.Level0
     auto deviceStateObserver = std::make_shared<DeviceStateObserver>();
 
     deviceStateObserver->subscriber_ = nullptr;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+    #ifdef TETHER_NETWORKSHARE
     deviceStateObserver->sharingEventCallback_ = nullptr;
 #endif
     deviceStateObserver->StopEventSubscriber();

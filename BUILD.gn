@@ -251,6 +251,11 @@ ohos_shared_library("tel_core_service") {
     defines += [ "HICOLLIE_ENABLE" ]
   }
 
+  if (core_service_feature_networkshare) {
+    external_deps += [ "netmanager_ext:net_tether_manager_if" ]
+    defines += [ "TETHER_NETWORKSHARE" ]
+  }
+
   part_name = "core_service"
   subsystem_name = "telephony"
-}
+ }
