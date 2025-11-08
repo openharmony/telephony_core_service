@@ -65,6 +65,7 @@ HWTEST_F(SimManagerBranchTest, Telephony_SimManager_002, Function | MediumTest |
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->RefreshCache(0);
     simManager->OnInit(DUAL_SLOT_COUNT);
     std::u16string testStr = u"";
     simManager->simFileManager_[0] = nullptr;
