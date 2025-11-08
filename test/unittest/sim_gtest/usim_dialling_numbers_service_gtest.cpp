@@ -54,12 +54,12 @@ void UsimDiallingNumbersServiceTest::SetUp() {}
 
 void UsimDiallingNumbersServiceTest::TearDown() {}
 
-HWTEST_F(UsimDiallingNumbersServiceTest, SetLoadDiallingNumResult001, Function | MediumTest | Level1)
+HWTEST_F(UsimDiallingNumbersServiceTest, SetLoadDiallingNumStatus001, Function | MediumTest | Level1)
 {
     auto service = std::make_shared<UsimDiallingNumbersService>();
-    service->SetLoadDiallingNumResult(true);
+    service->SetLoadDiallingNumStatus(true);
 
-    auto xresult = service->GetLoadDiallingNumResult();
+    auto xresult = service->IsLoadDiallingNumSuccess();
     EXPECT_TRUE(xresult);
 }
 
@@ -165,6 +165,15 @@ HWTEST_F(UsimDiallingNumbersServiceTest, ProcessDiallingNumberLoadDone001, Funct
     resultObject1->exception = exception;
     exception->error = ErrType::ERR_GENERIC_FAILURE;
     event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, resultObject1);
+    service->ProcessDiallingNumberLoadDone(event);
+
+    resultObject1 = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
+    resultObject1->fileID = 1;
+    exception = std::make_shared<RadioResponseInfo>();
+    resultObject1->exception = exception;
+    exception->error = ErrType::ERR_GENERIC_FAILURE;
+    event = AppExecFwk::InnerEvent::Get(MSG_USIM_ADN_LOAD_DONE, resultObject1);
+    service->reLoadNum_ = 1;
     service->ProcessDiallingNumberLoadDone(event);
 
     auto resultObject2 = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
