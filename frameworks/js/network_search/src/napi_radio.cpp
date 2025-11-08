@@ -3061,7 +3061,7 @@ static napi_value InitEnumRadioType(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY(
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
         DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
-                NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
