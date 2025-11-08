@@ -84,7 +84,6 @@ void UsimDiallingNumbersService::ReLoadPbrFile()
 void UsimDiallingNumbersService::ReLoadAdnFile(size_t recId)
 {
     ++reLoadNum_;
-    std::unique_lock<std::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         return;
     }
