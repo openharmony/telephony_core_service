@@ -358,9 +358,9 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
     diallingNumbersCache->usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>();
-    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumResult(false);
+    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumStatus(false);
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
-    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumResult(true);
+    diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumStatus(true);
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
     diallingNumbersCache->ProcessObtainAdnDetailsDone(response);
     diallingNumbersCache->ProcessChangeDiallingNumbersDone(response);
@@ -526,13 +526,13 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_001, Function | M
     auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_RUNNING;
-    iccDiallingNumbersManager->Init();
+    iccDiallingNumbersManager->Init(0);
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_NOT_START;
-    iccDiallingNumbersManager->Init();
+    iccDiallingNumbersManager->Init(0);
     simFileManager = nullptr;
     iccDiallingNumbersManager->simFileManager_ = simFileManager;
     iccDiallingNumbersManager->stateDiallingNumbers_ = IccDiallingNumbersManager::HandleRunningState::STATE_NOT_START;
-    iccDiallingNumbersManager->Init();
+    iccDiallingNumbersManager->Init(0);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(1, 1);
     event = nullptr;
     iccDiallingNumbersManager->ProcessEvent(event);
@@ -568,7 +568,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_003, Function | M
     auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto iccDiallingNumbersManager = IccDiallingNumbersManager::CreateInstance(simFileManager, simStateManager);
     iccDiallingNumbersManager->ProcessSimStateChanged();
-    iccDiallingNumbersManager->Init();
+    iccDiallingNumbersManager->Init(0);
     iccDiallingNumbersManager->ProcessEvent(AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, 1));
     iccDiallingNumbersManager->ProcessSimStateChanged();
     std::shared_ptr<DiallingNumbersInfo> diallingNumber =
