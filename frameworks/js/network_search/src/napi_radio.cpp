@@ -80,6 +80,8 @@ static int32_t WrapRadioTech(int32_t radioTechType)
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN);
         case RadioTech::RADIO_TECHNOLOGY_NR:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR);
+        case RadioTech::RADIO_TECHNOLOGY_NR_ENHANCED:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED);
         default:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
     }
@@ -3058,6 +3060,8 @@ static napi_value InitEnumRadioType(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
+        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
+                NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -3347,6 +3351,8 @@ static napi_value CreateRadioType(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
+        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "RadioTechnology", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
