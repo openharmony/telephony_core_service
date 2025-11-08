@@ -258,4 +258,4 @@ ohos_shared_library("tel_core_service") {
 
   part_name = "core_service"
   subsystem_name = "telephony"
- }
+}
