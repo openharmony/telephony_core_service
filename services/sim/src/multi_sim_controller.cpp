@@ -28,6 +28,7 @@
 #include "parameters.h"
 #include "sim_data.h"
 #include "sim_utils.h"
+#include "sim_manager.h"
 #include "string_ex.h"
 #include "telephony_ext_wrapper.h"
 
@@ -1268,19 +1269,23 @@ void MultiSimController::SetPrimarySlotIdDone(bool isUserSet)
     // trigger to obtain sim card status
     if (!isUserSet) {
         ObtainDualSimCardStatus();
-        ProcessAdvanceLoadPbr();
+        RefreshSimManagerCache();
     }
 }
 
-void MultiSimController::ProcessAdvanceLoadPbr()
+void MultiSimController::RefreshSimManagerCache()
 {
-    std::thread t([] {
-        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+    auto simManager = simManager_.lock();
+    if (simManager != nullptr) {
         for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-            CoreManagerInner::GetInstance().QueryIccDiallingNumbers(i, DiallingNumbersInfo::SIM_ADN, result);
+            simManager->RefreshCache(i);
         }
-    });
-    t.detach();
+    }
+}
+
+void MultiSimController::SetSimManagerPtr(std::weak_ptr<SimManager> simManager)
+{
+    simManager_ = simManager;
 }
 
 void MultiSimController::ObtainDualSimCardStatus()
