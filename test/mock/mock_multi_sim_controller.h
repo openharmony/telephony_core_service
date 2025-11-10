@@ -85,6 +85,7 @@ public:
     MOCK_METHOD1(InitIccId, bool(int32_t slotId));
     MOCK_METHOD2(GetAllSimAccountInfoList, int32_t(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList));
     MOCK_METHOD3(InsertEsimData, int32_t(const std::string &iccId, int32_t esimLabel, const std::string &operatorName));
+    MOCK_METHOD2(GetSimLabel, int32_t(int32_t slotId, SimLabel &simLabel));
     MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &iccId, int32_t &labelIndex));
 };
 } // namespace Telephony

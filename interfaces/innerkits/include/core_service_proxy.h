@@ -154,6 +154,7 @@ public:
     int32_t GetSimIO(int32_t slotId, int32_t command, int32_t fileId,
         const std::string &data, const std::string &path, SimAuthenticationResponse &response) override;
     int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) override;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;

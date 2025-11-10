@@ -147,6 +147,7 @@ private:
     int32_t OnGetOpkeyVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetOpnameVersion(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSimIO(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSimLabel(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetAllSimAccountInfoList(MessageParcel &data, MessageParcel &reply);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);

@@ -1635,6 +1635,19 @@ int32_t SimManager::GetDefaultMainSlotByIccId()
     return multiSimController_->GetDefaultMainSlotByIccId();
 }
 
+int32_t SimManager::GetSimLabel(int32_t slotId, SimLabel &simLabel)
+{
+    if (!HasSimCardInner(slotId)) {
+        simLabel.index = slotId + 1;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return INVALID_VALUE;
+    }
+    return multiSimController_->GetSimLabel(slotId, simLabel);
+}
+
 int32_t SimManager::InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName)
 {
     if (multiSimController_ == nullptr) {
