@@ -65,7 +65,6 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
         "SubscribeSystemAbility COMMON_EVENT_SERVICE_ID(result:%{public}d) POWER_MANAGER_SERVICE_ID(result:%{public}d) "
         "POWER_MANAGER_BATT_SERVICE_ID(result:%{public}d) COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID(result:%{public}d)",
         commonEventResult, powerManagerResult, powerManagerBattResult, netManagerResult);
-#endif
 }
 
 void DeviceStateObserver::StopEventSubscriber()
@@ -220,15 +219,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
         }
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         case COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID: {
-            auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
-            if (networkShareClient == nullptr) {
-                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
-                return;
-            }
-            int32_t isSharing = 0;
-            networkShareClient->IsSharing(isSharing);
-            sub_->GetEventHandler()->ProcessNetSharingState(isSharing == NetManagerStandard::NETWORKSHARE_IS_SHARING);
-            networkShareClient->RegisterSharingEvent(callback_);
+            HandleNetmanagerExtSysAbility();
             break;
         }
 #endif
@@ -236,6 +227,19 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
     }
+}
+
+void DeviceStateObserver::SystemAbilityStatusChangeListener::HandleNetmanagerExtSysAbility()
+{
+    auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
+    if (networkShareClient == nullptr) {
+        TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
+        return;
+    }
+    int32_t isSharing = 0;
+    networkShareClient->IsSharing(isSharing);
+    sub_->GetEventHandler()->ProcessNetSharingState(isSharing == NetManagerStandard::NETWORKSHARE_IS_SHARING);
+    networkShareClient->RegisterSharingEvent(callback_);
 }
 
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
