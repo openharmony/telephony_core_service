@@ -102,11 +102,11 @@ private:
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT        
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
 #endif
     };
-}; 
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // NETWORK_SEARCH_DEVICE_STATE_OBSERVER_H
