@@ -21,7 +21,7 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
-#ifdef TETHER_NETWORKSHARE
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 #include "sharing_event_callback_stub.h"
 #endif
 #include "net_all_capabilities.h"
@@ -57,7 +57,7 @@ private:
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_;
 };
 
-#ifdef TETHER_NETWORKSHARE
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 class SharingEventCallback : public NetManagerStandard::SharingEventCallbackStub {
 public:
     explicit SharingEventCallback(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
@@ -81,7 +81,7 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
-#ifdef TETHER_NETWORKSHARE
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
 #endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
@@ -90,7 +90,7 @@ private:
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
-        #ifdef TETHER_NETWORKSHAR
+        #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
             sptr<NetManagerStandard::ISharingEventCallback> &callback);
         #else
@@ -102,7 +102,7 @@ private:
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
-#ifdef TETHER_NETWORKSHARE        
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT        
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
 #endif
     };
