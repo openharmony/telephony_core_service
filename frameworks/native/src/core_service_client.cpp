@@ -1710,6 +1710,45 @@ int32_t CoreServiceClient::GetAllSimAccountInfoList(std::vector<IccAccountInfo> 
     return proxy->GetAllSimAccountInfoList(iccAccountInfoList);
 }
 
+int32_t CoreServiceClient::GetSimLabel(int32_t slotId, SimLabel &simLabel, int64_t timeoutMs)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    auto simLabelTp = std::make_shared<SimLabel>();
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback =
+        sptr<RawParcelCallbackStub>::MakeSptr([wpSimLabel = std::weak_ptr<SimLabel>(simLabelTp),
+                                                  wpRet = std::weak_ptr<int32_t>(result)](MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            auto spSimLabel = wpSimLabel.lock();
+            if (spRet == nullptr && spSimLabel == nullptr) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+            if (*spRet == TELEPHONY_ERR_SUCCESS) {
+                spSimLabel->simType = static_cast<SimType>(data.ReadInt32());
+                spSimLabel->index = data.ReadInt32();
+            }
+        });
+    int ret = proxy->GetSimLabel(slotId, simLabel, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("conect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if ((!ret)) {
+        TELEPHONY_LOGE("GetSimLabel wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (*result == TELEPHONY_ERR_SUCCESS) {
+        simLabel = *simLabelTp;
+    }
+    return *result;
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreServiceClient::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
