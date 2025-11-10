@@ -18,6 +18,7 @@
 #ifdef ABILITY_BATTERY_SUPPORT
 #include "battery_srv_client.h"
 #endif
+#include "iservice_registry.h"
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
