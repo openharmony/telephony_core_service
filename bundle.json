@@ -138,7 +138,6 @@
                     "name": "//base/telephony/core_service/frameworks/cj/telephony_sim:cj_sim_ffi"
                 },
                 {
-                    "type": "none",
                     "name": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked"
                 }
             ],
