@@ -99,6 +99,7 @@ private:
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        void HandleNetmanagerExtSysAbility();
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
