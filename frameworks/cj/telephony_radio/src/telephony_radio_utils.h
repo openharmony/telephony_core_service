@@ -167,9 +167,14 @@ namespace Telephony {
         RADIO_TECHNOLOGY_NR = 12,
 
         /**
-         * Indicates the max value.
-         */
-        RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_NR,
+        * Indicates that RAT is 5G new radio (NR) enhanced.
+        */
+        RADIO_TECHNOLOGY_NR_ENHANCED = 13,
+
+        /**
+        * Indicates the max value.
+        */
+        RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_NR_ENHANCED,
     };
 
     enum class NsaState : int32_t {
