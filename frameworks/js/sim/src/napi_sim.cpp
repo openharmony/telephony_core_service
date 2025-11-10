@@ -2993,6 +2993,73 @@ napi_value GetAllSimAccountInfoList(napi_env env, napi_callback_info info)
     return result;
 }
 
+void NativeGetSimLabel(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncSimLabelInfo *asyncContext = static_cast<AsyncSimLabelInfo *>(data);
+    if (!IsValidSlotId(asyncContext->asyncContext.slotId)) {
+        TELEPHONY_LOGE("slotId is invalid");
+        asyncContext->asyncContext.context.errorCode = ERROR_SLOT_ID_INVALID;
+        return;
+    }
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(
+        asyncContext->asyncContext.slotId, asyncContext->simLabel);
+    if (errorCode == ERROR_NONE) {
+        asyncContext->asyncContext.context.resolved = true;
+    } else {
+        asyncContext->asyncContext.context.resolved = false;
+    }
+    asyncContext->asyncContext.context.errorCode = errorCode;
+}
+
+void GetSimLabelCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr) ? napi_invalid_arg : napi_ok);
+    std::unique_ptr<AsyncSimLabelInfo> context(static_cast<AsyncSimLabelInfo *>(data));
+    AsyncContext<napi_value> &asyncContext = context->asyncContext;
+    if (asyncContext.context.resolved) {
+        napi_value value = nullptr;
+        napi_create_object(env, &value);
+        NapiUtil::SetPropertyInt32(env, value, "simType", static_cast<int32_t>(context->simLabel.simType));
+        NapiUtil::SetPropertyInt32(env, value, "index", context->simLabel.index);
+        asyncContext.callbackVal = value;
+    }
+    TELEPHONY_LOGI("GetSimLabelCallback end");
+}
+
+napi_value GetSimLabel(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("GetSimLabel start");
+    return NapiCreateAsyncWork<int32_t, NativeGetSimLabel, GetSimLabelCallback>(env, info, "GetSimLabel");
+}
+
+napi_value GetSimLabelSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 1;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    SimLabel simLabel;
+    napi_value value = nullptr;
+    napi_create_object(env, &value);
+    if (parameterCount != 1) {
+        TELEPHONY_LOGE("parameter count is incorrect");
+        return value;
+    }
+    int32_t slotId = -1;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("convert parameter fail");
+        return value;
+    }
+    if (IsValidSlotId(slotId)) {
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(slotId, simLabel);
+    }
+    NapiUtil::SetPropertyInt32(env, value, "simType", static_cast<int32_t>(simLabel.simType));
+    NapiUtil::SetPropertyInt32(env, value, "index", simLabel.index);
+    return value;
+}
+
 napi_status InitEnumSimState(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3266,6 +3333,8 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDsdsMode", GetDsdsMode),
         DECLARE_NAPI_FUNCTION("getSimAuthentication", GetSimAuthentication),
         DECLARE_NAPI_FUNCTION("getAllSimAccountInfoList", GetAllSimAccountInfoList),
+        DECLARE_NAPI_FUNCTION("getSimLabel", GetSimLabel),
+        DECLARE_NAPI_FUNCTION("getSimLabelSync", GetSimLabelSync),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
