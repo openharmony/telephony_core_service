@@ -217,7 +217,8 @@ ohos_shared_library("tel_core_service") {
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.communication_netmanager_ext) &&
-      global_parts_info.communication_netmanager_ext) {
+      global_parts_info.communication_netmanager_ext &&
+      core_service_feature_networkshare) {
     external_deps += [ "netmanager_ext:net_tether_manager_if" ]
     defines += [ "ABILITY_NETMANAGER_EXT_SUPPORT" ]
   }
@@ -249,11 +250,6 @@ ohos_shared_library("tel_core_service") {
   if (telephony_hicollie_able) {
     external_deps += [ "hicollie:libhicollie" ]
     defines += [ "HICOLLIE_ENABLE" ]
-  }
-
-  if (core_service_feature_networkshare) {
-    external_deps += [ "netmanager_ext:net_tether_manager_if" ]
-    defines += [ "TETHER_NETWORKSHARE" ]
   }
 
   part_name = "core_service"
