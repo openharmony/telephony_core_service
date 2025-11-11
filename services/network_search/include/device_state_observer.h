@@ -87,21 +87,26 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     ffrt::mutex callbackMutex_;
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
             sptr<NetManagerStandard::ISharingEventCallback> &callback);
+#else
+        SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
+#endif
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+        void HandleNetmanagerExtSysAbility();
 
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
-    };
 #endif
+    };
 };
 } // namespace Telephony
 } // namespace OHOS
