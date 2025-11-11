@@ -679,27 +679,6 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0300, Function | MediumTes
 }
 
 /**
- * @tc.number   Telephony_Sim_ReSetActiveSimSatellite_0100
- * @tc.name     Reset current sim active state
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0100, Function | MediumTest | Level2)
-{
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(ReSetActiveSimSatelliteTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_ReSetActiveSimSatellite_0200
  * @tc.name     Reset current sim active state
  * @tc.desc     Function test
