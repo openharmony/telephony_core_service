@@ -23,7 +23,7 @@ config("ffrt_mocked_config") {
   ]
 }
 
-ohos_static_library("ffrt_mocked") {
+ohos_shared_headers("ffrt_mocked") {
   use_exceptions = true
   branch_protector_ret = "pac_ret"
   public_configs = [ ":ffrt_mocked_config" ]
