@@ -2095,14 +2095,6 @@ int32_t CoreService::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAc
 
 int32_t CoreService::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback)
 {
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Failed because no permission:GET_TELEPHONY_STATE");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
