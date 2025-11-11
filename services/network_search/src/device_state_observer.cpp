@@ -229,6 +229,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     }
 }
 
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 void DeviceStateObserver::SystemAbilityStatusChangeListener::HandleNetmanagerExtSysAbility()
 {
     auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
@@ -255,6 +256,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbili
     }
     CoreManagerInner::GetInstance().UnregisterCommonEventCallback(sub_);
 }
+#endif
 
 #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 SharingEventCallback::SharingEventCallback(
