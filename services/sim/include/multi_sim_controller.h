@@ -172,6 +172,7 @@ private:
     std::vector<IccAccountInfo> allIccAccountInfoList_;
     std::vector<SimRdbInfo> allLocalCacheInfo_;
     ffrt::mutex mutex_;
+    ffrt::shared_mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;
