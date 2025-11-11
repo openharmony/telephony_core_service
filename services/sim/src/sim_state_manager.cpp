@@ -650,7 +650,6 @@ int32_t SimStateManager::NotifySimSlotsMapping(int32_t slotId)
 void SimStateManager::SetInSenseSwitchPhase(bool flag)
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->SetInSenseSwitchPhase(flag);
@@ -659,7 +658,6 @@ void SimStateManager::SetInSenseSwitchPhase(bool flag)
 void SimStateManager::ObtainIccStatus()
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->ObtainIccStatus();
@@ -677,7 +675,6 @@ int32_t SimStateManager::SetIccCardState(int32_t slotId, int32_t simStatus)
 void SimStateManager::UpdateSimStateToStateRegistry()
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->UpdateSimStateToStateRegistry();
