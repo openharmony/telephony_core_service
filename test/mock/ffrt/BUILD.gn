@@ -17,8 +17,6 @@ SUBSYSTEM_DIR = "../../../../"
 import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 ohos_shared_headers("ffrt_mocked") {
-  use_exceptions = true
-  branch_protector_ret = "pac_ret"
   include_dirs =  [
     "./kits",
     "./inner_api"
