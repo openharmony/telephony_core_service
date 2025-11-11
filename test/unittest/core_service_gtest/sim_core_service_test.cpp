@@ -183,6 +183,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0300, Function | MediumTest | Level3
     bool hasValue = false;
     EXPECT_NE(mCoreService->HasSimCard(0, callback0), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->HasOperatorPrivileges(0, callback0), TELEPHONY_ERR_SUCCESS);
+    SimLabel simLabel;
+    auto callback1 = sptr<MockRawParcelCallback>::MakeSptr();
+    EXPECT_NE(mCoreService->GetSimLabel(0, simLabel, callback1), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -310,6 +313,9 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     EXPECT_NE(mCoreService->GetSimId(0), TELEPHONY_ERR_SUCCESS);
     int32_t dsdsMode = INVALID_VALUE;
     EXPECT_NE(mCoreService->GetDsdsMode(dsdsMode), TELEPHONY_ERR_SUCCESS);
+    SimLabel simLabel;
+    auto callback1 = sptr<MockRawParcelCallback>::MakeSptr();
+    EXPECT_NE(mCoreService->GetSimLabel(0, simLabel, callback1), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

@@ -90,6 +90,7 @@ public:
     int32_t GetDefaultMainSlotByIccId();
     bool IsEsim(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
+    int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
 
 public:
@@ -171,6 +172,7 @@ private:
     std::vector<IccAccountInfo> allIccAccountInfoList_;
     std::vector<SimRdbInfo> allLocalCacheInfo_;
     ffrt::mutex mutex_;
+    ffrt::shared_mutex GetSimLabelMutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::vector<int> setPrimarySlotRemainCount_;

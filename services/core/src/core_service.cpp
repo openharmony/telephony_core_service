@@ -2093,6 +2093,31 @@ int32_t CoreService::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAc
     return simManager_->GetAllSimAccountInfoList(denied, iccAccountInfoList);
 }
 
+int32_t CoreService::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
+        SimLabel simLabel;
+        MessageParcel dataTmp;
+        auto simManager = wp.lock();
+        int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        if (simManager) {
+            ret = simManager->GetSimLabel(slotId, simLabel);
+        }
+        callback->Transfer([=](MessageParcel &data) {
+            data.WriteInt32(ret);
+            if (ret == TELEPHONY_ERR_SUCCESS) {
+                data.WriteInt32(static_cast<int32_t>(simLabel.simType));
+                data.WriteInt32(simLabel.index);
+            }
+            }, dataTmp);
+    });
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 int32_t CoreService::SendApduData(
     int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult)
