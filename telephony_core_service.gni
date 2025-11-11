@@ -23,6 +23,7 @@ declare_args() {
       defined(global_parts_info.core_service_support_esim)) {
     core_service_support_esim = true
   }
+  core_service_feature_networkshare = true
 }
 
 telephony_extra_defines = []
