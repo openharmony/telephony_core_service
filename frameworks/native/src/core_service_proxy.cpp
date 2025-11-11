@@ -3325,6 +3325,38 @@ int32_t CoreServiceProxy::GetAllSimAccountInfoList(std::vector<IccAccountInfo> &
     return result;
 }
 
+int32_t CoreServiceProxy::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSimLabel WriteInterfaceToken is false");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSimLabel Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_SIM_LABEL), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetSimLabel failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = reply.ReadInt32();
+    if (result == TELEPHONY_ERR_SUCCESS) {
+        simLabel.simType = static_cast<SimType>(reply.ReadInt32());
+        simLabel.index = reply.ReadInt32();
+    }
+    return result;
+}
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 bool CoreServiceProxy::WriteEsimApduData(MessageParcel &data, const EsimApduData &apduData)
 {

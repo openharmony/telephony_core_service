@@ -44,6 +44,11 @@ static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const int32_t MODEM_ID_0 = 0;
 static const int32_t MODEM_ID_1 = 1;
 static const int32_t CARD_ATR_LEN = 65;
+constexpr int32_t OCT_TYPE = 10;
+static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
+static const std::string TYPE_ESIM_ONLY = "6";
+static const std::string LAST_DEACTIVE_PROFILE = "persist.telephony.last_deactive_profile";
+constexpr int32_t ESIM1 = 1;
 const int32_t SYSTEM_PARAMETER_LENGTH = 128;
 constexpr int32_t IS_ESIM = 1;
 constexpr int32_t PSIM1 = 1;
@@ -460,6 +465,46 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
         return TELEPHONY_ERR_SUCCESS;
     }
     return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+}
+
+int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
+{
+    std::string esimType = OHOS::system::GetParameter(ESIM_SUPPORT_PARAM, "");
+    if (esimType == TYPE_ESIM_ONLY && slotId == SIM_SLOT_0) {
+        simLabel.simType = SimType::ESIM;
+        simLabel.index = ESIM1;
+        return TELEPHONY_ERR_SUCCESS;
+    }
+    int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
+    simLabel.simType = SimType::PSIM;
+    simLabel.index = PSIM1;
+    if (IsEsim(slotId)) {
+        simLabel.simType = SimType::ESIM;
+        std::shared_lock<ffrt::shared_mutex> lock(GetSimLabelMutex_);
+        if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
+            TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
+            return TELEPHONY_ERR_SUCCESS;
+        }
+        if (localCacheInfo_[slotId].iccId.empty()) {
+            OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "");
+            int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, OCT_TYPE);
+            if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
+                simLabel.index = ESIM1;
+            } else if (allLocalCacheInfo_[simId - 1].simLabelIndex > 0) {
+                simLabel.index = allLocalCacheInfo_[simId - 1].simLabelIndex;
+            } else {
+                simLabel.index = ESIM1;
+            }
+        } else {
+            simLabel.index = localCacheInfo_[slotId].simLabelIndex;
+        }
+    } else {
+        if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
+            simLabel.index = PSIM2;
+        }
+    }
+    TELEPHONY_LOGI("GetSimLabel simLabel.index = %{public}d", simLabel.index);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool MultiSimController::InitShowNumber(int slotId)

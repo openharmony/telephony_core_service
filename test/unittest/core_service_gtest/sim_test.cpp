@@ -1434,6 +1434,19 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimId_0100, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   Telephony_Sim_GetSimLabel_0100
+ * @tc.name     Get sim Label
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimTest, Telephony_Sim_GetSimLabel_0100, Function | MediumTest | Level3)
+{
+    int32_t slotId = 0;
+    SimLabel simLabel;
+    int32_t result = CoreServiceClient::GetInstance().GetSimLabel(slotId, simLabel);
+    EXPECT_GT(result, 0);
+}
+
+/**
  * @tc.number   Telephony_Sim_GetSimEons_0100
  * @tc.name     Get sim eons
  * @tc.desc     Function test
