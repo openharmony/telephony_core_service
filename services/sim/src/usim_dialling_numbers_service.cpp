@@ -115,6 +115,7 @@ void UsimDiallingNumbersService::ProcessPbrLoadDone(const AppExecFwk::InnerEvent
             isProcessingPbr = false;
             std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> list =
                 std::make_shared<std::vector<std::shared_ptr<DiallingNumbersInfo>>>();
+            isLoadDiallingNumResult_ = false;
             SendBackResult(list);
         }
         return;
@@ -159,7 +160,12 @@ void UsimDiallingNumbersService::ProcessDiallingNumberLoadDone(const AppExecFwk:
         auto exception = std::static_pointer_cast<RadioResponseInfo>(resultObject->exception);
         TELEPHONY_LOGE("process adn file exception occured, errno: %{public}d",
             static_cast<uint32_t>(exception->error));
-        ReLoadAdnFile(currentIndex_);
+        if (reLoadNum_ < MAX_RETRANSMIT_COUNT) {
+            ReLoadAdnFile(currentIndex_);
+        } else {
+            isLoadDiallingNumResult_ = false;
+            LoadDiallingNumber2Files(currentIndex_);
+        }
         return;
     }
 
@@ -291,7 +297,6 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
 {
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGI("LoadDiallingNumberFiles finish %{public}zu", recId);
-        isLoadDiallingNumResult_ = true;
         ProcessQueryDone();
         return false;
     }
