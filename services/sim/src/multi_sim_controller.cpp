@@ -480,7 +480,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
     simLabel.index = PSIM1;
     if (IsEsim(slotId)) {
         simLabel.simType = SimType::ESIM;
-        std::shared_lock<ffrt::shared_mutex> lock(mutex_);
+        std::shared_lock<ffrt::shared_mutex> lock(GetSimLabelMutex_);
         if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
             TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
             return TELEPHONY_ERR_SUCCESS;
