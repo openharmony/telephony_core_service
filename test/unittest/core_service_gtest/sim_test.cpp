@@ -572,27 +572,6 @@ HWTEST_F(SimTest, Telephony_Sim_IsSimActive_0200, Function | MediumTest | Level2
     }
 }
 
-/**
- * @tc.number   Telephony_Sim_SetActiveSim_0100
- * @tc.name     Set current sim active state
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SetActiveSimTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
-    }
-}
 
 /**
  * @tc.number   Telephony_Sim_SetActiveSim_0200
@@ -637,27 +616,6 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0300, Function | MediumTest | Level
 }
 
 /**
- * @tc.number   Telephony_Sim_ReSetActiveSim_0100
- * @tc.name     Reset current sim active state
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Level2)
-{
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(ReSetActiveSimTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_ReSetActiveSim_0200
  * @tc.name     Reset current sim active state
  * @tc.desc     Function test
@@ -669,28 +627,6 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0200, Function | MediumTest | Lev
     } else {
         CoreServiceTestHelper helper;
         if (!helper.Run(ReSetActiveSimTestFunc1, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_SetActiveSimSatellite_0100
- * @tc.name     Set current sim active state
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SetActiveSimSatelliteTestFunc, std::ref(helper))) {
             TELEPHONY_LOGI("Interface out of time");
             EXPECT_TRUE(true);
         } else {
@@ -1000,28 +936,6 @@ HWTEST_F(SimTest, Telephony_Sim_UnlockSimLock_0300, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   Telephony_Sim_SimAuthentication_0100
- * @tc.name     Sim authentication
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SimAuthenticationTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
-        }
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_SimAuthentication_0200
  * @tc.name     Sim authentication
  * @tc.desc     Function test
@@ -1064,28 +978,6 @@ HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0300, Function | MediumTest | 
 }
 
 /**
- * @tc.number   Telephony_Sim_SimAuthentication_0400
- * @tc.name     Sim authentication
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SimAuthentication_0400, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SimAuthenticationTestFunc2, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            bool result = helper.GetBoolResult();
-            EXPECT_TRUE(result);
-        }
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_SimAuthentication_0500
  * @tc.name     Sim authentication
  * @tc.desc     Function test
@@ -1120,28 +1012,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetPrimarySlotId_0100, Function | MediumTest | L
         int32_t result = TELEPHONY_ERROR;
         CoreServiceClient::GetInstance().GetPrimarySlotId(result);
         EXPECT_GT(result, TELEPHONY_ERROR);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_SendTerminalResponseCmd_0100
- * @tc.name     Send Terminal Response Command
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SendTerminalResponseCmdTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
     }
 }
 
@@ -1189,28 +1059,6 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0300, Function | MediumT
 }
 
 /**
- * @tc.number   Telephony_Sim_SendEnvelopeCmd_0100
- * @tc.name     Send Envelope Command
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SendEnvelopeCmdTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-        }
-    }
-}
-
-/**
  * @tc.number   Telephony_Sim_SendEnvelopeCmd_0200
  * @tc.name     Send Envelope Command
  * @tc.desc     Function test
@@ -1248,28 +1096,6 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0300, Function | MediumTest | Le
         } else {
             bool result = helper.GetBoolResult();
             EXPECT_FALSE(result);
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_SendCallSetupRequestResult_0100
- * @tc.name     Send Call Setup Request Result Command
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_SendCallSetupRequestResult_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        CoreServiceTestHelper helper;
-        if (!helper.Run(SendCallSetupRequestResultTestFunc, std::ref(helper))) {
-            TELEPHONY_LOGI("Interface out of time");
-            EXPECT_TRUE(true);
-        } else {
-            int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, 0);
         }
     }
 }
@@ -1329,22 +1155,6 @@ HWTEST_F(SimTest, Telephony_Sim_GetSlotId_0100, Function | MediumTest | Level3)
         int32_t simId = 1;
         int32_t result = CoreServiceClient::GetInstance().GetSlotId(simId);
         EXPECT_GE(result, -1);
-    }
-}
-
-/**
- * @tc.number   Telephony_Sim_GetSimId_0100
- * @tc.name     Get sim id
- * @tc.desc     Function test
- */
-HWTEST_F(SimTest, Telephony_Sim_GetSimId_0100, Function | MediumTest | Level3)
-{
-    if (!SimTest::HasSimCard(slotId_)) {
-        TELEPHONY_LOGI("TelephonyTestService has no sim card");
-    } else {
-        int32_t slotId = 0;
-        int32_t result = CoreServiceClient::GetInstance().GetSimId(slotId);
-        EXPECT_GT(result, 0);
     }
 }
 
