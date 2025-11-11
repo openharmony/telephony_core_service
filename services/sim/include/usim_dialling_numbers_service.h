@@ -72,7 +72,7 @@ private:
     using ProcessFunc = std::function<void(const AppExecFwk::InnerEvent::Pointer &event)>;
     std::map<int, ProcessFunc> memberFuncMap_;
     bool isProcessingPbr = false;
-    bool isLoadDiallingNumResult_ = false;
+    bool isLoadDiallingNumResult_ = true;
     std::map<int, std::vector<std::shared_ptr<DiallingNumbersInfo>>> adns_;
     std::map<int, std::vector<std::u16string>> anrs_;
     std::map<int, std::vector<std::vector<uint8_t>>> iaps_;
