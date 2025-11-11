@@ -472,9 +472,9 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
 
     EXPECT_FALSE(multiSimController->IsValidSlotId(INVALID_SLOTID));
     multiSimController->maxCount_ = 1;
-    EXPECT_FALSE(multiSimController->InitPrimary());
+    EXPECT_FALSE(multiSimController->InitPrimary(INVALID_SLOTID, false));
     multiSimController->maxCount_ = 2;
-    EXPECT_FALSE(multiSimController->InitPrimary());
+    EXPECT_FALSE(multiSimController->InitPrimary(INVALID_SLOTID, false));
     EXPECT_TRUE(multiSimController->IsAllCardsReady());
     EXPECT_FALSE(multiSimController->IsAllCardsLoaded());
 }
