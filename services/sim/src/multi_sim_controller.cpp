@@ -217,7 +217,7 @@ bool MultiSimController::InitData(int32_t slotId)
     if (!InitShowNumber(slotId)) {
         TELEPHONY_LOGE("InitShowNumber failed");
     }
-    if (InitPrimary()) {
+    if (InitPrimary(slotId, true)) {
         TELEPHONY_LOGI("InitPrimary start");
         CheckIfNeedSwitchMainSlotId();
     }
@@ -254,7 +254,7 @@ bool MultiSimController::InitActive(int slotId)
     return result;
 }
 
-bool MultiSimController::InitPrimary()
+bool MultiSimController::InitPrimary(int32_t slotId, bool isFirstInit)
 {
     if (maxCount_ <= 1) {
         TELEPHONY_LOGI("no need to init");
@@ -264,17 +264,24 @@ bool MultiSimController::InitPrimary()
         TELEPHONY_LOGI("wait for the other modem init");
         return false;
     }
+    if (isFirstInit && !IsSetPrimarySlotReady(slotId)) {
+        TELEPHONY_LOGI("set priamry slot not ready");
+        return false;
+    }
     unInitModemSlotId_ = INVALID_VALUE;
     if (IsAllCardsReady() && !IsAllCardsLoaded()) {
         TELEPHONY_LOGI("wait for the other card ready");
         return false;
+    }
+    if (isFirstInit) {
+        ResetPrimarySlotReady();
     }
     return true;
 }
 
 void MultiSimController::ReCheckPrimary()
 {
-    if (InitPrimary()) {
+    if (InitPrimary(INVALID_VALUE, false)) {
         CheckIfNeedSwitchMainSlotId();
     }
 }
@@ -2041,6 +2048,37 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         ret = simDbHelper_->UpdateSimPresent(INVALID_ICCID, false, INVALID_VALUE);
         GetAllListFromDataBase();
         return ret;
+    }
+}
+
+bool MultiSimController::IsSetPrimarySlotReady(int32_t slotId)
+{
+    if (SIM_SLOT_COUNT == 1) {
+        TELEPHONY_LOGI("slotId %{public}d IsSetPrimarySlotReady Single Card", slotId);
+        return true;
+    }
+    if (simStateManager_[slotId] != nullptr) {
+        simStateManager_[slotId]->SetInitPrimarySlotReady(true);
+    }
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        bool isReady = false;
+        if (simStateManager_[i] != nullptr) {
+            (void)simStateManager_[i]->GetInitPrimarySlotReady(isReady);
+        }
+        if (!isReady) {
+            TELEPHONY_LOGI("slotId %{public}d Set Primary Not Ready, beacuse index[%{public}d]", slotId, i);
+            return false;
+        }
+    }
+    return true;
+}
+ 
+void MultiSimController::ResetPrimarySlotReady()
+{
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        if (simStateManager_[i] != nullptr) {
+            simStateManager_[i]->SetInitPrimarySlotReady(false);
+        }
     }
 }
 } // namespace Telephony
