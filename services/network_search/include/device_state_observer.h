@@ -90,12 +90,12 @@ private:
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
-        #ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
             sptr<NetManagerStandard::ISharingEventCallback> &callback);
-        #else
+#else
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
-        #endif
+#endif
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
