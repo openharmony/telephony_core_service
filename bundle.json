@@ -78,6 +78,9 @@
             ]
         },
         "build": {
+            "sub_component": [ 
+                "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked"
+            ],
             "group_type": {
                 "base_group": [
                     "//base/telephony/core_service/interfaces/kits/c/telephony_radio:telephony_radio"
