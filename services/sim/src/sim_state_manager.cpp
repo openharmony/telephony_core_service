@@ -686,5 +686,23 @@ SimStateManager::~SimStateManager()
         simStateHandle_->UnInit();
     }
 }
+
+int32_t SimStateManager::SetInitPrimarySlotReady(bool isReady)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SetInitPrimarySlotReady(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->SetInitPrimarySlotReady(isReady);
+}
+ 
+int32_t SimStateManager::GetInitPrimarySlotReady(bool& isReady)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("GetInitPrimarySlotReady(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->GetInitPrimarySlotReady(isReady);
+}
 } // namespace Telephony
 } // namespace OHOS

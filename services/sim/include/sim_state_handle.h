@@ -148,6 +148,8 @@ public:
     void ObtainIccStatus();
     void SetInSenseSwitchPhase(bool flag);
     void UpdateSimStateToStateRegistry();
+    int32_t SetInitPrimarySlotReady(bool isReady);
+    int32_t GetInitPrimarySlotReady(bool& isReady);
 
 public:
     bool modemInitDone_ = false;
@@ -203,6 +205,7 @@ private:
     int32_t esimSwitchState_ = 0;
     bool needReupdate_ = false;
     bool isInSenseSwitchPhase_ = false;
+    bool isInitPrimarySlotReady = false;
 };
 } // namespace Telephony
 } // namespace OHOS

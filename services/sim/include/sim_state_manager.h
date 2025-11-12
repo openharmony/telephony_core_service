@@ -69,6 +69,8 @@ public:
     void ObtainIccStatus();
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     void UpdateSimStateToStateRegistry();
+    int32_t SetInitPrimarySlotReady(bool isReady);
+    int32_t GetInitPrimarySlotReady(bool& isReady);
 
 public:
     bool responseReady_ = false;

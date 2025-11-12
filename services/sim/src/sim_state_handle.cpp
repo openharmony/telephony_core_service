@@ -1138,5 +1138,18 @@ int32_t SimStateHandle::SetIccCardState(int32_t slotId, int32_t simStatus)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimStateHandle::SetInitPrimarySlotReady(bool isReady)
+{
+    TELEPHONY_LOGI("SimStateHandle::SetInitPrimarySlotReady [%{public}d]", isReady);
+    isInitPrimarySlotReady = isReady;
+    return TELEPHONY_ERR_SUCCESS;
+}
+ 
+int32_t SimStateHandle::GetInitPrimarySlotReady(bool& isReady)
+{
+    isReady = isInitPrimarySlotReady;
+    TELEPHONY_LOGI("SimStateHandle::GetInitPrimarySlotReady [%{public}d]", isReady);
+    return TELEPHONY_ERR_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
