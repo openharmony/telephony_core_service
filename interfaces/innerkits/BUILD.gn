@@ -127,6 +127,7 @@ ohos_shared_library("tel_core_service_api") {
   }
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:want",
     "ability_runtime:data_ability_helper",
     "ability_runtime:wantagent_innerkits",
