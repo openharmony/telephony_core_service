@@ -330,7 +330,7 @@ std::string VCardDecoderV21::GetNonEmptyLine()
 void VCardDecoderV21::BuildRawData(const std::string &line, std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
 {
     int32_t length = static_cast<int32_t>(line.length());
-    if (length >= 0 && line[0] == '#') {
+    if (length > 0 && line[0] == '#') {
         TELEPHONY_LOGE("line is invalid");
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return;
@@ -739,7 +739,7 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
     str += value;
     while (true) {
         std::string line = PeekLine();
-        if (line[0] != ' ') {
+        if (!line.empty() && line[0] != ' ') {
             break;
         }
         std::string nameUp = getUpperName(line);
