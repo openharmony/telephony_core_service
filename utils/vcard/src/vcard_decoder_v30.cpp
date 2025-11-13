@@ -63,7 +63,9 @@ std::string VCardDecoderV30::GetNonEmptyLine()
                 ret += preLine_;
                 preLine_ = "";
             }
-            ret += line.substr(1);
+            if (line.length() > 1) {
+                ret += line.substr(1);
+            }
             continue;
         }
         std::string tempPreLine = preLine_;
