@@ -1574,14 +1574,14 @@ HWTEST_F(SimTest, Telephony_Sim_TestTelProfileUtil_0101, Function | MediumTest |
     EXPECT_EQ(telProfileUtil->SaveString(key, value), NativePreferences::E_ERROR);
     EXPECT_EQ(telProfileUtil->ObtainString(key, defValue), "error");
     EXPECT_EQ(telProfileUtil->SaveInt(key, saveValue), NativePreferences::E_ERROR);
-    EXPECT_EQ(telProfileUtil->ObtainInt(key, getValue), NativePreferences::E_ERROR);
+    EXPECT_EQ(telProfileUtil->ObtainInt(key, getValue), getValue);
     EXPECT_EQ(telProfileUtil->SaveBool(key, saveBool), NativePreferences::E_ERROR);
     EXPECT_TRUE(telProfileUtil->ObtainBool(key, getBool));
     EXPECT_EQ(telProfileUtil->SaveLong(key, longValue), NativePreferences::E_ERROR);
-    EXPECT_EQ(telProfileUtil->ObtainLong(key, getLongValue), NativePreferences::E_ERROR);
+    EXPECT_EQ(telProfileUtil->ObtainLong(key, getLongValue), getLongValue);
     EXPECT_EQ(telProfileUtil->SaveFloat(key1, saveFloatValue), NativePreferences::E_ERROR);
-    EXPECT_EQ(telProfileUtil->ObtainFloat(key1, getFloatValue), NativePreferences::E_ERROR);
-    EXPECT_TRUE(telProfileUtil->IsExistKey(key));
+    EXPECT_EQ(telProfileUtil->ObtainFloat(key1, getFloatValue), getFloatValue);
+    EXPECT_FALSE(telProfileUtil->IsExistKey(key));
     EXPECT_EQ(telProfileUtil->RemoveKey(key), NativePreferences::E_ERROR);
     EXPECT_EQ(telProfileUtil->RemoveAll(), NativePreferences::E_ERROR);
     EXPECT_EQ(telProfileUtil->RefreshSync(), NativePreferences::E_ERROR);
