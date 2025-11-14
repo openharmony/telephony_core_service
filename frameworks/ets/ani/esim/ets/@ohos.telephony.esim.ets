@@ -23,7 +23,7 @@ export default namespace eSIM {
   export function resetMemory(slotId: int, options?:ResetOption): Promise<ResultCode> {
     return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeResetMemory, slotId, options)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as ResultCode
           resolve(r)
         }).catch((e: Error): void => {
@@ -43,7 +43,7 @@ export default namespace eSIM {
   export function addProfile(profile: DownloadableProfile): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       let p = taskpool.execute(nativeAddProfile, profile)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as boolean
           resolve(r)
         }).catch((e: Error): void => {
@@ -57,7 +57,7 @@ export default namespace eSIM {
   export function getEid(slotId: int): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       let p = taskpool.execute(nativeGetEid, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as string
           resolve(r)
         }).catch((e: Error): void => {
@@ -71,7 +71,7 @@ export default namespace eSIM {
   export function getOsuStatus(slotId: int): Promise<OsuStatus> {
     return new Promise<OsuStatus>((resolve, reject) => {
       let p = taskpool.execute(nativeGetOsuStatus, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as OsuStatus
           resolve(r)
         }).catch((e: Error): void => {
@@ -85,7 +85,7 @@ export default namespace eSIM {
   export function startOsu(slotId: int): Promise<OsuStatus> {
     return new Promise<OsuStatus>((resolve, reject) => {
       let p = taskpool.execute(nativeStartOsu, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as OsuStatus
           resolve(r)
         }).catch((e: Error): void => {
@@ -101,7 +101,7 @@ export default namespace eSIM {
     profile: DownloadableProfile, forceDisableProfile: boolean): Promise<GetDownloadableProfileMetadataResult> {
     return new Promise<GetDownloadableProfileMetadataResult>((resolve, reject) => {
       let p = taskpool.execute(nativeGetDownloadableProfileMetadata, slotId, portIndex, profile, forceDisableProfile)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as GetDownloadableProfileMetadataResult
           resolve(r)
         }).catch((e: Error): void => {
@@ -117,7 +117,7 @@ export default namespace eSIM {
     forceDisableProfile: boolean): Promise<GetDownloadableProfilesResult> {
       return new Promise<GetDownloadableProfilesResult>((resolve, reject) => {
         let p = taskpool.execute(nativeGetDownloadableProfiles, slotId, portIndex, forceDisableProfile)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as GetDownloadableProfilesResult
           resolve(r)
         }).catch((e: Error): void => {
@@ -133,7 +133,7 @@ export default namespace eSIM {
     configuration: DownloadConfiguration): Promise<DownloadProfileResult> {
     return new Promise<DownloadProfileResult>((resolve, reject) => {
       let p = taskpool.execute(nativeDownloadProfile, slotId, portIndex, profile, configuration)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
         let r = e as DownloadProfileResult
         resolve(r)
       }).catch((e: Error): void => {
@@ -147,7 +147,7 @@ export default namespace eSIM {
   export function getEuiccProfileInfoList(slotId: int): Promise<GetEuiccProfileInfoListResult> {
     return new Promise<GetEuiccProfileInfoListResult>((resolve, reject) => {
       let p = taskpool.execute(nativeGetEuiccProfileInfoList, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as GetEuiccProfileInfoListResult
           resolve(r)
         }).catch((e: Error): void => {
@@ -161,7 +161,7 @@ export default namespace eSIM {
   export function getEuiccInfo(slotId: int): Promise<EuiccInfo> {
     return new Promise<EuiccInfo>((resolve, reject) => {
       let p = taskpool.execute(nativeGetEuiccInfo, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as EuiccInfo
           resolve(r)
         }).catch((e: Error): void => {
@@ -175,7 +175,7 @@ export default namespace eSIM {
   export function deleteProfile(slotId: int, iccid: string): Promise<ResultCode> {
     return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeDeleteProfile, slotId, iccid)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as ResultCode
           resolve(r)
         }).catch((e: Error): void => {
@@ -191,7 +191,7 @@ export default namespace eSIM {
     forceDisableProfile: boolean): Promise<ResultCode> {
       return new Promise<ResultCode>((resolve, reject) => {
         let p = taskpool.execute(nativeSwitchToProfile, slotId, portIndex, iccid, forceDisableProfile)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as ResultCode
           resolve(r)
         }).catch((e: Error): void => {
@@ -205,7 +205,7 @@ export default namespace eSIM {
   export function setProfileNickname(slotId: int, iccid: string, nickname: string): Promise<ResultCode> {
     return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeSetProfileNickname, slotId, iccid, nickname)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as ResultCode
           resolve(r)
         }).catch((e: Error): void => {
@@ -219,7 +219,7 @@ export default namespace eSIM {
   export function reserveProfilesForFactoryRestore(slotId: int): Promise<ResultCode> {
     return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeReserveProfilesForFactoryRestore, slotId)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
           let r = e as ResultCode
           resolve(r)
         }).catch((e: Error): void => {
@@ -233,7 +233,7 @@ export default namespace eSIM {
   export function setDefaultSmdpAddress(slotId: int, address: string): Promise<ResultCode> {
       return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeSetDefaultSmdpAddress, slotId, address)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
         let r = e as ResultCode
         resolve(r)
       }).catch((e: Error): void => {
@@ -247,7 +247,7 @@ export default namespace eSIM {
   export function getDefaultSmdpAddress(slotId: int): Promise<string> {
       return new Promise<string>((resolve, reject) => {
       let p = taskpool.execute(nativeGetDefaultSmdpAddress, slotId)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
         let r = e as string
         resolve(r)
       }).catch((e: Error): void => {
@@ -261,7 +261,7 @@ export default namespace eSIM {
   export function cancelSession(slotId: int, transactionId: string, cancelReason: CancelReason): Promise<ResultCode> {
       return new Promise<ResultCode>((resolve, reject) => {
       let p = taskpool.execute(nativeCancelSession, slotId, transactionId, cancelReason)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
         let r = e as ResultCode
         resolve(r)
       }).catch((e: Error): void => {
