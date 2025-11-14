@@ -2258,6 +2258,38 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
 }
 
 /**
++ * @tc.number   Telephony_MultiSimMonitor_006
++ * @tc.name     test error branch
++ * @tc.desc     Function test
++ */
++ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_006, Function | MediumTest | Level1) +
+{
+    +std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    +auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    +auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    +auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        +telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    +std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = {simStateManagerPtr,
+                                                                                 +simStateManagerPtr};
+    +std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = {simFileManagerPtr, simFileManagerPtr};
+    +std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        +std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    +std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        +std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        +std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr) + };
+    +auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    +multiSimMonitor->SubscribeUserSwitch();
+    +auto handler = multiSimMonitor->userSwitchSubscriber_->handler_.lock();
+    +int32_t userId = 101;
+    +multiSimMonitor->IsNeedUpdataSimData(userId, handler);
+    +EXPECT_EQ(userId, multiSimMonitor->privateUserId_);
+    +multiSimMonitor->HasSimStateChanged = true;
+    +multiSimMonitor->IsNeedUpdataSimData(userId, handler);
+    +EXPECT_FALSE(multiSimMonitor->HasSimStateChanged);
+    +
+}
+
+/**
  * @tc.number   Telephony_ImsCoreServiceCallbackProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test

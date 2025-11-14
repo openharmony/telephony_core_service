@@ -106,6 +106,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             InitData(event->GetParam());
             break;
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
+            HasSimStateChanged = true;
             RefreshData(event->GetParam());
             break;
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT:
@@ -465,6 +466,17 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
     }
+    std::static_pointer_cast<MultiSimMonitor>(handler)->IsNeedUpdataSimData(userId, handler);
+}
+
+void MultiSimMonitor::IsNeedUpdataSimData(int32_t userId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    if ((userId != ACTIVE_USER_ID && userId != privateUserId_) ||
+        ((userId == ACTIVE_USER_ID || userId == privateUserId_) && HasSimStateChanged)) {
+        HasSimStateChanged = false;
+        std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateAllOpkeyConfigs();
+    }
+    privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
 }
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()

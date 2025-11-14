@@ -52,6 +52,7 @@ public:
     void UnRegisterSimNotify();
     int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
+    void IsNeedUpdataSimData(int32_t userId, std::shared_ptr<AppExecFwk::EventHandler> handler);
 
 public:
     enum {
@@ -146,6 +147,8 @@ private:
     bool isForgetAllDataDone_ = false;
     bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
+    int32_t privateUserId_ = -1;
+    bool HasSimStateChanged = false;
 };
 } // namespace Telephony
 } // namespace OHOS
