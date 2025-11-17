@@ -2283,9 +2283,9 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     +int32_t userId = 101;
     +multiSimMonitor->IsNeedUpdataSimData(userId, handler);
     +EXPECT_EQ(userId, multiSimMonitor->privateUserId_);
-    +multiSimMonitor->HasSimStateChanged = true;
+    +multiSimMonitor->hasSimStateChanged_ = true;
     +multiSimMonitor->IsNeedUpdataSimData(userId, handler);
-    +EXPECT_FALSE(multiSimMonitor->HasSimStateChanged);
+    +EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
     +
 }
 
