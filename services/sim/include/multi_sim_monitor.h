@@ -75,6 +75,7 @@ private:
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event);
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
     void InitEsimData();
