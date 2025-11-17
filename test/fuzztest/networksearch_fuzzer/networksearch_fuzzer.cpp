@@ -57,8 +57,10 @@ void NetworkSearchHandlerInit()
     networkSearchHandler->UpdateOperatorName();
     networkSearchHandler->SubscribeSystemAbility();
     networkSearchHandler->SyncGetSsbInfoResponse();
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->RegisterSatelliteCallback();
     networkSearchHandler->UnregisterSatelliteCallback();
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->SetRadioOffWhenAirplaneIsOn();
     networkSearchHandler->SetRadioOffWhenSimDeactive();
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
@@ -140,7 +142,9 @@ void NetworkSearchHandlerEvents(const uint8_t *data, size_t size)
     networkSearchHandler->SetPreferredNetworkResponse(event);
     networkSearchHandler->SetNetworkSelectionModeResponse(event);
     networkSearchHandler->GetNetworkSelectionModeResponse(event);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->SatelliteStatusChanged(event);
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->RadioResidentNetworkChange(event);
 }
 
@@ -163,7 +167,9 @@ void NetworkSearchHandlerProcesses(const uint8_t *data, size_t size)
     networkSearchHandler->ImsiLoadedReady(event);
     networkSearchHandler->SimRecordsLoaded(event);
     networkSearchHandler->NotifyStateChange(event);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->SatelliteStatusChanged(event);
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->UpdateImsRegisterState(event);
     networkSearchHandler->UpdateImsServiceStatus(event);
     networkSearchHandler->HandleDelayNotifyEvent(event);

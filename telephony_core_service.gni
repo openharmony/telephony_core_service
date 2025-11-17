@@ -24,6 +24,7 @@ declare_args() {
     core_service_support_esim = true
   }
   core_service_feature_networkshare = true
+  core_service_feature_support_satellite = true
 }
 
 telephony_extra_defines = []
@@ -36,4 +37,8 @@ if (defined(global_parts_info) &&
 
 if (core_service_support_esim) {
   telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_ESIM" ]
+}
+
+if (core_service_feature_support_satellite) {
+  telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_SATELLITE" ]
 }
