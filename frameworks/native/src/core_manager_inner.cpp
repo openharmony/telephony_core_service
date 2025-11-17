@@ -3053,5 +3053,14 @@ int32_t CoreManagerInner::SetTargetPrimarySlotId(bool isDualCard, int32_t primar
     }
     return simManager_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
 }
+
+bool CoreManagerInner::IsModemInitDone(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return false;
+    }
+    return simManager_->IsModemInitDone(slotId);
+}
 } // namespace Telephony
 } // namespace OHOS

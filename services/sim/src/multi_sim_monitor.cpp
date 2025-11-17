@@ -59,11 +59,14 @@ void MultiSimMonitor::Init()
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
+    initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
+    SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
+    SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT);
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -123,6 +126,13 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             CheckDataShareError();
             CheckSimNotifyRegister();
+            break;
+        case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT:
+            Removr(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
+            CheckSimPresentWhenReboot();
+            break;
+        case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT:
+            CheckSimPresentWhenReboot();
             break;
         default:
             break;
@@ -471,7 +481,22 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
 {
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (OHOS::system::GetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0") == "1" &&
-            !hasCheckedSimPresent_) {
+            !hasCheckedSimPresent_[slotId]) {
+            if (controller_->UpdateSimPresent(slotId, true) == TELEPHONY_SUCCESS) {
+                OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
+                hasCheckedSimPresent_[slotId] = true;
+                TELEPHONY_LOGI(reboot detect update sim present success);
+            } else if (initRebootDetectRemainCount_[slotId] > 0) {
+                SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, slotId, DELAY_THREE_SECONDS);
+                TELEPHONY_LOGI("reboot detect slotId=%{public}d retry remain %{public}d",
+                    slotId, initRebootDetectRemainCount_[slotId]);
+                initRebootDetectRemainCount_[slotId]--;
+            } else {
+                TELEPHONY_LOGE("reboot detect fail!!!");
+            }
+
+
+
             TELEPHONY_LOGE("reboot detect true, need update sim present");
             controller_->UpdateSimPresent(slotId, true);
             OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");

@@ -138,6 +138,7 @@ public:
     MOCK_METHOD1(CheckIfNeedSwitchMainSlotId, void(bool));
     MOCK_METHOD2(SetIccCardState, int32_t(int32_t, int32_t));
     MOCK_METHOD2(SetTargetPrimarySlotId, int32_t(bool, int32_t));
+    MOCK_METHOD1(IsModemInitDone, bool(int32_t));
 };
 }
 }

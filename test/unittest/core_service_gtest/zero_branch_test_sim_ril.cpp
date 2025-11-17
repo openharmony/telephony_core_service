@@ -1348,11 +1348,11 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_003, Function | MediumTest 
     simStateManager->simStateHandle_ = simStateHandle;
 
     EXPECT_EQ(simStateManager->SetModemInit(false), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(simStateManager->IfModemInitDone());
+    EXPECT_FALSE(simStateManager->IsModemInitDone());
 
     simStateManager->simStateHandle_ = nullptr;
     EXPECT_EQ(simStateManager->SetModemInit(false), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_FALSE(simStateManager->IfModemInitDone());
+    EXPECT_FALSE(simStateManager->IsModemInitDone());
 
     LockInfo lockInfo;
     lockInfo.lockType = static_cast<LockType>(0);

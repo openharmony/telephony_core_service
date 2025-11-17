@@ -1479,5 +1479,14 @@ int32_t SimManager::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotI
     }
     return multiSimController_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
 }
+
+bool SimManager::IsModemInitDone(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId invalid or simStateManager_ is null");
+        return false;
+    }
+    return simStateManager_[slotId]->IsModemInitDone();
+}
 } // namespace Telephony
 } // namespace OHOS

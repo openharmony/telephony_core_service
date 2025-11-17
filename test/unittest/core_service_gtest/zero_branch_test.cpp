@@ -67,6 +67,7 @@
 #include "sim_file_parse.h"
 #include "network_utils.h"
 #include "mock_sim_manager.h"
+#include "mock_multi_sim_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -857,6 +858,7 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_006, Function | MediumTest | Lev
     EXPECT_EQ(mInner.QueryImsSwitch(INVALID_SLOTID, imsSwitchValue), TELEPHONY_ERROR);
     EXPECT_GT(mInner.SetVoNRSwitch(0, 0, 0, nullptr), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mInner.SetIccCardState(0, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(mInner.IsModemInitDone(0));
 }
 
 /**
@@ -1362,6 +1364,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     EXPECT_GT(simManager->IsCTSimCard(INVALID_SLOTID, isCTSimCard), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->NotifySimSlotsMapping(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetIccCardState(INVALID_SLOTID, 0), TELEPHONY_ERR_SUCCESS);
+    EXPECT_FALSE(simManager->IsModemInitDone(0));
 }
 
 /**
