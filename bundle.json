@@ -140,6 +140,10 @@
                     "name": "//base/telephony/core_service/frameworks/cj/telephony_sim:cj_sim_ffi"
                 },
                 {
+                    "header": {
+                        "header_base": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked",
+                        "header_files": []
+                    },
                     "name": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked"
                 }
             ],
