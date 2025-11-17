@@ -119,7 +119,7 @@ void SimStateManager::SetSimState(SimState simState)
     simStateHandle_->SetSimState(simState);
 }
 
-bool SimStateManager::IfModemInitDone()
+bool SimStateManager::IsModemInitDone()
 {
     if (simStateHandle_ != nullptr) {
         return simStateHandle_->modemInitDone_;

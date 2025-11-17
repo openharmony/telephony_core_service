@@ -56,12 +56,14 @@ public:
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
-        RESET_OPKEY_CONFIG = 1,
-        REGISTER_SIM_NOTIFY_RETRY_EVENT = 2,
-        INIT_DATA_RETRY_EVENT = 3,
-        RETRY_RESET_OPKEY_CONFIG = 4,
-        INIT_ESIM_DATA_RETRY_EVENT = 5,
-        INIT_ESIM_DATA_EVENT = 6,
+        RESET_OPKEY_CONFIG,
+        REGISTER_SIM_NOTIFY_RETRY_EVENT,
+        INIT_DATA_RETRY_EVENT,
+        RETRY_RESET_OPKEY_CONFIG,
+        INIT_ESIM_DATA_RETRY_EVENT,
+        INIT_ESIM_DATA_EVENT,
+        INIT_REBOOT_DETECT_DATA_EVENT,
+        INIT_REBOOT_DETECT_DATA_RETRY_EVENT,
     };
 
 private:
@@ -73,6 +75,7 @@ private:
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event);
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
     void InitEsimData();
@@ -126,6 +129,9 @@ private:
     };
 
 private:
+    static constexpr const int SLOT_COUNT = 2;
+    bool hasCheckedSimPresent_[SLOT_COUNT] = {false, false};
+    std::vector<int> initRebootDetectRemainCount_;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -144,7 +150,6 @@ private:
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
-    bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
 };
 } // namespace Telephony

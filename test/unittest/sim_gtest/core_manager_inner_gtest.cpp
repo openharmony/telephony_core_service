@@ -1017,5 +1017,17 @@ HWTEST_F(CoreManagerInnerTest, SetIccCardState_001, Function | MediumTest | Leve
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
 }
 
+HWTEST_F(CoreManagerInnerTest, IsModemInitDone_001, Function | MediumTest | Level1)
+{
+    mInner.simManager_ = nullptr;
+    bool ret = mInner.IsModemInitDone(0);
+    EXPECT_FALSE(ret);
+
+    mInner.simManager_ = mockeSimManager;
+    EXPECT_CALL(*mockeSimManager, IsModemInitDone(_)).WillOnce(
+        Return(true));
+    ret = mInner.SetIccCardState(0);
+    EXPECT_TRUE(ret);
+}
 } // Telephony
 } // OHOS
