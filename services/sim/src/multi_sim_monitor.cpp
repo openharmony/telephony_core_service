@@ -126,8 +126,22 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             CheckDataShareError();
             CheckSimNotifyRegister();
             break;
+        default:
+            ProcessEventEx(event);
+            break;
+    }
+}
+
+void MultiSimMonitor::ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("start ProcessEvent but event is null!");
+        return;
+    }
+    auto eventCode = event->GetInnerEventId();
+    switch (eventCode) {
         case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT:
-            Removr(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
+            RemoveEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
             CheckSimPresentWhenReboot();
             break;
         case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT:
@@ -484,7 +498,7 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
             if (controller_->UpdateSimPresent(slotId, true) == TELEPHONY_SUCCESS) {
                 OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
                 hasCheckedSimPresent_[slotId] = true;
-                TELEPHONY_LOGI(reboot detect update sim present success);
+                TELEPHONY_LOGI("reboot detect update sim present success");
             } else if (initRebootDetectRemainCount_[slotId] > 0) {
                 SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, slotId, DELAY_THREE_SECONDS);
                 TELEPHONY_LOGI("reboot detect slotId=%{public}d retry remain %{public}d",
@@ -493,15 +507,8 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
             } else {
                 TELEPHONY_LOGE("reboot detect fail!!!");
             }
-
-
-
-            TELEPHONY_LOGE("reboot detect true, need update sim present");
-            controller_->UpdateSimPresent(slotId, true);
-            OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
         }
     }
-    hasCheckedSimPresent_ = true;
 }
 
 void MultiSimMonitor::CheckSimNotifyRegister()
