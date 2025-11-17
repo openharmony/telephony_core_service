@@ -307,7 +307,7 @@ bool MultiSimController::IsAllCardsReady()
 bool MultiSimController::IsAllModemInitDone()
 {
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
-        if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IfModemInitDone())) {
+        if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IsModemInitDone())) {
             TELEPHONY_LOGI("slotId %{public}d modem init not done", i);
             unInitModemSlotId_ = i;
             return false;
@@ -319,11 +319,11 @@ bool MultiSimController::IsAllModemInitDone()
 int32_t MultiSimController::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId)
 {
     TELEPHONY_LOGI("isDualCard:%{public}d, SetTargetPrimarySlotId:%{public}d", isDualCard, primarySlotId);
+    targetPrimarySlotId_ = primarySlotId;
     if (isDualCard) {
         waitCardsReady_ = true;
+        SendEvent(WAIT_FOR_ALL_CARDS_READY_EVENT, primarySlotId, WAIT_FOR_ALL_CARDS_READY_TIMEOUT);
     }
-    targetPrimarySlotId_ = primarySlotId;
-    SendEvent(WAIT_FOR_ALL_CARDS_READY_EVENT, primarySlotId, WAIT_FOR_ALL_CARDS_READY_TIMEOUT);
     return TELEPHONY_SUCCESS;
 }
 
