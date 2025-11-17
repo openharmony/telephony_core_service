@@ -65,7 +65,6 @@ void MultiSimMonitor::Init()
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
-    SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
     SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT);
 }
 
