@@ -81,6 +81,7 @@ ohos_unittest("tel_core_service_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -172,6 +173,7 @@ ohos_unittest("tel_network_search_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -262,6 +264,7 @@ ohos_unittest("tel_network_search_manager_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -354,6 +357,7 @@ ohos_unittest("tel_sim_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -447,6 +451,7 @@ ohos_unittest("tel_sim_manager_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -539,6 +544,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -622,6 +628,7 @@ ohos_unittest("tel_network_search_zero_branch_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
  
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -712,6 +719,7 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -791,6 +799,7 @@ ohos_unittest("tel_core_service_test") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -874,6 +883,7 @@ ohos_unittest("tel_core_service_common_test") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -962,6 +972,7 @@ ohos_unittest("tel_network_search_branch_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1138,6 +1149,7 @@ ohos_unittest("tel_satellite_service_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1230,6 +1242,7 @@ ohos_unittest("tel_sim_core_service_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1323,6 +1336,7 @@ ohos_unittest("tel_sim_elementary_file_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1416,6 +1430,7 @@ ohos_unittest("tel_sim_icc_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1509,6 +1524,7 @@ ohos_unittest("tel_sim_type_convert_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1602,6 +1618,7 @@ ohos_unittest("tel_vcard_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1695,6 +1712,7 @@ ohos_unittest("tel_vsim_gtest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += telephony_extra_defines
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.location_location) &&
@@ -1728,7 +1746,6 @@ group("unittest") {
     ":tel_network_search_zero_branch_gtest",
     ":tel_sim_gtest",
     ":tel_sim_zero_branch_gtest",
-    ":tel_satellite_service_gtest",
     ":tel_sim_core_service_gtest",
     ":tel_sim_elementary_file_gtest",
     ":tel_sim_icc_gtest",
@@ -1737,4 +1754,9 @@ group("unittest") {
     ":tel_vsim_gtest",
     ":tel_network_search_manager_gtest",
   ]
+  if (core_service_feature_support_satellite) {
+    deps += [
+      ":tel_satellite_service_gtest",
+    ]
+  }
 }

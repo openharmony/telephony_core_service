@@ -172,7 +172,9 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_005, Function | MediumTest
     auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager_);
     int32_t ret = simStateHandle->IsSatelliteSupported();
     EXPECT_GE(ret, 0);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     simStateHandle->UnregisterSatelliteCallback();
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
 }
 
 /**
