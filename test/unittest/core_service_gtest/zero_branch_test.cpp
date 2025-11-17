@@ -2286,7 +2286,6 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     +multiSimMonitor->hasSimStateChanged_ = true;
     +multiSimMonitor->IsNeedUpdataSimData(userId, handler);
     +EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
-    +
 }
 
 /**
