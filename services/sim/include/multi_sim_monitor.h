@@ -148,7 +148,7 @@ private:
     bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
     int32_t privateUserId_ = -1;
-    bool HasSimStateChanged = false;
+    bool hasSimStateChanged_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
