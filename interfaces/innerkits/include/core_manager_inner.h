@@ -407,6 +407,7 @@ public:
     int32_t GetContractInfo(
         int32_t slotId, GetContractInfoRequest &getContractInfoRequest, std::string &response);
     int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult);
+    bool IsModemInitDone(int32_t slotId);
     /******************** esimManager end *****************************/
 
 private:

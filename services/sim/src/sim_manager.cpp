@@ -1365,8 +1365,8 @@ int32_t SimManager::GetDefaultMainSlotByIccId()
 
 int32_t SimManager::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
-    if (multiSimController_ == nullptr) {
-        TELEPHONY_LOGE("multiSimController_ is nullptr");
+    if ((!IsValidSlotId(slotId)) || multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
     return multiSimController_->GetSimLabel(slotId, simLabel);
@@ -1478,6 +1478,15 @@ int32_t SimManager::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotI
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return multiSimController_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
+}
+
+bool SimManager::IsModemInitDone(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId invalid or simStateManager_ is null");
+        return false;
+    }
+    return simStateManager_[slotId]->IsModemInitDone();
 }
 } // namespace Telephony
 } // namespace OHOS
