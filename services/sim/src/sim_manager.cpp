@@ -1365,8 +1365,8 @@ int32_t SimManager::GetDefaultMainSlotByIccId()
 
 int32_t SimManager::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
-    if (multiSimController_ == nullptr) {
-        TELEPHONY_LOGE("multiSimController_ is nullptr");
+    if ((!IsValidSlotId(slotId)) || multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
     return multiSimController_->GetSimLabel(slotId, simLabel);
