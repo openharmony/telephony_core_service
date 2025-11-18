@@ -52,7 +52,8 @@ public:
     void UnRegisterSimNotify();
     int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
-    void IsNeedUpdataSimData(int32_t userId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void SetPrivateUserId(int32_t userId);
+    void UpdataAllSimData(int32_t userId);
 
 public:
     enum {
