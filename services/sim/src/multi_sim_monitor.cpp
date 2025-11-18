@@ -470,7 +470,8 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
     std::static_pointer_cast<MultiSimMonitor>(handler)->SetPrivateUserId(userId);
 }
 
-void MultiSimMonitor::SetPrivateUserId(int32_t userId) {
+void MultiSimMonitor::SetPrivateUserId(int32_t userId)
+{
     privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
 }
 
