@@ -2283,11 +2283,11 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
     auto handler = multiSimMonitor->userSwitchSubscriber_->handler_.lock();
     int32_t userId = 101;
     multiSimMonitor->hasSimStateChanged_ = true;
-    multiSimMonitor->UpdataAllSimData(userId);
+    multiSimMonitor->UpdateAllSimData(userId);
     multiSimMonitor->SetPrivateUserId(userId);
     EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
     multiSimMonitor->hasSimStateChanged_ = true;
-    multiSimMonitor->UpdataAllSimData(userId);
+    multiSimMonitor->UpdateAllSimData(userId);
     EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
 }
 
