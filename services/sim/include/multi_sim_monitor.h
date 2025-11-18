@@ -53,7 +53,7 @@ public:
     int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
     void SetPrivateUserId(int32_t userId);
-    void UpdataAllSimData(int32_t userId);
+    void UpdateAllSimData(int32_t userId);
 
 public:
     enum {
