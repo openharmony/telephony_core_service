@@ -466,17 +466,21 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
     }
-    std::static_pointer_cast<MultiSimMonitor>(handler)->IsNeedUpdataSimData(userId, handler);
+    std::static_pointer_cast<MultiSimMonitor>(handler)->UpdataAllSimData(userId);
+    std::static_pointer_cast<MultiSimMonitor>(handler)->SetPrivateUserId(userId);
 }
 
-void MultiSimMonitor::IsNeedUpdataSimData(int32_t userId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+void MultiSimMonitor::SetPrivateUserId(int32_t userId) {
+    privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
+}
+
+void MultiSimMonitor::UpdataAllSimData(int32_t userId)
 {
     if ((userId != ACTIVE_USER_ID && userId != privateUserId_) ||
         ((userId == ACTIVE_USER_ID || userId == privateUserId_) && hasSimStateChanged_)) {
         hasSimStateChanged_ = false;
-        std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateAllOpkeyConfigs();
+        SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
     }
-    privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
 }
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()
