@@ -57,6 +57,7 @@ ohos_static_library("esim_ani_cxx") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "ffrt:libffrt",
     "rust_cxx:cxx_cppdeps",
   ]
   subsystem_name = "telephony"
@@ -76,6 +77,7 @@ ohos_rust_shared_library("esim_ani") {
   
   external_deps = [
     "runtime_core:ani",
+    "hilog:libhilog",
     "netmanager_base:ani_rs",
     "rust_cxx:lib"
   ]
