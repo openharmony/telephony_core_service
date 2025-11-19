@@ -25,7 +25,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkRadioTech => {
           return nativeGetRadioTech(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkRadioTech);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -37,7 +37,7 @@ export default namespace radio {
         let p = taskpool.execute((): NetworkRadioTech => {
             return nativeGetRadioTech(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NetworkRadioTech
             resolve(r)
         }).catch((e: Error): void => {
@@ -56,7 +56,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeSendUpdateCellLocationRequest(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -68,7 +68,7 @@ export default namespace radio {
         let p = taskpool.execute((): void => {
             return nativeSendUpdateCellLocationRequest(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -80,7 +80,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeSendUpdateCellLocationRequest()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -93,7 +93,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): Array<CellInformation> => {
           return nativeGetCellInformation(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as Array<CellInformation>);
       }, (err: Error): void => {
           callback(err as BusinessError, new Array<CellInformation>());
@@ -105,7 +105,7 @@ export default namespace radio {
         let p = taskpool.execute((): Array<CellInformation> => {
             return nativeGetCellInformation(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as Array<CellInformation>
             resolve(r)
         }).catch((e: Error): void => {
@@ -118,7 +118,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): Array<CellInformation> => {
           return nativeGetCellInformation()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as Array<CellInformation>);
       }, (err: Error): void => {
           callback(err as BusinessError, new Array<CellInformation>());
@@ -131,7 +131,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkSelectionMode => {
         return nativeGetNetworkSelectionMode(slotId);
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkSelectionMode)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -143,7 +143,7 @@ export default namespace radio {
         let p = taskpool.execute((): NetworkSelectionMode => {
           return nativeGetNetworkSelectionMode(slotId);
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NetworkSelectionMode
             resolve(r)
         }).catch((e: Error): void => {
@@ -158,7 +158,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
         return nativeSetNetworkSelectionMode(options)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -170,7 +170,7 @@ export default namespace radio {
         let p = taskpool.execute((): void => {
           return nativeSetNetworkSelectionMode(options)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as undefined
             resolve(r)
         }).catch((e: Error): void => {
@@ -185,7 +185,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkSearchResult => {
         return nativeGetNetworkSearchInformation(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkSearchResult)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -197,7 +197,7 @@ export default namespace radio {
         let p = taskpool.execute((): NetworkSearchResult => {
           return nativeGetNetworkSearchInformation(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NetworkSearchResult
             resolve(r)
         }).catch((e: Error): void => {
@@ -212,7 +212,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetISOCountryCodeForNetwork(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -224,7 +224,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetISOCountryCodeForNetwork(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -243,7 +243,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetIMEI(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -255,7 +255,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetIMEI(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -268,7 +268,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetIMEI()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -281,7 +281,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetMEID(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -293,7 +293,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetMEID(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -306,7 +306,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetMEID()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -319,7 +319,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetUniqueDeviceId(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -331,7 +331,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetUniqueDeviceId(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -344,7 +344,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
           return nativeGetUniqueDeviceId()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -355,7 +355,7 @@ export default namespace radio {
 
     export function setPrimarySlotId(slotId: int, callback: AsyncCallback<void>): void {
       let p1 = taskpool.execute(nativeSetPrimarySlotId, slotId);
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -365,7 +365,7 @@ export default namespace radio {
     export function setPrimarySlotId(slotId: int): Promise<void> {
       return new Promise<void>((resolve, reject) => {
         let p = taskpool.execute(nativeSetPrimarySlotId, slotId);
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -379,7 +379,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): boolean => {
           return nativeIsRadioOn(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as boolean);
       }, (err: Error): void => {
           callback(err as BusinessError, false);
@@ -391,7 +391,7 @@ export default namespace radio {
         let p = taskpool.execute((): boolean => {
             return nativeIsRadioOn(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as boolean
             resolve(r)
         }).catch((e: Error): void => {
@@ -404,7 +404,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): boolean => {
           return nativeIsRadioOn()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as boolean);
       }, (err: Error): void => {
           callback(err as BusinessError, false);
@@ -417,7 +417,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeTurnOnRadio(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -429,7 +429,7 @@ export default namespace radio {
         let p = taskpool.execute((): void => {
             return nativeTurnOnRadio(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -441,7 +441,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeTurnOnRadio()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -454,7 +454,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeTurnOffRadio(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -466,7 +466,7 @@ export default namespace radio {
         let p = taskpool.execute((): void => {
             return nativeTurnOffRadio(slotId);
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -478,7 +478,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): void => {
           return nativeTurnOffRadio()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -491,7 +491,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
             return nativeGetOperatorName(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -503,7 +503,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetOperatorName(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -520,7 +520,7 @@ export default namespace radio {
 
     export function setPreferredNetwork(slotId: int, networkMode: PreferredNetworkMode, callback: AsyncCallback<void>): void {
       let p1 = taskpool.execute(nativeSetPreferredNetwork, slotId, networkMode);
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -530,7 +530,7 @@ export default namespace radio {
     export function setPreferredNetwork(slotId: int, networkMode: PreferredNetworkMode): Promise<void> {
       return new Promise<void>((resolve, reject) => {
         let p = taskpool.execute(nativeSetPreferredNetwork, slotId, networkMode);
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -544,7 +544,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): PreferredNetworkMode => {
         return nativeGetPreferredNetwork(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as PreferredNetworkMode)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -556,7 +556,7 @@ export default namespace radio {
         let p = taskpool.execute((): PreferredNetworkMode => {
           return nativeGetPreferredNetwork(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as PreferredNetworkMode
             resolve(r)
         }).catch((e: Error): void => {
@@ -571,7 +571,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): ImsRegInfo => {
         return nativeGetImsRegInfo(slotId, imsType)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as ImsRegInfo)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -583,7 +583,7 @@ export default namespace radio {
         let p = taskpool.execute((): ImsRegInfo => {
           return nativeGetImsRegInfo(slotId, imsType)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as ImsRegInfo
             resolve(r)
         }).catch((e: Error): void => {
@@ -598,7 +598,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): Array<SignalInformation> => {
         return nativeGetSignalInformation(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as Array<SignalInformation>)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -610,7 +610,7 @@ export default namespace radio {
         let p = taskpool.execute((): Array<SignalInformation> => {
           return nativeGetSignalInformation(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as Array<SignalInformation>
             resolve(r)
         }).catch((e: Error): void => {
@@ -629,7 +629,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): int => {
         return nativeGetPrimarySlotId()
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as int)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -641,7 +641,7 @@ export default namespace radio {
         let p = taskpool.execute((): int => {
           return nativeGetPrimarySlotId()
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as int
             resolve(r)
         }).catch((e: Error): void => {
@@ -656,7 +656,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkState => {
         return nativeGetNetworkState(slotId);
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkState)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -668,7 +668,7 @@ export default namespace radio {
         let p = taskpool.execute((): NetworkState => {
           return nativeGetNetworkState(slotId);
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NetworkState
             resolve(r)
         }).catch((e: Error): void => {
@@ -681,7 +681,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkState => {
         return nativeGetNetworkState();
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkState)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -715,7 +715,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): string => {
             return nativeGetBasebandVersion(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as string);
       }, (err: Error): void => {
           callback(err as BusinessError, new string());
@@ -727,7 +727,7 @@ export default namespace radio {
         let p = taskpool.execute((): string => {
             return nativeGetBasebandVersion(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as string
             resolve(r)
         }).catch((e: Error): void => {
@@ -740,7 +740,7 @@ export default namespace radio {
 
     export function setNROptionMode(slotId: int, mode: NROptionMode, callback: AsyncCallback<void>): void {
       let p1 = taskpool.execute(nativeSetNROptionMode, slotId, mode);
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -750,7 +750,7 @@ export default namespace radio {
     export function setNROptionMode(slotId: int, mode: NROptionMode): Promise<void> {
       return new Promise<void>((resolve, reject) => {
         let p = taskpool.execute(nativeSetNROptionMode, slotId, mode);
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -764,7 +764,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NROptionMode => {
         return nativeGetNROptionMode(slotId)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NROptionMode)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -776,7 +776,7 @@ export default namespace radio {
         let p = taskpool.execute((): NROptionMode => {
           return nativeGetNROptionMode(slotId)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NROptionMode
             resolve(r)
         }).catch((e: Error): void => {
@@ -790,7 +790,7 @@ export default namespace radio {
     export function setNetworkCapability(slotId: int, type: NetworkCapabilityType, state: NetworkCapabilityState,
       callback: AsyncCallback<void>): void {
       let p1 = taskpool.execute(nativeSetNetworkCapability, slotId, type, state);
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as undefined);
       }, (err: Error): void => {
           callback(err as BusinessError, undefined);
@@ -801,7 +801,7 @@ export default namespace radio {
       state: NetworkCapabilityState): Promise<void> {
       return new Promise<void>((resolve, reject) => {
         let p = taskpool.execute(nativeSetNetworkCapability, slotId, type, state);
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
@@ -816,7 +816,7 @@ export default namespace radio {
       let p1 = taskpool.execute((): NetworkCapabilityState => {
         return nativeGetNetworkCapability(slotId, type)
       })
-      p1.then((content: NullishType) => {
+      p1.then((content: Any) => {
           callback(new BusinessError(), content as NetworkCapabilityState)
       }, (err: Error): void => {
           callback(err as BusinessError, undefined)
@@ -829,7 +829,7 @@ export default namespace radio {
         let p = taskpool.execute((): NetworkCapabilityState => {
           return nativeGetNetworkCapability(slotId, type)
         })
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as NetworkCapabilityState
             resolve(r)
         }).catch((e: Error): void => {
@@ -843,7 +843,7 @@ export default namespace radio {
     export function factoryReset(slotId: int): Promise<void> {
       return new Promise<void>((resolve, reject) => {
         let p = taskpool.execute(nativeFactoryReset, slotId);
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             resolve(e as undefined)
         }).catch((e: Error): void => {
             reject(e as Error)
