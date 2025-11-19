@@ -20,40 +20,123 @@
 #include "cxx.h"
 
 namespace OHOS {
+namespace Telephony {
 namespace SimAni {
 
 struct ArktsError;
 struct AniLockStatusResponse;
 struct AniOperatorConfig;
 struct AniIccAccountInfo;
+struct ArktsDiallingNumbersInfo;
+struct AniSimAuthenticationResponse;
 
-ArktsError getLockState(int32_t slotId, int32_t lockType, int32_t &lockState);
+ArktsError GetLockState(int32_t slotId, int32_t lockType, int32_t &lockState);
 
-ArktsError unlockPuk(int32_t slotId, rust::String newPin,
+ArktsError UnlockPuk(int32_t slotId, rust::String newPin,
                      rust::String puk, AniLockStatusResponse &lockStatusResponse);
 
-ArktsError unlockPin(int32_t slotId, rust::String pin,
+ArktsError UnlockPin(int32_t slotId, rust::String pin,
                      AniLockStatusResponse &lockStatusResponse);
 
-ArktsError hasSimCard(int32_t slotId, bool &hasCard);
+ArktsError HasSimCard(int32_t slotId, bool &hasCard);
 
-ArktsError isSimActive(int32_t slotId, bool &isActive);
+ArktsError IsSimActive(int32_t slotId, bool &isActive);
 
-ArktsError getDefaultVoiceSlotId(int32_t &slotId);
+ArktsError GetDefaultVoiceSlotId(int32_t &slotId);
 
-ArktsError getOperatorConfigs(int32_t slotId, rust::Vec<AniOperatorConfig> &configValues);
+ArktsError GetOperatorConfigs(int32_t slotId, rust::Vec<AniOperatorConfig> &configValues);
 
-ArktsError getActiveSimAccountInfoList(rust::Vec<AniIccAccountInfo> &accountInfoValues);
+ArktsError GetActiveSimAccountInfoList(rust::Vec<AniIccAccountInfo> &accountInfoValues);
 
-ArktsError getSimAccountInfo(int32_t slotId, AniIccAccountInfo &accountInfoValue);
+ArktsError GetSimAccountInfo(int32_t slotId, AniIccAccountInfo &accountInfoValue);
 
-ArktsError getSimState(int32_t slotId, int32_t &simState);
+ArktsError GetSimState(int32_t slotId, int32_t &simState);
 
-ArktsError getISOCountryCodeForSim(int32_t slotId, rust::String &countryCode);
+ArktsError GetISOCountryCodeForSim(int32_t slotId, rust::String &countryCode);
 
-int32_t getMaxSimCount();
+int32_t GetMaxSimCount();
 
+ArktsError GetSimAuthentication(int32_t slotId, int32_t authType, rust::String authData,
+    AniSimAuthenticationResponse &simAuthenticationResponse);
+
+ArktsError GetDsdsMode(int32_t &dsdsMode);
+
+ArktsError GetDefaultVoiceSimId(int32_t &simId);
+
+ArktsError GetOpName(int32_t slotId, rust::String &opName);
+
+ArktsError GetOpKey(int32_t slotId, rust::String &opKey);
+
+ArktsError UnlockSimLock(int32_t slotId, int32_t persoLocktype, rust::String password,
+    AniLockStatusResponse &lockStatusResponse);
+
+ArktsError SendTerminalResponseCmd(int32_t slotId, rust::String cmd);
+
+ArktsError SendEnvelopeCmd(int32_t slotId, rust::String cmd);
+
+ArktsError UpdateIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError DelIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError AddIccDiallingNumbers(int32_t slotId, int32_t contactType, const ArktsDiallingNumbersInfo &diallingNumbers);
+
+ArktsError QueryIccDiallingNumbers(int32_t slotId, int32_t contactType,
+    rust::Vec<ArktsDiallingNumbersInfo> &diallingNumbers);
+
+ArktsError AlterPin2(int32_t slotId, const rust::String newPin2, const rust::String oldPin2,
+    AniLockStatusResponse &lockStatusResponse);
+
+ArktsError UnlockPuk2(int32_t slotId, const rust::String newPin2, const rust::String puk2,
+    AniLockStatusResponse &lockStatusResponse);
+
+ArktsError UnlockPin2(int32_t slotId, const rust::String pin2, AniLockStatusResponse &lockStatusResponse);
+
+ArktsError SetLockState(int32_t slotId, int32_t lockType, const rust::String password, int32_t state,
+    AniLockStatusResponse &lockStatusResponse);
+
+ArktsError AlterPin(int32_t slotId, const rust::String newPin, const rust::String oldPin,
+    AniLockStatusResponse &lockStatusResponse);
+
+ArktsError GetShowNumber(int32_t slotId, rust::String &showNumber);
+
+ArktsError SetShowNumber(int32_t slotId, rust::String showNumber);
+
+ArktsError GetShowName(int32_t slotId, rust::String &showName);
+
+ArktsError SetShowName(int32_t slotId, rust::String showName);
+
+ArktsError DeactivateSim(int32_t slotId);
+
+ArktsError ActivateSim(int32_t slotId);
+
+ArktsError SetDefaultVoiceSlotId(int32_t slotId);
+
+ArktsError GetImsi(int32_t slotId, rust::String &imsi);
+
+ArktsError IsOperatorSimCard(int32_t slotId, rust::String operatorName, bool &isOperatorCard);
+
+ArktsError GetSimGid1(int32_t slotId, rust::String &simGid1);
+
+ArktsError GetSimTelephoneNumber(int32_t slotId, rust::String &simTelephoneNumber);
+
+ArktsError SetVoiceMailInfo(int32_t slotId, rust::String mailName, rust::String mailNumber);
+
+ArktsError GetVoiceMailNumber(int32_t slotId, rust::String &voiceMailNumber);
+
+ArktsError GetVoiceMailIdentifier(int32_t slotId, rust::String &voiceMailIdentifier);
+
+ArktsError GetSimIccId(int32_t slotId, rust::String &simIccId);
+
+ArktsError GetCardType(int32_t slotId, int32_t &cardType);
+
+ArktsError GetSimSpn(int32_t slotId, rust::String &simSpn);
+
+ArktsError GetSimOperatorNumeric(int32_t slotId, rust::String &simOperatorNumeric);
+
+ArktsError HasOperatorPrivileges(int32_t slotId, bool &hasPrivileges);
 } // namespace SimAni
+} // namespace Telephony
 } // namespace OHOS
 
 

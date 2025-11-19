@@ -19,8 +19,25 @@ mod esim;
 
 
 ani_constructor!(
-    namespace "L@ohos/telephony/esim/eSIM"
+    namespace "@ohos.telephony.esim.eSIM"
     [
         "nativeResetMemory": esim::reset_memory,
+        "nativeIsSupported": esim::is_supported,
+        "nativeAddProfile": esim::add_profile,
+        "nativeGetEid": esim::get_eid,
+        "nativeGetOsuStatus": esim::get_osu_status,
+        "nativeStartOsu": esim::start_osu,
+        "nativeGetDownloadableProfileMetadata": esim::get_downloadable_profile_metadata,
+        "nativeGetDownloadableProfiles": esim::get_downloadable_profiles,
+        "nativeDownloadProfile": esim::download_profile,
+        "nativeGetEuiccProfileInfoList": esim::get_euicc_profile_info_list,
+        "nativeGetEuiccInfo": esim::get_euicc_info,
+        "nativeDeleteProfile": esim::delete_profile,
+        "nativeSwitchToProfile": esim::switch_to_profile,
+        "nativeSetProfileNickname": esim::set_profile_nickname,
+        "nativeReserveProfilesForFactoryRestore": esim::reserve_profiles_for_factory_restore,
+        "nativeSetDefaultSmdpAddress": esim::set_default_smdp_address,
+        "nativeGetDefaultSmdpAddress": esim::get_default_smdp_address,
+        "nativeCancelSession": esim::cancel_session,
     ]
 );
