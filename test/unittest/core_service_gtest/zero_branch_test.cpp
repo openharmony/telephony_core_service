@@ -2258,11 +2258,11 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_005, Function | MediumTest | Leve
 }
 
 /**
-+ * @tc.number   Telephony_MultiSimMonitor_006
-+ * @tc.name     test error branch
-+ * @tc.desc     Function test
-+ */
-+ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_006, Function | MediumTest | Level1) +
+ * @tc.number   Telephony_MultiSimMonitor_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_006, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
