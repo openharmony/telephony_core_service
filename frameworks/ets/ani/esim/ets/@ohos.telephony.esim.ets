@@ -32,6 +32,244 @@ export default namespace eSIM {
     })
   }
 
+  export native function nativeIsSupported(slotId: int): boolean;
+
+  export function isSupported(slotId: int): boolean {
+    return nativeIsSupported(slotId)
+  }
+
+  export native function nativeAddProfile(profile: DownloadableProfile): boolean;
+
+  export function addProfile(profile: DownloadableProfile): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      let p = taskpool.execute(nativeAddProfile, profile)
+        p.then((e: NullishType) => {
+          let r = e as boolean
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeGetEid(slotId: int): string;
+
+  export function getEid(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetEid, slotId)
+        p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeGetOsuStatus(slotId: int): OsuStatus;
+
+  export function getOsuStatus(slotId: int): Promise<OsuStatus> {
+    return new Promise<OsuStatus>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetOsuStatus, slotId)
+        p.then((e: NullishType) => {
+          let r = e as OsuStatus
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeStartOsu(slotId: int): OsuStatus;
+
+  export function startOsu(slotId: int): Promise<OsuStatus> {
+    return new Promise<OsuStatus>((resolve, reject) => {
+      let p = taskpool.execute(nativeStartOsu, slotId)
+        p.then((e: NullishType) => {
+          let r = e as OsuStatus
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeGetDownloadableProfileMetadata(slotId: int, portIndex: int,
+    profile: DownloadableProfile, forceDisableProfile: boolean): GetDownloadableProfileMetadataResult;
+
+  export function getDownloadableProfileMetadata(slotId: int, portIndex: int,
+    profile: DownloadableProfile, forceDisableProfile: boolean): Promise<GetDownloadableProfileMetadataResult> {
+    return new Promise<GetDownloadableProfileMetadataResult>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetDownloadableProfileMetadata, slotId, portIndex, profile, forceDisableProfile)
+        p.then((e: NullishType) => {
+          let r = e as GetDownloadableProfileMetadataResult
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeGetDownloadableProfiles(slotId: int, portIndex: int,
+    forceDisableProfile: boolean): GetDownloadableProfilesResult;
+
+  export function getDownloadableProfiles(slotId: int, portIndex: int,
+    forceDisableProfile: boolean): Promise<GetDownloadableProfilesResult> {
+      return new Promise<GetDownloadableProfilesResult>((resolve, reject) => {
+        let p = taskpool.execute(nativeGetDownloadableProfiles, slotId, portIndex, forceDisableProfile)
+        p.then((e: NullishType) => {
+          let r = e as GetDownloadableProfilesResult
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+      })
+    }
+
+  export native function nativeDownloadProfile(slotId: int, portIndex: int, profile: DownloadableProfile,
+    configuration: DownloadConfiguration): DownloadProfileResult;
+
+  export function downloadProfile(slotId: int, portIndex: int, profile: DownloadableProfile,
+    configuration: DownloadConfiguration): Promise<DownloadProfileResult> {
+    return new Promise<DownloadProfileResult>((resolve, reject) => {
+      let p = taskpool.execute(nativeDownloadProfile, slotId, portIndex, profile, configuration)
+      p.then((e: NullishType) => {
+        let r = e as DownloadProfileResult
+        resolve(r)
+      }).catch((e: Error): void => {
+        reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetEuiccProfileInfoList(slotId: int): GetEuiccProfileInfoListResult;
+
+  export function getEuiccProfileInfoList(slotId: int): Promise<GetEuiccProfileInfoListResult> {
+    return new Promise<GetEuiccProfileInfoListResult>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetEuiccProfileInfoList, slotId)
+        p.then((e: NullishType) => {
+          let r = e as GetEuiccProfileInfoListResult
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })        
+  }
+
+  export native function nativeGetEuiccInfo(slotId: int): EuiccInfo;
+
+  export function getEuiccInfo(slotId: int): Promise<EuiccInfo> {
+    return new Promise<EuiccInfo>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetEuiccInfo, slotId)
+        p.then((e: NullishType) => {
+          let r = e as EuiccInfo
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeDeleteProfile(slotId: int, iccid: string): ResultCode;
+
+  export function deleteProfile(slotId: int, iccid: string): Promise<ResultCode> {
+    return new Promise<ResultCode>((resolve, reject) => {
+      let p = taskpool.execute(nativeDeleteProfile, slotId, iccid)
+        p.then((e: NullishType) => {
+          let r = e as ResultCode
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeSwitchToProfile(slotId: int, portIndex: int, iccid: string,
+    forceDisableProfile: boolean): ResultCode;
+
+  export function switchToProfile(slotId: int, portIndex: int, iccid: string,
+    forceDisableProfile: boolean): Promise<ResultCode> {
+      return new Promise<ResultCode>((resolve, reject) => {
+        let p = taskpool.execute(nativeSwitchToProfile, slotId, portIndex, iccid, forceDisableProfile)
+        p.then((e: NullishType) => {
+          let r = e as ResultCode
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+      })
+    }
+
+  export native function nativeSetProfileNickname(slotId: int, iccid: string, nickname: string): ResultCode;
+
+  export function setProfileNickname(slotId: int, iccid: string, nickname: string): Promise<ResultCode> {
+    return new Promise<ResultCode>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetProfileNickname, slotId, iccid, nickname)
+        p.then((e: NullishType) => {
+          let r = e as ResultCode
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeReserveProfilesForFactoryRestore(slotId: int): ResultCode;
+
+  export function reserveProfilesForFactoryRestore(slotId: int): Promise<ResultCode> {
+    return new Promise<ResultCode>((resolve, reject) => {
+      let p = taskpool.execute(nativeReserveProfilesForFactoryRestore, slotId)
+        p.then((e: NullishType) => {
+          let r = e as ResultCode
+          resolve(r)
+        }).catch((e: Error): void => {
+          reject(e)
+        })
+    })
+  }
+
+  export native function nativeSetDefaultSmdpAddress(slotId: int, address: string): ResultCode;
+
+  export function setDefaultSmdpAddress(slotId: int, address: string): Promise<ResultCode> {
+      return new Promise<ResultCode>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetDefaultSmdpAddress, slotId, address)
+      p.then((e: NullishType) => {
+        let r = e as ResultCode
+        resolve(r)
+      }).catch((e: Error): void => {
+        reject(e)
+      })
+    })   
+  }
+
+  export native function nativeGetDefaultSmdpAddress(slotId: int): string;
+
+  export function getDefaultSmdpAddress(slotId: int): Promise<string> {
+      return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetDefaultSmdpAddress, slotId)
+      p.then((e: NullishType) => {
+        let r = e as string
+        resolve(r)
+      }).catch((e: Error): void => {
+        reject(e)
+      })
+    })  
+  }
+
+  export native function nativeCancelSession(slotId: int, transactionId: string, cancelReason: CancelReason): ResultCode;
+
+  export function cancelSession(slotId: int, transactionId: string, cancelReason: CancelReason): Promise<ResultCode> {
+      return new Promise<ResultCode>((resolve, reject) => {
+      let p = taskpool.execute(nativeCancelSession, slotId, transactionId, cancelReason)
+      p.then((e: NullishType) => {
+        let r = e as ResultCode
+        resolve(r)
+      }).catch((e: Error): void => {
+        reject(e)
+      })
+    })  
+  }
+
   export enum ResetOption {
     DELETE_OPERATIONAL_PROFILES = 1,
 
@@ -115,4 +353,186 @@ export default namespace eSIM {
 
     RESULT_SGP_22_OTHER = 400,
   }
+
+  export enum CancelReason {
+    CANCEL_REASON_END_USER_REJECTION = 0,
+    CANCEL_REASON_POSTPONED = 1,
+    CANCEL_REASON_TIMEOUT = 2,
+    CANCEL_REASON_PPR_NOT_ALLOWED = 3,
+  }
+
+  export interface EuiccInfo {
+    osVersion: string;
+  }
+
+  export class EuiccInfoInner implements EuiccInfo {
+    osVersion: string;
+  }
+
+  export enum ProfileState {
+    PROFILE_STATE_UNSPECIFIED = -1,
+    PROFILE_STATE_DISABLED = 0,
+    PROFILE_STATE_ENABLED = 1,
+  }
+
+  export enum ProfileClass {
+    PROFILE_CLASS_UNSPECIFIED = -1,
+    PROFILE_CLASS_TEST = 0,
+    PROFILE_CLASS_PROVISIONING = 1,
+    PROFILE_CLASS_OPERATIONAL = 2,
+  }
+
+  export interface OperatorId {
+    mcc: string;
+    mnc: string;
+    gid1: string;
+    gid2: string;
+  }
+
+  export class OperatorIdInner implements OperatorId {
+    mcc: string;
+    mnc: string;
+    gid1: string;
+    gid2: string;
+  }
+
+  export enum PolicyRules {
+    POLICY_RULE_DISABLE_NOT_ALLOWED = 1,
+    POLICY_RULE_DELETE_NOT_ALLOWED = 1 << 1,
+    POLICY_RULE_DISABLE_AND_DELETE = 1 << 2,
+  }
+
+  export interface AccessRule {
+    certificateHashHexStr: string;
+    packageName: string;
+    accessType: int;
+  }
+
+  export class AccessRuleInner implements AccessRule {
+    certificateHashHexStr: string;
+    packageName: string;
+    accessType: int;
+  }
+
+  export interface EuiccProfile {
+    iccid: string;
+    nickName: string;
+    serviceProviderName: string;
+    profileName: string;
+    state: ProfileState;
+    profileClass: ProfileClass;
+    operatorId: OperatorId;
+    policyRules: PolicyRules;
+    accessRules: Array<AccessRule>;
+  }
+
+  export class EuiccProfileInner implements EuiccProfile {
+    iccid: string;
+    nickName: string;
+    serviceProviderName: string;
+    profileName: string;
+    state: ProfileState;
+    profileClass: ProfileClass;
+    operatorId: OperatorId;
+    policyRules: PolicyRules;
+    accessRules: Array<AccessRule>;
+  }
+
+  export interface GetEuiccProfileInfoListResult {
+    responseResult: ResultCode;
+    profiles: Array<EuiccProfile>;
+    isRemovable: boolean;
+  }
+
+  export class GetEuiccProfileInfoListResultInner implements GetEuiccProfileInfoListResult {
+    responseResult: ResultCode;
+    profiles: Array<EuiccProfile>;
+    isRemovable: boolean;
+  }
+
+  export interface DownloadableProfile {
+    activationCode: string;
+    confirmationCode?: string;
+    carrierName?: string;
+    accessRules?: Array<AccessRule>;
+  }
+
+  export class DownloadableProfileInner implements DownloadableProfile {
+    activationCode: string;
+    confirmationCode?: string;
+    carrierName?: string;
+    accessRules?: Array<AccessRule>;
+  }
+
+  export interface DownloadConfiguration {
+    switchAfterDownload: boolean;
+    forceDisableProfile: boolean;
+    isPprAllowed: boolean;
+  }
+
+  export class DownloadConfigurationInner implements DownloadConfiguration {
+    switchAfterDownload: boolean;
+    forceDisableProfile: boolean;
+    isPprAllowed: boolean;
+  }
+
+  export enum SolvableErrors {
+    SOLVABLE_ERROR_NEED_CONFIRMATION_CODE = 1 << 0,
+    SOLVABLE_ERROR_NEED_POLICY_RULE = 1 << 1,
+  }  
+
+  export interface DownloadProfileResult {
+    responseResult: ResultCode;
+    solvableErrors: SolvableErrors;
+    cardId: int;
+  }
+
+  export class DownloadProfileResultInner implements DownloadProfileResult {
+    responseResult: ResultCode;
+    solvableErrors: SolvableErrors;
+    cardId: int;
+  }
+
+  export interface GetDownloadableProfilesResult {
+    responseResult: ResultCode;
+    downloadableProfiles: Array<DownloadableProfile>;
+  }
+
+  export class GetDownloadableProfilesResultInner implements GetDownloadableProfilesResult {
+    responseResult: ResultCode;
+    downloadableProfiles: Array<DownloadableProfile>;
+  }
+
+  export interface GetDownloadableProfileMetadataResult {
+    downloadableProfile: DownloadableProfile;
+    pprType: int;
+    pprFlag: boolean;
+    iccid: string;
+    serviceProviderName: string;
+    profileName: string;
+    profileClass: ProfileClass;
+    solvableErrors: SolvableErrors;
+    responseResult: ResultCode;
+  }
+
+  export class GetDownloadableProfileMetadataResultInner implements GetDownloadableProfileMetadataResult {
+    downloadableProfile: DownloadableProfile;
+    pprType: int;
+    pprFlag: boolean;
+    iccid: string;
+    serviceProviderName: string;
+    profileName: string;
+    profileClass: ProfileClass;
+    solvableErrors: SolvableErrors;
+    responseResult: ResultCode;
+  }
+
+  export enum OsuStatus {
+    EUICC_UPGRADE_IN_PROGRESS = 1,
+    EUICC_UPGRADE_FAILED = 2,
+    EUICC_UPGRADE_SUCCESSFUL = 3,
+    EUICC_UPGRADE_ALREADY_LATEST = 4,
+    EUICC_UPGRADE_SERVICE_UNAVAILABLE = 5,
+  }
+
 }
