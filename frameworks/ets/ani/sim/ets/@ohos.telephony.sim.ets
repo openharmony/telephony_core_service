@@ -180,6 +180,10 @@ export default namespace sim {
     })
   }
 
+  export function hasSimCardSync(slotId: int): boolean {
+    return nativeHasSimCard(slotId);
+  }
+
   export native function nativeGetSimState(slotId: int): SimState;
 
   export function getSimState(slotId: int, callback: AsyncCallback<SimState>): void {
@@ -228,6 +232,10 @@ export default namespace sim {
           reject(e)
       })
     })
+  }
+
+  export function getISOCountryCodeForSimSync(slotId: int): string {
+    return nativeGetISOCountryCodeForSim(slotId);
   }
 
   export native function nativeGetMaxSimCount(): int;
@@ -284,6 +292,828 @@ export default namespace sim {
 
   export function isSimActiveSync(slotId: int): boolean {
     return nativeIsSimActive(slotId)
+  }
+
+  export native function nativeHasOperatorPrivileges(slotId: int): boolean;
+
+  export function hasOperatorPrivileges(slotId: int, callback: AsyncCallback<boolean>): void {
+    let p1 = taskpool.execute(nativeHasOperatorPrivileges, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as boolean);
+    }, (err: Error): void => {
+        callback(err as BusinessError, false);
+    });
+  }
+
+  export function hasOperatorPrivileges(slotId: int): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      let p = taskpool.execute(nativeHasOperatorPrivileges, slotId)
+      p.then((e: NullishType) => {
+          let r = e as boolean
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetSimOperatorNumeric(slotId: int): string;
+
+  export function getSimOperatorNumeric(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetSimOperatorNumeric, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getSimOperatorNumeric(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimOperatorNumeric, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export function getSimOperatorNumericSync(slotId: int): string {
+    return nativeGetSimOperatorNumeric(slotId);
+  }
+
+  export native function nativeGetSimSpn(slotId: int): string;
+
+  export function getSimSpn(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetSimSpn, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getSimSpn(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimSpn, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export function getSimSpnSync(slotId: int): string {
+    return nativeGetSimSpn(slotId);
+  }
+
+  export native function nativeGetCardType(slotId: int): CardType;
+
+  export function getCardType(slotId: int, callback: AsyncCallback<CardType>): void {
+    let p1 = taskpool.execute(nativeGetCardType, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as CardType);
+    }, (err: Error): void => {
+        callback(err as BusinessError, CardType.UNKNOWN_CARD);
+    });
+  }
+
+  export function getCardType(slotId: int): Promise<CardType> {
+    return new Promise<CardType>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetCardType, slotId)
+      p.then((e: NullishType) => {
+          let r = e as CardType
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export function getCardTypeSync(slotId: int): CardType {
+    return nativeGetCardType(slotId);
+  }
+
+  export native function nativeGetSimIccId(slotId: int): string;
+
+  export function getSimIccId(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetSimIccId, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getSimIccId(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimIccId, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetVoiceMailIdentifier(slotId: int): string;
+
+  export function getVoiceMailIdentifier(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetVoiceMailIdentifier, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getVoiceMailIdentifier(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetVoiceMailIdentifier, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetVoiceMailNumber(slotId: int): string;
+
+  export function getVoiceMailNumber(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetVoiceMailNumber, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getVoiceMailNumber(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetVoiceMailNumber, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSetVoiceMailInfo(slotId: int, mailName: string, mailNumber: string): void;
+
+  export function setVoiceMailInfo(slotId: int, mailName: string, mailNumber: string, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSetVoiceMailInfo, slotId, mailName, mailNumber);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function setVoiceMailInfo(slotId: int, mailName: string, mailNumber: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetVoiceMailInfo, slotId, mailName, mailNumber);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetSimTelephoneNumber(slotId: int): string;
+
+  export function getSimTelephoneNumber(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetSimTelephoneNumber, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getSimTelephoneNumber(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimTelephoneNumber, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetSimGid1(slotId: int): string;
+
+  export function getSimGid1(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetSimGid1, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getSimGid1(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimGid1, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetIMSI(slotId: int): string;
+
+  export function getIMSI(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetIMSI, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getIMSI(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetIMSI, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeIsOperatorSimCard(slotId: int, operator: OperatorSimCard): boolean;
+
+  export function isOperatorSimCard(slotId: int, operator: OperatorSimCard): boolean {
+    return nativeIsOperatorSimCard(slotId, operator);
+  }
+
+  export native function nativeSetDefaultVoiceSlotId(slotId: int): void;
+
+  export function setDefaultVoiceSlotId(slotId: int, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSetDefaultVoiceSlotId, slotId);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function setDefaultVoiceSlotId(slotId: int): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetDefaultVoiceSlotId, slotId);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeActivateSim(slotId: int): void;
+
+  export function activateSim(slotId: int, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeActivateSim, slotId);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function activateSim(slotId: int): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeActivateSim, slotId);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeDeactivateSim(slotId: int): void;
+
+  export function deactivateSim(slotId: int, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeDeactivateSim, slotId);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function deactivateSim(slotId: int): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeDeactivateSim, slotId);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSetShowName(slotId: int, name: string): void;
+
+  export function setShowName(slotId: int, name: string, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSetShowName, slotId, name);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function setShowName(slotId: int, name: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetShowName, slotId, name);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetShowName(slotId: int): string;
+
+  export function getShowName(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetShowName, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getShowName(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetShowName, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSetShowNumber(slotId: int, number: string): void;
+
+  export function setShowNumber(slotId: int, number: string, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSetShowNumber, slotId, number);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function setShowNumber(slotId: int, number: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetShowNumber, slotId, number);
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetShowNumber(slotId: int): string;
+
+  export function getShowNumber(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetShowNumber, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getShowNumber(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetShowNumber, slotId);
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeAlterPin(slotId: int, newPin: string, oldPin: string): LockStatusResponse;
+
+  export function alterPin(slotId: int, newPin: string, oldPin: string, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeAlterPin, slotId, newPin, oldPin)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function alterPin(slotId: int, newPin: string, oldPin: string): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeAlterPin, slotId, newPin, oldPin)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSetLockState(slotId: int, options: LockInfo): LockStatusResponse;
+
+  export function setLockState(slotId: int, options: LockInfo, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeSetLockState, slotId, options)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function setLockState(slotId: int, options: LockInfo): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeSetLockState, slotId, options)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeUnlockPin2(slotId: int, Pin2: string): LockStatusResponse;
+
+  export function unlockPin2(slotId: int, pin2: string, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeUnlockPin2, slotId, pin2)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function unlockPin2(slotId: int, pin2: string): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeUnlockPin2, slotId, pin2)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeUnlockPuk2(slotId: int, newPin2: string, puk2: string): LockStatusResponse;
+
+  export function unlockPuk2(slotId: int, newPin2: string, puk2: string, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeUnlockPuk2, slotId, newPin2, puk2)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function unlockPuk2(slotId: int, newPin2: string, puk2: string): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeUnlockPuk2, slotId, newPin2, puk2)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeAlterPin2(slotId: int, newPin2: string, oldPin2: string): LockStatusResponse;
+
+  export function alterPin2(slotId: int, newPin2: string, oldPin2: string, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeAlterPin2, slotId, newPin2, oldPin2)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function alterPin2(slotId: int, newPin2: string, oldPin2: string): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeAlterPin2, slotId, newPin2, oldPin2)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeQueryIccDiallingNumbers(slotId: int, type: ContactType): Array<DiallingNumbersInfo>;
+
+  export function queryIccDiallingNumbers(slotId: int, type: ContactType, callback: AsyncCallback<Array<DiallingNumbersInfo>>): void {
+    let p1 = taskpool.execute(nativeQueryIccDiallingNumbers, slotId, type)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as Array<DiallingNumbersInfo>);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new Array<DiallingNumbersInfo>());
+    });
+  }
+
+  export function queryIccDiallingNumbers(slotId: int, type: ContactType): Promise<Array<DiallingNumbersInfo>> {
+    return new Promise<Array<DiallingNumbersInfo>>((resolve, reject) => {
+      let p = taskpool.execute(nativeQueryIccDiallingNumbers, slotId, type)
+      p.then((e: NullishType) => {
+          let r = e as Array<DiallingNumbersInfo>
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeAddIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function addIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeAddIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function addIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeAddIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeDelIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function delIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeDelIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function delIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeDelIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeUpdateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): void;
+
+  export function updateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeUpdateIccDiallingNumbers, slotId, type, diallingNumbers);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function updateIccDiallingNumbers(slotId: int, type: ContactType, diallingNumbers: DiallingNumbersInfo): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeUpdateIccDiallingNumbers, slotId, type, diallingNumbers)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSendEnvelopeCmd(slotId: int, cmd: string): void;
+
+  export function sendEnvelopeCmd(slotId: int, cmd: string, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSendEnvelopeCmd, slotId, cmd);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    })
+  }
+
+  export function sendEnvelopeCmd(slotId: int, cmd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSendEnvelopeCmd, slotId, cmd)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeSendTerminalResponseCmd(slotId: int, cmd: string): void;
+
+  export function sendTerminalResponseCmd(slotId: int, cmd: string, callback: AsyncCallback<void>): void {
+    let p1 = taskpool.execute(nativeSendTerminalResponseCmd, slotId, cmd);
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as undefined);
+    }, (err: Error): void => {
+        callback(err as BusinessError, undefined);
+    });
+  }
+
+  export function sendTerminalResponseCmd(slotId: int, cmd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let p = taskpool.execute(nativeSendTerminalResponseCmd, slotId, cmd)
+      p.then((e: NullishType) => {
+          let r = e as undefined
+          resolve(r)
+      }).catch((e: Error): void => {
+        reject(e)
+      })
+    })
+  }
+
+  export native function nativeUnlockSimLock(slotId: int, lockInfo: PersoLockInfo): LockStatusResponse;
+
+  export function unlockSimLock(slotId: int, lockInfo: PersoLockInfo, callback: AsyncCallback<LockStatusResponse>): void {
+    let p1 = taskpool.execute(nativeUnlockSimLock, slotId, lockInfo)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as LockStatusResponse);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new LockStatusResponseInner());
+    });
+  }
+
+  export function unlockSimLock(slotId: int, lockInfo: PersoLockInfo): Promise<LockStatusResponse> {
+    return new Promise<LockStatusResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeUnlockSimLock, slotId, lockInfo)
+      p.then((e: NullishType) => {
+          let r = e as LockStatusResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetOpKey(slotId: int): string;
+
+  export function getOpKey(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetOpKey, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getOpKey(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetOpKey, slotId)
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export function getOpKeySync(slotId: int): string {
+    return nativeGetOpKey(slotId);
+  }
+
+  export native function nativeGetOpName(slotId: int): string;
+
+  export function getOpName(slotId: int, callback: AsyncCallback<string>): void {
+    let p1 = taskpool.execute(nativeGetOpName, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as string);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new string());
+    });
+  }
+
+  export function getOpName(slotId: int): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetOpName, slotId)
+      p.then((e: NullishType) => {
+          let r = e as string
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export function getOpNameSync(slotId: int): string {
+    return nativeGetOpName(slotId);
+  }
+
+  export native function nativeGetDefaultVoiceSimId(): int;
+
+  export function getDefaultVoiceSimId(callback: AsyncCallback<int>): void {
+    let p1 = taskpool.execute(nativeGetDefaultVoiceSimId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as int);
+    }, (err: Error): void => {
+        callback(err as BusinessError, 0);
+    });
+  }
+
+  export function getDefaultVoiceSimId(): Promise<int> {
+    return new Promise<int>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetDefaultVoiceSimId)
+      p.then((e: NullishType) => {
+          let r = e as int
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+export native function nativeGetDsdsMode(): DsdsMode;
+
+  export function getDsdsMode(callback: AsyncCallback<DsdsMode>): void {
+    let p1 = taskpool.execute(nativeGetDsdsMode)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as DsdsMode);
+    }, (err: Error): void => {
+        callback(err as BusinessError, DsdsMode.DSDS_MODE_V2);
+    });
+  }
+
+  export function getDsdsMode(): Promise<DsdsMode> {
+    return new Promise<DsdsMode>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetDsdsMode)
+      p.then((e: NullishType) => {
+          let r = e as DsdsMode
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+
+  export native function nativeGetSimAuthentication(slotId: int, authType: AuthType, authData: string): SimAuthenticationResponse;
+
+  export function getSimAuthentication(slotId: int, authType: AuthType, authData: string): Promise<SimAuthenticationResponse> {
+    return new Promise<SimAuthenticationResponse>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimAuthentication, slotId, authType, authData)
+      p.then((e: NullishType) => {
+          let r = e as SimAuthenticationResponse
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
   }
 
   export enum LockState {
@@ -389,4 +1219,117 @@ export default namespace sim {
 
     SINGLE_MODE_ISIM_CARD = 60
   }
+
+  export enum PersoLockType {
+    PN_PIN_LOCK,
+
+    PN_PUK_LOCK,
+
+    PU_PIN_LOCK,
+
+    PU_PUK_LOCK,
+
+    PP_PIN_LOCK,
+
+    PP_PUK_LOCK,
+
+    PC_PIN_LOCK,
+
+    PC_PUK_LOCK,
+
+    SIM_PIN_LOCK,
+
+    SIM_PUK_LOCK,
+  }
+
+  export interface PersoLockInfo {
+    lockType: PersoLockType;
+
+    password: string;
+  }
+
+  export class PersoLockInfoInner implements PersoLockInfo {
+    lockType: PersoLockType;
+
+    password: string;
+  }
+
+  export enum ContactType {
+    GENERAL_CONTACT = 1,
+
+    FIXED_DIALING = 2,
+  }
+
+  export interface DiallingNumbersInfo {
+    alphaTag: string;
+
+    teleNumber: string;
+
+    recordNumber?: int;
+
+    pin2?: string;
+  }
+
+  export class DiallingNumbersInfoInner implements DiallingNumbersInfo {
+    alphaTag: string;
+
+    teleNumber: string;
+
+    recordNumber?: int;
+
+    pin2?: string;
+  }
+
+export interface LockInfo {
+  lockType: LockType;
+
+  password: string;
+
+  state: LockState;
+}
+
+export class LockInfoInner implements LockInfo {
+  lockType: LockType;
+
+  password: string;
+
+  state: LockState;
+}
+
+export enum OperatorSimCard {
+  CHINA_TELECOM_CARD = 'china_telecom_card',
+}
+
+export enum DsdsMode {
+  DSDS_MODE_V2 = 0,
+
+  DSDS_MODE_V3 = 1,
+
+  DSDS_MODE_V5_TDM = 2,
+
+  DSDS_MODE_V5_DSDA = 3,
+}
+
+export enum AuthType {
+  SIM_AUTH_EAP_SIM_TYPE = 128,
+
+  SIM_AUTH_EAP_AKA_TYPE = 129,
+}
+
+
+export interface SimAuthenticationResponse {
+  simStatusWord1: int;
+
+  simStatusWord2: int;
+
+  response: string;
+}
+
+export class SimAuthenticationResponseInner implements SimAuthenticationResponse {
+  simStatusWord1: int;
+
+  simStatusWord2: int;
+
+  response: string;
+}
 }
