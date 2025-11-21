@@ -14,7 +14,8 @@
 use crate::{
     bridge::{
         AniDiallingNumbersInfo, AniIccAccountInfo, AniLockInfo, AniLockStatusResponse, AniOperatorConfig, AniPersoLockInfo,
-        AniSimAuthenticationResponse, CardType, ContactType, DsdsMode, LockState, LockType, OperatorSimCard, SimState, AuthType,
+        AniSimAuthenticationResponse, AniSimLabel, CardType, ContactType, DsdsMode, LockState, LockType, OperatorSimCard, SimState,
+        AuthType,
     },
     wrapper,
 };
@@ -562,4 +563,16 @@ pub fn has_operator_privileges(slot_id: i32) -> Result<bool, BusinessError> {
     }
 
     Ok(has_privileges)
+}
+
+#[ani_rs::native]
+pub fn get_sim_label(slot_id: i32) -> Result<AniSimLabel, BusinessError> {
+    let mut sim_label = AniSimLabel::new();
+ 
+    let arkts_error = wrapper::ffi::GetSimLabel(slot_id, &mut sim_label);
+    if arkts_error.is_error() {
+        return Err(BusinessError::from(arkts_error));
+    }
+ 
+    Ok(sim_label)
 }
