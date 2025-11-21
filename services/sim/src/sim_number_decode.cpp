@@ -208,7 +208,6 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
     std::vector<uint8_t>::const_iterator it = codeBeg;
     const bool prependPlus = (*it == FLAG_INTERNATIONAL);
     ++it;
-  
     if (!prependPlus) {
         return true;
     }
