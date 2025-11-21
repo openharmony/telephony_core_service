@@ -519,7 +519,6 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     length = static_cast<int>(record[offset]);
     if (length > MAX_NUMBER_SIZE_BYTES) {
         length = MAX_NUMBER_SIZE_BYTES;
-        TELEPHONY_LOGE("FetchDiallingNumberContent number error");
     }
     /* parse number */
     ++offset;

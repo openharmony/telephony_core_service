@@ -255,7 +255,6 @@ std::string SIMUtils::Cphs7bitConvertToString(const std::string &rawData)
             wide_str += c;
         }
     }
-    TELEPHONY_LOGI("Cphs7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
     return ToUtf8(wide_str);
 }
 
