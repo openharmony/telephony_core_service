@@ -1116,6 +1116,33 @@ export native function nativeGetDsdsMode(): DsdsMode;
     })
   }
 
+export native function nativeGetSimLabel(slotId: int): SimLabel;
+ 
+  export function getSimLabel(slotId: int, callback: AsyncCallback<SimLabel>): void {
+    let p1 = taskpool.execute(nativeGetSimLabel, slotId)
+    p1.then((content: NullishType) => {
+        callback(new BusinessError(), content as SimLabel);
+    }, (err: Error): void => {
+        callback(err as BusinessError, new SimLabelInner);
+    });
+  }
+ 
+  export function getSimLabel(slotId: int): Promise<SimLabel> {
+    return new Promise<SimLabel>((resolve, reject) => {
+      let p = taskpool.execute(nativeGetSimLabel, slotId)
+      p.then((e: NullishType) => {
+          let r = e as SimLabel
+          resolve(r)
+      }).catch((e: Error): void => {
+          reject(e)
+      })
+    })
+  }
+ 
+  export function getSimLabelSync(slotId: int): SimLabel {
+    return nativeGetSimLabel(slotId)
+  }
+
   export enum LockState {
     LOCK_OFF = 0,
 
@@ -1240,6 +1267,24 @@ export native function nativeGetDsdsMode(): DsdsMode;
     SIM_PIN_LOCK,
 
     SIM_PUK_LOCK,
+  }
+
+export enum SimType {
+    PSIM = 0,
+ 
+    ESIM = 1,
+  }
+ 
+  export interface SimLabel {
+    simType: SimType;
+ 
+    index: int;
+  }
+ 
+  export class SimLabelInner implements SimLabel {
+    simType: SimType;
+ 
+    index: int;
   }
 
   export interface PersoLockInfo {

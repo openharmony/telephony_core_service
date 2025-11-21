@@ -68,5 +68,6 @@ ani_constructor!(
         "nativeGetSimOperatorNumeric": sim::get_sim_operator_numeric,
         "nativeHasOperatorPrivileges": sim::has_operator_privileges,
         "nativeIsOperatorSimCard": sim::is_operator_sim_card,
+        "nativeGetSimLabel": sim::get_sim_label,
     ]
 );
