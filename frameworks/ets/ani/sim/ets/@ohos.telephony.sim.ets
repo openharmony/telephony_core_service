@@ -1120,7 +1120,7 @@ export native function nativeGetSimLabel(slotId: int): SimLabel;
  
   export function getSimLabel(slotId: int, callback: AsyncCallback<SimLabel>): void {
     let p1 = taskpool.execute(nativeGetSimLabel, slotId)
-    p1.then((content: NullishType) => {
+    p1.then((content: Any) => {
         callback(new BusinessError(), content as SimLabel);
     }, (err: Error): void => {
         callback(err as BusinessError, new SimLabelInner);
@@ -1130,7 +1130,7 @@ export native function nativeGetSimLabel(slotId: int): SimLabel;
   export function getSimLabel(slotId: int): Promise<SimLabel> {
     return new Promise<SimLabel>((resolve, reject) => {
       let p = taskpool.execute(nativeGetSimLabel, slotId)
-      p.then((e: NullishType) => {
+      p.then((e: Any) => {
           let r = e as SimLabel
           resolve(r)
       }).catch((e: Error): void => {
