@@ -423,3 +423,44 @@ pub fn sim_authentication_response_conversion(
     sim_authentication_response.sim_status_word2 = status_word2;
     sim_authentication_response.response = response;
 }
+
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.SimType")]
+#[repr(i32)]
+pub enum SimType {
+    Psim = 0,
+    Esim = 1,
+}
+ 
+impl From<i32> for SimType {
+    fn from(value: i32) -> Self {
+        match value {
+            0 => SimType::Psim,
+            1 => SimType::Esim,
+            _ => SimType::Psim,
+        }
+    }
+}
+ 
+#[ani_rs::ani(path = "@ohos.telephony.sim.sim.SimLabelInner")]
+pub struct AniSimLabel {
+    sim_type: SimType,
+    index: i32,
+}
+ 
+impl AniSimLabel {
+    pub fn new() -> Self {
+        Self {
+            sim_type: SimType::Psim,
+            index: 1,
+        }
+    }
+}
+ 
+pub fn sim_label_conversion(
+    sim_label: &mut AniSimLabel,
+    sim_type: i32,
+index: i32,
+) {
+    sim_label.sim_type = SimType::from(sim_type);
+    sim_label.index = index;
+}

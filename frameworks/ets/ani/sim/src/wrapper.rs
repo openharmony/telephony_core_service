@@ -14,7 +14,7 @@
 use crate::bridge::{
     icc_account_info_conversion, icc_account_info_push_data, lock_status_response_conversion,
     sim_authentication_response_conversion, operator_config_push_kv, AniIccAccountInfo, AniLockStatusResponse,
-    AniOperatorConfig, AniDiallingNumbersInfo, AniSimAuthenticationResponse,
+    AniOperatorConfig, AniDiallingNumbersInfo, AniSimAuthenticationResponse, AniSimLabel, sim_label_conversion,
 };
 use ani_rs::business_error::BusinessError;
 use ffi::ArktsError;
@@ -156,6 +156,8 @@ pub mod ffi {
         fn GetSimOperatorNumeric(slotId: i32, simOperatorNumeric: &mut String) -> ArktsError;
 
         fn HasOperatorPrivileges(slotId: i32, hasPrivileges: &mut bool) -> ArktsError;
+
+        fn GetSimLabel(slotId: i32, simLabel: &mut AniSimLabel) -> ArktsError;
     }
 
     extern "Rust" {
@@ -202,6 +204,13 @@ pub mod ffi {
             status_word1: i32,
             status_word2: i32,
             response: String,
+        );
+
+        type AniSimLabel;
+        fn sim_label_conversion(
+            sim_label: &mut AniSimLabel,
+            sim_type: i32,
+            index: i32,
         );
     }
 }

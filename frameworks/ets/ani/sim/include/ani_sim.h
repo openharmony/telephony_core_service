@@ -29,6 +29,7 @@ struct AniOperatorConfig;
 struct AniIccAccountInfo;
 struct ArktsDiallingNumbersInfo;
 struct AniSimAuthenticationResponse;
+struct AniSimLabel;
 
 ArktsError GetLockState(int32_t slotId, int32_t lockType, int32_t &lockState);
 
@@ -135,6 +136,8 @@ ArktsError GetSimSpn(int32_t slotId, rust::String &simSpn);
 ArktsError GetSimOperatorNumeric(int32_t slotId, rust::String &simOperatorNumeric);
 
 ArktsError HasOperatorPrivileges(int32_t slotId, bool &hasPrivileges);
+
+ArktsError GetSimLabel(int32_t slotId, AniSimLabel &simLabel);
 } // namespace SimAni
 } // namespace Telephony
 } // namespace OHOS
