@@ -866,6 +866,23 @@ ArktsError HasOperatorPrivileges(int32_t slotId, bool &hasPrivileges)
 
     return ConvertArktsError(errorCode);
 }
+
+ArktsError GetSimLabel(int32_t slotId, AniSimLabel &simLabel)
+{
+    int32_t errorCode;
+    if (!IsValidSlotId(slotId)) {
+        errorCode = ERROR_SLOT_ID_INVALID;
+        return ConvertArktsError(errorCode);
+    }
+ 
+    SimLabel label;
+ 
+    errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(slotId, label);
+    if (errorCode == ERROR_NONE) {
+        sim_label_conversion(simLabel, static_cast<int32_t>(label.simType), label.index);
+    }
+    return ConvertArktsError(errorCode);
+}
 } // namespace SimAni
 } // namespace Telephony
 } // namespace OHOS
