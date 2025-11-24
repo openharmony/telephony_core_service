@@ -16,7 +16,7 @@ SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("NetworkSearchFuzzTest") {
   module_output_path = "core_service/core_service"
@@ -97,6 +97,8 @@ ohos_fuzztest("NetworkSearchFuzzTest") {
     "TELEPHONY_LOG_TAG = \"NetworkSearchFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  defines += telephony_extra_defines
 
   cflags = [
     "-g",

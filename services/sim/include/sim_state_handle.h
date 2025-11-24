@@ -135,8 +135,10 @@ public:
     bool IsIccLocked();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     void RegisterSatelliteCallback();
     void UnregisterSatelliteCallback();
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
     void SendSimMatchedOperatorInfo(
