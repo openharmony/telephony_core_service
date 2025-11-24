@@ -1026,7 +1026,7 @@ HWTEST_F(CoreManagerInnerTest, IsModemInitDone_001, Function | MediumTest | Leve
     mInner.simManager_ = mockeSimManager;
     EXPECT_CALL(*mockeSimManager, IsModemInitDone(_)).WillOnce(
         Return(true));
-    ret = mInner.SetIccCardState(0);
+    ret = mInner.IsModemInitDone(0);
     EXPECT_TRUE(ret);
 }
 } // Telephony
