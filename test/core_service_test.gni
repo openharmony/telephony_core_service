@@ -18,7 +18,9 @@ TELEPHONY_NETWORK_SEARCH_ROOT = "$CORE_SERVICE_ROOT/services/network_search"
 TELEPHONY_SIM_ROOT = "$CORE_SERVICE_ROOT/services/sim"
 TELEPHONY_TEL_RIL_ROOT = "$CORE_SERVICE_ROOT/services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "$CORE_SERVICE_ROOT/services/ims_service_interaction/src"
-TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH = "$CORE_SERVICE_ROOT/services/satellite_service_interaction/src"
+if (core_service_feature_support_satellite) {
+  TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH = "$CORE_SERVICE_ROOT/services/satellite_service_interaction/src"
+}
 TELEPHONY_EXT_WRAPPER_ROOT = "$CORE_SERVICE_ROOT/services/telephony_ext_wrapper"
 TELEPHONY_UTILS = "$CORE_SERVICE_ROOT/utils"
 common_src = [
@@ -93,10 +95,6 @@ tel_core_service_src = [
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/setting_utils.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
-  "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
-  "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
-  "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
-  "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
   "$TELEPHONY_SIM_ROOT/src/csim_file_controller.cpp",
   "$TELEPHONY_SIM_ROOT/src/esim_manager.cpp",
   "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
@@ -174,6 +172,14 @@ if (core_service_support_esim) {
     "$CORE_SERVICE_ROOT/test/mock/codec/src/asn1_utils.cpp",
     "$CORE_SERVICE_ROOT/test/mock/codec/src/request_apdu_build.cpp",
     "$CORE_SERVICE_ROOT/test/mock/codec/src/reset_response.cpp",
+  ]
+}
+if (core_service_feature_support_satellite) {
+  tel_core_service_src += [
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
+    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
   ]
 }
 
