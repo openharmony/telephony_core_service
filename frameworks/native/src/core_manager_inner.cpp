@@ -127,7 +127,14 @@ int32_t CoreManagerInner::GetDefaultSlotId(void)
 
 int32_t CoreManagerInner::GetMaxSimCount(void)
 {
-    return SIM_SLOT_COUNT;
+    int32_t slotCount = SIM_SLOT_COUNT;
+    if (slotCount > 0) {
+        return slotCount;
+    }
+    if (simManager_ != nullptr) {
+        return simManager_->GetMaxSimCount();
+    }
+    return slotCount;
 }
 
 int32_t CoreManagerInner::RegisterCoreNotify(

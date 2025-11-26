@@ -47,6 +47,7 @@ const int32_t DUAL_SLOT_COUNT = 2;
 const int32_t MAX_SLOT_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
+const int32_t DC_HAS_ONE_SLOT = 1;
 std::atomic<int32_t> maxRealSlotCount_ = 0;
 int32_t maxSlotCount_ = 0;
 int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;

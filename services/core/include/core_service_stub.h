@@ -148,6 +148,7 @@ private:
     int32_t OnGetSimLabel(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetAllSimAccountInfoList(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendApduData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetRealSimCount(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

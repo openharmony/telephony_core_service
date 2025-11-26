@@ -168,6 +168,8 @@ void CoreServiceStub::AddHandlerSimToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetShowName(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_SHOW_NAME)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetShowName(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_REAL_SIM_COUNT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetRealSimCount(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerSimLockToMap()
@@ -1963,6 +1965,17 @@ int32_t CoreServiceStub::OnSendApduData(MessageParcel &data, MessageParcel &repl
     if (!ret) {
         TELEPHONY_LOGE("write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetRealSimCount(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = GetRealSimCount();
+    int32_t ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnGetRealSimCount write reply failed.");
+        return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
 }

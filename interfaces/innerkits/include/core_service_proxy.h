@@ -157,6 +157,7 @@ public:
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) override;
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
+    int32_t GetRealSimCount() override;
 
 private:
     template<class T>

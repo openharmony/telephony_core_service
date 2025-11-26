@@ -269,6 +269,7 @@ public:
     int32_t GetAllSimAccountInfoList(std::vector<IccAccountInfo> &iccAccountInfoList) override;
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
+    int32_t GetRealSimCount() override;
 private:
     bool Init();
     bool NotifyCoreServiceReady();
