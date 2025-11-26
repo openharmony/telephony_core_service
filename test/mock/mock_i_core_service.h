@@ -165,6 +165,7 @@ public:
     MOCK_METHOD(int32_t, GetAllSimAccountInfoList, (std::vector<IccAccountInfo> & iccAccountInfoList), (override));
     MOCK_METHOD(int32_t, SendApduData, (int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult), (override));
+    MOCK_METHOD(int32_t, GetRealSimCount, (), (override));
 };
 } // namespace Telephony
 } // namespace OHOS
