@@ -47,19 +47,19 @@ TelEventQueue::~TelEventQueue()
     TELEPHONY_LOGD("%{public}s need to wait", name_.c_str());
     queue_->wait(curTask_);
     curTask_ = ffrt::task_handle();
-    std::lock_guard<std::mutex> lock(taskCtx_);
+    std::lock_guard<ffrt::mutex> lock(taskCtx_);
     queue_ = nullptr;
 }
 
 AppExecFwk::InnerEvent::TimePoint TelEventQueue::GetCurHandleTime()
 {
-    std::lock_guard<std::mutex> lock(memberCtx_);
+    std::lock_guard<ffrt::mutex> lock(memberCtx_);
     return curHandleTime_;
 }
 
 void TelEventQueue::SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint handleTime)
 {
-    std::lock_guard<std::mutex> lock(memberCtx_);
+    std::lock_guard<ffrt::mutex> lock(memberCtx_);
     curHandleTime_ = handleTime;
 }
 
@@ -89,7 +89,7 @@ void TelEventQueue::InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, Ap
     if (event == nullptr) {
         return;
     }
-    std::unique_lock<std::mutex> lock(eventCtx_);
+    std::unique_lock<ffrt::mutex> lock(eventCtx_);
     auto &events = eventLists_[ToTelPriority(priority)].events;
     auto f = [](const AppExecFwk::InnerEvent::Pointer &first, const AppExecFwk::InnerEvent::Pointer &second) {
         if (!first || !second) {
@@ -108,7 +108,7 @@ void TelEventQueue::InsertEventsInner(AppExecFwk::InnerEvent::Pointer &event, Ap
 
 void TelEventQueue::ClearCurrentTask(bool isNeedEnd)
 {
-    std::lock_guard<std::mutex> lock(taskCtx_);
+    std::lock_guard<ffrt::mutex> lock(taskCtx_);
     if (!curTask_ || !queue_) {
         return;
     }
@@ -150,7 +150,7 @@ int32_t TelEventQueue::GetNextQueueId()
 
 void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePoint handleTime, int64_t delayTime)
 {
-    std::lock_guard<std::mutex> lock(taskCtx_);
+    std::lock_guard<ffrt::mutex> lock(taskCtx_);
     if (queueId != queueId_.load()) {
         TELEPHONY_LOGD("%{public}s task no need to submit", name_.c_str());
         SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
@@ -191,7 +191,7 @@ void TelEventQueue::SubmitToFFRT(int32_t queueId, AppExecFwk::InnerEvent::TimePo
 
 void TelEventQueue::RemoveEvent(uint32_t innerEventId)
 {
-    std::lock_guard<std::mutex> lock(eventCtx_);
+    std::lock_guard<ffrt::mutex> lock(eventCtx_);
     auto filter = [innerEventId](const AppExecFwk::InnerEvent::Pointer &p) {
         if (p == nullptr) {
             return false;
@@ -210,7 +210,7 @@ void TelEventQueue::RemoveEvent(uint32_t innerEventId)
 
 bool TelEventQueue::HasInnerEvent(uint32_t innerEventId)
 {
-    std::lock_guard<std::mutex> lock(eventCtx_);
+    std::lock_guard<ffrt::mutex> lock(eventCtx_);
     auto filter = [innerEventId](
                       const AppExecFwk::InnerEvent::Pointer &p) { return p->GetInnerEventId() == innerEventId; };
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
@@ -225,7 +225,7 @@ bool TelEventQueue::HasInnerEvent(uint32_t innerEventId)
 
 void TelEventQueue::RemoveAllEvents()
 {
-    std::lock_guard<std::mutex> lock(eventCtx_);
+    std::lock_guard<ffrt::mutex> lock(eventCtx_);
     uint32_t removeCount = 0;
     for (uint32_t i = 0; i < EVENT_QUEUE_NUM; ++i) {
         removeCount += eventLists_[i].events.size();
@@ -248,7 +248,7 @@ bool TelEventQueue::IsEmpty()
 
 AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent(int32_t queueId, bool &isNeedSubmit)
 {
-    std::lock_guard<std::mutex> lock(eventCtx_);
+    std::lock_guard<ffrt::mutex> lock(eventCtx_);
     if (IsEmpty() || queueId != queueId_.load()) {
         isNeedSubmit = false;
         SetCurHandleTime(AppExecFwk::InnerEvent::TimePoint::max());
@@ -266,7 +266,7 @@ AppExecFwk::InnerEvent::Pointer TelEventQueue::PopEvent(int32_t queueId, bool &i
 
 AppExecFwk::InnerEvent::TimePoint TelEventQueue::GetHandleTime()
 {
-    std::lock_guard<std::mutex> lock(eventCtx_);
+    std::lock_guard<ffrt::mutex> lock(eventCtx_);
     if (IsEmpty()) {
         return AppExecFwk::InnerEvent::TimePoint::max();
     }
