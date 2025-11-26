@@ -70,9 +70,9 @@ private:
     static const uint32_t EVENT_QUEUE_NUM = 3;
     std::array<EventList, EVENT_QUEUE_NUM> eventLists_;
     AppExecFwk::InnerEvent::TimePoint curHandleTime_ { AppExecFwk::InnerEvent::TimePoint::max() };
-    std::mutex eventCtx_;
-    std::mutex taskCtx_;
-    std::mutex memberCtx_;
+    ffrt::mutex eventCtx_;
+    ffrt::mutex taskCtx_;
+    ffrt::mutex memberCtx_;
     ffrt::task_handle curTask_;
     std::string name_;
     std::atomic_int queueId_ { 0 };
