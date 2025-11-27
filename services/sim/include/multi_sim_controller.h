@@ -89,7 +89,6 @@ public:
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
-    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
     bool IsEsim(int32_t slotId);
@@ -165,6 +164,7 @@ private:
     bool IsNeedSetTargetPrimarySlotId();
     bool IsSetPrimarySlotReady(int32_t slotId);
     void ResetPrimarySlotReady();
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
