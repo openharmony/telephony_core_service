@@ -33,7 +33,7 @@
 
 namespace OHOS {
 namespace Telephony {
-typedef void (*ParameterChgPtr)(const char *, const char *, void *); 
+typedef void (*ParameterChgPtr)(const char *, const char *, void *);
 class MultiSimMonitor : public TelEventHandler {
 public:
     explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -98,7 +98,6 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
-    void CheckSimPresentWhenReboot();
     void UpdateSimStateToStateRegistry();
     void RegisterRebootDetectCallback();
     void UnregisterRebootDetectCallback();
