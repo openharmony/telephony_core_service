@@ -1374,7 +1374,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitPrimary_001, Functio
     EXPECT_EQ(multiSimController->InitPrimary(0, true), true);
 }
 
-HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitPrimary_001, Function | MediumTest | Level1)
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLocalCache, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
