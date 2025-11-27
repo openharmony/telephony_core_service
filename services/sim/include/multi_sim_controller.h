@@ -164,6 +164,7 @@ private:
     bool IsNeedSetTargetPrimarySlotId();
     bool IsSetPrimarySlotReady(int32_t slotId);
     void ResetPrimarySlotReady();
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;

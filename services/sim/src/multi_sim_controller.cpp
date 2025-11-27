@@ -544,6 +544,17 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
     return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
 }
 
+void MultiSimController::GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx)
+{
+    int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, OCT_TYPE);
+    if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
+        simLabelIdx = ESIM1;
+        return;
+    }
+    int simIdx = allLocalCacheInfo_[simId - 1].simLabelIndex;
+    simLabelIdx = simIdx > 0 ? simId : ESIM1;
+}
+
 int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
     std::string esimType = OHOS::system::GetParameter(ESIM_SUPPORT_PARAM, "");
@@ -560,17 +571,11 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
         std::shared_lock<ffrt::shared_mutex> lock(mutex_);
         if (static_cast<uint32_t>(slotId) >= localCacheInfo_.size()) {
             TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
+            GetSimLabelIdxFromAllLocalCache(simLabel.index);
             return TELEPHONY_ERR_SUCCESS;
         }
         if (localCacheInfo_[slotId].iccId.empty()) {
-            int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, OCT_TYPE);
-            if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
-                simLabel.index = ESIM1;
-            } else if (allLocalCacheInfo_[simId - 1].simLabelIndex > 0) {
-                simLabel.index = allLocalCacheInfo_[simId - 1].simLabelIndex;
-            } else {
-                simLabel.index = ESIM1;
-            }
+            GetSimLabelIdxFromAllLocalCache(simLabel.index);
         } else {
             simLabel.index = localCacheInfo_[slotId].simLabelIndex;
         }
