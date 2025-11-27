@@ -150,7 +150,7 @@ private:
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
     std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    ParameterChgPtr ParameterChgPtr_ = nullptr;
+    ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 15;
