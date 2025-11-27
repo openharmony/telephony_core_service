@@ -538,6 +538,17 @@ declare namespace radio {
   function getISOCountryCodeForNetworkSync(slotId: number): string;
 
   /**
+   * Obtains the resident network numeric.
+   *
+   * @param { int } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { string } Returns the resident network numeric.
+   * Returns an empty string if the sim card is not registered with any network.
+   * @since 24
+   */
+  function getResidentNetworkNumeric(slotId: int): string;
+
+  /**
    * Get the option mode of NR.
    *
    * @param { number } slotId - Indicates the card slot index number, ranging from 0 to the maximum card slot
