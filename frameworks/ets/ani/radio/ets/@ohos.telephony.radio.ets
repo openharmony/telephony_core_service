@@ -237,6 +237,12 @@ export default namespace radio {
       return nativeGetISOCountryCodeForNetwork(slotId);
     }
 
+    export native function nativeGetResidentNetworkNumeric(slotId: int): string;
+
+    export function getResidentNetworkNumeric(slotId: int): string {
+      return nativeGetResidentNetworkNumeric(slotId);
+    }
+
     export native function nativeGetIMEI(slotId?: int): string;
 
     export function getIMEI(slotId: int, callback: AsyncCallback<string>): void {
