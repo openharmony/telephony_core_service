@@ -33,6 +33,7 @@
 
 namespace OHOS {
 namespace Telephony {
+typedef void (*ParameterChgPtr)(const char *, const char *, void *);
 class MultiSimMonitor : public TelEventHandler {
 public:
     explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -54,6 +55,7 @@ public:
     bool IsVSimSlotId(int32_t slotId);
     void SetPrivateUserId(int32_t userId);
     void UpdateAllSimData(int32_t userId);
+    void CheckSimPresentWhenReboot();
 
 public:
     enum {
@@ -96,8 +98,9 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
-    void CheckSimPresentWhenReboot();
     void UpdateSimStateToStateRegistry();
+    void RegisterRebootDetectCallback();
+    void UnregisterRebootDetectCallback();
 
 private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
@@ -146,6 +149,7 @@ private:
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
     std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 15;

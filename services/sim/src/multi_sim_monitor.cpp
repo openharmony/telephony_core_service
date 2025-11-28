@@ -144,12 +144,45 @@ void MultiSimMonitor::ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &even
         case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT:
             RemoveEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
             CheckSimPresentWhenReboot();
+            RegisterRebootDetectCallback();
             break;
         case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT:
             CheckSimPresentWhenReboot();
             break;
         default:
             break;
+    }
+}
+
+static void RebootDetectCallback(const char *key, const char *value, void *context)
+{
+    TELEPHONY_LOGI("reboot detect, key = %{public}s, value = %{public}s", key, value);
+    MultiSimMonitor *service = reinterpret_cast<MultiSimMonitor *>(context);
+    service->CheckSimPresentWhenReboot();
+}
+
+void MultiSimMonitor::RegisterRebootDetectCallback()
+{
+    TELEPHONY_LOGI("RegisterRebootDetectCallback");
+    parameterChgPtr_ = RebootDetectCallback;
+    int32_t ret0 = WatchParameter((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_0)).c_str(),
+        parameterChgPtr_, this);
+    int32_t ret1 = WatchParameter((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_1)).c_str(),
+        parameterChgPtr_, this);
+    if (ret0 != 0 || ret1 != 0) {
+        TELEPHONY_LOGE("reboot detect WatchParameter fail");
+        return;
+    }
+}
+
+void MultiSimMonitor::UnregisterRebootDetectCallback()
+{
+    TELEPHONY_LOGI("UnregisterRebootDetectCallback");
+    if (parameterChgPtr_ != nullptr) {
+        RemoveParameterWatcher((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_0)).c_str(),
+            parameterChgPtr_, this);
+        RemoveParameterWatcher((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_1)).c_str(),
+            parameterChgPtr_, this);
     }
 }
 
