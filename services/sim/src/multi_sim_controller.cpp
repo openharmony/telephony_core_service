@@ -53,7 +53,7 @@ constexpr int32_t PSIM1_PSIM2 = 0;
 constexpr int32_t PSIM2_ESIM = 2;
 constexpr int32_t SIMID_INDEX0 = 0;
 constexpr int32_t EMPTY_ICCID_LEN = 10;
-constexpr int32_t OCT_TYPE = 10;
+constexpr int32_t DEC_TYPE = 10;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
@@ -546,13 +546,13 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
 
 void MultiSimController::GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx)
 {
-    int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, OCT_TYPE);
+    int32_t simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE, "").c_str(), nullptr, DEC_TYPE);
     if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
         simLabelIdx = ESIM1;
         return;
     }
     int simIdx = allLocalCacheInfo_[simId - 1].simLabelIndex;
-    simLabelIdx = simIdx > 0 ? simId : ESIM1;
+    simLabelIdx = simIdx > 0 ? simIdx : ESIM1;
 }
 
 int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
