@@ -331,8 +331,10 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     } else {
         TELEPHONY_LOGI("QueryIccDiallingNumbers wait timeout");
     }
-    if (!diallingNumbersList_.empty()) {
-        result = diallingNumbersList_;
+    for (const auto &each : diallingNumbersList_) {
+        if (each != nullptr) {
+            result.push_back(each);
+        }
     }
     return success ? TELEPHONY_SUCCESS : CORE_ERR_SIM_CARD_LOAD_FAILED;
 }
