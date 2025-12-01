@@ -2529,7 +2529,29 @@ int32_t CoreServiceProxy::GetOpName(int32_t slotId, std::u16string &opname)
 
 int32_t CoreServiceProxy::GetMaxSimCount()
 {
-    return SIM_SLOT_COUNT_REAL;
+    return GetRealSimCount();
+}
+
+int32_t CoreServiceProxy::GetRealSimCount()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetRealSimCount WriteInterfaceToken failed");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetRealSimCount Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_REAL_SIM_COUNT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("GetRealSimCount failed, error code[%{public}d]", st);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
 }
 
 int32_t CoreServiceProxy::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)

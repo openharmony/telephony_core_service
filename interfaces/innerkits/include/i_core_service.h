@@ -171,6 +171,7 @@ public:
     virtual int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel, const sptr<IRawParcelCallback> &callback) = 0;
     virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
         const EsimApduData &apduData, ResponseEsimResult &responseResult) = 0;
+    virtual int32_t GetRealSimCount() = 0;
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;

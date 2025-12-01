@@ -1488,5 +1488,33 @@ bool SimManager::IsModemInitDone(int32_t slotId)
     }
     return simStateManager_[slotId]->IsModemInitDone();
 }
+
+int32_t SimManager::GetMaxSimCount()
+{
+    int32_t slotCount = SIM_SLOT_COUNT;
+    if (slotCount > 0) { // phone or not wifi device
+        return slotCount;
+    }
+
+    if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
+        return DC_HAS_ONE_SLOT;
+    }
+    return slotCount;
+}
+
+int32_t SimManager::GetRealSimCount()
+{
+    int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
+    if (realSlotCount > 0) { // phone or not wifi device
+        return realSlotCount;
+    }
+
+    if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
+        return DC_HAS_ONE_SLOT;
+    }
+    return realSlotCount;
+}
 } // namespace Telephony
 } // namespace OHOS
