@@ -150,6 +150,7 @@ enum class CoreServiceInterfaceCode {
     IS_ESIM_SUPPORTED,
     SEND_APDU_DATA,
     GET_OPNAME_VERSION,
+    GET_REAL_SIM_COUNT,
 };
 } // namespace Telephony
 } // namespace OHOS

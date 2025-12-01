@@ -166,6 +166,8 @@ public:
     virtual int32_t SetIccCardState(int32_t slotId, int32_t simStatus) = 0;
     virtual int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId) = 0;
     virtual bool IsModemInitDone(int32_t slotId) = 0;
+    virtual int32_t GetMaxSimCount() = 0;
+    virtual int32_t GetRealSimCount() = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
