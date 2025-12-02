@@ -183,7 +183,7 @@ public:
     inline void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) override
     {
         if (operatorConfigHisysevent_ != nullptr) {
-            operatorConfigHisysevent_->SetMatchSimStateTracker(matchSimStateTracker);
+            operatorConfigHisysevent_->SetMatchSimStateTracker(matchSimStateTracker, slotId);
         }
     };
 

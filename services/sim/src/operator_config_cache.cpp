@@ -466,8 +466,8 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
 bool OperatorConfigCache::IsNeedSendOperatorConfigChange(std::string opkey, bool isOpkeyDbError, SimState simState)
 {
     return (opkey != std::string(INITIAL_OPKEY) && !isOpkeyDbError) ||
-        (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SIMSTATE::SIM_STATE_NOT_READY ||
-        simState == SIMSTATE::SIM_STATE_UNKNOWN);
+        (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
+        simState == SimState::SIM_STATE_UNKNOWN);
 }
 
 bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
@@ -502,7 +502,7 @@ void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromC
     isUpdateImsCapFromChipDone_ = true;
     OperatorConfig opc;
     int32_t ret = LoadOperatorConfigFile(slotId, opc);
-    bool isSetPrimarySlotIdInProgress = CoreManagerInner::GetInstance().isSetPrimarySlotIdInProgress();
+    bool isSetPrimarySlotIdInProgress = CoreManagerInner::GetInstance().IsSetPrimarySlotIdInProgress();
     auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
     if (isOperatorConfigChangeDone_ && !isSetPrimarySlotIdInProgress && operatorConfigHisysevent != nullptr &&
         simStateManager_ != nullptr) {

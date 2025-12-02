@@ -60,7 +60,7 @@ private:
     void ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::Pointer &event);
     void SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId);
-    void SetMatchSimReason(int32_t slotId, matchSimReason matchSimReason);
+    void SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason);
     bool IsNeedUpdateCarrierConfig();
     void ResetNeedUpdateCarrierConfig();
     void ReloadOperatorConfigCache();
