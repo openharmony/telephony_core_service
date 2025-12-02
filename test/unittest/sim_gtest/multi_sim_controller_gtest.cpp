@@ -1406,7 +1406,7 @@ HWTEST_F(MultiSimControllerTest, IsAllCardsReadytest, Function | MediumTest | Le
     simStateManager0->Init(0);
     auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
     simStateManager1->Init(1);
-    multiSimController->simStateManager_ = {simStateManager0,simStateManager1};
+    multiSimController->simStateManager_ = {simStateManager0, simStateManager1};
     multiSimController->simStateManager_[0]->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManager0);
     multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_NOT_PRESENT;
     multiSimController->waitCardsReady_ = true;
