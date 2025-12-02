@@ -33,6 +33,7 @@ static constexpr const char *SMS_RECEIVE_FAILED_EVENT = "SMS_RECEIVE_FAILED";
 static constexpr const char *DATA_ACTIVATE_FAILED_EVENT = "DATA_ACTIVATE_FAILED";
 static constexpr const char *AIRPLANE_MODE_EVENT = "AIRPLANE_MODE_STATE";
 static constexpr const char *SET_ACTIVESIM_FAILED_EVENT = "SET_ACTIVESIM_FAILED";
+static constexpr const char *MATCH_SIM_EVENT = "SIM_MATCH";
 
 // KEY
 static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
@@ -53,6 +54,18 @@ static constexpr const char *UPLINK_DATA_KEY = "UPLINK_DATA";
 static constexpr const char *DOWNLINK_DATA_KEY = "DOWNLINK_DATA";
 static constexpr const char *DATASTATE_KEY = "DATASTATE";
 static constexpr const char *SWITCH_KEY = "SWITCH";
+static constexpr const char *SIM_STATE_KEY = "SIM_STATE";
+static constexpr const char *MATCHSIM_FILE_STATE_KEY = "MATCHSIM_FILE_STATE";
+static constexpr const char *MATCHSIM_REASON_KEY = "MATCHSIM_REASON";
+static constexpr const char *MATCHSIM_STATE_TRACKER_KEY = "MATCHSIM_STATE_TRACKER";
+static constexpr const char *MATCHSIM_FAIL_REASON_KEY = "MATCHSIM_FAIL_REASON";
+static constexpr const char *MATCHSIM_STATE_KEY = "MATCHSIM_STATE";
+static constexpr const char *MATCHSIM_OPKEY_KEY = "MATCHSIM_OPKEY":
+static constexpr const char *MATCHSIM_OPNAME_KEY = "MATCHSIM_OPNAME";
+static constexpr const char *MATCHSIM_SPN_KEY = "MATCHSIM_SPN";
+static constexpr const char *MATCHSIM_GID1_KEY = "MATCHSIM_GID1";
+static constexpr const char *MATCHSIM_GID2_KEY = "MATCHSIM_GID2";
+static constexpr const char *MATCHSIM_MCCMNC_KEY = "MATCHSIM_MCCMNC";
 
 // VALUE
 static constexpr const char *CORE_SERVICE_MODULE = "CORE_SERVICE";
@@ -135,5 +148,22 @@ void CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
         ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY, desc);
 }
 
+void CoreServiceHiSysEvent::WriteMatchSimBehaviorEvent(int32_t slotId, const MatchSimInfo &matchSimInfo)
+{
+    HiWriteBehaviorEvent(MATCH_SIM_EVENT,
+        SLOT_ID_KEY, slotId,
+        SIM_STATE_KEY, matchSimInfo.simState,
+        MATCHSIM_FILE_STATE_KEY, matchSimInfo.matchSimFileState,
+        MATCHSIM_REASON_KEY, matchSimInfo.matchSimReason,
+        MATCHSIM_STATE_TRACKER_KEY, matchSimInfo.matchSimStateTracker,
+        MATCHSIM_FAIL_REASON_KEY, matchSimInfo.matchSimFailReason,
+        MATCHSIM_STATE_KEY, matchSimInfo.matchSimState,
+        MATCHSIM_OPKEY_KEY, matchSimInfo.GetOpkey(),
+        MATCHSIM_OPNAME_KEY, matchSimInfo.GetOpname(),
+        MATCHSIM_SPN_KEY, matchSimInfo.GetSpn(),
+        MATCHSIM_GID1_KEY, matchSimInfo.GetGid1(),
+        MATCHSIM_GID2_KEY, matchSimInfo.GetGid2(),
+        MATCHSIM_MCCMNC_KEY, matchSimInfo.GetMccMnc());
+}
 } // namespace Telephony
 } // namespace OHOS

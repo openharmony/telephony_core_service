@@ -21,6 +21,7 @@
 #include "event_runner.h"
 #include "i_tel_ril_manager.h"
 #include "isim_file.h"
+#include "i_operator_config_hisysevent.h"
 #include "isim_file_controller.h"
 #include "ruim_file.h"
 #include "ruim_file_controller.h"
@@ -77,6 +78,10 @@ public:
     std::shared_ptr<IccFile> GetIccFile();
     std::shared_ptr<IccFileController> GetIccFileController();
     std::shared_ptr<IccDiallingNumbersHandler> ObtainDiallingNumberHandler();
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
     bool SetVoiceMailInfo(const std::u16string &mailName, const std::u16string &mailNumber);
     bool SetSimTelephoneNumber(const std::u16string &alphaTag, const std::u16string &phoneNumber);
     bool HasSimCard();
@@ -94,6 +99,7 @@ protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::weak_ptr<Telephony::SimStateManager> simStateManager_;
