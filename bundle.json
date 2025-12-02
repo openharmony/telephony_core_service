@@ -25,7 +25,7 @@
         ],
         "features": [
             "core_service_support_esim",
-            "core_service_feature_networkshare",
+            "core_service_low_power_class_2",
             "core_service_feature_support_satellite"
         ],
         "hisysevent_config": [
