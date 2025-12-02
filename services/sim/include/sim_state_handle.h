@@ -221,7 +221,7 @@ private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     std::string iccid_ = "";
     std::string oldIccid_ = "";
     int32_t esimSwitchState_ = 0;
