@@ -57,12 +57,12 @@ enum class MatchSimState : int8_t {
     IMS_CLOUD_FAIL
 };
 
-enum class MatchSimReason : int8_t (
+enum class MatchSimReason : int8_t {
     QUICK_MATCH_SIM = 1,
     SIM_RECORDS_LOADED,
     DATA_SHARE_READY,
     PARAM_UPDATE
-);
+};
 }
 }
 #endif

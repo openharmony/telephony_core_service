@@ -73,7 +73,7 @@ private:
 private:
     std::weak_ptr<SimFileManager> simFileManager_;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
     std::string iccidFromSim_;
     std::string imsiFromSim_;
     std::string spnFromSim_;

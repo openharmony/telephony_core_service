@@ -129,7 +129,7 @@ protected:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
     std::string imsi_ = "";
     std::string iccId_ = "";
     std::string decIccId_ = "";

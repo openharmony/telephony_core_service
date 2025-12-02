@@ -85,7 +85,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> batchInsertApnRetryHandler_ = nullptr;
     std::function<void()> batchInsertApnRetryTask_;
     void RetryBatchInsertApnPostTask();
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
     bool isOperatorConfigChangeDone_ = false;
 };
 } // namespace Telephony
