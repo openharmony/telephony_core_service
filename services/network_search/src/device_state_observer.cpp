@@ -42,7 +42,7 @@ const std::string NET_TYPE = "NetType";
 
 void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
 {
-    subscriber_ = std::make_shared<DeviceStateEventSubscriber>(deviceStateHandler);
+    subscriber_ = std::make_shared<DeviceStateEventSubscriber>();
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 #if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
