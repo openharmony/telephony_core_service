@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t MAIN_SLOT = 0;
 constexpr int32_t SLAVE_SLOT = 1;
-OperatorConfigHisysevent::OperatorConfigHisysevent(){}
+OperatorConfigHisysevent::OperatorConfigHisysevent() {}
 
 void OperatorConfigHisysevent::InitOperatorConfigHisysevent(int32_t slotId, int32_t simState)
 {
@@ -90,11 +90,11 @@ void OperatorConfigHisysevent::ReportMatchSimChr(int32_t slotId)
     CoreServiceHiSysEvent::WriteMatchSimBehaviorEvent(slotId, matchSimInfo_[slotId]);
 }
 
-inline void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId)
+void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId)
 {
     if (static_cast<int8_t>(matchSimStateTracker) < 0 ||
         static_cast<int8_t>(matchSimStateTracker) >= static_cast<int8_t>(sizeof(uint32_t) * CHAR_BIT)) {
-        return;        
+        return;    
     }
 
     if (slotId == -1) {
@@ -108,7 +108,7 @@ inline void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState 
             matchSimStateTracker == MatchSimState::SEND_OPC_FAIL) {
             ClearMatchSimFailReason(slotId);
         }
-        UpdateMatchSimInfo(slotId,matchSimStateTracker);
+        UpdateMatchSimInfo(slotId, matchSimStateTracker);
     }
 }
 
