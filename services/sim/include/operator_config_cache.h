@@ -16,6 +16,7 @@
 #ifndef OHOS_OPERATOR_CONFIG_CACHE_H
 #define OHOS_OPERATOR_CONFIG_CACHE_H
 #include "core_service_errors.h"
+#include "i_operator_config_hisysevent.h"
 #include "operator_file_parser.h"
 #include "sim_file_manager.h"
 #include "sim_state_manager.h"
@@ -48,6 +49,10 @@ public:
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
     void UpdatevolteCap(int32_t slotId, OperatorConfig &opc);
     void UpdateOpcBoolValue(OperatorConfig &opc, const std::string &key, const bool value);
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 private:
     OperatorFileParser parser_;
@@ -62,6 +67,7 @@ private:
     int32_t LoadOperatorConfigFile(int32_t slotId, OperatorConfig &poc);
     void UpdateIccidCache(int32_t state);
     int GetSimState(int32_t slotId, SimState &simState);
+    bool IsNeedSendOperatorConfigChange(std::string opkey, bool isOpkeyDbError, SimState simState);
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
     inline static const int32_t IMS_SWITCH_OFF = 0;
@@ -79,6 +85,8 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> batchInsertApnRetryHandler_ = nullptr;
     std::function<void()> batchInsertApnRetryTask_;
     void RetryBatchInsertApnPostTask();
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
+    bool isOperatorConfigChangeDone_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

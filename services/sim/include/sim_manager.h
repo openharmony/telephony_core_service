@@ -20,6 +20,7 @@
 #include "event_handler.h"
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "i_operator_config_hisysevent.h"
 #include "multi_sim_controller.h"
 #include "multi_sim_monitor.h"
 #include "sim_state_manager.h"
@@ -179,6 +180,20 @@ public:
     bool IsModemInitDone(int32_t slotId) override;
     int32_t GetMaxSimCount() override;
     int32_t GetRealSimCount() override;
+    inline void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) override
+    {
+        if (operatorConfigHisysevent_ != nullptr) {
+            operatorConfigHisysevent_->SetMatchSimStateTracker(matchSimStateTracker);
+        }
+    };
+
+    inline void StartMatchSimTimeoutTimer(int32_t slotId) override
+    {
+        if (simStateManager_.empty() || simStateManager_[slotId] == nullptr) {
+            return;
+        }
+        return simStateManager_[slotId]->StartMatchSimTimeoutTimer();
+    }
 
 private:
     bool IsValidSlotId(int32_t slotId);
@@ -193,6 +208,7 @@ private:
 
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
+    std::shared_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<std::shared_ptr<Telephony::SimSmsManager>> simSmsManager_;

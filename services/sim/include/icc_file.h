@@ -23,6 +23,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "i_tel_ril_manager.h"
+#include "i_operator_config_hisysevent.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_file_controller.h"
 #include "mcc_pool.h"
@@ -104,6 +105,7 @@ public:
     bool ExecutOriginalSimIoRequest(int32_t filedId, int fileIdDone);
     void OnOpkeyLoad(const std::string opKey, const std::string opName);
     void FileChangeToExt(const std::string fileName, const FileChangeType fileLoad);
+    void ProcessOperatorConfigHisysevent(const std::string fileName, const fileChangeType fileLoad);
     void ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event);
     void SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt> &iccFile);
     void AddRecordsToLoadNum();
@@ -112,6 +114,11 @@ public:
     virtual void ProcessExtGetFileResponse();
     virtual void RegisterParamsListener();
     virtual void UnRegisterParamsListener();
+    void SetMatchSimStateTracker(int8_t matchSimStateTracker);
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 protected:
     virtual void ProcessFileLoaded(bool response) = 0;
@@ -122,6 +129,7 @@ protected:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<SimStateManager> stateManager_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
     std::string imsi_ = "";
     std::string iccId_ = "";
     std::string decIccId_ = "";
