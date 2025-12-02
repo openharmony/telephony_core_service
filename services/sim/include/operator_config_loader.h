@@ -68,7 +68,7 @@ private:
     int InsertOpkeyToSimDb(std::string opKeyVal, std::string mccVal, std::string mncVal, std::string imsiVal);
     std::string GetMccFromMccMnc(std::string mccmnc);
     std::string GetMncFromMccMnc(std::string mccmnc);
-    void SetOperatorConfigHisysevent(MatchSimState matchSimStateTracker, int32_t slotId);
+    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId);
 
 private:
     std::weak_ptr<SimFileManager> simFileManager_;

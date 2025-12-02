@@ -111,19 +111,19 @@ void SimManager::InitBaseManager(int32_t slotId)
     }
     simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager_);
     if (simStateManager_[slotId] != nullptr) {
-        simStateManager_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
+        simStateManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simStateManager_[slotId]->Init(slotId);
     }
     simFileManager_[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager_),
         std::weak_ptr<SimStateManager>(simStateManager_[slotId]));
     if (simFileManager_[slotId] != nullptr) {
-        simFileManager_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
+        simFileManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simFileManager_[slotId]->Init(slotId);
     }
     simAccountManager_[slotId] =
         std::make_shared<SimAccountManager>(telRilManager_, simStateManager_[slotId], simFileManager_[slotId]);
     if (simAccountManager_[slotId] != nullptr) {
-        simAccountManager_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
+        simAccountManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simAccountManager_[slotId]->Init(slotId);
     }
 }

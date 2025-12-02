@@ -331,7 +331,7 @@ void SimStateTracker::ReloadOperatorConfig()
     }
 }
 
-inline void SimStateTracker::SetMatchSimReason(int32_t slotId, matchSimReason matchSimReason)
+inline void SimStateTracker::SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason)
 {
     auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
     if (operatorConfigHisysevent != nullptr) {

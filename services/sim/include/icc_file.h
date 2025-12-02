@@ -105,7 +105,7 @@ public:
     bool ExecutOriginalSimIoRequest(int32_t filedId, int fileIdDone);
     void OnOpkeyLoad(const std::string opKey, const std::string opName);
     void FileChangeToExt(const std::string fileName, const FileChangeType fileLoad);
-    void ProcessOperatorConfigHisysevent(const std::string fileName, const fileChangeType fileLoad);
+    void ProcessOperatorConfigHisysevent(const std::string fileName, const FileChangeType fileLoad);
     void ProcessExtGetFileDone(const AppExecFwk::InnerEvent::Pointer &event);
     void SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt> &iccFile);
     void AddRecordsToLoadNum();

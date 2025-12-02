@@ -934,7 +934,7 @@ void IccFile::FileChangeToExt(const std::string fileName, const FileChangeType f
     ProcessOperatorConfigHisysevent(fileName, fileLoad);
 }
 
-void IccFile::ProcessOperatorConfigHisysevent(const std::string fileName, const fileChangeType fileLoad)
+void IccFile::ProcessOperatorConfigHisysevent(const std::string fileName, const FileChangeType fileLoad)
 {
     MatchSimFileType matchSimFileType = MatchSimFileType::MATCH_NONE;
     static constexpr std::pair<FileChangeType, MatchSimFileType> matchSimFileMap[] = {

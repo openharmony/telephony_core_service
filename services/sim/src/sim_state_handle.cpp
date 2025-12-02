@@ -412,7 +412,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
-        InitMatchSimInfo(slotId, int32_t newSimStatus);
+        InitMatchSimInfo(slotId, newSimStatus);
         oldSimStatus_ = newSimStatus;
         iter = simIccStatusMap_.find(newSimStatus);
         TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
