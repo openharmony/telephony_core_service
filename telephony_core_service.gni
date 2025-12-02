@@ -23,7 +23,7 @@ declare_args() {
       defined(global_parts_info.core_service_support_esim)) {
     core_service_support_esim = true
   }
-  core_service_feature_networkshare = true
+  core_service_low_power_class_2 = false
   core_service_feature_support_satellite = true
 }
 
@@ -41,4 +41,15 @@ if (core_service_support_esim) {
 
 if (core_service_feature_support_satellite) {
   telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_SATELLITE" ]
+}
+
+if (core_service_low_power_class_2) {
+  telephony_extra_defines += [ "CORE_SERVICE_LOW_POW_CLASS_2" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.communication_netmanager_ext) &&
+    global_parts_info.communication_netmanager_ext) {
+  deps_netmanager_ext = true
+  telephony_extra_defines += [ "DEPS_NETMANAGER_EXT" ]
 }

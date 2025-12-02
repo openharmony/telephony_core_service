@@ -224,12 +224,10 @@ ohos_shared_library("tel_core_service") {
     "time_service:time_client",
   ]
 
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.communication_netmanager_ext) &&
-      global_parts_info.communication_netmanager_ext &&
-      core_service_feature_networkshare) {
-    external_deps += [ "netmanager_ext:net_tether_manager_if" ]
-    defines += [ "ABILITY_NETMANAGER_EXT_SUPPORT" ]
+  if (!core_service_low_power_class_2) {
+    if (deps_netmanager_ext) {
+      external_deps += [ "netmanager_ext:net_tether_manager_if" ]
+    }
   }
 
   if (defined(global_parts_info) &&
