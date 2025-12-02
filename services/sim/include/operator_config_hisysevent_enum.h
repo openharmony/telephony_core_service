@@ -15,7 +15,7 @@
 #ifndef OPERATOR_CONFIG_HISYSEVENT_ENUM_H
 #define OPERATOR_CONFIG_HISYSEVENT_ENUM_H
 
-#include <sctdint>
+#include <cstdint>
 #include <string>
 namespace OHOS {
 namespace Telephony {
