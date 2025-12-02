@@ -453,7 +453,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         if ((!isUseCloudImsNV || state == STATE_PARA_CLEAR) && operatorConfigHisysevent != nullptr &&
             simStateManager_ != nullptr) {
             operatorConfigHisysevent->ReportMatchSimChr(slotId);
-            simStateManager_->RemoveMatchSimTimeoutTimer()            
+            simStateManager_->RemoveMatchSimTimeoutTimer();
         }
         if (state != STATE_PARA_CLEAR) {
             isOperatorConfigChangeDone_ = true;

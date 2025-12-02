@@ -113,12 +113,12 @@ void IccFileTest::InitCoreService()
             std::make_shared<SimAccountManager>(telRilManager_, simStateManager_[slotId], simFileManager_[slotId]);
         simAccountManager_[slotId]->Init(slotId);
     }
-    multiSimController_ = std::make_shared<MultiSimController>(telRilManager_,simStateManager_,simFileManager_);
+    multiSimController_ = std::make_shared<MultiSimController>(telRilManager_, simStateManager_, simFileManager_);
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak;
     for (auto simFile : simFileManager_) {
         simFileManagerWeak.push_back(std::weak_ptr<Telephony::SimFileManager>(simFile));
     }
-    multiSimMonitor_ = std::make_shared<MultiSimMonitor>(multiSimController_, simStateManager_,simFileManagerWeak);
+    multiSimMonitor_ = std::make_shared<MultiSimMonitor>(multiSimController_, simStateManager_, simFileManagerWeak);
     simManager_->simStateManager_ = simStateManager_;
     simManager_->simFileManager_ = simFileManager_;
     simManager_->simAccountManager_ = simAccountManager_;

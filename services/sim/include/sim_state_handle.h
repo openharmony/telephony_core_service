@@ -87,7 +87,7 @@ const int MSG_SIM_SEND_NCFG_OPER_INFO_DONE = 62;
 
 const int MSG_SIM_GET_SIM_IO_DONE = 71;
 
-const int EVENT_MATCH_SIM_TIMEOUT = 72; 
+const int EVENT_MATCH_SIM_TIMEOUT = 72;
 
 // pin lock type
 constexpr const char *FAC_PIN_LOCK = "SC";

@@ -34,7 +34,7 @@ struct MatchSimInfo {
     char mccMnc[32] = "";
 
     MatchSimInfo()
-        : slotId(0), simState(0), matchSimFileState(0U), matchSimReason(0),matchSimStateTracker(0U),
+        : slotId(0), simState(0), matchSimFileState(0U), matchSimReason(0), matchSimStateTracker(0U),
           matchSimFailReason(0U), matchSimState(0)
     {
         ClearMatchSimFile();
@@ -99,32 +99,32 @@ struct MatchSimInfo {
 
     void SetOpkey(const char *s)
     {
-       SetString(opkey, sizeof(opkey), s); 
+        SetString(opkey, sizeof(opkey), s);
     }
 
     void SetOpname(const char *s)
     {
-       SetString(opname, sizeof(opname), s); 
+        SetString(opname, sizeof(opname), s);
     }
 
     void SetSpn(const char *s)
     {
-       SetString(spn, sizeof(spn), s); 
+        SetString(spn, sizeof(spn), s);
     }
 
     void SetGid1(const char *s)
     {
-       SetString(gid1, sizeof(gid1), s); 
+        SetString(gid1, sizeof(gid1), s);
     }
 
     void SetGid2(const char *s)
     {
-       SetString(gid2, sizeof(gid2), s); 
+        SetString(gid2, sizeof(gid2), s);
     }
 
     void SetMccMnc(const char *s)
     {
-       SetString(mccMnc, sizeof(mccMnc), s); 
+        SetString(mccMnc, sizeof(mccMnc), s);
     }
 };
 }
