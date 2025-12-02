@@ -65,7 +65,7 @@ private:
     void ResetNeedUpdateCarrierConfig();
     void ReloadOperatorConfigCache();
     void ReloadOperatorConfig();
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
 };
 } // namespace Telephony
 } // namespace OHOS

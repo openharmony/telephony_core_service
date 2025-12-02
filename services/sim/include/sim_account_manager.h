@@ -54,7 +54,7 @@ private:
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     std::shared_ptr<IccOperatorPrivilegeController> privilegeController_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> privilegesRunner_;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
 };
 } // namespace Telephony
 } // namespace OHOS

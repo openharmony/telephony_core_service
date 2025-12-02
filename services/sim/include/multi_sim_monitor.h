@@ -154,7 +154,7 @@ private:
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
     std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;

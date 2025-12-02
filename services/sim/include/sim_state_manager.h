@@ -105,7 +105,7 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     SimHandleRun simStateRun_ = STATE_NOT_START;
     static std::mutex mtx_;
 };
