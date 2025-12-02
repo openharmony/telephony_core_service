@@ -99,7 +99,7 @@ protected:
     std::shared_ptr<IccFileController> fileController_ = nullptr;
     std::shared_ptr<IccFile> simFile_ = nullptr;
     std::shared_ptr<IccDiallingNumbersHandler> diallingNumberHandler_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_;
     HandleRunningState stateRecord_ = HandleRunningState::STATE_NOT_START;
     HandleRunningState stateHandler_ = HandleRunningState::STATE_NOT_START;
     std::weak_ptr<Telephony::SimStateManager> simStateManager_;

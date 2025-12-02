@@ -35,7 +35,7 @@ void OperatorConfigHisysevent::InitOperatorConfigHisysevent(int32_t slotId, int3
     info.matchSimStateTracker = 0U;
     info.matchSimFailReason = 0U;
     info.matchSimState = 0;
-    info.clear();
+    info.ClearMatchSimFile();
 }
 
 void OperatorConfigHisysevent::SetMatchSimResult(
@@ -45,7 +45,7 @@ void OperatorConfigHisysevent::SetMatchSimResult(
         return;
     }
     auto &info = matchSimInfo_[slotId];
-    info.SetOpKey(opkey);
+    info.SetOpkey(opkey);
     info.SetOpname(opname);
     info.matchSimState = matchSimState;
 }
@@ -104,7 +104,7 @@ void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState matchSi
         if (!IsValidSlotId(slotId)) {
             return;
         }
-        if (matchSimStateTracker == MatchSimReason::SEND_OPC_SUCC ||
+        if (matchSimStateTracker == MatchSimState::SEND_OPC_SUCC ||
             matchSimStateTracker == MatchSimState::SEND_OPC_FAIL) {
             ClearMatchSimFailReason(slotId);
         }
@@ -142,7 +142,7 @@ void OperatorConfigHisysevent::ProcessMatchSimFile(int32_t slotId, MatchSimFileT
     info.matchSimFileState |= (1U << static_cast<uint8_t>(simFileType));
 }
 
-inlie bool OperatorConfigHisysevent::IsMatchSimFailReason(MatchSimState matchSimStateTracker)
+inline bool OperatorConfigHisysevent::IsMatchSimFailReason(MatchSimState matchSimStateTracker)
 {
     return matchSimStateTracker == MatchSimState::SEND_OPC_FAIL ||
            matchSimStateTracker == MatchSimState::IMS_CLOUD_FAIL ||
