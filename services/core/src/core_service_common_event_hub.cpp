@@ -548,14 +548,13 @@ void CoreServiceCommonEventHub::HandleLocaleChanged(const EventFwk::CommonEventD
 
 void CoreServiceCommonEventHub::HandleAirplaneModeChanged(const EventFwk::CommonEventData &data)
 {
-    const EventFwk::Want &want = data.GetWant();
-    bool isAirplaneMode = want.GetBoolParam("isAirplaneMode", false);
+    auto code = data.GetCode();
 
     std::shared_lock<ffrt::shared_mutex> lock(callbacksMtx_);
     auto it = callbacks_.find(TelCommonEvent::AIRPLANE_MODE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnAirplaneModeChanged(isAirplaneMode);
+            cb->OnAirplaneModeChanged(static_cast<bool>(code));
         }
     }
 }
