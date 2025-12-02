@@ -94,7 +94,7 @@ void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState matchSi
 {
     if (static_cast<int8_t>(matchSimStateTracker) < 0 ||
         static_cast<int8_t>(matchSimStateTracker) >= static_cast<int8_t>(sizeof(uint32_t) * CHAR_BIT)) {
-        return;    
+        return;
     }
 
     if (slotId == -1) {
