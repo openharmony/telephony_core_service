@@ -565,10 +565,7 @@ bool VCardUtils::IsPrintableChar(char c) {
 }
 
 bool VCardUtils::IsPrintableString(const std::string &str) {
-    for (char ch : str) {
-        return std::all_of(str.begin(), str.end(), &VCardUtils::IsPrintableChar);
-    }
-    return true;  
+    return std::all_of(str.begin(), str.end(), &VCardUtils::IsPrintableChar);
 }
 
 } // namespace Telephony
