@@ -20,6 +20,7 @@
 #include <ffrt.h>
 
 #include "iservice_registry.h"
+#include "i_operator_config_hisysevent.h"
 #include "multi_sim_controller.h"
 #include "os_account_manager_wrapper.h"
 #include "sim_constant.h"
@@ -56,6 +57,10 @@ public:
     void SetPrivateUserId(int32_t userId);
     void UpdateAllSimData(int32_t userId);
     void CheckSimPresentWhenReboot();
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 public:
     enum {
@@ -101,6 +106,7 @@ private:
     void UpdateSimStateToStateRegistry();
     void RegisterRebootDetectCallback();
     void UnregisterRebootDetectCallback();
+    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker);
 
 private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
@@ -148,6 +154,7 @@ private:
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
     std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;

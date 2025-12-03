@@ -140,6 +140,7 @@ bool SimFileManager::InitSimFile(SimFileManager::IccType type)
 
     simFile_->SetRilAndFileController(telRilManager_.lock(), fileController_, diallingNumberHandler_);
     simFile_->SetId(slotId_);
+    simFile_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     simFile_->Init();
     if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.createIccFileExt_(slotId_, simFile_);
