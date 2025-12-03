@@ -2741,20 +2741,6 @@ int32_t CoreManagerInner::SetIccCardState(int32_t slotId, int32_t simStatus)
     return simManager_->SetIccCardState(slotId, simStatus);
 }
 
-void CoreManagerInner::SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId)
-{
-    if (simManager_ != nullptr) {
-        simManager_->SetMatchSimStateTracker(matchSimStateTracker, slotId);
-    }
-}
-
-void CoreManagerInner::StartMatchSimTimeoutTimer(int32_t slotId)
-{
-    if (simManager_ != nullptr) {
-        simManager_->StartMatchSimTimeoutTimer(slotId);
-    }
-}
-
 /******************** simManager_ end ************************/
 
 /******************** esimManager_ start ************************/
