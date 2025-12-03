@@ -58,6 +58,7 @@ ohos_unittest("icc_file_gtest") {
     "drivers_interface_ril:ril_idl_headers",
     "eventhandler:libeventhandler",
     "googletest:gtest_main",
+    "googletest:gmock_main",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "i18n:zone_util",
