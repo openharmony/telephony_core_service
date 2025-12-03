@@ -558,19 +558,17 @@ size_t VCardUtils::GetOStreamSize(const std::ostringstream &oss)
     return static_cast<size_t>(end - beg);
 }
 
-bool VCardUtils::isEnAscii(char c) {
-    const int asciiFirst = 0x20;
-    const int asciiLast = 0x7E;  // included
-    return (asciiFirst <= c && c <= asciiLast) || c == '\r' || c == '\n';
+bool VCardUtils::IsPrintableChar(char c) {
+    const char start = 0x20;
+    const char end = 0x7E;  // included
+    return (start <= c && c <= end) || c == '\r' || c == '\n';
 }
 
-bool VCardUtils::isEnPrintableAscii(const std::string &str) {
+bool VCardUtils::IsPrintableString(const std::string &str) {
     for (char ch : str) {
-        if (!isEnAscii(ch)) {
-            return false;
-        }
+        return std::all_of(str.begin(), str.end(), &VCardUtils::IsPrintableChar);
     }
-    return true;
+    return true;  
 }
 
 } // namespace Telephony
