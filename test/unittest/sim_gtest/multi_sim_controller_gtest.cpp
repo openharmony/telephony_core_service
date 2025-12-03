@@ -1418,6 +1418,7 @@ HWTEST_F(MultiSimControllerTest, IsAllCardsReadytest, Function | MediumTest | Le
     multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
     EXPECT_FALSE(multiSimController->IsAllCardsReady());
 }
+
 HWTEST_F(MultiSimControllerTest, GetSimLabeltest, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
