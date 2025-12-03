@@ -931,6 +931,35 @@ void IccFile::FileChangeToExt(const std::string fileName, const FileChangeType f
     if (TELEPHONY_EXT_WRAPPER.createIccFileExt_ != nullptr && iccFileExt) {
         iccFileExt->FileChange(fileName, fileLoad);
     }
+    ProcessOperatorConfigHisysevent(fileName, fileLoad);
+}
+
+void IccFile::ProcessOperatorConfigHisysevent(const std::string fileName, const FileChangeType fileLoad)
+{
+    MatchSimFileType matchSimFileType = MatchSimFileType::MATCH_NONE;
+    static constexpr std::pair<FileChangeType, MatchSimFileType> matchSimFileMap[] = {
+        { FileChangeType::ICCID_FILE_LOAD, MatchSimFileType::MATCH_ICCID },
+        { FileChangeType::C_IMSI_FILE_LOAD, MatchSimFileType::MATCH_IMSI },
+        { FileChangeType::G_IMSI_FILE_LOAD, MatchSimFileType::MATCH_IMSI },
+        { FileChangeType::GID1_FILE_LOAD, MatchSimFileType::MATCH_GID1 },
+        { FileChangeType::GID2_FILE_LOAD, MatchSimFileType::MATCH_GID2 },
+        { FileChangeType::SPN_FILE_LOAD, MatchSimFileType::MATCH_SPN },
+        { FileChangeType::G_MCCMNC_FILE_LOAD, MatchSimFileType::MATCH_MCCMNC },
+    };
+
+    for (const auto& [type, fileType] : matchSimFileMap) {
+        if (type == fileLoad) {
+            matchSimFileType = fileType;
+            break;
+        }
+    }
+
+    if (matchSimFileType != MatchSimFileType::MATCH_NONE) {
+        auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+        if (operatorConfigHisysevent != nullptr) {
+            operatorConfigHisysevent->SetMatchSimFile(slotId_, matchSimFileType, fileName);
+        }
+    }
 }
 
 void IccFile::AddRecordsToLoadNum()
@@ -981,5 +1010,12 @@ void IccFile::UnRegisterParamsListener()
     TELEPHONY_LOGD("UnRegisterParamsListener");
 }
 
+inline void IccFile::SetMatchSimStateTracker(int8_t matchSimStateTracker)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker, slotId_);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

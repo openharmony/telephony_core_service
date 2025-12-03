@@ -101,6 +101,10 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
         [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
             handle->GetSimIOResult(slotId, event);
         } },
+    { EVENT_MATCH_SIM_TIMEOUT,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->ProcessMatchSimTimeoutTimer(slotId);
+        } },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -402,17 +406,15 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
     }
-    
     PublishHotZoneInd(newSimStatus, slotId);
     ProcessNewSimStatus(newSimStatus);
     if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
+        InitMatchSimInfo(slotId, newSimStatus);
         oldSimStatus_ = newSimStatus;
         iter = simIccStatusMap_.find(newSimStatus);
-        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
-            "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
-            iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
+        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus %{public}d", newSimStatus);
         if (newSimStatus == ICC_CARD_ABSENT) {
             TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
             CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
@@ -1158,6 +1160,23 @@ int32_t SimStateHandle::GetInitPrimarySlotReady(bool& isReady)
     isReady = isInitPrimarySlotReady;
     TELEPHONY_LOGI("SimStateHandle::GetInitPrimarySlotReady [%{public}d]", isReady);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+inline void SimStateHandle::InitMatchSimInfo(int32_t slotId, int32_t simState)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->InitOperatorConfigHisysevent(slotId, simState);
+        StartMatchSimTimeoutTimer();
+    }
+}
+
+inline void SimStateHandle::ProcessMatchSimTimeoutTimer(int32_t slotId)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->ReportMatchSimChr(slotId);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
