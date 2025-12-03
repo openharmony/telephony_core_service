@@ -19,6 +19,7 @@
 #include <string>
 
 #include "iservice_registry.h"
+#include "i_operator_config_hisysevent.h"
 #include "operator_config_cache.h"
 #include "operator_config_loader.h"
 #include "telephony_log_wrapper.h"
@@ -40,7 +41,13 @@ public:
     bool UnRegisterOpkeyLoaded();
     bool UnregisterOperatorCacheDel();
     bool UnRegisterOperatorConfigUpdate();
-
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+        if (operatorConfigLoader_ != nullptr) {
+            operatorConfigLoader_->SetOperatorConfigHisysevent(operatorConfigHisysevent);
+        }
+    };
     std::shared_ptr<OperatorConfigLoader> operatorConfigLoader_ = nullptr;
 
 private:
@@ -52,10 +59,13 @@ private:
     void ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessOperatorCacheDel(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::Pointer &event);
+    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId);
+    void SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason);
     bool IsNeedUpdateCarrierConfig();
     void ResetNeedUpdateCarrierConfig();
     void ReloadOperatorConfigCache();
     void ReloadOperatorConfig();
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -37,6 +37,10 @@ OperatorConfigCache::OperatorConfigCache(
     : TelEventHandler("OperatorConfigCache"), simFileManager_(simFileManager), simStateManager_(simStateManager),
       slotId_(slotId)
 {
+    std::string key;
+    std::string initialOpkey = INITIAL_OPKEY;
+    SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), initialOpkey.c_str());
+    TELEPHONY_LOGI("OperatorConfigCache create");
     TELEPHONY_LOGI("OperatorConfigCache create");
 }
 
@@ -228,6 +232,10 @@ int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
         OperatorFileParser::ClearFilesCache();
     }
     OperatorConfig opc;
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->SetMatchSimReason(slotId_, MatchSimReason::PARAM_UPDATE);
+    }
     int32_t ret = LoadOperatorConfig(slotId_, opc, STATE_PARA_UPDATE);
     return ret;
 }
@@ -310,6 +318,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             modemSimMatchedOpNameCache_ = "";
             iccidCache_ = "";
             isUpdateImsCapFromChipDone_ = false;
+            isOperatorConfigChangeDone_ = false;
             lock.unlock();
             OperatorConfig opc;
             LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
@@ -359,6 +368,10 @@ void OperatorConfigCache::SendSimMatchedOperatorInfo(int32_t slotId, int32_t sta
         return;
     }
     int32_t response = simStateManager_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->SetMatchSimResult(slotId, operKey.c_str(), operName.c_str(), state);
+    }
     TELEPHONY_LOGI("slotId[%{public}d], opkey[%{public}s],opname[%{public}s], response = %{public}d",
         slotId, operKey.data(), operName.data(), response);
 }
@@ -413,9 +426,7 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
     retryBatchInsertApnTimes_ = 0;
     notifyInitApnConfigs(slotId);
     SendSimMatchedOperatorInfo(slotId, state);
-    if ((opkey != std::string(INITIAL_OPKEY) && !isOpkeyDbError && state >= STATE_PARA_LOADED) ||
-        (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
-        simState == SimState::SIM_STATE_UNKNOWN)) {
+    if (IsNeedSendOperatorConfigChange(opkey, isOpkeyDbError, simState)) {
         AAFwk::Want want;
         want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_OPERATOR_CONFIG_CHANGED);
         want.SetParam(KEY_SLOTID, slotId);
@@ -433,9 +444,30 @@ bool OperatorConfigCache::AnnounceOperatorConfigChanged(int32_t slotId, int32_t 
         if (simFileManager != nullptr) {
             TelEventHandler::SendTelEvent(simFileManager, RadioEvent::RADIO_OPERATOR_CONFIG_CHANGED);
         }
+        auto matchSimState = publishResult ? MatchSimState::SEND_OPC_SUCC : MatchSimState::SEND_OPC_FAIL;
+        auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+        if (operatorConfigHisysevent != nullptr) {
+            operatorConfigHisysevent->SetMatchSimStateTracker(matchSimState, slotId);
+        }
+        bool isUseCloudImsNV = system::GetBoolParameter(KEY_CONST_TELEPHONY_IS_USE_CLOUD_IMS_NV, true);
+        if ((!isUseCloudImsNV || state == STATE_PARA_CLEAR) && operatorConfigHisysevent != nullptr &&
+            simStateManager_ != nullptr) {
+            operatorConfigHisysevent->ReportMatchSimChr(slotId);
+            simStateManager_->RemoveMatchSimTimeoutTimer();
+        }
+        if (state != STATE_PARA_CLEAR) {
+            isOperatorConfigChangeDone_ = true;
+        }
         return publishResult;
     }
     return true;
+}
+
+bool OperatorConfigCache::IsNeedSendOperatorConfigChange(std::string opkey, bool isOpkeyDbError, SimState simState)
+{
+    return (opkey != std::string(INITIAL_OPKEY) && !isOpkeyDbError) ||
+        (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_NOT_READY ||
+        simState == SimState::SIM_STATE_UNKNOWN);
 }
 
 bool OperatorConfigCache::IsNeedOperatorLoad(int32_t slotId)
@@ -470,6 +502,14 @@ void OperatorConfigCache::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromC
     isUpdateImsCapFromChipDone_ = true;
     OperatorConfig opc;
     int32_t ret = LoadOperatorConfigFile(slotId, opc);
+    bool isSetPrimarySlotIdInProgress = CoreManagerInner::GetInstance().IsSetPrimarySlotIdInProgress();
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (isOperatorConfigChangeDone_ && !isSetPrimarySlotIdInProgress && operatorConfigHisysevent != nullptr &&
+        simStateManager_ != nullptr) {
+        operatorConfigHisysevent->SetMatchSimStateTracker(MatchSimState::IMS_CLOUD_SUCC, slotId);
+        operatorConfigHisysevent->ReportMatchSimChr(slotId);
+        simStateManager_->RemoveMatchSimTimeoutTimer();
+    }
     TELEPHONY_LOGI("[slot%{public}d] imsCapFromChip = %{public}d, %{public}d, %{public}d, %{public}d, ret = %{public}d",
         slotId, imsCapFromChip.volteCap, imsCapFromChip.vowifiCap, imsCapFromChip.vonrCap, imsCapFromChip.vtCap, ret);
 }
