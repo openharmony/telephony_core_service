@@ -50,7 +50,6 @@ void SimStateManager::Init(int32_t slotId)
         return;
     }
     simStateHandle_->SetRilManager(std::weak_ptr<Telephony::ITelRilManager>(telRilManager_));
-    simStateHandle_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     simStateHandle_->Init(slotId);
 
     TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");
