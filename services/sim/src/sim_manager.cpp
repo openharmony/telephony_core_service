@@ -17,6 +17,7 @@
 
 #include "core_service_errors.h"
 #include "ffrt.h"
+#include "operator_config_hisysevent.h"
 #include "radio_event.h"
 #include "str_convert.h"
 #include "telephony_errors.h"
@@ -36,6 +37,7 @@ bool SimManager::OnInit(int32_t slotCount)
 {
     TELEPHONY_LOGI("SimManager OnInit, slotCount = %{public}d", slotCount);
     slotCount_ = slotCount;
+    operatorConfigHisysevent_ = std::make_shared<OperatorConfigHisysevent>();
     InitMultiSimObject();
     InitSingleSimObject();
     TELEPHONY_LOGD("SimManager OnInit success");
@@ -109,16 +111,19 @@ void SimManager::InitBaseManager(int32_t slotId)
     }
     simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager_);
     if (simStateManager_[slotId] != nullptr) {
+        simStateManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simStateManager_[slotId]->Init(slotId);
     }
     simFileManager_[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager_),
         std::weak_ptr<SimStateManager>(simStateManager_[slotId]));
     if (simFileManager_[slotId] != nullptr) {
+        simFileManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simFileManager_[slotId]->Init(slotId);
     }
     simAccountManager_[slotId] =
         std::make_shared<SimAccountManager>(telRilManager_, simStateManager_[slotId], simFileManager_[slotId]);
     if (simAccountManager_[slotId] != nullptr) {
+        simAccountManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simAccountManager_[slotId]->Init(slotId);
     }
 }
@@ -140,6 +145,7 @@ void SimManager::InitSingleSimObject()
         TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
         return;
     }
+    multiSimMonitor_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     multiSimMonitor_->Init();
 }
 

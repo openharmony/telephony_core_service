@@ -121,6 +121,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case MultiSimMonitor::RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             UpdateAllOpkeyConfigs();
+            SetMatchSimStateTracker(MatchSimState::RESET_DATASHARE_ERROR);
             break;
         case MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
@@ -201,6 +202,14 @@ void MultiSimMonitor::CheckOpcNeedUpdata(const bool isDataShareError)
     });
 }
 
+inline void MultiSimMonitor::SetMatchSimStateTracker(MatchSimState matchSimStateTracker)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker);
+    }
+}
+
 int32_t MultiSimMonitor::CheckUpdateOpcVersion()
 {
     if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
@@ -211,10 +220,12 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
             SetBlockLoadOperatorConfig(true);
             if (controller_->UpdateOpKeyInfo() != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("UpdateOpKeyInfo error");
+                SetMatchSimStateTracker(MatchSimState::OPKEY_DB_UPDATE_FAIL);
                 return TELEPHONY_ERROR;
             }
             TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
             TELEPHONY_LOGI("Version updated succ");
+            SetMatchSimStateTracker(MatchSimState::OPKEY_DB_UPDATE_SUCC);
             return TELEPHONY_SUCCESS;
         }
     }

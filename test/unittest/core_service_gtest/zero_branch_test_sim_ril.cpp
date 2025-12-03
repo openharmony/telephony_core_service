@@ -28,6 +28,7 @@
 #include "mcc_pool.h"
 #include "operator_config_cache.h"
 #include "operator_config_loader.h"
+#include "operator_config_hisysevent.h"
 #include "parcel.h"
 #include "plmn_file.h"
 #include "sim_account_manager.h"
@@ -1964,6 +1965,31 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateManager_005, Function | MediumTest 
     simStateManager->simStateHandle_.reset();
     simStateManager->SetInSenseSwitchPhase(flag);
     simStateManager->ObtainIccStatus();
+}
+
+HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigHisysevent_001, Function | MediumTest | Level1)
+{
+    auto operatorConfigHisysevent = std::make_shared<OperatorConfigHisysevent>();
+    operatorConfigHisysevent->InitOperatorConfigHisysevent(-1, 1);
+    operatorConfigHisysevent->InitOperatorConfigHisysevent(0, 4);
+    operatorConfigHisysevent->SetMatchSimFile(-1, MatchSimFileType::MATCH_ICCID, "123456789");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_ICCID, "123456789");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_IMSI, "222222222");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_GID1, "123");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_GID2, "456");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_SPN, "CMCC");
+    operatorConfigHisysevent->SetMatchSimFile(0, MatchSimFileType::MATCH_MCCMNC, "46000");
+    std::string opkey = "46000";
+    std::string opname = "CMCC_CN";
+    operatorConfigHisysevent->SetMatchSimResult(-1, opkey.c_str(), opname.c_str(), 1);
+    operatorConfigHisysevent->SetMatchSimResult(0, opkey.c_str(), opname.c_str(), 1);
+    operatorConfigHisysevent->SetMatchSimReason(-1, MatchSimReason::QUICK_MATCH_SIM);
+    operatorConfigHisysevent->SetMatchSimReason(0, MatchSimReason::SIM_RECORDS_LOADED);
+    int8_t matchSimStateTracker = 0;
+    operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker, -2);
+    operatorConfigHisysevent->SetMatchSimStateTracker(MatchSimState::SEND_OPC_FAIL, 0);
+    auto &info = operatorConfigHisysevent->matchSimInfo_[0];
+    EXPECT_EQ(info.GetOpkey(), "46000");
 }
 } // namespace Telephony
 } // namespace OHOS
