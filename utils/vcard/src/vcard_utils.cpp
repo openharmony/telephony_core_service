@@ -558,5 +558,20 @@ size_t VCardUtils::GetOStreamSize(const std::ostringstream &oss)
     return static_cast<size_t>(end - beg);
 }
 
+bool VCardUtils::isEnAscii(char c) {
+    const int asciiFirst = 0x20;
+    const int asciiLast = 0x7E;  // included
+    return (asciiFirst <= c && c <= asciiLast) || c == '\r' || c == '\n';
+}
+
+bool VCardUtils::isEnPrintableAscii(const std::string &str) {
+    for (char ch : str) {
+        if (!isEnAscii(ch)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace Telephony
 } // namespace OHOS
