@@ -62,8 +62,8 @@ public:
     static bool IsContainsInvisibleChar(const std::string& value);
     static bool IsChineseString(const std::string& value);
     static size_t GetOStreamSize(const std::ostringstream &oss);
-    static bool isEnAscii(char c);
-    static bool isEnPrintableAscii(const std::string &str);
+    static bool IsPrintableChar(char c);
+    static bool IsPrintableString(const std::string &str);
 };
 } // namespace Telephony
 } // namespace OHOS
