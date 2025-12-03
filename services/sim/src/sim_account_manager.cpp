@@ -56,7 +56,6 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::operatorConfigCache_ is null");
         return;
     }
-    operatorConfigCache_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     operatorConfigCache_->RegisterForIccChange();
     simStateTracker_ =
         std::make_shared<SimStateTracker>(std::weak_ptr<SimFileManager>(simFileManager_), operatorConfigCache_, slotId);
@@ -64,7 +63,6 @@ void SimAccountManager::Init(int32_t slotId)
         TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
         return;
     }
-    simStateTracker_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     simStateTracker_->RegisterForIccLoaded();
     simStateTracker_->RegisterOpkeyLoaded();
     simStateTracker_->RegisterOperatorCacheDel();
