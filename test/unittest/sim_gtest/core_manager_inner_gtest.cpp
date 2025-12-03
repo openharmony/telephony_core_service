@@ -1078,6 +1078,7 @@ HWTEST_F(CoreManagerInnerTest, SetTargetPrimarySlotId_001, Function | MediumTest
     ret = mInner.SetTargetPrimarySlotId(false, 0);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
 HWTEST_F(CoreManagerInnerTest, SetIccCardState_001, Function | MediumTest | Level1)
 {
     mInner.simManager_ = nullptr;
