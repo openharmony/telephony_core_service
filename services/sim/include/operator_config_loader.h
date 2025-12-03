@@ -31,7 +31,6 @@
 #include "inner_event.h"
 #include "iremote_broker.h"
 #include "iservice_registry.h"
-#include "i_operator_config_hisysevent.h"
 #include "operator_config_cache.h"
 #include "sim_constant.h"
 #include "sim_file_manager.h"
@@ -52,10 +51,6 @@ public:
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId, int32_t state);
     int InitOpKeyData();
-    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
-    {
-        operatorConfigHisysevent_ = operatorConfigHisysevent;
-    };
 
 private:
     std::string LoadOpKeyOnMccMnc(int32_t slotId);
@@ -68,12 +63,10 @@ private:
     int InsertOpkeyToSimDb(std::string opKeyVal, std::string mccVal, std::string mncVal, std::string imsiVal);
     std::string GetMccFromMccMnc(std::string mccmnc);
     std::string GetMncFromMccMnc(std::string mccmnc);
-    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId);
 
 private:
     std::weak_ptr<SimFileManager> simFileManager_;
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
-    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     std::string iccidFromSim_;
     std::string imsiFromSim_;
     std::string spnFromSim_;
