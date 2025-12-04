@@ -17,6 +17,7 @@
 #define OHOS_SIM_ACCOUNT_MANAGER_H
 
 #include "i_tel_ril_manager.h"
+#include "i_operator_config_hisysevent.h"
 #include "icc_operator_privilege_controller.h"
 #include "operator_config_cache.h"
 #include "sim_file_manager.h"
@@ -36,6 +37,10 @@ public:
     int32_t UpdateOperatorConfigs(int32_t slotId);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 private:
     bool IsValidSlotId(int32_t);
@@ -49,6 +54,7 @@ private:
     std::shared_ptr<OperatorConfigCache> operatorConfigCache_ = nullptr;
     std::shared_ptr<IccOperatorPrivilegeController> privilegeController_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> privilegesRunner_;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
 };
 } // namespace Telephony
 } // namespace OHOS
