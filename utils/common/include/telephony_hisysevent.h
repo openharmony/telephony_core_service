@@ -404,6 +404,21 @@ enum class CellularDataErrorCode {
      * Indicates found apn empty.
      */
     DATA_ERROR_APN_FOUND_EMPTY,
+
+    /**
+     * Indicates supplierid register fail.
+     */
+    DATA_ERROR_REGISTER_SUPPLIERID_FAIL,
+
+    /**
+     * Indicates receive sim account ready.
+     */
+    DATA_ERROR_RECEIVE_SIM_ACCOUNT_READY,
+
+    /**
+     * Indicates create apn is empty.
+     */
+    DATA_ERROR_CREATE_APN_EMPTY,
 };
 
 /**

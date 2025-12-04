@@ -67,7 +67,6 @@ group("unittest") {
     "unittest/core_service_gtest:tel_network_search_zero_branch_gtest",
     "unittest/core_service_gtest:tel_sim_gtest",
     "unittest/core_service_gtest:tel_sim_zero_branch_gtest",
-    "unittest/core_service_gtest:tel_satellite_service_gtest",
     "unittest/core_service_gtest:tel_sim_core_service_gtest",
     "unittest/core_service_gtest:tel_sim_elementary_file_gtest",
     "unittest/core_service_gtest:tel_sim_icc_gtest",
@@ -95,6 +94,12 @@ group("unittest") {
       "unittest/esim_gtest:tel_esim_gtest",
       "unittest/esim_parcel_gtest:parcel_gtest",
       "unittest/utils_codec_gtest:utils_codec_gtest",
+    ]
+  }
+
+  if (core_service_feature_support_satellite) {
+    deps += [
+      "unittest/core_service_gtest:tel_satellite_service_gtest",
     ]
   }
 }

@@ -20,6 +20,7 @@
 #include <ffrt.h>
 
 #include "iservice_registry.h"
+#include "i_operator_config_hisysevent.h"
 #include "multi_sim_controller.h"
 #include "os_account_manager_wrapper.h"
 #include "sim_constant.h"
@@ -33,6 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
+typedef void (*ParameterChgPtr)(const char *, const char *, void *);
 class MultiSimMonitor : public TelEventHandler {
 public:
     explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -52,16 +54,25 @@ public:
     void UnRegisterSimNotify();
     int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
+    void SetPrivateUserId(int32_t userId);
+    void UpdateAllSimData(int32_t userId);
+    void CheckSimPresentWhenReboot();
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 public:
     enum {
         REGISTER_SIM_NOTIFY_EVENT = 0,
-        RESET_OPKEY_CONFIG = 1,
-        REGISTER_SIM_NOTIFY_RETRY_EVENT = 2,
-        INIT_DATA_RETRY_EVENT = 3,
-        RETRY_RESET_OPKEY_CONFIG = 4,
-        INIT_ESIM_DATA_RETRY_EVENT = 5,
-        INIT_ESIM_DATA_EVENT = 6,
+        RESET_OPKEY_CONFIG,
+        REGISTER_SIM_NOTIFY_RETRY_EVENT,
+        INIT_DATA_RETRY_EVENT,
+        RETRY_RESET_OPKEY_CONFIG,
+        INIT_ESIM_DATA_RETRY_EVENT,
+        INIT_ESIM_DATA_EVENT,
+        INIT_REBOOT_DETECT_DATA_EVENT,
+        INIT_REBOOT_DETECT_DATA_RETRY_EVENT,
     };
 
 private:
@@ -73,6 +84,7 @@ private:
 
 private:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    void ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event);
     void RefreshData(int32_t slotId);
     void InitData(int32_t slotId);
     void InitEsimData();
@@ -91,8 +103,10 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
-    void CheckSimPresentWhenReboot();
     void UpdateSimStateToStateRegistry();
+    void RegisterRebootDetectCallback();
+    void UnregisterRebootDetectCallback();
+    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker);
 
 private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
@@ -126,6 +140,9 @@ private:
     };
 
 private:
+    static constexpr const int SLOT_COUNT = 2;
+    bool hasCheckedSimPresent_[SLOT_COUNT] = {false, false};
+    std::vector<int> initRebootDetectRemainCount_;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -137,15 +154,18 @@ private:
     std::list<SimAccountCallbackRecord> listSimAccountCallbackRecord_;
     std::shared_ptr<DataShareEventSubscriber> dataShareSubscriber_ = nullptr;
     std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
-    bool hasCheckedSimPresent_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
+    int32_t privateUserId_ = -1;
+    bool hasSimStateChanged_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

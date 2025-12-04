@@ -291,6 +291,7 @@ HWTEST_F(SimTest, Telephony_Sim_CoreService_0600, Function | MediumTest | Level3
     ImsRegInfo mImsRegInfo;
     EXPECT_NE(mCoreService->GetImsRegStatus(0, ImsServiceType::TYPE_VOICE, mImsRegInfo), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetMaxSimCount(), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mCoreService->GetRealSimCount(), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpKey(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpKeyExt(0, testU16Str), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(mCoreService->GetOpName(0, testU16Str), TELEPHONY_ERR_SUCCESS);

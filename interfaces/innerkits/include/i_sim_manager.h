@@ -165,6 +165,11 @@ public:
     virtual void CheckIfNeedSwitchMainSlotId(bool isUserSet) = 0;
     virtual int32_t SetIccCardState(int32_t slotId, int32_t simStatus) = 0;
     virtual int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId) = 0;
+    virtual bool IsModemInitDone(int32_t slotId) = 0;
+    virtual int32_t GetMaxSimCount() = 0;
+    virtual int32_t GetRealSimCount() = 0;
+    virtual void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) = 0;
+    virtual void StartMatchSimTimeoutTimer(int32_t slotId) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

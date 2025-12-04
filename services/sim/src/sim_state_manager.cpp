@@ -50,6 +50,7 @@ void SimStateManager::Init(int32_t slotId)
         return;
     }
     simStateHandle_->SetRilManager(std::weak_ptr<Telephony::ITelRilManager>(telRilManager_));
+    simStateHandle_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     simStateHandle_->Init(slotId);
 
     TELEPHONY_LOGI("SimStateManager::eventLoop_ is running");
@@ -119,7 +120,7 @@ void SimStateManager::SetSimState(SimState simState)
     simStateHandle_->SetSimState(simState);
 }
 
-bool SimStateManager::IfModemInitDone()
+bool SimStateManager::IsModemInitDone()
 {
     if (simStateHandle_ != nullptr) {
         return simStateHandle_->modemInitDone_;
@@ -650,7 +651,6 @@ int32_t SimStateManager::NotifySimSlotsMapping(int32_t slotId)
 void SimStateManager::SetInSenseSwitchPhase(bool flag)
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->SetInSenseSwitchPhase(flag);
@@ -659,7 +659,6 @@ void SimStateManager::SetInSenseSwitchPhase(bool flag)
 void SimStateManager::ObtainIccStatus()
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->ObtainIccStatus();
@@ -677,7 +676,6 @@ int32_t SimStateManager::SetIccCardState(int32_t slotId, int32_t simStatus)
 void SimStateManager::UpdateSimStateToStateRegistry()
 {
     if (simStateHandle_ == nullptr) {
-        TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return;
     }
     simStateHandle_->UpdateSimStateToStateRegistry();
@@ -688,6 +686,24 @@ SimStateManager::~SimStateManager()
     if (simStateHandle_ != nullptr) {
         simStateHandle_->UnInit();
     }
+}
+
+int32_t SimStateManager::SetInitPrimarySlotReady(bool isReady)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SetInitPrimarySlotReady(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->SetInitPrimarySlotReady(isReady);
+}
+ 
+int32_t SimStateManager::GetInitPrimarySlotReady(bool& isReady)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("GetInitPrimarySlotReady(), simStateHandle_ is nullptr!!!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simStateHandle_->GetInitPrimarySlotReady(isReady);
 }
 } // namespace Telephony
 } // namespace OHOS

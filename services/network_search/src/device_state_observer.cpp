@@ -19,7 +19,7 @@
 #include "battery_srv_client.h"
 #endif
 #include "iservice_registry.h"
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
 #include "networkshare_client.h"
 #include "networkshare_constants.h"
 #endif
@@ -43,12 +43,14 @@ const std::string NET_TYPE = "NetType";
 void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
 {
     subscriber_ = std::make_shared<DeviceStateEventSubscriber>();
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
     sharingEventCallback_ = new (std::nothrow) SharingEventCallback(deviceStateHandler);
-
-    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_, sharingEventCallback_);
+#else
+    statusChangeListener_ = new (std::nothrow) SystemAbilityStatusChangeListener(subscriber_);
+#endif
     if (samgrProxy == nullptr || statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("StartEventSubscriber samgrProxy or statusChangeListener_ is nullptr");
         return;
@@ -63,15 +65,13 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
         "SubscribeSystemAbility COMMON_EVENT_SERVICE_ID(result:%{public}d) POWER_MANAGER_SERVICE_ID(result:%{public}d) "
         "POWER_MANAGER_BATT_SERVICE_ID(result:%{public}d) COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID(result:%{public}d)",
         commonEventResult, powerManagerResult, powerManagerBattResult, netManagerResult);
-#endif
 }
 
 void DeviceStateObserver::StopEventSubscriber()
 {
     CoreManagerInner::GetInstance().UnregisterCommonEventCallback(subscriber_);
     subscriber_ = nullptr;
-
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
     if (sharingEventCallback_ == nullptr) {
         TELEPHONY_LOGE("DeviceStateObserver::StopEventSubscriber sharingEventCallback_ is nullptr");
@@ -173,11 +173,15 @@ std::shared_ptr<DeviceStateHandler> DeviceStateEventSubscriber::GetEventHandler(
     return deviceStateHandler_;
 }
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
 DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
     std::shared_ptr<DeviceStateEventSubscriber> &sub, sptr<NetManagerStandard::ISharingEventCallback> &callback)
     : sub_(sub), callback_(callback)
 {}
+#else
+DeviceStateObserver::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<DeviceStateEventSubscriber> &sub) : sub_(sub) {}
+#endif
 
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
@@ -213,23 +217,32 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
                     TelCommonEvent::POWER_SAVE_MODE_CHANGED});
             break;
         }
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
         case COMM_NET_TETHERING_MANAGER_SYS_ABILITY_ID: {
-            auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
-            if (networkShareClient == nullptr) {
-                TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
-                return;
-            }
-            int32_t isSharing = 0;
-            networkShareClient->IsSharing(isSharing);
-            sub_->GetEventHandler()->ProcessNetSharingState(isSharing == NetManagerStandard::NETWORKSHARE_IS_SHARING);
-            networkShareClient->RegisterSharingEvent(callback_);
+            HandleNetmanagerExtSysAbility();
             break;
         }
+#endif
         default:
             TELEPHONY_LOGE("systemAbilityId is invalid");
             break;
     }
 }
+
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
+void DeviceStateObserver::SystemAbilityStatusChangeListener::HandleNetmanagerExtSysAbility()
+{
+    auto networkShareClient = DelayedSingleton<NetManagerStandard::NetworkShareClient>::GetInstance();
+    if (networkShareClient == nullptr) {
+        TELEPHONY_LOGE("DeviceStateObserver OnAddSystemAbility networkShareClient is nullptr");
+        return;
+    }
+    int32_t isSharing = 0;
+    networkShareClient->IsSharing(isSharing);
+    sub_->GetEventHandler()->ProcessNetSharingState(isSharing == NetManagerStandard::NETWORKSHARE_IS_SHARING);
+    networkShareClient->RegisterSharingEvent(callback_);
+}
+#endif
 
 void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
     int32_t systemAbilityId, const std::string& deviceId)
@@ -245,6 +258,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnRemoveSystemAbili
     CoreManagerInner::GetInstance().UnregisterCommonEventCallback(sub_);
 }
 
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
 SharingEventCallback::SharingEventCallback(
     const std::shared_ptr<DeviceStateHandler> &deviceStateHandler) : handler_(deviceStateHandler)
 {}

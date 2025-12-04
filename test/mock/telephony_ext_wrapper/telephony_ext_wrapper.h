@@ -120,6 +120,7 @@ public:
     typedef void (*UpdateHotplugCardState)(int32_t slotId, SimState state);
     typedef void (*CacheAssetPinForUpgrade)(
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
+    typedef bool (*IsDistributedCommunicationConnected)();
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -189,6 +190,7 @@ public:
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
+    IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -377,6 +379,10 @@ inline void UpdateHotPlugCardStateImpl(int32_t, SimState)
 {}
 inline void CacheAssetPinForUpgradeImpl(int32_t, const std::string &, PinOperationType, const std::string &)
 {}
+inline bool IsDistributedCommunicationConnectedImpl()
+{
+    return false;
+}
 
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
@@ -496,6 +502,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     initBip_ = &InitBipImpl;
     updateHotPlugCardState_ = &UpdateHotPlugCardStateImpl;
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
+    isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()

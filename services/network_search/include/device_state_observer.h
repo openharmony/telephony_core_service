@@ -21,7 +21,7 @@
 #include "common_event_support.h"
 #include "common_event_manager.h"
 #include "device_state_handler.h"
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
 #include "sharing_event_callback_stub.h"
 #endif
 #include "net_all_capabilities.h"
@@ -56,8 +56,7 @@ public:
 private:
     std::shared_ptr<DeviceStateHandler> deviceStateHandler_;
 };
-
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
 class SharingEventCallback : public NetManagerStandard::SharingEventCallbackStub {
 public:
     explicit SharingEventCallback(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler);
@@ -81,27 +80,33 @@ public:
 
 private:
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
+    ffrt::mutex callbackMutex_;
 #endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    ffrt::mutex callbackMutex_;
 
-#ifdef ABILITY_NETMANAGER_EXT_SUPPORT
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
     public:
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
         SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber,
             sptr<NetManagerStandard::ISharingEventCallback> &callback);
+#else
+        SystemAbilityStatusChangeListener(std::shared_ptr<DeviceStateEventSubscriber> &subscriber);
+#endif
         ~SystemAbilityStatusChangeListener() = default;
         virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
         virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
+        void HandleNetmanagerExtSysAbility();
+#endif
     private:
         std::shared_ptr<DeviceStateEventSubscriber> sub_ = nullptr;
+#if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
         sptr<NetManagerStandard::ISharingEventCallback> callback_ = nullptr;
-    };
 #endif
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

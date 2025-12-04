@@ -17,6 +17,7 @@
 
 #include "core_service_errors.h"
 #include "ffrt.h"
+#include "operator_config_hisysevent.h"
 #include "radio_event.h"
 #include "str_convert.h"
 #include "telephony_errors.h"
@@ -36,6 +37,7 @@ bool SimManager::OnInit(int32_t slotCount)
 {
     TELEPHONY_LOGI("SimManager OnInit, slotCount = %{public}d", slotCount);
     slotCount_ = slotCount;
+    operatorConfigHisysevent_ = std::make_shared<OperatorConfigHisysevent>();
     InitMultiSimObject();
     InitSingleSimObject();
     TELEPHONY_LOGD("SimManager OnInit success");
@@ -109,16 +111,19 @@ void SimManager::InitBaseManager(int32_t slotId)
     }
     simStateManager_[slotId] = std::make_shared<SimStateManager>(telRilManager_);
     if (simStateManager_[slotId] != nullptr) {
+        simStateManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simStateManager_[slotId]->Init(slotId);
     }
     simFileManager_[slotId] = SimFileManager::CreateInstance(std::weak_ptr<ITelRilManager>(telRilManager_),
         std::weak_ptr<SimStateManager>(simStateManager_[slotId]));
     if (simFileManager_[slotId] != nullptr) {
+        simFileManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simFileManager_[slotId]->Init(slotId);
     }
     simAccountManager_[slotId] =
         std::make_shared<SimAccountManager>(telRilManager_, simStateManager_[slotId], simFileManager_[slotId]);
     if (simAccountManager_[slotId] != nullptr) {
+        simAccountManager_[slotId]->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
         simAccountManager_[slotId]->Init(slotId);
     }
 }
@@ -141,6 +146,7 @@ void SimManager::InitSingleSimObject()
         TELEPHONY_LOGE("SimAccountManager:: multiSimMonitor is null");
         return;
     }
+    multiSimMonitor_->SetOperatorConfigHisysevent(operatorConfigHisysevent_);
     multiSimMonitor_->Init();
 }
 
@@ -1375,8 +1381,8 @@ int32_t SimManager::GetDefaultMainSlotByIccId()
 
 int32_t SimManager::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
-    if (multiSimController_ == nullptr) {
-        TELEPHONY_LOGE("multiSimController_ is nullptr");
+    if ((!IsValidSlotId(slotId)) || multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
     return multiSimController_->GetSimLabel(slotId, simLabel);
@@ -1488,6 +1494,43 @@ int32_t SimManager::SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotI
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return multiSimController_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
+}
+
+bool SimManager::IsModemInitDone(int32_t slotId)
+{
+    if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId invalid or simStateManager_ is null");
+        return false;
+    }
+    return simStateManager_[slotId]->IsModemInitDone();
+}
+
+int32_t SimManager::GetMaxSimCount()
+{
+    int32_t slotCount = SIM_SLOT_COUNT;
+    if (slotCount > 0) { // phone or not wifi device
+        return slotCount;
+    }
+
+    if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
+        return DC_HAS_ONE_SLOT;
+    }
+    return slotCount;
+}
+
+int32_t SimManager::GetRealSimCount()
+{
+    int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
+    if (realSlotCount > 0) { // phone or not wifi device
+        return realSlotCount;
+    }
+
+    if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
+        return DC_HAS_ONE_SLOT;
+    }
+    return realSlotCount;
 }
 } // namespace Telephony
 } // namespace OHOS

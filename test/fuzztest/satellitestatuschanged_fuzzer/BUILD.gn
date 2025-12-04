@@ -16,7 +16,7 @@ SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
- 
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("SatelliteStatusChangedFuzzTest") {
   module_output_path = "core_service/core_service"
@@ -102,9 +102,11 @@ ohos_fuzztest("SatelliteStatusChangedFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":SatelliteStatusChangedFuzzTest",
-  ]
+  if (core_service_feature_support_satellite) {
+    deps += [
+      # deps file
+      ":SatelliteStatusChangedFuzzTest",
+    ]
+  }
 }
 ###############################################################################

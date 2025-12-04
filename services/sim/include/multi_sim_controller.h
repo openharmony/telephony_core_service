@@ -134,7 +134,7 @@ private:
         std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo);
     std::string EncryptIccId(const std::string iccid);
     bool IsValidSlotId(int32_t slotId);
-    bool InitPrimary();
+    bool InitPrimary(int32_t slotId, bool isFirstInit);
     bool IsAllCardsReady();
     bool IsAllCardsLoaded();
     void SendMainCardBroadCast(int32_t slotId);
@@ -164,7 +164,10 @@ private:
     void ObtainDualSimCardStatus();
     void SetInSenseSwitchPhase(bool flag);
     bool IsNeedSetTargetPrimarySlotId();
-
+    bool IsSetPrimarySlotReady(int32_t slotId);
+    void ResetPrimarySlotReady();
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
+    
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     const int ACTIVE_SIM_IN_PROGRESS = 1;

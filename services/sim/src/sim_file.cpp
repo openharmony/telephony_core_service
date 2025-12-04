@@ -236,6 +236,7 @@ void SimFile::ProcessFileLoaded(bool response)
         UpdateSimLanguage();
     } else if (fileToGet_ < 0) {
         fileToGet_ = 0;
+        LoadVoiceMail();
     }
 }
 
@@ -1403,7 +1404,6 @@ bool SimFile::ProcessGetCspCphs(const AppExecFwk::InnerEvent::Pointer &event)
         return isFileProcessResponse;
     }
     TELEPHONY_LOGI("SimFile MSG_SIM_OBTAIN_CSP_CPHS_DONE data:%{public}s", fileData);
-    TELEPHONY_LOGI("ELEMENTARY_FILE_CSP: %{public}s", fileData);
     ProcessElementaryFileCsp(iccData);
     return isFileProcessResponse;
 }

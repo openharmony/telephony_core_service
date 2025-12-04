@@ -17,7 +17,7 @@
 #define TELEPHONY_IMS_CORE_SERVICE_CLIENT_H
 
 #include "singleton.h"
-#include "rwlock.h"
+#include "ffrt.h"
 #include "ims_core_service_interface.h"
 #include "event_handler.h"
 #include "radio_event.h"
@@ -59,11 +59,10 @@ private:
     void Clean();
 
 private:
-    std::mutex mutex_;
     sptr<ImsCoreServiceInterface> imsCoreServiceProxy_ = nullptr;
     sptr<ImsCoreServiceCallbackInterface> imsCoreServiceCallback_ = nullptr;
     std::map<int32_t, std::shared_ptr<AppExecFwk::EventHandler>> handlerMap_;
-    Utils::RWLock rwClientLock_;
+    ffrt::shared_mutex clientLock_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony

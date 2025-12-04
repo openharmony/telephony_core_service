@@ -1371,7 +1371,9 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_006, Function |
     networkSearchHandler->networkSelection_ = nullptr;
     networkSearchHandler->AirplaneModeChange(event);
     networkSearchHandler->RadioSignalStrength(event);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->SatelliteStatusChanged(event);
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     networkSearchHandler->SetNetworkSelectionModeResponse(event);
     networkSearchHandler->ClearSignalAndCellInfoList();
 }

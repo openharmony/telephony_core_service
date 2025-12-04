@@ -29,7 +29,9 @@
 #include "inner_event.h"
 #include "iservice_registry.h"
 #include "radio_event.h"
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
 #include "satellite_service_client.h"
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
 #include "sim_constant.h"
 #include "sim_state_manager.h"
 #ifdef CORE_SERVICE_SUPPORT_ESIM
@@ -99,6 +101,10 @@ const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = 
         [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
             handle->GetSimIOResult(slotId, event);
         } },
+    { EVENT_MATCH_SIM_TIMEOUT,
+        [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
+            handle->ProcessMatchSimTimeoutTimer(slotId);
+        } },
 };
 
 SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateManager)
@@ -112,11 +118,13 @@ void SimStateHandle::Init(int32_t slotId)
     slotId_ = slotId;
     TELEPHONY_LOGI("SimStateHandle::HasSimCard(), slotId_ = %{public}d", slotId_);
     ConnectService();
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
         satelliteClient->AddSimHandler(slotId_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     }
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     auto telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
         TELEPHONY_LOGI("SimStateHandle::SimStateHandle RegisterEvent start");
@@ -398,17 +406,15 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         CardTypeEscape(newSimType, slotId);
         oldSimType_ = newSimType;
     }
-    
     PublishHotZoneInd(newSimStatus, slotId);
     ProcessNewSimStatus(newSimStatus);
     if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
+        InitMatchSimInfo(slotId, newSimStatus);
         oldSimStatus_ = newSimStatus;
         iter = simIccStatusMap_.find(newSimStatus);
-        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus[%{public}s]"
-            "(%{public}d) observerHandler_ is nullptr[%{public}d] ",
-            iter->second.c_str(), newSimStatus, (observerHandler_ == nullptr));
+        TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus %{public}d", newSimStatus);
         if (newSimStatus == ICC_CARD_ABSENT) {
             TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
             CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
@@ -472,14 +478,17 @@ void SimStateHandle::UnInit()
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
     }
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
         satelliteCallback_ != nullptr) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
         satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
 }
 
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
 void SimStateHandle::RegisterSatelliteCallback()
 {
     satelliteCallback_ =
@@ -495,6 +504,7 @@ void SimStateHandle::UnregisterSatelliteCallback()
         satelliteCallback_ = nullptr;
     }
 }
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
 
 void SimStateHandle::SetInSenseSwitchPhase(bool flag)
 {
@@ -1138,5 +1148,35 @@ int32_t SimStateHandle::SetIccCardState(int32_t slotId, int32_t simStatus)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t SimStateHandle::SetInitPrimarySlotReady(bool isReady)
+{
+    TELEPHONY_LOGI("SimStateHandle::SetInitPrimarySlotReady [%{public}d]", isReady);
+    isInitPrimarySlotReady = isReady;
+    return TELEPHONY_ERR_SUCCESS;
+}
+ 
+int32_t SimStateHandle::GetInitPrimarySlotReady(bool& isReady)
+{
+    isReady = isInitPrimarySlotReady;
+    TELEPHONY_LOGI("SimStateHandle::GetInitPrimarySlotReady [%{public}d]", isReady);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+inline void SimStateHandle::InitMatchSimInfo(int32_t slotId, int32_t simState)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->InitOperatorConfigHisysevent(slotId, simState);
+        StartMatchSimTimeoutTimer();
+    }
+}
+
+inline void SimStateHandle::ProcessMatchSimTimeoutTimer(int32_t slotId)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->ReportMatchSimChr(slotId);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

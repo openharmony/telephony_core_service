@@ -2152,5 +2152,17 @@ int32_t CoreService::SendApduData(
 
     return res;
 }
+
+int32_t CoreService::GetRealSimCount()
+{
+    int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
+    if (realSlotCount > 0) {
+        return realSlotCount;
+    }
+    if (simManager_ != nullptr) {
+        return simManager_->GetRealSimCount();
+    }
+    return realSlotCount;
+}
 } // namespace Telephony
 } // namespace OHOS
