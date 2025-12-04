@@ -363,6 +363,8 @@ public:
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
+    void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId);
+    void StartMatchSimTimeoutTimer(int32_t slotId);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);
@@ -407,6 +409,7 @@ public:
     int32_t GetContractInfo(
         int32_t slotId, GetContractInfoRequest &getContractInfoRequest, std::string &response);
     int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult);
+    bool IsModemInitDone(int32_t slotId);
     /******************** esimManager end *****************************/
 
 private:

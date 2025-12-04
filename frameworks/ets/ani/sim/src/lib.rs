@@ -18,7 +18,7 @@ mod sim;
 mod wrapper;
 
 ani_constructor!(
-    namespace "L@ohos/telephony/sim/sim"
+    namespace "@ohos.telephony.sim.sim"
     [
         "nativeGetLockState": sim::get_lock_state,
         "nativeUnlockPuk": sim::unlock_puk,
@@ -32,5 +32,42 @@ ani_constructor!(
         "nativeGetMaxSimCount": sim::get_max_sim_count,
         "nativeGetDefaultVoiceSlotId": sim::get_default_voice_slot_id,
         "nativeIsSimActive": sim::is_sim_active,
+        "nativeGetSimAuthentication": sim::get_sim_authentication,
+        "nativeGetDsdsMode": sim::get_dsds_mode,
+        "nativeGetDefaultVoiceSimId": sim::get_default_voice_sim_id,
+        "nativeGetOpName": sim::get_op_name,
+        "nativeGetOpKey": sim::get_op_key,
+        "nativeUnlockSimLock": sim::unlock_sim_lock,
+        "nativeSendTerminalResponseCmd": sim::send_terminal_response_cmd,
+        "nativeSendEnvelopeCmd": sim::send_envelope_cmd,
+        "nativeUpdateIccDiallingNumbers": sim::update_icc_dialling_numbers,
+        "nativeDelIccDiallingNumbers": sim::del_icc_dialling_numbers,
+        "nativeAddIccDiallingNumbers": sim::add_icc_dialling_numbers,
+        "nativeQueryIccDiallingNumbers": sim::query_icc_dialling_numbers,
+        "nativeAlterPin2": sim::alter_pin2,
+        "nativeUnlockPuk2": sim::unlock_puk2,
+        "nativeUnlockPin2": sim::unlock_pin2,
+        "nativeSetLockState": sim::set_lock_state,
+        "nativeAlterPin": sim::alter_pin,
+        "nativeGetShowNumber": sim::get_show_number,
+        "nativeSetShowNumber": sim::set_show_number,
+        "nativeGetShowName": sim::get_show_name,
+        "nativeSetShowName": sim::set_show_name,
+        "nativeDeactivateSim": sim::deactivate_sim,
+        "nativeActivateSim": sim::activate_sim,
+        "nativeSetDefaultVoiceSlotId": sim::set_default_voice_slot_id,
+        "nativeGetIMSI": sim::get_imsi,
+        "nativeGetSimGid1": sim::get_sim_gid1,
+        "nativeGetSimTelephoneNumber": sim::get_sim_telephone_number,
+        "nativeSetVoiceMailInfo": sim::set_voice_mail_info,
+        "nativeGetVoiceMailNumber": sim::get_voice_mail_number,
+        "nativeGetVoiceMailIdentifier": sim::get_voice_mail_identifier,
+        "nativeGetSimIccId": sim::get_sim_icc_id,
+        "nativeGetCardType": sim::get_card_type,
+        "nativeGetSimSpn": sim::get_sim_spn,
+        "nativeGetSimOperatorNumeric": sim::get_sim_operator_numeric,
+        "nativeHasOperatorPrivileges": sim::has_operator_privileges,
+        "nativeIsOperatorSimCard": sim::is_operator_sim_card,
+        "nativeGetSimLabel": sim::get_sim_label,
     ]
 );

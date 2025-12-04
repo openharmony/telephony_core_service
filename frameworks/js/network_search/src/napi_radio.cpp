@@ -38,6 +38,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t UNDEFINED_VALUE = -1;
 constexpr int32_t DEFAULT_REF_COUNT = 1;
 constexpr int16_t PARAMETER_COUNT_ZERO = 0;
 constexpr int16_t PARAMETER_COUNT_ONE = 1;
@@ -80,6 +81,8 @@ static int32_t WrapRadioTech(int32_t radioTechType)
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN);
         case RadioTech::RADIO_TECHNOLOGY_NR:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR);
+        case RadioTech::RADIO_TECHNOLOGY_NR_ENHANCED:
+            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED);
         default:
             return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
     }
@@ -3058,6 +3061,8 @@ static napi_value InitEnumRadioType(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
+        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -3347,6 +3352,8 @@ static napi_value CreateRadioType(napi_env env, napi_value exports)
             NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
+        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
+            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "RadioTechnology", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
@@ -3636,6 +3643,35 @@ static napi_value CreateImsRegState(napi_env env, napi_value exports)
     return exports;
 }
 
+static napi_value GetResidentNetworkNumeric(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = PARAMETER_COUNT_ONE;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    std::string numeric;
+    napi_value value = nullptr;
+    if (parameterCount != PARAMETER_COUNT_ONE ||
+        !NapiUtil::MatchParameters(env, parameters, { napi_number })) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric parameter count is incorrect");
+        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+        return value;
+    }
+    int32_t slotId = UNDEFINED_VALUE;
+    if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric convert parameter fail");
+        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+        return value;
+    }
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("GetResidentNetworkNumeric slotId is invalid");
+        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+        return value;
+    }
+    numeric = CoreServiceClient::GetInstance().GetResidentNetworkNumeric(slotId);
+    NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
+    return value;
+}
+
 static napi_value CreateFunctions(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3649,6 +3685,7 @@ static napi_value CreateFunctions(napi_env env, napi_value exports)
         DECLARE_NAPI_WRITABLE_FUNCTION("getNetworkSearchInformation", GetNetworkSearchInformation),
         DECLARE_NAPI_WRITABLE_FUNCTION("getISOCountryCodeForNetwork", GetISOCountryCodeForNetwork),
         DECLARE_NAPI_WRITABLE_FUNCTION("getISOCountryCodeForNetworkSync", GetISOCountryCodeForNetworkSync),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getResidentNetworkNumeric", GetResidentNetworkNumeric),
         DECLARE_NAPI_WRITABLE_FUNCTION("isRadioOn", IsRadioOn),
         DECLARE_NAPI_WRITABLE_FUNCTION("turnOnRadio", TurnOnRadio),
         DECLARE_NAPI_WRITABLE_FUNCTION("turnOffRadio", TurnOffRadio),

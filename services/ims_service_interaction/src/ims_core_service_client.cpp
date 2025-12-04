@@ -96,7 +96,7 @@ int32_t ImsCoreServiceClient::GetPhoneNumberFromIMPU(int32_t slotId, std::string
 
 sptr<ImsCoreServiceInterface> ImsCoreServiceClient::GetImsCoreServiceProxy()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     if (imsCoreServiceProxy_ != nullptr) {
         return imsCoreServiceProxy_;
     }
@@ -188,7 +188,7 @@ int32_t ImsCoreServiceClient::ReConnectService()
 
 void ImsCoreServiceClient::Clean()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     if (imsCoreServiceProxy_ != nullptr) {
         imsCoreServiceProxy_.clear();
         imsCoreServiceProxy_ = nullptr;

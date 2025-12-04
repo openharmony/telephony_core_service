@@ -105,7 +105,6 @@ bool SimNumberDecode::BcdToChar(const uint8_t bcdCode, char &result, const int b
         return false;
     }
     if (static_cast<size_t>(surplus) >= extendedPtr->size()) {
-        TELEPHONY_LOGE("Unknow bcdCode:[%{public}d]", bcdCode);
         return false;
     }
     result = extendedPtr->at(surplus);
@@ -182,8 +181,6 @@ bool SimNumberDecode::BCDSectionConvertToString(const std::vector<uint8_t>::cons
         uint8_t loFourBit = (*it & LO_FOUR);
         char c = INIT_VAL;
         if (!BcdToChar(loFourBit, c, bcdExtType)) {
-            TELEPHONY_LOGE(
-                "occur error in BcdToChar(bcd:'%{public}d',bcdExtType:'%{public}d')", loFourBit, bcdExtType);
             return false;
         }
         number.push_back(c);
@@ -211,10 +208,7 @@ bool SimNumberDecode::BCDConvertToString(const std::vector<uint8_t>::const_itera
     std::vector<uint8_t>::const_iterator it = codeBeg;
     const bool prependPlus = (*it == FLAG_INTERNATIONAL);
     ++it;
-    if (!BCDSectionConvertToString(it, codeEnd, number, bcdExtType)) {
-        TELEPHONY_LOGE("BCDConvertToString occur error to BCDSectionConvertToString bcdExtType: %{public}d",
-            bcdExtType);
-    }
+    BCDSectionConvertToString(it, codeEnd, number, bcdExtType);
     if (!prependPlus) {
         return true;
     }

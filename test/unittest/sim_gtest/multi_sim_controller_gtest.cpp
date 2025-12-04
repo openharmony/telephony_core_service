@@ -1352,5 +1352,108 @@ HWTEST_F(MultiSimControllerTest, UpdateSimPresenttest_002, Function | MediumTest
     EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
     EXPECT_NE(multiSimController->UpdateSimPresent(1, false), 0);
 }
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitPrimary_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager0->Init(0);
+    auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager1->Init(1);
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManager0, simStateManager1 };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->maxCount_ = 2;
+    simStateManager0->SetModemInit(true);
+    simStateManager1->SetModemInit(true);
+    simStateManager0->SetInitPrimarySlotReady(true);
+    simStateManager1->SetInitPrimarySlotReady(true);
+    simStateManager0->SetSimState(SimState::SIM_STATE_NOT_PRESENT);
+    multiSimController->waitCardsReady_ = false;
+    EXPECT_EQ(multiSimController->InitPrimary(0, true), true);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLocalCache, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+
+    int32_t simIdx = 0;
+    SimRdbInfo simRdb1;
+    simRdb1.simLabelIndex = 3;
+    multiSimController->allLocalCacheInfo_.push_back(simRdb1);
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    EXPECT_EQ(simIdx, 1);
+
+    OHOS::system::SetParameter("persist.telephony.last_deactive_profile", "1");
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    EXPECT_EQ(simIdx, 3);
+}
+
+HWTEST_F(MultiSimControllerTest, IsAllCardsReadytest, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager0->Init(0);
+    auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager1->Init(1);
+    multiSimController->simStateManager_ = { simStateManager0, simStateManager1 };
+    multiSimController->simStateManager_[0]->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManager0);
+    multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_NOT_PRESENT;
+    multiSimController->waitCardsReady_ = true;
+    EXPECT_TRUE(multiSimController->IsAllCardsReady());
+ 
+    multiSimController->waitCardsReady_ = false;
+    EXPECT_FALSE(multiSimController->IsAllCardsReady());
+ 
+    multiSimController->simStateManager_[0]->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    EXPECT_FALSE(multiSimController->IsAllCardsReady());
+}
+
+HWTEST_F(MultiSimControllerTest, GetSimLabeltest, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    int32_t slotId = 0;
+    SimLabel simLabel;
+    OHOS::system::SetParameter(ESIM_SUPPORT_PARAM, "6");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_SUCCESS);
+    slotId = 1;
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    OHOS::system::SetParameter(ESIM_SUPPORT_PARAM, "0");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+ 
+    std::shared_ptr<MockSimManager> mockeSimManager = std::make_shared<MockSimManager>();
+    EXPECT_CALL(*mockeSimManager, IsEsim(_)).WillRepeatedly(
+        Return(true));
+    EXPECT_FALSE(CoreManagerInner::GetInstance().IsSupported(slotId));
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    multiSimController->localCacheInfo_ = newCache;
+    OHOS::system::SetParameter(LAST_DEACTIVE_PROFILE, "3");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simLabel.index, ESIM1);
+ 
+    OHOS::system::SetParameter(LAST_DEACTIVE_PROFILE, "");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simLabel.index, ESIM1);
+ 
+    OHOS::system::SetParameter(LAST_DEACTIVE_PROFILE, "1");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+}
 }
 }

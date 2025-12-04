@@ -564,6 +564,11 @@ public:
     {
         return 0;
     }
+
+    int32_t GetRealSimCount() override
+    {
+        return 0;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -153,6 +153,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
         "GetVoiceMailTagExt");
     resetVoiceMailManagerExt_ = (RESET_VOICE_MAIL_MANAGER_EXT)dlsym(telephonyExtWrapperHandle_,
         "ResetVoiceMailManagerExt");
+    isDistributedCommunicationConnected_ = (IsDistributedCommunicationConnected)dlsym(telephonyExtWrapperHandle_,
+        "IsDistributedCommunicationConnected");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||

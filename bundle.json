@@ -24,7 +24,9 @@
             "SystemCapability.Telephony.CoreService.Esim"
         ],
         "features": [
-            "core_service_support_esim"
+            "core_service_support_esim",
+            "core_service_low_power_class_2",
+            "core_service_feature_support_satellite"
         ],
         "hisysevent_config": [
             "//base/telephony/core_service/hisysevent.yaml"
@@ -79,6 +81,7 @@
         "build": {
             "group_type": {
                 "base_group": [
+                    "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked",
                     "//base/telephony/core_service/interfaces/kits/c/telephony_radio:telephony_radio"
                 ],
                 "fwk_group": [
@@ -138,7 +141,10 @@
                     "name": "//base/telephony/core_service/frameworks/cj/telephony_sim:cj_sim_ffi"
                 },
                 {
-                    "type": "none",
+                    "header": {
+                        "header_base": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked",
+                        "header_files": []
+                    },
                     "name": "//base/telephony/core_service/test/mock/ffrt:ffrt_mocked"
                 }
             ],

@@ -26,6 +26,7 @@
 
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "i_operator_config_hisysevent.h"
 #include "icc_state.h"
 #include "observer_handler.h"
 #include "satellite_core_callback.h"
@@ -86,6 +87,8 @@ const int MSG_SIM_SEND_NCFG_OPER_INFO_DONE = 62;
 
 const int MSG_SIM_GET_SIM_IO_DONE = 71;
 
+const int EVENT_MATCH_SIM_TIMEOUT = 72;
+
 // pin lock type
 constexpr const char *FAC_PIN_LOCK = "SC";
 // change pin2 type
@@ -96,6 +99,8 @@ constexpr const char *FDN_PIN2_LOCK = "FD";
 constexpr const char *USIM_AID = "USIM_AID";
 constexpr const char *CDMA_FAKE_AID = "CDMA_FAKE_AID";
 constexpr const char *GSM_FAKE_AID = "GSM_FAKE_AID";
+
+constexpr int64_t MATCH_SIM_TIMEOUT_TIME = 3 * 60 * 1000;
 
 struct UnlockData {
     int32_t result = 0;
@@ -135,8 +140,10 @@ public:
     bool IsIccLocked();
     void RegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandler> &observerCallBack, int what);
+#ifdef CORE_SERVICE_SUPPORT_SATELLITE
     void RegisterSatelliteCallback();
     void UnregisterSatelliteCallback();
+#endif // CORE_SERVICE_SUPPORT_SATELLITE
     int32_t SimAuthentication(int32_t slotId, AuthType authType, const std::string &authData);
     SimAuthenticationResponse GetSimAuthenticationResponse();
     void SendSimMatchedOperatorInfo(
@@ -148,6 +155,21 @@ public:
     void ObtainIccStatus();
     void SetInSenseSwitchPhase(bool flag);
     void UpdateSimStateToStateRegistry();
+    int32_t SetInitPrimarySlotReady(bool isReady);
+    int32_t GetInitPrimarySlotReady(bool& isReady);
+    inline void RemoveMatchSimTimeoutTimer()
+    {
+        RemoveEvent(EVENT_MATCH_SIM_TIMEOUT);
+    };
+    void InitMatchSimInfo(int32_t slotId, int32_t simState);
+    inline void StartMatchSimTimeoutTimer()
+    {
+        SendEvent(EVENT_MATCH_SIM_TIMEOUT, 0, MATCH_SIM_TIMEOUT_TIME);
+    };
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 public:
     bool modemInitDone_ = false;
@@ -177,6 +199,7 @@ private:
     void GetSimIOResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessNewSimStatus(int newSimStatus);
     void PublishHotZoneInd(int32_t newSimStatus, int32_t slotId);
+    void ProcessMatchSimTimeoutTimer(int32_t slotId);
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     void UpdateEsimOSVersion(int32_t slotId);
 #endif
@@ -198,11 +221,13 @@ private:
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_; // ril manager
     std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     std::string iccid_ = "";
     std::string oldIccid_ = "";
     int32_t esimSwitchState_ = 0;
     bool needReupdate_ = false;
     bool isInSenseSwitchPhase_ = false;
+    bool isInitPrimarySlotReady = false;
 };
 } // namespace Telephony
 } // namespace OHOS

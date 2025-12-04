@@ -59,11 +59,13 @@ void MultiSimMonitor::Init()
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
+    initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
     controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
+    SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT);
 }
 
 void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
@@ -106,6 +108,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             InitData(event->GetParam());
             break;
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
+            hasSimStateChanged_ = true;
             RefreshData(event->GetParam());
             break;
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT:
@@ -118,6 +121,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         case MultiSimMonitor::RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
             UpdateAllOpkeyConfigs();
+            SetMatchSimStateTracker(MatchSimState::RESET_DATASHARE_ERROR);
             break;
         case MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG:
             RemoveEvent(MultiSimMonitor::RETRY_RESET_OPKEY_CONFIG);
@@ -125,7 +129,61 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             CheckSimNotifyRegister();
             break;
         default:
+            ProcessEventEx(event);
             break;
+    }
+}
+
+void MultiSimMonitor::ProcessEventEx(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("start ProcessEvent but event is null!");
+        return;
+    }
+    auto eventCode = event->GetInnerEventId();
+    switch (eventCode) {
+        case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_EVENT:
+            RemoveEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
+            CheckSimPresentWhenReboot();
+            RegisterRebootDetectCallback();
+            break;
+        case MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT:
+            CheckSimPresentWhenReboot();
+            break;
+        default:
+            break;
+    }
+}
+
+static void RebootDetectCallback(const char *key, const char *value, void *context)
+{
+    TELEPHONY_LOGI("reboot detect, key = %{public}s, value = %{public}s", key, value);
+    MultiSimMonitor *service = reinterpret_cast<MultiSimMonitor *>(context);
+    service->CheckSimPresentWhenReboot();
+}
+
+void MultiSimMonitor::RegisterRebootDetectCallback()
+{
+    TELEPHONY_LOGI("RegisterRebootDetectCallback");
+    parameterChgPtr_ = RebootDetectCallback;
+    int32_t ret0 = WatchParameter((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_0)).c_str(),
+        parameterChgPtr_, this);
+    int32_t ret1 = WatchParameter((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_1)).c_str(),
+        parameterChgPtr_, this);
+    if (ret0 != 0 || ret1 != 0) {
+        TELEPHONY_LOGE("reboot detect WatchParameter fail");
+        return;
+    }
+}
+
+void MultiSimMonitor::UnregisterRebootDetectCallback()
+{
+    TELEPHONY_LOGI("UnregisterRebootDetectCallback");
+    if (parameterChgPtr_ != nullptr) {
+        RemoveParameterWatcher((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_0)).c_str(),
+            parameterChgPtr_, this);
+        RemoveParameterWatcher((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_1)).c_str(),
+            parameterChgPtr_, this);
     }
 }
 
@@ -144,6 +202,14 @@ void MultiSimMonitor::CheckOpcNeedUpdata(const bool isDataShareError)
     });
 }
 
+inline void MultiSimMonitor::SetMatchSimStateTracker(MatchSimState matchSimStateTracker)
+{
+    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
+    if (operatorConfigHisysevent != nullptr) {
+        operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker);
+    }
+}
+
 int32_t MultiSimMonitor::CheckUpdateOpcVersion()
 {
     if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
@@ -154,10 +220,12 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
             SetBlockLoadOperatorConfig(true);
             if (controller_->UpdateOpKeyInfo() != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("UpdateOpKeyInfo error");
+                SetMatchSimStateTracker(MatchSimState::OPKEY_DB_UPDATE_FAIL);
                 return TELEPHONY_ERROR;
             }
             TELEPHONY_EXT_WRAPPER.updateOpcVersion_();
             TELEPHONY_LOGI("Version updated succ");
+            SetMatchSimStateTracker(MatchSimState::OPKEY_DB_UPDATE_SUCC);
             return TELEPHONY_SUCCESS;
         }
     }
@@ -465,19 +533,43 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
     }
+    std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateAllSimData(userId);
+    std::static_pointer_cast<MultiSimMonitor>(handler)->SetPrivateUserId(userId);
+}
+
+void MultiSimMonitor::SetPrivateUserId(int32_t userId)
+{
+    privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
+}
+
+void MultiSimMonitor::UpdateAllSimData(int32_t userId)
+{
+    if ((userId != ACTIVE_USER_ID && userId != privateUserId_) ||
+        ((userId == ACTIVE_USER_ID || userId == privateUserId_) && hasSimStateChanged_)) {
+        hasSimStateChanged_ = false;
+        SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
+    }
 }
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()
 {
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (OHOS::system::GetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0") == "1" &&
-            !hasCheckedSimPresent_) {
-            TELEPHONY_LOGE("reboot detect true, need update sim present");
-            controller_->UpdateSimPresent(slotId, true);
-            OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
+            !hasCheckedSimPresent_[slotId]) {
+            if (controller_->UpdateSimPresent(slotId, true) == TELEPHONY_SUCCESS) {
+                OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
+                hasCheckedSimPresent_[slotId] = true;
+                TELEPHONY_LOGI("reboot detect update sim present success");
+            } else if (initRebootDetectRemainCount_[slotId] > 0) {
+                SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, slotId, DELAY_THREE_SECONDS);
+                TELEPHONY_LOGI("reboot detect slotId=%{public}d retry remain %{public}d",
+                    slotId, initRebootDetectRemainCount_[slotId]);
+                initRebootDetectRemainCount_[slotId]--;
+            } else {
+                TELEPHONY_LOGE("reboot detect fail!!!");
+            }
         }
     }
-    hasCheckedSimPresent_ = true;
 }
 
 void MultiSimMonitor::CheckSimNotifyRegister()

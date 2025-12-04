@@ -59,7 +59,7 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response);
     int32_t SendSimMatchedOperatorInfo(
         int32_t slotId, int32_t state, const std::string &operName, const std::string &operKey);
-    bool IfModemInitDone();
+    bool IsModemInitDone();
     int32_t GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo, SimAuthenticationResponse &response);
     void SyncCmdResponse();
     void SyncSimMatchResponse();
@@ -69,6 +69,24 @@ public:
     void ObtainIccStatus();
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     void UpdateSimStateToStateRegistry();
+    int32_t SetInitPrimarySlotReady(bool isReady);
+    int32_t GetInitPrimarySlotReady(bool& isReady);
+    inline void RemoveMatchSimTimeoutTimer()
+    {
+        if (simStateHandle_ != nullptr) {
+            simStateHandle_->RemoveMatchSimTimeoutTimer();
+        }
+    };
+    inline void StartMatchSimTimeoutTimer()
+    {
+        if (simStateHandle_ != nullptr) {
+            simStateHandle_->StartMatchSimTimeoutTimer();
+        }
+    };
+    inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
+    {
+        operatorConfigHisysevent_ = operatorConfigHisysevent;
+    };
 
 public:
     bool responseReady_ = false;
@@ -87,6 +105,7 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
+    std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     SimHandleRun simStateRun_ = STATE_NOT_START;
     static std::mutex mtx_;
 };

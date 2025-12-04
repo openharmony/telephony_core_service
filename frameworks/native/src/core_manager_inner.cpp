@@ -127,7 +127,14 @@ int32_t CoreManagerInner::GetDefaultSlotId(void)
 
 int32_t CoreManagerInner::GetMaxSimCount(void)
 {
-    return SIM_SLOT_COUNT;
+    int32_t slotCount = SIM_SLOT_COUNT;
+    if (slotCount > 0) {
+        return slotCount;
+    }
+    if (simManager_ != nullptr) {
+        return simManager_->GetMaxSimCount();
+    }
+    return slotCount;
 }
 
 int32_t CoreManagerInner::RegisterCoreNotify(
@@ -2734,6 +2741,20 @@ int32_t CoreManagerInner::SetIccCardState(int32_t slotId, int32_t simStatus)
     return simManager_->SetIccCardState(slotId, simStatus);
 }
 
+void CoreManagerInner::SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId)
+{
+    if (simManager_ != nullptr) {
+        simManager_->SetMatchSimStateTracker(matchSimStateTracker, slotId);
+    }
+}
+
+void CoreManagerInner::StartMatchSimTimeoutTimer(int32_t slotId)
+{
+    if (simManager_ != nullptr) {
+        simManager_->StartMatchSimTimeoutTimer(slotId);
+    }
+}
+
 /******************** simManager_ end ************************/
 
 /******************** esimManager_ start ************************/
@@ -3052,6 +3073,15 @@ int32_t CoreManagerInner::SetTargetPrimarySlotId(bool isDualCard, int32_t primar
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->SetTargetPrimarySlotId(isDualCard, primarySlotId);
+}
+
+bool CoreManagerInner::IsModemInitDone(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return false;
+    }
+    return simManager_->IsModemInitDone(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

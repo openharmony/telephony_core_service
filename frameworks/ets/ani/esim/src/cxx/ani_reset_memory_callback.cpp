@@ -17,7 +17,7 @@
 #include "telephony_errors.h"
 
 namespace OHOS {
-using namespace Telephony;
+namespace Telephony {
 namespace EsimAni {
 
 AniResetMemoryCallback::AniResetMemoryCallback(AniAsyncResetMemory *context) : asyncContext_(context)
@@ -29,7 +29,7 @@ void AniResetMemoryCallback::OnResetMemory(const int32_t &result, const int32_t 
         return;
     }
 
-    std::lock_guard<ffrt::mutex> callbackLock(asyncContext_->callbackMutex);
+    std::unique_lock<ffrt::mutex> callbackLock(asyncContext_->callbackMutex);
     if (errorCode == TELEPHONY_ERR_SUCCESS) {
         asyncContext_->callbackVal = result;
     } else {
@@ -40,4 +40,5 @@ void AniResetMemoryCallback::OnResetMemory(const int32_t &result, const int32_t 
 }
 
 } // namespace EsimAni
+} // namespace Telephony
 } // namespace OHOS
