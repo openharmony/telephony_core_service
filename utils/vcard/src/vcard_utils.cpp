@@ -561,7 +561,7 @@ size_t VCardUtils::GetOStreamSize(const std::ostringstream &oss)
 bool VCardUtils::IsPrintableChar(char c)
 {
     const char start = 0x20;
-    const char end = 0x7E;  // included
+    const char end = 0x7E;
     return (start <= c && c <= end) || c == '\r' || c == '\n';
 }
 
