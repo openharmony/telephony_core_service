@@ -1346,6 +1346,10 @@ void VCardContact::UpdateDisplayName()
         .suffix = nameData_->GetSuffix(),
     };
     auto language = Global::I18n::LocaleConfig::GetSystemLanguage();
+    if (vCardType_ != VERSION_30 && VCardUtils::IsPrintableString(rawNameInfo.family) &&
+        VCardUtils::IsPrintableString(rawNameInfo.given)) {
+        language = "en-Latn-US";
+    }
     std::string displayName = GenerateDisplayName(language, rawNameInfo);
     if (displayName.empty()) {
         return;

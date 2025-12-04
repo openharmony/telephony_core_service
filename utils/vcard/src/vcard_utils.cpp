@@ -558,5 +558,17 @@ size_t VCardUtils::GetOStreamSize(const std::ostringstream &oss)
     return static_cast<size_t>(end - beg);
 }
 
+bool VCardUtils::IsPrintableChar(char c)
+{
+    const char start = 0x20;
+    const char end = 0x7E;
+    return (start <= c && c <= end) || c == '\r' || c == '\n';
+}
+
+bool VCardUtils::IsPrintableString(const std::string &str)
+{
+    return std::all_of(str.begin(), str.end(), &VCardUtils::IsPrintableChar);
+}
+
 } // namespace Telephony
 } // namespace OHOS
