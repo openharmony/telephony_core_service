@@ -158,6 +158,7 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_SIM_ROOT/src/multi_sim_monitor.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_config_cache.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_config_loader.cpp",
+    "$TELEPHONY_SIM_ROOT/src/operator_config_hisysevent.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_file_parser.cpp",
     "$TELEPHONY_SIM_ROOT/src/operator_matching_rule.cpp",
     "$TELEPHONY_SIM_ROOT/src/pdp_profile_rdb_helper.cpp",
