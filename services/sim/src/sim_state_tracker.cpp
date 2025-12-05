@@ -57,14 +57,12 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
-    SetMatchSimStateTracker(MatchSimState::SIM_RECORDS_LOADED, slotId_);
     std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
     GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
         "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
         TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
-        SetMatchSimStateTracker(MatchSimState::SIM_RECORDS_LOADED_TRIGGER_BLOCKED, slotId_);
         return;
     }
     if (operatorConfigLoader_ == nullptr) {
@@ -72,7 +70,6 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
         return;
     }
     TELEPHONY_LOGI("slotId: %{public}d need trigger LoadOperatorConfig", slotId_);
-    SetMatchSimReason(slotId_, MatchSimReason::SIM_RECORDS_LOADED);
     if (IsNeedUpdateCarrierConfig()) {
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
         ResetNeedUpdateCarrierConfig();
@@ -85,35 +82,38 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
 {
     std::shared_ptr<std::vector<std::string>> msgObj = event->GetSharedObject<std::vector<std::string>>();
     if ((msgObj == nullptr) || ((*msgObj).size() != OPKEY_VMSG_LENTH)) {
+        TELEPHONY_LOGI("argument count error");
         return;
     }
     int slotId;
-    if (!StrToInt((*msgObj)[0], slotId) || slotId != slotId_) {
+    if (!StrToInt((*msgObj)[0], slotId)) {
+        return;
+    }
+    if (slotId != slotId_) {
+        TELEPHONY_LOGE("is not current slotId");
         return;
     }
     std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
-    key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId));
-    GetParameter(key.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
+    GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
+        "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
         TELEPHONY_LOGE("slotId: %{public}d BlockLoadOperatorConfig is true", slotId_);
-        SetMatchSimStateTracker(MatchSimState::OPKEY_LOADED_TRIGGER_BLOCKED, slotId);
         return;
     }
     std::string opkey = (*msgObj)[1];
     std::string opName = (*msgObj)[2];
     TELEPHONY_LOGI("OnOpkeyLoad slotId, %{public}d opkey: %{public}s opName: %{public}s",
         slotId, opkey.data(), opName.data());
-    SetMatchSimReason(slotId, MatchSimReason::QUICK_MATCH_SIM);
-    auto simFileManager = simFileManager_.lock();
     if (!opkey.empty() && !opName.empty()) {
+        auto simFileManager = simFileManager_.lock();
         if (simFileManager != nullptr) {
             simFileManager->SetOpKey(opkey);
             simFileManager->SetOpName(opName);
         }
-        SetMatchSimStateTracker(MatchSimState::OPKEY_LOADED_RESULT_VALID, slotId);
         ReloadOperatorConfigCache();
     } else {
+        auto simFileManager = simFileManager_.lock();
         if (simFileManager != nullptr) {
             simFileManager->SetOpKey("");
             simFileManager->SetOpName("");
@@ -124,7 +124,6 @@ void SimStateTracker::ProcessSimOpkeyLoad(const AppExecFwk::InnerEvent::Pointer 
             TELEPHONY_LOGE("sim is not exist");
             return;
         }
-        SetMatchSimStateTracker(MatchSimState::OPKEY_LOADED_RESULT_INVALID, slotId);
         ReloadOperatorConfig();
     }
 }
@@ -164,7 +163,6 @@ void SimStateTracker::ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = { 0 };
     GetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(),
         "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
-    SetMatchSimReason(slotId, MatchSimReason::DATA_SHARE_READY);
     if (strcmp(isBlockLoadOperatorConfig, "true") == 0) {
         SetParameter(key.c_str(), "false");
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
@@ -328,22 +326,6 @@ void SimStateTracker::ReloadOperatorConfig()
         ResetNeedUpdateCarrierConfig();
     } else {
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_LOADED);
-    }
-}
-
-inline void SimStateTracker::SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason)
-{
-    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
-    if (operatorConfigHisysevent != nullptr) {
-        operatorConfigHisysevent->SetMatchSimReason(slotId, matchSimReason);
-    }
-}
-
-inline void SimStateTracker::SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId)
-{
-    auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();
-    if (operatorConfigHisysevent != nullptr) {
-        operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker, slotId);
     }
 }
 } // namespace Telephony

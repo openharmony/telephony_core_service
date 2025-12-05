@@ -95,10 +95,6 @@ public:
     {
     }
 
-    virtual void SetMatchSimStateTracker(int8_t matchSimStateTracker)
-    {
-    }
-
 protected:
     std::weak_ptr<OHOS::Telephony::IIccFileExt> iccFile_;
 };
