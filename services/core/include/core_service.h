@@ -20,7 +20,6 @@
 #include "i_network_search.h"
 #include "i_sim_manager.h"
 #include "i_esim_manager.h"
-#include "i_operator_config_hisysevent.h"
 #include "i_tel_ril_manager.h"
 #include "if_system_ability_manager.h"
 #include "singleton.h"
