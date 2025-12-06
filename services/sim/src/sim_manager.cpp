@@ -1135,9 +1135,13 @@ int32_t SimManager::AddIccDiallingNumbers(
 
 void SimManager::RefreshCache(int slotId)
 {
-    std::thread t([this, slotId] {
+    auto weakPtr = weak_from_this();
+    std::thread t([weakPtr, slotId] {
         std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
-        QueryIccDiallingNumbers(slotId, DiallingNumbersInfo::SIM_ADN, result);
+        auto sharePtr = weakPtr.lock();
+        if (sharePtr != nullptr) {
+            sharePtr->QueryIccDiallingNumbers(slotId, DiallingNumbersInfo::SIM_ADN, result);            
+        }
     });
     t.detach();
 }
