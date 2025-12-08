@@ -354,7 +354,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
     if (anrTag == nullptr) {
         TELEPHONY_LOGE("load number anr files error: anr file is nullptr");
         NextStep(MSG_USIM_ANR_LOAD_DONE);
-        return false
+        return false;
     }
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_ANR_LOAD_DONE);
     if (fileController_ == nullptr) {
