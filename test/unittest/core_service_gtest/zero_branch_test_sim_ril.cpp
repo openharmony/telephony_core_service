@@ -265,10 +265,10 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_STK_001, Function | MediumTes
     auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
     std::string bundleNameEmpty = "";
     stkController->getStkBundleNameFromExt(bundleNameEmpty);
-    EXPECT_TRUE(bundleNameEmpty.emtpy());
+    EXPECT_TRUE(bundleNameEmpty.empty());
     std::string bundleName = "123";
     stkController->getStkBundleNameFromExt(bundleName);
-    EXPECT_TRUE(bundleName.emtpy());
+    EXPECT_TRUE(bundleName.empty());
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_StkManager_003, Function | MediumTest | Level1)
