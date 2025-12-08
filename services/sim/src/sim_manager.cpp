@@ -1140,7 +1140,7 @@ void SimManager::RefreshCache(int slotId)
         std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
         auto sharePtr = weakPtr.lock();
         if (sharePtr != nullptr) {
-            sharePtr->QueryIccDiallingNumbers(slotId, DiallingNumbersInfo::SIM_ADN, result);            
+            sharePtr->QueryIccDiallingNumbers(slotId, DiallingNumbersInfo::SIM_ADN, result);
         }
     });
     t.detach();
