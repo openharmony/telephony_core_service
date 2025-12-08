@@ -106,6 +106,7 @@ public:
 
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
+    typedef void (*GET_STK_BUNDLE_NAME)(std::string &bundleName);
     typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(int32_t slotId, std::vector<sptr<SignalInformation>> &signals);
@@ -177,6 +178,7 @@ public:
     SEND_EVENT sendEvent_ = nullptr;
     INIT_BIP initBip_ = nullptr;
     IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
+    GET_STK_BUNDLE_NAME getStkBundleName_ = nullptr;
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
     GET_OPKEY_VERSION getOpkeyVersion_ = nullptr;
@@ -347,6 +349,8 @@ inline bool InitBipImpl(int32_t)
 {
     return false;
 }
+inline void GetStkBundleNameImpl(std::string &)
+{}
 inline bool IsAllowedInsertApnImpl(std::string &)
 {
     return false;
@@ -500,6 +504,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getRoamingBrokerImsi_ = &GetRoamingBrokerImsiImpl;
     sendEvent_ = &SendEventImpl;
     initBip_ = &InitBipImpl;
+    getStkBundleName_ = &GetStkBundleNameImpl;
     updateHotPlugCardState_ = &UpdateHotPlugCardStateImpl;
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
