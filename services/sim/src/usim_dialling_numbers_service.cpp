@@ -339,7 +339,6 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
     std::unique_lock<std::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGE("load number anr files error: recId over");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_ANR_LOAD_DONE);
         return false;
     }
@@ -348,21 +347,18 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
     auto anrIter = files.find(TAG_SIM_USIM_ANR);
     if (anrIter == files.end()) {
         TELEPHONY_LOGE("load number anr files error: have not anr file");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_ANR_LOAD_DONE);
         return false;
     }
     std::shared_ptr<TagData> anrTag = anrIter->second;
     if (anrTag == nullptr) {
         TELEPHONY_LOGE("load number anr files error: anr file is nullptr");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_ANR_LOAD_DONE);
-        return false;
+        return false
     }
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_ANR_LOAD_DONE);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("load number anr files error: fileController_ is nullptr");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_ANR_LOAD_DONE);
         return false;
     }
@@ -375,7 +371,6 @@ bool UsimDiallingNumbersService::LoadIapFiles(size_t recId)
     std::unique_lock<std::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGE("load number iap files error: recId over");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_IAP_LOAD_DONE);
         return false;
     }
@@ -384,21 +379,18 @@ bool UsimDiallingNumbersService::LoadIapFiles(size_t recId)
     auto iapIter = files.find(TAG_SIM_USIM_IAP);
     if (iapIter == files.end()) {
         TELEPHONY_LOGE("load number iap files error: have not iap file");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_IAP_LOAD_DONE);
         return false;
     }
     std::shared_ptr<TagData> iapTag = iapIter->second;
     if (iapTag == nullptr) {
         TELEPHONY_LOGE("load number iap files error: iap file is nullptr");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_IAP_LOAD_DONE);
         return false;
     }
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_USIM_IAP_LOAD_DONE);
     if (fileController_ == nullptr) {
         TELEPHONY_LOGE("LoadPbrFiles fileController_ is nullptr");
-        isLoadDiallingNumSuccess_ = false;
         NextStep(MSG_USIM_IAP_LOAD_DONE);
         return false;
     }
