@@ -194,7 +194,7 @@ private:
     ffrt::shared_mutex mutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
-    std::weak_ptr<SimManager> simManager_ = nullptr;
+    std::weak_ptr<SimManager> simManager_;
     std::vector<int> setPrimarySlotRemainCount_;
     std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
     ffrt::mutex setPrimarySlotToRilMutex_;
