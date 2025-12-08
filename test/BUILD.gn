@@ -137,10 +137,6 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/radio_info.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/setting_utils.cpp",
     "$TELEPHONY_NETWORK_SEARCH_ROOT/src/signal_info.cpp",
-    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
-    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
-    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
-    "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
     "$TELEPHONY_SIM_ROOT/src/csim_file_controller.cpp",
     "$TELEPHONY_SIM_ROOT/src/esim_manager.cpp",
     "$TELEPHONY_SIM_ROOT/src/icc_dialling_numbers_cache.cpp",
@@ -213,6 +209,15 @@ ohos_static_library("tel_core_service_static") {
       "$TELEPHONY_SIM_ROOT/src/esim_controller.cpp",
       "$TELEPHONY_SIM_ROOT/src/esim_file.cpp",
       "$TELEPHONY_SIM_ROOT/src/start_osu_result_callback.cpp",
+    ]
+  }
+
+  if (core_service_feature_support_satellite) {
+    sources += [
+      "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
+      "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
+      "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_client.cpp",
+      "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_service_proxy.cpp",
     ]
   }
 
