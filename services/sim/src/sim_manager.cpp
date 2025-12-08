@@ -69,7 +69,7 @@ void SimManager::InitMultiSimObject()
         iccDiallingNumbersManager_[slotId] = IccDiallingNumbersManager::CreateInstance(
             std::weak_ptr<SimFileManager>(simFileManager_[slotId]), simStateManager_[slotId]);
         if (iccDiallingNumbersManager_[slotId] != nullptr) {
-            iccDiallingNumbersManager_[slotId]->Init();
+            iccDiallingNumbersManager_[slotId]->Init(slotId);
         }
         stkManager_[slotId] = std::make_shared<StkManager>(telRilManager_, simStateManager_[slotId]);
         if (stkManager_[slotId] != nullptr) {
@@ -136,6 +136,7 @@ void SimManager::InitSingleSimObject()
         return;
     }
     multiSimController_->Init();
+    multiSimController_->SetSimManagerPtr(weak_from_this());
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager;
     for (auto simFile : simFileManager_) {
         simFileManager.push_back(std::weak_ptr<Telephony::SimFileManager>(simFile));
@@ -1130,6 +1131,19 @@ int32_t SimManager::AddIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return iccDiallingNumbersManager_[slotId]->AddIccDiallingNumbers(type, diallingNumber);
+}
+
+void SimManager::RefreshCache(int slotId)
+{
+    auto weakPtr = weak_from_this();
+    ffrt::thread t([weakPtr, slotId] {
+        std::vector<std::shared_ptr<DiallingNumbersInfo>> result;
+        auto sharePtr = weakPtr.lock();
+        if (sharePtr != nullptr) {
+            sharePtr->QueryIccDiallingNumbers(slotId, DiallingNumbersInfo::SIM_ADN, result);
+        }
+    });
+    t.detach();
 }
 
 int32_t SimManager::DelIccDiallingNumbers(

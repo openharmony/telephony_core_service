@@ -31,9 +31,10 @@ IccDiallingNumbersManager::IccDiallingNumbersManager(
     : TelEventHandler("IccDiallingNumbersManager"), simFileManager_(simFileManager), simStateManager_(simState)
 {}
 
-void IccDiallingNumbersManager::Init()
+void IccDiallingNumbersManager::Init(int slotId)
 {
     TELEPHONY_LOGI("IccDiallingNumbersManager::Init() started ");
+    slotId_ = slotId;
     if (stateDiallingNumbers_ == HandleRunningState::STATE_RUNNING) {
         TELEPHONY_LOGI("IccDiallingNumbersManager::Init eventLoopDiallingNumbers_ started.");
         return;
@@ -310,7 +311,7 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     if (!IsValidType(type)) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d", type);
+    TELEPHONY_LOGI("QueryIccDiallingNumbers start:%{public}d slotId:%{public}d", type, slotId_);
     ClearRecords();
     auto simFM = simFileManager_.lock();
     if (simFM == nullptr) {
@@ -327,9 +328,9 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     bool success = processWait_.wait_for(
         lock, std::chrono::seconds(WAIT_QUERY_TIME_SECOND), [this] { return hasQueryEventDone_ == true; });
     if (success) {
-        TELEPHONY_LOGI("QueryIccDiallingNumbers wait success");
+        TELEPHONY_LOGI("QueryIccDiallingNumbers wait success slotId:%{public}d", slotId_);
     } else {
-        TELEPHONY_LOGI("QueryIccDiallingNumbers wait timeout");
+        TELEPHONY_LOGI("QueryIccDiallingNumbers wait timeout slotId:%{public}d", slotId_);
     }
     for (const auto &each : diallingNumbersList_) {
         if (each != nullptr) {
