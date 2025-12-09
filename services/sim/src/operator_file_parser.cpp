@@ -59,7 +59,7 @@ bool OperatorFileParser::WriteOperatorConfigJson(const char *filePath, const cJS
     }
     int ret = fwrite(cjValue, sizeof(char), strlen(cjValue), file);
     (void)fclose(file);
-    free(cjValue);
+    cJSON_free(cjValue);
     cjValue = nullptr;
     file = nullptr;
     if (ret == 0) {
@@ -177,7 +177,7 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
             tempChar = cJSON_PrintUnformatted(value);
             tempConfig_[value->string] = tempChar != nullptr ? tempChar : "";
             if (tempChar != nullptr) {
-                free(tempChar);
+                cJSON_free(tempChar);
             }
         }
         tempChar = cJSON_Print(value);
@@ -185,7 +185,7 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
         TELEPHONY_LOGI("ParseOperatorConfigFromFile key %{public}s value %{public}s", value->string,
             Str16ToStr8(configValue[Str8ToStr16(value->string)]).c_str());
         if (tempChar != nullptr) {
-            free(tempChar);
+            cJSON_free(tempChar);
         }
         if (value->type == cJSON_Array) {
             TELEPHONY_LOGD("parse type arrayValue");
