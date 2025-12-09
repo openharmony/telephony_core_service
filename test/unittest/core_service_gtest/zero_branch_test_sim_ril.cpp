@@ -266,6 +266,9 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_STK_001, Function | MediumTes
     std::string bundleName = "";
     stkController->getStkBundleNameFromExt(bundleName);
     EXPECT_TRUE(bundleName.empty());
+    TELEPHONY_EXT_WRAPPER.getStkBundleName_ = [](std::string &bundleName) { bundleName = "123"; };
+    stkController->getStkBundleNameFromExt(bundleName);
+    EXPECT_TRUE(!bundleName.empty());
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_StkManager_003, Function | MediumTest | Level1)
