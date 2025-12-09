@@ -253,6 +253,25 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_002, Function | MediumTest | 
     EXPECT_FALSE(stkController->PublishStkEvent(want));
 }
 
+/**
+ * @tc.number   Telephony_StkController_STK_001
+ * @tc.name     test stk bundle name
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_StkController_STK_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = nullptr;
+    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
+    std::string bundleName = "";
+    TELEPHONY_EXT_WRAPPER.getStkBundleName_ = nullptr;
+    stkController->getStkBundleNameFromExt(bundleName);
+    EXPECT_TRUE(bundleName.empty());
+    TELEPHONY_EXT_WRAPPER.getStkBundleName_ = [](std::string &bundleName) { bundleName = "123"; };
+    stkController->getStkBundleNameFromExt(bundleName);
+    EXPECT_TRUE(!bundleName.empty());
+}
+
 HWTEST_F(SimRilBranchTest, Telephony_StkManager_003, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();

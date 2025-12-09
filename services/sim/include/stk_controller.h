@@ -52,7 +52,6 @@ public:
         const std::weak_ptr<Telephony::SimStateManager> &simStateManager, int32_t slotId);
     ~StkController();
     void Init();
-    std::string initStkBudleName();
     int32_t SendTerminalResponseCmd(const std::string &strCmd);
     int32_t SendEnvelopeCmd(const std::string &strCmd);
     int32_t SendCallSetupRequestResult(bool accept);
@@ -88,6 +87,7 @@ private:
     void OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SendStkIsReady();
     void OnReceiveSetPrimarySlotStatus(bool setDone);
+    void getStkBundleNameFromExt(std::string &bundleName);
 
 private:
     class BundleScanFinishedEventSubscriber : public CoreServiceCommonEventCallback {
