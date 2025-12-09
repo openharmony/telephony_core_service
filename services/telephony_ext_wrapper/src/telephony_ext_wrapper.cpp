@@ -300,5 +300,10 @@ void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
     dynamicLoadDeInit_();
     TELEPHONY_LOGI("DeInitTelephonyExtWrapper success");
 }
+
+TelephonyExtWrapper::GetStkBundleName TelephonyExtWrapper::GetStkBundleNameMethod()
+{
+    return getStkBundleName_;
+}
 } // namespace Telephony
 } // namespace OHOS
