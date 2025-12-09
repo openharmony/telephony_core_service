@@ -107,7 +107,7 @@ public:
     /* add for vsim end */
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
-    typedef void (*GET_STK_BUNDLE_NAME)(std::string &bundleName);
+    typedef void (*GetStkBundleName)(std::string &bundleName);
     typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(
@@ -179,7 +179,6 @@ public:
     /* add for vsim end */
     SEND_EVENT sendEvent_ = nullptr;
     INIT_BIP initBip_ = nullptr;
-    GET_STK_BUNDLE_NAME getStkBundleName_ = nullptr;
     IS_ALLOWED_INSERT_APN isAllowedInsertApn_ = nullptr;
     GET_TARGET_OPKEY getTargetOpkey_ = nullptr;
     SORT_SIGNAL_INFO_LIST_EXT sortSignalInfoListExt_ = nullptr;
@@ -195,6 +194,7 @@ public:
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
+    GetStkBundleName GetStkBundleNameMethod();
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -210,6 +210,7 @@ private:
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
     void InitTelephonyExtWrapperForDynamicLoad();
+    GetStkBundleName getStkBundleName_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

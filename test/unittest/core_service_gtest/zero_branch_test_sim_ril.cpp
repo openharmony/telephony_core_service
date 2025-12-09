@@ -255,7 +255,7 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_002, Function | MediumTest | 
 
 /**
  * @tc.number   Telephony_StkController_STK_001
- * @tc.name     test error branch
+ * @tc.name     test stk bundle name
  * @tc.desc     Function test
  */
 HWTEST_F(SimRilBranchTest, Telephony_StkController_STK_001, Function | MediumTest | Level1)
@@ -264,6 +264,7 @@ HWTEST_F(SimRilBranchTest, Telephony_StkController_STK_001, Function | MediumTes
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
     std::string bundleName = "";
+    TELEPHONY_EXT_WRAPPER.getStkBundleName_ = nullptr;
     stkController->getStkBundleNameFromExt(bundleName);
     EXPECT_TRUE(bundleName.empty());
     TELEPHONY_EXT_WRAPPER.getStkBundleName_ = [](std::string &bundleName) { bundleName = "123"; };

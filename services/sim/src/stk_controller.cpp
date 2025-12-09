@@ -210,8 +210,8 @@ void StkController::OnReceiveSetPrimarySlotStatus(bool setDone)
 
 void StkController::getStkBundleNameFromExt(std::string &bundleName)
 {
-    if (TELEPHONY_EXT_WRAPPER.getStkBundleName_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.getStkBundleName_(bundleName);
+    if (TELEPHONY_EXT_WRAPPER.GetStkBundleNameMethod() != nullptr) {
+        TELEPHONY_EXT_WRAPPER.GetStkBundleNameMethod()(bundleName);
     }
 }
 
