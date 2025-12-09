@@ -240,7 +240,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getRoamingBrokerImsi_ = (GET_ROAMINGBROKER_IMSI)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerImsi");
     sendEvent_ = (SEND_EVENT)dlsym(telephonyExtWrapperHandle_, "SendEvent");
     initBip_ = (INIT_BIP)dlsym(telephonyExtWrapperHandle_, "InitBip");
-    getStkBundleName_ = (GET_STK_BUNDLE_NAME) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
+    getStkBundleName_ = (GetStkBundleName) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
     updateHotPlugCardState_ = (UpdateHotplugCardState)dlsym(telephonyExtWrapperHandle_, "UpdateHotPlugCardState");
     cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
