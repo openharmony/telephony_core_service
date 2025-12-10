@@ -391,7 +391,7 @@ void OperatorConfigCache::notifyInitApnConfigs(int32_t slotId)
         return;
     }
     TELEPHONY_LOGI("notifyInitApnConfigs end");
-    auto runner = AppExecFwk::EventRunner::Create(TASK_ID);
+    auto runner = AppExecFwk::EventRunner::Create(TASK_ID, AppExecFwk::ThreadMode::FFRT);
     batchInsertApnRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     std::weak_ptr<AppExecFwk::EventHandler> weakThis = shared_from_this();
     batchInsertApnRetryTask_ = [weakThis, slotId]() {
