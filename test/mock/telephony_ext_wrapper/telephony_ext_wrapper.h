@@ -106,7 +106,7 @@ public:
 
     typedef bool (*SEND_EVENT)(std::shared_ptr<std::string> cmdData, int32_t slotId);
     typedef bool (*INIT_BIP)(int32_t slotId);
-    typedef void (*GetStkBundleName)(std::string &bundleName);
+    typedef void (*GetStkBundleNameFunc)(std::string &bundleName);
     typedef bool (*IS_ALLOWED_INSERT_APN)(std::string &value);
     typedef void (*GET_TARGET_OPKEY)(int32_t slotId, std::u16string &opkey);
     typedef void (*SORT_SIGNAL_INFO_LIST_EXT)(int32_t slotId, std::vector<sptr<SignalInformation>> &signals);
@@ -192,13 +192,13 @@ public:
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
-    GetStkBundleName GetStkBundleNameMethod();
+    bool GetStkBundleName(std::string &bundleName);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
     void* telephonyDynamicLoadWrapperHandle_ = nullptr;
-    GetStkBundleName getStkBundleName_ = nullptr;
+    GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -350,8 +350,6 @@ inline bool InitBipImpl(int32_t)
 {
     return false;
 }
-inline void GetStkBundleNameImpl(std::string &)
-{}
 inline bool IsAllowedInsertApnImpl(std::string &)
 {
     return false;
@@ -505,7 +503,6 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getRoamingBrokerImsi_ = &GetRoamingBrokerImsiImpl;
     sendEvent_ = &SendEventImpl;
     initBip_ = &InitBipImpl;
-    getStkBundleName_ = &GetStkBundleNameImpl;
     updateHotPlugCardState_ = &UpdateHotPlugCardStateImpl;
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
@@ -531,9 +528,12 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForDynamicLoad()
     }
 }
 
-inline TelephonyExtWrapper::GetStkBundleName TelephonyExtWrapper::GetStkBundleNameMethod()
+inline bool TelephonyExtWrapper::GetStkBundleName(std::string &bundleName)
 {
-    return getStkBundleName_;
+    if (getStkBundleNameFunc_ != nullptr) {
+        getStkBundleNameFunc_(bundleName);
+    }
+    return !bundleName.empty();
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
