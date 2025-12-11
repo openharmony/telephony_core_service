@@ -140,7 +140,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_005, Function | MediumTest | L
     SimAuthenticationResponse mResponse;
     IccSimStatus iccStatus = IccSimStatus::ICC_CONTENT_READY;
     CardType cardType = CardType::SINGLE_MODE_USIM_CARD;
-
     int32_t ret = simManager_->GetSimIO(slotId, command, fileId, data, path, mResponse);
     EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
     auto simManager = std::make_shared<MockSimManager>();
