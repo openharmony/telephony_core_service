@@ -51,7 +51,7 @@ public:
         int32_t slotId, int32_t switchState, CellularDataErrorCode errorType, const std::string &errorMsg);
     static void WriteAirplaneModeChangeEvent(const int32_t enable);
     static void WriteSetActiveSimFaultEvent(int32_t slotId, SimCardErrorCode errorCode, const std::string &desc);
-    static void WriteMatchSimBehaviorEvent(int32_t slotId, const MatchSimInfo &matchSimInfo);
+    static void WriteMatchSimStatisticEvent(int32_t slotId, const MatchSimInfo &matchSimInfo);
 };
 } // namespace Telephony
 } // namespace OHOS
