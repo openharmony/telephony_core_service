@@ -150,7 +150,7 @@ void CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
 
 void CoreServiceHiSysEvent::WriteMatchSimStatisticEvent(int32_t slotId, const MatchSimInfo &matchSimInfo)
 {
-    HiSysEventWrite(DOMAIN_NAME, MATCH_SIM_EVENT, EventType::STATISTIC
+    HiSysEventWrite(DOMAIN_NAME, MATCH_SIM_EVENT, EventType::STATISTIC,
         SLOT_ID_KEY, slotId,
         SIM_STATE_KEY, matchSimInfo.simState,
         MATCHSIM_FILE_STATE_KEY, matchSimInfo.matchSimFileState,
