@@ -40,7 +40,7 @@ bool TelRilManager::OnInit()
     for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
         InitTelModule(slotId);
     }
-    int32_t res = res = RegisterHdfStatusListener();
+    int32_t res = RegisterHdfStatusListener();
     TELEPHONY_LOGI("TelRilManager, OnInit successfully! register hdf status is %{public}d", res);
     return true;
 }
