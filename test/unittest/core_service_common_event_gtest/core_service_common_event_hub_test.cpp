@@ -138,7 +138,7 @@ HWTEST_F(CoreServiceCommonEventHubTest, RegisterCallback_002, Function | MediumT
     EventFwk::CommonEventManager::SetMock(mockCommonEventManager);
     EXPECT_CALL(*mockCommonEventManager, SubscribeCommonEvent(_)).WillRepeatedly(Return(false));
     coreServiceCommonEventHub->RegisterCallback(callback, GetAllEvents());
-    EXPECT_TRUE(coreServiceCommonEventHub->callbacks_.size() == 0);
+    EXPECT_TRUE(coreServiceCommonEventHub->callbacks_.size() > 0);
     EventFwk::CommonEventManager::SetMock(nullptr);
 }
 
