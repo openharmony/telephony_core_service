@@ -56,6 +56,7 @@ group("unittest") {
   testonly = true
   deps = []
   deps += [
+    "unittest/core_service_gtest:tel_stk_controller_gtest",
     "unittest/core_service_gtest:tel_core_service_common_test",
     "unittest/core_service_gtest:tel_core_service_gtest",
     "unittest/core_service_gtest:tel_core_service_native_branch_gtest",

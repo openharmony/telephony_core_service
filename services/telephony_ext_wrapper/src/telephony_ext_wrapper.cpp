@@ -240,13 +240,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getRoamingBrokerImsi_ = (GET_ROAMINGBROKER_IMSI)dlsym(telephonyExtWrapperHandle_, "GetRoamingBrokerImsi");
     sendEvent_ = (SEND_EVENT)dlsym(telephonyExtWrapperHandle_, "SendEvent");
     initBip_ = (INIT_BIP)dlsym(telephonyExtWrapperHandle_, "InitBip");
-    getStkBundleName_ = (GetStkBundleName) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
+    getStkBundleNameFunc_ = (GetStkBundleNameFunc) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
     updateHotPlugCardState_ = (UpdateHotplugCardState)dlsym(telephonyExtWrapperHandle_, "UpdateHotPlugCardState");
     cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
                         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
                         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-                        getStkBundleName_ == nullptr);
+                        getStkBundleNameFunc_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -301,9 +301,12 @@ void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
     TELEPHONY_LOGI("DeInitTelephonyExtWrapper success");
 }
 
-TelephonyExtWrapper::GetStkBundleName TelephonyExtWrapper::GetStkBundleNameMethod()
+bool TelephonyExtWrapper::GetStkBundleName(std::string &bundleName)
 {
-    return getStkBundleName_;
+    if (getStkBundleNameFunc_ != nullptr) {
+        getStkBundleNameFunc_(bundleName);
+    }
+    return !bundleName.empty();
 }
 } // namespace Telephony
 } // namespace OHOS
