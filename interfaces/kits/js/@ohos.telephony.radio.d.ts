@@ -544,6 +544,7 @@ declare namespace radio {
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @returns { string } Returns the resident network numeric.
    * Returns an empty string if the sim card is not registered with any network.
+   * @syscap SystemCapability.Telephony.CoreService
    * @since 24
    */
   function getResidentNetworkNumeric(slotId: int): string;
