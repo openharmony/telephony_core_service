@@ -3643,6 +3643,13 @@ static napi_value CreateImsRegState(napi_env env, napi_value exports)
     return exports;
 }
 
+static napi_value CreateEmptyString(napi_env env)
+{
+    napi_value value;
+    NAPI_CALL(env, napi_create_string_utf8(env, "", 0, &value));
+    return value;
+}
+
 static napi_value GetResidentNetworkNumeric(napi_env env, napi_callback_info info)
 {
     size_t parameterCount = PARAMETER_COUNT_ONE;
@@ -3652,20 +3659,17 @@ static napi_value GetResidentNetworkNumeric(napi_env env, napi_callback_info inf
     napi_value value = nullptr;
     if (parameterCount != PARAMETER_COUNT_ONE ||
         !NapiUtil::MatchParameters(env, parameters, { napi_number })) {
-        TELEPHONY_LOGE("GetResidentNetworkNumeric parameter count is incorrect");
-        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
-        return value;
+        TELEPHONY_LOGE("parameter count is incorrect");
+        return CreateEmptyString(env);
     }
     int32_t slotId = UNDEFINED_VALUE;
     if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("GetResidentNetworkNumeric convert parameter fail");
-        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
-        return value;
+        TELEPHONY_LOGE("convert parameter fail");
+        return CreateEmptyString(env);
     }
     if (!IsValidSlotId(slotId)) {
-        TELEPHONY_LOGE("GetResidentNetworkNumeric slotId is invalid");
-        NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
-        return value;
+        TELEPHONY_LOGE("slotId is invalid");
+        return CreateEmptyString(env);
     }
     numeric = CoreServiceClient::GetInstance().GetResidentNetworkNumeric(slotId);
     NAPI_CALL(env, napi_create_string_utf8(env, numeric.c_str(), numeric.length(), &value));
