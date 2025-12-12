@@ -59,15 +59,7 @@ NetworkSearchManager::NetworkSearchManager(
     TELEPHONY_LOGI("NetworkSearchManager");
 }
 
-NetworkSearchManager::~NetworkSearchManager()
-{
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-        std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
-        if (inner != nullptr) {
-            inner->UnRegisterDeviceStateObserver();
-        }
-    }
-}
+NetworkSearchManager::~NetworkSearchManager() { }
 
 bool NetworkSearchManager::InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId)
 {
@@ -190,6 +182,16 @@ bool NetworkSearchManager::OnInit()
     delayTime_ = GetDelayNotifyTime();
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
+}
+
+void NetworkSearchManager::DeInit()
+{
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+            std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
+            if (inner != nullptr) {
+                inner->UnRegisterDeviceStateObserver();
+            }
+        }
 }
 
 int32_t NetworkSearchManager::InitTelExtraModule(int32_t slotId)

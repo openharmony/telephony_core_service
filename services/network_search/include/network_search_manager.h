@@ -162,6 +162,7 @@ public:
     virtual ~NetworkSearchManager();
 
     bool OnInit() override;
+    void DeInit() override;
     int32_t InitTelExtraModule(int32_t slotId) override;
     void SetRadioState(int32_t slotId, bool isOn, int32_t rst) override;
     int32_t SetRadioState(int32_t slotId, bool isOn, int32_t rst, NSCALLBACK &callback) override;

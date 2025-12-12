@@ -37,6 +37,7 @@ public:
     using HANDLE = const std::shared_ptr<AppExecFwk::EventHandler>;
     using NSCALLBACK = const sptr<INetworkSearchCallback>;
     virtual bool OnInit() = 0;
+    virtual void DeInit() = 0;
     virtual int32_t InitTelExtraModule(int32_t slotId) = 0;
     virtual int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech) = 0;
     virtual int32_t GetCsRadioTech(int32_t slotId, int32_t &csRadioTech) = 0;
