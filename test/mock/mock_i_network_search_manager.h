@@ -24,6 +24,7 @@ class MockINetworkSearch : public INetworkSearch {
 public:
     virtual ~MockINetworkSearch() = default;
     MOCK_METHOD(bool, OnInit, (), (override));
+    MOCK_METHOD(void, DeInit, (), (override));
     MOCK_METHOD(int32_t, InitTelExtraModule, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, GetPsRadioTech, (int32_t slotId, int32_t &psRadioTech), (override));
     MOCK_METHOD(int32_t, GetCsRadioTech, (int32_t slotId, int32_t &csRadioTech), (override));
