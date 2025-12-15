@@ -75,6 +75,7 @@ public:
     int32_t GetContractInfo(
         int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response) override;
     int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult) override;
+    int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult) override;
 
 private:
     template<class N>
