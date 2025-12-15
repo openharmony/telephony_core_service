@@ -148,9 +148,9 @@ void CoreServiceHiSysEvent::WriteSetActiveSimFaultEvent(
         ERROR_TYPE_KEY, static_cast<int32_t>(errorCode), ERROR_MSG_KEY, desc);
 }
 
-void CoreServiceHiSysEvent::WriteMatchSimBehaviorEvent(int32_t slotId, const MatchSimInfo &matchSimInfo)
+void CoreServiceHiSysEvent::WriteMatchSimStatisticEvent(int32_t slotId, const MatchSimInfo &matchSimInfo)
 {
-    HiWriteBehaviorEvent(MATCH_SIM_EVENT,
+    HiSysEventWrite(DOMAIN_NAME, MATCH_SIM_EVENT, EventType::STATISTIC,
         SLOT_ID_KEY, slotId,
         SIM_STATE_KEY, matchSimInfo.simState,
         MATCHSIM_FILE_STATE_KEY, matchSimInfo.matchSimFileState,

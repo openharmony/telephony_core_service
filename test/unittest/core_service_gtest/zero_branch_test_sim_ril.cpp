@@ -2007,6 +2007,8 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigHisysevent_001, Function | Me
     int8_t matchSimStateTracker = 0;
     operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker, -2);
     operatorConfigHisysevent->SetMatchSimStateTracker(MatchSimState::SEND_OPC_FAIL, 0);
+    operatorConfigHisysevent->ReportMatchSimChr(-1);
+    operatorConfigHisysevent->ReportMatchSimChr(0);
     auto &info = operatorConfigHisysevent->matchSimInfo_[0];
     EXPECT_EQ(info.GetOpkey(), "46000");
 }

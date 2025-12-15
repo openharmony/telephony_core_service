@@ -87,7 +87,7 @@ void OperatorConfigHisysevent::ReportMatchSimChr(int32_t slotId)
     if (!IsValidSlotId(slotId)) {
         return;
     }
-    CoreServiceHiSysEvent::WriteMatchSimBehaviorEvent(slotId, matchSimInfo_[slotId]);
+    CoreServiceHiSysEvent::WriteMatchSimStatisticEvent(slotId, matchSimInfo_[slotId]);
 }
 
 void OperatorConfigHisysevent::ProcessMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId)
