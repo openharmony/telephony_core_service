@@ -187,11 +187,11 @@ bool NetworkSearchManager::OnInit()
 void NetworkSearchManager::DeInit()
 {
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
-            std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
-            if (inner != nullptr) {
-                inner->UnRegisterDeviceStateObserver();
-            }
+        std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
+        if (inner != nullptr) {
+            inner->UnRegisterDeviceStateObserver();
         }
+    }
 }
 
 int32_t NetworkSearchManager::InitTelExtraModule(int32_t slotId)
