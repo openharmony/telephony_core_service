@@ -69,7 +69,7 @@ StkController::~StkController()
 
 void StkController::Init()
 {
-    getStkBundleNameFromExt(stkBundleName_);
+    InitStkBundleName();
     RegisterEvents();
     if (TELEPHONY_EXT_WRAPPER.initBip_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.initBip_(slotId_);
@@ -208,10 +208,10 @@ void StkController::OnReceiveSetPrimarySlotStatus(bool setDone)
     }
 }
 
-void StkController::getStkBundleNameFromExt(std::string &bundleName)
+void StkController::InitStkBundleName()
 {
-    if (TELEPHONY_EXT_WRAPPER.GetStkBundleNameMethod() != nullptr) {
-        TELEPHONY_EXT_WRAPPER.GetStkBundleNameMethod()(bundleName);
+    if (!TELEPHONY_EXT_WRAPPER.GetStkBundleName(stkBundleName_)) {
+        TELEPHONY_LOGE("InitStkBundleName is empty");
     }
 }
 
