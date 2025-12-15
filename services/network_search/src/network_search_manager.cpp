@@ -1513,7 +1513,7 @@ int32_t NetworkSearchManager::HandleNotifyStateChangeWithDelay(int32_t slotId, b
             inner->networkSearchHandler_->RemoveEvent(delayEventId);
         }
         auto event = AppExecFwk::InnerEvent::Get(RadioEvent::NOTIFY_STATE_CHANGE);
-        inner->networkSearchHandler_->SendEvent(event);
+        inner->networkSearchHandler_->NotifyStateChange(event);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
