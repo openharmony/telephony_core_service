@@ -3077,11 +3077,16 @@ napi_value GetSimLabelSync(napi_env env, napi_callback_info info)
     }
     int32_t slotId = -1;
     if (napi_get_value_int32(env, parameters[0], &slotId) != napi_ok) {
+        NapiUtil::ThrowParameterError(env);
         TELEPHONY_LOGE("convert parameter fail");
-        return value;
+        return nullptr;
     }
     if (IsValidSlotId(slotId)) {
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(slotId, simLabel);
+    } else {
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_ARGUMENT_ERROR, JS_ERROR_TELEPHONY_ARGUMENT_ERROR_STRING);
+        TELEPHONY_LOGE("convert parameter fail");
+        return nullptr;
     }
     NapiUtil::SetPropertyInt32(env, value, "simType", static_cast<int32_t>(simLabel.simType));
     NapiUtil::SetPropertyInt32(env, value, "index", simLabel.index);
