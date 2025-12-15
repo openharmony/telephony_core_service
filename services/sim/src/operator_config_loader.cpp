@@ -49,7 +49,6 @@ OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId, int32_t 
         SetMatchSimStateTracker(MatchSimState::GET_OPKEY_FAIL_NONEED, slotId);
         return opc;
     }
-    TELEPHONY_LOGI("LoadOperatorConfig slotId %{public}d", slotId);
     std::string opkey = LoadOpKeyOnMccMnc(slotId);
     if (opkey == DEFAULT_OPERATOR_KEY) {
         state = operatorConfigCache_->STATE_PARA_CLEAR;
