@@ -530,6 +530,18 @@ HWTEST_F(EsimManagerTest, GetEsimCaVerifyResult_001, Function | MediumTest | Lev
     ret = esimManager->GetEsimCaVerifyResult(slotId, result);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimManagerTest, SetEsimCaVerifyResult_001, Function | MediumTest | Level1)
+{
+    int32_t slotId = -1;
+    bool result = false;
+    int32_t ret = esimManager->SetEsimCaVerifyResult(slotId, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SLOTID_INVALID);
+
+    slotId = 0;
+    ret = esimManager->SetEsimCaVerifyResult(slotId, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
 #else
 HWTEST_F(EsimManagerTest, OnInit_002, Function | MediumTest | Level1)
 {
@@ -787,6 +799,14 @@ HWTEST_F(EsimManagerTest, GetEsimCaVerifyResult_002, Function | MediumTest | Lev
     int32_t slotId = -1;
     bool result = false;
     int32_t ret = esimManager->GetEsimCaVerifyResult(slotId, result);
+    EXPECT_EQ(ret, TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM);
+}
+
+HWTEST_F(EsimManagerTest, SetEsimCaVerifyResult_002, Function | MediumTest | Level1)
+{
+    int32_t slotId = -1;
+    bool result = false;
+    int32_t ret = esimManager->SetEsimCaVerifyResult(slotId, result);
     EXPECT_EQ(ret, TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM);
 }
 #endif

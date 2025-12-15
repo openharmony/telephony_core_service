@@ -358,6 +358,17 @@ int32_t EsimManager::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
+{
+    if (slotId < ESIM_SLOT_ID_ZERO || slotId >= ESIM_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGE("bad slotId: %{public}d", slotId);
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
+
+    EsimController::GetInstance().SetVerifyResult(slotId, verifyResult);
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 } // namespace Telephony
 } // namespace OHOS
 
@@ -529,6 +540,11 @@ int32_t EsimManager::GetContractInfo(
 }
 
 int32_t EsimManager::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
+{
+    return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
+}
+
+int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
 {
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }

@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <dlfcn.h>
 #include <thread>
-
+#include "core_manager_inner.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -97,6 +97,15 @@ void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)
         return;
     }
 
+    std::lock_guard<ffrt::mutex> lock(setVerifyResultMutex_);
+
+    bool hasSimCard = false;
+    CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
+    if (!hasSimCard) {
+        TELEPHONY_LOGE("SetVerifyResult sim not exist");
+        return;
+    }
+    
     TELEPHONY_LOGI("SetVerifyResult slot%{public}d, %{public}d", slotId, isVerifySuccess);
     isVerifySuccess_[slotId] = isVerifySuccess;
 }
