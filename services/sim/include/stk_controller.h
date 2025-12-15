@@ -87,7 +87,7 @@ private:
     void OnRadioStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
     void SendStkIsReady();
     void OnReceiveSetPrimarySlotStatus(bool setDone);
-    void getStkBundleNameFromExt(std::string &bundleName);
+    void InitStkBundleName();
 
 private:
     class BundleScanFinishedEventSubscriber : public CoreServiceCommonEventCallback {
