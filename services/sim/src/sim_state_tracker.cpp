@@ -152,8 +152,7 @@ void SimStateTracker::ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::
         return;
     }
     bool hasSimCard = false;
-    CoreManagerInner::GetInstance().HasSimCard(slotId_, hasSimCard);
-    if (operatorConfigLoader_ == nullptr || operatorConfigCache_ == nullptr || !hasSimCard) {
+    if (operatorConfigLoader_ == nullptr || operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("operatorConfigLoader or operatorConfigCache is nullptr");
         return;
     }
