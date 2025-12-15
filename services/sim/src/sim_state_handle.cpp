@@ -439,7 +439,7 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         return;
     }
     if (needReupdate_) {
-        UpdateSimStateToStateRegistry(slotId, reason);
+        UpdateSimStateToStateRegistry(slotId, lockReason_);
     }
 }
 
