@@ -151,7 +151,6 @@ void SimStateTracker::ProcessOperatorConfigUpdate(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("is not current slotId");
         return;
     }
-    bool hasSimCard = false;
     if (operatorConfigLoader_ == nullptr || operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("operatorConfigLoader or operatorConfigCache is nullptr");
         return;
