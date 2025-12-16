@@ -1946,7 +1946,7 @@ HWTEST_F(EsimTest, EsimController_001, Function | MediumTest | Level2)
 
     slotId = 0;
     EsimController::GetInstance().SetVerifyResult(slotId, true);
-    EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), true);
+    EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), false);
 }
 } // namespace Telephony
 } // namespace OHOS

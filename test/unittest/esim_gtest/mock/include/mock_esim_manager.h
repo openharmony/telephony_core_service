@@ -52,7 +52,9 @@ public:
     MOCK_METHOD3(AuthenticateServer, int32_t(int32_t, const AuthenticateConfigInfo &, ResponseEsimInnerResult &));
     MOCK_METHOD3(GetContractInfo, int32_t(int32_t, const GetContractInfoRequest &, std::string &));
     MOCK_METHOD2(GetEsimCaVerifyResult, int32_t(int32_t, bool &));
+    MOCK_METHOD2(SetEsimCaVerifyResult, int32_t(int32_t, bool));
 };
 } // Telephony
 } // OHOS
 #endif // MOCK_ESIM_MANAGER_H
+

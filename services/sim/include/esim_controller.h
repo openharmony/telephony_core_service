@@ -39,6 +39,7 @@ public:
     bool GetVerifyResult(int slotId);
 private:
     ffrt::mutex caMutex_;
+    ffrt::mutex setVerifyResultMutex_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
     std::atomic<bool> isVerifySuccess_[MAX_SLOT_COUNT] = {}; // use default value - false
 };

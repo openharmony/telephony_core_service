@@ -3019,6 +3019,14 @@ int32_t CoreManagerInner::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResu
     return esimManager_->GetEsimCaVerifyResult(slotId, verifyResult);
 }
 
+int32_t CoreManagerInner::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
+{
+    if (esimManager_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return esimManager_->SetEsimCaVerifyResult(slotId, verifyResult);
+}
+
 /******************** esimManager_ end ************************/
 
 bool CoreManagerInner::IsEsim(int32_t slotId)
