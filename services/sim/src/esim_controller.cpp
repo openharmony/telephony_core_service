@@ -101,7 +101,7 @@ void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)
 
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);
-    if (!hasSimCard) {
+    if (isVerifySuccess && !hasSimCard) {
         TELEPHONY_LOGE("SetVerifyResult sim not exist");
         return;
     }
