@@ -77,6 +77,7 @@ public:
     virtual int32_t GetContractInfo(int32_t slotId, const GetContractInfoRequest &contractInfoRequest,
         std::string &response) = 0;
     virtual int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult) = 0;
+    virtual int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
