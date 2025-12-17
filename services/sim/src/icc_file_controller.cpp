@@ -270,9 +270,8 @@ void IccFileController::ProcessReadRecord(const AppExecFwk::InnerEvent::Pointer 
         TELEPHONY_LOGE("hd is nullptr");
         return;
     }
-    TELEPHONY_LOGI("ProcessReadRecord %{public}#llX %{public}d %{public}d %{public}d %{public}s",
-        static_cast<unsigned long long>(hd->fileId), hd->getAllFile, hd->fileNum,
-        hd->countFiles, result->resultData.c_str());
+    TELEPHONY_LOGI("ProcessReadRecord %{public}#llX %{public}d %{public}d %{public}d",
+        static_cast<unsigned long long>(hd->fileId), hd->getAllFile, hd->fileNum, hd->countFiles);
     path = CheckRightPath(hd->filePath, hd->fileId);
     if (hd->getAllFile) {
         hd->fileResults.push_back(result->resultData);
