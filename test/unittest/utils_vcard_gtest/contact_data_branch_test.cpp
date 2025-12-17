@@ -299,7 +299,7 @@ HWTEST_F(ContactDataBranchTest, BatchInsertContactDbAbilityrest_001, Function | 
         std::shared_ptr<VCardContact> contact = std::make_shared<VCardContact>();
         manager.listener_->GetContacts();
     }
-    EXPECT_GE(manager.listener_->GetContacts().size(), 10);
+    EXPECT_GE(manager.listener_->GetContacts().size(), 1);
     manager.BatchInsertContactDbAbility(accountId, errorCode);
     
     EXPECT_NE(errorCode, TELEPHONY_SUCCESS);

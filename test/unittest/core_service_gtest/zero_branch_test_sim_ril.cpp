@@ -1991,7 +1991,8 @@ HWTEST_F(SimRilBranchTest, Telephony_OperatorConfigHisysevent_001, Function | Me
     operatorConfigHisysevent->ReportMatchSimChr(-1);
     operatorConfigHisysevent->ReportMatchSimChr(0);
     auto &info = operatorConfigHisysevent->matchSimInfo_[0];
-    EXPECT_EQ(info.GetOpkey(), "46000");
+    std::string str = info.GetOpkey();
+    EXPECT_EQ(str, "46000");
 }
 } // namespace Telephony
 } // namespace OHOS
