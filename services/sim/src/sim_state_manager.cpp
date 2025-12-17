@@ -93,7 +93,6 @@ SimState SimStateManager::GetSimState()
     SimState ret = SimState::SIM_STATE_UNKNOWN;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
-        TELEPHONY_LOGD("SimStateManager::GetSimState()");
         ret = simStateHandle_->GetSimState();
     }
     return ret;
@@ -104,7 +103,6 @@ IccSimStatus SimStateManager::GetSimIccStatus()
     IccSimStatus ret = IccSimStatus::ICC_CONTENT_UNKNOWN;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
-        TELEPHONY_LOGD("SimStateManager::GetSimIccStatus()");
         ret = simStateHandle_->GetSimIccStatus();
     }
     return ret;
@@ -133,7 +131,6 @@ CardType SimStateManager::GetCardType()
     CardType ret = CardType::UNKNOWN_CARD;
     if (simStateHandle_ != nullptr) {
         std::lock_guard<std::mutex> lck(mtx_);
-        TELEPHONY_LOGD("SimStateManager::GetCardType()");
         ret = simStateHandle_->GetCardType();
     }
     return ret;
@@ -205,7 +202,6 @@ int32_t SimStateManager::UnlockPin(int32_t slotId, const std::string &pin, LockS
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<ffrt::mutex> lck(unlockPinCtx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPin slotId = %{public}d", slotId);
     responseUnlockPinReady_ = false;
     simStateHandle_->UnlockPin(slotId, pin);
     while (!responseUnlockPinReady_) {
@@ -247,7 +243,6 @@ int32_t SimStateManager::UnlockPuk(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::UnlockPuk slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->UnlockPuk(slotId, newPin, puk);
     while (!responseReady_) {
@@ -288,7 +283,6 @@ int32_t SimStateManager::AlterPin(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_lock<std::mutex> lck(ctx_);
-    TELEPHONY_LOGD("SimStateManager::AlterPin slotId = %{public}d", slotId);
     responseReady_ = false;
     simStateHandle_->AlterPin(slotId, newPin, oldPin);
     while (!responseReady_) {
