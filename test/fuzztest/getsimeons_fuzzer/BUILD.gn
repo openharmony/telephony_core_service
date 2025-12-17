@@ -75,15 +75,7 @@ ohos_fuzztest("GetSimEonsFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
     "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
     "-fvisibility=hidden",
-  ]
-
-  ldflags = [
-    "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 
   sources = [
