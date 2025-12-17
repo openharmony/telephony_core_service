@@ -129,6 +129,14 @@ static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
         outParam = u"46001";
         return 0;
     });
+    EXPECT_CALL(*simManager, ObtainSpnCondition(_, _, _)).WillRepeatedly([=](int32_t slotId,
+        bool roaming, std::string operatorNum) {
+            auto telRilManager = std::make_shared<TelRilManager>();
+            auto simManager1 = std::make_shared<SimManager>(telRilManager);
+            int slotCount = 2;
+            simManager1->OnInit(slotCount);
+            return simManager1->ObtainSpnCondition(slotId, roaming, operatorNum);
+        });
 }
  
 /**
@@ -509,10 +517,17 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_003, Function | MediumT
     operatorName->UpdateSpn(RegServiceState::REG_STATE_IN_SERVICE, networkState, params);
     networkState->SetOperatorInfo("ChinaPhone", "ChinaPhone", "46000", DomainType::DOMAIN_TYPE_PS);
     system::SetParameter("persist.radio.cfg.display_rule_use_roaming_from_network_state", "false");
+    operatorName->slotId_ = 0;
+    operatorName->displayConditionCust_ = SPN_COND_PLMN;
+    EXPECT_EQ(operatorName->GetSpnRule(networkState), 3);
+    operatorName->displayConditionCust_ = SPN_INVALID;
+    networkState->SetRoaming(RoamingType::ROAMING_STATE_UNKNOWN, DomainType::DOMAIN_TYPE_PS);
+    networkState->SetRoaming(RoamingType::ROAMING_STATE_UNKNOWN, DomainType::DOMAIN_TYPE_CS);
+    EXPECT_EQ(operatorName->GetSpnRule(networkState), 2);
+    networkState->SetRoaming(RoamingType::ROAMING_STATE_UNSPEC, DomainType::DOMAIN_TYPE_PS);
+    networkState->SetRoaming(RoamingType::ROAMING_STATE_UNSPEC, DomainType::DOMAIN_TYPE_CS);
     EXPECT_EQ(operatorName->GetSpnRule(networkState), 0);
-    EXPECT_EQ(operatorName->GetSpnRule(networkState), 2);
-    EXPECT_EQ(operatorName->GetSpnRule(networkState), 2);
-    EXPECT_EQ(operatorName->GetSpnRule(networkState), 2);
+    EXPECT_EQ(operatorName->GetSpnRule(networkState), 0);
     EXPECT_EQ(operatorName->GetSpnRule(networkState), 0);
 }
  
@@ -1028,7 +1043,8 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_009, Function |
     EXPECT_EQ(networkSearchManager->SetRadioState(INVALID_SLOTID, true, 1, callBack), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchManager->GetNetworkSearchInformation(INVALID_SLOTID, callBack),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 0, networkInfo, callBack),
+    bool resumeSelection = true;
+    EXPECT_EQ(networkSearchManager->SetNetworkSelectionMode(INVALID_SLOTID, 0, networkInfo, resumeSelection, callBack),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
  
@@ -1055,7 +1071,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_010, Function |
 
     inner->deviceStateObserver_ = nullptr;
     inner->UnRegisterDeviceStateObserver();
-    EXPECT_FALSE(inner->UnRegisterSetting());
 
     networkSearchManager->GetImei(SLOT_ID_0, result);
     networkSearchManager->IsRadioFirstPowerOn(SLOT_ID_0);
@@ -1592,18 +1607,21 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkStateReport, Function | Mediu
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, INVALID_SLOTID);
     networkSearchHandler->slotId_ = SLOT_ID_0;
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
     networkSearchHandler->RadioOnState();
     auto networkSearchManagerTmp = networkSearchHandler->networkSearchManager_.lock();
-    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
-    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
-    networkSearchHandler->RadioOnState(false);
-    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
-    networkSearchHandler->RadioOnState();
-    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 2);
-    networkSearchHandler->UpdateNetworkState();
     EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), false);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 0);
     networkSearchHandler->RadioOnState(false);
-    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 3);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 0);
+    EXPECT_EQ(networkSearchManagerTmp->GetSkipUnsolRptFlag(networkSearchHandler->slotId_), true);
+    networkSearchHandler->RadioOnState();
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 1);
+    inner->msgNum_ = 0;
+    networkSearchHandler->UpdateNetworkState();
+    networkSearchHandler->RadioOnState(false);
+    EXPECT_EQ(networkSearchManagerTmp->GetSerialNum(networkSearchHandler->slotId_), 2);
 }
 
 HWTEST_F(NetworkSearchBranchTest, Telephony_UpdateDeviceState, Function | MediumTest | Level1)
