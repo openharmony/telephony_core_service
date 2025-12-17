@@ -129,7 +129,7 @@ static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
         outParam = u"46001";
         return 0;
     });
-    EXPECT_CALL(*simManager, ObtainSpnCondition(_, _, _)).WillRepeatedly([=](int32_t slotId, 
+    EXPECT_CALL(*simManager, ObtainSpnCondition(_, _, _)).WillRepeatedly([=](int32_t slotId,
         bool roaming, std::string operatorNum) {
             auto telRilManager = std::make_shared<TelRilManager>();
             auto simManager1 = std::make_shared<SimManager>(telRilManager);
