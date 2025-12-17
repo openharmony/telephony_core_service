@@ -136,7 +136,7 @@ static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
             int slotCount = 2;
             simManager1->OnInit(slotCount);
             return simManager1->ObtainSpnCondition(slotId, roaming, operatorNum);
-        })
+        });
 }
  
 /**
