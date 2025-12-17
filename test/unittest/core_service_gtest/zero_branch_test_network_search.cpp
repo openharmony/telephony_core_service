@@ -133,7 +133,8 @@ static void MockSimManagerFucTest(std::shared_ptr<MockSimManager> simManager)
         bool roaming, std::string operatorNum) {
             auto telRilManager = std::make_shared<TelRilManager>();
             auto simManager1 = std::make_shared<SimManager>(telRilManager);
-            simManager1->OnInit(2);
+            int slotCount = 2;
+            simManager1->OnInit(slotCount);
             return simManager1->ObtainSpnCondition(slotId, roaming, operatorNum);
         })
 }
