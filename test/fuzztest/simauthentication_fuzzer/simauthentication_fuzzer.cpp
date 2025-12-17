@@ -182,6 +182,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    OHOS::DelayedSingleton<CoreService>::DestroyInstance();
     return 0;
 }
