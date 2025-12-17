@@ -2345,23 +2345,23 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0100
     AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-    } else {
-        ASSERT_NE(NetworkSearchTest::telephonyService_, nullptr);
-        ASSERT_TRUE(NetworkSearchTest::HasSimCard(SLOT_ID));
-        int ret = CoreServiceClient::GetInstance().UnregisterImsRegInfoCallback(SLOT_ID, DEFAULT_TYPE);
-        ASSERT_EQ(ret, TELEPHONY_SUCCESS);
-        auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
-        for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
-            if (itor->slotId == SLOT_ID && itor->imsSrvType == DEFAULT_TYPE) {
-                if (itor->imsCallback != nullptr) {
-                    itor->imsCallback = nullptr;
-                }
-                NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
-                break;
-            }
-        }
-        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
     }
+    ASSERT_NE(NetworkSearchTest::telephonyService_, nullptr);
+    ASSERT_TRUE(NetworkSearchTest::HasSimCard(SLOT_ID));
+    int ret = CoreServiceClient::GetInstance().UnregisterImsRegInfoCallback(SLOT_ID, DEFAULT_TYPE);
+    ASSERT_EQ(ret, TELEPHONY_SUCCESS);
+    auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
+    for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
+        if (itor->slotId == SLOT_ID && itor->imsSrvType == DEFAULT_TYPE) {
+            if (itor->imsCallback != nullptr) {
+                itor->imsCallback = nullptr;
+            }
+            NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
+            break;
+        }
+    }
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
 }
 
 /**
@@ -2426,23 +2426,24 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_UnRegImsRegInfoCallback_0500
     int ret = TELEPHONY_SUCCESS;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID1))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
-    } else {
-        ASSERT_NE(NetworkSearchTest::telephonyService_, nullptr);
-        ASSERT_TRUE(NetworkSearchTest::HasSimCard(SLOT_ID1));
-        ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID1, DEFAULT_TYPE);
         EXPECT_EQ(TELEPHONY_SUCCESS, ret);
-        auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
-        for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
-            if (itor->slotId == SLOT_ID1 && itor->imsSrvType == DEFAULT_TYPE) {
-                if (itor->imsCallback != nullptr) {
-                    itor->imsCallback = nullptr;
-                }
-                NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
-                break;
-            }
-        }
-        EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+        return;
     }
+    ASSERT_NE(NetworkSearchTest::telephonyService_, nullptr);
+    ASSERT_TRUE(NetworkSearchTest::HasSimCard(SLOT_ID1));
+    ret = NetworkSearchTest::telephonyService_->UnregisterImsRegInfoCallback(SLOT_ID1, DEFAULT_TYPE);
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
+    auto itor = NetworkSearchTest::imsRegStateCallbackList_.begin();
+    for (; itor != NetworkSearchTest::imsRegStateCallbackList_.end(); ++itor) {
+        if (itor->slotId == SLOT_ID1 && itor->imsSrvType == DEFAULT_TYPE) {
+            if (itor->imsCallback != nullptr) {
+                itor->imsCallback = nullptr;
+            }
+            NetworkSearchTest::imsRegStateCallbackList_.erase(itor);
+            break;
+        }
+    }
+    EXPECT_EQ(TELEPHONY_SUCCESS, ret);
 }
 
 /**
