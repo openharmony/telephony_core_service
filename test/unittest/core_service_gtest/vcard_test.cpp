@@ -1241,18 +1241,14 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
     AccessToken token;
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
         CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
-    if (dataShareHelper != nullptr) {
-        TELEPHONY_LOGI("CreateDataShareHelper start test!!");
-        VCardManager::GetInstance().SetDataHelper(dataShareHelper);
-        std::string filePath = "test";
-        DataShare::DataSharePredicates predicates;
-        predicates.EqualTo(Contact::ID, "-1");
-        int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
-        EXPECT_EQ(errorCode, TELEPHONY_ERROR);
-    } else {
-        TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
-        EXPECT_NE(dataShareHelper, nullptr);
-    }
+    ASSERT_TRUE(dataShareHelper == nullptr);
+    TELEPHONY_LOGI("CreateDataShareHelper start test!!");
+    VCardManager::GetInstance().SetDataHelper(dataShareHelper);
+    std::string filePath = "test";
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(Contact::ID, "-1");
+    int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
+    EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
