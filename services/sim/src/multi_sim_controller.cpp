@@ -70,6 +70,7 @@ constexpr int32_t THREE_MODEMS = 3;
 constexpr int32_t SLOT_ID_1 = 1;
 constexpr int32_t RIL_SET_PRIMARY_SLOT_TIMEOUT = 45 * 1000; // 45 second
 constexpr int32_t WAIT_FOR_ALL_CARDS_READY_TIMEOUT = 10 * 1000;
+constexpr int32_t WAIT_FOR_SINGLE_PRIMARY_SLOT_TIMEOUT = 5 * 1000;
 const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
 static const std::string SIM_LABEL_STATE_PROP = "persist.ril.sim_switch";
 static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
@@ -321,9 +322,12 @@ int32_t MultiSimController::SetTargetPrimarySlotId(bool isDualCard, int32_t prim
 {
     TELEPHONY_LOGI("isDualCard:%{public}d, SetTargetPrimarySlotId:%{public}d", isDualCard, primarySlotId);
     targetPrimarySlotId_ = primarySlotId;
+    RemoveEvent(WAIT_FOR_ALL_CARDS_READY_EVENT);
     if (isDualCard) {
         waitCardsReady_ = true;
         SendEvent(WAIT_FOR_ALL_CARDS_READY_EVENT, primarySlotId, WAIT_FOR_ALL_CARDS_READY_TIMEOUT);
+    } else {
+        SendEvent(WAIT_FOR_ALL_CARDS_READY_EVENT, primarySlotId, WAIT_FOR_SINGLE_PRIMARY_SLOT_TIMEOUT);
     }
     return TELEPHONY_SUCCESS;
 }
@@ -961,7 +965,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
         TELEPHONY_LOGW("satelliteStatusOn or simslots is mapping, no need check main slotId");
         return;
     }
-    if (IsNeedSetTargetPrimarySlotId()) {
+    if (isInit && IsNeedSetTargetPrimarySlotId()) {
         return;
     }
     int32_t defaultSlotId = GetDefaultMainSlotByIccId();
