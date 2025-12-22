@@ -452,6 +452,35 @@ void TelRilNetwork::BuildSignalStrength(std::shared_ptr<Rssi> signalStrength, co
     signalStrength->nr.sinr = rssi.nr.sinr;
 }
 
+/*
+ * Normalizes a low-level radio technology to its common teltechcategory.
+ * For example: GPRS, EDGE -> GSM, UMTS，HSDPA, HSUPA -> WCDMA
+ */
+
+TelRilRadioTech TelRilNetwork::ConvertToCommonRadioTech(const TelRilRadioTech &radioTechnology)
+{
+    switch (radioTechnology) {
+        case TelRilRadioTech::RADIO_TECHNOLOGY_GPRS:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EDGE:
+            return TelRilRadioTech::RADIO_TECHNOLOGY_GSM;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_UMTS:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSDPA:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSUPA:
+            return TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_IS95A:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_IS95B:
+            return TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EVDO_0:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EVDO_A:
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EVDO_B:
+            return TelRilRadioTech::RADIO_TECHNOLOGY_EVDO;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_DCHSPAP:
+            return TelRilRadioTech::RADIO_TECHNOLOGY_HSPAP;
+        default:
+            return radioTechnology;
+    }
+}
+
 void TelRilNetwork::BuildCsRegStatusInfo(
     std::shared_ptr<CsRegStatusInfo> regStatusInfo, const HDI::Ril::V1_1::CsRegStatusInfo &csRegStatusInfo)
 {
@@ -459,7 +488,9 @@ void TelRilNetwork::BuildCsRegStatusInfo(
     regStatusInfo->regStatus = static_cast<TelRilRegStatus>(csRegStatusInfo.regStatus);
     regStatusInfo->lacCode = csRegStatusInfo.lacCode;
     regStatusInfo->cellId = csRegStatusInfo.cellId;
-    regStatusInfo->radioTechnology = static_cast<TelRilRadioTech>(csRegStatusInfo.radioTechnology);
+    const TelRilRadioTech tech = static_cast<TelRilRadioTech>(csRegStatusInfo.radioTechnology);
+    regStatusInfo->radioTechnology = ConvertToCommonRadioTech(tech);
+    regStatusInfo->radioTechnologyV2 = tech;
 }
 
 void TelRilNetwork::BuildPsRegStatusInfo(
@@ -469,7 +500,9 @@ void TelRilNetwork::BuildPsRegStatusInfo(
     regStatusInfo->regStatus = static_cast<TelRilRegStatus>(psRegStatusInfo.regStatus);
     regStatusInfo->lacCode = psRegStatusInfo.lacCode;
     regStatusInfo->cellId = psRegStatusInfo.cellId;
-    regStatusInfo->radioTechnology = static_cast<TelRilRadioTech>(psRegStatusInfo.radioTechnology);
+    const TelRilRadioTech tech = static_cast<TelRilRadioTech>(psRegStatusInfo.radioTechnology);
+    regStatusInfo->radioTechnology = ConvertToCommonRadioTech(tech);
+    regStatusInfo->radioTechnologyV2 = tech;
     regStatusInfo->isNrAvailable = psRegStatusInfo.isNrAvailable;
     regStatusInfo->isEnDcAvailable = psRegStatusInfo.isEnDcAvailable;
     regStatusInfo->isDcNrRestricted = psRegStatusInfo.isDcNrRestricted;

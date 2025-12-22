@@ -370,5 +370,56 @@ HWTEST_F(TelRilBranchTest, Telephony_tel_ril_Call_001, Function | MediumTest | L
     EXPECT_NE(telRilCall->CreateTelRilRequest(event), nullptr);
     ASSERT_TRUE(telRilCall->SendDtmfResponse(responseInfo));
 }
+
+/**
+ * @tc.number   ConvertToCommonRadioTech_Test
+ * @tc.name     test all switch branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilBranchTest, ConvertToCommonRadioTech_Test, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_5::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilNetwork = std::make_shared<TelRilNetwork>(SLOT_ID, rilInterface, observerHandler, nullptr);
+
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_GPRS),
+        TelRilRadioTech::RADIO_TECHNOLOGY_GSM);
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_UMTS),
+        TelRilRadioTech::RADIO_TECHNOLOGY_WCDMA);
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_IS95A),
+        TelRilRadioTech::RADIO_TECHNOLOGY_1XRTT);
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_EVDO_0),
+        TelRilRadioTech::RADIO_TECHNOLOGY_EVDO);
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_DCHSPAP),
+        TelRilRadioTech::RADIO_TECHNOLOGY_HSPAP);
+    EXPECT_EQ(telRilNetwork->ConvertToCommonRadioTech(TelRilRadioTech::RADIO_TECHNOLOGY_NR),
+        TelRilRadioTech::RADIO_TECHNOLOGY_NR);
+}
+
+/**
+ * @tc.number   BuildRegStatusInfo_Test
+ * @tc.name     zero branch test
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelRilBranchTest, BuildRegStatusInfo_Test, Function | MediumTest | Level1)
+{
+    auto rilInterface = HDI::Ril::V1_5::IRil::Get();
+    std::shared_ptr<ObserverHandler> observerHandler = std::make_shared<ObserverHandler>();
+    auto telRilNetwork = std::make_shared<TelRilNetwork>(SLOT_ID, rilInterface, observerHandler, nullptr);
+    HDI::Ril::V1_1::CsRegStatusInfo csRegStatusRilInfo;
+    csRegStatusRilInfo.radioTechnology =
+        static_cast<HDI::Ril::V1_1::RilRadioTech>(TelRilRadioTech::RADIO_TECHNOLOGY_GPRS);
+    HDI::Ril::V1_1::PsRegStatusInfo psRegStatusRilInfo;
+    psRegStatusRilInfo.radioTechnology =
+        static_cast<HDI::Ril::V1_1::RilRadioTech>(TelRilRadioTech::RADIO_TECHNOLOGY_GPRS);
+    std::shared_ptr<CsRegStatusInfo> csRegStatusInfo = std::make_shared<CsRegStatusInfo>();
+    std::shared_ptr<PsRegStatusResultInfo> psRegStatusInfo = std::make_shared<PsRegStatusResultInfo>();
+    telRilNetwork->BuildCsRegStatusInfo(csRegStatusInfo, csRegStatusRilInfo);
+    telRilNetwork->BuildPsRegStatusInfo(psRegStatusInfo, psRegStatusRilInfo);
+    EXPECT_EQ(csRegStatusInfo->radioTechnology, TelRilRadioTech::RADIO_TECHNOLOGY_GSM);
+    EXPECT_EQ(csRegStatusInfo->radioTechnologyV2, TelRilRadioTech::RADIO_TECHNOLOGY_GPRS);
+    EXPECT_EQ(psRegStatusInfo->radioTechnology, TelRilRadioTech::RADIO_TECHNOLOGY_GSM);
+    EXPECT_EQ(psRegStatusInfo->radioTechnologyV2, TelRilRadioTech::RADIO_TECHNOLOGY_GPRS);
+}
 } // namespace Telephony
 } // namespace OHOS

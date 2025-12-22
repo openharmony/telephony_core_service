@@ -589,11 +589,13 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_001, Function | M
     networkSearchState->SetEmergency(true);
     networkSearchState->IsEmergency();
     networkSearchState->SetNetworkType(RadioTech::RADIO_TECHNOLOGY_GSM, DomainType::DOMAIN_TYPE_PS);
+    networkSearchState->SetNetworkTypeV2(RadioTech::RADIO_TECHNOLOGY_GSM, DomainType::DOMAIN_TYPE_PS);
     networkSearchState->SetNetworkState(RegServiceState::REG_STATE_IN_SERVICE, DomainType::DOMAIN_TYPE_PS);
     networkSearchState->SetNetworkStateToRoaming(RoamingType::ROAMING_STATE_UNSPEC, DomainType::DOMAIN_TYPE_PS);
     networkSearchState->SetInitial();
     networkSearchState->SetNrState(NrState::NR_STATE_NOT_SUPPORT);
     networkSearchState->SetCfgTech(RadioTech::RADIO_TECHNOLOGY_EVDO);
+    networkSearchState->SetCfgTechV2(RadioTech::RADIO_TECHNOLOGY_EVDO);
     networkSearchState->SetImsStatus(true);
     networkSearchState->SetImsStatus(false);
     networkSearchState->SetLongOperatorName(longName, DomainType::DOMAIN_TYPE_PS);

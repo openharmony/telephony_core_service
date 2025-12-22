@@ -76,6 +76,7 @@ void NetworkRegister::InitNrConversionConfig()
 
 void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
                                                RadioTech tech,
+                                               RadioTech techV2,
                                                RoamingType roam,
                                                DomainType type)
 {
@@ -83,6 +84,7 @@ void NetworkRegister::UpdateNetworkSearchState(RegServiceState regStatus,
     networkSearchState_->SetEmergency(
         (regStatus == RegServiceState::REG_STATE_EMERGENCY_ONLY) && isCsCapable_);
     networkSearchState_->SetNetworkType(tech, type);
+    networkSearchState_->SetNetworkTypeV2(techV2, type);
     networkSearchState_->SetNetworkStateToRoaming(roam, type);
 }
 
@@ -105,11 +107,12 @@ void NetworkRegister::ProcessCsRegister(const std::shared_ptr<CsRegStatusInfo> c
     }
     UpdateCellularCall(regStatus, CS_TYPE);
     RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(csRegStateResult->radioTechnology));
+    RadioTech techV2 = ConvertTechFromRil(static_cast<TelRilRadioTech>(csRegStateResult->radioTechnologyV2));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
-    UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_CS);
+    UpdateNetworkSearchState(regStatus, tech, techV2, roam, DomainType::DOMAIN_TYPE_CS);
     PrintCurrentRegistrationState(registrationStatus, csRegStateResult->radioTechnology, roam, slotId_);
     CoreServiceHiSysEvent::WriteNetworkStateBehaviorEvent(slotId_, static_cast<int32_t>(DomainType::DOMAIN_TYPE_CS),
         static_cast<int32_t>(tech), static_cast<int32_t>(regStatus));
@@ -149,11 +152,12 @@ void NetworkRegister::ProcessPsRegister(const std::shared_ptr<PsRegStatusResultI
     }
     UpdateCellularCall(regStatus, IMS_TYPE);
     RadioTech tech = ConvertTechFromRil(static_cast<TelRilRadioTech>(psRegStatusResult->radioTechnology));
+    RadioTech techV2 = ConvertTechFromRil(static_cast<TelRilRadioTech>(psRegStatusResult->radioTechnologyV2));
     RoamingType roam = RoamingType::ROAMING_STATE_UNKNOWN;
     if (registrationStatus == RilRegister::REG_STATE_ROAMING) {
         roam = RoamingType::ROAMING_STATE_UNSPEC;
     }
-    UpdateNetworkSearchState(regStatus, tech, roam, DomainType::DOMAIN_TYPE_PS);
+    UpdateNetworkSearchState(regStatus, tech, techV2, roam, DomainType::DOMAIN_TYPE_PS);
     endcSupport_ = psRegStatusResult->isEnDcAvailable;
     dcNrRestricted_ = psRegStatusResult->isDcNrRestricted;
     nrSupport_ = psRegStatusResult->isNrAvailable;
@@ -184,10 +188,16 @@ int32_t NetworkRegister::RevertLastTechnology()
     }
     RadioTech lastCfgTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     RadioTech lastPsRadioTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    RadioTech lastCfgTechV2 = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    RadioTech lastPsRadioTechV2 = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     networkSearchState_->GetLastCfgTech(lastCfgTech);
     networkSearchState_->GetLastPsRadioTech(lastPsRadioTech);
     networkSearchState_->SetCfgTech(lastCfgTech);
     networkSearchState_->SetNetworkType(lastPsRadioTech, DomainType::DOMAIN_TYPE_PS);
+    networkSearchState_->GetLastCfgTechV2(lastCfgTechV2);
+    networkSearchState_->GetLastPsRadioTechV2(lastPsRadioTechV2);
+    networkSearchState_->SetCfgTechV2(lastCfgTechV2);
+    networkSearchState_->SetNetworkTypeV2(lastPsRadioTechV2, DomainType::DOMAIN_TYPE_PS);
     TELEPHONY_LOGI(
         "lastCfgTech:%{public}d lastPsRadioTech:%{public}d slotId:%{public}d", lastCfgTech, lastPsRadioTech, slotId_);
     return TELEPHONY_ERR_SUCCESS;
@@ -378,9 +388,13 @@ void NetworkRegister::UpdateCfgTech()
     auto networkState = networkSearchState_->GetNetworkStatus();
     RadioTech tech = networkState->GetPsRadioTech() != RadioTech::RADIO_TECHNOLOGY_UNKNOWN ?
         networkState->GetPsRadioTech() : networkState->GetCsRadioTech();
+    RadioTech techV2 = networkState->GetPsRadioTechV2() != RadioTech::RADIO_TECHNOLOGY_UNKNOWN ?
+        networkState->GetPsRadioTechV2() : networkState->GetCsRadioTechV2();
     TELEPHONY_LOGD("tech:%{public}d slotId:%{public}d", tech, slotId_);
     RadioTech cfgTech = GetTechnologyByNrConfig(tech);
+    RadioTech cfgTechV2 = GetTechnologyByNrConfig(techV2);
     networkSearchState_->SetCfgTech(cfgTech);
+    networkSearchState_->SetCfgTechV2(cfgTechV2);
 }
 
 void NetworkRegister::ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const {}
@@ -430,6 +444,16 @@ RadioTech NetworkRegister::ConvertTechFromRil(TelRilRadioTech code) const
             return RadioTech::RADIO_TECHNOLOGY_LTE_CA;
         case TelRilRadioTech::RADIO_TECHNOLOGY_NR:
             return RadioTech::RADIO_TECHNOLOGY_NR;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_GPRS:
+            return RadioTech::RADIO_TECHNOLOGY_GPRS;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_EDGE:
+            return RadioTech::RADIO_TECHNOLOGY_EDGE;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_UMTS:
+            return RadioTech::RADIO_TECHNOLOGY_UMTS;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSDPA:
+            return RadioTech::RADIO_TECHNOLOGY_HSDPA;
+        case TelRilRadioTech::RADIO_TECHNOLOGY_HSUPA:
+            return RadioTech::RADIO_TECHNOLOGY_HSUPA;
         default:
             return RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     }

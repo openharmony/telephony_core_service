@@ -173,6 +173,7 @@ private:
         CurrentCellInformation &cellInfo, const HDI::Ril::V1_2::CurrentCellInfo_1_2 &info);
     void BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
         const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList);
+    TelRilRadioTech ConvertToCommonRadioTech(const TelRilRadioTech &radioTechnology);
 
 protected:
     inline bool IsNeedBlockTelRilRequest(const char *funcName) override;
