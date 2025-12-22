@@ -88,6 +88,14 @@ void NetworkSearchState::SetNetworkType(RadioTech tech, DomainType domainType)
     }
 }
 
+void NetworkSearchState::SetNetworkTypeV2(RadioTech tech, DomainType domainType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetNetworkTypeV2(tech, domainType);
+    }
+}
+
 void NetworkSearchState::SetNetworkState(RegServiceState state, DomainType domainType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -278,11 +286,41 @@ int32_t NetworkSearchState::GetLastPsRadioTech(RadioTech &tech)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t NetworkSearchState::GetLastCfgTechV2(RadioTech &tech)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    tech = networkState_->GetLastCfgTechV2();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
+int32_t NetworkSearchState::GetLastPsRadioTechV2(RadioTech &tech)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    tech = networkState_->GetLastPsRadioTechV2();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 void NetworkSearchState::SetCfgTech(RadioTech tech)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetCfgTech(tech);
+    }
+}
+
+void NetworkSearchState::SetCfgTechV2(RadioTech tech)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (networkState_ != nullptr) {
+        networkState_->SetCfgTechV2(tech);
     }
 }
 

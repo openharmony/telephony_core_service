@@ -34,10 +34,12 @@ public:
         DomainType domainType);
     void SetEmergency(bool isEmergency);
     void SetNetworkType(RadioTech tech, DomainType domainType);
+    void SetNetworkTypeV2(RadioTech tech, DomainType domainType);
     void SetRoaming(RoamingType roamingType, DomainType domainType);
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
+    void SetCfgTechV2(RadioTech tech);
     void SetLongOperatorName(const std::string &longName, DomainType domainType);
     RegServiceState GetPsRegStatus() const;
     RegServiceState GetCsRegStatus() const;
@@ -60,6 +62,21 @@ public:
      * @return Returns RAT of the CS domain on the registered network
      */
     RadioTech GetCsRadioTech() const;
+    /*
+     * Obtains RAT of the PS domain on the registered network.
+     * @return Returns RAT of the PS domain on the registered network
+     */
+    RadioTech GetPsRadioTechV2() const;
+    /*
+     * Obtains RAT of the PS domain on the registered network.
+     * @return Returns last RAT of the PS domain on the registered network
+     */
+    RadioTech GetLastPsRadioTechV2() const;
+    /*
+     * Obtains RAT of the CS domain on the registered network.
+     * @return Returns RAT of the CS domain on the registered network
+     */
+    RadioTech GetCsRadioTechV2() const;
     /*
      * Obtains the operator name in the long alphanumeric format of the registered network.
      * @return Returns operator name in the long alphanumeric format
@@ -106,12 +123,26 @@ public:
      * @return Returns last access technology.
      */
     RadioTech GetLastCfgTech() const;
+    /*
+     * Obtains the radio access technology after config conversion.
+     * @return Returns access technology.
+     */
+    RadioTech GetCfgTechV2() const;
+    /*
+     * Obtains the radio Access technology after config conversion.
+     * @return Returns last access technology.
+     */
+    RadioTech GetLastCfgTechV2() const;
 
 private:
     bool ReadParcelString(Parcel &parcel);
     bool ReadParcelInt(Parcel &parcel);
     bool MarshallingString(Parcel &parcel) const;
     bool MarshallingInt(Parcel &parcel) const;
+    inline bool ReadParcelToRegServiceState(Parcel &parcel, RegServiceState &regServiceState);
+    inline bool ReadParcelToNrState(Parcel &parcel, NrState &nrState);
+    inline bool ReadParcelToRadioTech(Parcel &parcel, RadioTech &tech);
+    inline bool ReadParcelToRoamingType(Parcel &parcel, RoamingType &roamingType);
 
 private:
     bool isEmergency_;
@@ -127,7 +158,52 @@ private:
     RadioTech csRadioTech_;
     RadioTech cfgTech_;
     NrState nrState_;
+    RadioTech psRadioTechV2_;
+    RadioTech lastPsRadioTechV2_;
+    RadioTech lastCfgTechV2_;
+    RadioTech csRadioTechV2_;
+    RadioTech cfgTechV2_;
 };
+
+inline bool NetworkState::ReadParcelToRegServiceState(Parcel &parcel, RegServiceState &regServiceState)
+{
+    int32_t regServiceStateInt;
+    if (!parcel.ReadInt32(regServiceStateInt)) {
+        return false;
+    }
+    regServiceState = static_cast<RegServiceState>(regServiceStateInt);
+    return true;
+}
+
+inline bool NetworkState::ReadParcelToRoamingType(Parcel &parcel, RoamingType &roamingType)
+{
+    int32_t roamingTypeInt;
+    if (!parcel.ReadInt32(roamingTypeInt)) {
+        return false;
+    }
+    roamingType = static_cast<RoamingType>(roamingTypeInt);
+    return true;
+}
+
+inline bool NetworkState::ReadParcelToNrState(Parcel &parcel, NrState &nrState)
+{
+    int32_t nrStateInt;
+    if (!parcel.ReadInt32(nrStateInt)) {
+        return false;
+    }
+    nrState = static_cast<NrState>(nrStateInt);
+    return true;
+}
+
+inline bool NetworkState::ReadParcelToRadioTech(Parcel &parcel, RadioTech &tech)
+{
+    int32_t techInt;
+    if (!parcel.ReadInt32(techInt)) {
+        return false;
+    }
+    tech = static_cast<RadioTech>(techInt);
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS
 #endif // NETWORK_STATE_H

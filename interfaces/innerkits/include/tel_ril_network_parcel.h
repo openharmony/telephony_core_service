@@ -108,8 +108,10 @@ struct CsRegStatusInfo {
     int32_t cellId = 0;
 
     /** Available voice radio technology, RMS defined by radio technology. */
-    TelRilRadioTech radioTechnology =
-        TelRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    TelRilRadioTech radioTechnology = TelRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+
+    /** Available voice radio technology, RMS defined by radio technology. */
+    TelRilRadioTech radioTechnologyV2 = TelRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
 
     /** flag, Used by search network manager in response. */
     int64_t flag = 0;
@@ -136,6 +138,9 @@ struct PsRegStatusResultInfo {
 
     /** Radio access technology type. For details, see {@link RilRadioTech}. */
     TelRilRadioTech radioTechnology = TelRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+
+    /** Radio access technology type. For details, see {@link RilRadioTech}. */
+    TelRilRadioTech radioTechnologyV2 = TelRilRadioTech::RADIO_TECHNOLOGY_UNKNOWN;
 
     /** Whether the NR mode is available.*/
     bool isNrAvailable = false;

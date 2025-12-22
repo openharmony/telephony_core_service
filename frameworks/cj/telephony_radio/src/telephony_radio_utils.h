@@ -167,14 +167,80 @@ namespace Telephony {
         RADIO_TECHNOLOGY_NR = 12,
 
         /**
-        * Indicates that RAT is 5G new radio (NR) enhanced.
-        */
+         * Indicates that RAT is 5G new radio (NR) enhanced.
+         */
         RADIO_TECHNOLOGY_NR_ENHANCED = 13,
+
+        /**
+         * Indicates that RAT is general packet radio service (GPRS), a packet-based wireless communication technology
+         * used in GSM networks.
+         */
+        RADIO_TECHNOLOGY_GPRS = 14,
+
+        /**
+         * Indicates that RAT is enhanced data rates for GSM evolution (EDGE), an enhanced version of GSM that
+         * provides higher data transmission speeds.
+         */
+        RADIO_TECHNOLOGY_EDGE = 15,
+
+        /**
+         * Indicates that RAT is universal mobile telecommunications system (UMTS), a 3G mobile communication technology
+         * based on WCDMA.
+         */
+        RADIO_TECHNOLOGY_UMTS = 16,
+
+        /**
+         * Indicates that RAT is high-speed downlink packet access (HSDPA), an enhancement to WCDMA for faster
+         * downlink data transmission.
+         */
+        RADIO_TECHNOLOGY_HSDPA = 17,
+
+        /**
+         * Indicates that RAT is high-speed uplink packet access (HSUPA), an enhancement to WCDMA for faster
+         * uplink data transmission.
+         */
+        RADIO_TECHNOLOGY_HSUPA = 18,
+
+        /**
+         * Indicates that RAT is Interim Standard 95 (IS-95), also know as CDMA One,
+         * a 2G mobile communication standard based on code division multiple access (CDMA).
+         */
+        RADIO_TECHNOLOGY_IS95A = 19,
+
+        /**
+         * Indicates that RAT is Interim Standard 95B (IS-95B),
+         * an enhanced version of IS-95 with improved data rates and voice quality.
+         */
+        RADIO_TECHNOLOGY_IS95B = 20,
+
+        /**
+         * Indicates that RAT is evolution data only (EVDO) Rev.0,
+         * a 3G mobile communication standard that provides high-speed data transmission over CDMA networks.
+         */
+        RADIO_TECHNOLOGY_EVDO_0 = 21,
+
+        /**
+         * Indicates that RAT is evolution data only (EVDO) Rev.A,
+         * an enhanced version of EVDO Rev.0 with improved data rates and support for voice services.
+         */
+        RADIO_TECHNOLOGY_EVDO_A = 22,
+
+        /**
+         * Indicates that RAT is evolution data only (EVDO) Rev.B,
+         * a further enhancement to EVDO that supports higher data rates and improved spectral efficiency.
+         */
+        RADIO_TECHNOLOGY_EVDO_B = 23,
+
+        /**
+         * Indicates that RAT is dual-carrier HSPA+ (DC -HSPA+),
+         * a high-speed data technology that uses two carriers to improve data throughput.
+         */
+        RADIO_TECHNOLOGY_DCHSPAP = 30,
 
         /**
         * Indicates the max value.
         */
-        RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_NR_ENHANCED,
+        RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_DCHSPAP,
     };
 
     enum class NsaState : int32_t {

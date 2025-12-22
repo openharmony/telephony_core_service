@@ -347,6 +347,12 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_002, TestSize.Lev
     EXPECT_EQ(networkSearchState->GetLastPsRadioTech(tech), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(tech, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 
+    EXPECT_EQ(networkSearchState->GetLastCfgTechV2(tech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(tech, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
+
+    EXPECT_EQ(networkSearchState->GetLastPsRadioTechV2(tech), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(tech, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
+
     networkSearchState->networkSearchManager_ = std::weak_ptr<NetworkSearchManager>();
     ASSERT_TRUE(networkSearchState->networkSearchManager_.expired());
 
@@ -373,6 +379,25 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchState_003, TestSize.Lev
     EXPECT_EQ(deviceStateHandler->isEnterStrMode_, true);
     deviceStateHandler->UpdateDeviceState(false);
     EXPECT_EQ(deviceStateHandler->isEnterStrMode_, false);
+}
+
+HWTEST_F(NetworkSearchBranchTest, NetworkState_V2Interface_Test, Function | MediumTest | Level1)
+{
+    sptr<NetworkState> networkState = new NetworkState;
+    networkState->SetNetworkTypeV2(RadioTech::RADIO_TECHNOLOGY_LTE, DomainType::DOMAIN_TYPE_CS);
+    networkState->SetNetworkTypeV2(RadioTech::RADIO_TECHNOLOGY_LTE, DomainType::DOMAIN_TYPE_PS);
+    networkState->SetCfgTechV2(RadioTech::RADIO_TECHNOLOGY_LTE);
+    RadioTech psRadioTechV2 = networkState->GetPsRadioTechV2();
+    RadioTech csRadioTechV2 = networkState->GetCsRadioTechV2();
+    RadioTech cfgTechV2 = networkState->GetCfgTechV2();
+    RadioTech lastCfgTechV2 = networkState->GetLastCfgTechV2();
+    RadioTech lastPsRadioTechV2 = networkState->GetLastPsRadioTechV2();
+
+    EXPECT_EQ(psRadioTechV2, RadioTech::RADIO_TECHNOLOGY_LTE);
+    EXPECT_EQ(csRadioTechV2, RadioTech::RADIO_TECHNOLOGY_LTE);
+    EXPECT_EQ(cfgTechV2, RadioTech::RADIO_TECHNOLOGY_LTE);
+    EXPECT_EQ(lastCfgTechV2, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
+    EXPECT_EQ(lastPsRadioTechV2, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
 } // namespace Telephony
 } // namespace OHOS
