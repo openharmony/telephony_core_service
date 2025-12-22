@@ -1397,11 +1397,12 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlotId, Function | MediumTest | Level1)
 {
-    std::shared_ptr telRilManager = std::make_shared();
-    std::vector<std::shared_ptrTelephony::SimStateManager> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptrTelephony::SimFileManager> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptrTelephony::MultiSimController multiSimController =
-    std::make_shared(telRilManager, simStateManager, simFileManager);
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
 
     multiSimController->targetPrimarySlotId_ = SIM_SLOT_1;
@@ -1413,11 +1414,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlo
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetTargetPrimarySlotId001, Function | MediumTest | Level1)
 {
-    std::shared_ptr telRilManager = std::make_shared();
-    std::vector<std::shared_ptrTelephony::SimStateManager> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptrTelephony::SimFileManager> simFileManager = { nullptr, nullptr };
-    std::shared_ptrTelephony::MultiSimController multiSimController =
-    std::make_shared(telRilManager, simStateManager, simFileManager);
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
     multiSimController->SetTargetPrimarySlotId(false, SIM_SLOT_1);
     bool ret = multiSimController->HasInnerEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
