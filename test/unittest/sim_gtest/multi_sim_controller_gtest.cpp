@@ -1394,5 +1394,35 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
     EXPECT_EQ(simIdx, 3);
 }
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlotId, Function | MediumTest | Level1)
+{
+    std::shared_ptr telRilManager = std::make_shared();
+    std::vector<std::shared_ptrTelephony::SimStateManager> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptrTelephony::SimFileManager> simFileManager = { nullptr, nullptr };
+    std::shared_ptrTelephony::MultiSimController multiSimController =
+    std::make_shared(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->targetPrimarySlotId_ = SIM_SLOT_1;
+    multiSimController->CheckIfNeedSwitchMainSlotId(false);
+    EXPECT_EQ(multiSimController->targetPrimarySlotId_, 1);
+    multiSimController->CheckIfNeedSwitchMainSlotId(true);
+    EXPECT_EQ(multiSimController->targetPrimarySlotId_, INVALID_VALUE);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetTargetPrimarySlotId001, Function | MediumTest | Level1)
+{
+    std::shared_ptr telRilManager = std::make_shared();
+    std::vector<std::shared_ptrTelephony::SimStateManager> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptrTelephony::SimFileManager> simFileManager = { nullptr, nullptr };
+    std::shared_ptrTelephony::MultiSimController multiSimController =
+    std::make_shared(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+    multiSimController->SetTargetPrimarySlotId(false, SIM_SLOT_1);
+    bool ret = multiSimController->HasInnerEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
+    EXPECT_TRUE(ret);
+    multiSimController->RemoveEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
+}
 }
 }
