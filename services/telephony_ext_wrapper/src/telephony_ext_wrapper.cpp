@@ -243,10 +243,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getStkBundleNameFunc_ = (GetStkBundleNameFunc) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
     updateHotPlugCardState_ = (UpdateHotplugCardState)dlsym(telephonyExtWrapperHandle_, "UpdateHotPlugCardState");
     cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
+    sendSimChgTypeInfo_ = (SEND_SIM_CHG_TYPE_INFO)dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
                         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
                         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-                        getStkBundleNameFunc_ == nullptr);
+                        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
