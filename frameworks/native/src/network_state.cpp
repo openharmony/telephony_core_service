@@ -45,6 +45,11 @@ void NetworkState::Init()
     lastCfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     cfgTech_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
     nrState_ = NrState::NR_STATE_NOT_SUPPORT;
+    psRadioTechV2_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    csRadioTechV2_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    lastPsRadioTechV2_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    lastCfgTechV2_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
+    cfgTechV2_ = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
 }
 
 bool NetworkState::ReadFromParcel(Parcel &parcel)
@@ -95,48 +100,14 @@ bool NetworkState::ReadParcelString(Parcel &parcel)
 
 bool NetworkState::ReadParcelInt(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    csRoaming_ = static_cast<RoamingType>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    psRoaming_ = static_cast<RoamingType>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    psRegStatus_ = static_cast<RegServiceState>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    csRegStatus_ = static_cast<RegServiceState>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    psRadioTech_ = static_cast<RadioTech>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    csRadioTech_ = static_cast<RadioTech>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    cfgTech_ = static_cast<RadioTech>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    nrState_ = static_cast<NrState>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    lastPsRadioTech_ = static_cast<RadioTech>(rat);
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
-    lastCfgTech_ = static_cast<RadioTech>(rat);
-    return true;
+    return ReadParcelToRoamingType(parcel, csRoaming_) && ReadParcelToRoamingType(parcel, psRoaming_) &&
+        ReadParcelToRegServiceState(parcel, psRegStatus_) && ReadParcelToRegServiceState(parcel, csRegStatus_) &&
+        ReadParcelToRadioTech(parcel, psRadioTech_) && ReadParcelToRadioTech(parcel, csRadioTech_) &&
+        ReadParcelToRadioTech(parcel, cfgTech_) && ReadParcelToNrState(parcel, nrState_) &&
+        ReadParcelToRadioTech(parcel, lastPsRadioTech_) && ReadParcelToRadioTech(parcel, lastCfgTech_) &&
+        ReadParcelToRadioTech(parcel, psRadioTechV2_) && ReadParcelToRadioTech(parcel, csRadioTechV2_) &&
+        ReadParcelToRadioTech(parcel, cfgTechV2_) && ReadParcelToRadioTech(parcel, lastPsRadioTechV2_) &&
+        ReadParcelToRadioTech(parcel, lastCfgTechV2_);
 }
 
 bool NetworkState::operator==(const NetworkState &other) const
@@ -144,7 +115,8 @@ bool NetworkState::operator==(const NetworkState &other) const
     return isEmergency_ == other.isEmergency_ && csRoaming_ == other.csRoaming_ && psRoaming_ == other.psRoaming_ &&
         psRegStatus_ == other.psRegStatus_ && csRegStatus_ == other.csRegStatus_ &&
         psRadioTech_ == other.psRadioTech_ && csRadioTech_ == other.csRadioTech_ &&
-        cfgTech_ == other.cfgTech_ && nrState_ == other.nrState_ &&
+        cfgTech_ == other.cfgTech_ && psRadioTechV2_ == other.psRadioTechV2_ &&
+        csRadioTechV2_ == other.csRadioTechV2_ && cfgTechV2_ == other.cfgTechV2_ && nrState_ == other.nrState_ &&
         psOperatorInfo_.operatorNumeric == other.psOperatorInfo_.operatorNumeric &&
         psOperatorInfo_.fullName == other.psOperatorInfo_.fullName &&
         psOperatorInfo_.shortName == other.psOperatorInfo_.shortName &&
@@ -220,6 +192,21 @@ bool NetworkState::MarshallingInt(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(lastCfgTech_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(psRadioTechV2_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(csRadioTechV2_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(cfgTechV2_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(lastPsRadioTechV2_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(lastCfgTechV2_))) {
         return false;
     }
     return true;
@@ -304,6 +291,21 @@ RadioTech NetworkState::GetCsRadioTech() const
     return csRadioTech_;
 }
 
+RadioTech NetworkState::GetPsRadioTechV2() const
+{
+    return psRadioTechV2_;
+}
+
+RadioTech NetworkState::GetLastPsRadioTechV2() const
+{
+    return lastPsRadioTechV2_;
+}
+
+RadioTech NetworkState::GetCsRadioTechV2() const
+{
+    return csRadioTechV2_;
+}
+
 RegServiceState NetworkState::GetPsRegStatus() const
 {
     return psRegStatus_;
@@ -340,6 +342,16 @@ void NetworkState::SetNetworkType(RadioTech tech, DomainType domainType)
     } else {
         lastPsRadioTech_ = psRadioTech_;
         psRadioTech_ = tech;
+    }
+}
+
+void NetworkState::SetNetworkTypeV2(RadioTech tech, DomainType domainType)
+{
+    if (domainType == DomainType::DOMAIN_TYPE_CS) {
+        csRadioTechV2_ = tech;
+    } else {
+        lastPsRadioTechV2_ = psRadioTechV2_;
+        psRadioTechV2_ = tech;
     }
 }
 
@@ -380,6 +392,9 @@ std::string NetworkState::ToString() const
     int32_t psRadioTech = static_cast<int32_t>(psRadioTech_);
     int32_t csRadioTech = static_cast<int32_t>(csRadioTech_);
     int32_t cfgTech = static_cast<int32_t>(cfgTech_);
+    int32_t psRadioTechV2 = static_cast<int32_t>(psRadioTechV2_);
+    int32_t csRadioTechV2 = static_cast<int32_t>(csRadioTechV2_);
+    int32_t cfgTechV2 = static_cast<int32_t>(cfgTechV2_);
     int32_t nrState = static_cast<int32_t>(nrState_);
     std::string psOperatorInfoStr =
         psOperatorInfo_.fullName + "|" + psOperatorInfo_.operatorNumeric + "|" + psOperatorInfo_.shortName;
@@ -390,7 +405,9 @@ std::string NetworkState::ToString() const
         ",csRoaming:" + std::to_string(csRoaming) + ",psRoaming:" + std::to_string(psRoaming) +
         ",psRegStatus:" + std::to_string(psRegStatus) + ",csRegStatus:" + std::to_string(csRegStatus) +
         ",cfgTech:" + std::to_string(cfgTech) + ",nrState:" + std::to_string(nrState) +
-        ",psRadioTech:" + std::to_string(psRadioTech) + ",csRadioTech:" + std::to_string(csRadioTech));
+        ",psRadioTech:" + std::to_string(psRadioTech) + ",csRadioTech:" + std::to_string(csRadioTech) +
+        ",cfgTechV2:" + std::to_string(cfgTechV2) + ",psRadioTechV2:" + std::to_string(psRadioTechV2) +
+        ",csRadioTechV2:" + std::to_string(csRadioTechV2));
     return content;
 }
 
@@ -408,6 +425,22 @@ RadioTech NetworkState::GetCfgTech() const
 RadioTech NetworkState::GetLastCfgTech() const
 {
     return lastCfgTech_;
+}
+
+void NetworkState::SetCfgTechV2(RadioTech tech)
+{
+    lastCfgTechV2_ = cfgTechV2_;
+    cfgTechV2_ = tech;
+}
+
+RadioTech NetworkState::GetCfgTechV2() const
+{
+    return cfgTechV2_;
+}
+
+RadioTech NetworkState::GetLastCfgTechV2() const
+{
+    return lastCfgTechV2_;
 }
 
 void NetworkState::SetNrState(NrState state)
