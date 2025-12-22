@@ -430,9 +430,8 @@ void MultiSimMonitor::InitListener()
         return;
     }
     auto retComEvt = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result is %{public}d", retComEvt);
     auto retStaReg = samgrProxy->SubscribeSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID result is %{public}d", retStaReg);
+    TELEPHONY_LOGI("SubscribeSystemAbility retComEvt is %{public}d, retStaReg is %{public}d", retComEvt, retStaReg);
     CheckOpcNeedUpdata(false);
 }
 
@@ -452,7 +451,6 @@ void MultiSimMonitor::SystemAbilityStatusChangeListener::OnAddSystemAbility(int3
             std::static_pointer_cast<MultiSimMonitor>(handler)->SubscribeUserSwitch();
             break;
         case TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID:
-            TELEPHONY_LOGI("TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID is running");
             std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateSimStateToStateRegistry();
             break;
         default:
