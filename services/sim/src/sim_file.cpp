@@ -184,7 +184,7 @@ void SimFile::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     auto itFunc = memberFuncMap_.find(id);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
+        if (memberFunc != nullptr && stateManager_ != nullptr && stateManager_->IsModemInitDone()) {
             bool isFileProcessResponse = memberFunc(event);
             ProcessFileLoaded(isFileProcessResponse);
         }
