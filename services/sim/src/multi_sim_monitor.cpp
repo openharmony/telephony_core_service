@@ -431,7 +431,7 @@ void MultiSimMonitor::InitListener()
     }
     auto retComEvt = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
     auto retStaReg = samgrProxy->SubscribeSystemAbility(TELEPHONY_STATE_REGISTRY_SYS_ABILITY_ID, statusChangeListener_);
-    TELEPHONY_LOGI("SubscribeSystemAbility retComEvt is %{public}d,  retStaReg is %{public}d", retComEvt, retStaReg);
+    TELEPHONY_LOGI("SubscribeSystemAbility retComEvt is %{public}d, retStaReg is %{public}d", retComEvt, retStaReg);
     CheckOpcNeedUpdata(false);
 }
 
