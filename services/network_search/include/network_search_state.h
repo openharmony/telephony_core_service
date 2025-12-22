@@ -36,13 +36,17 @@ public:
     void SetEmergency(bool isEmergency);
     bool IsEmergency();
     void SetNetworkType(RadioTech tech, DomainType domainType);
+    void SetNetworkTypeV2(RadioTech tech, DomainType domainType);
     void SetNetworkState(RegServiceState state, DomainType domainType);
     void SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType);
     void SetInitial();
     int32_t GetLastCfgTech(RadioTech &tech);
     int32_t GetLastPsRadioTech(RadioTech &tech);
+    int32_t GetLastCfgTechV2(RadioTech &tech);
+    int32_t GetLastPsRadioTechV2(RadioTech &tech);
     void SetNrState(NrState state);
     void SetCfgTech(RadioTech tech);
+    void SetCfgTechV2(RadioTech tech);
     std::unique_ptr<NetworkState> GetNetworkStatus();
     int32_t GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &info);
     void SetImsStatus(bool imsRegStatus);

@@ -50,42 +50,68 @@ static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHON
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *LOCATION = "ohos.permission.LOCATION";
 static constexpr const char *GET_NETWORK_INFO = "ohos.permission.GET_NETWORK_INFO";
+// 定义枚举名到 RatType 的映射表（静态常量）
+static constexpr std::pair<const char*, RatType> RADIO_TECH_MAP[] = {
+    {"RADIO_TECHNOLOGY_UNKNOWN", RatType::RADIO_TECHNOLOGY_UNKNOWN},
+    {"RADIO_TECHNOLOGY_GSM", RatType::RADIO_TECHNOLOGY_GSM},
+    {"RADIO_TECHNOLOGY_1XRTT", RatType::RADIO_TECHNOLOGY_1XRTT},
+    {"RADIO_TECHNOLOGY_WCDMA", RatType::RADIO_TECHNOLOGY_WCDMA},
+    {"RADIO_TECHNOLOGY_HSPA", RatType::RADIO_TECHNOLOGY_HSPA},
+    {"RADIO_TECHNOLOGY_HSPAP", RatType::RADIO_TECHNOLOGY_HSPAP},
+    {"RADIO_TECHNOLOGY_TD_SCDMA", RatType::RADIO_TECHNOLOGY_TD_SCDMA},
+    {"RADIO_TECHNOLOGY_EVDO", RatType::RADIO_TECHNOLOGY_EVDO},
+    {"RADIO_TECHNOLOGY_EHRPD", RatType::RADIO_TECHNOLOGY_EHRPD},
+    {"RADIO_TECHNOLOGY_LTE", RatType::RADIO_TECHNOLOGY_LTE},
+    {"RADIO_TECHNOLOGY_LTE_CA", RatType::RADIO_TECHNOLOGY_LTE_CA},
+    {"RADIO_TECHNOLOGY_IWLAN", RatType::RADIO_TECHNOLOGY_IWLAN},
+    {"RADIO_TECHNOLOGY_NR", RatType::RADIO_TECHNOLOGY_NR},
+    {"RADIO_TECHNOLOGY_NR_ENHANCED", RatType::RADIO_TECHNOLOGY_NR_ENHANCED},
+    {"RADIO_TECHNOLOGY_GPRS", RatType::RADIO_TECHNOLOGY_GPRS},
+    {"RADIO_TECHNOLOGY_EDGE", RatType::RADIO_TECHNOLOGY_EDGE},
+    {"RADIO_TECHNOLOGY_UMTS", RatType::RADIO_TECHNOLOGY_UMTS},
+    {"RADIO_TECHNOLOGY_HSDPA", RatType::RADIO_TECHNOLOGY_HSDPA},
+    {"RADIO_TECHNOLOGY_HSUPA", RatType::RADIO_TECHNOLOGY_HSUPA},
+    {"RADIO_TECHNOLOGY_IS95A", RatType::RADIO_TECHNOLOGY_IS95A},
+    {"RADIO_TECHNOLOGY_IS95B", RatType::RADIO_TECHNOLOGY_IS95B},
+    {"RADIO_TECHNOLOGY_EVDO_0", RatType::RADIO_TECHNOLOGY_EVDO_0},
+    {"RADIO_TECHNOLOGY_EVDO_A", RatType::RADIO_TECHNOLOGY_EVDO_A},
+    {"RADIO_TECHNOLOGY_EVDO_B", RatType::RADIO_TECHNOLOGY_EVDO_B},
+    {"RADIO_TECHNOLOGY_DCHSPAP", RatType::RADIO_TECHNOLOGY_DCHSPAP}
+};
 
 ImsRegStateCallback stateCallback_;
 
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
-    RadioTech techType = static_cast<RadioTech>(radioTechType);
-    switch (techType) {
-        case RadioTech::RADIO_TECHNOLOGY_GSM:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_GSM);
-        case RadioTech::RADIO_TECHNOLOGY_LTE:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE);
-        case RadioTech::RADIO_TECHNOLOGY_WCDMA:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_WCDMA);
-        case RadioTech::RADIO_TECHNOLOGY_1XRTT:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_1XRTT);
-        case RadioTech::RADIO_TECHNOLOGY_HSPA:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPA);
-        case RadioTech::RADIO_TECHNOLOGY_HSPAP:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPAP);
-        case RadioTech::RADIO_TECHNOLOGY_TD_SCDMA:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_TD_SCDMA);
-        case RadioTech::RADIO_TECHNOLOGY_EVDO:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EVDO);
-        case RadioTech::RADIO_TECHNOLOGY_EHRPD:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EHRPD);
-        case RadioTech::RADIO_TECHNOLOGY_LTE_CA:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE_CA);
-        case RadioTech::RADIO_TECHNOLOGY_IWLAN:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN);
-        case RadioTech::RADIO_TECHNOLOGY_NR:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR);
-        case RadioTech::RADIO_TECHNOLOGY_NR_ENHANCED:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED);
-        default:
-            return static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
-    }
+    static const std::map<RadioTech, RatType> radioTechMap = {
+        {RadioTech::RADIO_TECHNOLOGY_GSM, RatType::RADIO_TECHNOLOGY_GSM},
+        {RadioTech::RADIO_TECHNOLOGY_LTE, RatType::RADIO_TECHNOLOGY_LTE},
+        {RadioTech::RADIO_TECHNOLOGY_WCDMA, RatType::RADIO_TECHNOLOGY_WCDMA},
+        {RadioTech::RADIO_TECHNOLOGY_1XRTT, RatType::RADIO_TECHNOLOGY_1XRTT},
+        {RadioTech::RADIO_TECHNOLOGY_HSPA, RatType::RADIO_TECHNOLOGY_HSPA},
+        {RadioTech::RADIO_TECHNOLOGY_HSPAP, RatType::RADIO_TECHNOLOGY_HSPAP},
+        {RadioTech::RADIO_TECHNOLOGY_TD_SCDMA, RatType::RADIO_TECHNOLOGY_TD_SCDMA},
+        {RadioTech::RADIO_TECHNOLOGY_EVDO, RatType::RADIO_TECHNOLOGY_EVDO},
+        {RadioTech::RADIO_TECHNOLOGY_EHRPD, RatType::RADIO_TECHNOLOGY_EHRPD},
+        {RadioTech::RADIO_TECHNOLOGY_LTE_CA, RatType::RADIO_TECHNOLOGY_LTE_CA},
+        {RadioTech::RADIO_TECHNOLOGY_IWLAN, RatType::RADIO_TECHNOLOGY_IWLAN},
+        {RadioTech::RADIO_TECHNOLOGY_NR, RatType::RADIO_TECHNOLOGY_NR},
+        {RadioTech::RADIO_TECHNOLOGY_NR_ENHANCED, RatType::RADIO_TECHNOLOGY_NR_ENHANCED},
+        {RadioTech::RADIO_TECHNOLOGY_GPRS, RatType::RADIO_TECHNOLOGY_GPRS},
+        {RadioTech::RADIO_TECHNOLOGY_EDGE, RatType::RADIO_TECHNOLOGY_EDGE},
+        {RadioTech::RADIO_TECHNOLOGY_UMTS, RatType::RADIO_TECHNOLOGY_UMTS},
+        {RadioTech::RADIO_TECHNOLOGY_HSDPA, RatType::RADIO_TECHNOLOGY_HSDPA},
+        {RadioTech::RADIO_TECHNOLOGY_HSUPA, RatType::RADIO_TECHNOLOGY_HSUPA},
+        {RadioTech::RADIO_TECHNOLOGY_IS95A, RatType::RADIO_TECHNOLOGY_IS95A},
+        {RadioTech::RADIO_TECHNOLOGY_IS95B, RatType::RADIO_TECHNOLOGY_IS95B},
+        {RadioTech::RADIO_TECHNOLOGY_EVDO_0, RatType::RADIO_TECHNOLOGY_EVDO_0},
+        {RadioTech::RADIO_TECHNOLOGY_EVDO_A, RatType::RADIO_TECHNOLOGY_EVDO_A},
+        {RadioTech::RADIO_TECHNOLOGY_EVDO_B, RatType::RADIO_TECHNOLOGY_EVDO_B},
+        {RadioTech::RADIO_TECHNOLOGY_DCHSPAP, RatType::RADIO_TECHNOLOGY_DCHSPAP}
+    };
+    auto it = radioTechMap.find(static_cast<RadioTech>(radioTechType));
+    return (it != radioTechMap.end()) ? static_cast<int32_t>(it->second) :
+        static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN);
 }
 
 static int32_t WrapSignalInformationType(SignalInformation::NetworkType type)
@@ -3034,37 +3060,14 @@ static napi_value ObserverOff(napi_env env, napi_callback_info info)
 
 static napi_value InitEnumRadioType(napi_env env, napi_value exports)
 {
-    napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_UNKNOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_GSM", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_GSM))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_1XRTT",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_1XRTT))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_WCDMA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_WCDMA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_HSPA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_HSPAP",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPAP))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_TD_SCDMA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_TD_SCDMA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_EVDO",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EVDO))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_EHRPD",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EHRPD))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_LTE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_LTE_CA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE_CA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_IWLAN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
-    };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    // 构建 NAPI 属性描述符数组
+    napi_property_descriptor desc[std::size(RADIO_TECH_MAP)];
+    for (size_t i = 0; i < std::size(RADIO_TECH_MAP); ++i) {
+        desc[i] = DECLARE_NAPI_STATIC_PROPERTY(RADIO_TECH_MAP[i].first,
+        NapiUtil::ToInt32Value(env, static_cast<int32_t>(RADIO_TECH_MAP[i].second)));
+    }
+    // 使用 napi_define_properties 注册所有属性
+    NAPI_CALL(env, napi_define_properties(env, exports, std::size(desc), desc));
     return exports;
 }
 
@@ -3325,39 +3328,16 @@ static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info)
 
 static napi_value CreateRadioType(napi_env env, napi_value exports)
 {
-    napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_UNKNOWN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_UNKNOWN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_GSM", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_GSM))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_1XRTT",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_1XRTT))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_WCDMA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_WCDMA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_HSPA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_HSPAP",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_HSPAP))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_TD_SCDMA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_TD_SCDMA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_EVDO",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EVDO))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_EHRPD",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_EHRPD))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_LTE", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_LTE_CA",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_LTE_CA))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_IWLAN",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_IWLAN))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_TECHNOLOGY_NR", NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR))),
-        DECLARE_NAPI_STATIC_PROPERTY("RADIO_TECHNOLOGY_NR_ENHANCED",
-            NapiUtil::ToInt32Value(env, static_cast<int32_t>(RatType::RADIO_TECHNOLOGY_NR_ENHANCED))),
-    };
+    // 构建 NAPI 属性描述符数组
+    napi_property_descriptor desc[std::size(RADIO_TECH_MAP)];
+    for (size_t i = 0; i < std::size(RADIO_TECH_MAP); ++i) {
+        desc[i] = DECLARE_NAPI_STATIC_PROPERTY(RADIO_TECH_MAP[i].first,
+        NapiUtil::ToInt32Value(env, static_cast<int32_t>(RADIO_TECH_MAP[i].second)));
+    }
+    // 定义类并导出
     napi_value result = nullptr;
-    napi_define_class(env, "RadioTechnology", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_define_class(env, "RadioTechnology", NAPI_AUTO_LENGTH, CreateEnumConstructor, nullptr, std::size(desc), desc,
+        &result);
     napi_set_named_property(env, exports, "RadioTechnology", result);
     return exports;
 }
