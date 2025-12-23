@@ -1235,14 +1235,17 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | M
 
     EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_ADN), ELEMENTARY_FILE_ADN);
     EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_FDN), ELEMENTARY_FILE_FDN);
+    EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(DiallingNumbersInfo::SIM_SDN), ELEMENTARY_FILE_SDN);
     EXPECT_EQ(iccDiallingNumbersManager.GetFileIdForType(-1), 0);
 
     EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_ADN));
     EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_FDN));
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidType(DiallingNumbersInfo::SIM_SDN));
     EXPECT_FALSE(iccDiallingNumbersManager.IsValidType(-1));
 
     EXPECT_TRUE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_ADN, diallingNumbers));
     EXPECT_FALSE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_FDN, diallingNumbers));
+    EXPECT_TRUE(iccDiallingNumbersManager.IsValidParam(DiallingNumbersInfo::SIM_SDN, diallingNumbers));
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_SimSmsManager, Function | MediumTest | Level1)
