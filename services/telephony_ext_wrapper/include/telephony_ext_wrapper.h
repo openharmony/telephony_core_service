@@ -124,6 +124,7 @@ public:
     typedef void (*CacheAssetPinForUpgrade)(
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
+    typedef int32_t (*SEND_SIM_CHG_TYPE_INFO)(int32_t slotId, int32_t type);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -195,6 +196,7 @@ public:
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
+    SEND_SIM_CHG_TYPE_INFO sendSimChgTypeInfo_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
