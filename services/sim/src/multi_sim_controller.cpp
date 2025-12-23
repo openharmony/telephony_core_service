@@ -968,7 +968,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isUserSet)
         TELEPHONY_LOGW("satelliteStatusOn or simslots is mapping, no need check main slotId");
         return;
     }
-    if (isUserSet && IsNeedSetTargetPrimarySlotId()) {
+    if (!isUserSet && IsNeedSetTargetPrimarySlotId()) {
         return;
     }
     int32_t defaultSlotId = GetDefaultMainSlotByIccId();
