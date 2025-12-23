@@ -34,6 +34,7 @@ void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
         return;
     }
     uint32_t id = event->GetInnerEventId();
+    TELEPHONY_LOGD("SimSmsController ProcessEvent Id is %{public}d", id);
     switch (id) {
         case SIM_SMS_GET_COMPLETED:
             ProcessLoadDone(event);

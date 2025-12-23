@@ -836,7 +836,6 @@ void IccFile::ClearData()
     isOpl5gFilesPresent_ = false;
     isOplFileResponsed_ = false;
     isOpl5gFileResponsed_ = false;
-    fileToGet_ = 0;
     fileQueried_ = false;
     pnnFiles_.clear();
     oplFiles_.clear();
