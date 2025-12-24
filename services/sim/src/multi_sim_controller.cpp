@@ -1369,7 +1369,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     GetParameter(MAIN_CARD_ICCID_KEY.c_str(), "", oldMainCardIccId, SYSTEM_PARAMETER_LENGTH);
     char oldPrimarySlotId[SYSTEM_PARAMETER_LENGTH] = { 0 };
     GetParameter(PRIMARY_SLOTID_KEY.c_str(), "", oldPrimarySlotId, SYSTEM_PARAMETER_LENGTH);
-    SavePrimarySlotIdInfoStart(slotId);
+    SavePrimaryCardInfo(slotId);
     PublishSetPrimaryEvent(false, false);
     SendSimChgTypeInfo(slotId, isUserSet);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
@@ -1384,14 +1384,15 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         }
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    SavePrimarySlotIdInfoSucc(slotId);
+    SendMainCardBroadCast(slotId);
+    SetDefaultCellularDataSlotId(slotId);
     SetPrimarySlotIdDone(false);
     setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
 }
 
-void MultiSimController::SavePrimarySlotIdInfoStart(int32_t slotId)
+void MultiSimController::SavePrimaryCardInfo(int32_t slotId)
 {
     lastPrimarySlotId_ = slotId;
     SetParameter(PRIMARY_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
@@ -1407,25 +1408,33 @@ void MultiSimController::SavePrimarySlotIdInfoStart(int32_t slotId)
     }
 }
  
-inline void MultiSimController::SavePrimarySlotIdInfoFail(const char* oldPrimarySlotId, const char* oldMainCardIccId)
+void MultiSimController::ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId)
 {
-    lastPrimarySlotId_ = std::stoi(oldPrimarySlotId);
+    if (oldPrimarySlotId == nullptr) {
+        return;
+    }
+    if (oldPrimarySlotId[0] == '\0') {
+        return;
+    }
+    bool isValid = true;
+    for (int i = 0; oldPrimarySlotId[i] != '\0'; ++i) {
+        if (!std::isdigit(oldPrimarySlotId[i])) {
+            isValid = false;
+            break;
+        }
+    }
+    if (!isValid) {
+        return;
+    }
+    lastPrimarySlotId_ = std::strtol(oldPrimarySlotId, nullptr, DEC_TYPE);
     SetParameter(PRIMARY_SLOTID_KEY.c_str(), oldPrimarySlotId);
     SetParameter(MAIN_CARD_ICCID_KEY.c_str(), oldMainCardIccId);
-}
- 
-inline void MultiSimController::SavePrimarySlotIdInfoSucc(int32_t slotId)
-{
-    SendMainCardBroadCast(slotId);
-    SetDefaultCellularDataSlotId(slotId);
 }
  
 inline void MultiSimController::SendSimChgTypeInfo(int32_t slotId, bool isUserSet)
 {
     int32_t type = isUserSet ? SWITCH_SLOT_SIM_DONE: SWITCH_SLOT_AUTO;
-    if (TELEPHONY_EXT_WRAPPER.sendSimChgTypeInfo_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.sendSimChgTypeInfo_(slotId, type);
-    }
+    TELEPHONY_EXT_WRAPPER.SendSimChgTypeInfo(slotId, type);
 }
 
 void MultiSimController::ResetSetPrimarySlotRemain(int32_t slotId)

@@ -1425,5 +1425,36 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetTargetPrimarySlotId00
     EXPECT_TRUE(ret);
     multiSimController->RemoveEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
 }
+
+HWTEST_F(MultiSimControllerTest, SavePrimaryCardInfoTest_SetPrimarySlotid, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager;
+    simStateManager.push_back(simStateManager0);
+    
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_;
+    simFileManager_.push_back(simFileManager);
+    
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager_);
+    auto mocksimFileManager = std::make_shared<MockSimFileManager>(telRilManager, simStateManager0);
+ 
+    EXPECT_CALL(*mocksimFileManager, GetSimIccId()).WillRepeatedly(Return(u"123456789012345678"));
+    multiSimController->SavePrimaryCardInfo(0);
+    EXPECT_EQ(multiSimController->lastPrimarySlotId_, 0);
+ 
+    EXPECT_CALL(*mocksimFileManager, GetSimIccId()).WillRepeatedly(Return(u""));
+    multiSimController->SavePrimaryCardInfo(0);
+    EXPECT_EQ(multiSimController->lastPrimarySlotId_, 0);
+ 
+    multiSimController->simFileManager_[0] = nullptr;
+    multiSimController->SavePrimaryCardInfo(0);
+    EXPECT_EQ(multiSimController->lastPrimarySlotId_, 0);
+}
 }
 }
