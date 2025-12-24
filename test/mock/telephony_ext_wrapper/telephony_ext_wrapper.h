@@ -219,28 +219,19 @@ inline bool CheckOpcVersionIsUpdateImpl()
 {
     return false;
 }
-inline void UpdateOpcVersionImpl()
-{}
-inline void GetVoiceMailIccidParameterImpl(int32_t, const char *, std::string &)
-{}
-inline void SetVoiceMailIccidParameterImpl(int32_t, const char *, const char *)
-{}
-inline void InitVoiceMailManagerExtImpl(int32_t)
-{}
-inline void DeinitVoiceMailManagerExtImpl(int32_t)
-{}
-inline void ResetVoiceMailLoadedFlagExtImpl(int32_t)
-{}
-inline void SetVoiceMailOnSimExtImpl(int32_t, const char *, const char *)
-{}
+inline void UpdateOpcVersionImpl() {}
+inline void GetVoiceMailIccidParameterImpl(int32_t, const char *, std::string &) {}
+inline void SetVoiceMailIccidParameterImpl(int32_t, const char *, const char *) {}
+inline void InitVoiceMailManagerExtImpl(int32_t) {}
+inline void DeinitVoiceMailManagerExtImpl(int32_t) {}
+inline void ResetVoiceMailLoadedFlagExtImpl(int32_t) {}
+inline void SetVoiceMailOnSimExtImpl(int32_t, const char *, const char *) {}
 inline bool GetVoiceMailFixedExtImpl(int32_t, const char *)
 {
     return false;
 }
-inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &)
-{}
-inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &)
-{}
+inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &) {}
+inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &) {}
 inline void ResetVoiceMailManagerExtImpl(int32_t)
 {}
 inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &)
@@ -401,7 +392,6 @@ inline TelephonyExtWrapper::~TelephonyExtWrapper() = default;
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
 {
-    TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
     telephonyExtWrapperHandle_ = NONULL_HANDLE;
     InitTelephonyExtWrapperForDynamicLoad();
     InitTelephonyExtWrapperForSim();
@@ -412,7 +402,6 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
     InitTelephonyExtWrapperForApnCust();
     InitTelephonyExtWrapperForOpkeyVersion();
     InitTelephonyExtWrapperForOpnameVersion();
-    TELEPHONY_LOGI("TelephonyExtWrapper init success");
 }
 
 inline void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
@@ -420,7 +409,6 @@ inline void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
     if (dynamicLoadDeInit_ != nullptr) {
         dynamicLoadDeInit_();
     }
-    TELEPHONY_LOGI("DeInitTelephonyExtWrapper success");
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
