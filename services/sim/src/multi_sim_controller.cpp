@@ -911,7 +911,6 @@ int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable
     }
     isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_IN_PROGRESS;
     if (force) {
-        TELEPHONY_LOGD("no need to update cache");
         UpdateSubState(slotId, enable);
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -1025,7 +1024,6 @@ int32_t MultiSimController::GetDefaultMainSlotByIccId()
     std::string iccIdSub1 = Str16ToStr8(simFileManager_[SIM_SLOT_0]->GetSimIccId());
     std::string iccIdSub2 = Str16ToStr8(simFileManager_[SIM_SLOT_1]->GetSimIccId());
     if (iccIdSub1.empty() || iccIdSub2.empty()) {
-        TELEPHONY_LOGD("iccid is null");
         return mainSlot;
     }
     std::string encryptIccIdSub1 = EncryptIccId(iccIdSub1);
@@ -1198,7 +1196,6 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
 
 int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
 {
-    TELEPHONY_LOGD("slotId %{public}d", slotId);
     int curSimId = 0;
     int32_t ret = GetTargetDefaultSimId(slotId, curSimId);
     if (ret != TELEPHONY_ERR_SUCCESS) {
@@ -1261,7 +1258,6 @@ int32_t MultiSimController::GetTargetDefaultSimId(int32_t slotId, int &simId)
 
 int32_t MultiSimController::GetDefaultCellularDataSlotId()
 {
-    TELEPHONY_LOGD("start lastCellularDataSlotId_ is %{public}d", lastCellularDataSlotId_);
     return lastCellularDataSlotId_;
 }
 
@@ -1274,7 +1270,6 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 
 int32_t MultiSimController::GetPrimarySlotId()
 {
-    TELEPHONY_LOGD("start lastPrimarySlotId_ is %{public}d", lastPrimarySlotId_);
     return lastPrimarySlotId_;
 }
 
@@ -1681,7 +1676,6 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
     lock.unlock();
-    TELEPHONY_LOGD("Get the SIM name set by the user");
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1812,7 +1806,6 @@ bool MultiSimController::PublishSimFileEvent(const AAFwk::Want &want, int eventC
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(false);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGD("end###publishResult = %{public}d", publishResult);
     return publishResult;
 }
 
@@ -1917,7 +1910,6 @@ bool MultiSimController::IsSetActiveSimInProgress(int32_t slotId)
         TELEPHONY_LOGE("invalid slotId %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGD("isSetActiveSimInProgress_ %{public}d, is %{public}d", slotId, isSetActiveSimInProgress_[slotId]);
     return static_cast<bool>(isSetActiveSimInProgress_[slotId]);
 }
 
@@ -1935,7 +1927,6 @@ int32_t MultiSimController::SavePrimarySlotId(int32_t slotId)
 
 int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
 {
-    TELEPHONY_LOGD("slotId = %{public}d", slotId);
     if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
         return TELEPHONY_ERR_FAIL;
@@ -1954,7 +1945,6 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     SetPrimarySlotIdDone(true);
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
-    TELEPHONY_LOGD("SetPrimarySlotIdWithoutModemReboot finish");
     return TELEPHONY_ERR_SUCCESS;
 }
 
