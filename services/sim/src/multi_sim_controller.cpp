@@ -1373,7 +1373,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     PublishSetPrimaryEvent(false, false);
     SendSimChgTypeInfo(slotId, isUserSet);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
-        SavePrimarySlotIdInfoFail(oldPrimarySlotId, oldMainCardIccId);
+        ResumePrimaryCardInfo(oldPrimarySlotId, oldMainCardIccId);
         TELEPHONY_LOGE("SetRadioProtocol failed");
         SetPrimarySlotIdDone(false);
         if (setPrimarySlotRemainCount_[slotId] > 0) {
