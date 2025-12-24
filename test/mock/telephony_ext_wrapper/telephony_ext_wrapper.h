@@ -122,7 +122,7 @@ public:
     typedef void (*CacheAssetPinForUpgrade)(
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
-    typedef int32_t (*SEND_SIM_CHG_TYPE_INFO)(int32_t slotId, int32_t type);
+    typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -194,13 +194,14 @@ public:
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
-    SEND_SIM_CHG_TYPE_INFO sendSimChgTypeInfo_ = nullptr;
+    void SendSimChgTypeInfo(int32_t slotId, int32_t type);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
     void* telephonyDynamicLoadWrapperHandle_ = nullptr;
     GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
+    SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -388,7 +389,7 @@ inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
 }
-inline int32_t SendSimChgTypeInfo(int32_t slotId, int32_t type)
+inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
     return 0;
 }
@@ -512,7 +513,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     updateHotPlugCardState_ = &UpdateHotPlugCardStateImpl;
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
-    sendSimChgTypeInfo_  = &SendSimChgTypeInfo;
+    sendSimChgTypeInfo_  = &SendSimChgTypeInfoImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
@@ -541,6 +542,13 @@ inline bool TelephonyExtWrapper::GetStkBundleName(std::string &bundleName)
         getStkBundleNameFunc_(bundleName);
     }
     return !bundleName.empty();
+}
+
+inline void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type)
+{
+    if (sendSimChgTypeInfo_ != nullptr) {
+        sendSimChgTypeInfo_(slotId, type);
+    }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony

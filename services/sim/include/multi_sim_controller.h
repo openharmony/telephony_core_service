@@ -168,9 +168,8 @@ private:
     void ResetPrimarySlotReady();
     void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
     void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
-    void SavePrimarySlotIdInfoStart(int32_t slotId);
-    void SavePrimarySlotIdInfoFail(const char* oldPrimarySlotId, const char* oldMainCardIccId);
-    void SavePrimarySlotIdInfoSucc(int32_t slotId);
+    void SavePrimaryCardInfo(int32_t slotId);
+    void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;

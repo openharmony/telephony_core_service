@@ -243,7 +243,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     getStkBundleNameFunc_ = (GetStkBundleNameFunc) dlsym(telephonyExtWrapperHandle_, "GetStkBundleName");
     updateHotPlugCardState_ = (UpdateHotplugCardState)dlsym(telephonyExtWrapperHandle_, "UpdateHotPlugCardState");
     cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
-    sendSimChgTypeInfo_ = (SEND_SIM_CHG_TYPE_INFO)dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo");
+    sendSimChgTypeInfo_ =
+        reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
                         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
                         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
@@ -308,6 +309,13 @@ bool TelephonyExtWrapper::GetStkBundleName(std::string &bundleName)
         getStkBundleNameFunc_(bundleName);
     }
     return !bundleName.empty();
+}
+
+void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type)
+{
+    if (sendSimChgTypeInfo_ != nullptr) {
+        sendSimChgTypeInfo_(slotId, type);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
