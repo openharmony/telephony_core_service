@@ -457,7 +457,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
         simStateManager, simFileManager);
     EXPECT_CALL(*multiSimControllerMock, GetDefaultMainSlotByIccId()).WillRepeatedly(Return(0));
-    multiSimController->CheckIfNeedSwitchMainSlotId();
+    multiSimController->CheckIfNeedSwitchMainSlotId(true);
     multiSimController->IsAllModemInitDone();
     multiSimController->ReCheckPrimary();
     int simId = 0;

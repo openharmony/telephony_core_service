@@ -55,6 +55,9 @@ constexpr int32_t PSIM2_ESIM = 2;
 constexpr int32_t SIMID_INDEX0 = 0;
 constexpr int32_t EMPTY_ICCID_LEN = 10;
 constexpr int32_t DEC_TYPE = 10;
+constexpr int32_t SWITCH_SLOT_AUTO = 0;
+constexpr int32_t SWITCH_SLOT_MANUL = 1;
+constexpr int32_t SWITCH_SLOT_SIM_DONE = 2;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
@@ -221,7 +224,7 @@ bool MultiSimController::InitData(int32_t slotId)
     }
     if (InitPrimary(slotId, true)) {
         TELEPHONY_LOGI("InitPrimary start");
-        CheckIfNeedSwitchMainSlotId();
+        CheckIfNeedSwitchMainSlotId(false);
     }
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
@@ -284,7 +287,7 @@ bool MultiSimController::InitPrimary(int32_t slotId, bool isFirstInit)
 void MultiSimController::ReCheckPrimary()
 {
     if (InitPrimary(INVALID_VALUE, false)) {
-        CheckIfNeedSwitchMainSlotId();
+        CheckIfNeedSwitchMainSlotId(false);
     }
 }
 
@@ -875,7 +878,7 @@ int32_t MultiSimController::SetActiveCommonSim(int32_t slotId, int32_t enable, b
     allLocalCacheInfo_[curSimId - 1].isActive = enable;
     lock.unlock();
     UpdateSubState(slotId, enable);
-    CheckIfNeedSwitchMainSlotId(false);
+    CheckIfNeedSwitchMainSlotId(true);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -908,7 +911,6 @@ int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable
     }
     isSetActiveSimInProgress_[slotId] = ACTIVE_SIM_IN_PROGRESS;
     if (force) {
-        TELEPHONY_LOGD("no need to update cache");
         UpdateSubState(slotId, enable);
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -939,7 +941,7 @@ int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable
     allLocalCacheInfo_[curSimId - 1].isActive = enable;
     lock.unlock();
     UpdateSubState(slotId, enable);
-    CheckIfNeedSwitchMainSlotId(false);
+    CheckIfNeedSwitchMainSlotId(true);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -958,31 +960,32 @@ bool MultiSimController::IsNeedSetTargetPrimarySlotId()
     return false;
 }
 
-void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
+void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isUserSet)
 {
     if ((IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
         CoreManagerInner::GetInstance().IsSatelliteEnabled()) || IsSimSlotsMapping()) {
         TELEPHONY_LOGW("satelliteStatusOn or simslots is mapping, no need check main slotId");
         return;
     }
-    if (isInit && IsNeedSetTargetPrimarySlotId()) {
+    if (!isUserSet && IsNeedSetTargetPrimarySlotId()) {
         return;
     }
     int32_t defaultSlotId = GetDefaultMainSlotByIccId();
     if (IsSimActive(defaultSlotId)) {
         if (IsAllCardsReady()) {
+            isUserSet = isRilSetPrimarySlotSupport_ ? true : isUserSet;
             TELEPHONY_LOGI("defaultSlotId changed, need to set slot%{public}d primary", defaultSlotId);
-            std::thread initDataTask([&, defaultSlotId = defaultSlotId]() {
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isUserSet = isUserSet]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, true);
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, isUserSet);
             });
             initDataTask.detach();
         } else if (radioProtocolController_ != nullptr &&
-            radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) != MODEM_ID_0 && isInit) {
+            radioProtocolController_->GetRadioProtocolModemId(defaultSlotId) != MODEM_ID_0) {
             TELEPHONY_LOGI("main slot is different with modemid, need to set slot%{public}d primary", defaultSlotId);
-            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isInit = isInit]() {
+            std::thread initDataTask([&, defaultSlotId = defaultSlotId, isUserSet  = isUserSet ]() {
                 pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, !isInit);
+                CoreManagerInner::GetInstance().SetPrimarySlotId(defaultSlotId, isUserSet);
             });
             initDataTask.detach();
         } else {
@@ -997,11 +1000,11 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isInit)
         TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
         if (radioProtocolController_ != nullptr &&
             radioProtocolController_->GetRadioProtocolModemId(firstActivedSlotId) == MODEM_ID_0) {
-            isInit = false;
+            isUserSet = isRilSetPrimarySlotSupport_ ? true : isUserSet;
         }
-        std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId, isInit = isInit]() {
+        std::thread initDataTask([&, firstActivedSlotId = firstActivedSlotId, isUserSet = isUserSet]() {
             pthread_setname_np(pthread_self(), "SetPrimarySlotId");
-            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, !isInit);
+            CoreManagerInner::GetInstance().SetPrimarySlotId(firstActivedSlotId, isUserSet);
         });
         initDataTask.detach();
     }
@@ -1021,7 +1024,6 @@ int32_t MultiSimController::GetDefaultMainSlotByIccId()
     std::string iccIdSub1 = Str16ToStr8(simFileManager_[SIM_SLOT_0]->GetSimIccId());
     std::string iccIdSub2 = Str16ToStr8(simFileManager_[SIM_SLOT_1]->GetSimIccId());
     if (iccIdSub1.empty() || iccIdSub2.empty()) {
-        TELEPHONY_LOGD("iccid is null");
         return mainSlot;
     }
     std::string encryptIccIdSub1 = EncryptIccId(iccIdSub1);
@@ -1194,7 +1196,6 @@ int32_t MultiSimController::GetDefaultSmsSlotId()
 
 int32_t MultiSimController::SetDefaultSmsSlotId(int32_t slotId)
 {
-    TELEPHONY_LOGD("slotId %{public}d", slotId);
     int curSimId = 0;
     int32_t ret = GetTargetDefaultSimId(slotId, curSimId);
     if (ret != TELEPHONY_ERR_SUCCESS) {
@@ -1257,7 +1258,6 @@ int32_t MultiSimController::GetTargetDefaultSimId(int32_t slotId, int &simId)
 
 int32_t MultiSimController::GetDefaultCellularDataSlotId()
 {
-    TELEPHONY_LOGD("start lastCellularDataSlotId_ is %{public}d", lastCellularDataSlotId_);
     return lastCellularDataSlotId_;
 }
 
@@ -1270,7 +1270,6 @@ int32_t MultiSimController::SetDefaultCellularDataSlotId(int32_t slotId)
 
 int32_t MultiSimController::GetPrimarySlotId()
 {
-    TELEPHONY_LOGD("start lastPrimarySlotId_ is %{public}d", lastPrimarySlotId_);
     return lastPrimarySlotId_;
 }
 
@@ -1346,7 +1345,6 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
         return TELEPHONY_ERR_FAIL;
     }
-
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("no sim card");
         return TELEPHONY_ERR_NO_SIM_CARD;
@@ -1359,11 +1357,18 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
         return TELEPHONY_ERR_SUCCESS;
     }
-    // change protocol for default cellulardata slotId
+    // save before change protocol, rollback when change failure, send BroadCast after change successful
     isSetPrimarySlotIdInProgress_ = true;
     SetInSenseSwitchPhase(true);
+    char oldMainCardIccId[SYSTEM_PARAMETER_LENGTH] = { 0 };
+    GetParameter(MAIN_CARD_ICCID_KEY.c_str(), "", oldMainCardIccId, SYSTEM_PARAMETER_LENGTH);
+    char oldPrimarySlotId[SYSTEM_PARAMETER_LENGTH] = { 0 };
+    GetParameter(PRIMARY_SLOTID_KEY.c_str(), "", oldPrimarySlotId, SYSTEM_PARAMETER_LENGTH);
+    SavePrimaryCardInfo(slotId);
     PublishSetPrimaryEvent(false, false);
+    SendSimChgTypeInfo(slotId, isUserSet);
     if (radioProtocolController_ == nullptr || !radioProtocolController_->SetRadioProtocol(slotId)) {
+        ResumePrimaryCardInfo(oldPrimarySlotId, oldMainCardIccId);
         TELEPHONY_LOGE("SetRadioProtocol failed");
         SetPrimarySlotIdDone(false);
         if (setPrimarySlotRemainCount_[slotId] > 0) {
@@ -1374,11 +1379,57 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         }
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    SavePrimarySlotIdInfo(slotId);
+    SendMainCardBroadCast(slotId);
+    SetDefaultCellularDataSlotId(slotId);
     SetPrimarySlotIdDone(false);
     setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+void MultiSimController::SavePrimaryCardInfo(int32_t slotId)
+{
+    lastPrimarySlotId_ = slotId;
+    SetParameter(PRIMARY_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
+    if (simFileManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("simFileManager_ is null slotId is %{public}d", slotId);
+        return;
+    }
+    std::string iccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
+    TELEPHONY_LOGI("save data is empty %{public}d", iccId.empty());
+    if (!iccId.empty()) {
+        std::string encryptIccId = EncryptIccId(iccId);
+        SetParameter(MAIN_CARD_ICCID_KEY.c_str(), encryptIccId.c_str());
+    }
+}
+ 
+void MultiSimController::ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId)
+{
+    if (oldPrimarySlotId == nullptr) {
+        return;
+    }
+    if (oldPrimarySlotId[0] == '\0') {
+        return;
+    }
+    bool isValid = true;
+    for (int i = 0; oldPrimarySlotId[i] != '\0'; ++i) {
+        if (!std::isdigit(oldPrimarySlotId[i])) {
+            isValid = false;
+            break;
+        }
+    }
+    if (!isValid) {
+        return;
+    }
+    lastPrimarySlotId_ = std::strtol(oldPrimarySlotId, nullptr, DEC_TYPE);
+    SetParameter(PRIMARY_SLOTID_KEY.c_str(), oldPrimarySlotId);
+    SetParameter(MAIN_CARD_ICCID_KEY.c_str(), oldMainCardIccId);
+}
+ 
+inline void MultiSimController::SendSimChgTypeInfo(int32_t slotId, bool isUserSet)
+{
+    int32_t type = isUserSet ? SWITCH_SLOT_SIM_DONE: SWITCH_SLOT_AUTO;
+    TELEPHONY_EXT_WRAPPER.SendSimChgTypeInfo(slotId, type);
 }
 
 void MultiSimController::ResetSetPrimarySlotRemain(int32_t slotId)
@@ -1625,7 +1676,6 @@ int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName
     }
     showName = Str8ToStr16(localCacheInfo_[slotId].showName);
     lock.unlock();
-    TELEPHONY_LOGD("Get the SIM name set by the user");
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1756,7 +1806,6 @@ bool MultiSimController::PublishSimFileEvent(const AAFwk::Want &want, int eventC
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(false);
     bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGD("end###publishResult = %{public}d", publishResult);
     return publishResult;
 }
 
@@ -1861,7 +1910,6 @@ bool MultiSimController::IsSetActiveSimInProgress(int32_t slotId)
         TELEPHONY_LOGE("invalid slotId %{public}d", slotId);
         return false;
     }
-    TELEPHONY_LOGD("isSetActiveSimInProgress_ %{public}d, is %{public}d", slotId, isSetActiveSimInProgress_[slotId]);
     return static_cast<bool>(isSetActiveSimInProgress_[slotId]);
 }
 
@@ -1879,7 +1927,6 @@ int32_t MultiSimController::SavePrimarySlotId(int32_t slotId)
 
 int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
 {
-    TELEPHONY_LOGD("slotId = %{public}d", slotId);
     if (TELEPHONY_EXT_WRAPPER.isHandleVSim_ && TELEPHONY_EXT_WRAPPER.isHandleVSim_()) {
         TELEPHONY_LOGE("in vsim handle, not allowed switch card");
         return TELEPHONY_ERR_FAIL;
@@ -1898,7 +1945,6 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
     SavePrimarySlotIdInfo(slotId);
     SetPrimarySlotIdDone(true);
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
-    TELEPHONY_LOGD("SetPrimarySlotIdWithoutModemReboot finish");
     return TELEPHONY_ERR_SUCCESS;
 }
 

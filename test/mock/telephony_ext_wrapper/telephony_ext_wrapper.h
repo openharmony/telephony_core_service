@@ -122,6 +122,7 @@ public:
     typedef void (*CacheAssetPinForUpgrade)(
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
+    typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -193,12 +194,14 @@ public:
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
+    void SendSimChgTypeInfo(int32_t slotId, int32_t type);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
     void* telephonyDynamicLoadWrapperHandle_ = nullptr;
     GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
+    SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -216,28 +219,19 @@ inline bool CheckOpcVersionIsUpdateImpl()
 {
     return false;
 }
-inline void UpdateOpcVersionImpl()
-{}
-inline void GetVoiceMailIccidParameterImpl(int32_t, const char *, std::string &)
-{}
-inline void SetVoiceMailIccidParameterImpl(int32_t, const char *, const char *)
-{}
-inline void InitVoiceMailManagerExtImpl(int32_t)
-{}
-inline void DeinitVoiceMailManagerExtImpl(int32_t)
-{}
-inline void ResetVoiceMailLoadedFlagExtImpl(int32_t)
-{}
-inline void SetVoiceMailOnSimExtImpl(int32_t, const char *, const char *)
-{}
+inline void UpdateOpcVersionImpl() {}
+inline void GetVoiceMailIccidParameterImpl(int32_t, const char *, std::string &) {}
+inline void SetVoiceMailIccidParameterImpl(int32_t, const char *, const char *) {}
+inline void InitVoiceMailManagerExtImpl(int32_t) {}
+inline void DeinitVoiceMailManagerExtImpl(int32_t) {}
+inline void ResetVoiceMailLoadedFlagExtImpl(int32_t) {}
+inline void SetVoiceMailOnSimExtImpl(int32_t, const char *, const char *) {}
 inline bool GetVoiceMailFixedExtImpl(int32_t, const char *)
 {
     return false;
 }
-inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &)
-{}
-inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &)
-{}
+inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &) {}
+inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &) {}
 inline void ResetVoiceMailManagerExtImpl(int32_t)
 {}
 inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &)
@@ -386,6 +380,10 @@ inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
 }
+inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
+{
+    return 0;
+}
 
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
@@ -394,7 +392,6 @@ inline TelephonyExtWrapper::~TelephonyExtWrapper() = default;
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
 {
-    TELEPHONY_LOGD("TelephonyExtWrapper::InitTelephonyExtWrapper() start");
     telephonyExtWrapperHandle_ = NONULL_HANDLE;
     InitTelephonyExtWrapperForDynamicLoad();
     InitTelephonyExtWrapperForSim();
@@ -405,7 +402,6 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
     InitTelephonyExtWrapperForApnCust();
     InitTelephonyExtWrapperForOpkeyVersion();
     InitTelephonyExtWrapperForOpnameVersion();
-    TELEPHONY_LOGI("TelephonyExtWrapper init success");
 }
 
 inline void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
@@ -413,7 +409,6 @@ inline void TelephonyExtWrapper::DeInitTelephonyExtWrapper()
     if (dynamicLoadDeInit_ != nullptr) {
         dynamicLoadDeInit_();
     }
-    TELEPHONY_LOGI("DeInitTelephonyExtWrapper success");
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
@@ -506,6 +501,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     updateHotPlugCardState_ = &UpdateHotPlugCardStateImpl;
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
+    sendSimChgTypeInfo_  = &SendSimChgTypeInfoImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
@@ -534,6 +530,13 @@ inline bool TelephonyExtWrapper::GetStkBundleName(std::string &bundleName)
         getStkBundleNameFunc_(bundleName);
     }
     return !bundleName.empty();
+}
+
+inline void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type)
+{
+    if (sendSimChgTypeInfo_ != nullptr) {
+        sendSimChgTypeInfo_(slotId, type);
+    }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
