@@ -346,7 +346,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         return;
     }
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
-        ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId))) {
+        (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN)) {
         HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or is esim", slotId);
         simFileManager->ClearData();
         controller_->ForgetAllData(slotId);
@@ -357,11 +357,6 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
         initDataRemainCount_[slotId] = INIT_DATA_TIMES;
         std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
         controller_->loadedSimCardInfo_.erase(slotId);
-    } else if (simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
-                !controller_->IsSetPrimarySlotIdInProgress()) {
-        HILOG_COMM_INFO("MultiSimMonitor::RefreshData clear data when sim is unknown");
-        simFileManager->ClearData();
-        isSimAccountLoaded_[slotId] = 0;
     }
     if (controller_->unInitModemSlotId_ == slotId) {
         TELEPHONY_LOGI("need to recheck primary");

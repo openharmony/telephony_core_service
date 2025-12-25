@@ -159,7 +159,6 @@ bool SimStateHandle::HasSimCard()
         (iccState_.simStatus_ == ICC_CONTENT_UNKNOWN && CoreManagerInner::GetInstance().IsEsim(slotId_))) {
         has = false;
     }
-    TELEPHONY_LOGD("SimStateHandle::HasSimCard(), has = %{public}d", has);
     return has;
 }
 
@@ -180,7 +179,6 @@ void SimStateHandle::SetSimState(SimState simState)
 
 CardType SimStateHandle::GetCardType()
 {
-    TELEPHONY_LOGD("SimStateHandle::GetCardType() externalType_=%{public}d", static_cast<int32_t>(externalType_));
     return externalType_;
 }
 
@@ -620,7 +618,6 @@ std::string SimStateHandle::GetAidByCardType(CardType type)
 
 void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGD("SimStateHandle::GetSimCardData slotId = %{public}d", slotId);
     if (isInSenseSwitchPhase_) {
         // In sense switching, response data may be fault
         TELEPHONY_LOGI("GetSimCardData slotId: %{public}d inSenseSwitchPhase, return", slotId);
@@ -817,7 +814,6 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
         return;
     }
     uint32_t eventId = event->GetInnerEventId();
-    TELEPHONY_LOGD("SimStateHandle::ProcessEvent(), eventId = %{public}d, slotId_ = %{public}d", eventId, slotId_);
     auto itFunc = memberFuncMap_.find(eventId);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;

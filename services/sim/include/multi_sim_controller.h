@@ -97,7 +97,7 @@ public:
     int32_t ClearSimLabel(SimType simType);
     int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent);
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
-    void CheckIfNeedSwitchMainSlotId(bool isInit = true);
+    void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
 
 public:
@@ -167,6 +167,9 @@ private:
     bool IsSetPrimarySlotReady(int32_t slotId);
     void ResetPrimarySlotReady();
     void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
+    void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
+    void SavePrimaryCardInfo(int32_t slotId);
+    void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
