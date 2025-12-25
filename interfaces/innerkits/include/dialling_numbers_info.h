@@ -35,6 +35,10 @@ public:
          * Abbreviated dialing numbers
          */
         SIM_FDN = 2,
+        /**
+         * Service Dialling Numbers
+         */
+        SIM_SDN = 3,
     };
     static const int EMPTY_INDEX = 0;
     int32_t elementaryFileId_ = 0;

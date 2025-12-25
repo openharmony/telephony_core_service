@@ -366,6 +366,8 @@ int IccDiallingNumbersManager::GetFileIdForType(int fileType)
         fileId = ELEMENTARY_FILE_ADN; //  ELEMENTARY_FILE_PBR  for usim
     } else if (fileType == DiallingNumbersInfo::SIM_FDN) {
         fileId = ELEMENTARY_FILE_FDN;
+    } else if (fileType == DiallingNumbersInfo::SIM_SDN) {
+        fileId = ELEMENTARY_FILE_SDN;
     }
     return fileId;
 }
@@ -388,6 +390,7 @@ bool IccDiallingNumbersManager::IsValidType(int type)
     switch (type) {
         case DiallingNumbersInfo::SIM_ADN:
         case DiallingNumbersInfo::SIM_FDN:
+        case DiallingNumbersInfo::SIM_SDN:
             return true;
         default:
             return false;
