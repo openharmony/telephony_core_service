@@ -2968,8 +2968,6 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
 
 static bool UnregisterImsRegStateCallback(napi_env env, int32_t slotId, ImsServiceType imsSrvType)
 {
-    napi_delete_reference(env, stateCallback_.thisVar);
-    napi_delete_reference(env, stateCallback_.callbackRef);
     int32_t ret = DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->UnregisterImsRegStateCallback(
         env, slotId, imsSrvType);
     if (ret != TELEPHONY_SUCCESS) {
