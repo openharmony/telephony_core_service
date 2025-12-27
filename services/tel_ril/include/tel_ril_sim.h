@@ -57,6 +57,8 @@ public:
     int32_t GetRadioProtocol(const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SetRadioProtocol(RadioProtocol radioProtocol, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimOpenLogicalChannel(std::string appID, int32_t p2, const AppExecFwk::InnerEvent::Pointer &response);
+    int32_t SimOpenLogicalChannelWithPort(std::string appID, int32_t p2, int32_t portIndex,
+        const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response);
     int32_t SimTransmitApduLogicalChannel(
         const ApduSimIORequestInfo &reqInfo, const AppExecFwk::InnerEvent::Pointer &response);
