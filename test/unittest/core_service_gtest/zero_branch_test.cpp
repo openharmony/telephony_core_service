@@ -2551,5 +2551,40 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_007, Function | MediumTest | L
     multiSimController->SetInSenseSwitchPhase(flag);
     EXPECT_NE(multiSimController->simStateManager_[0], nullptr);
 }
+
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Refreshdata, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
+    multiSimMonitor->initDataRemainCount_.resize(SIM_SLOT_COUNT, 5);
+    multiSimController->setPrimarySlotRemainCount_.resize(2, 5);
+    multiSimMonitor->RefreshData(INVALID_SLOTID);
+    auto stateManager = multiSimMonitor->simStateManager_[0];
+    auto controller = multiSimMonitor->controller_;
+    stateManager->SetSimState(SimState::SIM_STATE_UNKNOWN);
+    controller->isSetPrimarySlotIdInProgress_ = false;
+    multiSimMonitor->RefreshData(0);
+    controller->isSetPrimarySlotIdInProgress_ = true;
+    multiSimMonitor->RefreshData(0);
+    multiSimMonitor->NotifySimAccountChanged();
+    int32_t tokenId = 123456789;
+    sptr<SimAccountCallback> callback = nullptr;
+    EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
+    EXPECT_GT(multiSimMonitor->UnregisterSimAccountCallback(callback), TELEPHONY_ERROR);
+}
 } // namespace Telephony
 } // namespace OHOS
