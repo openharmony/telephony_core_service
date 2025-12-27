@@ -116,7 +116,6 @@ SimStateHandle::SimStateHandle(const std::weak_ptr<SimStateManager> &simStateMan
 void SimStateHandle::Init(int32_t slotId)
 {
     slotId_ = slotId;
-    TELEPHONY_LOGI("SimStateHandle::HasSimCard(), slotId_ = %{public}d", slotId_);
     ConnectService();
 #ifdef CORE_SERVICE_SUPPORT_SATELLITE
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
@@ -1094,7 +1093,9 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
         iccState.simType_ = ICC_UNKNOWN_TYPE;
         iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
         modemInitDone_ = false;
-        ProcessIccCardState(iccState, slotId_);
+        if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
+            ProcessIccCardState(iccState, slotId_);
+        }
         return true;
     }
     return false;
