@@ -155,8 +155,7 @@ bool SimStateHandle::HasSimCard()
 {
     bool has = true;
     if (iccState_.simStatus_ == ICC_CARD_ABSENT ||
-        (iccState_.simStatus_ == ICC_CONTENT_UNKNOWN && CoreManagerInner::GetInstance().IsEsim(slotId_) &&
-            GetModemInitStatus())) {
+        (iccState_.simStatus_ == ICC_CONTENT_UNKNOWN && CoreManagerInner::GetInstance().IsEsim(slotId_))) {
         has = false;
     }
     return has;

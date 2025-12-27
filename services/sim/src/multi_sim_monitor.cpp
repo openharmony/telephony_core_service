@@ -352,7 +352,6 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
             "MultiSimMonitor::RefreshData clear data when slotId %{public}d is absent or unknown out of switch card",
             slotId);
         simFileManager->ClearData();
-        controller_->CleanLoadedSimInfo(slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         controller_->GetAllListFromDataBase();
