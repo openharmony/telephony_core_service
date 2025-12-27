@@ -97,7 +97,6 @@ int SimRdbHelper::Insert(
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
-    TELEPHONY_LOGD("SimRdbHelper::Insert");
     return dataShareHelper->Insert(simUri, values);
 }
 
@@ -121,7 +120,6 @@ int SimRdbHelper::Update(std::shared_ptr<DataShare::DataShareHelper> dataShareHe
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
-    TELEPHONY_LOGD("SimRdbHelper::Update");
     return dataShareHelper->Update(simUri, predicates, value);
 }
 
@@ -133,7 +131,6 @@ int SimRdbHelper::Delete(
         return INVALID_VALUE;
     }
     Uri simUri(SimRdbInfo::SIM_RDB_SELECTION);
-    TELEPHONY_LOGD("SimRdbHelper::Delete");
     return dataShareHelper->Delete(simUri, predicates);
 }
 
@@ -157,7 +154,6 @@ int32_t SimRdbHelper::GetDefaultMainCardSlotId()
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
-        TELEPHONY_LOGD("not found main card");
         result->Close();
         dataShareHelper->Release();
         return mainCardSlotId;
@@ -190,7 +186,6 @@ int32_t SimRdbHelper::GetDefaultMessageCardSlotId()
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
-        TELEPHONY_LOGD("not found default sms card");
         result->Close();
         dataShareHelper->Release();
         return messageCardSlotId;
@@ -223,7 +218,6 @@ int32_t SimRdbHelper::GetDefaultCellularDataCardSlotId()
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
-        TELEPHONY_LOGD("not found default data card");
         result->Close();
         dataShareHelper->Release();
         return cellularDataCardSlotId;
@@ -256,7 +250,6 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     }
     int resultSetNum = result->GoToFirstRow();
     if (resultSetNum != 0) {
-        TELEPHONY_LOGD("not found default voice card");
         result->Close();
         dataShareHelper->Release();
         return voiceCardSlotId;
@@ -266,7 +259,6 @@ int32_t SimRdbHelper::GetDefaultVoiceCardSlotId()
     result->GetInt(index, voiceCardSlotId);
     result->Close();
     dataShareHelper->Release();
-    TELEPHONY_LOGD("voiceCardSlotId = %{public}d", voiceCardSlotId);
     return voiceCardSlotId;
 }
 
