@@ -1993,6 +1993,7 @@ void NetworkSearchManager::SetResidentNetworkNumeric(int32_t slotId, std::string
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
+        std::unique_lock<ffrt::shared_mutex> lock(residentNetworkNumericMutex_);
         inner->residentNetworkNumeric_ = residentNetworkNumeric;
     }
 }
@@ -2004,6 +2005,7 @@ std::string NetworkSearchManager::GetResidentNetworkNumeric(int32_t slotId)
         TELEPHONY_LOGE("inner is null");
         return "";
     }
+    std::shared_lock<ffrt::shared_mutex> lock(residentNetworkNumericMutex_);
     return inner->residentNetworkNumeric_;
 }
 
