@@ -946,10 +946,12 @@ int32_t TelRilManager::SimOpenLogicalChannel(
 }
 
 int32_t TelRilManager::SimOpenLogicalChannelWithPort(
-    int32_t slotId, const std::string &appID, const int32_t p2, int32_t portIndex, const AppExecFwk::InnerEvent::Pointer &response)
+    int32_t slotId, const std::string &appID, const int32_t p2, int32_t portIndex,
+        const AppExecFwk::InnerEvent::Pointer &response)
 {
     return TaskSchedule(
-        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimOpenLogicalChannelWithPort, appID.substr(0), p2, portIndex);
+        response, "TelRilSim", GetTelRilSim(slotId), &TelRilSim::SimOpenLogicalChannelWithPort,
+            appID.substr(0), p2, portIndex);
 }
 
 int32_t TelRilManager::SimCloseLogicalChannel(
