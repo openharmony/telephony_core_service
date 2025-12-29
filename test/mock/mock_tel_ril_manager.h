@@ -199,7 +199,7 @@ public:
     MOCK_METHOD2(GetCallFailReason, int32_t(int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD4(SimOpenLogicalChannel, int32_t(int32_t, const std::string &, const int32_t,
         const AppExecFwk::InnerEvent::Pointer &));
-    MOCK_METHOD5(SimOpenLogicalChannel, int32_t(int32_t, const std::string &, const int32_t,
+    MOCK_METHOD5(SimOpenLogicalChannelWithPort, int32_t(int32_t, const std::string &, const int32_t,
         int32_t, const AppExecFwk::InnerEvent::Pointer &));
     MOCK_METHOD3(SimCloseLogicalChannel, int32_t(
         int32_t, const int32_t, const AppExecFwk::InnerEvent::Pointer &));
