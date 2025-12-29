@@ -116,6 +116,7 @@ public:
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
     typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
+    typedef bool (*PROCESS_DELAY_OPERATOR_NAME)(int32_t slotId);
     typedef void (*DynamicLoadInit)(void);
     typedef void (*DynamicLoadDeInit)(void);
     typedef void (*UpdateHotplugCardState)(int32_t slotId, SimState state);
@@ -188,6 +189,7 @@ public:
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
+    PROCESS_DELAY_OPERATOR_NAME processDelayOperatorName_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
@@ -368,6 +370,10 @@ inline bool ProcessOperatorNameImpl(int32_t, std::string &, const std::string &)
 {
     return false;
 }
+inline bool ProcessDelayOperatorNameImpl(int32_t)
+{
+    return false;
+}
 inline void InitDynamicLoadHandlerImpl()
 {}
 inline void DeInitDynamicLoadHandlerImpl()
@@ -438,6 +444,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
 {
     processOperatorName_ = &ProcessOperatorNameImpl;
+    processDelayOperatorName_ = &ProcessDelayOperatorNameImpl;
     setNrOptionModeExt_ = &SetNrOptionModeExtImpl;
     updatePlmnExt_ = &UpdatePlmnExtImpl;
     isInModem2Optimization_ = &IsInModem2OptimizationImpl;
