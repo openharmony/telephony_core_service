@@ -79,8 +79,6 @@ static constexpr std::pair<const char*, RatType> RADIO_TECH_MAP[] = {
     {"RADIO_TECHNOLOGY_DCHSPAP", RatType::RADIO_TECHNOLOGY_DCHSPAP}
 };
 
-ImsRegStateCallback stateCallback_;
-
 static int32_t WrapRadioTech(int32_t radioTechType)
 {
     static const std::map<RadioTech, RatType> radioTechMap = {
@@ -2805,14 +2803,15 @@ static napi_value GetImsRegInfo(napi_env env, napi_callback_info info)
 static bool RegisterImsRegStateCallback(
     napi_env env, napi_value thisVar, int32_t slotId, int32_t imsSrvType, napi_value argv[])
 {
-    stateCallback_.env = env;
-    stateCallback_.slotId = slotId;
-    stateCallback_.imsSrvType = static_cast<ImsServiceType>(imsSrvType);
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(stateCallback_.thisVar));
-    napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &(stateCallback_.callbackRef));
+    ImsRegStateCallback stateCallback;
+    stateCallback.env = env;
+    stateCallback.slotId = slotId;
+    stateCallback.imsSrvType = static_cast<ImsServiceType>(imsSrvType);
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(stateCallback.thisVar));
+    napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DEFAULT_REF_COUNT, &(stateCallback.callbackRef));
 
     int32_t ret =
-        DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->RegisterImsRegStateCallback(stateCallback_);
+        DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->RegisterImsRegStateCallback(stateCallback);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Register imsRegState callback failed");
         ReportFunctionFailed(env, ret, "on_imsRegStateChange");
@@ -2995,8 +2994,6 @@ static napi_value ObserverOn(napi_env env, napi_callback_info info)
 
 static bool UnregisterImsRegStateCallback(napi_env env, int32_t slotId, ImsServiceType imsSrvType)
 {
-    napi_delete_reference(env, stateCallback_.thisVar);
-    napi_delete_reference(env, stateCallback_.callbackRef);
     int32_t ret = DelayedSingleton<NapiImsRegInfoCallbackManager>::GetInstance()->UnregisterImsRegStateCallback(
         env, slotId, imsSrvType);
     if (ret != TELEPHONY_SUCCESS) {
