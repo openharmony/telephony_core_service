@@ -367,7 +367,7 @@ void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid, const SimMessag
         return;
     }
     TELEPHONY_LOGI("req to open channel:%{public}d, msgType is %{public}d", currentChannelId_.load(), msgType);
-    if (isSupportEsimMEP) {
+    if (!isSupportEsimMEP) {
         telRilManager_->SimOpenLogicalChannel(slotId_, appId, PARAMETER_TWO, response);
     } else {
         telRilManager_->SimOpenLogicalChannelWithPort(slotId_, appId, PARAMETER_TWO, COMMAND_PORT, response);
