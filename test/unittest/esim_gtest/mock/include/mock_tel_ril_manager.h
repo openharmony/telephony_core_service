@@ -234,3 +234,4 @@ public:
 };
 } // namespace Telephony
 } // namespace OHOS
+#endif // MOCK_TEL_RIL_MANAGER_H
