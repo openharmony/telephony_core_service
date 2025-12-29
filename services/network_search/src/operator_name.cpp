@@ -194,6 +194,11 @@ void OperatorName::NotifySpnChanged(bool isForce)
         domesticSpn = GetCustomName(simPlmn);
     }
 
+    if (TELEPHONY_EXT_WRAPPER.processDelayOperatorName_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.processDelayOperatorName_(slotId_)) {
+        return;
+    }
+
     if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
         NotifyGsmSpnChanged(regStatus, networkState, domesticSpn, isForce);
     } else if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_CDMA) {

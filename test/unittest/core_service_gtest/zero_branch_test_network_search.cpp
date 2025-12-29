@@ -56,6 +56,7 @@ const CellInformation::CellType WCDMA = CellInformation::CellType::CELL_TYPE_WCD
 const CellInformation::CellType TDSCDMA = CellInformation::CellType::CELL_TYPE_TDSCDMA;
 const CellInformation::CellType LTE = CellInformation::CellType::CELL_TYPE_LTE;
 const CellInformation::CellType NR = CellInformation::CellType::CELL_TYPE_NR;
+const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 } // namespace
  
 class NetworkSearchBranchTest : public testing::Test {
@@ -552,6 +553,34 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_004, Function | MediumT
     operatorName->UpdateVSimSpn(params);
     operatorName->networkSearchManager_.reset();
     EXPECT_EQ(operatorName->GetCurrentLac(), 0);
+}
+
+/**
+ * @tc.number   Telephony_OperatorName_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_005, Function | MediumTest | Level1)
+{
+    bool isForce = true;
+    std::string netPlmn = "";
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+ 
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForNetWork1();
+    operatorName->NotifySpnChanged(isForce);
+ 
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForNetWork1();
+    operatorName->NotifySpnChanged(isForce);
+ 
+    operatorName->simManager_ = nullptr;
+    EXPECT_EQ(operatorName->GetRoamStateBySimFile(netPlmn), false);
 }
  
 /**
