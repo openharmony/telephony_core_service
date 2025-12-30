@@ -837,6 +837,7 @@ void SimStateHandle::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
     switch (eventId) {
         case RadioEvent::RADIO_STATE_CHANGED:
             if (IsRadioStateUnavailable(event)) {
+                ProcessRadioStateUnavailable();
                 break;
             }
             [[fallthrough]]; // fall_through
@@ -1089,16 +1090,20 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
     int32_t radioState = object->data;
     if (radioState == ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE) {
         TELEPHONY_LOGI("received radio unavailable");
-        IccState iccState;
-        iccState.simType_ = ICC_UNKNOWN_TYPE;
-        iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
-        modemInitDone_ = false;
-        if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
-            ProcessIccCardState(iccState, slotId_);
-        }
         return true;
     }
     return false;
+}
+
+void SimStateHandle::ProcessRadioStateUnavailable()
+{
+    modemInitDone_ = false;
+    if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
+        IccState iccState;
+        iccState.simType_ = ICC_UNKNOWN_TYPE;
+        iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
+        ProcessIccCardState(iccState, slotId_);
+    }
 }
 
 int32_t SimStateHandle::GetSimIO(int32_t slotId, SimIoRequestInfo requestInfo)

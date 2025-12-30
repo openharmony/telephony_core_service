@@ -1430,6 +1430,9 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     simStateHandle->slotId_ = INVALID_SLOTID;
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED);
     simStateHandle->ProcessEvent(event);
+    auto radioState = std::make_shared<Int32Parcel>(ModemPowerState::CORE_SERVICE_POWER_NOT_AVAILABLE);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STATE_CHANGED, radioState);
+    simStateHandle->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
     simStateHandle->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_GET_ICC_STATUS_DONE);
