@@ -436,6 +436,13 @@ int32_t TelRilSim::SimOpenLogicalChannel(std::string appID, int32_t p2, const Ap
     return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SimOpenLogicalChannel, appID, p2);
 }
 
+int32_t TelRilSim::SimOpenLogicalChannelWithPort(std::string appID, int32_t p2, int32_t portIndex,
+    const AppExecFwk::InnerEvent::Pointer &response)
+{
+    return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_5::IRil::SimOpenLogicalChannelWithPort,
+        appID, p2, portIndex);
+}
+
 int32_t TelRilSim::SimCloseLogicalChannel(int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response)
 {
     return Request(TELEPHONY_LOG_FUNC_NAME, response, &HDI::Ril::V1_1::IRil::SimCloseLogicalChannel, channelId);

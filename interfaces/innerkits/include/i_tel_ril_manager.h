@@ -258,6 +258,8 @@ public:
     virtual int32_t GetCallFailReason(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimOpenLogicalChannel(int32_t slotId, const std::string &appID, const int32_t p2,
         const AppExecFwk::InnerEvent::Pointer &response) = 0;
+    virtual int32_t SimOpenLogicalChannelWithPort(int32_t slotId, const std::string &appID, const int32_t p2,
+        int32_t portIndex, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimCloseLogicalChannel(
         int32_t slotId, const int32_t channelId, const AppExecFwk::InnerEvent::Pointer &response) = 0;
     virtual int32_t SimTransmitApduLogicalChannel(

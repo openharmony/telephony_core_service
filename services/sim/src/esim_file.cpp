@@ -41,6 +41,9 @@ static constexpr const char *KEY_IMEI = "kIMEI";
 static constexpr const char *KEY_IMEI2 = "kIMEI2";
 static constexpr const char *KEY_NONCE = "kNonce";
 static constexpr const char *KEY_TIMESTAMP = "kTimestamp";
+static constexpr int32_t COMMAND_PORT = 0;
+const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
+
 EsimFile::EsimFile(std::shared_ptr<ITelRilManager> telRilManager, int32_t slotId,
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner) : AppExecFwk::EventHandler(eventRunner)
 {
@@ -358,12 +361,17 @@ bool EsimFile::IsLogicChannelOpen(const SimMessage msgType)
 void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid, const SimMessage msgType)
 {
     std::string appId = OHOS::Telephony::ToUtf8(aid);
+    bool isSupportEsimMEP = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_OPEN_CHANNEL_DONE);
     if (telRilManager_ == nullptr) {
         return;
     }
     TELEPHONY_LOGI("req to open channel:%{public}d, msgType is %{public}d", currentChannelId_.load(), msgType);
-    telRilManager_->SimOpenLogicalChannel(slotId_, appId, PARAMETER_TWO, response);
+    if (!isSupportEsimMEP) {
+        telRilManager_->SimOpenLogicalChannel(slotId_, appId, PARAMETER_TWO, response);
+    } else {
+        telRilManager_->SimOpenLogicalChannelWithPort(slotId_, appId, PARAMETER_TWO, COMMAND_PORT, response);
+    }
     return;
 }
 
