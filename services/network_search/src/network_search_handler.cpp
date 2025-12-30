@@ -1309,7 +1309,6 @@ int32_t NetworkSearchHandler::RevertLastTechnology()
 
 void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto networkSearchManager = networkSearchManager_.lock();
     if (event == nullptr) {
         TELEPHONY_LOGE("UpdateImsServiceStatus event is null slotId:%{public}d", slotId_);
         return;
@@ -1319,6 +1318,7 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("UpdateImsServiceStatus imsServiceStatus is null slotId:%{public}d", slotId_);
         return;
     }
+    auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         return;
     }
@@ -1331,7 +1331,6 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
 
 void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto networkSearchManager = networkSearchManager_.lock();
     if (event == nullptr) {
         TELEPHONY_LOGE("UpdateImsRegisterState event is null slotId:%{public}d", slotId_);
         return;
@@ -1342,6 +1341,7 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         return;
     }
     bool isRegister = (*registerInfo == 1);
+    auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         return;
     }
