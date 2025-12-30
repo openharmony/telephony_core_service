@@ -1309,7 +1309,6 @@ int32_t NetworkSearchHandler::RevertLastTechnology()
 
 void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto networkSearchManager = networkSearchManager_.lock();
     if (event == nullptr) {
         TELEPHONY_LOGE("UpdateImsServiceStatus event is null slotId:%{public}d", slotId_);
         return;
@@ -1317,6 +1316,10 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
     std::shared_ptr<ImsServiceStatus> imsServiceStatus = event->GetSharedObject<ImsServiceStatus>();
     if (imsServiceStatus == nullptr) {
         TELEPHONY_LOGE("UpdateImsServiceStatus imsServiceStatus is null slotId:%{public}d", slotId_);
+        return;
+    }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
         return;
     }
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
@@ -1328,7 +1331,6 @@ void NetworkSearchHandler::UpdateImsServiceStatus(const AppExecFwk::InnerEvent::
 
 void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto networkSearchManager = networkSearchManager_.lock();
     if (event == nullptr) {
         TELEPHONY_LOGE("UpdateImsRegisterState event is null slotId:%{public}d", slotId_);
         return;
@@ -1339,6 +1341,10 @@ void NetworkSearchHandler::UpdateImsRegisterState(const AppExecFwk::InnerEvent::
         return;
     }
     bool isRegister = (*registerInfo == 1);
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (networkSearchManager == nullptr) {
+        return;
+    }
     std::shared_ptr<NetworkSearchState> networkSearchState = networkSearchManager->GetNetworkSearchState(slotId_);
     if (networkSearchState != nullptr) {
         networkSearchState->SetImsStatus(isRegister);
