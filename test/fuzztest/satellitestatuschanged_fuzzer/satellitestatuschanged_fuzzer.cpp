@@ -168,18 +168,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     RadioStateChanged(data, size);
     SatelliteStatusChanged(data, size);
     SimStateChanged(data, size);
-    auto telRilManager = std::static_pointer_cast<TelRilManager>(
-         DelayedSingleton<CoreService>::GetInstance()->telRilManager_);
-    if (telRilManager == nullptr || telRilManager->handler_ == nullptr) {
-        return;
-    }
-    auto handler = telRilManager->handler_;
-    if (handler != nullptr) {
-        handler->RemoveAllEvents();
-        usleep(SLEEP_TIME_SECONDS);
-    }
-    telRilManager->handler_->ClearFfrt(false);
-    telRilManager->handler_->queue_ = nullptr;
     return;
 }
 } // namespace OHOS
@@ -196,10 +184,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    if (OHOS::g_isInited) {
-        OHOS::DelayedSingleton<CoreService>::GetInstance()->OnStop();
-        OHOS::g_isInited = false;
-    }
-    usleep(OHOS::SLEEP_TIME_SECONDS);
     return 0;
 }
