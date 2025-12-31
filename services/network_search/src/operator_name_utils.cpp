@@ -64,7 +64,6 @@ void OperatorNameUtils::Init()
 
 bool OperatorNameUtils::IsInit()
 {
-    TELEPHONY_LOGD("is init %{public}d nameArray_ size %{public}zu", isInit_, nameArray_.size());
     return isInit_;
 }
 
@@ -220,8 +219,6 @@ std::string OperatorNameUtils::GetNameByLocale(OperatorNameCust &value)
     if (!(localeInfo.GetScript().empty())) {
         countryCodeTempScript = localeInfo.GetLanguage() + "_" + localeInfo.GetScript();
     }
-    TELEPHONY_LOGD("locale is %{public}s, languageCode is %{public}s, countryCodeTempScript is %{public}s",
-        locale.c_str(), languageCode.c_str(), countryCodeTempScript.c_str());
     if (countryCodeTempScript == std::string(ITEM_ZH_HANS)) {
         languageCode = std::string(ITEM_ZH_HANS);
     }
