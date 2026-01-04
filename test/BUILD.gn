@@ -98,7 +98,7 @@ group("unittest") {
     ]
   }
 
-  if (core_service_feature_support_satellite) {
+  if (core_service_satellite) {
     deps += [
       "unittest/core_service_gtest:tel_satellite_service_gtest",
     ]
@@ -213,7 +213,7 @@ ohos_static_library("tel_core_service_static") {
     ]
   }
 
-  if (core_service_feature_support_satellite) {
+  if (core_service_satellite) {
     sources += [
       "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
       "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",
