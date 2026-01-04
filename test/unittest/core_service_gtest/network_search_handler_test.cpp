@@ -406,7 +406,7 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkRegister_001, Function | Med
     auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, SLOT_ID_0);
     auto networkRegister = std::make_shared<NetworkRegister>(networkSearchState, networkSearchManager, SLOT_ID_0);
 
-    networkSearchState->networkState_ = std::make_unique<NetworkState>(); 
+    networkSearchState->networkState_ = std::make_unique<NetworkState>();
     networkRegister->networkSearchState_ = networkSearchState;
     networkRegister->UpdateCfgTech();
 
