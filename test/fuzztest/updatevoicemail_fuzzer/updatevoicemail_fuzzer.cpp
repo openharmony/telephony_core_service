@@ -49,9 +49,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     std::int32_t eventId = static_cast<int32_t>(*data + offset);
     offset += sizeof(int32_t);
     std::int64_t refId = static_cast<int64_t>(*data + offset);
-    std::string operatorNum(reinterpret_cast<const char *>(data), size);
-    std::string mailName(reinterpret_cast<const char *>(data), size);
-    std::string mailNumber(reinterpret_cast<const char *>(data), size);
+    offset += sizeof(int32_t);
+    std::string operatorNum(reinterpret_cast<const char *>(data + offset), size);
+    offset += sizeof(int32_t);
+    std::string mailName(reinterpret_cast<const char *>(data + offset), size);
+    offset += sizeof(int32_t);
+    std::string mailNumber(reinterpret_cast<const char *>(data + offset), size);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, refId);
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
