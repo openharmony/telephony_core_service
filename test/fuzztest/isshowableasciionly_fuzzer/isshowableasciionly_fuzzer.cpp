@@ -35,8 +35,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     int32_t byteslen = static_cast<int32_t>(*data);
     int32_t offset = static_cast<int32_t>(*data + sizeof(int32_t));
     char argument = static_cast<char>(*data);
+    int32_t offset = 0;
     std::string str(reinterpret_cast<const char *>(data), size);
-    std::string parameter(reinterpret_cast<const char *>(data), size);
+    offset += sizeof(int32_t);
+    offset = (offset > (int32_t)size) ? (int32_t)size : offset;
+    std::string parameter(reinterpret_cast<const char *>(data + offset), size - offset);
     simUtils->HexStringConvertToBytes(str, byteslen);
     simUtils->IsShowableAsciiOnly(str);
     simUtils->BcdPlmnConvertToString(parameter, offset);
