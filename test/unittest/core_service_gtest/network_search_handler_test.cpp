@@ -40,7 +40,6 @@
 #include "telephony_ext_wrapper.h"
 #include "network_utils.h"
 #include "mock_sim_manager.h"
-#include "emc_rescue_mode_control.h"
 #include "emc_rescue_mode_observer.h"
 #include "emc_rescue_net_info_callback_stub.h"
 #include "app_mgr_interface.h"
