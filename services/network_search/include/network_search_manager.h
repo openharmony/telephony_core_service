@@ -381,6 +381,7 @@ private:
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
     sptr<NetworkSearchCallBackBase> cellularCallCallBack_ = nullptr;
     ffrt::shared_mutex callBackMtx_{};
+    ffrt::shared_mutex residentNetworkNumericMutex_{};
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::unique_ptr<EventSender> eventSender_ = nullptr;
