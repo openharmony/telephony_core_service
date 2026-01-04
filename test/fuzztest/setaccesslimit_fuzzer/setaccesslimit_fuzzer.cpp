@@ -32,11 +32,20 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     auto iccOperatorRule = std::make_shared<IccOperatorRule>();
+    int32_t offset =0;
     std::string result(reinterpret_cast<const char *>(data), size);
-    std::string packageName(reinterpret_cast<const char *>(data), size);
-    std::string hexStr(reinterpret_cast<const char *>(data), size);
-    std::string certificate(reinterpret_cast<const char *>(data), size);
-    std::string accessLimit(reinterpret_cast<const char *>(data), size);
+    offset += sizeof(int32_t);
+    offset = (offset > size) ? size : offset;
+    std::string packageName(reinterpret_cast<const char *>(data + offset), size - offset);
+    offset += sizeof(int32_t);
+    offset = (offset > size) ? size : offset;
+    std::string hexStr(reinterpret_cast<const char *>(data + offset), size - offset);
+    offset += sizeof(int32_t);
+    offset = (offset > size) ? size : offset;
+    std::string certificate(reinterpret_cast<const char *>(data + offset), size - offset);
+    offset += sizeof(int32_t);
+    offset = (offset > size) ? size : offset;
+    std::string accessLimit(reinterpret_cast<const char *>(data + offset), size - offset);
     iccOperatorRule->GetPackageName(result);
     iccOperatorRule->GetPackageName(packageName);
     iccOperatorRule->SetPackageNameByHexStr(hexStr);
