@@ -63,7 +63,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (size < offset) {
         return;
     }
-    std::string mailNumber(reinterpret_cast<const char *>(data + offset), size -offset);
+    std::string mailNumber(reinterpret_cast<const char *>(data + offset), size - offset);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, refId);
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
