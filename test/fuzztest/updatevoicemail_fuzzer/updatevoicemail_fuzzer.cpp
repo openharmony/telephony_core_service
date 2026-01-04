@@ -52,10 +52,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     offset = 0;
     std::string operatorNum(reinterpret_cast<const char *>(data + offset), size - offset);
     offset += sizeof(int32_t);
-    offset = (offset > (int32_t)size) ? (int32_t)size : offset;
+    offset = (offset > static_cast<int32_t>size) ? static_cast<int32_t>size : offset;
     std::string mailName(reinterpret_cast<const char *>(data + offset), size - offset);
     offset += sizeof(int32_t);
-    offset = (offset > (int32_t)size) ? (int32_t)size : offset;
+    offset = (offset > static_cast<int32_t>size) ? static_cast<int32_t>size : offset;
     std::string mailNumber(reinterpret_cast<const char *>(data + offset), size - offset);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, refId);
     auto telRilManager_ = std::make_shared<TelRilManager>();
