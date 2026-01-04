@@ -42,8 +42,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     offset += sizeof(int32_t);
     char argument = static_cast<char>(*data + offset);
     std::string str(reinterpret_cast<const char *>(data), size);
-    offset += sizeof(int32_t);
-    offset = (offset > static_cast<int32_t>size) ? static_cast<int32_t>size : offset;
+    offset =  static_cast<size_t>(offset) + sizeof(int32_t);
+    offset = (offset > size) ? size : offset;
     std::string number(reinterpret_cast<const char *>(data + offset), size - offset);
     std::vector<uint8_t> bcdCodes;
     bcdCodes.push_back(result);
