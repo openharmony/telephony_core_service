@@ -43,7 +43,7 @@ void NetworkSearchNotify::NotifyNetworkStateUpdated(int32_t slotId, const sptr<N
 void NetworkSearchNotify::NotifySignalInfoUpdated(
     int32_t slotId, const std::vector<sptr<SignalInformation>> &signalInfos)
 {
-    TELEPHONY_LOGD("NotifySignalInfoUpdated~~~ signalInfos size=%{public}zu", signalInfos.size());
+    TELEPHONY_LOGD("NotifySignalInfoUpdated signalInfos size=%{public}zu", signalInfos.size());
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSignalInfo(slotId, signalInfos);
     TELEPHONY_LOGD("NotifySignalInfoUpdated ret %{public}d", result);
@@ -54,7 +54,7 @@ void NetworkSearchNotify::NotifySignalInfoUpdated(
 
 void NetworkSearchNotify::NotifyCellInfoUpdated(int32_t slotId, const std::vector<sptr<CellInformation>> &cellInfos)
 {
-    TELEPHONY_LOGD("NotifyCellInfoUpdated~~~ cell size=%{public}zu", cellInfos.size());
+    TELEPHONY_LOGD("NotifyCellInfoUpdated cell size=%{public}zu", cellInfos.size());
     int32_t result =
         DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCellInfo(slotId, cellInfos);
     TELEPHONY_LOGD("NotifyCellInfoUpdated ret %{public}d", result);

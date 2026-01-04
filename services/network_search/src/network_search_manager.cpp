@@ -593,7 +593,7 @@ int32_t NetworkSearchManager::GetRadioState(int32_t slotId)
 
 int32_t NetworkSearchManager::GetRadioState(int32_t slotId, NSCALLBACK &callback)
 {
-    TELEPHONY_LOGD("NetworkSearchManager::GetRadioState... slotId:%{public}d", slotId);
+    TELEPHONY_LOGD("NetworkSearchManager::GetRadioState slotId:%{public}d", slotId);
     if (eventSender_ == nullptr) {
         TELEPHONY_LOGE("slotId:%{public}d eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

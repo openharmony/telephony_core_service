@@ -298,7 +298,7 @@ void OperatorName::NotifyGsmSpnChanged(
     if (isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
-        TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d...", slotId_);
+        TELEPHONY_LOGI("OperatorName::NotifyGsmSpnChanged start send broadcast slotId:%{public}d", slotId_);
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.showSpn = false;
@@ -357,7 +357,7 @@ void OperatorName::NotifyCdmaSpnChanged(
     if (isForce || curParams_.spnRule != params.spnRule || curRegState_ != regStatus ||
         curParams_.showSpn != params.showSpn || curParams_.showPlmn != params.showPlmn ||
         curParams_.spn.compare(params.spn) || curParams_.plmn.compare(params.plmn)) {
-        TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d...", slotId_);
+        TELEPHONY_LOGI("OperatorName::NotifyCdmaSpnChanged start send broadcast slotId:%{public}d", slotId_);
         PublishEvent(params, regStatus, domesticSpn);
     } else {
         TELEPHONY_LOGI(

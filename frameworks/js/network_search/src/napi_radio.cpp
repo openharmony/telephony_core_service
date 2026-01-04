@@ -470,7 +470,6 @@ static void NativeGetNetworkState(napi_env env, void *data)
     asyncContext->csRoamingStatus = static_cast<int32_t>(networkState->GetCsRoamingStatus());
     asyncContext->psRoamingStatus = static_cast<int32_t>(networkState->GetPsRoamingStatus());
     asyncContext->cfgTech = static_cast<int32_t>(networkState->GetCfgTech());
-    TELEPHONY_LOGD("NativeGetNetworkState resolved is true.");
 }
 
 static void GetNetworkStateCallback(napi_env env, napi_status status, void *data)

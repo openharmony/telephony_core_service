@@ -267,7 +267,7 @@ int32_t CoreServiceClient::GetImei(int32_t slotId, std::u16string &imei, int64_t
         });
     int ret = proxy->GetImei(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        TELEPHONY_LOGE("connect stub failed, code: %{public}d", ret);
         return ret;
     }
     ret = callback->WaitForResult(timeoutMs);
@@ -306,7 +306,7 @@ int32_t CoreServiceClient::GetImeiSv(int32_t slotId, std::u16string &imeiSv, int
         });
     int ret = proxy->GetImeiSv(slotId, callback);
     if (ret != TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
+        TELEPHONY_LOGE("connect stub failed, code: %{public}d", ret);
         return ret;
     }
     ret = callback->WaitForResult(timeoutMs);
