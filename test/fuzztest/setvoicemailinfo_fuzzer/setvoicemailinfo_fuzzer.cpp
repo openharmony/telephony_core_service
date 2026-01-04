@@ -111,8 +111,13 @@ void SetVoiceMailInfo(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t offset = 0;
     std::string mailNumber(reinterpret_cast<const char *>(data), size);
-    std::string mailName(reinterpret_cast<const char *>(data), size);
+    offset += sizeof(int32_t)
+    if (size < offset) {
+        return;
+    }
+    std::string mailName(reinterpret_cast<const char *>(data + offset), size - offset);
     auto mailNameU16 = Str8ToStr16(mailName);
     auto mailNumberU16 = Str8ToStr16(mailNumber);
     MessageParcel dataMessageParcel;
