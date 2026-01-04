@@ -38,7 +38,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     int32_t offset = 0;
     std::string str(reinterpret_cast<const char *>(data), size);
     offset += sizeof(int32_t);
-    offset = (offset > (int32_t)size) ? (int32_t)size : offset;
+    offset = (offset > static_cast<int32_t>size) ? static_cast<int32_t>size : offset;
     std::string parameter(reinterpret_cast<const char *>(data + offset), size - offset);
     simUtils->HexStringConvertToBytes(str, byteslen);
     simUtils->IsShowableAsciiOnly(str);
