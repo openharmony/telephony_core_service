@@ -29,9 +29,9 @@
 #include "inner_event.h"
 #include "iservice_registry.h"
 #include "radio_event.h"
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
 #include "satellite_service_client.h"
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
 #include "sim_constant.h"
 #include "sim_state_manager.h"
 #ifdef CORE_SERVICE_SUPPORT_ESIM
@@ -40,6 +40,7 @@
 #include "system_ability_definition.h"
 #include "tel_event_handler.h"
 #include "tel_ril_sim_parcel.h"
+#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 #include "telephony_types.h"
@@ -117,13 +118,13 @@ void SimStateHandle::Init(int32_t slotId)
 {
     slotId_ = slotId;
     ConnectService();
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED)) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
         satelliteClient->AddSimHandler(slotId_, std::static_pointer_cast<TelEventHandler>(shared_from_this()));
     }
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
     auto telRilManager = telRilManager_.lock();
     if (telRilManager != nullptr) {
         TELEPHONY_LOGI("SimStateHandle::SimStateHandle RegisterEvent start");
@@ -475,17 +476,17 @@ void SimStateHandle::UnInit()
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
         telRilManager->UnRegisterCoreNotify(slotId_, shared_from_this(), RadioEvent::RADIO_STATE_CHANGED);
     }
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     if (IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
         satelliteCallback_ != nullptr) {
         std::shared_ptr<SatelliteServiceClient> satelliteClient =
             DelayedSingleton<SatelliteServiceClient>::GetInstance();
         satelliteClient->UnRegisterCoreNotify(slotId_, RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
 }
 
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
 void SimStateHandle::RegisterSatelliteCallback()
 {
     satelliteCallback_ =
@@ -501,7 +502,7 @@ void SimStateHandle::UnregisterSatelliteCallback()
         satelliteCallback_ = nullptr;
     }
 }
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
 
 void SimStateHandle::SetInSenseSwitchPhase(bool flag)
 {

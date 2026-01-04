@@ -19,7 +19,7 @@ TELEPHONY_SIM_ROOT = "services/sim"
 TELEPHONY_TEL_RIL_ROOT = "services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
 
-if (core_service_feature_support_satellite) {
+if (core_service_satellite) {
   TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH =
     "services/satellite_service_interaction/src"
 }
@@ -136,7 +136,7 @@ ohos_shared_library("tel_core_service") {
     ]
   }
 
-  if (core_service_feature_support_satellite) {
+  if (core_service_satellite) {
     sources += [
       "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback.cpp",
       "$TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH/satellite_core_callback_stub.cpp",

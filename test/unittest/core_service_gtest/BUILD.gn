@@ -1846,7 +1846,7 @@ group("unittest") {
     ":tel_network_search_manager_gtest",
     ":tel_stk_controller_gtest",
   ]
-  if (core_service_feature_support_satellite) {
+  if (core_service_satellite) {
     deps += [
       ":tel_satellite_service_gtest",
     ]

@@ -1031,13 +1031,13 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
         TELEPHONY_LOGE("slotId:%{public}d inner or eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
     if (IsSatelliteEnabled()) {
         imei = Str8ToStr16(satelliteClient->GetImei());
         return TELEPHONY_ERR_SUCCESS;
     }
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
     if (inner->imei_.empty()) {
         eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1264,7 +1264,7 @@ bool NetworkSearchManager::IsNrSupported(int32_t slotId)
 
 bool NetworkSearchManager::IsSatelliteEnabled()
 {
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
     if (satelliteClient == nullptr) {
         TELEPHONY_LOGE("satelliteClient is nullptr");
@@ -1273,7 +1273,7 @@ bool NetworkSearchManager::IsSatelliteEnabled()
     return satelliteClient->IsSatelliteEnabled();
 #else
     return false;
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
 }
 
 int32_t NetworkSearchManager::HandleRrcStateChanged(int32_t slotId, int32_t status)
