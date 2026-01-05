@@ -54,7 +54,7 @@ void UnlockPin(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -73,7 +73,7 @@ void UnlockPuk(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -95,7 +95,7 @@ void AlterPin(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -117,7 +117,7 @@ void UnlockPin2(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -136,7 +136,7 @@ void UnlockPuk2(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -158,7 +158,7 @@ void AlterPin2(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -180,7 +180,7 @@ void SetLockState(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -205,7 +205,7 @@ void SetActiveSim(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -223,7 +223,7 @@ void DiallingNumbersGet(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -241,7 +241,7 @@ void DelIccDiallingNumbers(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;
@@ -259,7 +259,7 @@ void UnlockSimLock(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
 
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     MessageParcel dataMessageParcel;

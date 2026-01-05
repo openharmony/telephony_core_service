@@ -58,7 +58,7 @@ void WriteTestData(const std::string &testStr)
 
 void DecodeVcard(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString = R"(
@@ -81,7 +81,7 @@ END:VCARD
 
 void DecodeVcardNull01(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString = R"(
@@ -114,7 +114,7 @@ END:VCARD
 
 void DecodeVcardNull02(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString = R"(
@@ -127,7 +127,7 @@ void DecodeVcardNull02(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -151,7 +151,7 @@ END:VCARD
 
 void DecodeVcardRelation(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString =
@@ -165,7 +165,7 @@ void DecodeVcardRelation(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -181,7 +181,7 @@ void DecodeVcardRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ContructName(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     auto nameData = std::make_shared<VCardNameData>();
@@ -203,7 +203,7 @@ void ContructName(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ContructNameData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     auto nameData = std::make_shared<VCardNameData>();
@@ -233,7 +233,7 @@ void ContructNameData(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ContructRelation(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     auto data1 = std::make_shared<VCardRelationData>();
@@ -254,7 +254,7 @@ void ContructRelation(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ContructRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     auto data1 = std::make_shared<VCardRelationData>();
@@ -280,7 +280,7 @@ void ContructRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardRelationV30(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
@@ -292,7 +292,7 @@ void DecodeVcardRelationV30(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardRelationDataV30(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -306,7 +306,7 @@ void DecodeVcardRelationDataV30(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardRelationV40(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string inputString =
@@ -319,7 +319,7 @@ void DecodeVcardRelationV40(std::shared_ptr<FuzzedDataProvider> provider)
 
 void DecodeVcardRelationDataV40(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -334,7 +334,7 @@ void DecodeVcardRelationDataV40(std::shared_ptr<FuzzedDataProvider> provider)
 
 void Import(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -344,7 +344,7 @@ void Import(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ImportLock(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -354,7 +354,7 @@ void ImportLock(std::shared_ptr<FuzzedDataProvider> provider)
 
 void Export(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -366,7 +366,7 @@ void Export(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ExportLock(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -378,7 +378,7 @@ void ExportLock(std::shared_ptr<FuzzedDataProvider> provider)
 
 void ExportToStr(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
@@ -391,7 +391,7 @@ void ExportToStr(std::shared_ptr<FuzzedDataProvider> provider)
 
 void VCardUtilsTest(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (provider = nullptr) {
+    if (provider == nullptr) {
         return;
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();

@@ -41,6 +41,9 @@ constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
 void SetDefaultSlotIdFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
