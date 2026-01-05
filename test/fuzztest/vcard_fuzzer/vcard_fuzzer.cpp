@@ -34,6 +34,7 @@
 #include "vcard_constructor.h"
 #include "vcard_manager.h"
 #include "vcard_utils.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -55,8 +56,11 @@ void WriteTestData(const std::string &testStr)
     file.close();
 }
 
-void DecodeVcard(const uint8_t *data, size_t size)
+void DecodeVcard(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString = R"(
 BEGIN:VCARD
 VERSION:2.0
@@ -71,12 +75,15 @@ EMAIL;INTERNET:"llll"
 END:VCARD
 )";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardNull01(const uint8_t *data, size_t size)
+void DecodeVcardNull01(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString = R"(
 BEGIN:VCARD
 VERSION:3.0
@@ -101,23 +108,29 @@ END:VCARD
 
 )";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardNull02(const uint8_t *data, size_t size)
+void DecodeVcardNull02(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString = R"(
  
 )";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardData(const uint8_t *data, size_t size)
+void DecodeVcardData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     std::string inputString = R"(
 BEGIN:VCARD
 VERSION:2.0
@@ -132,38 +145,47 @@ EMAIL;INTERNET:"llll"
 END:VCARD
 )" + fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardRelation(const uint8_t *data, size_t size)
+void DecodeVcardRelation(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString =
         "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
         "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardRelationData(const uint8_t *data, size_t size)
+void DecodeVcardRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     std::string inputString =
         "BEGIN:VCARD\r\nVERSION:2.1\r\nX_OHOS_CUSTOM;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:relation;="
         "E6=B5=8B=E8=AF=95;=E6=B5=8B=E8=AF=95=69=64;=E6=B5=8B=E8=AF=95=6E=61=6D=65\r\nX_OHOS_CUSTOM:"
         "relation;realationName;labelId;labelName\r\nEND:VCARD\r\n" +
         fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void ContructName(const uint8_t *data, size_t size)
+void ContructName(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     auto nameData = std::make_shared<VCardNameData>();
-    std::string displayName(reinterpret_cast<const char *>(data), size);
+    std::string displayName = provider->ConsumeRandomLengthString();
     nameData->displayName_ = displayName;
     nameData->family_ = "测试F";
     nameData->given_ = "wowowo";
@@ -179,29 +201,29 @@ void ContructName(const uint8_t *data, size_t size)
     auto value = constructor->ContactVCard(contact);
 }
 
-void ContructNameData(const uint8_t *data, size_t size)
+void ContructNameData(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (data == nullptr || size == 0) {
+    if (provider == nullptr) {
         return;
     }
     auto nameData = std::make_shared<VCardNameData>();
-    std::string displayName(reinterpret_cast<const char *>(data), size);
+    std::string displayName = provider->ConsumeRandomLengthString();
     nameData->displayName_ = displayName;
-    std::string family(reinterpret_cast<const char *>(data), size);
+    std::string family = provider->ConsumeRandomLengthString();
     nameData->family_ = family;
-    std::string given(reinterpret_cast<const char *>(data), size);
+    std::string given = provider->ConsumeRandomLengthString();
     nameData->given_ = given;
-    std::string middle(reinterpret_cast<const char *>(data), size);
+    std::string middle = provider->ConsumeRandomLengthString();
     nameData->middle_ = middle;
-    std::string suffix(reinterpret_cast<const char *>(data), size);
+    std::string suffix = provider->ConsumeRandomLengthString();
     nameData->suffix_ = suffix;
-    std::string prefix(reinterpret_cast<const char *>(data), size);
+    std::string prefix = provider->ConsumeRandomLengthString();
     nameData->prefix_ = prefix;
-    std::string phoneticFamily(reinterpret_cast<const char *>(data), size);
+    std::string phoneticFamily = provider->ConsumeRandomLengthString();
     nameData->phoneticFamily_ = phoneticFamily;
-    std::string phoneticGiven(reinterpret_cast<const char *>(data), size);
+    std::string phoneticGiven = provider->ConsumeRandomLengthString();
     nameData->phoneticGiven_ = phoneticGiven;
-    std::string phoneticMiddle(reinterpret_cast<const char *>(data), size);
+    std::string phoneticMiddle = provider->ConsumeRandomLengthString();
     nameData->phoneticMiddle_ = phoneticMiddle;
     auto contact = std::make_shared<VCardContact>();
     contact->names_.push_back(nameData);
@@ -209,10 +231,13 @@ void ContructNameData(const uint8_t *data, size_t size)
     auto value = constructor->ContactVCard(contact);
 }
 
-void ContructRelation(const uint8_t *data, size_t size)
+void ContructRelation(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     auto data1 = std::make_shared<VCardRelationData>();
-    std::string test(reinterpret_cast<const char *>(data), size);
+    std::string test = provider->ConsumeRandomLengthString();
     data1->relationName_ = test;
     data1->labelId_ = "测试id";
     data1->labelName_ = "测试name";
@@ -227,21 +252,24 @@ void ContructRelation(const uint8_t *data, size_t size)
     auto value = constructor->ContactVCard(contact);
 }
 
-void ContructRelationData(const uint8_t *data, size_t size)
+void ContructRelationData(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     auto data1 = std::make_shared<VCardRelationData>();
-    std::string test(reinterpret_cast<const char *>(data), size);
+    std::string test = provider->ConsumeRandomLengthString();
     data1->relationName_ = test;
-    std::string testId(reinterpret_cast<const char *>(data), size);
+    std::string testId = provider->ConsumeRandomLengthString();
     data1->labelId_ = testId;
-    std::string testName(reinterpret_cast<const char *>(data), size);
+    std::string testName = provider->ConsumeRandomLengthString();
     data1->labelName_ = testName;
     auto data2 = std::make_shared<VCardRelationData>();
-    std::string realationName(reinterpret_cast<const char *>(data), size);
+    std::string realationName = provider->ConsumeRandomLengthString();
     data2->relationName_ = realationName;
-    std::string labelId(reinterpret_cast<const char *>(data), size);
+    std::string labelId = provider->ConsumeRandomLengthString();
     data2->labelId_ = labelId;
-    std::string labelName(reinterpret_cast<const char *>(data), size);
+    std::string labelName = provider->ConsumeRandomLengthString();
     data2->labelName_ = labelName;
     auto contact = std::make_shared<VCardContact>();
     contact->relations_.push_back(data1);
@@ -250,96 +278,127 @@ void ContructRelationData(const uint8_t *data, size_t size)
     auto value = constructor->ContactVCard(contact);
 }
 
-void DecodeVcardRelationV30(const uint8_t *data, size_t size)
+void DecodeVcardRelationV30(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
                               "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardRelationDataV30(const uint8_t *data, size_t size)
+void DecodeVcardRelationDataV30(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     std::string inputString = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:\r\nFN:\r\nTEL;TYPE=HOME:1202020\r\nTEL;TYPE=WORK,FAX:"
                               "49305484\r\nTEL;TYPE=X-Work:503330303030\r\nEND:VCARD\r\n" +
                               fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardRelationV40(const uint8_t *data, size_t size)
+void DecodeVcardRelationV40(std::shared_ptr<FuzzedDataProvider> provider)
 {
+    if (provider == nullptr) {
+        return;
+    }
     std::string inputString =
         "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
         ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n";
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void DecodeVcardRelationDataV40(const uint8_t *data, size_t size)
+void DecodeVcardRelationDataV40(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     std::string inputString =
         "BEGIN:VCARD\r\nVERSION:4.0\r\nN:test1;;;;\r\nFN:test1\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test2;;;"
         ";\r\nFN:test2\r\nEND:VCARD\r\nBEGIN:VCARD\r\nVERSION:4.0\r\nN:test3;;;;\r\nFN:test3\r\nEND:VCARD\r\n" +
         fuzzdata;
     WriteTestData(inputString);
-    int32_t errorCode = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t errorCode = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Decode(FILE_NAME, errorCode);
 }
 
-void Import(const uint8_t *data, size_t size)
+void Import(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t accountId = static_cast<int32_t>(*data);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
+    int32_t accountId = provider->ConsumeIntegral<int32_t>();
     VCardManager::GetInstance().Import(fuzzdata, accountId);
 }
 
-void ImportLock(const uint8_t *data, size_t size)
+void ImportLock(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t accountId = static_cast<int32_t>(*data);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
+    int32_t accountId = provider->ConsumeIntegral<int32_t>();
     VCardManager::GetInstance().ImportLock(fuzzdata, nullptr, accountId);
 }
 
-void Export(const uint8_t *data, size_t size)
+void Export(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t cardType = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().Export(fuzzdata, predicates, cardType);
 }
 
-void ExportLock(const uint8_t *data, size_t size)
+void ExportLock(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t cardType = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().ExportLock(fuzzdata, nullptr, predicates, cardType);
 }
 
-void ExportToStr(const uint8_t *data, size_t size)
+void ExportToStr(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
     DataShare::DataSharePredicates predicates;
     predicates.Between(Contact::ID, "0", "10");
-    int32_t cardType = static_cast<int32_t>(*data % TYPE_NUM);
+    int32_t cardType = provider->ConsumeIntegral<int32_t>() % TYPE_NUM;
     VCardManager::GetInstance().ExportToStr(fuzzdata, predicates, cardType);
     VCardManager::GetInstance().SetDataHelper(nullptr);
 }
 
-void VCardUtilsTest(const uint8_t *data, size_t size)
+void VCardUtilsTest(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::string fuzzdata(reinterpret_cast<const char *>(data), size);
-    int32_t intPara = static_cast<int32_t>(*data);
-    char argument = static_cast<char>(*data);
-    std::string fileData(reinterpret_cast<const char *>(data), size);
+    if (provider == nullptr) {
+        return;
+    }
+    std::string fuzzdata = provider->ConsumeRandomLengthString();
+    int32_t intPara = provider->ConsumeIntegral<int32_t>();
+    std::string argument0 = provider->ConsumeRandomLengthString();
+    char argument = argument0[0];
+    std::string fileData = provider->ConsumeRandomLengthString();
     std::string numberStr = std::to_string(intPara);
     std::vector<std::string> records;
     records.push_back(fileData);
@@ -374,24 +433,29 @@ void VCardUtilsTest(const uint8_t *data, size_t size)
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
-    DecodeVcard(data, size);
-    DecodeVcardData(data, size);
-    DecodeVcardRelation(data, size);
-    DecodeVcardRelationData(data, size);
-    ContructName(data, size);
-    ContructNameData(data, size);
-    ContructRelation(data, size);
-    ContructRelationData(data, size);
-    DecodeVcardRelationV30(data, size);
-    DecodeVcardRelationDataV30(data, size);
-    DecodeVcardRelationV40(data, size);
-    DecodeVcardRelationDataV40(data, size);
-    Import(data, size);
-    ImportLock(data, size);
-    Export(data, size);
-    ExportLock(data, size);
-    ExportToStr(data, size);
-    VCardUtilsTest(data, size);
+    if (data == nullptr || size == 0) {
+        return;
+    }
+
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    DecodeVcard(provider);
+    DecodeVcardData(provider);
+    DecodeVcardRelation(provider);
+    DecodeVcardRelationData(provider);
+    ContructName(provider);
+    ContructNameData(provider);
+    ContructRelation(provider);
+    ContructRelationData(provider);
+    DecodeVcardRelationV30(provider);
+    DecodeVcardRelationDataV30(provider);
+    DecodeVcardRelationV40(provider);
+    DecodeVcardRelationDataV40(provider);
+    Import(provider);
+    ImportLock(provider);
+    Export(provider);
+    ExportLock(provider);
+    ExportToStr(provider);
+    VCardUtilsTest(provider);
     return;
 }
 } // namespace OHOS
