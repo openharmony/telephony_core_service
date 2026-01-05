@@ -31,8 +31,8 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
-#include "fuzzer/FuzzedDataProvider.h"
- 
+#include "fuzzer/FuzzedDataprovider.h"
+
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
@@ -52,15 +52,15 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     simManager->multiSimController_ =std::make_shared<MultiSimController>(
         telRilManager, simStateManager, simFileManager);
-    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     std::string pin = provider->ConsumeRandomLengthString();
     std::string puk = provider->ConsumeRandomLengthString();
     std::string number1 = provider->ConsumeRandomLengthString();
     std::u16string number = Str8ToStr16(number1)
     LockStatusResponse lockResponse;
-    int32_t lockType = provider.ConsumeIntegral<int32_t>() % LOCK_TYPE_NUM + 1;
+    int32_t lockType = provider->ConsumeIntegral<int32_t>() % LOCK_TYPE_NUM + 1;
     LockType lockEnum = static_cast<LockType>(lockType);
-    int32_t lockState = provider.ConsumeIntegral<int32_t>() % LOCK_STATE_NUM + 1;
+    int32_t lockState = provider->ConsumeIntegral<int32_t>() % LOCK_STATE_NUM + 1;
     LockState lockStateEnum = static_cast<LockState>(lockState);
     PersoLockInfo lockInfo;
     SimAuthenticationResponse simResponse;
@@ -72,14 +72,14 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->AlterPin2(slotId, pin, puk, lockResponse);
     simManager->GetLockState(slotId, lockEnum, lockStateEnum);
     simManager->UnlockSimLock(slotId, lockInfo, lockResponse);
-    simManager->SetActiveSim(slotId, provider.ConsumeIntegral<int32_t>());
-    simManager->SetActiveSimSatellite(slotId, provider.ConsumeIntegral<int32_t>());
+    simManager->SetActiveSim(slotId, provider->ConsumeIntegral<int32_t>());
+    simManager->SetActiveSimSatellite(slotId, provider->ConsumeIntegral<int32_t>());
     simManager->SetShowNumber(slotId, number);
     simManager->SetShowName(slotId, number);
     simManager->GetShowNumber(slotId, number);
     simManager->GetShowName(slotId, number);
-    simManager->GetDsdsMode(provider.ConsumeIntegral<int32_t>());
-    simManager->SetDsdsMode(provider.ConsumeIntegral<int32_t>());
+    simManager->GetDsdsMode(provider->ConsumeIntegral<int32_t>());
+    simManager->SetDsdsMode(provider->ConsumeIntegral<int32_t>());
     simManager->SendEnvelopeCmd(slotId, pin);
     simManager->SendTerminalResponseCmd(slotId, pin);
     simManager->SendCallSetupRequestResult(slotId, true);
