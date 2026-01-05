@@ -53,6 +53,7 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->multiSimController_ =std::make_shared<MultiSimController>(
         telRilManager, simStateManager, simFileManager);
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
+     int32_t enable = provider->ConsumeIntegral<int32_t>()
     std::string pin = provider->ConsumeRandomLengthString();
     std::string puk = provider->ConsumeRandomLengthString();
     std::string number1 = provider->ConsumeRandomLengthString();
@@ -72,14 +73,14 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->AlterPin2(slotId, pin, puk, lockResponse);
     simManager->GetLockState(slotId, lockEnum, lockStateEnum);
     simManager->UnlockSimLock(slotId, lockInfo, lockResponse);
-    simManager->SetActiveSim(slotId, provider->ConsumeIntegral<int32_t>());
-    simManager->SetActiveSimSatellite(slotId, provider->ConsumeIntegral<int32_t>());
+    simManager->SetActiveSim(slotId, enable);
+    simManager->SetActiveSimSatellite(slotId, enable);
     simManager->SetShowNumber(slotId, number);
     simManager->SetShowName(slotId, number);
     simManager->GetShowNumber(slotId, number);
     simManager->GetShowName(slotId, number);
-    simManager->GetDsdsMode(provider->ConsumeIntegral<int32_t>());
-    simManager->SetDsdsMode(provider->ConsumeIntegral<int32_t>());
+    simManager->GetDsdsMode(enable);
+    simManager->SetDsdsMode(enable);
     simManager->SendEnvelopeCmd(slotId, pin);
     simManager->SendTerminalResponseCmd(slotId, pin);
     simManager->SendCallSetupRequestResult(slotId, true);
