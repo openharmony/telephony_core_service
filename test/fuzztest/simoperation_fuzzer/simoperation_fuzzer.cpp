@@ -53,7 +53,7 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->multiSimController_ =std::make_shared<MultiSimController>(
         telRilManager, simStateManager, simFileManager);
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
-     int32_t enable = provider->ConsumeIntegral<int32_t>()
+    int32_t enable = provider->ConsumeIntegral<int32_t>();
     std::string pin = provider->ConsumeRandomLengthString();
     std::string puk = provider->ConsumeRandomLengthString();
     std::string number1 = provider->ConsumeRandomLengthString();
