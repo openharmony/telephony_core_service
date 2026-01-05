@@ -57,7 +57,7 @@ void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
     std::string pin = provider->ConsumeRandomLengthString();
     std::string puk = provider->ConsumeRandomLengthString();
     std::string number1 = provider->ConsumeRandomLengthString();
-    std::u16string number = Str8ToStr16(number1)
+    std::u16string number = Str8ToStr16(number1);
     LockStatusResponse lockResponse;
     int32_t lockType = provider->ConsumeIntegral<int32_t>() % LOCK_TYPE_NUM + 1;
     LockType lockEnum = static_cast<LockType>(lockType);
