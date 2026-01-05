@@ -31,7 +31,7 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
-#include "fuzzer/FuzzedDataprovider.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
