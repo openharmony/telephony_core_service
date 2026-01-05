@@ -39,24 +39,13 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr const char *DEFAULT_SLOT_COUNT = "1";
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
-static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
-{
-    size_t typeSize = sizeof(int32_t);
-    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
-    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
-    if (size - align < typeSize * index + (typeSize - align)) {
-        return 0;
-    }
-    return *reinterpret_cast<const int32_t*>(base + index * typeSize);
-}
- 
 void SetDefaultSlotIdFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
-    int32_t voiceMailCount = GetInt(data, size, index++);
+    int32_t voiceMailCount = provider->ConsumeIntegral<int32_t>();
     simManager->multiSimController_ = nullptr;
     simManager->SetDefaultVoiceSlotId(slotId);
     simManager->SetDefaultSmsSlotId(slotId);
