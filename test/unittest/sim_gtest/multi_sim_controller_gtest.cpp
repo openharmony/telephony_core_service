@@ -1466,8 +1466,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SavePrimarySlotId001, Fu
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
 
-    EXPECT_TRUE(multiSimController->SavePrimarySlotId(SLOT_COUNT), TELEPHONY_ERR_ARGUMENT_INVALID);
-    EXPECT_TRUE(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(multiSimController->SavePrimarySlotId(SLOT_COUNT), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
 }
 }
 }
