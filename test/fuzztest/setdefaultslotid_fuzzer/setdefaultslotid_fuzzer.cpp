@@ -31,6 +31,7 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
  
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -38,24 +39,16 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr const char *DEFAULT_SLOT_COUNT = "1";
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
-static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
+void SetDefaultSlotIdFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    size_t typeSize = sizeof(int32_t);
-    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
-    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
-    if (size - align < typeSize * index + (typeSize - align)) {
-        return 0;
+    if (provider == nullptr) {
+        return;
     }
-    return *reinterpret_cast<const int32_t*>(base + index * typeSize);
-}
- 
-void SetDefaultSlotIdFunc(const uint8_t *data, size_t size)
-{
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t voiceMailCount = GetInt(data, size, index++);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t voiceMailCount = provider->ConsumeIntegral<int32_t>();
     simManager->multiSimController_ = nullptr;
     simManager->SetDefaultVoiceSlotId(slotId);
     simManager->SetDefaultSmsSlotId(slotId);
@@ -67,9 +60,9 @@ void SetDefaultSlotIdFunc(const uint8_t *data, size_t size)
     simManager->GetDefaultCellularDataSlotId();
     simManager->GetDefaultCellularDataSimId(slotId);
     simManager->GetPrimarySlotId(slotId);
-    simManager->InsertEsimData(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount,
-        std::string(reinterpret_cast<const char *>(data), size));
-    simManager->SetSimLabelIndex(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
+    simManager->InsertEsimData(std::string(provider->ConsumeRandomLengthString()), voiceMailCount,
+        std::string(provider->ConsumeRandomLengthString()));
+    simManager->SetSimLabelIndex(std::string(provider->ConsumeRandomLengthString()), voiceMailCount);
     simManager->slotCount_ = std::atoi(DEFAULT_SLOT_COUNT);
     simManager->GetDefaultSmsSlotId();
     simManager->GetDefaultCellularDataSlotId();
@@ -82,7 +75,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    SetDefaultSlotIdFunc(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    SetDefaultSlotIdFunc(provider);
     return;
 }
 } // namespace OHOS
