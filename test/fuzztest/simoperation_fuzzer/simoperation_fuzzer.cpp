@@ -31,6 +31,7 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
  
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -39,18 +40,7 @@ constexpr int32_t LOCK_TYPE_NUM = 2;
 constexpr int32_t LOCK_STATE_NUM = 3;
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
  
-static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
-{
-    size_t typeSize = sizeof(int32_t);
-    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
-    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
-    if (size - align < typeSize * index + (typeSize - align)) {
-        return 0;
-    }
-    return *reinterpret_cast<const int32_t*>(base + index * typeSize);
-}
- 
-void SimOperationFunc(const uint8_t *data, size_t size)
+void SimOperationFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -59,18 +49,15 @@ void SimOperationFunc(const uint8_t *data, size_t size)
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     simManager->multiSimController_ =std::make_shared<MultiSimController>(
         telRilManager, simStateManager, simFileManager);
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t enable = GetInt(data, size, index++);
-    std::string pin(reinterpret_cast<const char *>(data), size);
-    std::string puk(reinterpret_cast<const char *>(data), size);
-    if (size < sizeof(char16_t)) {
-        return;
-    }
-    std::u16string number(reinterpret_cast<const char16_t *>(data), size / sizeof(char16_t));
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string pin = provider->ConsumeRandomLengthString();
+    std::string puk = provider->ConsumeRandomLengthString();
+    std::string number1 = provider->ConsumeRandomLengthString();
+    std::u16string number = Str8ToStr16(number1)
     LockStatusResponse lockResponse;
-    int32_t lockType = *data % LOCK_TYPE_NUM + 1;
+    int32_t lockType = provider.ConsumeIntegral<int32_t>() % LOCK_TYPE_NUM + 1;
     LockType lockEnum = static_cast<LockType>(lockType);
-    int32_t lockState = *data % LOCK_STATE_NUM + 1;
+    int32_t lockState = provider.ConsumeIntegral<int32_t>() % LOCK_STATE_NUM + 1;
     LockState lockStateEnum = static_cast<LockState>(lockState);
     PersoLockInfo lockInfo;
     SimAuthenticationResponse simResponse;
@@ -82,14 +69,14 @@ void SimOperationFunc(const uint8_t *data, size_t size)
     simManager->AlterPin2(slotId, pin, puk, lockResponse);
     simManager->GetLockState(slotId, lockEnum, lockStateEnum);
     simManager->UnlockSimLock(slotId, lockInfo, lockResponse);
-    simManager->SetActiveSim(slotId, enable);
-    simManager->SetActiveSimSatellite(slotId, enable);
+    simManager->SetActiveSim(slotId, provider.ConsumeIntegral<int32_t>());
+    simManager->SetActiveSimSatellite(slotId, provider.ConsumeIntegral<int32_t>());
     simManager->SetShowNumber(slotId, number);
     simManager->SetShowName(slotId, number);
     simManager->GetShowNumber(slotId, number);
     simManager->GetShowName(slotId, number);
-    simManager->GetDsdsMode(enable);
-    simManager->SetDsdsMode(enable);
+    simManager->GetDsdsMode(provider.ConsumeIntegral<int32_t>());
+    simManager->SetDsdsMode(provider.ConsumeIntegral<int32_t>());
     simManager->SendEnvelopeCmd(slotId, pin);
     simManager->SendTerminalResponseCmd(slotId, pin);
     simManager->SendCallSetupRequestResult(slotId, true);
@@ -101,8 +88,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
-    SimOperationFunc(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    SimOperationFunc(provider);
     return;
 }
 } // namespace OHOS

@@ -28,6 +28,7 @@
 #include "tel_event_handler.h"
 #include "unistd.h"
 #include "tel_ril_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -47,193 +48,226 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void UnlockPin(const uint8_t *data, size_t size)
+void UnlockPin(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string pin(reinterpret_cast<const char *>(data), size);
+    std::string pin = provider->ConsumeRandomLengthString();
     std::u16string pinStr = Str8ToStr16(pin);
     dataMessageParcel.WriteString16(pinStr);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnUnlockPin(dataMessageParcel, reply);
 }
 
-void UnlockPuk(const uint8_t *data, size_t size)
+void UnlockPuk(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string pin(reinterpret_cast<const char *>(data), size);
+    std::string pin = provider->ConsumeRandomLengthString();
     std::u16string pinStr = Str8ToStr16(pin);
     dataMessageParcel.WriteString16(pinStr);
-    std::string puk(reinterpret_cast<const char *>(data), size);
+    std::string puk = provider->ConsumeRandomLengthString();
     std::u16string pukStr = Str8ToStr16(puk);
     dataMessageParcel.WriteString16(pukStr);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnUnlockPuk(dataMessageParcel, reply);
 }
 
-void AlterPin(const uint8_t *data, size_t size)
+void AlterPin(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string newPin(reinterpret_cast<const char *>(data), size);
+    std::string newPin = provider->ConsumeRandomLengthString();
     std::u16string newPinStr = Str8ToStr16(newPin);
     dataMessageParcel.WriteString16(newPinStr);
-    std::string oldPin(reinterpret_cast<const char *>(data), size);
+    std::string oldPin = provider->ConsumeRandomLengthString();
     std::u16string oldPinStr = Str8ToStr16(oldPin);
     dataMessageParcel.WriteString16(oldPinStr);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnAlterPin(dataMessageParcel, reply);
 }
 
-void UnlockPin2(const uint8_t *data, size_t size)
+void UnlockPin2(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string pin2(reinterpret_cast<const char *>(data), size);
+    std::string pin2 = provider->ConsumeRandomLengthString();
     std::u16string pin2Str = Str8ToStr16(pin2);
     dataMessageParcel.WriteString16(pin2Str);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnUnlockPin2(dataMessageParcel, reply);
 }
 
-void UnlockPuk2(const uint8_t *data, size_t size)
+void UnlockPuk2(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string pin2(reinterpret_cast<const char *>(data), size);
+    std::string pin2 = provider->ConsumeRandomLengthString();
     std::u16string pin2Str = Str8ToStr16(pin2);
     dataMessageParcel.WriteString16(pin2Str);
-    std::string puk2(reinterpret_cast<const char *>(data), size);
+    std::string puk2 = provider->ConsumeRandomLengthString();
     std::u16string puk2Str = Str8ToStr16(puk2);
     dataMessageParcel.WriteString16(puk2Str);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnUnlockPuk2(dataMessageParcel, reply);
 }
 
-void AlterPin2(const uint8_t *data, size_t size)
+void AlterPin2(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    std::string newPin2(reinterpret_cast<const char *>(data), size);
+    std::string newPin2 = provider->ConsumeRandomLengthString();
     std::u16string newPin2Str = Str8ToStr16(newPin2);
     dataMessageParcel.WriteString16(newPin2Str);
-    std::string oldPin2(reinterpret_cast<const char *>(data), size);
+    std::string oldPin2 = provider->ConsumeRandomLengthString();
     std::u16string oldPin2Str = Str8ToStr16(oldPin2);
     dataMessageParcel.WriteString16(oldPin2Str);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnAlterPin2(dataMessageParcel, reply);
 }
 
-void SetLockState(const uint8_t *data, size_t size)
+void SetLockState(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
     int32_t offset = 0;
-    int32_t lockType = static_cast<int32_t>(*data + offset);
+    int32_t lockType = provider->ConsumeIntegral<int32_t>() + offset;
     dataMessageParcel.WriteInt32(lockType);
     offset += sizeof(int32_t);
-    int32_t lockState = static_cast<int32_t>(*data + offset);
+    int32_t lockState = provider->ConsumeIntegral<int32_t>() + offset;
     dataMessageParcel.WriteInt32(lockState);
-    std::string password(reinterpret_cast<const char *>(data), size);
+    std::string password = provider->ConsumeRandomLengthString();
     std::u16string passwordStr = Str8ToStr16(password);
     dataMessageParcel.WriteString16(passwordStr);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnSetLockState(dataMessageParcel, reply);
 }
 
-void SetActiveSim(const uint8_t *data, size_t size)
+void SetActiveSim(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t enable = static_cast<int32_t>(*data + sizeof(int32_t));
+    int32_t enable = provider->ConsumeIntegral<int32_t>() + sizeof(int32_t);
     dataMessageParcel.WriteInt32(enable);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnSetActiveSim(dataMessageParcel, reply);
 }
 
-void DiallingNumbersGet(const uint8_t *data, size_t size)
+void DiallingNumbersGet(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t type = static_cast<int32_t>(*data + sizeof(int32_t));
+    int32_t type = provider->ConsumeIntegral<int32_t>() + sizeof(int32_t);
     dataMessageParcel.WriteInt32(type);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnDiallingNumbersGet(dataMessageParcel, reply);
 }
 
-void DelIccDiallingNumbers(const uint8_t *data, size_t size)
+void DelIccDiallingNumbers(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t type = static_cast<int32_t>(*data + sizeof(int32_t));
+    int32_t type = provider->ConsumeIntegral<int32_t>() + sizeof(int32_t);
     dataMessageParcel.WriteInt32(type);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnDelIccDiallingNumbers(dataMessageParcel, reply);
 }
 
-void UnlockSimLock(const uint8_t *data, size_t size)
+void UnlockSimLock(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    if (provider = nullptr) {
+        return;
+    }
     MessageParcel dataMessageParcel;
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     dataMessageParcel.WriteInt32(slotId);
-    int32_t lockType = static_cast<int32_t>(*data + sizeof(int32_t));
+    int32_t lockType = provider->ConsumeIntegral<int32_t>() + sizeof(int32_t);
     dataMessageParcel.WriteInt32(lockType);
-    std::string password(reinterpret_cast<const char *>(data), size);
+    std::string password = provider->ConsumeRandomLengthString();
     std::u16string passwordStr = Str8ToStr16(password);
     dataMessageParcel.WriteString16(passwordStr);
     MessageParcel reply;
@@ -246,17 +280,18 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    UnlockPin(data, size);
-    UnlockPuk(data, size);
-    AlterPin(data, size);
-    UnlockPin2(data, size);
-    UnlockPuk2(data, size);
-    AlterPin2(data, size);
-    SetLockState(data, size);
-    SetActiveSim(data, size);
-    DiallingNumbersGet(data, size);
-    DelIccDiallingNumbers(data, size);
-    UnlockSimLock(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    UnlockPin(provider);
+    UnlockPuk(provider);
+    AlterPin(provider);
+    UnlockPin2(provider);
+    UnlockPuk2(provider);
+    AlterPin2(provider);
+    SetLockState(provider);
+    SetActiveSim(provider);
+    DiallingNumbersGet(provider);
+    DelIccDiallingNumbers(provider);
+    UnlockSimLock(provider);
     return;
 }
 } // namespace OHOS

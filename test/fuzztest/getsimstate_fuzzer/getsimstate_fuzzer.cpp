@@ -31,6 +31,7 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
  
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -38,27 +39,15 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_STATUS_NUM = 5;
 constexpr int32_t ICC_STATUS_NUM = 12;
 constexpr int32_t SLEEP_TIME_SECONDS = 100000;
- 
-static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
-{
-    size_t typeSize = sizeof(int32_t);
-    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
-    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
-    if (size - align < typeSize * index + (typeSize - align)) {
-        return 0;
-    }
-    return *reinterpret_cast<const int32_t*>(base + index * typeSize);
-}
 
-void GetSimStateFunc(const uint8_t *data, size_t size)
+void GetSimStateFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t voiceMailCount = GetInt(data, size, index++);
-    int32_t simState = *data % SIM_STATUS_NUM + 1;
-    int32_t iccStatus = *data % ICC_STATUS_NUM + 1;
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t simState = provider->ConsumeIntegral<int32_t>() % SIM_STATUS_NUM + 1;
+    int32_t iccStatus = provider->ConsumeIntegral<int32_t>() % ICC_STATUS_NUM + 1;
     SimState simEnum = static_cast<SimState>(simState);
     IccSimStatus iccEnum = static_cast<IccSimStatus>(iccStatus);
     bool hasOperatorPrivileges = true;
@@ -66,14 +55,14 @@ void GetSimStateFunc(const uint8_t *data, size_t size)
     simManager->GetSimIccStatus(slotId, iccEnum);
     simManager->SetModemInit(slotId, true);
     simManager->RefreshSimState(slotId);
-    simManager->SendSimMatchedOperatorInfo(slotId, simState, std::string(reinterpret_cast<const char *>(data), size),
-        std::string(reinterpret_cast<const char *>(data), size));
-    simManager->SetVoiceMailCount(slotId, voiceMailCount);
-    simManager->GetVoiceMailCount(slotId, voiceMailCount);
+    simManager->SendSimMatchedOperatorInfo(slotId, simState, std::string(provider->ConsumeRandomLengthString()),
+        std::string(provider->ConsumeRandomLengthString()));
+    simManager->SetVoiceMailCount(slotId, provider->ConsumeIntegral<int32_t>());
+    simManager->GetVoiceMailCount(slotId, provider->ConsumeIntegral<int32_t>());
     simManager->ObtainSpnCondition(
-        slotId, hasOperatorPrivileges, std::string(reinterpret_cast<const char *>(data), size));
-    std::string pdu(reinterpret_cast<const char*>(data), size);
-    std::string smsc(reinterpret_cast<const char*>(data), size);
+        slotId, hasOperatorPrivileges, std::string(provider->ConsumeRandomLengthString()));
+    std::string pdu(provider->ConsumeRandomLengthString());
+    std::string smsc(provider->ConsumeRandomLengthString());
     simManager->AddSmsToIcc(slotId, static_cast<int32_t>(simState), pdu, smsc);
     simManager->IsCTSimCard(slotId, hasOperatorPrivileges);
     simManager->IsValidSlotIdForDefault(slotId);
@@ -88,7 +77,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    GetSimStateFunc(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    GetSimStateFunc(provider);
     return;
 }
 } // namespace OHOS

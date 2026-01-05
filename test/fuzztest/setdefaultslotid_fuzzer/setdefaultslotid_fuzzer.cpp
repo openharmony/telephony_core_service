@@ -31,6 +31,7 @@
 #include "sim_manager.h"
 #include "operator_config_cache.h"
 #include "voice_mail_constants.h"
+#include "fuzzer/FuzzedDataProvider.h"
  
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -49,12 +50,12 @@ static int32_t GetInt(const uint8_t *data, size_t size, int index = 0)
     return *reinterpret_cast<const int32_t*>(base + index * typeSize);
 }
  
-void SetDefaultSlotIdFunc(const uint8_t *data, size_t size)
+void SetDefaultSlotIdFunc(std::shared_ptr<FuzzedDataProvider> provider)
 {
     int index = 0;
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     int32_t voiceMailCount = GetInt(data, size, index++);
     simManager->multiSimController_ = nullptr;
     simManager->SetDefaultVoiceSlotId(slotId);
@@ -67,9 +68,9 @@ void SetDefaultSlotIdFunc(const uint8_t *data, size_t size)
     simManager->GetDefaultCellularDataSlotId();
     simManager->GetDefaultCellularDataSimId(slotId);
     simManager->GetPrimarySlotId(slotId);
-    simManager->InsertEsimData(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount,
-        std::string(reinterpret_cast<const char *>(data), size));
-    simManager->SetSimLabelIndex(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
+    simManager->InsertEsimData(std::string(provider->ConsumeRandomLengthString()), voiceMailCount,
+        std::string(provider->ConsumeRandomLengthString()));
+    simManager->SetSimLabelIndex(std::string(provider->ConsumeRandomLengthString()), voiceMailCount);
     simManager->slotCount_ = std::atoi(DEFAULT_SLOT_COUNT);
     simManager->GetDefaultSmsSlotId();
     simManager->GetDefaultCellularDataSlotId();
@@ -82,7 +83,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    SetDefaultSlotIdFunc(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    SetDefaultSlotIdFunc(provider);
     return;
 }
 } // namespace OHOS
