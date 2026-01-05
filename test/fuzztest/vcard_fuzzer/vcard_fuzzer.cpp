@@ -396,8 +396,8 @@ void VCardUtilsTest(std::shared_ptr<FuzzedDataProvider> provider)
     }
     std::string fuzzdata = provider->ConsumeRandomLengthString();
     int32_t intPara = provider->ConsumeIntegral<int32_t>();
-    std::string argument = provider->ConsumeRandomLengthString();
-    char argument0 = argument[0];
+    std::string argument0 = provider->ConsumeRandomLengthString();
+    char argument = argument0[0];
     std::string fileData = provider->ConsumeRandomLengthString();
     std::string numberStr = std::to_string(intPara);
     std::vector<std::string> records;
