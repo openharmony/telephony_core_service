@@ -1470,3 +1470,4 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SavePrimarySlotId001, Fu
     EXPECT_TRUE(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
 }
 }
+}
