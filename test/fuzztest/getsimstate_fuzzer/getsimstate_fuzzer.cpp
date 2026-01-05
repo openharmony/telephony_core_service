@@ -49,6 +49,7 @@ void GetSimStateFunc(std::shared_ptr<FuzzedDataProvider> provider)
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simManager = std::make_shared<SimManager>(telRilManager);
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t voiceMailCount = provider->ConsumeIntegral<int32_t>()
     int32_t simState = provider->ConsumeIntegral<int32_t>() % SIM_STATUS_NUM + 1;
     int32_t iccStatus = provider->ConsumeIntegral<int32_t>() % ICC_STATUS_NUM + 1;
     SimState simEnum = static_cast<SimState>(simState);
@@ -60,8 +61,8 @@ void GetSimStateFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->RefreshSimState(slotId);
     simManager->SendSimMatchedOperatorInfo(slotId, simState, std::string(provider->ConsumeRandomLengthString()),
         std::string(provider->ConsumeRandomLengthString()));
-    simManager->SetVoiceMailCount(slotId, provider->ConsumeIntegral<int32_t>());
-    simManager->GetVoiceMailCount(slotId, provider->ConsumeIntegral<int32_t>());
+    simManager->SetVoiceMailCount(slotId, voiceMailCount);
+    simManager->GetVoiceMailCount(slotId, voiceMailCount);
     simManager->ObtainSpnCondition(
         slotId, hasOperatorPrivileges, std::string(provider->ConsumeRandomLengthString()));
     std::string pdu(provider->ConsumeRandomLengthString());
