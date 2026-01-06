@@ -118,7 +118,6 @@ void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
             ReduceReqRLockCount(serialId);
         } else {
             reqSerialSet_.clear();
-            TELEPHONY_LOGD("ReduceRunningLock, UnLock");
             ReleaseRunningLockDelay(lockType);
         }
     } else {

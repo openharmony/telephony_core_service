@@ -2538,17 +2538,17 @@ int32_t CoreServiceProxy::GetRealSimCount()
     MessageParcel reply;
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
-        TELEPHONY_LOGE("GetRealSimCount WriteInterfaceToken failed");
+        TELEPHONY_LOGE("WriteInterfaceToken failed");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     auto remote = Remote();
     if (remote == nullptr) {
-        TELEPHONY_LOGE("GetRealSimCount Remote is null");
+        TELEPHONY_LOGE("Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_REAL_SIM_COUNT), data, reply, option);
     if (st != ERR_NONE) {
-        TELEPHONY_LOGE("GetRealSimCount failed, error code[%{public}d]", st);
+        TELEPHONY_LOGE("failed, error code is %{public}d", st);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return reply.ReadInt32();
