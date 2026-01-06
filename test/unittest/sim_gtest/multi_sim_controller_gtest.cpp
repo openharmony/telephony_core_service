@@ -1456,5 +1456,18 @@ HWTEST_F(MultiSimControllerTest, SavePrimaryCardInfoTest_SetPrimarySlotid, Funct
     multiSimController->SavePrimaryCardInfo(0);
     EXPECT_EQ(multiSimController->lastPrimarySlotId_, 0);
 }
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SavePrimarySlotId001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+
+    EXPECT_EQ(multiSimController->SavePrimarySlotId(SLOT_COUNT), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
+}
 }
 }

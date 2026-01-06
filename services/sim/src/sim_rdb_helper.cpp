@@ -603,6 +603,10 @@ int32_t SimRdbHelper::ClearSimLabel(SimType simType)
     predicates.GreaterThan(SimData::SIM_LABEL_INDEX, 0);
     DataShare::DataShareValuesBucket simLabelValue;
     simLabelValue.Put(SimData::SIM_LABEL_INDEX, valueObj);
+    if (!isEsim) {
+        DataShare::DataShareValueObject isActiveObj(ACTIVE);
+        simLabelValue.Put(SimData::IS_ACTIVE, isActiveObj);
+    }
     int32_t result = Update(dataShareHelper, simLabelValue, predicates);
     TELEPHONY_LOGI("ClearSimLabel result:%{public}d", result);
     dataShareHelper->Release();
