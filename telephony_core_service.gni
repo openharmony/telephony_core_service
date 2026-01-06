@@ -24,7 +24,7 @@ declare_args() {
     core_service_support_esim = true
   }
   core_service_low_power_class_2 = false
-  core_service_feature_support_satellite = true
+  core_service_satellite = false
 }
 
 telephony_extra_defines = []
@@ -39,8 +39,8 @@ if (core_service_support_esim) {
   telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_ESIM" ]
 }
 
-if (core_service_feature_support_satellite) {
-  telephony_extra_defines += [ "CORE_SERVICE_SUPPORT_SATELLITE" ]
+if (core_service_satellite) {
+  telephony_extra_defines += [ "CORE_SERVICE_SATELLITE" ]
 }
 
 if (core_service_low_power_class_2) {

@@ -94,7 +94,7 @@ ohos_fuzztest("SatelliteStatusChangedFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  if (core_service_feature_support_satellite) {
+  if (core_service_satellite) {
     deps += [
       # deps file
       ":SatelliteStatusChangedFuzzTest",

@@ -60,10 +60,10 @@ public:
     int32_t RevertLastTechnology();
     void UpdateImsServiceStatus(const AppExecFwk::InnerEvent::Pointer &event);
     void UpdateImsRegisterState(const AppExecFwk::InnerEvent::Pointer &event);
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     void RegisterSatelliteCallback();
     void UnregisterSatelliteCallback();
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
     int32_t SendUpdateCellLocationRequest();
     PhoneType GetPhoneType();
     int32_t GetNrSsbId(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo);
@@ -146,9 +146,9 @@ private:
     void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
     bool InitOperatorName();
     void SubscribeSystemAbility();
     int32_t IsSatelliteSupported() const;
@@ -188,9 +188,9 @@ private:
     uint32_t cellRequestMinInterval_ = 2; // This is the minimum interval in seconds for cell requests
     uint32_t lastCellRequestTime_ = 0;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-#ifdef CORE_SERVICE_SUPPORT_SATELLITE
+#ifdef CORE_SERVICE_SATELLITE
     sptr<ISatelliteCoreCallback> satelliteCallback_ = nullptr;
-#endif // CORE_SERVICE_SUPPORT_SATELLITE
+#endif // CORE_SERVICE_SATELLITE
     const int32_t INVALID_SLOT_ID = -1;
     bool isCsCapable_ = true;
     std::mutex mutex_;
