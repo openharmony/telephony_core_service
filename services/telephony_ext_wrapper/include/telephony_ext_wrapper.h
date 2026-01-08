@@ -191,7 +191,7 @@ public:
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
-    PROCESS_DELAY_OPERATOR_NAME processDelayOperatorName_ = nullptr;
+    PROCESS_DELAY_OPERATOR_NAME isInDelayProcessForOperatorName_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
