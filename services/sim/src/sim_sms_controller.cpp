@@ -137,6 +137,9 @@ int32_t SimSmsController::UpdateSmsIcc(int index, int status, std::string &pduDa
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("UpdateSmsIcc start: %{public}d, %{public}d", index, isCDMA);
     responseReady_ = false;
+    if (telRilManager_ == nullptr) {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_UPDATE_COMPLETED);
         SimMessageParam param { index, status, smsc, pduData };
@@ -166,6 +169,9 @@ int32_t SimSmsController::DelSmsIcc(int index)
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("DelSmsIcc start: %{public}d, %{public}d", index, isCDMA);
     responseReady_ = false;
+    if (telRilManager_ == nullptr) {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_DELETE_COMPLETED);
         telRilManager_->DelSimMessage(slotId_, index, response);
@@ -194,6 +200,9 @@ int32_t SimSmsController::AddSmsToIcc(int status, std::string &pdu, std::string 
     bool isCDMA = IsCdmaCardType();
     TELEPHONY_LOGI("AddSmsToIcc start: %{public}d, %{public}d", status, isCDMA);
     responseReady_ = false;
+    if (telRilManager_ == nullptr) {
+        return CORE_ERR_SIM_CARD_UPDATE_FAILED;
+    }
     if (!isCDMA) {
         AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(SIM_SMS_WRITE_COMPLETED);
         SimMessageParam param { 0, status, smsc, pdu };
@@ -224,6 +233,11 @@ void SimSmsController::Init(int slodId)
 std::vector<std::string> SimSmsController::ObtainAllSmsOfIcc()
 {
     std::unique_lock<std::mutex> lock(mtx_);
+    if (fileManager_ == nullptr) {
+        std::vector<std::string> nullVector;
+        smsList_.swap(nullVector);
+        return smsList_;
+    }
     std::shared_ptr<IccFileController> fileController = fileManager_->GetIccFileController();
     loadDone_ = false;
     if (fileController == nullptr) {
