@@ -121,7 +121,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
     isInDelayProcessForOperatorName_ = (PROCESS_DELAY_OPERATOR_NAME)dlsym(telephonyExtWrapperHandle_,
-        "ProcessDelayOperatorNameExt");
+        "IsInDelayProcessForOperatorName");
     if (isInDelayProcessForOperatorName_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
