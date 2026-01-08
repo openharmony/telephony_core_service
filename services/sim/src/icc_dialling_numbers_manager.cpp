@@ -182,7 +182,7 @@ int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
 {
     QueryIccDiallingNumbersPreLoad(type);
     std::unique_lock<std::mutex> lock(mtx_);
-    if (diallingNumber == nullptr) {
+    if (diallingNumber == nullptr || diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!HasSimCard()) {
@@ -212,7 +212,7 @@ int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
 {
     QueryIccDiallingNumbersPreLoad(type);
     std::unique_lock<std::mutex> lock(mtx_);
-    if (diallingNumber == nullptr) {
+    if (diallingNumber == nullptr || diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!HasSimCard()) {
