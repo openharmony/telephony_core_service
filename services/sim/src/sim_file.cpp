@@ -266,7 +266,7 @@ void SimFile::OnAllFilesFetched()
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (stateManager_ == false) {
+    if (stateManager_ == nullptr) {
         return false;
     }
     TELEPHONY_LOGI("SimFile::SIM_STATE_READY received slotId = %{public}d", slotId_);
