@@ -72,4 +72,5 @@ interface OHOS.Telephony.IEsimService {
         [in] int slotId,
         [in] ContractRequestData contractRequestData,
         [in] IEsimServiceCallback listener);
+    void GetEsimFreeStorage([out] int freeStorage);
 }
