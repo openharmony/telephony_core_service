@@ -560,7 +560,7 @@ std::shared_ptr<unsigned char> IccDiallingNumbersHandler::CreateSavingSequence(
     TELEPHONY_LOGI("CreateSavingSequence contents start");
 
     uint maxNumberSize = (DIALING_NUMBERS_END - DIALING_NUMBERS_BEGIN + 1) * LENGTH_RATE;
-    if (diallingNumber->number_.empty()) {
+    if (diallingNumber == nullptr && diallingNumber->number_.empty()) {
         TELEPHONY_LOGE("CreateSavingSequence number should not be empty");
         return diallingNumberStringPac;
     } else if (diallingNumber->number_.size() > maxNumberSize) {
