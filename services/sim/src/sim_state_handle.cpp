@@ -623,7 +623,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         TELEPHONY_LOGI("GetSimCardData slotId: %{public}d inSenseSwitchPhase, return", slotId);
         return;
     }
-    
+
     int32_t error = 0;
     IccState iccState;
     std::shared_ptr<SimCardStatusInfo> param = event->GetSharedObject<SimCardStatusInfo>();
