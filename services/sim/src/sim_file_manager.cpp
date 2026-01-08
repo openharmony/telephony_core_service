@@ -581,6 +581,9 @@ void SimFileManager::SetVoiceMailParamGsm(const std::u16string mailNumber, bool 
     std::string vmNumKey = "";
     SetParameter(vmNumKey.append(VM_NUMBER_KEY).append(std::to_string(slotId_)).c_str(),
         Str16ToStr8(mailNumber).c_str());
+    if (simFile_ == nullptr) {
+        return;
+    }
     if (isSavedIccRecords) {
         simFile_->SetVoiceMailNumber(Str16ToStr8(mailNumber));
     }
@@ -630,6 +633,9 @@ void SimFileManager::SetVoiceMailSimImsiParam(std::string imsi)
 
 void SimFileManager::StoreVoiceMailNumber(const std::u16string mailNumber, bool isSavedIccRecords)
 {
+    if (simFile_ == nullptr) {
+        return;
+    }
     std::string imsi = simFile_->ObtainIMSI();
     SetVoiceMailSimImsiParam(imsi);
     if (IsPhoneTypeGsm(slotId_)) {

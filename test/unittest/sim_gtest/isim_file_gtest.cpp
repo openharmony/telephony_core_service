@@ -89,6 +89,7 @@ HWTEST_F(ISimFileTest, ISimFileTest002, Function | MediumTest | Level1)
     std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IsimFile> iSimFile = std::make_shared<IsimFile>(simStateManager);
+    iSimFile->LoadIsimFiles();
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
     iSimFile->SetRilAndFileController(telRilManager, file, handler);

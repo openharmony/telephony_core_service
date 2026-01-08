@@ -1324,6 +1324,9 @@ int32_t SimManager::GetSimIO(int32_t slotId, int32_t command,
         TELEPHONY_LOGE("SIM IO input data length invalid");
         return TELEPHONY_ERR_FAIL;
     }
+    if (simStateManager_[slotId] == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     SimIoRequestInfo requestInfo;
     requestInfo.p1 = static_cast<int>(strtol(
         data.substr(SIM_IO_DATA_P1_OFFSET, SIM_IO_DATA_STR_LEN).c_str(), nullptr, SIM_IO_HEX_SIGN));
@@ -1487,6 +1490,9 @@ int32_t SimManager::SetIccCardState(int32_t slotId, int32_t simStatus)
     if (!HasSimCardInner(slotId)) {
         TELEPHONY_LOGE("SetIccCardState has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    if (simStateManager_[slotId] == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simStateManager_[slotId]->SetIccCardState(slotId, simStatus);
 }

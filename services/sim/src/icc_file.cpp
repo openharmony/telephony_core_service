@@ -572,7 +572,7 @@ void IccFile::UnRegisterCoreNotify(const std::shared_ptr<AppExecFwk::EventHandle
 
 void IccFile::UpdateSPN(const std::string spn)
 {
-    if (spn_ != spn) {
+    if (spn_ != spn && spnUpdatedObser_ != nullptr) {
         spnUpdatedObser_->NotifyObserver(MSG_SIM_SPN_UPDATED);
         spn_ = spn;
     }

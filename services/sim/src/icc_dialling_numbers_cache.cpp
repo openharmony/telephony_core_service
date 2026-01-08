@@ -93,6 +93,9 @@ void IccDiallingNumbersCache::ProcessObtainPbrDetailsDone(const AppExecFwk::Inne
     if (iter != diallingNumberFileList_.end()) {
         diallingNumberFileList_.erase(fileId);
     }
+    if (usimDiallingNumberSrv_ == nullptr) {
+        return;
+    }
     if (!usimDiallingNumberSrv_->IsLoadDiallingNumSuccess()) {
         SendBackResult(fd->callerCache->caller, diallingNumberList, fd->exception);
         usimDiallingNumberSrv_->SetLoadDiallingNumStatus(true);
