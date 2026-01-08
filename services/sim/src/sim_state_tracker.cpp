@@ -73,6 +73,9 @@ void SimStateTracker::ProcessSimRecordLoad(const AppExecFwk::InnerEvent::Pointer
     }
     TELEPHONY_LOGI("slotId: %{public}d need trigger LoadOperatorConfig", slotId_);
     SetMatchSimReason(slotId_, MatchSimReason::SIM_RECORDS_LOADED);
+    if (operatorConfigLoader_ == nullptr) {
+        return;
+    }
     if (IsNeedUpdateCarrierConfig()) {
         operatorConfigLoader_->LoadOperatorConfig(slotId_, operatorConfigCache_->STATE_PARA_UPDATE);
         ResetNeedUpdateCarrierConfig();
