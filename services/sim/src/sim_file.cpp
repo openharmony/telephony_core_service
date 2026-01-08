@@ -266,6 +266,9 @@ void SimFile::OnAllFilesFetched()
 
 bool SimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (stateManager_ == false) {
+        return false;
+    }
     TELEPHONY_LOGI("SimFile::SIM_STATE_READY received slotId = %{public}d", slotId_);
     CardType cardType = stateManager_->GetCardType();
     if (cardType == CardType::SINGLE_MODE_USIM_CARD || cardType == CardType::SINGLE_MODE_SIM_CARD) {
@@ -1020,7 +1023,7 @@ bool SimFile::ProcessReloadIccid(const AppExecFwk::InnerEvent::Pointer &event)
 bool SimFile::ProcessReloadImsi(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = false;
-    if (event == nullptr) {
+    if (event == nullptr || telRilManager_ == nullptr) {
         TELEPHONY_LOGE("ProcessReloadImsi event is nullptr");
         return isFileProcessResponse;
     }
