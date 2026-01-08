@@ -358,6 +358,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_002, Function | Med
     auto owner = event->GetOwner();
     int eventParam = 0;
     AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(-1, data, eventParam);
+    diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
     diallingNumbersCache->usimDiallingNumberSrv_ = std::make_shared<UsimDiallingNumbersService>();
     diallingNumbersCache->usimDiallingNumberSrv_->SetLoadDiallingNumStatus(false);
     diallingNumbersCache->ProcessObtainPbrDetailsDone(response);
@@ -496,7 +497,8 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     EXPECT_TRUE(diallingNumberHandler->FormatNameAndNumber(telNumber, true));
     diallingNumberHandler->MakeExceptionResult(0);
     diallingNumberHandler->UpdateFileController(iccFileController);
-    auto sequence = diallingNumberHandler->CreateSavingSequence(telNumber, -1);
+    auto sequence = diallingNumberHandler->CreateSavingSequence(nullptr, -1);
+    sequence = diallingNumberHandler->CreateSavingSequence(telNumber, -1);
     EXPECT_EQ(sequence, nullptr);
     telNumber = nullptr;
     diallingNumberHandler->FormatNameAndNumber(telNumber, true);
@@ -1805,6 +1807,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFileManager_002, Function | MediumTest |
     simFileManager->SetVoiceMailParamGsm(u"12345", false);
     EXPECT_FALSE(simFileManager->SetVoiceMailInfo(u"", u""));
     simFileManager->simFile_ = nullptr;
+    simFileManager->SetVoiceMailParamGsm(u"12345", true);
     EXPECT_TRUE(simFileManager->GetVoiceMailNumber().empty());
     EXPECT_EQ(simFileManager->GetVoiceMailCount(), UNKNOWN_VOICE_MAIL_COUNT);
     EXPECT_FALSE(simFileManager->SetVoiceMailCount(1));
