@@ -246,6 +246,9 @@ bool MultiSimController::InitEsimData()
 bool MultiSimController::InitActive(int slotId)
 {
     bool result = true;
+    if (simStateManager_[slotId] == nullptr) {
+        return result;
+    }
     if (!simStateManager_[slotId]->HasSimCard()) {
         TELEPHONY_LOGI("has no sim and not need to active");
         return result;

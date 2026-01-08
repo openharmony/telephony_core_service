@@ -270,6 +270,9 @@ void IccOperatorPrivilegeController::ProcessEvent(const AppExecFwk::InnerEvent::
 
 void IccOperatorPrivilegeController::ProcessSimStateChanged()
 {
+    if (simStateManager_ == nullptr) {
+        return;
+    }
     const SimState state = simStateManager_->GetSimState();
     TELEPHONY_LOGI("ProcessSimStateChanged simState:%{public}d", state);
     switch (state) {
@@ -295,6 +298,9 @@ void IccOperatorPrivilegeController::ProcessSimStateChanged()
 void IccOperatorPrivilegeController::OpenChannel()
 {
     TELEPHONY_LOGI("IccOperatorPrivilegeController::openChannel begin");
+    if (telRilManager_ == nullptr) {
+        return;
+    }
     if (!state_->IsAppropriateToOpenChannel()) {
         TELEPHONY_LOGI("now is not appropriate to open a new logical channel!!");
         return;
@@ -336,6 +342,9 @@ void IccOperatorPrivilegeController::ProcessOpenLogicalChannelDone(const AppExec
     reqInfo.p2 = P2;
     reqInfo.p3 = P3;
     reqInfo.data = "";
+    if (telRilManager_ == nullptr) {
+        return;
+    }
     telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, transmitEvent);
 }
 
@@ -368,6 +377,9 @@ void IccOperatorPrivilegeController::ProcessTransmitLogicalChannelDone(const App
             reqInfo.p2 = P2_EXTENDED_DATA;
             reqInfo.p3 = P3;
             reqInfo.data = "";
+            if (telRilManager_ == nullptr) {
+                return;
+            }
             telRilManager_->SimTransmitApduLogicalChannel(slotId_, reqInfo, transmitEvent);
             return;
         }

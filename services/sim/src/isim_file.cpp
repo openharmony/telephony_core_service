@@ -126,6 +126,9 @@ void IsimFile::LoadIsimFiles()
     TELEPHONY_LOGI("LoadIsimFiles started");
     fileQueried_ = true;
     AppExecFwk::InnerEvent::Pointer eventImpi = BuildCallerInfo(MSG_SIM_OBTAIN_IMPI_DONE);
+    if (fileController_ == nullptr) {
+        return;
+    }
     fileController_->ObtainBinaryFile(ELEMENTARY_FILE_IMPI, eventImpi);
     fileToGet_++;
 
