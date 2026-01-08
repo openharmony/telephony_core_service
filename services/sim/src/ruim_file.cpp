@@ -141,7 +141,7 @@ void RuimFile::OnAllFilesFetched()
 bool RuimFile::ProcessIccReady(const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGI("RuimFile::SIM_STATE_READY --received");
-    if (stateManager_->GetCardType() != CardType::SINGLE_MODE_RUIM_CARD) {
+    if (stateManager_ != nullptr && stateManager_->GetCardType() != CardType::SINGLE_MODE_RUIM_CARD) {
         TELEPHONY_LOGI("invalid RuimFile::SIM_STATE_READY received");
         return false;
     }
@@ -169,6 +169,9 @@ void RuimFile::LoadRuimFiles()
 {
     TELEPHONY_LOGI("LoadRuimFiles started");
     fileQueried_ = true;
+    if (telRilManager_ == nullptr) {
+        return;
+    }
 
     AppExecFwk::InnerEvent::Pointer eventIMSI = BuildCallerInfo(MSG_SIM_OBTAIN_IMSI_DONE);
     telRilManager_->GetImsi(slotId_, eventIMSI);
