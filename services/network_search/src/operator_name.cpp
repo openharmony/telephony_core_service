@@ -194,8 +194,8 @@ void OperatorName::NotifySpnChanged(bool isForce)
         domesticSpn = GetCustomName(simPlmn);
     }
 
-    if (TELEPHONY_EXT_WRAPPER.processDelayOperatorName_ != nullptr &&
-        TELEPHONY_EXT_WRAPPER.processDelayOperatorName_(slotId_)) {
+    if (TELEPHONY_EXT_WRAPPER.isInDelayProcessForOperatorName_ != nullptr &&
+        TELEPHONY_EXT_WRAPPER.isInDelayProcessForOperatorName_(slotId_)) {
         return;
     }
 

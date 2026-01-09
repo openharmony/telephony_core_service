@@ -189,7 +189,7 @@ public:
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
-    PROCESS_DELAY_OPERATOR_NAME processDelayOperatorName_ = nullptr;
+    PROCESS_DELAY_OPERATOR_NAME isInDelayProcessForOperatorName_ = nullptr;
     DynamicLoadInit dynamicLoadInit_ = nullptr;
     DynamicLoadDeInit dynamicLoadDeInit_ = nullptr;
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
@@ -370,7 +370,7 @@ inline bool ProcessOperatorNameImpl(int32_t, std::string &, const std::string &)
 {
     return false;
 }
-inline bool ProcessDelayOperatorNameImpl(int32_t)
+inline bool IsProcessDelayOperatorNameImpl(int32_t)
 {
     return false;
 }
@@ -444,7 +444,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork()
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
 {
     processOperatorName_ = &ProcessOperatorNameImpl;
-    processDelayOperatorName_ = &ProcessDelayOperatorNameImpl;
+    isInDelayProcessForOperatorName_ = &IsProcessDelayOperatorNameImpl;
     setNrOptionModeExt_ = &SetNrOptionModeExtImpl;
     updatePlmnExt_ = &UpdatePlmnExtImpl;
     isInModem2Optimization_ = &IsInModem2OptimizationImpl;
