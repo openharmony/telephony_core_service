@@ -99,9 +99,9 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_OperatorName_001, Function | Medium
     networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
 
     operatorName->slotId_ = SLOT_ID_0;
-    networkSearchState->networkState_ = std::make_unique<NetworkState>();//
-    networkSearchState->networkState_->psRegStatus_ = RegServiceState::REG_STATE_IN_SERVICE;//
-    operatorName->networkSearchState_ = networkSearchState;//
+    networkSearchState->networkState_ = std::make_unique<NetworkState>();
+    networkSearchState->networkState_->psRegStatus_ = RegServiceState::REG_STATE_IN_SERVICE;
+    operatorName->networkSearchState_ = networkSearchState;
     operatorName->networkSearchManager_ = networkSearchManager;
     operatorName->OnLocaleChanged();
     operatorName->OnOperatorConfigChanged(SLOT_ID_0, state);
@@ -351,8 +351,8 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_005, Function 
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(networkSearchManager->GetImei(SLOT_ID_0, imei), TELEPHONY_ERR_SUCCESS);
 
-    INetworkSearch::NSCALLBACK callback = nullptr;//
-    EXPECT_NE(networkSearchManager->GetRadioState(SLOT_ID_0, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);//
+    INetworkSearch::NSCALLBACK callback = nullptr;
+    EXPECT_NE(networkSearchManager->GetRadioState(SLOT_ID_0, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_006, Function | MediumTest | Level1)
@@ -405,12 +405,12 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_007, Function 
     inner->networkSearchState_->networkState_ = std::make_unique<NetworkState>();
     networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
 
-    TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ = nullptr;//
+    TELEPHONY_EXT_WRAPPER.getSignalInfoListExt_ = nullptr;
     TELEPHONY_EXT_WRAPPER.sortSignalInfoListExt_ = nullptr;
-    sptr<SignalInformation> signalInfo = new WcdmaSignalInformation;//
-    std::vector<sptr<SignalInformation>> signals;//
-    signals.emplace_back(signalInfo);//
-    EXPECT_EQ(networkSearchManager->GetSignalInfoList(SLOT_ID_0, signals), TELEPHONY_ERR_SUCCESS);//
+    sptr<SignalInformation> signalInfo = new WcdmaSignalInformation;
+    std::vector<sptr<SignalInformation>> signals;
+    signals.emplace_back(signalInfo);
+    EXPECT_EQ(networkSearchManager->GetSignalInfoList(SLOT_ID_0, signals), TELEPHONY_ERR_SUCCESS);
 
     networkSearchManager->delayTime_ = SLOT_ID_0;
     EXPECT_EQ(networkSearchManager->IsNeedDelayNotify(SLOT_ID_0), false);
@@ -441,7 +441,7 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_008, Function 
     EXPECT_EQ(networkSearchManager->ProcessSignalIntensity(SLOT_ID_0, signalIntensity), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_009, Function | MediumTest | Level1)//
+HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_009, Function | MediumTest | Level1)
 {
     std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
@@ -765,7 +765,7 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_RadioInfo_004, Function | MediumTes
     networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
     radioInfo->networkSearchManager_ = networkSearchManager;
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, object);
-    EXPECT_EQ(radioInfo->ProcessGetRrcConnectionState(event),TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(radioInfo->ProcessGetRrcConnectionState(event), TELEPHONY_ERR_FAIL);
 
     auto nrModeInfo = std::make_shared<NrModeInfo>();
     auto responseInfo = std::make_shared<RadioResponseInfo>();
