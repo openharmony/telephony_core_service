@@ -347,7 +347,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
     }
     if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT) ||
         ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN &&
-            !controller_->IsSetPrimarySlotIdInProgress()))) {
+            CoreManagerInner::GetInstance().IsModemInitDone(slotId)))) {
         HILOG_COMM_INFO("RefreshData clear data when slotId %{public}d is absent or unknown", slotId);
         simFileManager->ClearData();
         controller_->ForgetAllData(slotId);

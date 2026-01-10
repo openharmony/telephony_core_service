@@ -446,7 +446,7 @@ void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
     if (newSimStatus == ICC_CONTENT_UNKNOWN) {
         if (CoreManagerInner::GetInstance().IsEsim(slotId_)) {
             if (oldSimStatus_ == ICC_CONTENT_READY) {
-                CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(false);
+                CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(true);
             }
         } else {
             modemInitDone_ = false;
