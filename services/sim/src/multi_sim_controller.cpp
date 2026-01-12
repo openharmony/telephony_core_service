@@ -2073,9 +2073,9 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
     if (!IsValidSlotId(slotId)) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    SimRdbInfo simRdbInfo;
     int32_t ret = TELEPHONY_SUCCESS;
     if (isShowPresent) {
-        SimRdbInfo simRdbInfo;
         std::unique_lock<ffrt::mutex> dbLock(writeDbMutex_);
         if (simDbHelper_->QueryDataByIccId(invalidIccId, simRdbInfo) == INVALID_VALUE) {
             return INVALID_VALUE;
@@ -2083,8 +2083,6 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
             TELEPHONY_LOGI("UpdateSimPresent exist INVALID_ICCID");
             ret = simDbHelper_->UpdateSimPresent(invalidIccId, true, slotId + 1);
-            GetAllListFromDataBase();
-            return ret;
         } else {
             DataShare::DataShareValuesBucket values;
             DataShare::DataShareValueObject slotObj(INVALID_VALUE);
@@ -2104,14 +2102,16 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
             values.Put(SimData::IS_MESSAGE_CARD, notMainCardObj);
             values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
             ret = simDbHelper_->InsertData(id, values);
-            GetAllListFromDataBase();
-            return ret > SIMID_INDEX0 ? TELEPHONY_SUCCESS : INVALID_VALUE;
+            ret = ret > SIMID_INDEX0 ? TELEPHONY_SUCCESS : INVALID_VALUE;
         }
     } else {
         ret = simDbHelper_->UpdateSimPresent(INVALID_ICCID, false, INVALID_VALUE);
-        GetAllListFromDataBase();
-        return ret;
     }
+    GetAllListFromDataBase();
+    auto querryRet = simDbHelper_->QueryDataByIccId(invalidIccId, simRdbInfo);
+    TELEPHONY_LOGI("INVALID_ICCID%{public}d update finish, querry ret:%{public}d, simLabelIndex:%{public}d",
+        slotId, querryRet, simRdbInfo.simLabelIndex);
+    return ret;
 }
 
 bool MultiSimController::IsSetPrimarySlotReady(int32_t slotId)
