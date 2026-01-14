@@ -181,10 +181,11 @@ int32_t MultiSimController::UpdateEsimOpName(const std::string &iccId, const std
     return ret;
 }
 
-void void MultiSimController::GetLoadedSimInfo(std::unordered_map<int32_t, std::string>& loadedSimCardInfo)
+void MultiSimController::GetLoadedSimInfo(std::unordered_map<int32_t, std::string>& loadedSimCardInfo)
 {
     loadedSimCardInfo = loadedSimCardInfo_;
 }
+
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
