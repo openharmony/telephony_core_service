@@ -574,7 +574,12 @@ ohos_unittest("tel_network_search_zero_branch_gtest") {
   module_out_path = part_name + "/" + test_module
  
   sources = [
+    # Depends files
+    "ims_reg_info_callback_gtest.cpp",
+ 
+    # Test cases
     "zero_branch_test_network_search.cpp",
+    "network_search_handler_test.cpp",
   ]
  
   include_dirs = [
