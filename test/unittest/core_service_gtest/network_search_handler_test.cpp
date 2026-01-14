@@ -891,7 +891,7 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_RadioInfo_RrcConnectionStateAndNrOp
     networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
     radioInfo->networkSearchManager_ = networkSearchManager;
     auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE, object);
-    EXPECT_EQ(radioInfo->ProcessGetRrcConnectionState(event),TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(radioInfo->ProcessGetRrcConnectionState(event), TELEPHONY_ERR_FAIL);
  
     auto nrModeInfo = std::make_shared<NrModeInfo>();
     auto responseInfo = std::make_shared<RadioResponseInfo>();
