@@ -693,9 +693,24 @@ void MultiSimMonitor::RegisterSimNotify()
         return;
     }
     isForgetAllDataDone_ = true;
+    RefreshSimAccountLoaded();
     TELEPHONY_LOGI("Register with time left %{public}d", static_cast<int32_t>(remainCount_));
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         RegisterSimNotify(static_cast<int32_t>(slotId));
+    }
+}
+
+void MultiSimMonitor::RefreshSimAccountLoaded()
+{
+    if (controller_ == nullptr) {
+        TELEPHONY_LOGE("MultiSimContorller is null");
+        return;
+    }
+    std::unordered_map<int32_t, std::string> simInfo;
+    controller_->GetLoadedSimInfo(simInfo);
+    for (const auto& pair : simInfo) {
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, pair.first);
+        TELEPHONY_LOGI("slot %{public}d refresh send sim account Loaded", pair.first);
     }
 }
 
