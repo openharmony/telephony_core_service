@@ -2323,7 +2323,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Fu
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
         std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr) + };
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)};
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->SubscribeUserSwitch();
     multiSimMonitor->SubscribeDataShareReady();
