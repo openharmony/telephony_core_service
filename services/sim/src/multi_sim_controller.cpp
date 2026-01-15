@@ -181,9 +181,10 @@ int32_t MultiSimController::UpdateEsimOpName(const std::string &iccId, const std
     return ret;
 }
 
-void MultiSimController::GetLoadedSimInfo(std::unordered_map<int32_t, std::string>& loadedSimCardInfo)
+bool MultiSimController::isNeedRefreshLoadedSlot(int32_t slotId)
 {
-    loadedSimCardInfo = loadedSimCardInfo_;
+    std::shared_lock<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
+    return loadedSimCardInfo_.count(slotId) > 0;
 }
 
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
