@@ -107,6 +107,7 @@ private:
     void RegisterRebootDetectCallback();
     void UnregisterRebootDetectCallback();
     void SetMatchSimStateTracker(MatchSimState matchSimStateTracker);
+    void RefreshSimAccountLoaded();
 
 private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
