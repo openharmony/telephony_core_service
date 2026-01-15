@@ -706,11 +706,17 @@ void MultiSimMonitor::RefreshSimAccountLoaded()
         TELEPHONY_LOGE("MultiSimContorller is null");
         return;
     }
-    std::unordered_map<int32_t, std::string> simInfo;
-    controller_->GetLoadedSimInfo(simInfo);
-    for (const auto& pair : simInfo) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, pair.first);
-        TELEPHONY_LOGI("slot %{public}d refresh send sim account Loaded", pair.first);
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ is nullptr");
+        return;
+    }
+    if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_0)) {
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_0);
+        TELEPHONY_LOGI("slot 0 refresh send sim account Loaded");
+    }
+    if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_1)) {
+        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_1);
+        TELEPHONY_LOGI("slot 1 refresh send sim account Loaded");
     }
 }
 
