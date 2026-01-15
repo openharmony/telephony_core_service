@@ -41,6 +41,7 @@ ohos_static_library("esim_ani_cxx") {
 
   sources = [
     "src/cxx/ani_esim.cpp",
+    "src/cxx/ani_esim_service_callback.cpp",
     "src/cxx/ani_reset_memory_callback.cpp",
   ]
   sources += get_target_outputs(":esim_ani_cxx_gen")
