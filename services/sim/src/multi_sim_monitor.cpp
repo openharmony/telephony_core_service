@@ -541,14 +541,13 @@ void MultiSimMonitor::UpdateAllSimData(int32_t userId)
     }
 }
 
-void MultiSimMonitor::OnUserSwitched(int32_t userId){
-    if (userId == ACTIVE_USER_ID && isDataShareReady_)
-    {
+void MultiSimMonitor::OnUserSwitched(int32_t userId)
+{
+    if (userId == ACTIVE_USER_ID && isDataShareReady_){
         CheckDataShareError();
         CheckSimNotifyRegister();
     }
-    if (userId != 0 && isDataShareReady_)
-    {
+    if (userId != 0 && isDataShareReady_){
         UpdateAllSimData(userId);
     }
     SetLastUserId(userId);
