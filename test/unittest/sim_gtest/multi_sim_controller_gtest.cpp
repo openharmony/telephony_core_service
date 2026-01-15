@@ -1495,13 +1495,16 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
     EXPECT_TRUE(multiSimMonitor->controller_->loadedSimCardInfo_.empty());
     multiSimMonitor->controller_->loadedSimCardInfo_ = simInfo;
     multiSimMonitor->RefreshSimAccountLoaded();
- 
-    multiSimMonitor->observerHandler_ = nullptr;
-    multiSimMonitor->RefreshSimAccountLoaded();
-
+    
     multiSimMonitor->controller_ = nullptr;
     multiSimMonitor->RefreshSimAccountLoaded();
-    EXPECT_TRUE(multiSimMonitor->controller_->loadedSimCardInfo_[0] = "000000000");
+
+    auto multiSimMonitor1 = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor1->controller_->loadedSimCardInfo_ = simInfo;
+    multiSimMonitor1->observerHandler_ = nullptr;
+    multiSimMonitor1->RefreshSimAccountLoaded();
+
+    EXPECT_TRUE(multiSimMonitor1->controller_->loadedSimCardInfo_[0] == "000000000");
 }
 }
 }
