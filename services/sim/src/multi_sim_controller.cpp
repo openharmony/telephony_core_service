@@ -1544,18 +1544,7 @@ std::string MultiSimController::EncryptIccId(const std::string iccid)
 
 void MultiSimController::SavePrimarySlotIdInfo(int32_t slotId)
 {
-    lastPrimarySlotId_ = slotId;
-    SetParameter(PRIMARY_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
-    if (simFileManager_[slotId] == nullptr) {
-        TELEPHONY_LOGE("simFileManager_ is null slotId is %{public}d", slotId);
-        return;
-    }
-    std::string iccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
-    TELEPHONY_LOGI("save data is empty %{public}d", iccId.empty());
-    if (!iccId.empty()) {
-        std::string encryptIccId = EncryptIccId(iccId);
-        SetParameter(MAIN_CARD_ICCID_KEY.c_str(), encryptIccId.c_str());
-    }
+    SavePrimaryCardInfo(slotId);
     SendMainCardBroadCast(slotId);
     SetDefaultCellularDataSlotId(slotId);
 }
