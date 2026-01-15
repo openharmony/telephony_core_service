@@ -1488,11 +1488,17 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     std::unordered_map<int32_t, std::string> simInfo;
+    simInfo[0] = '000000000';
+    simInfo[1] = '000000001';
+ 
     multiSimMonitor->RefreshSimAccountLoaded();
-    EXPECT_TRUE(simInfo.empty());
-    std::shared_ptr<MultiSimController> controller_ = nullptr;
+    EXPECT_TRUE(multiSimMonitor->controller_->loadedSimCardInfo_.empty());
+    multiSimMonitor->controller_->loadedSimCardInfo_ = simInfo;
     multiSimMonitor->RefreshSimAccountLoaded();
-    EXPECT_TRUE(simInfo.empty());
+ 
+    multiSimMonitor->controller_ = nullptr;
+    multiSimMonitor->RefreshSimAccountLoaded();
+    EXPECT_TRUE(multiSimMonitor->controller_->loadedSimCardInfo_[0] = '000000000');
 }
 }
 }
