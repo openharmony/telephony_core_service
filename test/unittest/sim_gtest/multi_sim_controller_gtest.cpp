@@ -1491,6 +1491,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
     multiSimMonitor->RefreshSimAccountLoaded();
     EXPECT_TRUE(simInfo.empty());
     std::shared_ptr<MultiSimController> controller_ = nullptr;
+    multiSimMonitor->RefreshSimAccountLoaded();
     EXPECT_TRUE(simInfo.empty());
 }
 }
