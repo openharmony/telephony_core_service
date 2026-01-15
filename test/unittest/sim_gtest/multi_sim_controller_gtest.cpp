@@ -1498,6 +1498,9 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
  
     multiSimMonitor->controller_ = nullptr;
     multiSimMonitor->RefreshSimAccountLoaded();
+
+    multiSimMonitor->observerHandler_ = nullptr;
+    multiSimMonitor->RefreshSimAccountLoaded();
     EXPECT_TRUE(multiSimMonitor->controller_->loadedSimCardInfo_[0] = '000000000');
 }
 }
