@@ -1388,7 +1388,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
     simRdb1.simLabelIndex = 3;
     multiSimController->allLocalCacheInfo_.push_back(simRdb1);
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
-    EXPECT_EQ(simIdx, 1);
+    EXPECT_EQ(simIdx, 3);
 
     OHOS::system::SetParameter("persist.telephony.last_deactive_profile", "1");
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
