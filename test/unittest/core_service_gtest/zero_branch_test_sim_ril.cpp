@@ -1231,7 +1231,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersManager_002, Function | M
     IccDiallingNumbersManager iccDiallingNumbersManager(simFileManager, nullptr);
     std::shared_ptr<DiallingNumbersInfo> diallingNumbers = std::make_shared<DiallingNumbersInfo>();
 
-    EXPECT_EQ(iccDiallingNumbersManager.UpdateIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
+    EXPECT_EQ(iccDiallingNumbersManager.UpdateIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(iccDiallingNumbersManager.DelIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
     EXPECT_EQ(iccDiallingNumbersManager.AddIccDiallingNumbers(0, diallingNumbers), TELEPHONY_ERR_NO_SIM_CARD);
 
