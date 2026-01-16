@@ -455,6 +455,10 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 void NetworkSearchState::NotifyStateChange()
 {
     sptr<NetworkState> ns = new NetworkState;
+    if (ns == nullptr) {
+        TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
+        return;
+    }
     MessageParcel data;
     HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     {
@@ -470,10 +474,6 @@ void NetworkSearchState::NotifyStateChange()
         if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
             TELEPHONY_LOGI(
                 "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
-            if (ns == nullptr) {
-                TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
-                return;
-            }
 
             networkState_->Marshalling(data);
             ns->ReadFromParcel(data);
@@ -505,8 +505,8 @@ void NetworkSearchState::NotifyStateChange()
     {
         std::lock_guard<std::mutex> lock(mutex_);
         networkState_->Marshalling(data);
+        networkStateOld_->ReadFromParcel(data);
     }
-    networkStateOld_->ReadFromParcel(data);
     processNetworkState_ = false;
 }
 
