@@ -454,7 +454,7 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    sptr<NetworkState> ns = new NetworkState;
+    auto ns = sptr<NetworkState>::MakeSptr();
     if (ns == nullptr) {
         TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
         return;
