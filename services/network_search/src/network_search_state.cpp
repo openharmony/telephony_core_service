@@ -470,13 +470,11 @@ void NetworkSearchState::NotifyStateChange()
         if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
             TELEPHONY_LOGI(
                 "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
-            // sptr<NetworkState> ns = new NetworkState;
             if (ns == nullptr) {
                 TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
                 return;
             }
 
-            // MessageParcel data;
             networkState_->Marshalling(data);
             ns->ReadFromParcel(data);
             if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
