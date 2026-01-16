@@ -989,7 +989,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_SetNetworkSelectionMode_0300
         callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         bool syncResult = callback->SetNetworkModeCallbackResult();
         TELEPHONY_LOGI("TelephonyTestService SetNetworkSelectionMode syncResult: %{public}d", syncResult);
-        ASSERT_GE(syncResult);
+        ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
     }
 }
 
