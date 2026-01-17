@@ -509,12 +509,17 @@ void MultiSimMonitor::DataShareEventSubscriber::OnDataShareReady()
         return;
     }
     std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_ = true;
-    auto isUserSwitch = std::static_pointer_cast<MultiSimMonitor>(handler)->isUserSwitch_;
-    if (isUserSwitch || activeList[0] == ACTIVE_USER_ID) {
+    auto isUserIdValid = std::static_pointer_cast<MultiSimMonitor>(handler)->IsUserIdValid();
+    if (isUserIdValid || activeList[0] == ACTIVE_USER_ID) {
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
         std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimPresentWhenReboot();
     }
+}
+
+bool MultiSimMonitor::IsUserIdValid()
+{
+    return lastUserId_ != -1;
 }
 
 void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
@@ -525,7 +530,6 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
         TELEPHONY_LOGE("handler is invalid");
         return;
     }
-    std::static_pointer_cast<MultiSimMonitor>(handler)->isUserSwitch_ = true;
     std::static_pointer_cast<MultiSimMonitor>(handler)->OnUserSwitched(userId);
 }
 
