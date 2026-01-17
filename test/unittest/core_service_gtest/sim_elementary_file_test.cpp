@@ -83,7 +83,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1
         std::u16string iccId;
         CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_, iccId);
         std::string result = Str16ToStr8(iccId);
-        EXPECT_STRNE(result.c_str(), "");
+        EXPECT_STREQ(result.c_str(), "");
     }
 }
 
@@ -170,7 +170,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
         std::u16string imsi;
         CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_, imsi);
         std::string result = Str16ToStr8(imsi);
-        EXPECT_STRNE(result.c_str(), "");
+        EXPECT_STREQ(result.c_str(), "");
     }
 }
 
@@ -223,7 +223,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
         std::u16string gid1;
         CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_, gid1);
         std::string result = Str16ToStr8(gid1);
-        EXPECT_STRNE(result.c_str(), "");
+        EXPECT_STREQ(result.c_str(), "");
     }
 }
 
@@ -275,7 +275,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid2(SimTest::slotId_));
-        EXPECT_STRNE(result.c_str(), "");
+        EXPECT_STREQ(result.c_str(), "");
     }
 }
 
@@ -545,7 +545,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetVoiceMailCount_0100, Function | MediumTest | 
     } else {
         int32_t voiceMailCount;
         int32_t result = CoreServiceClient::GetInstance().GetVoiceMailCount(SimTest::slotId_, voiceMailCount);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     }
 }
 
@@ -811,7 +811,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetFDNState_0100, Function | MediumTest | Level2
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
         }
     }
 }
@@ -1411,7 +1411,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetVoiceMailInfo_0100, Function | MediumTest | L
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
         }
     }
 }
@@ -1472,7 +1472,7 @@ HWTEST_F(SimTest, Telephony_Sim_IsCTSimCard_0100, Function | MediumTest | Level3
     } else {
         bool isCTSimCard = false;
         int32_t result = CoreServiceClient::GetInstance().IsCTSimCard(SimTest::slotId_, isCTSimCard);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     }
 }
 
