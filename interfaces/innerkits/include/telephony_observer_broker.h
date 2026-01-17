@@ -40,6 +40,7 @@ public:
         ON_VOICE_MAIL_MSG_INDICATOR_UPDATED,
         ON_ICC_ACCOUNT_UPDATED,
         ON_CALL_STATE_EX_UPDATED,
+        ON_CCALL_STATE_UPDATED,
     };
 
     virtual void OnCellularDataConnectStateUpdated(
@@ -60,6 +61,8 @@ public:
     virtual void OnVoiceMailMsgIndicatorUpdated(int32_t slotId, bool voiceMailMsgResult) = 0;
     virtual void OnIccAccountUpdated() = 0;
     virtual void OnCallStateUpdatedEx(int32_t slotId, int32_t callState) = 0;
+    virtual void OnCCallStateUpdated(
+        int32_t slotId, int32_t callState, const std::u16string &phoneNumber) = 0;
 
 public:
     static const uint32_t OBSERVER_MASK_NETWORK_STATE = 0x00000001;
@@ -73,6 +76,7 @@ public:
     static const uint32_t OBSERVER_MASK_CFU_INDICATOR = 0x00000100;
     static const uint32_t OBSERVER_MASK_VOICE_MAIL_MSG_INDICATOR = 0x00000200;
     static const uint32_t OBSERVER_MASK_ICC_ACCOUNT = 0x00000400;
+    static const uint32_t OBSERVER_MASK_CCALL_STATE = 0x00000800;
 };
 } // namespace Telephony
 } // namespace OHOS

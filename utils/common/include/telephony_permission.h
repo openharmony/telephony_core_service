@@ -118,6 +118,10 @@ static constexpr const char *GET_TELEPHONY_ESIM_STATE = "ohos.permission.GET_TEL
  * This permission allows a application to obtain apn info and set apn.
  */
 static constexpr const char *MANAGE_APN_SETTING = "ohos.permission.MANAGE_APN_SETTING";
+/**
+ * This permission allows a application to manage call state.
+ */
+static constexpr const char *MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
 } // namespace Permission
 
 class TelephonyPermission {
