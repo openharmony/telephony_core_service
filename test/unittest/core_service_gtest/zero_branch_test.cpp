@@ -2327,12 +2327,12 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Fu
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->SubscribeUserSwitch();
     multiSimMonitor->SubscribeDataShareReady();
-    multiSimMonitor->isUserSwitch_ = true;
+    multiSimMonitor->lastUserId_ = 100;
     multiSimMonitor->remainCount_ = 30;
     multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
     EXPECT_EQ(multiSimMonitor->remainCount_, 14);
     multiSimMonitor->remainCount_ = 30;
-    multiSimMonitor->isUserSwitch_ = false;
+    multiSimMonitor->lastUserId_ = -1;
     multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
     EXPECT_EQ(multiSimMonitor->remainCount_, 14);
 }
