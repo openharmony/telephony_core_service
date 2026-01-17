@@ -167,7 +167,6 @@ private:
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
     std::atomic<int32_t> lastUserId_ = -1;
-    bool isUserSwitch_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
