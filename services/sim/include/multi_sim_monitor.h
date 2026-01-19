@@ -57,7 +57,7 @@ public:
     void SetLastUserId(int32_t userId);
     void UpdateAllSimData(int32_t userId);
     void OnUserSwitched(int32_t userId);
-    bool IsUserIdValid();
+    void OnDataShareReady(int32_t userId);
     void CheckSimPresentWhenReboot();
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {
