@@ -384,7 +384,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetOperatorConfig_0100, Function | MediumTest | 
     } else {
         OperatorConfig oc;
         int32_t result = CoreServiceClient::GetInstance().GetOperatorConfigs(SimTest::slotId_, oc);
-        EXPECT_EQ(result, TTELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+        EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     }
 }
 
