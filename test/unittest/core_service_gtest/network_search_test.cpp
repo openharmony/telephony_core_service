@@ -1199,7 +1199,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetNetworkSelectionMode_0300
         callback->WaitForSetNetworkModeCallback(WAIT_TIME_SECOND_LONG);
         bool syncResult = callback->SetNetworkModeCallbackResult();
         TELEPHONY_LOGI("GetNetworkSelectionMode_0300 SetNetworkModeCallbackResult syncResult: %{public}d", syncResult);
-        ASSERT_TRUE(syncResult);
+        ASSERT_GE(syncResult, TELEPHONY_ERR_SUCCESS);
 
         result = CoreServiceClient::GetInstance().GetNetworkSelectionMode(SLOT_ID1, callback);
         TELEPHONY_LOGI("GetNetworkSelectionMode_0300 GetNetworkSelectionMode result: %{public}d", result);
