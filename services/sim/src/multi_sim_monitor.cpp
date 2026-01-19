@@ -499,6 +499,16 @@ void MultiSimMonitor::SubscribeUserSwitch()
         userSwitchSubscriber_, {TelCommonEvent::USER_SWITCHED});
 }
 
+void MultiSimMonitor::OnDataShareReady(int32_t userId)
+{
+    isDataShareReady_ = true;
+    if (lastUserId_ != -1 || userId == ACTIVE_USER_ID) {
+        CheckDataShareError();
+        CheckSimNotifyRegister();
+        CheckSimPresentWhenReboot();
+    }
+}
+
 void MultiSimMonitor::DataShareEventSubscriber::OnDataShareReady()
 {
     std::vector<int32_t> activeList = { 0 };
@@ -508,18 +518,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnDataShareReady()
         TELEPHONY_LOGE("handler is invalid");
         return;
     }
-    std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_ = true;
-    auto isUserIdValid = std::static_pointer_cast<MultiSimMonitor>(handler)->IsUserIdValid();
-    if (isUserIdValid || activeList[0] == ACTIVE_USER_ID) {
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimPresentWhenReboot();
-    }
-}
-
-bool MultiSimMonitor::IsUserIdValid()
-{
-    return lastUserId_ != -1;
+    std::static_pointer_cast<MultiSimMonitor>(handler)->OnDataShareReady(activeList[0]);
 }
 
 void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
