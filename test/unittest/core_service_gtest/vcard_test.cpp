@@ -1250,7 +1250,8 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
         EXPECT_EQ(errorCode, SUBSYS_CCRUNTIME_SYS_ABILITY_ID_BEGIN + 1);
    } else {
-    EXPECT_TRUE(true);
+        TELEPHONY_LOGI("VCardTestCreateDataShareHelper == null");
+        EXPECT_TRUE(true);
    }
 }
 
