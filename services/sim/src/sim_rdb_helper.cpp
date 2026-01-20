@@ -547,6 +547,7 @@ int32_t SimRdbHelper::ForgetAllData()
     }
     DataShare::DataSharePredicates predicates2;
     predicates2.EqualTo(SimData::IS_ESIM, std::to_string(0));
+    predicates2.Unlike(SimData::ICC_ID, "INVALID_ICCID_");
     DataShare::DataShareValuesBucket simLabelValue;
     simLabelValue.Put(SimData::SIM_LABEL_INDEX, valueObj);
     result = Update(dataShareHelper, simLabelValue, predicates2);
