@@ -1248,7 +1248,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(Contact::ID, "-1");
     int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
-    EXPECT_EQ(errorCode, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(errorCode, SUBSYS_CCRUNTIME_SYS_ABILITY_ID_BEGIN + 1);
 }
 
 /**
