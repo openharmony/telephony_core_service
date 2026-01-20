@@ -1249,10 +1249,10 @@ HWTEST_F(VcardTest, Telephony_VCardTest_022, Function | MediumTest | Level1)
         predicates.EqualTo(Contact::ID, "-1");
         int32_t errorCode = VCardManager::GetInstance().Export(filePath, predicates);
         EXPECT_EQ(errorCode, SUBSYS_CCRUNTIME_SYS_ABILITY_ID_BEGIN + 1);
-   } else {
+    } else {
         TELEPHONY_LOGI("VCardTestCreateDataShareHelper == null");
         EXPECT_TRUE(true);
-   }
+    }
 }
 
 /**
