@@ -108,7 +108,6 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             InitData(event->GetParam());
             break;
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
-            hasSimStateChanged_ = true;
             RefreshData(event->GetParam());
             break;
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT:
@@ -500,6 +499,16 @@ void MultiSimMonitor::SubscribeUserSwitch()
         userSwitchSubscriber_, {TelCommonEvent::USER_SWITCHED});
 }
 
+void MultiSimMonitor::OnDataShareReady(int32_t userId)
+{
+    isDataShareReady_ = true;
+    if (lastUserId_ != -1 || userId == ACTIVE_USER_ID) {
+        CheckDataShareError();
+        CheckSimNotifyRegister();
+        CheckSimPresentWhenReboot();
+    }
+}
+
 void MultiSimMonitor::DataShareEventSubscriber::OnDataShareReady()
 {
     std::vector<int32_t> activeList = { 0 };
@@ -509,12 +518,7 @@ void MultiSimMonitor::DataShareEventSubscriber::OnDataShareReady()
         TELEPHONY_LOGE("handler is invalid");
         return;
     }
-    std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_ = true;
-    if (activeList[0] == ACTIVE_USER_ID) {
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimPresentWhenReboot();
-    }
+    std::static_pointer_cast<MultiSimMonitor>(handler)->OnDataShareReady(activeList[0]);
 }
 
 void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
@@ -525,26 +529,31 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
         TELEPHONY_LOGE("handler is invalid");
         return;
     }
-    if (userId == ACTIVE_USER_ID && std::static_pointer_cast<MultiSimMonitor>(handler)->isDataShareReady_) {
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckDataShareError();
-        std::static_pointer_cast<MultiSimMonitor>(handler)->CheckSimNotifyRegister();
-    }
-    std::static_pointer_cast<MultiSimMonitor>(handler)->UpdateAllSimData(userId);
-    std::static_pointer_cast<MultiSimMonitor>(handler)->SetPrivateUserId(userId);
+    std::static_pointer_cast<MultiSimMonitor>(handler)->OnUserSwitched(userId);
 }
 
-void MultiSimMonitor::SetPrivateUserId(int32_t userId)
+void MultiSimMonitor::SetLastUserId(int32_t userId)
 {
-    privateUserId_ = userId != ACTIVE_USER_ID ? userId : privateUserId_;
+    lastUserId_ = userId;
 }
 
 void MultiSimMonitor::UpdateAllSimData(int32_t userId)
 {
-    if ((userId != ACTIVE_USER_ID && userId != privateUserId_) ||
-        ((userId == ACTIVE_USER_ID || userId == privateUserId_) && hasSimStateChanged_)) {
-        hasSimStateChanged_ = false;
+    if (userId != lastUserId_) {
         SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
     }
+}
+
+void MultiSimMonitor::OnUserSwitched(int32_t userId)
+{
+    if (userId == ACTIVE_USER_ID && isDataShareReady_) {
+        CheckDataShareError();
+        CheckSimNotifyRegister();
+    }
+    if (userId != 0 && isDataShareReady_) {
+        UpdateAllSimData(userId);
+    }
+    SetLastUserId(userId);
 }
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()

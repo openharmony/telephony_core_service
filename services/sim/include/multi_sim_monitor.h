@@ -54,8 +54,10 @@ public:
     void UnRegisterSimNotify();
     int32_t ResetSimLoadAccount(int32_t slotId);
     bool IsVSimSlotId(int32_t slotId);
-    void SetPrivateUserId(int32_t userId);
+    void SetLastUserId(int32_t userId);
     void UpdateAllSimData(int32_t userId);
+    void OnUserSwitched(int32_t userId);
+    void OnDataShareReady(int32_t userId);
     void CheckSimPresentWhenReboot();
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {
@@ -165,8 +167,7 @@ private:
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
-    int32_t privateUserId_ = -1;
-    bool hasSimStateChanged_ = false;
+    std::atomic<int32_t> lastUserId_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS
