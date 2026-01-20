@@ -2286,15 +2286,55 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_006, Function | MediumTest | Leve
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->SubscribeUserSwitch();
-    auto handler = multiSimMonitor->userSwitchSubscriber_->handler_.lock();
-    int32_t userId = 101;
-    multiSimMonitor->hasSimStateChanged_ = true;
-    multiSimMonitor->UpdateAllSimData(userId);
-    multiSimMonitor->SetPrivateUserId(userId);
-    EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
-    multiSimMonitor->hasSimStateChanged_ = true;
-    multiSimMonitor->UpdateAllSimData(userId);
-    EXPECT_FALSE(multiSimMonitor->hasSimStateChanged_);
+    int32_t userId = 100;
+    multiSimMonitor->isDataShareReady_ = true;
+    multiSimMonitor->OnUserSwitched(userId);
+    EXPECT_EQ(multiSimMonitor->lastUserId_, 100);
+    userId = 101;
+    multiSimMonitor->isDataShareReady_ = true;
+    multiSimMonitor->OnUserSwitched(userId);
+    EXPECT_EQ(multiSimMonitor->lastUserId_, 101);
+    userId = 100;
+    multiSimMonitor->isDataShareReady_ = false;
+    multiSimMonitor->OnUserSwitched(userId);
+    EXPECT_EQ(multiSimMonitor->lastUserId_, 100);
+    userId = 0;
+    multiSimMonitor->isDataShareReady_ = false;
+    multiSimMonitor->OnUserSwitched(userId);
+    EXPECT_EQ(multiSimMonitor->lastUserId_, 0);
+}
+
+/**
+ * @tc.number   Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = {simStateManagerPtr,
+                                                                                 simStateManagerPtr};
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = {simFileManagerPtr, simFileManagerPtr};
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)};
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    multiSimMonitor->SubscribeUserSwitch();
+    multiSimMonitor->SubscribeDataShareReady();
+    multiSimMonitor->lastUserId_ = 100;
+    multiSimMonitor->remainCount_ = 30;
+    multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
+    EXPECT_EQ(multiSimMonitor->remainCount_, 14);
+    multiSimMonitor->remainCount_ = 30;
+    multiSimMonitor->lastUserId_ = -1;
+    multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
+    EXPECT_EQ(multiSimMonitor->remainCount_, 14);
 }
 
 /**
