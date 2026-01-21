@@ -1542,7 +1542,7 @@ bool NetworkSearchManager::IsNeedDelayNotify(int32_t slotId)
         return false;
     }
     RegServiceState regState = inner->networkSearchState_->GetNetworkStatus()->GetRegStatus();
-    if (regState == RegServiceState::REG_STATE_NO_SERVICE) {
+    if (regState != RegServiceState::REG_STATE_IN_SERVICE) {
         TELEPHONY_LOGI("The reg state is no service.");
         return false;
     }
