@@ -433,7 +433,6 @@ void NativeIsSimActive(napi_env env, void *data)
         return;
     }
     reVal->callbackVal = DelayedRefSingleton<CoreServiceClient>::GetInstance().IsSimActive(reVal->slotId);
-    TELEPHONY_LOGI("NAPI NativeIsSimActive %{public}d", reVal->callbackVal);
     /* transparent return value */
     reVal->context.resolved = true;
 }
