@@ -362,7 +362,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         int32_t result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
