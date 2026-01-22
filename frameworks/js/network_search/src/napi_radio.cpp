@@ -321,9 +321,6 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
             NapiUtil::SetPropertyInt32(env, info, "dBm", signalIntensity);
             napi_set_element(env, callbackValue, i, info);
             i++;
-            TELEPHONY_LOGI(
-                "GetSignalInfoListCallback signalType:%{public}d, signalIntensity:%{public}d, signalLevel:%{public}d",
-                signalType, signalIntensity, signalLevel);
         }
     } else {
         JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
@@ -411,9 +408,6 @@ static napi_value GetSignalInfoListSync(napi_env env, napi_callback_info info)
         NapiUtil::SetPropertyInt32(env, info, "dBm", signalIntensity);
         napi_set_element(env, value, i, info);
         i++;
-        TELEPHONY_LOGI(
-            "GetSignalInfoListCallback signalType:%{public}d, signalIntensity:%{public}d, signalLevel:%{public}d",
-            signalType, signalIntensity, signalLevel);
     }
     return value;
 }
