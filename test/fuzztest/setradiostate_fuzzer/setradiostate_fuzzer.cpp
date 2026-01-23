@@ -311,6 +311,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     RegisterImsRegInfoCallback(data, size);
     UnRegisterImsRegInfoCallback(data, size);
     GetSimOperatorNumeric(data, size);
+    sleep(2);
     return;
 }
 } // namespace OHOS

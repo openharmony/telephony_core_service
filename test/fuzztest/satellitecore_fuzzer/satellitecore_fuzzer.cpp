@@ -78,6 +78,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     OnRemoteRequest(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS
