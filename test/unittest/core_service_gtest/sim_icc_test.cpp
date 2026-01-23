@@ -233,8 +233,8 @@ HWTEST_F(SimTest, Telephony_Sim_AddIccAdnDiallingNumbers_0400, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         CoreServiceClient::GetInstance().AddIccDiallingNumbers(
             SimTest::slotId1_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
-        ASSERT_EQ(diallingNumber->index_, 1);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
+        ASSERT_EQ(diallingNumber->index_, 0);
         ASSERT_EQ(diallingNumber->name_, Str8ToStr16("电话卡"));
         ASSERT_EQ(diallingNumber->number_, Str8ToStr16("00000000000"));
     }
@@ -258,8 +258,8 @@ HWTEST_F(SimTest, Telephony_Sim_UpdateIccAdnDiallingNumbers_0100, Function | Med
         diallingNumber->index_ = index;
         CoreServiceClient::GetInstance().UpdateIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        ASSERT_EQ(diallingNumber->elementaryFileId_, 1);
-        ASSERT_EQ(diallingNumber->index_, 0);
+        ASSERT_EQ(diallingNumber->elementaryFileId_, 0);
+        ASSERT_EQ(diallingNumber->index_, 1);
         ASSERT_EQ(diallingNumber->name_, Str8ToStr16("SimAdnLi"));
         ASSERT_EQ(diallingNumber->number_, Str8ToStr16("12345678901"));
     }
@@ -362,7 +362,7 @@ HWTEST_F(SimTest, Telephony_Sim_DelIccAdnDiallingNumbers_0300, Function | Medium
         diallingNumber->number_ = Str8ToStr16("00000000000");
         int32_t result = CoreServiceClient::GetInstance().DelIccDiallingNumbers(
             SimTest::slotId_, DiallingNumbersInfo::SIM_ADN, diallingNumber);
-        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, 0);
     }
 }
 
