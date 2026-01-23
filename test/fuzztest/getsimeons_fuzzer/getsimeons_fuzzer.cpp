@@ -169,6 +169,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSimEons(data, size);
     GetIsoCountryCodeForNetwork(data, size);
     GetSignalInfoList(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS
