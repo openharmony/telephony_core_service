@@ -138,6 +138,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetActiveSimAccountInfoList(data, size);
     GetLockState(data, size);
     SetVoiceMailInfo(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS

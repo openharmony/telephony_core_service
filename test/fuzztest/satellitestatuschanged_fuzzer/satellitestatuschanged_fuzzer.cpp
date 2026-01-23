@@ -168,6 +168,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     RadioStateChanged(data, size);
     SatelliteStatusChanged(data, size);
     SimStateChanged(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS

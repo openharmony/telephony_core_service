@@ -132,6 +132,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSimId(data, size);
     GetLocaleFromDefaultSim(data, size);
     SetShowNumber(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS

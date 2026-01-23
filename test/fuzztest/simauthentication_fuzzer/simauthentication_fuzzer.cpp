@@ -166,6 +166,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     QueryIccDiallingNumbers(data, size);
     SimAuthentication(data, size);
     ParseOpl5g(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS

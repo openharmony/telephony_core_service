@@ -211,6 +211,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetNetworkCapability(data, size);
     SetNetworkCapability(data, size);
     GetResidentNetworkNumeric(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS
