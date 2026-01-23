@@ -292,6 +292,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     DiallingNumbersGet(provider);
     DelIccDiallingNumbers(provider);
     UnlockSimLock(provider);
+    sleep(1);
     return;
 }
 } // namespace OHOS

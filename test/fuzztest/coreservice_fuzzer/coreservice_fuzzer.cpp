@@ -200,6 +200,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     IsCTSimCard(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS

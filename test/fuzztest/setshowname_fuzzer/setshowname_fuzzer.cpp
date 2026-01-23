@@ -149,6 +149,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetIMSI(data, size);
     IsSimActive(data, size);
     SetShowName(data, size);
+    sleep(1);
     return;
 }
 } // namespace OHOS
