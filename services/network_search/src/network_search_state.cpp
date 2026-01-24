@@ -454,7 +454,8 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+
+    std::unique_lock<std::mutex> lock(mutex_);
     HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
@@ -485,6 +486,7 @@ void NetworkSearchState::NotifyStateChange()
         }
         // We must Update RadioTech(PhoneType) bebore notifying observers,
         // otherwise observers may get the wrong phone type
+        lock.unlock();
         CsRadioTechChange();
 
         NotifyPsRadioTechChange();
@@ -497,6 +499,7 @@ void NetworkSearchState::NotifyStateChange()
         if (networkSearchManager != nullptr) {
             networkSearchManager->UpdateOperatorName(slotId_);
         }
+        lock.lock();
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
