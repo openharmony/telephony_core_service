@@ -454,52 +454,52 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    auto ns = sptr<NetworkState>::MakeSptr();
-    MessageParcel data;
+    std::unique_lock<std::mutex> lock(mutex_);
     HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (networkState_ == nullptr) {
-            TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
+    if (networkState_ == nullptr) {
+        TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
+        return;
+    }
+    if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
+    }
+
+    if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
+        TELEPHONY_LOGI(
+            "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
+        sptr<NetworkState> ns = new NetworkState;
+        if (ns == nullptr) {
+            TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
             return;
         }
-        if (TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_ != nullptr) {
-            TELEPHONY_EXT_WRAPPER.updateNetworkStateExt_(slotId_, networkState_);
-        }
-
-        if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
-            TELEPHONY_LOGI(
-                "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
-
-            networkState_->Marshalling(data);
-            ns->ReadFromParcel(data);
-            if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
-                if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns)) {
-                    networkStateOld_->Marshalling(data);
-                    networkState_->ReadFromParcel(data);
-                    processNetworkState_ = true;
-                    return;
-                }
+        MessageParcel data;
+        networkState_->Marshalling(data);
+        ns->ReadFromParcel(data);
+        if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_ != nullptr) {
+            if (TELEPHONY_EXT_WRAPPER.processStateChangeExt_(slotId_, ns)) {
+                networkStateOld_->Marshalling(data);
+                networkState_->ReadFromParcel(data);
+                processNetworkState_ = true;
+                return;
             }
-            // We must Update RadioTech(PhoneType) bebore notifying observers,
-            // otherwise observers may get the wrong phone type
         }
-    }
-    CsRadioTechChange();
+        // We must Update RadioTech(PhoneType) bebore notifying observers,
+        // otherwise observers may get the wrong phone type
+        lock.unlock();
+        CsRadioTechChange();
 
-    NotifyPsRadioTechChange();
-    NotifyPsRegStatusChange();
-    NotifyPsRoamingStatusChange();
-    NotifyEmergencyChange();
-    NotifyNrStateChange();
+        NotifyPsRadioTechChange();
+        NotifyPsRegStatusChange();
+        NotifyPsRoamingStatusChange();
+        NotifyEmergencyChange();
+        NotifyNrStateChange();
 
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager != nullptr) {
-        networkSearchManager->UpdateOperatorName(slotId_);
-    }
-    DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
+        auto networkSearchManager = networkSearchManager_.lock();
+        if (networkSearchManager != nullptr) {
+            networkSearchManager->UpdateOperatorName(slotId_);
+        }
+        lock.lock();
+        DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
