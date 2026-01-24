@@ -68,6 +68,7 @@ private:
     void UpdateIccidCache(int32_t state);
     int GetSimState(int32_t slotId, SimState &simState);
     bool IsNeedSendOperatorConfigChange(std::string opkey, bool isOpkeyDbError, SimState simState);
+    void ClearOperatorConfig();
     inline static const std::string KEY_SLOTID = "slotId";
     inline static const std::string CHANGE_STATE = "state";
     inline static const int32_t IMS_SWITCH_OFF = 0;
