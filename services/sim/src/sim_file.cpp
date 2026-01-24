@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "sim_file.h"
 
 #include <unistd.h>
@@ -2149,3 +2150,4 @@ void SimFile::OnParamChanged(const char *key, const char *value, void *context)
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP

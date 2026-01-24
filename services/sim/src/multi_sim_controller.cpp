@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "multi_sim_controller.h"
 
 #include <openssl/sha.h>
@@ -2141,3 +2142,4 @@ void MultiSimController::ResetPrimarySlotReady()
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
