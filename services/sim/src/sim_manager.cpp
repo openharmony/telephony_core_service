@@ -1543,6 +1543,6 @@ int32_t SimManager::GetRealSimCount()
     }
     return realSlotCount;
 }
-} // namespace Telephony
+} // namespace Telephony	 
 } // namespace OHOS
 // LOCV_EXCL_STOP
