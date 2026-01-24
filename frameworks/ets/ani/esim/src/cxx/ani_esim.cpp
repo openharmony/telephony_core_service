@@ -339,7 +339,7 @@ ArktsError DownloadProfile(int32_t slotId, int32_t portIndex, const Downloadable
         } else {
             resultAni.responseResult = static_cast<int32_t>(context->resultValue.result_);
             resultAni.solvableErrors = static_cast<int32_t>(context->resultValue.resolvableErrors_);
-            resultAni.cardId = context->resultValue.cardId_;
+            resultAni.cardId = static_cast<int32_t>(context->resultValue.cardId_);
         }
     }
 
