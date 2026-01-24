@@ -14,6 +14,7 @@
  */
 #include "operator_config_cache.h"
 
+#include <ffrt.h>
 #include <fstream>
 #include <openssl/sha.h>
 #include <string_ex.h>
@@ -40,7 +41,6 @@ OperatorConfigCache::OperatorConfigCache(
     std::string key;
     std::string initialOpkey = INITIAL_OPKEY;
     SetParameter(key.append(OPKEY_PROP_PREFIX).append(std::to_string(slotId)).c_str(), initialOpkey.c_str());
-    TELEPHONY_LOGI("OperatorConfigCache create");
 }
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)
@@ -155,7 +155,6 @@ int32_t OperatorConfigCache::LoadOperatorConfigFile(int32_t slotId, OperatorConf
     std::string opkey = GetOpKey(slotId);
     std::string filename = EncryptIccId(iccid + opkey) + ".json";
     if (opkey == std::string(INITIAL_OPKEY)) {
-        TELEPHONY_LOGI("load default operator config, slotId = %{public}d", slotId);
         filename = DEFAULT_OPERATOR_CONFIG;
     }
     if (iccid != "" && iccid != iccidCache_) {
@@ -295,8 +294,26 @@ bool OperatorConfigCache::RegisterForIccChange()
         TELEPHONY_LOGE("can not get SimFileManager");
         return false;
     }
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    GetSimState(slotId_, simState);
+    if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED) {
+        ffrt::submit([=]() { ClearOperatorConfig(); });
+    }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
+}
+
+void OperatorConfigCache::ClearOperatorConfig()
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    ClearOperatorValue(slotId_);
+    modemSimMatchedOpNameCache_ = "";
+    iccidCache_ = "";
+    isUpdateImsCapFromChipDone_ = false;
+    isOperatorConfigChangeDone_ = false;
+    lock.unlock();
+    OperatorConfig opc;
+    LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
 }
 
 void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
@@ -312,15 +329,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             slotId_, static_cast<int>(simState));
         if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED ||
             simState == SimState::SIM_STATE_UNKNOWN) {
-            std::unique_lock<std::mutex> lock(mutex_);
-            ClearOperatorValue(slotId_);
-            modemSimMatchedOpNameCache_ = "";
-            iccidCache_ = "";
-            isUpdateImsCapFromChipDone_ = false;
-            isOperatorConfigChangeDone_ = false;
-            lock.unlock();
-            OperatorConfig opc;
-            LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
+            ClearOperatorConfig();
         }
     }
 }
@@ -530,16 +539,10 @@ void OperatorConfigCache::UpdateIccidCache(int32_t state)
 int OperatorConfigCache::GetSimState(int32_t slotId, SimState &simState)
 {
     if (slotId != slotId_) {
-        TELEPHONY_LOGE("is not current slotId, current slotId %{public}d", slotId_);
         return TELEPHONY_ERR_ARGUMENT_MISMATCH;
     }
     if (simStateManager_ == nullptr) {
-        TELEPHONY_LOGE("simStateManager is nullptr, slotId %{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!simStateManager_->HasSimCard()) {
-        simState = SimState::SIM_STATE_NOT_PRESENT;
-        return TELEPHONY_ERR_SUCCESS;
     }
     simState = simStateManager_->GetSimState();
     return TELEPHONY_ERR_SUCCESS;
