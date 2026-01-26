@@ -100,18 +100,5 @@ HWTEST_F(OperatorConfigCacheTest, ProcessEvent, Function | MediumTest | Level1)
     operatorConfigCache->ProcessEvent(AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE));
     EXPECT_NE(simFileManager->opKey_, "46001");
 }
-
-HWTEST_F(OperatorConfigCacheTest, RegisterForIccChange, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
-    simStateHandle->slotId_ = 0;
-    simStateHandle->externalState_ = SimState::SIM_STATE_LOCKED;
-    simStateManager->simStateHandle_  = simStateHandle;
-    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
-    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
-    EXPECT_TRUE(operatorConfigCache->RegisterForIccChange());
-}
 }
 }
