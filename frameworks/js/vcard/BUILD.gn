@@ -43,6 +43,7 @@ ohos_shared_library("vcard") {
     "ability_runtime:data_ability_helper",
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_base_context",
+    "ability_runtime:napi_common",
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
