@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "sim_manager.h"
 
 #include "core_service_errors.h"
@@ -1544,3 +1545,4 @@ int32_t SimManager::GetRealSimCount()
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
