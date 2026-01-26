@@ -14,7 +14,6 @@
  */
 #include "operator_config_cache.h"
 
-#include <ffrt.h>
 #include <fstream>
 #include <openssl/sha.h>
 #include <string_ex.h>
@@ -301,19 +300,6 @@ bool OperatorConfigCache::RegisterForIccChange()
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
-}
-
-void OperatorConfigCache::ClearOperatorConfig()
-{
-    std::unique_lock<std::mutex> lock(mutex_);
-    ClearOperatorValue(slotId_);
-    modemSimMatchedOpNameCache_ = "";
-    iccidCache_ = "";
-    isUpdateImsCapFromChipDone_ = false;
-    isOperatorConfigChangeDone_ = false;
-    lock.unlock();
-    OperatorConfig opc;
-    LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
 }
 
 void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
