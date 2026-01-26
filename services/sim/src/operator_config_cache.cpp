@@ -297,7 +297,7 @@ bool OperatorConfigCache::RegisterForIccChange()
     SimState simState = SimState::SIM_STATE_UNKNOWN;
     GetSimState(slotId_, simState);
     if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED) {
-        ffrt::submit([=]() { ClearOperatorConfig(); });
+        SendEvent(RadioEvent::RADIO_SIM_STATE_CHANGE);
     }
     simFileManager->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     return true;
@@ -329,7 +329,15 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             slotId_, static_cast<int>(simState));
         if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED ||
             simState == SimState::SIM_STATE_UNKNOWN) {
-            ClearOperatorConfig();
+            std::unique_lock<std::mutex> lock(mutex_);
+            ClearOperatorValue(slotId_);
+            modemSimMatchedOpNameCache_ = "";
+            iccidCache_ = "";
+            isUpdateImsCapFromChipDone_ = false;
+            isOperatorConfigChangeDone_ = false;
+            lock.unlock();
+            OperatorConfig opc;
+            LoadOperatorConfig(slotId_, opc, STATE_PARA_CLEAR);
         }
     }
 }
