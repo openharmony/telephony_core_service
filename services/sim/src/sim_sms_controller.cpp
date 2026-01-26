@@ -39,9 +39,11 @@ void SimSmsController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
             ProcessLoadDone(event);
             break;
         case SIM_SMS_UPDATE_COMPLETED:
+            TELEPHONY_LOGI("ProcessEvent update");
             ProcessUpdateDone(event);
             break;
         case SIM_SMS_WRITE_COMPLETED:
+            TELEPHONY_LOGI("ProcessEvent write");
             ProcessWriteDone(event);
             break;
         case SIM_SMS_DELETE_COMPLETED:
@@ -90,8 +92,10 @@ void SimSmsController::ProcessUpdateDone(const AppExecFwk::InnerEvent::Pointer &
     responseReady_ = true;
     std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
+        TELEPHONY_LOGE("SimSmsController::ProcessUpdateDone error %{public}d", responseInfo->error);
         responseReady_ = (responseInfo->error == ErrType::NONE);
     }
+    TELEPHONY_LOGI("SimSmsController::ProcessUpdateDone: end");
     processWait_.notify_all();
 }
 
@@ -104,8 +108,10 @@ void SimSmsController::ProcessWriteDone(const AppExecFwk::InnerEvent::Pointer &e
     responseReady_ = true;
     std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
+        TELEPHONY_LOGE("SimSmsController::ProcessWriteDone error %{public}d", responseInfo->error);
         responseReady_ = (responseInfo->error == ErrType::NONE);
     }
+    TELEPHONY_LOGI("SimSmsController::ProcessWriteDone: end");
     processWait_.notify_all();
 }
 
@@ -118,8 +124,10 @@ void SimSmsController::ProcessDeleteDone(const AppExecFwk::InnerEvent::Pointer &
     responseReady_ = true;
     std::shared_ptr<RadioResponseInfo> responseInfo = event->GetSharedObject<RadioResponseInfo>();
     if (responseInfo != nullptr) {
+        TELEPHONY_LOGE("SimSmsController::ProcessDeleteDone error %{public}d", responseInfo->error);
         responseReady_ = (responseInfo->error == ErrType::NONE);
     }
+    TELEPHONY_LOGI("SimSmsController::ProcessDeleteDone: end");
     processWait_.notify_all();
 }
 
