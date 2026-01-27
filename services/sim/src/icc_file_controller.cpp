@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 // LCOV_EXCL_START
 #include "icc_file_controller.h"
 
