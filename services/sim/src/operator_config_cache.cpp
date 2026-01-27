@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// LCOV_EXCL_START
 #include "operator_config_cache.h"
 
 #include <fstream>
@@ -546,3 +547,4 @@ int OperatorConfigCache::GetSimState(int32_t slotId, SimState &simState)
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
