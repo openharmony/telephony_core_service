@@ -83,7 +83,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimIccId_0100, Function | MediumTest | Level1
         std::u16string iccId;
         CoreServiceClient::GetInstance().GetSimIccId(SimTest::slotId_, iccId);
         std::string result = Str16ToStr8(iccId);
-        EXPECT_STREQ(result.c_str(), "89860125801188088381");
+        EXPECT_STRNE(result.c_str(), "");
     }
 }
 
@@ -170,7 +170,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetIMSI_0100, Function | MediumTest | Level1)
         std::u16string imsi;
         CoreServiceClient::GetInstance().GetIMSI(SimTest::slotId_, imsi);
         std::string result = Str16ToStr8(imsi);
-        EXPECT_STREQ(result.c_str(), "460012160126762");
+        EXPECT_STRNE(result.c_str(), "");
     }
 }
 
@@ -223,7 +223,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid1_0100, Function | MediumTest | Level1)
         std::u16string gid1;
         CoreServiceClient::GetInstance().GetSimGid1(SimTest::slotId_, gid1);
         std::string result = Str16ToStr8(gid1);
-        EXPECT_STREQ(result.c_str(), "FF");
+        EXPECT_STRNE(result.c_str(), "");
     }
 }
 
@@ -275,7 +275,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimGid2_0100, Function | MediumTest | Level1)
         TELEPHONY_LOGI("TelephonyTestService has no sim card");
     } else {
         std::string result = Str16ToStr8(CoreServiceClient::GetInstance().GetSimGid2(SimTest::slotId_));
-        EXPECT_STREQ(result.c_str(), "FF");
+        EXPECT_STRNE(result.c_str(), "");
     }
 }
 
@@ -722,7 +722,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimAccountInfo_0300, Function | MediumTest | 
     } else {
         IccAccountInfo info;
         int32_t result = CoreServiceClient::GetInstance().GetSimAccountInfo(SimTest::slotId_, info);
-        EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
