@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "sim_file_manager.h"
 
 #include <openssl/sha.h>
@@ -1027,3 +1028,4 @@ bool SimFileManager::IsUiccCard()
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
