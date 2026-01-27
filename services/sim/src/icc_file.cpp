@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "icc_file.h"
 
 #include "core_manager_inner.h"
@@ -1003,3 +1004,4 @@ inline void IccFile::SetMatchSimStateTracker(int8_t matchSimStateTracker)
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP

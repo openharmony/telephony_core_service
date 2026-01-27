@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "icc_file_controller.h"
 
 using namespace std;
@@ -831,3 +832,4 @@ bool IccFileController::IsFixedNumberType(int efId)
 IccFileController::~IccFileController() {}
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
