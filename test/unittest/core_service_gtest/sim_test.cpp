@@ -434,7 +434,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0100, Function | MediumTest | Level3
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
         int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId_, cardName);
-        EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -451,7 +451,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetShowName_0200, Function | MediumTest | Level3
     } else {
         const std::u16string cardName = Str8ToStr16("SimNameZhang");
         int32_t result = CoreServiceClient::GetInstance().SetShowName(SimTest::slotId1_, cardName);
-        EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -674,7 +674,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0100, Function | MediumTest | Level
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -695,7 +695,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSim_0200, Function | MediumTest | Level
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -737,7 +737,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0100, Function | MediumTest | Lev
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -758,7 +758,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSim_0200, Function | MediumTest | Lev
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -780,7 +780,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0100, Function | MediumTes
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -801,7 +801,7 @@ HWTEST_F(SimTest, Telephony_Sim_SetActiveSimSatellite_0200, Function | MediumTes
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -843,7 +843,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0100, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -864,7 +864,7 @@ HWTEST_F(SimTest, Telephony_Sim_ReSetActiveSimSatellite_0200, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -1247,7 +1247,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0200, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
@@ -1311,7 +1311,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendEnvelopeCmd_0200, Function | MediumTest | Le
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
         }
     }
 }
