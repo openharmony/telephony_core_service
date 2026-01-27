@@ -1,0 +1,118 @@
+# Copyright (C) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+SUBSYSTEM_DIR = "../../../../.."
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
+
+rust_cxx("vcard_ani_cxx_gen") {
+  sources = [
+    "src/wrapper.rs"
+  ]
+}
+
+ohos_static_library("vcard_ani_cxx") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "include",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
+    "$SUBSYSTEM_DIR/core_service/utils/vcard/include",
+    "$SUBSYSTEM_DIR/core_service/utils/vcard/include/contact_data",
+    "${target_gen_dir}/src",
+  ]
+
+  sources = [
+    "src/cxx/ani_vcard.cpp",
+  ]
+  sources += get_target_outputs(":vcard_ani_cxx_gen")
+  deps = [
+    ":vcard_ani_cxx_gen",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_vcard",
+  ]
+  external_deps = [
+    "ability_runtime:ani_base_context",
+    "ability_runtime:app_context",
+    "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "runtime_core:ani",
+    "rust_cxx:cxx_cppdeps",
+  ]
+  subsystem_name = "telephony"
+  part_name = "core_service"
+}
+
+ohos_rust_shared_library("vcard_ani") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    boundary_sanitize = true
+    all_ubsan = true
+    debug = false
+  }
+
+  sources = [ "src/lib.rs" ]
+  
+  external_deps = [
+    "hilog:hilog_rust",
+    "runtime_core:ani",
+    "netmanager_base:ani_rs",
+    "rust_cxx:lib"
+  ]
+  deps = [
+    ":vcard_ani_cxx",
+    "//third_party/rust/crates/serde/serde:lib",
+  ]
+
+  clippy_lints = "none"
+
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  output_extension = "so"
+}
+
+generate_static_abc("vcard_ani_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.telephony.vcard.ets" ]
+  dst_file = "$target_out_dir/telephony_vcard.abc"
+  out_puts = [ "$target_out_dir/telephony_vcard.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/telephony_vcard.abc"
+}
+
+ohos_prebuilt_etc("vcard_ani_etc") {
+  source = "$target_out_dir/telephony_vcard.abc"
+  module_install_dir = "framework"
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  deps = [ ":vcard_ani_abc" ]
+}
+
+group("vcard_ani_group") {
+  deps = [
+    ":vcard_ani",
+    ":vcard_ani_etc",
+  ]
+}
