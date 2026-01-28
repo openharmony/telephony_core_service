@@ -70,7 +70,6 @@ void IsimFile::ProcessFileLoaded(bool response)
         return;
     }
     fileToGet_ -= LOAD_STEP;
-    TELEPHONY_LOGI("IsimFile::ProcessFileLoaded: %{public}d requested: %{public}d", fileToGet_, fileQueried_);
     if (ObtainFilesFetched()) {
         OnAllFilesFetched();
     } else if (LockQueriedOrNot()) {

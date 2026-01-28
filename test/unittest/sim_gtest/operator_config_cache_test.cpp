@@ -16,6 +16,7 @@
 #define protected public
 #include "operator_config_cache.h"
 #include "mock_datashare_helper.h"
+#include "observer_handler.h"
 #include "tel_ril_manager.h"
 #include "common_event_support.h"
 #include "gtest/gtest.h"
@@ -84,6 +85,36 @@ HWTEST_F(OperatorConfigCacheTest, NotifyInitApnConfigsTest003, Function | Medium
     operatorConfigCache->notifyInitApnConfigs(0);
     operatorConfigCache->batchInsertApnRetryTask_();
     EXPECT_NE(operatorConfigCache->retryBatchInsertApnTimes_, 0);
+}
+
+HWTEST_F(OperatorConfigCacheTest, ProcessEvent, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->slotId_ = 0;
+    simStateHandle->externalState_ = SimState::SIM_STATE_LOCKED;
+    simStateManager->simStateHandle_  = simStateHandle;
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    simFileManager->SetOpKey("46001");
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    operatorConfigCache->ProcessEvent(AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE));
+    EXPECT_NE(simFileManager->opKey_, "46001");
+}
+
+HWTEST_F(OperatorConfigCacheTest, RegisterForIccChange, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simStateHandle = std::make_shared<SimStateHandle>(simStateManager);
+    simStateHandle->slotId_ = 0;
+    simStateHandle->externalState_ = SimState::SIM_STATE_LOCKED;
+    simStateHandle->observerHandler_ = std::make_unique<ObserverHandler>();
+    simStateManager->simStateHandle_  = simStateHandle;
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    bool result = operatorConfigCache->RegisterForIccChange();
+    EXPECT_TRUE(result);
 }
 }
 }
