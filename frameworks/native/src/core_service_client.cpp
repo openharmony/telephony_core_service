@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INVALID_VALUE = -1;
+constexpr int32_t EXTEND_TIMEOUT_MS = 3;
 
 CoreServiceClient::CoreServiceClient() = default;
 CoreServiceClient::~CoreServiceClient()
@@ -347,7 +348,8 @@ int32_t CoreServiceClient::HasSimCard(int32_t slotId, bool &hasSimCard, int64_t 
         TELEPHONY_LOGE("connect to stub fail with error code: %{public}d", ret);
         return ret;
     }
-    ret = callback->WaitForResult(timeoutMs);
+    /* An IPC timeout may happen. */
+    ret = callback->WaitForResult(timeoutMs*EXTEND_TIMEOUT_MS);
     if (!ret) {
         TELEPHONY_LOGE("HasSimCard wait callback timeout");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
