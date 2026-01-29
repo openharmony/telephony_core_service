@@ -1525,7 +1525,7 @@ int32_t SimManager::GetMaxSimCount()
 
     if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
-        return DC_HAS_ONE_SLOT;
+        return DC_MAX_SLOT_COUNT;
     }
     return slotCount;
 }
@@ -1539,7 +1539,7 @@ int32_t SimManager::GetRealSimCount()
 
     if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
-        return DC_HAS_ONE_SLOT;
+        return DC_MAX_SLOT_COUNT;
     }
     return realSlotCount;
 }
