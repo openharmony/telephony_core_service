@@ -47,7 +47,7 @@ const int32_t DUAL_SLOT_COUNT = 2;
 const int32_t MAX_SLOT_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
-const int32_t DC_HAS_ONE_SLOT = 1;
+const int32_t DC_MAX_SLOT_COUNT = 2;
 std::atomic<int32_t> maxRealSlotCount_ = 0;
 int32_t maxSlotCount_ = 0;
 int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
@@ -95,7 +95,7 @@ inline T GetMaxSlotCount()
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
         maxSlotCount_ = std::atoi(simSlotCount);
         if (GetVirtualModemSwitch<bool>() && maxSlotCount_ == 0) {
-            maxSlotCount_ = 1;
+            maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
     }
     return maxSlotCount_;
