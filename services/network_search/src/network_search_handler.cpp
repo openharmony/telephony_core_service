@@ -611,6 +611,10 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     std::lock_guard<std::mutex> lock(mutex_);
     psRegStatusResultInfo_ = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResultInfo_ == nullptr) {
+        auto info = event->GetSharedObject<RadioResponseInfo>();
+        if ((info != nullptr) && (info->flag == networkSearchManager->GetSerialNum(slotId_))) {
+            networkSearchManager->decMsgNum(slotId_);
+        }
         TELEPHONY_LOGE("psRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
@@ -642,6 +646,10 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     std::lock_guard<std::mutex> lock(mutex_);
     csRegStatusInfo_ = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStatusInfo_ == nullptr) {
+        auto info = event->GetSharedObject<RadioResponseInfo>();
+        if ((info != nullptr) && (info->flag == networkSearchManager->GetSerialNum(slotId_))) {
+            networkSearchManager->decMsgNum(slotId_);
+        }
         TELEPHONY_LOGE("csRegStatusResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
@@ -691,6 +699,10 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     std::lock_guard<std::mutex> lock(mutex_);
     operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult_ == nullptr) {
+        auto info = event->GetSharedObject<RadioResponseInfo>();
+        if ((info != nullptr) && (info->flag == networkSearchManager->GetSerialNum(slotId_))) {
+            networkSearchManager->decMsgNum(slotId_);
+        }
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
