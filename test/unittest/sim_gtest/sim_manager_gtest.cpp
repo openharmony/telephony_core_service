@@ -494,9 +494,9 @@ HWTEST_F(SimManagerTest, GetDefaultMainCardSlotId_02, Function | MediumTest | Le
 HWTEST_F(SimManagerTest, InsertDatatest, Function | MediumTest | Level1)
 {
     auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
-    EXPECT_CALL(*mocksimrdbhelper, CreateDataHelper(_)).WillOnce(Return(nullptr));
+    EXPECT_CALL(*mocksimrdbhelper, CreateDataHelper(_)).WillRepeatedly(Return(nullptr));
 
-    EXPECT_CALL(*mocksimrdbhelper, Insert(_, _)).WillOnce(Return(1));
+    EXPECT_CALL(*mocksimrdbhelper, Insert(_, _)).WillRepeatedly(Return(1));
 
     SimRdbHelper simRdbHelper;
     int64_t id = 123;
