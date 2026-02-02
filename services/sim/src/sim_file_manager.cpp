@@ -108,6 +108,7 @@ void SimFileManager::Init(int slotId)
     TELEPHONY_LOGI("SimFileManager::Init() end");
 }
 
+__attribute__((no_sanitize("cfi")))
 bool SimFileManager::InitSimFile(SimFileManager::IccType type)
 {
     if (fileController_ == nullptr || diallingNumberHandler_ == nullptr) {
@@ -414,6 +415,7 @@ std::string SimFileManager::GetVoiceMailNumberCdmaKey()
     return spNumber;
 }
 
+__attribute__((no_sanitize("cfi")))
 std::string SimFileManager::GetVoiceMailNumberKey()
 {
     std::string number = simFile_->GetVoiceMailNumber();
@@ -576,6 +578,7 @@ void SimFileManager::SetImsi(std::string imsi)
     simFile_->UpdateImsi(imsi);
 }
 
+__attribute__((no_sanitize("cfi")))
 void SimFileManager::SetVoiceMailParamGsm(const std::u16string mailNumber, bool isSavedIccRecords)
 {
     TELEPHONY_LOGI("SimFileManager::SetVoiceMailParamGsm, set gsm voice mail number");

@@ -63,6 +63,7 @@ void VoiceMailConstants::ResetVoiceMailLoadedFlag()
     isVoiceMailFixed_ = false;
 }
 
+__attribute__((no_sanitize("cfi")))
 bool VoiceMailConstants::GetVoiceMailFixed(std::string carrier)
 {
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailFixedExt_ != nullptr) {
@@ -73,6 +74,7 @@ bool VoiceMailConstants::GetVoiceMailFixed(std::string carrier)
     return isVoiceMailFixed_;
 }
 
+__attribute__((no_sanitize("cfi")))
 std::string VoiceMailConstants::GetVoiceMailNumber(std::string carrier)
 {
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailNumberExt_ != nullptr) {
@@ -84,6 +86,7 @@ std::string VoiceMailConstants::GetVoiceMailNumber(std::string carrier)
     return GetStringValueFromCust(slotId_, KEY_VOICE_MAIL_NUMBER_STRING);
 }
 
+__attribute__((no_sanitize("cfi")))
 std::string VoiceMailConstants::GetVoiceMailTag(std::string carrier)
 {
     if (TELEPHONY_EXT_WRAPPER.getVoiceMailTagExt_ != nullptr) {

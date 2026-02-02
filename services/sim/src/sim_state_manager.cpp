@@ -311,6 +311,7 @@ int32_t SimStateManager::AlterPin(
     return (response.result == UNLOCK_FAIL) ? TELEPHONY_ERR_RIL_CMD_FAIL : TELEPHONY_SUCCESS;
 }
 
+__attribute__((no_sanitize("cfi")))
 int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, LockStatusResponse &response)
 {
     if (options.lockType != LockType::PIN_LOCK && options.lockType != LockType::FDN_LOCK) {

@@ -769,6 +769,7 @@ bool SimFile::ProcessGetCfisDone(const AppExecFwk::InnerEvent::Pointer &event)
     return isFileProcessResponse;
 }
 
+__attribute__((no_sanitize("cfi")))
 bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
