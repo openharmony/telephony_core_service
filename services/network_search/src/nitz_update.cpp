@@ -239,6 +239,7 @@ void NitzUpdate::ProcessTime(NetworkTime &networkTime)
 #endif
 }
 
+__attribute__((no_sanitize("cfi")))
 void NitzUpdate::ProcessTimeZone()
 {
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();

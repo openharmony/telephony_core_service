@@ -112,6 +112,7 @@ static void PrintfLog(const Rssi &signalIntensity)
         signalIntensity.nr.rsrp, signalIntensity.nr.rsrq, signalIntensity.nr.sinr);
 }
 
+__attribute__((no_sanitize("cfi")))
 void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
     TELEPHONY_LOGD("rssi start......\n");
