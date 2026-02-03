@@ -715,7 +715,6 @@ bool SimFile::ProcessGetSpdiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
     if (event == nullptr) {
-        TELEPHONY_LOGE("get Spdi event is nullptr!");
         return isFileProcessResponse;
     }
     std::unique_ptr<ControllerToFileMsg> fd = event->GetUniqueObject<ControllerToFileMsg>();
@@ -769,6 +768,7 @@ bool SimFile::ProcessGetCfisDone(const AppExecFwk::InnerEvent::Pointer &event)
     return isFileProcessResponse;
 }
 
+__attribute__((no_sanitize("cfi")))
 bool SimFile::ProcessGetMbiDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
     bool isFileProcessResponse = true;
