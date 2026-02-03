@@ -16,6 +16,7 @@ SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
@@ -40,6 +41,7 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/test:tel_core_service_static",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:esim_service_api",
   ]
 
   external_deps = [
@@ -91,6 +93,15 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
     "addiccdiallingnumbers_fuzzer.cpp",
   ]
+  
+  if (core_service_support_esim) {
+    idl_gen_dir = "../../../../../../out/generic_generic_arm_64only/general_all_phone_standard/gen"
+    sources += [
+      "$idl_gen_dir/base/telephony/core_service/interfaces/innerkits/esim_service_stub.cpp",
+      "$idl_gen_dir/base/telephony/core_service/interfaces/innerkits/esim_service_proxy.cpp",
+    ]
+  }
+
 }
 
 ###############################################################################
