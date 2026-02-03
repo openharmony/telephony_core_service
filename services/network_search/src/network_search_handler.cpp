@@ -1480,6 +1480,7 @@ void NetworkSearchHandler::AirplaneModeChange(const AppExecFwk::InnerEvent::Poin
     }
 }
 
+__attribute__((no_sanitize("cfi")))
 void NetworkSearchHandler::RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
