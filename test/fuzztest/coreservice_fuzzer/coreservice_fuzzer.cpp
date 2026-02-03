@@ -34,7 +34,7 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
-constexpr int32_t SLEEP_TIME_SECONDS = 100000;
+constexpr int32_t SLEEP_TIME_SECONDS = 2;
  
 bool IsServiceInited()
 {
@@ -184,7 +184,7 @@ void IsCTSimCard(const uint8_t *data, size_t size)
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnIsCTSimCard(dataMessageParcel, reply);
 }
- 
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -200,7 +200,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HasSimCard(data, size);
     AddIccDiallingNumbers(data, size);
     IsCTSimCard(data, size);
-    sleep(1);
+    sleep(SLEEP_TIME_SECONDS);
     return;
 }
 } // namespace OHOS
