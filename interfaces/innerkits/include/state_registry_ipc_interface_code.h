@@ -32,7 +32,8 @@ enum class StateNotifyInterfaceCode {
     REMOVE_OBSERVER,
     CFU_INDICATOR,
     VOICE_MAIL_MSG_INDICATOR,
-    ICC_ACCOUNT_CHANGE
+    ICC_ACCOUNT_CHANGE,
+    SIM_ACTIVR_STATE
 };
 } // namespace Telephony
 } // namespace OHOS
