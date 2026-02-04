@@ -784,5 +784,9 @@ void MultiSimMonitor::UpdateSimStateToStateRegistry()
     }
 }
 
+void MultiSimMonitor::NotifySimActiveStateChanged(int32_t slotId, bool enable)
+{
+    DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateSimActiveState(slotId, enable);
+}
 } // namespace Telephony
 } // namespace OHOS
