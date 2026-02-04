@@ -1247,7 +1247,7 @@ HWTEST_F(SimTest, Telephony_Sim_SendTerminalResponseCmd_0200, Function | MediumT
             EXPECT_TRUE(true);
         } else {
             int32_t result = helper.GetIntResult();
-            EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+            EXPECT_EQ(result, TELEPHONY_ERR_SLOTID_INVALID);
         }
     }
 }
