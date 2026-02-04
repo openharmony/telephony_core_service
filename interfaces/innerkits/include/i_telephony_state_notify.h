@@ -120,6 +120,15 @@ public:
     virtual int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult) = 0;
 
     /**
+     * Update sim active state
+     *
+     * @param slotId sim slot id
+     * @param activeStateResult sim active state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateSimActiveState(int32_t slotId, bool activeStateResult) = 0;
+
+    /**
      * RegisterStateChange
      *
      * @param telephonyObserver api callback

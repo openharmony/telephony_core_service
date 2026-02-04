@@ -113,6 +113,14 @@ public:
      * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult);
+    /**
+     * @brief Update sim active state
+     *
+     * @param slotId sim slot id
+     * @param activeStateResult sim active state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t UpdateSimActiveState(int32_t slotId, bool activeStateResult);
     int32_t UpdateIccAccount();
     sptr<ITelephonyStateNotify> GetProxy();
 
