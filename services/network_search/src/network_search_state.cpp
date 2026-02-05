@@ -485,10 +485,10 @@ void NetworkSearchState::NotifyStateChange()
                 return;
             }
         }
-        // We must Update RadioTech(PhoneType) bebore notifying observers,
-        // otherwise observers may get the wrong phone type
+        // Update RadioTech(PhoneType) bebore notifying observers, otherwise observers may get the wrong phone type
         lock.unlock();
         CsRadioTechChange();
+
         NotifyPsRadioTechChange();
         NotifyPsRegStatusChange();
         NotifyPsRoamingStatusChange();
