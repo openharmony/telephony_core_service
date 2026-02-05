@@ -126,6 +126,7 @@ public:
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
     typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
+    typedef int32_t (*SendSimAccountLoadedInfoFunc)(int32_t slotId, int32_t event);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -199,6 +200,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
+    void SendSimAccountLoadedInfo(int32_t slotId, int32_t event);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -216,6 +218,7 @@ private:
     void InitTelephonyExtWrapperForDynamicLoad();
     GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
     SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
+    SendSimAccountLoadedInfoFunc sendSimAccountLoadedInfo_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

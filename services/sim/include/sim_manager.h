@@ -187,14 +187,7 @@ public:
             operatorConfigHisysevent_->SetMatchSimStateTracker(matchSimStateTracker, slotId);
         }
     };
-
-    inline void StartMatchSimTimeoutTimer(int32_t slotId) override
-    {
-        if (simStateManager_.empty() || simStateManager_[slotId] == nullptr) {
-            return;
-        }
-        return simStateManager_[slotId]->StartMatchSimTimeoutTimer();
-    }
+    void SendSimAccountLoadedInfo(int32_t slotId, int32_t event) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);
