@@ -192,11 +192,7 @@ void OperatorName::NotifySpnChanged(bool isForce)
         return;
     }
 
-    if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_GSM) {
-        NotifyGsmSpnChanged(regStatus, networkState, domesticSpn, isForce);
-    } else if (networkSearchManager->GetPhoneType(slotId_) == PhoneType::PHONE_TYPE_IS_CDMA) {
-        NotifyCdmaSpnChanged(regStatus, networkState, domesticSpn, isForce);
-    }
+    NotifyGsmSpnChanged(regStatus, networkState, domesticSpn, isForce);
 }
 
 void OperatorName::UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &networkState, OperatorNameParams &params)
