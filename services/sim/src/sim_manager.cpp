@@ -433,7 +433,11 @@ int32_t SimManager::SetShowNumber(int32_t slotId, const std::u16string &number)
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetShowNumber(slotId, number);
+    int32_t ret = multiSimController_->SetShowNumber(slotId, number);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::SetShowName(int32_t slotId, const std::u16string &name)
@@ -442,7 +446,11 @@ int32_t SimManager::SetShowName(int32_t slotId, const std::u16string &name)
         TELEPHONY_LOGE("slotId is invalid or multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SetShowName(slotId, name);
+    int32_t ret = multiSimController_->SetShowName(slotId, name);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::GetDefaultVoiceSlotId()
