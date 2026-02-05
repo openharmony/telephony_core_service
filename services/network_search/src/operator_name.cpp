@@ -96,14 +96,7 @@ void OperatorName::HandleOperatorInfo(const std::shared_ptr<OperatorInfoResult> 
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    PhoneType type = networkSearchManager->GetPhoneType(slotId_);
-    if (type == PhoneType::PHONE_TYPE_IS_GSM) {
-        GsmOperatorInfo(operatorInfoResult);
-    } else if (type == PhoneType::PHONE_TYPE_IS_CDMA) {
-        CdmaOperatorInfo(operatorInfoResult);
-    } else {
-        TELEPHONY_LOGE("OperatorName::HandleOperatorInfo phone type:%{public}d invalid", type);
-    }
+    GsmOperatorInfo(operatorInfoResult);
     networkSearchManager->TriggerTimezoneRefresh(slotId_);
 }
 
