@@ -466,7 +466,7 @@ void NetworkSearchState::NotifyStateChange()
 
     if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
         TELEPHONY_LOGI(
-            "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
+            "NotifyStateChange::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
         sptr<NetworkState> ns = new NetworkState;
         if (ns == nullptr) {
             TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
@@ -480,6 +480,8 @@ void NetworkSearchState::NotifyStateChange()
                 networkStateOld_->Marshalling(data);
                 networkState_->ReadFromParcel(data);
                 processNetworkState_ = true;
+                TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%d, isSame:%d",
+                    slotId_, networkState_.GetRegStatus(), *networkState_ == *networkStateOld_);
                 return;
             }
         }
@@ -503,6 +505,8 @@ void NetworkSearchState::NotifyStateChange()
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
+    TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%d, isSame:%d",
+        slotId_, networkState_.GetRegStatus(), *networkState_ == *networkStateOld_);
     processNetworkState_ = false;
 }
 
