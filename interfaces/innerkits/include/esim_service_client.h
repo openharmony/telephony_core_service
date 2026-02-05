@@ -250,6 +250,14 @@ public:
     int32_t GetContractInfo(int32_t slotId, ContractRequestData &contractRequestData,
         const sptr<IEsimServiceCallback> &callback);
 
+    /**
+     * @brief Get esim free storage.
+     *
+     * @param freeStorage[out], the free storage.
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetEsimFreeStorage(int32_t &freeStorage);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class EsimServiceDeathRecipient : public IRemoteObject::DeathRecipient {

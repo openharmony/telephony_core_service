@@ -1738,6 +1738,64 @@ napi_value GetContractInfo(napi_env env, napi_callback_info info)
     return result;
 }
 
+void NativeGetEsimFreeStorage(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncFreeStorageInfo *freeStorageContext = static_cast<AsyncFreeStorageInfo *>(data);
+    int32_t result = UNDEFINED_VALUE;
+    int32_t errorCode =
+        DelayedRefSingleton<EsimServiceClient>::GetInstance().GetEsimFreeStorage(result);
+    TELEPHONY_LOGI("NAPI NativeGetEsimFreeStorage %{public}d", errorCode);
+    if (errorCode == ERROR_NONE) {
+        freeStorageContext->asyncContext.callbackVal = result;
+        freeStorageContext->asyncContext.context.resolved = true;
+    } else {
+        freeStorageContext->asyncContext.context.resolved = false;
+    }
+    freeStorageContext->asyncContext.context.errorCode = errorCode;
+}
+
+void GetEsimFreeStorageCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr ? napi_invalid_arg : napi_ok));
+    std::unique_ptr<AsyncFreeStorageInfo> context(static_cast<AsyncFreeStorageInfo *>(data));
+    if (context == nullptr) {
+        TELEPHONY_LOGE("GetEsimFreeStorageCallback context is nullptr");
+        return;
+    }
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, false, { "GetEsimFreeStorage", Permission::GET_TELEPHONY_ESIM_STATE });
+}
+
+napi_value GetEsimFreeStorage(napi_env env, napi_callback_info info)
+{
+    auto freeStorageContext = std::make_unique<AsyncFreeStorageInfo>();
+    BaseContext &context = freeStorageContext->asyncContext.context;
+    auto initPara = std::make_tuple(&context.callbackRef);
+    AsyncPara para {
+        .funcName = "GetEsimFreeStorage",
+        .env = env,
+        .info = info,
+        .execute = NativeGetEsimFreeStorage,
+        .complete = GetEsimFreeStorageCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncFreeStorageInfo>(para, freeStorageContext.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("creat asyncwork failed!");
+        return nullptr;
+    }
+    auto ret = napi_queue_async_work_with_qos(env, context.work, napi_qos_default);
+    if (ret != napi_ok) {
+        TELEPHONY_LOGE("GetEsimFreeStorage asyncwork running failed!");
+        napi_delete_async_work(env, context.work);
+        return nullptr;
+    }
+    freeStorageContext.release();
+    return result;
+}
+
 napi_status InitEnumResetOption(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -1995,6 +2053,7 @@ napi_status InitEuiccServiceInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_WRITABLE_FUNCTION("cancelSession", CancelSession),
         DECLARE_NAPI_WRITABLE_FUNCTION("getSupportedPkids", GetSupportedPkids),
         DECLARE_NAPI_WRITABLE_FUNCTION("getContractInfo", GetContractInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getEsimFreeStorage", GetEsimFreeStorage),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }

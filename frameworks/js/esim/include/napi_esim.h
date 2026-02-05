@@ -150,6 +150,10 @@ struct AsyncGetContractInfo {
     AsyncContext<std::string> asyncContext;
     AsyncContractRequestData contractRequestData;
 };
+
+struct AsyncFreeStorageInfo {
+    AsyncContext<int32_t> asyncContext;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_ESIM_H
