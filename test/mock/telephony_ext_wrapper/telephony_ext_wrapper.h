@@ -236,23 +236,17 @@ inline bool GetVoiceMailFixedExtImpl(int32_t, const char *)
 }
 inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &) {}
 inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &) {}
-inline void ResetVoiceMailManagerExtImpl(int32_t)
-{}
-inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &)
-{}
+inline void ResetVoiceMailManagerExtImpl(int32_t) {}
+inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &) {}
 
 inline int32_t GetCellInfoListImpl(int32_t, std::vector<sptr<CellInformation>> &)
 {
     return 0;
 }
-inline void GetRadioTechExtImpl(int32_t, int32_t &)
-{}
-inline void GetNrOptionModeExtImpl(int32_t, int32_t &)
-{}
-inline void GetNrOptionModeExtendImpl(int32_t, NrMode &)
-{}
-inline void GetPreferredNetworkExtImpl(int32_t &)
-{}
+inline void GetRadioTechExtImpl(int32_t, int32_t &) {}
+inline void GetNrOptionModeExtImpl(int32_t, int32_t &) {}
+inline void GetNrOptionModeExtendImpl(int32_t, NrMode &) {}
+inline void GetPreferredNetworkExtImpl(int32_t &) {}
 inline bool IsChipsetNetworkExtSupportedImpl()
 {
     return false;
@@ -261,14 +255,10 @@ inline bool IsNrSupportedNativeImpl(int32_t)
 {
     return false;
 }
-inline void GetSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &)
-{}
-inline void GetNetworkCapabilityExtImpl(int32_t, int32_t, int32_t &)
-{}
-inline void OnGetNetworkSearchInformationExtImpl(int32_t &, std::vector<NetworkInformation> &)
-{}
-inline void CreateIccFileExtImpl(int32_t, std::shared_ptr<IIccFileExt>)
-{}
+inline void GetSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &) {}
+inline void GetNetworkCapabilityExtImpl(int32_t, int32_t, int32_t &) {}
+inline void OnGetNetworkSearchInformationExtImpl(int32_t &, std::vector<NetworkInformation> &) {}
+inline void CreateIccFileExtImpl(int32_t, std::shared_ptr<IIccFileExt>) {}
 
 inline void UpdateCountryCodeExtImpl(int32_t, const char *)
 {}
@@ -364,8 +354,7 @@ inline bool ProcessSignalInfosImpl(int32_t, Rssi &)
 {
     return false;
 }
-inline void ClearSignalInfoCacheImpl(int32_t)
-{}
+inline void ClearSignalInfoCacheImpl(int32_t) {}
 inline bool ProcessStateChangeExtImpl(int32_t, sptr<NetworkState> &)
 {
     return false;
