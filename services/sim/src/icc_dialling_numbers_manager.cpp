@@ -319,7 +319,10 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool isCardUicc = simFM->IsUiccCard();
-    int fileId = isCardUicc ? ELEMENTARY_FILE_PBR : GetFileIdForType(type);
+    int fileId = GetFileIdForType(type);
+    if (fileId == ELEMENTARY_FILE_ADN && isCardUicc) {
+        fileId = ELEMENTARY_FILE_PBR;
+    }
     int extensionEf = diallingNumbersCache_->ExtendedElementFile(fileId);
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(MSG_SIM_DIALLING_NUMBERS_GET_DONE);
     hasQueryEventDone_ = false;
