@@ -677,6 +677,10 @@ void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Poi
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
         networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        if (TELEPHONY_EXT_WRAPPER.clearSignalInfoCache_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.clearSignalInfoCache_(slotId_);
+            TELEPHONY_LOGD("TELEPHONY_EXT_WRAPPER.clearSignalInfoCache");
+        }
         TELEPHONY_LOGI("radio is power off, no need update signal strength");
         return;
     }
