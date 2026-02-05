@@ -465,8 +465,7 @@ void NetworkSearchState::NotifyStateChange()
     }
 
     if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
-        TELEPHONY_LOGI(
-            "NotifyStateChange::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI("NotifyStateChange isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
         sptr<NetworkState> ns = new NetworkState;
         if (ns == nullptr) {
             TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
