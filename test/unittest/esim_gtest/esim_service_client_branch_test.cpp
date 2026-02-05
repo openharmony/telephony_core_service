@@ -335,5 +335,14 @@ HWTEST_F(EsimServiceClientBranchTest, OnRemoteDied_0001, Function | MediumTest |
     EXPECT_EQ(EsimServiceClient::GetInstance().proxy_, nullptr);
 }
 
+HWTEST_F(EsimServiceClientBranchTest, GetEsimFreeStorage_0001, Function | MediumTest | Level1)
+{
+    int32_t freeStorage = -1;
+    EXPECT_CALL(*samgr, LoadSystemAbility(testing::_,
+        testing::A<const sptr<ISystemAbilityLoadCallback>&>())).WillOnce(testing::Return(-1));
+    sptr<IEsimServiceCallback> callback = nullptr;
+    int32_t result = EsimServiceClient::GetInstance().GetEsimFreeStorage(freeStorage);
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
 } // namespace Telephony
 } // namespace OHOS
