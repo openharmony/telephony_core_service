@@ -489,7 +489,6 @@ void NetworkSearchState::NotifyStateChange()
         // otherwise observers may get the wrong phone type
         lock.unlock();
         CsRadioTechChange();
-
         NotifyPsRadioTechChange();
         NotifyPsRegStatusChange();
         NotifyPsRoamingStatusChange();
