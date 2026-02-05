@@ -1767,6 +1767,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersCache_007, Function | Med
     iccDiallingNumbersManager->QueryIccDiallingNumbers(1, result);
     iccDiallingNumbersManager->hasQueryEventDone_ = false;
     iccDiallingNumbersManager->QueryIccDiallingNumbers(1, result);
+    iccDiallingNumbersManager->QueryIccDiallingNumbers(2, result);
     EXPECT_EQ(iccDiallingNumbersManager->QueryIccDiallingNumbers(0, result), TELEPHONY_ERR_ARGUMENT_INVALID);
 }
  
