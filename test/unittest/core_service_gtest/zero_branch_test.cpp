@@ -2629,5 +2629,37 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Refreshdata, Function | MediumTes
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
     EXPECT_GT(multiSimMonitor->UnregisterSimAccountCallback(callback), TELEPHONY_ERROR);
 }
+ 
+/**
+ * @tc.number   Telephony_MultiSimMonitor_Initdata
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Initdata, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
+        simStateManager, simFileManager);
+    EXPECT_CALL(*multiSimControllerMock, InitData(0)).WillRepeatedly(testing::Return(true));
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_ != nullptr);
+    multiSimMonitor->isSimAccountLoaded_.resize(SLOT_COUNT, 0);
+    multiSimMonitor->InitData(0);
+    EXPECT_TRUE(multiSimMonitor->isSimAccountLoaded_[0]);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -364,7 +364,7 @@ public:
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
     void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId);
-    void StartMatchSimTimeoutTimer(int32_t slotId);
+    void SendSimAccountLoadedInfo(int32_t slotId, int32_t event);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);

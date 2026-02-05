@@ -3027,6 +3027,14 @@ int32_t CoreManagerInner::SetEsimCaVerifyResult(int32_t slotId, bool verifyResul
     return esimManager_->SetEsimCaVerifyResult(slotId, verifyResult);
 }
 
+void CoreManagerInner::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    simManager_->SendSimAccountLoadedInfo(slotId, event);
+}
 /******************** esimManager_ end ************************/
 
 bool CoreManagerInner::IsEsim(int32_t slotId)

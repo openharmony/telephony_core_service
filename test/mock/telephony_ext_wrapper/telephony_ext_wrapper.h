@@ -124,6 +124,7 @@ public:
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
     typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
+    typedef void (*SendSimAccountLoadedInfoFunc)(int32_t slotId, int32_t event);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -197,6 +198,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
+    void SendSimAccountLoadedInfo(int32_t slotId, int32_t event);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -204,6 +206,7 @@ private:
     void* telephonyDynamicLoadWrapperHandle_ = nullptr;
     GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
     SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
+    SendSimAccountLoadedInfoFunc sendSimAccountLoadedInfo_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -390,7 +393,8 @@ inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
     return 0;
 }
-
+inline void SendSimAccountLoadedInfoImpl(int32_t slotId, int32_t event)
+{}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -509,6 +513,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     cacheAssetPinForUpgrade_ = &CacheAssetPinForUpgradeImpl;
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
     sendSimChgTypeInfo_  = &SendSimChgTypeInfoImpl;
+    sendSimAccountLoadedInfo_  = &SendSimAccountLoadedInfoImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
@@ -543,6 +548,13 @@ inline void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type
 {
     if (sendSimChgTypeInfo_ != nullptr) {
         sendSimChgTypeInfo_(slotId, type);
+    }
+}
+ 
+inline void TelephonyExtWrapper::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
+{
+    if (sendSimAccountLoadedInfo_ != nullptr) {
+        sendSimAccountLoadedInfo_(slotId, event);
     }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
