@@ -134,6 +134,10 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     if (updatePlmnExt_ == nullptr || isInModem2Optimization_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    clearSignalInfoCache_ = (CLEAR_SIGNAL_INFO_CACHE)dlsym(telephonyExtWrapperHandle_, "ClearSignalInfoCache");
+    if (clearSignalInfoCache_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()

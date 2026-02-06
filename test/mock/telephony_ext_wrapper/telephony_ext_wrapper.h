@@ -114,6 +114,7 @@ public:
     typedef void (*GetOpnameVersion)(std::string &versionInfo);
 
     typedef bool (*PROCESS_SIGNAL_INFOS)(int32_t slotId, Rssi &signalIntensity);
+    typedef void (*CLEAR_SIGNAL_INFO_CACHE)(int32_t slotId);
     typedef bool (*PROCESS_STATE_CHANGE_EXT)(int32_t slotId, sptr<NetworkState> &ns);
     typedef bool (*PROCESS_OPERATOR_NAME)(int32_t slotId, std::string &plmnName, const std::string &numeric);
     typedef bool (*PROCESS_DELAY_OPERATOR_NAME)(int32_t slotId);
@@ -188,6 +189,7 @@ public:
     GET_ROAMINGBROKER_NUMERIC getRoamingBrokerNumeric_ = nullptr;
     GET_ROAMINGBROKER_IMSI getRoamingBrokerImsi_ = nullptr;
     PROCESS_SIGNAL_INFOS processSignalInfos_ = nullptr;
+    CLEAR_SIGNAL_INFO_CACHE clearSignalInfoCache_ = nullptr;
     PROCESS_STATE_CHANGE_EXT processStateChangeExt_ = nullptr;
     PROCESS_OPERATOR_NAME processOperatorName_ = nullptr;
     PROCESS_DELAY_OPERATOR_NAME isInDelayProcessForOperatorName_ = nullptr;
@@ -247,7 +249,8 @@ inline void GetRadioTechExtImpl(int32_t, int32_t &) {}
 inline void GetNrOptionModeExtImpl(int32_t, int32_t &) {}
 inline void GetNrOptionModeExtendImpl(int32_t, NrMode &) {}
 inline void GetPreferredNetworkExtImpl(int32_t &) {}
-inline bool IsChipsetNetworkExtSupportedImpl() {
+inline bool IsChipsetNetworkExtSupportedImpl()
+{
     return false;
 }
 inline bool IsNrSupportedNativeImpl(int32_t)
@@ -335,6 +338,7 @@ inline bool ProcessSignalInfosImpl(int32_t, Rssi &)
 {
     return false;
 }
+inline void ClearSignalInfoCacheImpl(int32_t) {}
 inline bool ProcessStateChangeExtImpl(int32_t, sptr<NetworkState> &)
 {
     return false;
@@ -417,6 +421,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     setNrOptionModeExt_ = &SetNrOptionModeExtImpl;
     updatePlmnExt_ = &UpdatePlmnExtImpl;
     isInModem2Optimization_ = &IsInModem2OptimizationImpl;
+    clearSignalInfoCache_ = &ClearSignalInfoCacheImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
