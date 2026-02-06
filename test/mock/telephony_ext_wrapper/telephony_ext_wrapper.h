@@ -237,60 +237,40 @@ inline bool GetVoiceMailFixedExtImpl(int32_t, const char *)
 }
 inline void GetVoiceMailNumberExtImpl(int32_t, const char *, std::string &) {}
 inline void GetVoiceMailTagExtImpl(int32_t, const char *, std::string &) {}
-inline void ResetVoiceMailManagerExtImpl(int32_t)
-{}
-inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &)
-{}
-
+inline void ResetVoiceMailManagerExtImpl(int32_t) {}
+inline void GetNetworkStatusExtImpl(int32_t, sptr<NetworkState> &) {}
 inline int32_t GetCellInfoListImpl(int32_t, std::vector<sptr<CellInformation>> &)
 {
     return 0;
 }
-inline void GetRadioTechExtImpl(int32_t, int32_t &)
-{}
-inline void GetNrOptionModeExtImpl(int32_t, int32_t &)
-{}
-inline void GetNrOptionModeExtendImpl(int32_t, NrMode &)
-{}
-inline void GetPreferredNetworkExtImpl(int32_t &)
-{}
-inline bool IsChipsetNetworkExtSupportedImpl()
-{
+inline void GetRadioTechExtImpl(int32_t, int32_t &) {}
+inline void GetNrOptionModeExtImpl(int32_t, int32_t &) {}
+inline void GetNrOptionModeExtendImpl(int32_t, NrMode &) {}
+inline void GetPreferredNetworkExtImpl(int32_t &) {}
+inline bool IsChipsetNetworkExtSupportedImpl() {
     return false;
 }
 inline bool IsNrSupportedNativeImpl(int32_t)
 {
     return false;
 }
-inline void GetSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &)
-{}
-inline void GetNetworkCapabilityExtImpl(int32_t, int32_t, int32_t &)
-{}
-inline void OnGetNetworkSearchInformationExtImpl(int32_t &, std::vector<NetworkInformation> &)
-{}
-inline void CreateIccFileExtImpl(int32_t, std::shared_ptr<IIccFileExt>)
-{}
+inline void GetSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &) {}
+inline void GetNetworkCapabilityExtImpl(int32_t, int32_t, int32_t &) {}
+inline void OnGetNetworkSearchInformationExtImpl(int32_t &, std::vector<NetworkInformation> &) {}
+inline void CreateIccFileExtImpl(int32_t, std::shared_ptr<IIccFileExt>) {}
 
-inline void UpdateCountryCodeExtImpl(int32_t, const char *)
-{}
-inline void UpdateTimeZoneOffsetExtImpl(int32_t, NitzData)
-{}
-inline void UpdateNetworkStateExtImpl(int32_t, std::unique_ptr<NetworkState> &)
-{}
-inline void UpdateOperatorNameParamsExtImpl(int32_t, sptr<NetworkState> &, OperatorNameParams &)
-{}
+inline void UpdateCountryCodeExtImpl(int32_t, const char *) {}
+inline void UpdateTimeZoneOffsetExtImpl(int32_t, NitzData) {}
+inline void UpdateNetworkStateExtImpl(int32_t, std::unique_ptr<NetworkState> &) {}
+inline void UpdateOperatorNameParamsExtImpl(int32_t, sptr<NetworkState> &, OperatorNameParams &) {}
 inline int32_t UpdateNsaStateExtImpl(int32_t, int32_t, bool, bool, int32_t)
 {
     return 0;
 }
-inline void PublishSpnInfoChangedExtImpl(OHOS::AAFwk::Want &)
-{}
-inline void PublishContainerDisableHotZoneIndImpl(int32_t)
-{}
-inline void GetRoamingBrokerNumericImpl(int32_t, std::string &)
-{}
-inline void GetRoamingBrokerImsiImpl(int32_t, std::string &)
-{}
+inline void PublishSpnInfoChangedExtImpl(OHOS::AAFwk::Want &) {}
+inline void PublishContainerDisableHotZoneIndImpl(int32_t) {}
+inline void GetRoamingBrokerNumericImpl(int32_t, std::string &) {}
+inline void GetRoamingBrokerImsiImpl(int32_t, std::string &) {}
 inline bool SetNrOptionModeExtImpl(int32_t, int32_t, int32_t, int32_t &)
 {
     return false;
@@ -302,18 +282,12 @@ inline bool IsInModem2OptimizationImpl(int32_t)
     return false;
 }
 
-inline void IsVSimInStatusImpl(int32_t, int32_t, bool &)
-{}
-inline void GetVSimSlotIdImpl(int32_t &)
-{}
-inline void OnAllFilesFetchedExtImpl(int32_t)
-{}
-inline void PutVSimExtraInfoImpl(OHOS::AAFwk::Want &, int32_t, int32_t)
-{}
-inline void ChangeSpnAndRuleExtImpl(std::string &, int32_t &, bool &)
-{}
-inline void GetVSimCardStateImpl(int32_t &)
-{}
+inline void IsVSimInStatusImpl(int32_t, int32_t, bool &) {}
+inline void GetVSimSlotIdImpl(int32_t &) {}
+inline void OnAllFilesFetchedExtImpl(int32_t) {}
+inline void PutVSimExtraInfoImpl(OHOS::AAFwk::Want &, int32_t, int32_t) {}
+inline void ChangeSpnAndRuleExtImpl(std::string &, int32_t &, bool &) {}
+inline void GetVSimCardStateImpl(int32_t &) {}
 inline bool GetSimIdExtImpl(int32_t, int32_t &)
 {
     return false;
@@ -353,14 +327,10 @@ inline bool IsAllowedInsertApnImpl(std::string &)
 {
     return false;
 }
-inline void GetTargetOpkeyImpl(int32_t, std::u16string &)
-{}
-inline void SortSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &)
-{}
-inline void GetOpkeyVersionImpl(std::string &)
-{}
-inline void GetOpnameVersionImpl(std::string &)
-{}
+inline void GetTargetOpkeyImpl(int32_t, std::u16string &) {}
+inline void SortSignalInfoListExtImpl(int32_t, std::vector<sptr<SignalInformation>> &) {}
+inline void GetOpkeyVersionImpl(std::string &) {}
+inline void GetOpnameVersionImpl(std::string &) {}
 inline bool ProcessSignalInfosImpl(int32_t, Rssi &)
 {
     return false;
@@ -377,14 +347,10 @@ inline bool IsProcessDelayOperatorNameImpl(int32_t)
 {
     return false;
 }
-inline void InitDynamicLoadHandlerImpl()
-{}
-inline void DeInitDynamicLoadHandlerImpl()
-{}
-inline void UpdateHotPlugCardStateImpl(int32_t, SimState)
-{}
-inline void CacheAssetPinForUpgradeImpl(int32_t, const std::string &, PinOperationType, const std::string &)
-{}
+inline void InitDynamicLoadHandlerImpl() {}
+inline void DeInitDynamicLoadHandlerImpl() {}
+inline void UpdateHotPlugCardStateImpl(int32_t, SimState) {}
+inline void CacheAssetPinForUpgradeImpl(int32_t, const std::string &, PinOperationType, const std::string &) {}
 inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
@@ -393,8 +359,7 @@ inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
     return 0;
 }
-inline void SendSimAccountLoadedInfoImpl(int32_t slotId, int32_t event)
-{}
+inline void SendSimAccountLoadedInfoImpl(int32_t slotId, int32_t event) {}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -560,5 +525,4 @@ inline void TelephonyExtWrapper::SendSimAccountLoadedInfo(int32_t slotId, int32_
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
 }  // namespace OHOS
-
 #endif  // TELEPHONY_EXT_WRAPPER_H
