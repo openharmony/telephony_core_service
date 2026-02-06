@@ -479,8 +479,8 @@ void NetworkSearchState::NotifyStateChange()
                 networkStateOld_->Marshalling(data);
                 networkState_->ReadFromParcel(data);
                 processNetworkState_ = true;
-                TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%d, isSame:%d",
-                    slotId_, networkState_.GetRegStatus(), *networkState_ == *networkStateOld_);
+                TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%{public}d, isSame:%{public}d",
+                    slotId_, networkState_->GetRegStatus(), *networkState_ == *networkStateOld_);
                 return;
             }
         }
@@ -503,8 +503,8 @@ void NetworkSearchState::NotifyStateChange()
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
-    TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%d, isSame:%d",
-        slotId_, networkState_.GetRegStatus(), *networkState_ == *networkStateOld_);
+    TELEPHONY_LOGI("NotifyStateChange slotId:%{public}d, regStatus:%{public}d, isSame:%{public}d",
+        slotId_, networkState_->GetRegStatus(), *networkState_ == *networkStateOld_);
     processNetworkState_ = false;
 }
 
