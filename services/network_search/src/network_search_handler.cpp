@@ -677,6 +677,10 @@ void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Poi
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr ||
         networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        if (TELEPHONY_EXT_WRAPPER.clearSignalInfoCache_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.clearSignalInfoCache_(slotId_);
+            TELEPHONY_LOGD("TELEPHONY_EXT_WRAPPER.clearSignalInfoCache");
+        }
         TELEPHONY_LOGI("radio is power off, no need update signal strength");
         return;
     }
@@ -708,11 +712,6 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         networkSearchManager->decMsgNum(slotId_);
         if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
             UpdateNetworkState();
-        }
-    } else if (operatorInfoResult_->flag == NetworkSearchManagerInner::SERIAL_NUMBER_EXEMPT) {
-        if (operatorName_ != nullptr) {
-            operatorName_->HandleOperatorInfo(operatorInfoResult_);
-            networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
         }
     } else {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
