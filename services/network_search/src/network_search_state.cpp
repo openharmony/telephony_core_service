@@ -465,8 +465,7 @@ void NetworkSearchState::NotifyStateChange()
     }
 
     if (processNetworkState_ || !(*networkState_ == *networkStateOld_)) {
-        TELEPHONY_LOGI(
-            "NetworkSearchState::StateCheck isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
+        TELEPHONY_LOGI("NotifyStateChange isNetworkStateChange notify to app... slotId:%{public}d", slotId_);
         sptr<NetworkState> ns = new NetworkState;
         if (ns == nullptr) {
             TELEPHONY_LOGE("failed to create networkState slotId:%{public}d", slotId_);
@@ -480,11 +479,12 @@ void NetworkSearchState::NotifyStateChange()
                 networkStateOld_->Marshalling(data);
                 networkState_->ReadFromParcel(data);
                 processNetworkState_ = true;
+                TELEPHONY_LOGI("NotifyStateChange delay slotId:%{public}d, regStatus:%{public}d, isSame:%{public}d",
+                    slotId_, networkState_->GetRegStatus(), *networkState_ == *networkStateOld_);
                 return;
             }
         }
-        // We must Update RadioTech(PhoneType) bebore notifying observers,
-        // otherwise observers may get the wrong phone type
+        // Update RadioTech(PhoneType) bebore notifying observers, otherwise observers may get the wrong phone type
         lock.unlock();
         CsRadioTechChange();
 
@@ -503,6 +503,8 @@ void NetworkSearchState::NotifyStateChange()
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
+    TELEPHONY_LOGI("NotifyStateChange finish slotId:%{public}d, regStatus:%{public}d, isSame:%{public}d",
+        slotId_, networkState_->GetRegStatus(), *networkState_ == *networkStateOld_);
     processNetworkState_ = false;
 }
 
