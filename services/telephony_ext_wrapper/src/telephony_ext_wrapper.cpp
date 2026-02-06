@@ -253,9 +253,9 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     sendSimAccountLoadedInfo_ =
         reinterpret_cast<SendSimAccountLoadedInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimAccountLoadedInfo"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
-                        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
-                        updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-                        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || sendSimAccountLoadedInfo_ == nullptr);
+        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
+        updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
+        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || sendSimAccountLoadedInfo_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
