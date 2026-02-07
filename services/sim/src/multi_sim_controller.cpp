@@ -486,9 +486,11 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
     int simLabelIndex = PSIM1;
     if (isSupportEsimMep_) {
-+       simLabelIndex = GetPsimLabelIndex(slotId);
-+   } else if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
-+       simLabelIndex = PSIM2;
+        simLabelIndex = GetPsimLabelIndex(slotId);
+    } else {
+        if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
+            simLabelIndex = PSIM2;
+        }
     }
     if (newIccId.substr(0, EMPTY_ICCID_LEN) == "emptyiccid") {
         simLabelIndex = INVALID_VALUE;
