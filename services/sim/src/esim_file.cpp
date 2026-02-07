@@ -799,13 +799,13 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
 int32_t EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
     if (slotId_ == SLOT_ID_0) {
-+       OHOS::system::SetParameter(
-+           LAST_DEACTIVE_PROFILE_SLOT0, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
-+   }
-+   if (slotId_ == SLOT_ID_1) {
-+       OHOS::system::SetParameter(
-+           LAST_DEACTIVE_PROFILE_SLOT1, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
-+   }
+        OHOS::system::SetParameter(
+            LAST_DEACTIVE_PROFILE_SLOT0, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
+    }
+    if (slotId_ == SLOT_ID_1) {
+        OHOS::system::SetParameter(
+            LAST_DEACTIVE_PROFILE_SLOT1, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
+    }
     disableProfileResult_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
     esimProfile_.portIndex = portIndex;
     esimProfile_.iccId = iccId;
