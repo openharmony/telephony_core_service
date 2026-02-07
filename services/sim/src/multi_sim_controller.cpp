@@ -168,7 +168,7 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     bool isUpdateActiveState = !IsSimSlotsMapping();
     isSimSlotsMapping_[slotId] = false;
     TELEPHONY_LOGI("slotId %{public}d: isNeedUpdateSimLabel is %{public}d, isUpdateActiveState %{public}d",
-+        slotId, isNeedUpdateSimLabel, isUpdateActiveState);
+        slotId, isNeedUpdateSimLabel, isUpdateActiveState);
     return simDbHelper_->ForgetAllData(slotId, isNeedUpdateSimLabel, isUpdateActiveState) != INVALID_VALUE;
 }
 
@@ -487,10 +487,8 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     int simLabelIndex = PSIM1;
     if (isSupportEsimMep_) {
 +       simLabelIndex = GetPsimLabelIndex(slotId);
-+   } else {
-+       if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
-+           simLabelIndex = PSIM2;
-+       }
++   } else if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
++       simLabelIndex = PSIM2;
     }
     if (newIccId.substr(0, EMPTY_ICCID_LEN) == "emptyiccid") {
         simLabelIndex = INVALID_VALUE;
