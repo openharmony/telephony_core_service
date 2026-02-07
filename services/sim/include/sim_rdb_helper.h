@@ -38,47 +38,47 @@ namespace Telephony {
 class SimRdbHelper {
 public:
     SimRdbHelper();
-    ~SimRdbHelper();
+    virtual ~SimRdbHelper();
 
-    int32_t GetDefaultMainCardSlotId();
-    int32_t GetDefaultMessageCardSlotId();
-    int32_t GetDefaultVoiceCardSlotId();
-    int32_t GetDefaultCellularDataCardSlotId();
-    int32_t SetDefaultMainCard(int32_t simId);
-    int32_t SetDefaultVoiceCard(int32_t simId);
-    int32_t SetDefaultMessageCard(int32_t simId);
-    int32_t SetDefaultCellularData(int32_t simId);
-    int32_t InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values);
-    int32_t QueryDataByIccId(std::string iccId, SimRdbInfo &simBean);
-    int32_t QueryAllData(std::vector<SimRdbInfo> &vec);
-    int32_t QueryAllValidData(std::vector<SimRdbInfo> &vec);
-    int32_t UpdateDataBySimId(int32_t simId, const DataShare::DataShareValuesBucket &values);
-    int32_t UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values);
-    int32_t ForgetAllData();
-    int32_t ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState);
-    int32_t ClearSimLabel(SimType simType);
-    int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
-    int32_t UpdateSimPresent(const std::string &iccId, bool isShowPresent, int32_t labelIndex);
+    virtual int32_t GetDefaultMainCardSlotId();
+    virtual int32_t GetDefaultMessageCardSlotId();
+    virtual int32_t GetDefaultVoiceCardSlotId();
+    virtual int32_t GetDefaultCellularDataCardSlotId();
+    virtual int32_t SetDefaultMainCard(int32_t simId);
+    virtual int32_t SetDefaultVoiceCard(int32_t simId);
+    virtual int32_t SetDefaultMessageCard(int32_t simId);
+    virtual int32_t SetDefaultCellularData(int32_t simId);
+    virtual int32_t InsertData(int64_t &id, const DataShare::DataShareValuesBucket &values);
+    virtual int32_t QueryDataByIccId(std::string iccId, SimRdbInfo &simBean);
+    virtual int32_t QueryAllData(std::vector<SimRdbInfo> &vec);
+    virtual int32_t QueryAllValidData(std::vector<SimRdbInfo> &vec);
+    virtual int32_t UpdateDataBySimId(int32_t simId, const DataShare::DataShareValuesBucket &values);
+    virtual int32_t UpdateDataByIccId(std::string iccId, const DataShare::DataShareValuesBucket &values);
+    virtual int32_t ForgetAllData();
+    virtual int32_t ForgetAllData(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState);
+    virtual int32_t ClearSimLabel(SimType simType);
+    virtual int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
+    virtual int32_t UpdateSimPresent(std::string iccId, bool isShowPresent, int labelIndex);
 
-    int32_t ClearData();
-    int32_t UpdateOpKeyInfo();
-    bool IsDataShareError();
-    void ResetDataShareError();
+    virtual int32_t ClearData();
+    virtual int32_t UpdateOpKeyInfo();
+    virtual bool IsDataShareError();
+    virtual void ResetDataShareError();
 
 private:
     std::shared_ptr<TelephonyDataHelper> mTelephonyDatahelper = DelayedSingleton<TelephonyDataHelper>::GetInstance();
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
-    std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper(int waitTime);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const int waitTime);
-    int Insert(
+    virtual std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper();
+    virtual std::shared_ptr<DataShare::DataShareHelper> CreateOpKeyHelper(int waitTime);
+    virtual std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const int waitTime);
+    virtual int Insert(
         std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataShareValuesBucket &values);
-    std::shared_ptr<DataShare::DataShareResultSet> Query(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
-        std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates);
-    int Update(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
+    virtual std::shared_ptr<DataShare::DataShareResultSet> Query(std::shared_ptr<DataShare::DataShareHelper>
+        dataShareHelper, std::vector<std::string> &columns, const DataShare::DataSharePredicates &predicates);
+    virtual int Update(std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
         const DataShare::DataShareValuesBucket &value, const DataShare::DataSharePredicates &predicates);
-    int Delete(
+    virtual int Delete(
         std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataSharePredicates &predicates);
-    void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
+    virtual void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 
 private:
     enum class DefaultCardType {
