@@ -167,10 +167,12 @@ private:
     bool IsNeedSetTargetPrimarySlotId();
     bool IsSetPrimarySlotReady(int32_t slotId);
     void ResetPrimarySlotReady();
-    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, int32_t slotId);
     void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
     void SavePrimaryCardInfo(int32_t slotId);
     void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
+    int32_t GetPsimLabelIndex(int slotId);
++   bool IsESimUpdateStatus(int32_t slotId);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
