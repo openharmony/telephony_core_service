@@ -1232,7 +1232,7 @@ void SimManager::UnRegisterCoreNotify(
             return;
         }
         TELEPHONY_EXT_WRAPPER.unregisterEsimSwitchNotify_(slotId, observerCallBack, what);
-     } else {
+    } else {
         TELEPHONY_LOGE("SimManager::UnRegisterCoreNotify faild");
     }
 }
