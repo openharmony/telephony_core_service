@@ -2645,7 +2645,7 @@ HWTEST_F(BranchTest, Telephony_SimManager_SendSimAccountLoadedInfo, Function | M
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     mInner.OnInit(networkSearchManager, simManager, telRilManager);
     mInner.SendSimAccountLoadedInfo(0, 0);
-    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_  != nullptr);
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_ != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
