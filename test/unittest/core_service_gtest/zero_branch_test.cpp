@@ -2631,39 +2631,21 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Refreshdata, Function | MediumTes
 }
  
 /**
- * @tc.number   Telephony_MultiSimMonitor_Initdata
+ * @tc.number   Telephony_Network_InitTelephonyExtService_001
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Initdata, Function | MediumTest | Level1)
+HWTEST_F(BranchTest, Telephony_SimManager_SendSimAccountLoadedInfo, Function | MediumTest | Level1)
 {
-    CoreManagerInner mInner;
-    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    mInner.OnInit(nullptr, simManager, telRilManager);
-    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
-    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
-    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
-        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
-        simStateManagerPtr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
-    std::shared_ptr<Telephony::MultiSimController> multiSimController =
-        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
-    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
-        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
-    };
-    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
-        simStateManager, simFileManager);
-    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    EXPECT_CALL(*multiSimControllerMock, InitData(0)).WillRepeatedly(testing::Return(true));
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_ != nullptr);
-    multiSimMonitor->isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
-    multiSimMonitor->initDataRemainCount_.resize(SIM_SLOT_COUNT, 5);
-    multiSimMonitor->InitData(0);
-    EXPECT_TRUE(multiSimMonitor->isSimAccountLoaded_[0]);
+    CoreManagerInner mInner;
+    mInner.SendSimAccountLoadedInfo(0, 0);
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    mInner.OnInit(networkSearchManager, simManager, telRilManager);
+    mInner.SendSimAccountLoadedInfo(0, 0);
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_  != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
