@@ -2748,13 +2748,14 @@ void CoreManagerInner::SetMatchSimStateTracker(int8_t matchSimStateTracker, int3
     }
 }
 
-void CoreManagerInner::StartMatchSimTimeoutTimer(int32_t slotId)
+void CoreManagerInner::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
 {
-    if (simManager_ != nullptr) {
-        simManager_->StartMatchSimTimeoutTimer(slotId);
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
     }
+    simManager_->SendSimAccountLoadedInfo(slotId, event);
 }
-
 /******************** simManager_ end ************************/
 
 /******************** esimManager_ start ************************/
@@ -3025,15 +3026,6 @@ int32_t CoreManagerInner::SetEsimCaVerifyResult(int32_t slotId, bool verifyResul
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return esimManager_->SetEsimCaVerifyResult(slotId, verifyResult);
-}
-
-void CoreManagerInner::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
-{
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null!");
-        return;
-    }
-    simManager_->SendSimAccountLoadedInfo(slotId, event);
 }
 /******************** esimManager_ end ************************/
 
