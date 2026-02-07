@@ -632,10 +632,10 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
         bool isSupportEsimMep = OHOS::system::GetBoolParameter("const.ril.sim.esim_support_mep", true);
         bool isEsim = false;
         if (isSupportEsimMep) {
-          simLabel.index = GetPsimLabelIndex(slotId);
+            simLabel.index = GetPsimLabelIndex(slotId);
         } else {
             if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
-               simLabel.index = PSIM2;
+                simLabel.index = PSIM2;
             }
         }
     }
