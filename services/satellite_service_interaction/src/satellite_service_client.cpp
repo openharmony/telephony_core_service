@@ -267,5 +267,15 @@ std::string SatelliteServiceClient::GetImei()
     }
     return proxy->GetImei();
 }
+
+int32_t SatelliteServiceClient::GetSatelliteSlotId()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetSatelliteSlotId();
+}
 } // namespace Telephony
 } // namespace OHOS

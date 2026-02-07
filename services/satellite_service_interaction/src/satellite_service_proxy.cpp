@@ -237,6 +237,34 @@ std::string SatelliteServiceProxy::GetImei()
     return imei;
 }
 
+int32_t SatelliteServiceProxy::GetSatelliteSlotId()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = 0;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSatelliteSlotId WriteInterfaceToken is false");
+        return result;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSatelliteSlotId Remote is null");
+        return result;
+    }
+    int32_t ret =
+        remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_SATELLITE_SLOT_ID), data, reply, option);
+    if (ret != ERR_NONE) {
+        TELEPHONY_LOGE("GetSatelliteSlotId failed, error code is %{public}d ", ret);
+        return result;
+    }
+    if (!reply.ReadInt32(result)) {
+        TELEPHONY_LOGE("GetSatelliteSlotId read reply failed");
+    }
+    TELEPHONY_LOGD("Satellite GetSatelliteSlotId %{public}d", result);
+    return result;
+}
+
 sptr<IRemoteObject> SatelliteServiceProxy::GetProxyObjectPtr(SatelliteServiceProxyType proxyType)
 {
     MessageParcel dataParcel;
