@@ -41,7 +41,7 @@ public:
     MOCK_METHOD2(UpdateDataBySimId, int32_t(int32_t simId, const DataShare::DataShareValuesBucket &values));
     MOCK_METHOD2(UpdateDataByIccId, int32_t(std::string iccId, const DataShare::DataShareValuesBucket &values));
     MOCK_METHOD0(ForgetAllData, int32_t());
-    MOCK_METHOD1(ForgetAllData, int32_t(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState));
+    MOCK_METHOD3(ForgetAllData, int32_t(int32_t slotId, bool isNeedUpdateSimLabel, bool isUpdateActiveState));
     MOCK_METHOD0(ClearData, int32_t());
     MOCK_METHOD0(UpdateOpKeyInfo, int32_t());
     MOCK_METHOD0(IsDataShareError, bool());
