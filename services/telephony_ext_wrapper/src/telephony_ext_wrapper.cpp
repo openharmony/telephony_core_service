@@ -165,8 +165,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
     isDistributedCommunicationConnected_ = (IsDistributedCommunicationConnected)dlsym(telephonyExtWrapperHandle_,
         "IsDistributedCommunicationConnected");
     registerEsimSwitchNotify_ = (RegisterEsimSwitchNotify)dlsym(telephonyExtWrapperHandle_, "RegisterEsimSwitchNotify");
-+   unregisterEsimSwitchNotify_ = (RegisterEsimSwitchNotify)dlsym(telephonyExtWrapperHandle_,
-+        "UnregisterEsimSwitchNotify");
+    unregisterEsimSwitchNotify_ = (RegisterEsimSwitchNotify)dlsym(telephonyExtWrapperHandle_,
+        "UnregisterEsimSwitchNotify");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
