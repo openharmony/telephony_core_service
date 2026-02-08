@@ -2823,12 +2823,12 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
     }
     builder->Asn1AddChild(subNode);
     bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, true);
-+    if (isSupportEsimMep) {
-+        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, false);
-+        builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_2, esimProfile_.portIndex);
-+    } else {
-+        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
-+    }
+    if (isSupportEsimMep) {
+        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, false);
+        builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_2, esimProfile_.portIndex);
+    } else {
+        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
+    }
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
