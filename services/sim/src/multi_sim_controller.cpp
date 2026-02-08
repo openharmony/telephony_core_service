@@ -160,9 +160,9 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     // conversion.
     bool isNeedUpdateSimLabel = false;
     if (isSupportEsimMep_) {
-       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !IsESimUpdateStatus(slotId) && !isSimSlotsMapping_[slotId];
+        isNeedUpdateSimLabel = !IsSimSlotsMapping() && !IsESimUpdateStatus(slotId) && !isSimSlotsMapping_[slotId];
     } else {
-       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !(slotId == 1 && simLabelState != PSIM1_PSIM2) &&
+        isNeedUpdateSimLabel = !IsSimSlotsMapping() && !(slotId == 1 && simLabelState != PSIM1_PSIM2) &&
                                  !IsEsim(slotId) && !isSimSlotsMapping_[slotId];
     }
     bool isUpdateActiveState = !IsSimSlotsMapping();
@@ -521,7 +521,7 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
 }
 
 void MultiSimController::SimDataBuilder(DataShare::DataShareValuesBucket &values, const std::string &iccId,
-     int32_t simLabel, bool isEsim)
+    int32_t simLabel, bool isEsim)
 {
     DataShare::DataShareValueObject slotObj(INVALID_VALUE);
     DataShare::DataShareValueObject iccidObj(iccId);
