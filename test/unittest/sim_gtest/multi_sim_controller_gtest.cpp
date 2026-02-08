@@ -29,6 +29,7 @@
 #include "mock_sim_fil_manage.h"
 #include "mock_multi_sim_controller.h"
 #include "mock_sim_rdb_helper.h"
+#include "mock_sim_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_ext_wrapper.h"
 
@@ -40,6 +41,7 @@ const int SLOT_COUNT = 2;
 const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_deactive_profile_slot0";
 const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
+const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
 constexpr int32_t ESIM1 = 1;
 constexpr int32_t PSIM1 = 1;
 constexpr int32_t PSIM2 = 2;
@@ -91,7 +93,6 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ForgetAllData_001, Funct
     EXPECT_FALSE(ret);
     OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
     ret = multiSimController->ForgetAllData();
-    multiSimController->CleanLoadedSimInfo(0);
     multiSimController->ResetDataShareError();
     EXPECT_FALSE(ret);
 }
@@ -1509,11 +1510,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
     SimRdbInfo simRdb1;
     simRdb1.simLabelIndex = 3;
     multiSimController->allLocalCacheInfo_.push_back(simRdb1);
-    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 1);
     EXPECT_EQ(simIdx, 3);
 
-    OHOS::system::SetParameter("persist.telephony.last_deactive_profile", "1");
-    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot0", "1");
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 0);
     EXPECT_EQ(simIdx, 3);
 }
 
