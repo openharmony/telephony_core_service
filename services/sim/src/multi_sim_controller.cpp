@@ -89,6 +89,7 @@ static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
 static const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_deactive_profile_slot0";
 static const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 static const std::string TYPE_ESIM_ONLY = "6";
+const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
 
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
@@ -526,9 +527,6 @@ void MultiSimController::SimDataBuilder(DataShare::DataShareValuesBucket &values
     DataShare::DataShareValueObject slotObj(INVALID_VALUE);
     DataShare::DataShareValueObject iccidObj(iccId);
     DataShare::DataShareValueObject valueObj(ACTIVE);
-    DataShare::DataShareValueObject simLabelIndexObj(esimLabel);
-    DataShare::DataShareValueObject isEsimObj(IS_ESIM);
-    DataShare::DataShareValueObject operatorNameObj(operatorName);
     DataShare::DataShareValueObject simLabelIndexObj(simLabel);
     DataShare::DataShareValueObject isEsimObj(isEsim);
     values.Put(SimData::SLOT_INDEX, slotObj);
@@ -537,10 +535,16 @@ void MultiSimController::SimDataBuilder(DataShare::DataShareValuesBucket &values
     values.Put(SimData::IS_ACTIVE, valueObj);
     values.Put(SimData::IS_ESIM, isEsimObj);
     values.Put(SimData::SIM_LABEL_INDEX, simLabelIndexObj);
-    values.Put(SimData::OPERATOR_NAME, operatorNameObj);
     if (SIM_SLOT_COUNT == 1) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
+        values.Put(SimData::IS_VOICE_CARD, mainCardObj);
+        values.Put(SimData::IS_MESSAGE_CARD, mainCardObj);
+        values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
+    } else {
+        DataShare::DataShareValueObject notMainCardObj(NOT_MAIN);
+        values.Put(SimData::IS_MAIN_CARD, notMainCardObj);
+        values.Put(SimData::IS_VOICE_CARD, notMainCardObj);
         values.Put(SimData::IS_MESSAGE_CARD, notMainCardObj);
         values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
     }
