@@ -391,7 +391,7 @@ HWTEST_F(EsimTest, ProcessEsimOpenChannel_001, Function | MediumTest | Level2)
     esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
 
     OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
-+   esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
+    esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
     EXPECT_NE(telRilManager, nullptr);
 }
 
