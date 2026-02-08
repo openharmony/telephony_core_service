@@ -42,7 +42,6 @@ const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_deactive
 const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
 const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
-constexpr int32_t ESIM1 = 1;
 constexpr int32_t PSIM1 = 1;
 constexpr int32_t PSIM2 = 2;
 class MultiSimControllerTest : public testing::Test {
