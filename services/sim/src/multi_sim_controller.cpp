@@ -158,13 +158,13 @@ bool MultiSimController::ForgetAllData(int32_t slotId)
     // !IsEsim(slotId) indicates card atr is not esim
     // !isSimSlotsMapping_[slotId] indicates the current slotId has not yet forgetalldata operation after circuit
     // conversion.
-+   bool isNeedUpdateSimLabel = false;
-+   if (isSupportEsimMep_) {
-+       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !IsESimUpdateStatus(slotId) && !isSimSlotsMapping_[slotId];
-+   } else {
-+       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !(slotId == 1 && simLabelState != PSIM1_PSIM2) &&
+    bool isNeedUpdateSimLabel = false;
+    if (isSupportEsimMep_) {
+       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !IsESimUpdateStatus(slotId) && !isSimSlotsMapping_[slotId];
+    } else {
+       isNeedUpdateSimLabel = !IsSimSlotsMapping() && !(slotId == 1 && simLabelState != PSIM1_PSIM2) &&
                                  !IsEsim(slotId) && !isSimSlotsMapping_[slotId];
-+   }
+    }
     bool isUpdateActiveState = !IsSimSlotsMapping();
     isSimSlotsMapping_[slotId] = false;
     TELEPHONY_LOGI("slotId %{public}d: isNeedUpdateSimLabel is %{public}d, isUpdateActiveState %{public}d",
@@ -509,8 +509,8 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
     }
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject operatorNameObj(operatorName);
-+   values.Put(SimData::OPERATOR_NAME, operatorNameObj);
-+   SimDataBuilder(values, iccId, esimLabel, true);
+    values.Put(SimData::OPERATOR_NAME, operatorNameObj);
+    SimDataBuilder(values, iccId, esimLabel, true);
     int64_t id;
     std::unique_lock<ffrt::mutex> lock(writeDbMutex_);
     int32_t ret = simDbHelper_->InsertData(id, values);
@@ -521,23 +521,23 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
 }
 
 void MultiSimController::SimDataBuilder(DataShare::DataShareValuesBucket &values, const std::string &iccId,
-+    int32_t simLabel, bool isEsim)
-+{
+     int32_t simLabel, bool isEsim)
+{
     DataShare::DataShareValueObject slotObj(INVALID_VALUE);
     DataShare::DataShareValueObject iccidObj(iccId);
     DataShare::DataShareValueObject valueObj(ACTIVE);
--   DataShare::DataShareValueObject simLabelIndexObj(esimLabel);
--   DataShare::DataShareValueObject isEsimObj(IS_ESIM);
--   DataShare::DataShareValueObject operatorNameObj(operatorName);
-+   DataShare::DataShareValueObject simLabelIndexObj(simLabel);
-+   DataShare::DataShareValueObject isEsimObj(isEsim);
+    DataShare::DataShareValueObject simLabelIndexObj(esimLabel);
+    DataShare::DataShareValueObject isEsimObj(IS_ESIM);
+    DataShare::DataShareValueObject operatorNameObj(operatorName);
+    DataShare::DataShareValueObject simLabelIndexObj(simLabel);
+    DataShare::DataShareValueObject isEsimObj(isEsim);
     values.Put(SimData::SLOT_INDEX, slotObj);
     values.Put(SimData::ICC_ID, iccidObj);
     values.Put(SimData::CARD_ID, iccidObj); // iccId == cardId by now
     values.Put(SimData::IS_ACTIVE, valueObj);
     values.Put(SimData::IS_ESIM, isEsimObj);
     values.Put(SimData::SIM_LABEL_INDEX, simLabelIndexObj);
--   values.Put(SimData::OPERATOR_NAME, operatorNameObj);
+    values.Put(SimData::OPERATOR_NAME, operatorNameObj);
     if (SIM_SLOT_COUNT == 1) {
         DataShare::DataShareValueObject mainCardObj(MAIN_CARD);
         values.Put(SimData::IS_MAIN_CARD, mainCardObj);
@@ -575,12 +575,12 @@ int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t l
 void MultiSimController::GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, int32_t slotId)
 {
     int32_t simId = INVALID_VALUE;
-+   if (slotId == SLOT_ID_0) {
-+       simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE_SLOT0, "").c_str(), nullptr, DEC_TYPE);
-+   }
-+   if (slotId == SLOT_ID_1) {
-+       simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE_SLOT1, "").c_str(), nullptr, DEC_TYPE);
-+   }
+    if (slotId == SLOT_ID_0) {
+        simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE_SLOT0, "").c_str(), nullptr, DEC_TYPE);
+    }
+    if (slotId == SLOT_ID_1) {
+        simId = strtol(OHOS::system::GetParameter(LAST_DEACTIVE_PROFILE_SLOT1, "").c_str(), nullptr, DEC_TYPE);
+    }
     if (simId - 1 >= static_cast<int>(allLocalCacheInfo_.size()) || simId - 1 < 0) {
         simLabelIdx = ESIM1;
         return;
