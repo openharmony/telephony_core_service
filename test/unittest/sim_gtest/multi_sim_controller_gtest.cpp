@@ -29,6 +29,7 @@
 #include "mock_sim_fil_manage.h"
 #include "mock_multi_sim_controller.h"
 #include "mock_sim_rdb_helper.h"
+#include "mock_sim_manager.h"
 #include "tel_ril_manager.h"
 #include "telephony_ext_wrapper.h"
 
@@ -37,6 +38,12 @@ namespace Telephony {
 using namespace testing::ext;
 using namespace testing;
 const int SLOT_COUNT = 2;
+const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_deactive_profile_slot0";
+const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
+const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
+const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
+constexpr int32_t PSIM1 = 1;
+constexpr int32_t PSIM2 = 2;
 class MultiSimControllerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -81,6 +88,10 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ForgetAllData_001, Funct
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
     bool ret = multiSimController->ForgetAllData();
+    multiSimController->ResetDataShareError();
+    EXPECT_FALSE(ret);
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    ret = multiSimController->ForgetAllData();
     multiSimController->ResetDataShareError();
     EXPECT_FALSE(ret);
 }
@@ -394,6 +405,26 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDataByIccId_001, F
     EXPECT_EQ(ret, INVALID_VALUE);
 }
 
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDataByIccId_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    radioProtocolController->Init();
+    multiSimController->simDbHelper_ = std::make_unique<MockSimRdbHelper>();
+    auto simDb = static_cast<MockSimRdbHelper*>(multiSimController->simDbHelper_.get());
+
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    EXPECT_CALL(*simDb, UpdateDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
+    auto ret = multiSimController->UpdateDataByIccId(0, "00002222");
+    multiSimController->UpdateDataByIccId(1, "00002222");
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+}
+
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InsertData_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -415,6 +446,30 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InsertData_001, Function
     multiSimController->UpdateSubState(0, 1);
 
     EXPECT_EQ(ret, INVALID_VALUE);
+}
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InsertDataMep_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    auto radioProtocolController =
+        std::make_shared<RadioProtocolController>(std::weak_ptr<TelRilManager>(telRilManager));
+    multiSimController->simDbHelper_ = nullptr;
+
+    multiSimController->maxCount_ = 2;
+    multiSimController->Init();
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    auto ret = multiSimController->InsertData(0, "000011111");
+    EXPECT_EQ(ret, INVALID_VALUE);
+
+    multiSimController->simDbHelper_ = std::make_unique<MockSimRdbHelper>();
+    auto simDb = static_cast<MockSimRdbHelper*>(multiSimController->simDbHelper_.get());
+    EXPECT_CALL(*simDb, UpdateDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
+    ret = multiSimController->InsertData(1, "00002222");
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_001, Function | MediumTest | Level1)
@@ -465,6 +520,52 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SetPrimarySlotId_002, Fu
     multiSimController->SendSetPrimarySlotEvent(0);
 }
 
+HWTEST_F(MultiSimControllerTest, GetSimLabelMeptest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    OHOS::system::SetParameter("persist.ril.sim_switch", "0");
+    int32_t slotId = 0;
+    SimLabel simLabel;
+    OHOS::system::SetParameter(ESIM_SUPPORT_PARAM, "0");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+ 
+    std::shared_ptr<MockSimManager> mockeSimManager = std::make_shared<MockSimManager>();
+    EXPECT_CALL(*mockeSimManager, IsEsim(_)).WillRepeatedly(
+        Return(false));
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simLabel.index, PSIM1);
+
+    slotId = 1;
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simLabel.index, PSIM2);
+}
+
+HWTEST_F(MultiSimControllerTest, GetSimLabelMeptest_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    OHOS::system::SetParameter("persist.ril.sim_switch", "1");
+    int32_t slotId = 0;
+    SimLabel simLabel;
+    OHOS::system::SetParameter(ESIM_SUPPORT_PARAM, "0");
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+ 
+    std::shared_ptr<MockSimManager> mockeSimManager = std::make_shared<MockSimManager>();
+    EXPECT_CALL(*mockeSimManager, IsEsim(_)).WillRepeatedly(
+        Return(false));
+    EXPECT_EQ(multiSimController->GetSimLabel(slotId, simLabel), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(simLabel.index, PSIM1);
+}
+
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ProcessEvent_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -489,6 +590,27 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ProcessEvent_001, Functi
     multiSimController->OnRilSetPrimarySlotDone(nullEvent);
     multiSimController->OnRilSetPrimarySlotTimeout(nullEvent);
     EXPECT_FALSE(multiSimController->setPrimarySlotResponseResult_);
+}
+
+HWTEST_F(MultiSimControllerTest, GetSimLabelIdxFromAllLocalCache, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+ 
+    int32_t simIdx = 0;
+    SimRdbInfo simRdb1;
+    simRdb1.simLabelIndex = 3;
+    multiSimController->allLocalCacheInfo_.push_back(simRdb1);
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 1);
+    EXPECT_EQ(simIdx, 1);
+ 
+    OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot1", "1");
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 1);
+    EXPECT_EQ(simIdx, 3);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SendMainCardBroadCast_001, Function | MediumTest | Level1)
@@ -1387,11 +1509,11 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
     SimRdbInfo simRdb1;
     simRdb1.simLabelIndex = 3;
     multiSimController->allLocalCacheInfo_.push_back(simRdb1);
-    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 1);
     EXPECT_EQ(simIdx, 3);
 
-    OHOS::system::SetParameter("persist.telephony.last_deactive_profile", "1");
-    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
+    OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot0", "1");
+    multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 0);
     EXPECT_EQ(simIdx, 3);
 }
 
