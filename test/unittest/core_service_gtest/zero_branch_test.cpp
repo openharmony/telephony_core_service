@@ -2141,6 +2141,10 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_001, Function | MediumTest | Leve
     multiSimMonitor->RefreshData(INVALID_SLOTID);
     multiSimMonitor->RefreshData(0);
     multiSimMonitor->NotifySimAccountChanged();
+    multiSimMonitor->NotifySimActiveStateChanged(0, true);
+    multiSimMonitor->NotifySimActiveStateChanged(INVALID_SLOTID, true);
+    multiSimMonitor->NotifySimActiveStateChanged(0, false);
+    multiSimMonitor->NotifySimActiveStateChanged(INVALID_SLOTID, false);
     int32_t tokenId = 123456789;
     sptr<SimAccountCallback> callback = nullptr;
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);

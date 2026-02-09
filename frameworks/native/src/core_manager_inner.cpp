@@ -146,7 +146,8 @@ int32_t CoreManagerInner::RegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         networkSearchManager_->RegisterCoreNotify(slotId, handler, what);
-    } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE) && (what <= RadioEvent::RADIO_SIM_ACCOUNT_LOADED)) {
+    } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE && what <= RadioEvent::RADIO_SIM_ACCOUNT_LOADED) ||
+        (what >= RadioEvent::RADIO_ESIM_SWITCH_CIRCUIT_BEGIN && what <= RadioEvent::RADIO_ESIM_SWITCH_END)) {
         if (simManager_ == nullptr) {
             TELEPHONY_LOGE("simManager_ is null");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -171,7 +172,8 @@ int32_t CoreManagerInner::UnRegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         networkSearchManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
-    } else if (what >= RadioEvent::RADIO_SIM_STATE_CHANGE && what <= RadioEvent::RADIO_SIM_RECORDS_LOADED) {
+    } else if ((what >= RadioEvent::RADIO_SIM_STATE_CHANGE && what <= RadioEvent::RADIO_SIM_RECORDS_LOADED) ||
+        (what >= RadioEvent::RADIO_ESIM_SWITCH_CIRCUIT_BEGIN && what <= RadioEvent::RADIO_ESIM_SWITCH_END)) {
         if (simManager_ == nullptr) {
             TELEPHONY_LOGE("simManager_ is null");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;

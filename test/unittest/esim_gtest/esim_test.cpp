@@ -185,6 +185,8 @@ static const std::string BOUND_PROFILE_PACKAGE_GET_BPP_LOAD_ERROR_NULLPTR =
     "wMDAwMDAwMDQ5NDU0ZTQ0YWU0MjYwODJiNjIxMzAxZjgwMDIwNGYwODExOTc0NjU3Mzc0NzM2ZDY0NzA3MDZjNzU3MzMxMmU2NT"
     "c4NjE2ZDcwNmM2NTJlNjM2ZjZkYjcwNTgwMDM5MmY5MThjNDI2ZTZkZThiN2UyM2ExYTMwMA==";
 
+const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
+
 HWTEST_F(EsimTest, SyncOpenChannel_001, Function | MediumTest | Level2)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -386,6 +388,9 @@ HWTEST_F(EsimTest, ProcessEsimOpenChannel_001, Function | MediumTest | Level2)
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     std::u16string aid = Str8ToStr16("123");
+    esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
+
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
     esimFile->ProcessEsimOpenChannel(aid, MSG_ESIM_OPEN_CHANNEL_DONE);
     EXPECT_NE(telRilManager, nullptr);
 }
@@ -1536,6 +1541,9 @@ HWTEST_F(EsimTest, ProcessSwitchToProfile_001, Function | MediumTest | Level2)
 
     std::string str = "ABCDEFGG";
     esimFile->esimProfile_.iccId = Str8ToStr16(str);
+    EXPECT_TRUE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
+
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
     EXPECT_TRUE(esimFile->ProcessSwitchToProfile(slotId, eventSwitchToProfile));
 }
 
