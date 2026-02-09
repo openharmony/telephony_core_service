@@ -537,8 +537,8 @@ int32_t TelRilCall::SetBarringPassword(
 {
     HDI::Ril::V1_1::SetBarringInfo setBarringInfo = {};
     setBarringInfo.fac = fac;
-    setBarringInfo.oldPassword = oldPassword;
-    setBarringInfo.newPassword = newPassword;
+    setBarringInfo.oldPassword = (oldPassword != nullptr) ? oldPassword : "";
+    setBarringInfo.newPassword = (newPassword != nullptr) ? oldPassword : "";
     return Request(TELEPHONY_LOG_FUNC_NAME, result, &HDI::Ril::V1_1::IRil::SetBarringPassword, setBarringInfo);
 }
 
