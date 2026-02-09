@@ -41,8 +41,12 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/test:tel_core_service_static",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:esim_service_api",
   ]
+  if (core_service_support_esim) {
+      deps += [
+        "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:esim_service_api",
+      ]
+  }
 
   external_deps = [
     "ability_base:want",
@@ -78,6 +82,11 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  if (core_service_support_esim) {
+    defines += [
+      "OHOS_BUILD_ENABLE_TELEPHONY_ESIM"
+    ]
+  }
 
   cflags = [
     "-g",
