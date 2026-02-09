@@ -49,6 +49,7 @@ public:
     int32_t RegisterSimAccountCallback(const int32_t tokenId, const sptr<SimAccountCallback> &callback);
     int32_t UnregisterSimAccountCallback(const sptr<SimAccountCallback> &callback);
     void NotifySimAccountChanged();
+    void NotifySimActiveStateChanged(int32_t slotId, bool enable);
     void RegisterSimNotify();
     void RegisterSimNotify(int32_t slotId);
     void UnRegisterSimNotify();
