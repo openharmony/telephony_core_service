@@ -86,6 +86,8 @@ void NapiImsRegInfoCallbackManager::RemoveImsRegCallback(int32_t slotId, ImsServ
             if (iter->imsCallback != nullptr) {
                 iter->imsCallback = nullptr;
             }
+            napi_delete_reference(iter->env, iter->callbackRef);
+            napi_delete_reference(iter->env, iter->thisVar);
             listImsRegStateCallback_.erase(iter);
             break;
         }

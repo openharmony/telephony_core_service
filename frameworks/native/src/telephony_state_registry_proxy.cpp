@@ -430,5 +430,32 @@ int32_t TelephonyStateRegistryProxy::UpdateIccAccount()
     }
     return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
 }
+
+int32_t TelephonyStateRegistryProxy::UpdateSimActiveState(int32_t slotId, bool activeStateResult)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(activeStateResult)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int result = remote->SendRequest(
+        static_cast<uint32_t>(StateNotifyInterfaceCode::SIM_ACTIVR_STATE), in, out, option);
+    if (result == ERR_NONE) {
+        result = out.ReadInt32();
+        return result;
+    }
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+}
 } // namespace Telephony
 } // namespace OHOS

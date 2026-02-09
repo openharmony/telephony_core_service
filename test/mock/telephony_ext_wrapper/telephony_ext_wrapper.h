@@ -126,6 +126,8 @@ public:
     typedef bool (*IsDistributedCommunicationConnected)();
     typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
     typedef void (*ReportEventToChrFunc)(int32_t slotId, const char* scenario ,int32_t cause);
+    typedef void (*RegisterEsimSwitchNotify)(
+        int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -198,6 +200,8 @@ public:
     UpdateHotplugCardState updateHotPlugCardState_ = nullptr;
     CacheAssetPinForUpgrade cacheAssetPinForUpgrade_ = nullptr;
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
+    RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
+    RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
      void ReportEventToChr(int32_t slotId, const char* scenario ,int32_t cause);
