@@ -167,10 +167,14 @@ private:
     bool IsNeedSetTargetPrimarySlotId();
     bool IsSetPrimarySlotReady(int32_t slotId);
     void ResetPrimarySlotReady();
-    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx);
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, int32_t slotId);
     void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
     void SavePrimaryCardInfo(int32_t slotId);
     void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
+    int32_t GetPsimLabelIndex(int slotId);
+    bool IsESimUpdateStatus(int32_t slotId);
+    void SimDataBuilder(DataShare::DataShareValuesBucket &values, const std::string &iccId,
+        int32_t simLabel, bool isEsim);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -208,6 +212,7 @@ private:
     bool isSettingPrimarySlotToRil_ = false;
     bool setPrimarySlotResponseResult_ = false;
     bool isRilSetPrimarySlotSupport_ = false;
+    bool isSupportEsimMep_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

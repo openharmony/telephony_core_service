@@ -1200,6 +1200,12 @@ void SimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExe
             return;
         }
         multiSimMonitor_->RegisterCoreNotify(slotId, handler, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_SWITCH_CIRCUIT_BEGIN && what <= RadioEvent::RADIO_ESIM_SWITCH_END) {
+        if (TELEPHONY_EXT_WRAPPER.registerEsimSwitchNotify_ == nullptr) {
+            TELEPHONY_LOGE("TELEPHONY_EXT_WRAPPER.registerEsimSwitchNotify_ is nullptr!");
+            return;
+        }
+        TELEPHONY_EXT_WRAPPER.registerEsimSwitchNotify_(slotId, handler, what);
     } else {
         TELEPHONY_LOGE("SimManager::RegisterCoreNotify faild");
     }
@@ -1220,6 +1226,12 @@ void SimManager::UnRegisterCoreNotify(
             return;
         }
         simStateManager_[slotId]->UnRegisterCoreNotify(observerCallBack, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_SWITCH_CIRCUIT_BEGIN && what <= RadioEvent::RADIO_ESIM_SWITCH_END) {
+        if (TELEPHONY_EXT_WRAPPER.unregisterEsimSwitchNotify_ == nullptr) {
+            TELEPHONY_LOGE("TELEPHONY_EXT_WRAPPER.unregisterEsimSwitchNotify_ is nullptr!");
+            return;
+        }
+        TELEPHONY_EXT_WRAPPER.unregisterEsimSwitchNotify_(slotId, observerCallBack, what);
     } else {
         TELEPHONY_LOGE("SimManager::UnRegisterCoreNotify faild");
     }
