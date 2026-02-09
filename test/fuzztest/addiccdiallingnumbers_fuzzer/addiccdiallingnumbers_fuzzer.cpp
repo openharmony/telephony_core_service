@@ -29,13 +29,14 @@
 #include "tel_ril_manager.h"
 #include "sim_state_type.h"
 
-
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
 #include "esim_service_stub.h"
 #include "esim_service_proxy.h"
 #include "if_system_ability_manager.h"
 #include "singleton.h"
 #include "system_ability.h"
 #include "fuzzer/FuzzedDataProvider.h"
+#endif
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -46,6 +47,7 @@ constexpr int32_t SLEEP_TIME_SECONDS = 2;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TELEPHONY_ESIM_SERVICE_SYS_ABILITY_ID = 1003;
 
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
 class EsimService : public SystemAbility, public EsimServiceStub {
     DECLARE_DELAYED_SINGLETON(EsimService)
     DECLARE_SYSTEM_ABILITY(EsimService)
@@ -231,31 +233,6 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    if (size < SIZE_LIMIT) {
-        return;
-    }
-
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
-        return;
-    }
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-
-    uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
-                    (static_cast<uint32_t>(data[2]) << 8) | (static_cast<uint32_t>(data[3])) % FUCTION_SIZE;
-
-    MessageParcel reply;
-    MessageOption option;
-    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-}
-
 void OnRemoteRequestEsim(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -327,6 +304,32 @@ void EsimServiceProxyTest(const uint8_t *data, size_t size)
     esimServiceProxy.GetContractInfo(slotId, reqData, listener);
     esimServiceProxy.GetEsimFreeStorage(result);
 }
+#endif
+
+void OnRemoteRequest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    if (size < SIZE_LIMIT) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
+        return;
+    }
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+
+    uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
+                    (static_cast<uint32_t>(data[2]) << 8) | (static_cast<uint32_t>(data[3])) % FUCTION_SIZE;
+
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<CoreService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
@@ -335,8 +338,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     OnRemoteRequest(data, size);
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
     OnRemoteRequestEsim(data, size);
     EsimServiceProxyTest(data, size);
+#endif
     sleep(SLEEP_TIME_SECONDS);
     return;
 }
