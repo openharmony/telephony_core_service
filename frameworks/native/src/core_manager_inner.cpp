@@ -2748,14 +2748,6 @@ void CoreManagerInner::SetMatchSimStateTracker(int8_t matchSimStateTracker, int3
     }
 }
 
-void CoreManagerInner::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
-{
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null!");
-        return;
-    }
-    simManager_->SendSimAccountLoadedInfo(slotId, event);
-}
 /******************** simManager_ end ************************/
 
 /******************** esimManager_ start ************************/

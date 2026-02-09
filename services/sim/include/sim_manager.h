@@ -187,7 +187,6 @@ public:
             operatorConfigHisysevent_->SetMatchSimStateTracker(matchSimStateTracker, slotId);
         }
     };
-    void SendSimAccountLoadedInfo(int32_t slotId, int32_t event) override;
 
 private:
     bool IsValidSlotId(int32_t slotId);

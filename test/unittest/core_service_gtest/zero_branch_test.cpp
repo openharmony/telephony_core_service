@@ -2631,21 +2631,15 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Refreshdata, Function | MediumTes
 }
  
 /**
- * @tc.number   Telephony_Network_InitTelephonyExtService_001
+ * @tc.number   Telephony_Sim_ReportEventToChr
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_SimManager_SendSimAccountLoadedInfo, Function | MediumTest | Level1)
+HWTEST_F(BranchTest, Telephony_Sim_ReportEventToChr, Function | MediumTest | Level1)
 {
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    CoreManagerInner mInner;
-    mInner.SendSimAccountLoadedInfo(0, 0);
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto simManager = std::make_shared<SimManager>(telRilManager);
-    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    mInner.OnInit(networkSearchManager, simManager, telRilManager);
-    mInner.SendSimAccountLoadedInfo(0, 0);
-    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.sendSimAccountLoadedInfo_ != nullptr);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim();
+    TELEPHONY_EXT_WRAPPER.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1);
+    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.reportEventToChr_ != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS

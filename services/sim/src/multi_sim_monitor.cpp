@@ -35,6 +35,7 @@ const int32_t ACTIVE_USER_ID = 100;
 const int32_t SIM_ACCOUNT_LOADED_SEND = 1;
 const int INIT_TIMES = 15;
 const int INIT_DATA_TIMES = 10;
+constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 const std::string PROP_REBOOT_DETECT_SIM = "persist.ril.reboot_detect_sim";
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -308,7 +309,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
     }
     NotifySimAccountChanged();
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId);
-    CoreManagerInner::GetInstance().SendSimAccountLoadedInfo(slotId, SIM_ACCOUNT_LOADED_SEND);
+    TELEPHONY_EXT_WRAPPER.ReportEventToChr(slotId, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_SEND);
 }
 
 void MultiSimMonitor::InitEsimData()

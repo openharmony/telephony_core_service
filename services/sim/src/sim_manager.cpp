@@ -1551,11 +1551,6 @@ int32_t SimManager::GetRealSimCount()
     }
     return realSlotCount;
 }
-
-void SimManager::SendSimAccountLoadedInfo(int32_t slotId, int32_t event)
-{
-    TELEPHONY_EXT_WRAPPER.SendSimAccountLoadedInfo(slotId, event);
-}
 } // namespace Telephony
 } // namespace OHOS
 // LOCV_EXCL_STOP
