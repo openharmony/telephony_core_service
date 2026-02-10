@@ -368,7 +368,7 @@ void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool isStar
 
 bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
 {
-    if (processCellScanNetwork_ != nullptr) {
+    if (getManualNetworkSearchState_ != nullptr) {
         return getManualNetworkSearchState_();
     }
     return false;
