@@ -61,13 +61,11 @@ int32_t ManualNetworkScanCallbackManager::InsertStartManualScanCallback(int32_t 
     StartManualScanCallback &stateCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    auto iter = listStartManualScanCallback_.begin();
-    for (; iter != listStartManualScanCallback_.end(); ++iter) {
+    for (auto iter = listStartManualScanCallback_.begin(); iter != listStartManualScanCallback_.end();) {
         if (iter->slotId == slotId) {
-            if (iter->callback != nullptr) {
-                iter->callback = nullptr;
-            }
-            listStartManualScanCallback_.erase(iter);
+            iter = listStartManualScanCallback_.erase(iter);
+        } else {
+            ++iter;
         }
     }
     listStartManualScanCallback_.push_back(stateCallback);
@@ -116,7 +114,7 @@ int32_t ManualNetworkScanCallbackManager::ReportManualScanInfoInner(const StartM
         TELEPHONY_LOGE("stateCallback.env is null");
         return TELEPHONY_ERROR;
     }
-    auto task = [stateCallback, networkSearchResult, isFinish]() {
+    auto task = [stateCallback = stateCallback, networkSearchResult, isFinish]() {
         int32_t ret = ReportManualScanInfo(networkSearchResult, isFinish, stateCallback);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("ReportManualScanInfo failed, result: %{public}d", ret);
@@ -181,7 +179,6 @@ int32_t ManualNetworkScanCallbackManager::ReportManualScanInfo(const sptr<Networ
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackValues[CALLBACK_VALUES_SIZE] = { 0 };

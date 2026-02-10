@@ -139,8 +139,8 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 
-    porcessCellScanNetwork_ = (PorcessCellScanNetwork)dlsym(telephonyExtWrapperHandle_, "PorcessCellScanNetwork");
-    if (porcessCellScanNetwork_ == nullptr) {
+    processCellScanNetwork_ = (ProcessCellScanNetwork)dlsym(telephonyExtWrapperHandle_, "ProcessCellScanNetwork");
+    if (processCellScanNetwork_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
     getManualNetworkSearchState_ = (GetManualNetworkSearchState)dlsym(telephonyExtWrapperHandle_,

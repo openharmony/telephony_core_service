@@ -2701,7 +2701,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_04
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
     } else {
         int ret = NetworkSearchTest::telephonyService_->GetManualNetworkScanState(SLOT_ID, nullptr);
-        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
     }
 }
 
@@ -2799,7 +2799,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
     } else {
         int ret = NetworkSearchTest::telephonyService_->StartManualNetworkScanCallback(SLOT_ID, nullptr);
-        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
     }
 }
 
@@ -2886,7 +2886,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StopManualNetworkScanCallbac
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
     } else {
         int ret = NetworkSearchTest::telephonyService_->StopManualNetworkScanCallback(SLOT_ID);
-        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
     }
 }
 #else // TEL_TEST_UNSUPPORT

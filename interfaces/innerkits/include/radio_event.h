@@ -175,6 +175,7 @@ enum RadioEvent {
     RADIO_PS_ROAMING_CLOSE,
     RADIO_EMERGENCY_STATE_OPEN,
     RADIO_EMERGENCY_STATE_CLOSE,
+    RADIO_MANUAL_SEARCH_PLMN_LIST,
     RADIO_FACTORY_RESET,
 
     // SIM
@@ -255,9 +256,6 @@ enum RadioEvent {
     // Satellite status
     SATELLITE_STATUS_CHANGED,
     GET_SATELLITE_CAPABILITY,
-
-    // Manual network scan
-    RADIO_MANUAL_SEARCH_PLMN_LIST,
 
     // esim switch
     RADIO_ESIM_SWITCH_CIRCUIT_BEGIN = 1100,

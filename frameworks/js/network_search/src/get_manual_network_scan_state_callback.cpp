@@ -35,7 +35,7 @@ void GetManualNetworkScanStateCallback::OnGetManualNetworkScanStateCallback(cons
     if (asyncContext_->resolved) {
         asyncContext_->isManualScanning = isScanning;
     } else {
-        asyncContext_->errorCode = TELEPHONY_ERR_RIL_CMD_FAIL;
+        asyncContext_->errorCode = errorCode;
     }
     asyncContext_->callbackEnd = true;
     asyncContext_->cv.notify_all();

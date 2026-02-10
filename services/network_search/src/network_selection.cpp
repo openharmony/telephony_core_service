@@ -204,7 +204,6 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
     }
     const std::vector<AvailableNetworkInfo> &availableNetworkInfo = manualScanResult->availableNetworkInfo;
     std::vector<NetworkInformation> networkInformation;
-    int32_t listSize = 0;
     for (auto &availableNetworkInfoItem : availableNetworkInfo) {
         std::string numeric = availableNetworkInfoItem.numeric;
         std::string longName = GetCustomName(availableNetworkInfoItem);
@@ -214,9 +213,9 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
         NetworkInformation networkStateItem;
         networkStateItem.SetOperateInformation(longName, shortName, numeric, status, rat);
         networkInformation.push_back(networkStateItem);
-        listSize++;
     }
-    networkSearchResult->SetNetworkSearchResultValue(listSize, networkInformation);
+    networkSearchResult->SetNetworkSearchResultValue(
+        static_cast<int32_t>(networkInformation.size()), networkInformation);
     nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
     TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult start end");
 }

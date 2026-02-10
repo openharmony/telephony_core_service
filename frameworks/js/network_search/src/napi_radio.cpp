@@ -3141,6 +3141,8 @@ static bool StartManualNetworkScanCallback(
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("startManualNetworkScan callback failed");
         ReportFunctionFailed(env, ret, "startManualNetworkScan");
+        napi_delete_reference(env, startCallback.callbackRef);
+        napi_delete_reference(env, startCallback.thisVar);
         return false;
     }
     return true;

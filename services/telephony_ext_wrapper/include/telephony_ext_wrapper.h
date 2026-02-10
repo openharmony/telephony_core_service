@@ -130,7 +130,7 @@ public:
     typedef int32_t (*ReportEventToChrFunc)(int32_t slotId, const char* scenario, int32_t cause);
     typedef void (*RegisterEsimSwitchNotify)(
         int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
-    typedef void (*PorcessCellScanNetwork)(int32_t slotId, bool isStart);
+    typedef void (*ProcessCellScanNetwork)(int32_t slotId, bool isStart);
     typedef bool (*GetManualNetworkSearchState)();
     typedef void (*RegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
@@ -213,7 +213,7 @@ public:
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
-    PorcessCellScanNetwork porcessCellScanNetwork_ = nullptr;
+    ProcessCellScanNetwork processCellScanNetwork_ = nullptr;
     GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
