@@ -2079,7 +2079,7 @@ void NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
     if (isStart) {
         if (TELEPHONY_EXT_WRAPPER.registryCoreNotify_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.registryCoreNotify_(
-                slotId, networkSearchHandler,RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+                slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
         }
     } else {
         if (TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_ != nullptr) {
