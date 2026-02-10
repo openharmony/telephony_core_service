@@ -3021,6 +3021,7 @@ int32_t CoreManagerInner::SetEsimCaVerifyResult(int32_t slotId, bool verifyResul
     }
     return esimManager_->SetEsimCaVerifyResult(slotId, verifyResult);
 }
+
 /******************** esimManager_ end ************************/
 
 bool CoreManagerInner::IsEsim(int32_t slotId)
