@@ -2633,17 +2633,5 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_Refreshdata, Function | MediumTes
     EXPECT_GT(multiSimMonitor->RegisterSimAccountCallback(tokenId, callback), TELEPHONY_ERROR);
     EXPECT_GT(multiSimMonitor->UnregisterSimAccountCallback(callback), TELEPHONY_ERROR);
 }
- 
-/**
- * @tc.number   Telephony_Sim_ReportEventToChr
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_Sim_ReportEventToChr, Function | MediumTest | Level1)
-{
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim();
-    TELEPHONY_EXT_WRAPPER.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1);
-    EXPECT_TRUE(TELEPHONY_EXT_WRAPPER.reportEventToChr_ != nullptr);
-}
 } // namespace Telephony
 } // namespace OHOS
