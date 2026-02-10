@@ -566,6 +566,423 @@ ohos_unittest("tel_core_zero_branch_gtest") {
   ldflags = [ "-flto" ]
 }
 
+ohos_unittest("core_service_state_registry_proxy_mock_test") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "core_service_state_registry_proxy_mock_test.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_message_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_remote_object.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/test/unittest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
+    "libphonenumber:phonenumber_standard",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += telephony_extra_defines
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  defines += [ "MOCK_WRITE_INTERFACE_TOKEN_RETURN_FALSE" ]
+}
+
+ohos_unittest("core_service_state_registry_proxy_mock_test_one") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "core_service_state_registry_proxy_mock_test.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_message_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_remote_object.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/test/unittest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
+    "libphonenumber:phonenumber_standard",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += telephony_extra_defines
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  defines += [ "MOCK_WRITE_INT32_RETURN_FALSE" ]
+}
+
+ohos_unittest("core_service_state_registry_proxy_mock_test_two") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "core_service_state_registry_proxy_mock_test.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_message_parcel.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_remote_object.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/test/unittest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
+    "libphonenumber:phonenumber_standard",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += telephony_extra_defines
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  defines += [ "MOCK_WRITE_BOOL_RETURN_FALSE" ]
+}
+
+ohos_unittest("core_service_state_registry_proxy_mock_test_three") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "core_service_state_registry_proxy_mock_test.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_peer_holder.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_remote_object.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/test/unittest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
+    "libphonenumber:phonenumber_standard",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += telephony_extra_defines
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  defines += [ "MOCK_REMOTE_RETURN_NULL" ]
+}
+
+ohos_unittest("core_service_state_registry_proxy_mock_test_four") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "core_service"
+  test_module = "core_service"
+  module_out_path = part_name + "/" + test_module
+
+  sources = [
+    "core_service_state_registry_proxy_mock_test.cpp",
+    "$SOURCE_DIR/test/unittest/mock/src/mock_remote_object.cpp",
+  ]
+
+  include_dirs = [
+    "$SOURCE_DIR/services/core/include",
+    "$SOURCE_DIR/utils/log/include",
+    "$SOURCE_DIR/utils/preferences/include",
+    "$SOURCE_DIR/services/sim/include",
+    "$SOURCE_DIR/services/network_search/include",
+    "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/test/mock",
+    "$SOURCE_DIR/test/unittest/mock/include",
+  ]
+
+  configs = [ "$SOURCE_DIR/utils:telephony_log_config" ]
+
+  deps = [
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:data_ability_helper",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "drivers_interface_ril:ril_idl_headers",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "i18n:zone_util",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libxml2:libxml2",
+    "libphonenumber:phonenumber_standard",
+    "netmanager_base:net_conn_manager_if",
+    "netmanager_ext:net_tether_manager_if",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "telephony_data:tel_telephony_data",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += telephony_extra_defines
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.location_location) &&
+      global_parts_info.location_location) {
+    external_deps += [
+      "location:lbsservice_common",
+      "location:locator_sdk",
+    ]
+    defines += [ "ABILITY_LOCATION_SUPPORT" ]
+  }
+
+  defines += [ "MOCK_SEND_REQUEST_RETURN_ONE" ]
+}
+
 ohos_unittest("tel_network_search_zero_branch_gtest") {
   install_enable = true
   subsystem_name = "telephony"
