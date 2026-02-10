@@ -1460,9 +1460,10 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_006, Function |
  */
 HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_007, Function | MediumTest | Level1)
 {
-    std::shared_ptr<TelRilManager> telRilManager = nullptr;
-    auto simManager = std::make_shared<SimManager>(telRilManager);
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    EXPECT_TRUE(networkSearchManager->OnInit());
 
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
