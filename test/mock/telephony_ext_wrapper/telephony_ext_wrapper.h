@@ -204,7 +204,7 @@ public:
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
-     void ReportEventToChr(int32_t slotId, const char* scenario ,int32_t cause);
+    bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
