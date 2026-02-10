@@ -33,7 +33,10 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+<<<<<<< HEAD
 #include "core_manager_inner.h"
+=======
+>>>>>>> a2e9c926 (add manual network scan interface)
 
 namespace OHOS {
 namespace Telephony {
@@ -2140,7 +2143,8 @@ void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isF
                 INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
 
             if (isFinish) {
-                listManualScanCallbackRecord_.erase(iter);
+                iter = listManualScanCallbackRecord_.erase(iter);
+                continue;
             }
         }
     }
@@ -2153,18 +2157,19 @@ void NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
         return;
     }
     auto networkSearchHandler = inner->networkSearchHandler_;
-    auto& coreMagInner = CoreManagerInner::GetInstance();
+
     if (isStart) {
-        coreMagInner.RegisterCoreNotify(slotId, networkSearchHandler,
-            RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, nullptr);
-        coreMagInner.GetNetworkSearchInformation(slotId,
-            static_cast<int32_t>(RadioEvent::TELEPHONY_EXT_MANUAL_NETWORK_SEARCH), networkSearchHandler);
+        if (TELEPHONY_EXT_WRAPPER.registryCoreNotify_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.registryCoreNotify_(slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+        }
     } else {
-        coreMagInner.UnRegisterCoreNotify(slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+        if (TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_ != nullptr) {
+            TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_(slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+        }
     }
 
-    if (TELEPHONY_EXT_WRAPPER.startManualNetworkSearch_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.startManualNetworkSearch_(slotId, isStart);
+    if (TELEPHONY_EXT_WRAPPER.porcessCellScanNetwork_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.porcessCellScanNetwork_(slotId, isStart);
     }
 }
 

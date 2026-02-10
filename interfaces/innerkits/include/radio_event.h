@@ -258,7 +258,6 @@ enum RadioEvent {
 
     // Manual network scan
     RADIO_MANUAL_SEARCH_PLMN_LIST,
-    TELEPHONY_EXT_MANUAL_NETWORK_SEARCH,
 
     // esim switch
     RADIO_ESIM_SWITCH_CIRCUIT_BEGIN = 1100,

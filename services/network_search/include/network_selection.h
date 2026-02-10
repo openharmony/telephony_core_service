@@ -34,7 +34,6 @@ public:
     void ProcessGetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessManualScanResult(const AppExecFwk::InnerEvent::Pointer &event) const;
-    void ProcessManualScanFinish(const AppExecFwk::InnerEvent::Pointer &event) const;
 
 private:
     bool AvailNetworkResult(

@@ -191,10 +191,15 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
         return;
     }
     bool isFinish = manualScanResult->isFinish;
-    sptr<NetworkSearchResult> networkSearchResult = new (std::nothrow) NetworkSearchResult;
+    auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
     if (networkSearchResult == nullptr) {
         TELEPHONY_LOGE(
             "GetNetworkSearchInformationValue failed to create new NetWorkSearchResult slotId:%{public}d", slotId_);
+        return;
+    }
+    if (isFinish) {
+        nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
+        TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult stop end");
         return;
     }
     const std::vector<AvailableNetworkInfo> &availableNetworkInfo = manualScanResult->availableNetworkInfo;
@@ -213,30 +218,7 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
     }
     networkSearchResult->SetNetworkSearchResultValue(listSize, networkInformation);
     nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
-    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult end");
-}
-
-void NetworkSelection::ProcessManualScanFinish(const AppExecFwk::InnerEvent::Pointer &event) const
-{
-    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanFinish slotId:%{public}d", slotId_);
-    if (event == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessManualScanFinish event is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
-    if (nsm == nullptr) {
-        TELEPHONY_LOGE("NetworkSelection::ProcessManualScanFinish nsm is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-
-    bool isFinish = true;
-    sptr<NetworkSearchResult> networkSearchResult = new (std::nothrow) NetworkSearchResult;
-    if (networkSearchResult == nullptr) {
-        TELEPHONY_LOGE("ProcessManualScanFinish create new NetWorkSearchResult slotId:%{public}d", slotId_);
-        return;
-    }
-    nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
-    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanFinish end");
+    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult start end");
 }
 
 bool NetworkSelection::AvailNetworkResult(
