@@ -127,7 +127,7 @@ public:
         int32_t slotId, const std::string &iccId, PinOperationType operationType, const std::string &pin);
     typedef bool (*IsDistributedCommunicationConnected)();
     typedef int32_t (*SendSimChgTypeInfoFunc)(int32_t slotId, int32_t type);
-    typedef void (*ReportEventToChrFunc)(int32_t slotId, const char* scenario ,int32_t cause);
+    typedef void (*ReportEventToChrFunc)(int32_t slotId, const char* scenario, int32_t cause);
     typedef void (*RegisterEsimSwitchNotify)(
         int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
 
@@ -206,7 +206,7 @@ public:
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
-    bool ReportEventToChr(int32_t slotId, const char* scenario ,int32_t cause);
+    bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
