@@ -82,6 +82,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, TestSize.Level0)
     networkSelection->ProcessNetworkSearchResult(event);
     networkSelection->ProcessGetNetworkSelectionMode(event);
     networkSelection->ProcessSetNetworkSelectionMode(event);
+    networkSelection->ProcessManualScanResult(event);
 
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORK_SEARCH_RESULT);
     networkSelection->networkSearchManager_ = std::weak_ptr<NetworkSearchManager>();
@@ -89,6 +90,9 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection, TestSize.Level0)
     networkSelection->ProcessNetworkSearchResult(event);
     networkSelection->ProcessGetNetworkSelectionMode(event);
     networkSelection->ProcessSetNetworkSelectionMode(event);
+
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+    networkSelection->ProcessManualScanResult(event);
 
     std::shared_ptr<AvailableNetworkList> availNetworkResult = std::make_shared<AvailableNetworkList>();
     MessageParcel data;

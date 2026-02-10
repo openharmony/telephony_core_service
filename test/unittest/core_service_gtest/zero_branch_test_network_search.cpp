@@ -1177,19 +1177,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_012, Function |
     EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
     networkSearchManager->ManualNetworkScanState(0, true);
     networkSearchManager->ManualNetworkScanState(0, false);
-
-    auto networkSearchHandler =
-        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
-    networkSearchHandler->Init();
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
-    networkSearchHandler->ManualScanStateChanged(event);
-    networkSearchHandler->networkSelection_ = nullptr;
-    networkSearchHandler->ManualScanStateChanged(event);
-    event = nullptr;
-    networkSearchHandler->ManualScanStateChanged(event);
-
-    auto networkSelection = std::make_unique<NetworkSelection>(networkSearchManager, 0);
-    networkSelection->ProcessManualScanResult(event);
 }
  
 /**
@@ -1464,6 +1451,29 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_006, Function |
 #endif // CORE_SERVICE_SATELLITE
     networkSearchHandler->SetNetworkSelectionModeResponse(event);
     networkSearchHandler->ClearSignalAndCellInfoList();
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    EXPECT_TRUE(networkSearchManager->OnInit());
+
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    EXPECT_TRUE(networkSearchHandler->Init());
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+    networkSearchHandler->ManualScanStateChanged(event);
+    networkSearchHandler->networkSelection_ = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
+    event = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
 }
  
 /**
