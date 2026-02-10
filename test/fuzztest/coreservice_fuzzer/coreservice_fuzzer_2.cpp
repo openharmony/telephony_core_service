@@ -108,36 +108,6 @@ void RegisterImsRegInfoCallback(const uint8_t *data, size_t size)
     DelayedSingleton<CoreService>::GetInstance()->OnRegisterImsRegInfoCallback(dataMessageParcel, reply);
 }
 
-void RegisterEmcRescueNetInfoCallback(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
- 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CoreService>::GetInstance()->OnRegisterEmcRescueNetInfoCallback(dataMessageParcel, reply);
-}
-
-void UnRegisterEmcRescueNetInfoCallback(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
- 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CoreService>::GetInstance()->OnUnRegisterEmcRescueNetInfoCallback(dataMessageParcel, reply);
-}
-
 void FactoryReset(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -208,8 +178,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     UpdateIccDiallingNumbers(data, size);
     GetNeighboringCellInfoList(data, size);
     RegisterImsRegInfoCallback(data, size);
-    RegisterEmcRescueNetInfoCallback(data, size);
-    UnRegisterEmcRescueNetInfoCallback(data, size);
     IsAllowedInsertApn(data, size);
     GetOpkeyVersion(data, size);
     GetOpnameVersion(data, size);
