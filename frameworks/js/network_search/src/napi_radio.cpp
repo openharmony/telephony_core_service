@@ -3070,6 +3070,11 @@ static bool MatchStartManualNetworkScanParameter(napi_env env, napi_value parame
 
 static void NativeIsManualNetworkScanning(napi_env env, void *data)
 {
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NativeIsManualNetworkScanning data is null");
+        return;
+    }
+
     auto asyncContext = static_cast<IsManualScanningContext *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeIsManualNetworkScanning slotId is invalid");
@@ -3089,6 +3094,11 @@ static void NativeIsManualNetworkScanning(napi_env env, void *data)
 
 static void IsManualNetworkScanningCallback(napi_env env, napi_status status, void *data)
 {
+    if (data == nullptr) {
+        TELEPHONY_LOGE("IsManualNetworkScanningCallback data is null");
+        return;
+    }
+
     auto asyncContext = static_cast<IsManualScanningContext *>(data);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
