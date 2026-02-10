@@ -33,10 +33,6 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
-<<<<<<< HEAD
-#include "core_manager_inner.h"
-=======
->>>>>>> a2e9c926 (add manual network scan interface)
 
 namespace OHOS {
 namespace Telephony {

@@ -22,8 +22,6 @@ TELEPHONY_FRAMEWORKS_NATIVE_ROOT =
     "$TELEPHONY_CORE_SERVICE_ROOT/frameworks/native/"
 TELEPHONY_IMS_CORE_SERVICE_ROOT =
     "$TELEPHONY_CORE_SERVICE_ROOT/services/ims_service_interaction"
-TELEPHONY_EXT_WRAPPER_ROOT =
-    "$TELEPHONY_CORE_SERVICE_ROOT/services/telephony_ext_wrapper"
 
 config("tel_core_service_api_config") {
   # header file path
@@ -32,7 +30,6 @@ config("tel_core_service_api_config") {
     "$TELEPHONY_INTERFACES_INNERKITS/ims/include",
     "$TELEPHONY_INTERFACES_INNERKITS/satellite",
     "$TELEPHONY_CORE_SERVICE_ROOT/utils/common/include",
-    "$TELEPHONY_EXT_WRAPPER_ROOT/include",
   ]
   if (core_service_support_esim) {
     include_dirs += [ "${target_gen_dir}" ]
@@ -93,7 +90,6 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_proxy.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_callback_proxy.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_proxy.cpp",
-    "$TELEPHONY_EXT_WRAPPER_ROOT/src/telephony_ext_wrapper.cpp",
   ]
 
   if (core_service_support_esim) {

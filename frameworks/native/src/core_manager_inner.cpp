@@ -22,7 +22,6 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "i_core_service_common_event_hub.h"
-#include "telephony_ext_wrapper.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -154,11 +153,6 @@ int32_t CoreManagerInner::RegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->RegisterCoreNotify(slotId, handler, what);
-    } else if (what == RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST) {
-        if (TELEPHONY_EXT_WRAPPER.registryCoreNotify_ != nullptr) {
-            TELEPHONY_LOGI("CoreManagerInner::RegisterCoreNotify RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST");
-            TELEPHONY_EXT_WRAPPER.registryCoreNotify_(slotId, handler, what);
-        }
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
@@ -185,10 +179,6 @@ int32_t CoreManagerInner::UnRegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
-    } else if (what == RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST) {
-        if (TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_ != nullptr) {
-            TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_(slotId, observerCallBack, what);
-        }
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
