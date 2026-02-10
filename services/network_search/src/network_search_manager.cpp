@@ -162,7 +162,7 @@ bool NetworkSearchManager::OnInit()
 {
     TELEPHONY_LOGI("NetworkSearchManager::Init");
     if (telRilManager_ == nullptr || simManager_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::Init telRilManager_ or simManager_ is null.")
+        TELEPHONY_LOGE("NetworkSearchManager::Init telRilManager_ or simManager_ is null.");
         return false;
     }
     eventSender_ = std::make_unique<EventSender>(telRilManager_, shared_from_this());
