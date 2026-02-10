@@ -47,6 +47,18 @@ constexpr int32_t SLEEP_TIME_SECONDS = 2;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TELEPHONY_ESIM_SERVICE_SYS_ABILITY_ID = 1003;
 
+bool IsServiceInited()
+{
+    if (!g_isInited) {
+        DelayedSingleton<CoreService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
+
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
 class EsimService : public SystemAbility, public EsimServiceStub {
     DECLARE_DELAYED_SINGLETON(EsimService)
@@ -221,24 +233,8 @@ EsimService::EsimService() : SystemAbility(TELEPHONY_ESIM_SERVICE_SYS_ABILITY_ID
 
 EsimService::~EsimService() {}
 
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CoreService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CoreService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
-
 void OnRemoteRequestEsim(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
-        return;
-    }
-
     if (size < SIZE_LIMIT) {
         return;
     }
@@ -260,10 +256,6 @@ void OnRemoteRequestEsim(const uint8_t *data, size_t size)
 
 void EsimServiceProxyTest(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
-        return;
-    }
-
     if (size < SIZE_LIMIT) {
         return;
     }
