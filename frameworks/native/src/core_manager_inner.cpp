@@ -2750,13 +2750,6 @@ void CoreManagerInner::SetMatchSimStateTracker(int8_t matchSimStateTracker, int3
     }
 }
 
-void CoreManagerInner::StartMatchSimTimeoutTimer(int32_t slotId)
-{
-    if (simManager_ != nullptr) {
-        simManager_->StartMatchSimTimeoutTimer(slotId);
-    }
-}
-
 /******************** simManager_ end ************************/
 
 /******************** esimManager_ start ************************/

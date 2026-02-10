@@ -188,14 +188,6 @@ public:
         }
     };
 
-    inline void StartMatchSimTimeoutTimer(int32_t slotId) override
-    {
-        if (simStateManager_.empty() || simStateManager_[slotId] == nullptr) {
-            return;
-        }
-        return simStateManager_[slotId]->StartMatchSimTimeoutTimer();
-    }
-
 private:
     bool IsValidSlotId(int32_t slotId);
     template<class N>
