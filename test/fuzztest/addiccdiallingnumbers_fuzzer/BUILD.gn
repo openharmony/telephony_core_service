@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,6 +16,7 @@ SUBSYSTEM_DIR = "../../../.."
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
@@ -41,6 +42,11 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
   ]
+  if (core_service_support_esim) {
+      deps += [
+        "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:esim_service_api",
+      ]
+  }
 
   external_deps = [
     "ability_base:want",
@@ -76,6 +82,11 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  if (core_service_support_esim) {
+    defines += [
+      "OHOS_BUILD_ENABLE_TELEPHONY_ESIM"
+    ]
+  }
 
   cflags = [
     "-g",
@@ -91,6 +102,15 @@ ohos_fuzztest("AddIccDiallingNumbersFuzzTest") {
     "$SUBSYSTEM_DIR/core_service/test/fuzztest/common_fuzzer/addcoreservicetoken_fuzzer.cpp",
     "addiccdiallingnumbers_fuzzer.cpp",
   ]
+  
+  if (core_service_support_esim) {
+    idl_gen_dir = "../../../../../../out/generic_generic_arm_64only/general_all_phone_standard/gen"
+    sources += [
+      "$idl_gen_dir/base/telephony/core_service/interfaces/innerkits/esim_service_stub.cpp",
+      "$idl_gen_dir/base/telephony/core_service/interfaces/innerkits/esim_service_proxy.cpp",
+    ]
+  }
+
 }
 
 ###############################################################################
