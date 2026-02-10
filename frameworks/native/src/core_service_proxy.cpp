@@ -3461,5 +3461,84 @@ int32_t CoreServiceProxy::SendApduData(
     return result;
 }
 
+int32_t CoreServiceProxy::GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetManualNetworkScanState WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (callback != nullptr) {
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetManualNetworkScanState Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_MANUAL_NETWORK_SCAN_STATE), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("GetManualNetworkScanState failed, error code is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::StartManualNetworkScanCallback(
+    int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("StartManualNetworkScanCallback WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    if (callback != nullptr) {
+        data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("StartManualNetworkScanCallback Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::START_MANUAL_NETWORK_SCAN), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("StartManualNetworkScanCallback failed, error code is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t CoreServiceProxy::StopManualNetworkScanCallback(int32_t slotId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("StopManualNetworkScanCallback WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    data.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("StopManualNetworkScanCallback Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t requestResult =
+        remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STOP_MANUAL_NETWORK_SCAN), data, reply, option);
+    if (requestResult != ERR_NONE) {
+        TELEPHONY_LOGE("StopManualNetworkScanCallback failed, error code is %{public}d", requestResult);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
+
 } // namespace Telephony
 } // namespace OHOS

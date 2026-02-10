@@ -15,8 +15,8 @@
 #ifndef MOCK_I_NETWORK_SEARCH_MANAGER_H
 #define MOCK_I_NETWORK_SEARCH_MANAGER_H
 
-#include "i_network_search.h"
 #include <gmock/gmock.h>
+#include "i_network_search.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -111,6 +111,10 @@ public:
     MOCK_METHOD(int32_t, UpdateOperatorName, (int32_t slotId), (override));
     MOCK_METHOD(void, UpdateDeviceState, (int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState),
         (override));
+    MOCK_METHOD(int32_t, GetManualNetworkScanState, (int32_t slotId, NSCALLBACK &callback), (override));
+    MOCK_METHOD(int32_t, StartManualNetworkScanCallback, (int32_t slotId,
+        const sptr<INetworkSearchCallback> &callback), (override));
+    MOCK_METHOD(int32_t, StopManualNetworkScanCallback, (int32_t slotId), (override));
 };
 
 }

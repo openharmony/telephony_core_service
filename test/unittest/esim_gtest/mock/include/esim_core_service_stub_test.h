@@ -569,6 +569,21 @@ public:
     {
         return 0;
     }
+
+    int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override
+    {
+        return 0;
+    }
+
+    int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override
+    {
+        return 0;
+    }
+
+    int32_t StopManualNetworkScanCallback(int32_t slotId) override
+    {
+        return 0;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

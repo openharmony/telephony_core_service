@@ -65,6 +65,16 @@ bool NetworkSearchTestCallbackStub::GetNrOptionModeCallbackResult() const
     return getNrOptionModeResult_;
 }
 
+bool NetworkSearchTestCallbackStub::GetManualNetworkScanStateCallbackResult() const
+{
+    return getManualNetworkScanStateResult_;
+}
+
+bool NetworkSearchTestCallbackStub::StartManualNetworkScanCallbackResult() const
+{
+    return startManualNetworkScanResult_;
+}
+
 void NetworkSearchTestCallbackStub::WaitForGetNetworkModeCallback(int32_t timeoutSecond)
 {
     std::unique_lock<std::mutex> callbackLock(getNetworkModeMutex_);
@@ -117,6 +127,18 @@ void NetworkSearchTestCallbackStub::WaitForGetNrOptionModeCallback(int32_t timeo
 {
     std::unique_lock<std::mutex> callbackLock(getNrOptionModeMutex_);
     getNrOptionModeCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
+}
+
+void NetworkSearchTestCallbackStub::WaitForGetManualNetworkScanStateCallback(int32_t timeoutSecond)
+{
+    std::unique_lock<std::mutex> callbackLock(getManualNetworkScanStateMutex_);
+    getManualNetworkScanStateCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
+}
+
+void NetworkSearchTestCallbackStub::WaitForStartManualNetworkScanCallback(int32_t timeoutSecond)
+{
+    std::unique_lock<std::mutex> callbackLock(startManualNetworkScanMutex_);
+    startManualNetworkScanCv_.wait_for(callbackLock, std::chrono::seconds(timeoutSecond));
 }
 
 void NetworkSearchTestCallbackStub::OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode)
@@ -218,6 +240,21 @@ void NetworkSearchTestCallbackStub::OnGetNrOptionModeCallback(const int32_t mode
     TELEPHONY_LOGI("mode:%{public}d, errorCode:%{public}d", mode, errorCode);
     getNrOptionModeResult_ = (TELEPHONY_SUCCESS == errorCode);
     getNrOptionModeCv_.notify_all();
+}
+
+void NetworkSearchTestCallbackStub::OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode)
+{
+    TELEPHONY_LOGI("isScanning:%{public}d, errorCode:%{public}d", isScanning, errorCode);
+    getManualNetworkScanStateResult_ = (TELEPHONY_SUCCESS == errorCode);
+    getManualNetworkScanStateCv_.notify_all();
+}
+
+void NetworkSearchTestCallbackStub::OnStartManualNetworkScanCallback(
+    const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish, const int32_t slotId)
+{
+    TELEPHONY_LOGI("OnStartManualNetworkScanCallback isFinish:%{public}d, slotId:%{public}d", isFinish, slotId);
+    startManualNetworkScanResult_ = true;
+    startManualNetworkScanCv_.notify_all();
 }
 } // namespace Telephony
 } // namespace OHOS

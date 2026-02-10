@@ -172,6 +172,9 @@ public:
     virtual int32_t SendApduData(int32_t slotId, const std::u16string &aid,
         const EsimApduData &apduData, ResponseEsimResult &responseResult) = 0;
     virtual int32_t GetRealSimCount() = 0;
+    virtual int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
+    virtual int32_t StopManualNetworkScanCallback(int32_t slotId) = 0;
 protected:
     const int32_t ERROR = -1;
     const int32_t MIN_STRING_LE = 0;

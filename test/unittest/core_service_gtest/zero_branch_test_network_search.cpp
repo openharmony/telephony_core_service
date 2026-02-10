@@ -15,8 +15,8 @@
 #define private public
 #define protected public
  
-#include "gtest/gtest.h"
 #include <gmock/gmock.h>
+#include "gtest/gtest.h"
  
 #include "cell_info.h"
 #include "cell_location.h"
@@ -1299,6 +1299,14 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
     networkSearchHandler->UpdateOperatorName();
     networkSearchHandler->CheckRegistrationState(networkSearchManager);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+    networkSearchHandler->ManualScanStateChanged(event);
+    event = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::TELEPHONY_EXT_MANUAL_NETWORK_SEARCH);
+    networkSearchHandler->ManualScanStateChanged(event);
+    event = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
 }
  
 /**

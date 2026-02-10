@@ -73,6 +73,17 @@ struct AvailableNetworkList {
 };
 
 /**
+ * @brief Defines the manual scan network list.
+ */
+struct ManualScanResult {
+    /** Available network list. */
+    std::vector<AvailableNetworkInfo> availableNetworkInfo {};
+
+    /** manual scan is finish. */
+    bool isFinish = false;
+};
+
+/**
  * @brief Defines the network mode information.
  */
 struct SetNetworkModeInfo {

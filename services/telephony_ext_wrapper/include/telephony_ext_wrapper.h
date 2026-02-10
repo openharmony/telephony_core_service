@@ -130,6 +130,12 @@ public:
     typedef int32_t (*ReportEventToChrFunc)(int32_t slotId, const char* scenario, int32_t cause);
     typedef void (*RegisterEsimSwitchNotify)(
         int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
+    typedef void (*StartManualNetworkSearch)(int32_t slotId, bool isStart);
+    typedef bool (*GetManualNetworkSearchState)();
+    typedef void (*RegistryCoreNotify)(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    typedef void (*UnRegistryCoreNotify)(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -207,6 +213,10 @@ public:
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
+    StartManualNetworkSearch startManualNetworkSearch_ = nullptr;
+    GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
+    RegistryCoreNotify registryCoreNotify_ = nullptr;
+    UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;

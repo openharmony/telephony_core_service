@@ -220,6 +220,10 @@ public:
     virtual int32_t ProcessSignalIntensity(int32_t slotId, const struct Rssi &signalIntensity) = 0;
     virtual int32_t UpdateOperatorName(int32_t slotId) = 0;
     virtual void UpdateDeviceState(int32_t slotId, bool isEnterStrMode, bool isNeedUpdateNetworkState) = 0;
+    virtual int32_t GetManualNetworkScanState(int32_t slotId, NSCALLBACK &callback) = 0;
+    virtual int32_t StopManualNetworkScanCallback(int32_t slotId) = 0;
+    virtual int32_t StartManualNetworkScanCallback(
+        int32_t slotId, const sptr<INetworkSearchCallback> &callback) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

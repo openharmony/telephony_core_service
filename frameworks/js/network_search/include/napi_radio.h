@@ -35,6 +35,7 @@
 #include "telephony_napi_common_error.h"
 #include "telephony_napi_hril_error_code.h"
 #include "telephony_types.h"
+#include "i_network_search_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -307,6 +308,19 @@ struct ImsStateWorker {
 struct GetBasebandVersionContext : BaseContext {
     int32_t slotId = DEFAULT_SIM_SLOT_ID;
     std::string getBasebandVersion = "";
+};
+
+struct IsManualScanningContext : CallbackContext {
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    bool isManualScanning = false;
+};
+
+struct StartManualScanCallback {
+    napi_env env = nullptr;
+    napi_ref thisVar = nullptr;
+    napi_ref callbackRef = nullptr;
+    int32_t slotId = DEFAULT_SIM_SLOT_ID;
+    sptr<INetworkSearchCallback> callback = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

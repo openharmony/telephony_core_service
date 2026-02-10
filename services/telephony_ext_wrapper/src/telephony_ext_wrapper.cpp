@@ -14,8 +14,8 @@
  */
 
 #include <dlfcn.h>
-#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -136,6 +136,24 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     }
     clearSignalInfoCache_ = (CLEAR_SIGNAL_INFO_CACHE)dlsym(telephonyExtWrapperHandle_, "ClearSignalInfoCache");
     if (clearSignalInfoCache_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+
+    startManualNetworkSearch_ = (StartManualNetworkSearch)dlsym(telephonyExtWrapperHandle_, "StartManualNetworkSearch");
+    if (startManualNetworkSearch_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    getManualNetworkSearchState_ = (GetManualNetworkSearchState)dlsym(telephonyExtWrapperHandle_,
+        "GetManualNetworkSearchState");
+    if (getManualNetworkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    registryCoreNotify_ = (RegistryCoreNotify)dlsym(telephonyExtWrapperHandle_, "RegistryCoreNotify");
+    if (registryCoreNotify_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    unRegistryCoreNotify_ = (UnRegistryCoreNotify)dlsym(telephonyExtWrapperHandle_, "UnRegistryCoreNotify");
+    if (unRegistryCoreNotify_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 }

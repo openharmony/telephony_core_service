@@ -20,52 +20,45 @@
 
 namespace OHOS {
 namespace Telephony {
+INetworkSearchCallbackStub::INetworkSearchCallbackStub()
+{
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_AVAILABLE_RESULT)] =
+        [this](MessageParcel &data) { OnGetNetworkSearchInformation(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_NETWORK_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnGetNetworkModeCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::SET_NETWORK_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnSetNetworkModeCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_RADIO_STATUS_RESULT)] =
+        [this](MessageParcel &data) { OnGetRadioStateCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::SET_RADIO_STATUS_RESULT)] =
+        [this](MessageParcel &data) { OnSetRadioStateCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_PREFERRED_NETWORK_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnGetPreferredNetworkCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::SET_PREFERRED_NETWORK_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnSetPreferredNetworkCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::SET_NR_OPTION_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnSetNrOptionModeCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_NR_OPTION_MODE_RESULT)] =
+        [this](MessageParcel &data) { OnGetNrOptionModeCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::GET_MANUAL_NETWORK_SCAN_STATUS_RESULT)] =
+        [this](MessageParcel &data) { OnGetManualNetworkScanStateCallback(data); };
+    memberFuncMap_[uint32_t(INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT)] =
+        [this](MessageParcel &data) { OnStartManualNetworkScanCallback(data); };
+}
+
 int32_t INetworkSearchCallbackStub::OnNetworkSearchCallback(NetworkSearchCallback requestId, MessageParcel &data)
 {
-    auto callbackType = requestId;
+    uint32_t callbackType = static_cast<uint32_t>(requestId);
     TELEPHONY_LOGI("INetworkSearchCallbackStub::OnNetworkSearchCallback requestId:%{public}d", callbackType);
-    switch (callbackType) {
-        case INetworkSearchCallback::NetworkSearchCallback::GET_AVAILABLE_RESULT: {
-            OnGetNetworkSearchInformation(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::GET_NETWORK_MODE_RESULT: {
-            OnGetNetworkModeCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_NETWORK_MODE_RESULT: {
-            OnSetNetworkModeCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::GET_RADIO_STATUS_RESULT: {
-            OnGetRadioStateCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_RADIO_STATUS_RESULT: {
-            OnSetRadioStateCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::GET_PREFERRED_NETWORK_MODE_RESULT: {
-            OnGetPreferredNetworkCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_PREFERRED_NETWORK_MODE_RESULT: {
-            OnSetPreferredNetworkCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::SET_NR_OPTION_MODE_RESULT: {
-            OnSetNrOptionModeCallback(data);
-            break;
-        }
-        case INetworkSearchCallback::NetworkSearchCallback::GET_NR_OPTION_MODE_RESULT: {
-            OnGetNrOptionModeCallback(data);
-            break;
-        }
-        default: {
-            return DEFAULT_ERROR;
+    auto itFunc = memberFuncMap_.find(callbackType);
+    if (itFunc != memberFuncMap_.end()) {
+        auto memberFunc = itFunc->second;
+        if (memberFunc != nullptr) {
+            memberFunc(data);
+            return DEFAULT_RESULT;
         }
     }
-    return DEFAULT_RESULT;
+    return DEFAULT_ERROR;
 }
 
 void INetworkSearchCallbackStub::OnSetNetworkModeCallback(MessageParcel &data)
@@ -131,6 +124,21 @@ void INetworkSearchCallbackStub::OnGetNrOptionModeCallback(MessageParcel &data)
     OnGetNrOptionModeCallback(mode, error);
 }
 
+void INetworkSearchCallbackStub::OnGetManualNetworkScanStateCallback(MessageParcel &data)
+{
+    bool isScanning = data.ReadBool();
+    int32_t error = data.ReadInt32();
+    OnGetManualNetworkScanStateCallback(isScanning, error);
+}
+
+void INetworkSearchCallbackStub::OnStartManualNetworkScanCallback(MessageParcel &data)
+{
+    sptr<NetworkSearchResult> callback = NetworkSearchResult::Unmarshalling(data);
+    bool isFinish = data.ReadBool();
+    int32_t slotId = data.ReadInt32();
+    OnStartManualNetworkScanCallback(callback, isFinish, slotId);
+}
+
 void INetworkSearchCallbackStub::OnGetNetworkSearchInformation(
     const sptr<NetworkSearchResult> &networkSearchResult, const int32_t errorCode)
 {}
@@ -162,5 +170,10 @@ void INetworkSearchCallbackStub::OnGetPreferredNetworkCallback(const int32_t net
 void INetworkSearchCallbackStub::OnSetNrOptionModeCallback(const bool result, const int32_t errorCode) {}
 
 void INetworkSearchCallbackStub::OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode) {}
+
+void INetworkSearchCallbackStub::OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode) {}
+
+void INetworkSearchCallbackStub::OnStartManualNetworkScanCallback(
+    const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish, const int32_t slotId) {}
 } // namespace Telephony
 } // namespace OHOS
