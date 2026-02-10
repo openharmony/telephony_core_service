@@ -525,11 +525,13 @@ inline void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type
     }
 }
  
-inline void TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause)
+inline bool TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause)
 {
     if (reportEventToChr_ != nullptr) {
         reportEventToChr_(slotId, scenario, cause);
+        return true;
     }
+    return false;
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony

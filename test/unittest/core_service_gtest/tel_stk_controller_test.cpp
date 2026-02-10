@@ -27,27 +27,27 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int32_t INVALID_SLOTID = -1;
-class TelStkControllerText : public testing::Test {
+class TelStkControllerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
-void TelStkControllerText::SetUpTestCase() {}
+void TelStkControllerTest::SetUpTestCase() {}
  
-void TelStkControllerText::TearDownTestCase() {}
+void TelStkControllerTest::TearDownTestCase() {}
  
-void TelStkControllerText::SetUp() {}
+void TelStkControllerTest::SetUp() {}
  
-void TelStkControllerText::TearDown() {}
+void TelStkControllerTest::TearDown() {}
  
 /**
  * @tc.number   Telephony_StkController_StkBundleName_001
  * @tc.name     test stk bundle name
  * @tc.desc     Function test
  */
-HWTEST_F(TelStkControllerText, Telephony_StkController_StkBundleName_001, Function | MediumTest | Level1)
+HWTEST_F(TelStkControllerTest, Telephony_StkController_StkBundleName_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
@@ -67,13 +67,26 @@ HWTEST_F(TelStkControllerText, Telephony_StkController_StkBundleName_001, Functi
  * @tc.name     test stk bundle name ext
  * @tc.desc     Function test
  */
-HWTEST_F(TelStkControllerText, Telephony_StkController_StkBundleName_002, Function | MediumTest | Level1)
+HWTEST_F(TelStkControllerTest, Telephony_StkController_StkBundleName_002, Function | MediumTest | Level1)
 {
     TelephonyExtWrapper telephonyExtWrapper;
     std::string bundleName;
     EXPECT_FALSE(telephonyExtWrapper.GetStkBundleName(bundleName));
     telephonyExtWrapper.getStkBundleNameFunc_ = [](std::string &bundleName) { bundleName = "123"; };
     EXPECT_TRUE(telephonyExtWrapper.GetStkBundleName(bundleName));
+}
+
+/**
+ * @tc.number   Telephony_Sim_ReportEventToChr
+ * @tc.name     test ReportEventToChr
+ * @tc.desc     Function test
+ */
+HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | MediumTest | Level1)
+{
+    TelephonyExtWrapper telephonyExtWrapper;
+    EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
+    telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) {};
+    EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
 }
 } // namespace Telephony
 } // namespace OHOS
