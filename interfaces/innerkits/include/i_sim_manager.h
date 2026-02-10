@@ -169,7 +169,6 @@ public:
     virtual int32_t GetMaxSimCount() = 0;
     virtual int32_t GetRealSimCount() = 0;
     virtual void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) = 0;
-    virtual void StartMatchSimTimeoutTimer(int32_t slotId) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

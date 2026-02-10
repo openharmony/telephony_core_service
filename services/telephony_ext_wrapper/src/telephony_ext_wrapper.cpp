@@ -257,10 +257,12 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     cacheAssetPinForUpgrade_ = (CacheAssetPinForUpgrade)dlsym(telephonyExtWrapperHandle_, "CacheAssetPinForUpgrade");
     sendSimChgTypeInfo_ =
         reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
+    reportEventToChr_ =
+        reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
-                        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
-                        updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-                        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr);
+        getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
+        updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
+        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -328,6 +330,15 @@ void TelephonyExtWrapper::SendSimChgTypeInfo(int32_t slotId, int32_t type)
     if (sendSimChgTypeInfo_ != nullptr) {
         sendSimChgTypeInfo_(slotId, type);
     }
+}
+ 
+bool TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause)
+{
+    if (reportEventToChr_ != nullptr) {
+        reportEventToChr_(slotId, scenario, cause);
+        return true;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
