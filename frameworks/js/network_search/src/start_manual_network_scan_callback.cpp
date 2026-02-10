@@ -25,8 +25,16 @@ namespace Telephony {
 void NapiStartManualScanCallback::OnStartManualNetworkScanCallback(
     const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish, int32_t slotId)
 {
-    int32_t ret = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance()->ReportManualScanInfo(
-        slotId, networkSearchResult, isFinish);
+    if (networkSearchResult == nullptr) {
+        TELEPHONY_LOGE("networkSearchResult is null!");
+        return;
+    }
+    auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
+    if (manager == nullptr) {
+        TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
+        return;
+    }
+    int32_t ret = manager->ReportManualScanInfo(slotId, networkSearchResult, isFinish);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed! errCode:%{public}d", ret);
     } else {

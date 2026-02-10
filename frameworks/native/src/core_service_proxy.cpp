@@ -3483,7 +3483,7 @@ int32_t CoreServiceProxy::GetManualNetworkScanState(int32_t slotId, const sptr<I
         remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_MANUAL_NETWORK_SCAN_STATE), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("GetManualNetworkScanState failed, error code is %{public}d", requestResult);
-        return requestResult;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return reply.ReadInt32();
 }
@@ -3511,7 +3511,7 @@ int32_t CoreServiceProxy::StartManualNetworkScanCallback(
         remote->SendRequest(uint32_t(CoreServiceInterfaceCode::START_MANUAL_NETWORK_SCAN), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("StartManualNetworkScanCallback failed, error code is %{public}d", requestResult);
-        return requestResult;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return reply.ReadInt32();
 }
@@ -3535,7 +3535,7 @@ int32_t CoreServiceProxy::StopManualNetworkScanCallback(int32_t slotId)
         remote->SendRequest(uint32_t(CoreServiceInterfaceCode::STOP_MANUAL_NETWORK_SCAN), data, reply, option);
     if (requestResult != ERR_NONE) {
         TELEPHONY_LOGE("StopManualNetworkScanCallback failed, error code is %{public}d", requestResult);
-        return requestResult;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return reply.ReadInt32();
 }

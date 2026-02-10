@@ -358,5 +358,36 @@ bool TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* scenario,
     }
     return false;
 }
+
+void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool isStart)
+{
+    if (processCellScanNetwork_ != nullptr) {
+        processCellScanNetwork_(slotId, isStart);
+    }
+}
+
+bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
+{
+    if (processCellScanNetwork_ != nullptr) {
+        return getManualNetworkSearchState_();
+    }
+    return false;
+}
+
+void TelephonyExtWrapper::RegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (registryCoreNotify_ != nullptr) {
+        registryCoreNotify_(slotId, handler, what);
+    }
+}
+
+void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (unRegistryCoreNotify_ != nullptr) {
+        unRegistryCoreNotify_(slotId, handler, what);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

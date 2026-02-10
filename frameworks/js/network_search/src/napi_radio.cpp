@@ -3136,8 +3136,12 @@ static bool StartManualNetworkScanCallback(
     startCallback.slotId = slotId;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(startCallback.thisVar));
     napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &(startCallback.callbackRef));
-    int32_t ret = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance()->StartManualNetworkScanCallback(
-        startCallback);
+    auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
+    if (manager == nullptr) {
+        TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
+        return false;
+    }
+    int32_t ret = manager->StartManualNetworkScanCallback(startCallback);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("startManualNetworkScan callback failed");
         ReportFunctionFailed(env, ret, "startManualNetworkScan");
@@ -3181,8 +3185,12 @@ static napi_value StartManualNetworkScan(napi_env env, napi_callback_info info)
 
 static bool StopManualNetworkScanCallback(napi_env env, int32_t slotId)
 {
-    int32_t ret =
-        DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance()->StopManualNetworkScanCallback(env, slotId);
+    auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
+    if (manager == nullptr) {
+        TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
+        return false;
+    }
+    int32_t ret = manager->StopManualNetworkScanCallback(env, slotId);
     if (ret != TELEPHONY_SUCCESS) {
         ReportFunctionFailed(env, ret, "stopManualNetworkScan");
         return false;

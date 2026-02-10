@@ -31,10 +31,7 @@ int32_t ManualNetworkScanCallbackManager::StartManualNetworkScanCallback(StartMa
         TELEPHONY_LOGE("[slot%{public}d] Creat callback failed", slotId);
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
-    if (InsertStartManualScanCallback(slotId, stateCallback) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("[slot%{public}d] callback is existent", slotId);
-        return TELEPHONY_SUCCESS;
-    }
+    InsertStartManualScanCallback(slotId, stateCallback);
     int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().StartManualNetworkScanCallback(
         slotId, stateCallback.callback);
     if (ret == TELEPHONY_SUCCESS) {
@@ -57,10 +54,10 @@ int32_t ManualNetworkScanCallbackManager::StopManualNetworkScanCallback(napi_env
     return ret;
 }
 
-int32_t ManualNetworkScanCallbackManager::InsertStartManualScanCallback(int32_t slotId,
-    StartManualScanCallback &stateCallback)
+void ManualNetworkScanCallbackManager::InsertStartManualScanCallback(int32_t slotId,
+    const StartManualScanCallback &stateCallback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     for (auto iter = listStartManualScanCallback_.begin(); iter != listStartManualScanCallback_.end();) {
         if (iter->slotId == slotId) {
             iter = listStartManualScanCallback_.erase(iter);
@@ -69,12 +66,11 @@ int32_t ManualNetworkScanCallbackManager::InsertStartManualScanCallback(int32_t 
         }
     }
     listStartManualScanCallback_.push_back(stateCallback);
-    return TELEPHONY_SUCCESS;
 }
 
 void ManualNetworkScanCallbackManager::RemoveStartManualScanCallback(int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     auto iter = listStartManualScanCallback_.begin();
     for (; iter != listStartManualScanCallback_.end(); ++iter) {
         if (iter->slotId == slotId) {
@@ -91,7 +87,7 @@ int32_t ManualNetworkScanCallbackManager::ReportManualScanInfo(int32_t slotId,
     const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish)
 {
     int32_t ret = TELEPHONY_ERROR;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     for (auto iter : listStartManualScanCallback_) {
         if (iter.slotId == slotId) {
             ret = ReportManualScanInfoInner(iter, networkSearchResult, isFinish);

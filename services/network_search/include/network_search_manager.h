@@ -291,8 +291,6 @@ public:
     int32_t StopManualNetworkScanCallback(int32_t slotId) override;
     void NotifyManualScanStateChanged(
 	    int32_t slotId, bool isFinish, const sptr<NetworkSearchResult> &networkSearchResult);
-    void ManualNetworkScanState(int32_t slotId, bool isStart);
-    bool GetManualNetworkScanState();
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -376,6 +374,8 @@ private:
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
+    int32_t ManualNetworkScanState(int32_t slotId, bool isStart);
+    bool GetManualNetworkScanState();
 
 private:
     struct ImsRegInfoCallbackRecord {

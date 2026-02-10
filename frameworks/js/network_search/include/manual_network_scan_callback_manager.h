@@ -20,6 +20,7 @@
 #include <uv.h>
 
 #include "napi_radio.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,14 +34,14 @@ public:
 private:
     int32_t ReportManualScanInfoInner(const StartManualScanCallback &stateCallback,
         const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish);
-    int32_t InsertStartManualScanCallback(int32_t slotId, StartManualScanCallback &stateCallback);
+    void InsertStartManualScanCallback(int32_t slotId, const StartManualScanCallback &stateCallback);
     void RemoveStartManualScanCallback(int32_t slotId);
     static int32_t ReportManualScanInfo(const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish,
         const StartManualScanCallback &stateCallback);
 
 private:
     std::list<StartManualScanCallback> listStartManualScanCallback_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

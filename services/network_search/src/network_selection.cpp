@@ -190,7 +190,7 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
         TELEPHONY_LOGE("ManualScanStateChanged manualScanResult is nullptr slotId:%{public}d", slotId_);
         return;
     }
-    bool isFinish = manualScanResult->isFinish;
+    bool isFinish = manualScanResult->isFinished;
     auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
     if (networkSearchResult == nullptr) {
         TELEPHONY_LOGE(

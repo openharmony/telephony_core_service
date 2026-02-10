@@ -80,7 +80,7 @@ struct ManualScanResult {
     std::vector<AvailableNetworkInfo> availableNetworkInfo {};
 
     /** manual scan is finish. */
-    bool isFinish = false;
+    bool isFinished = false;
 };
 
 /**

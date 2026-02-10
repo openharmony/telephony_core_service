@@ -58,6 +58,7 @@ ohos_shared_library("radio") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

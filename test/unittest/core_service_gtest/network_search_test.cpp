@@ -2699,9 +2699,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_04
     AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
         int ret = NetworkSearchTest::telephonyService_->GetManualNetworkScanState(SLOT_ID, nullptr);
-        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
     }
 }
 
@@ -2797,9 +2798,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
     AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
         int ret = NetworkSearchTest::telephonyService_->StartManualNetworkScanCallback(SLOT_ID, nullptr);
-        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
     }
 }
 
@@ -2884,9 +2886,10 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StopManualNetworkScanCallbac
     AccessToken token;
     if (NetworkSearchTest::telephonyService_ == nullptr || !(NetworkSearchTest::HasSimCard(SLOT_ID))) {
         TELEPHONY_LOGE("TelephonyTestService Remote service is null");
+        NetworkSearchTest::telephonyService_ = GetProxy();
     } else {
         int ret = NetworkSearchTest::telephonyService_->StopManualNetworkScanCallback(SLOT_ID);
-        EXPECT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, ret);
+        EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
     }
 }
 #else // TEL_TEST_UNSUPPORT

@@ -1997,6 +1997,10 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
 
 int32_t NetworkSearchManager::GetManualNetworkScanState(int32_t slotId, NSCALLBACK &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("NetworSearchManager::GetManualNetworkScanState callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     bool isScanning = GetManualNetworkScanState();
     MessageParcel data;
     data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
@@ -2012,7 +2016,10 @@ int32_t NetworkSearchManager::GetManualNetworkScanState(int32_t slotId, NSCALLBA
 int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     const sptr<INetworkSearchCallback> &callback)
 {
-    ManualNetworkScanState(slotId, true);
+    int32_t ret = ManualNetworkScanState(slotId, true);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
     std::lock_guard<std::mutex> lock(mutexScan_);
     for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
         if (iter->slotId == slotId) {
@@ -2021,12 +2028,10 @@ int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
             ++iter;
         }
     }
-
     ManualScanCallbackRecord scanRecord;
     scanRecord.slotId = slotId;
     scanRecord.callback = callback;
     listManualScanCallbackRecord_.push_back(scanRecord);
-
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -2068,39 +2073,29 @@ void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isF
     }
 }
 
-void NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
+int32_t NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
-        return;
+        TELEPHONY_LOGE("NetworkSearchManager::ManualNetworkScanState slotId:%{public}d inner is null", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto networkSearchHandler = inner->networkSearchHandler_;
-
     if (isStart) {
-        if (TELEPHONY_EXT_WRAPPER.registryCoreNotify_ != nullptr) {
-            TELEPHONY_EXT_WRAPPER.registryCoreNotify_(
-                slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
-        }
+        TELEPHONY_EXT_WRAPPER.RegistryCoreNotifyFunc(slotId, networkSearchHandler,
+            RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
     } else {
-        if (TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_ != nullptr) {
-            TELEPHONY_EXT_WRAPPER.unRegistryCoreNotify_(
-                slotId, networkSearchHandler, RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
-        }
+        TELEPHONY_EXT_WRAPPER.UnRegistryCoreNotifyFunc(slotId, networkSearchHandler,
+            RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
     }
 
-    if (TELEPHONY_EXT_WRAPPER.processCellScanNetwork_ != nullptr) {
-        TELEPHONY_EXT_WRAPPER.processCellScanNetwork_(slotId, isStart);
-    }
+    TELEPHONY_EXT_WRAPPER.ProcessCellScanNetworkFunc(slotId, isStart);
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 bool NetworkSearchManager::GetManualNetworkScanState()
 {
-    bool networkSearchState = false;
-    if (TELEPHONY_EXT_WRAPPER.getManualNetworkSearchState_ != nullptr) {
-        networkSearchState = TELEPHONY_EXT_WRAPPER.getManualNetworkSearchState_();
-    }
-
-    return networkSearchState;
+    return TELEPHONY_EXT_WRAPPER.GetManualNetworkSearchStateFunc();
 }
 } // namespace Telephony
 } // namespace OHOS
