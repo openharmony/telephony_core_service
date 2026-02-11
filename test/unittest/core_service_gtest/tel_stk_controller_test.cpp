@@ -87,20 +87,7 @@ HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | Medium
     EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
     telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) {};
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
-}
-
-/**
- * @tc.number   Telephony_Sim_ReportEventToChr
- * @tc.name     test ReportEventToChr
- * @tc.desc     Function test
- */
-HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | MediumTest | Level1)
-{
-    TelephonyExtWrapper telephonyExtWrapper;
-    EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
-    EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 0));
-    telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) {};
-    EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
+    EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 0));
 }
 } // namespace Telephony
 } // namespace OHOS
