@@ -53,7 +53,7 @@ bool PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
     int result = dataShareHelper->BatchInsert(pdpProfileUri, values);
     if (result < 0) {
         dataShareHelper->Release();
-        dataShareHelper = nullptr;        
+        dataShareHelper = nullptr;
         return false;
     }
     dataShareHelper->Release();
