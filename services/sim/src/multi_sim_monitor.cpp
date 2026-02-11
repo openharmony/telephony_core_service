@@ -272,7 +272,6 @@ void MultiSimMonitor::UpdateAllOpkeyConfigs()
     }
 }
 
-__attribute__((no_sanitize("cfi")))
 void MultiSimMonitor::InitData(int32_t slotId)
 {
     TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d", slotId);
