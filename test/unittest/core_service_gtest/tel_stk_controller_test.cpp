@@ -85,7 +85,7 @@ HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | Medium
 {
     TelephonyExtWrapper telephonyExtWrapper;
     EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
-    telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) {};
+    telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) { return 0; };
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 0));
 }
