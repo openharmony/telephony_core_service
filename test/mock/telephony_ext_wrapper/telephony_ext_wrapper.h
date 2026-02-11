@@ -367,7 +367,10 @@ inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
     return 0;
 }
-inline int32_t ReportEventToChrImpl(int32_t slotId, const char* scenario, int32_t cause) {}
+inline int32_t ReportEventToChrImpl(int32_t slotId, const char* scenario, int32_t cause)
+{
+    return 0;
+}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
