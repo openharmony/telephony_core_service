@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define private public
+#define protected public
 #include "network_search_test.h"
 
 #include "accesstoken_kit.h"
