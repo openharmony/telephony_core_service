@@ -50,7 +50,12 @@ bool PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
     value.Put(SLOT_ID, slotId);
     values.push_back(value);
     Uri pdpProfileUri(PDP_PROFILE_RDB_INIT_URI);
-    dataShareHelper->BatchInsert(pdpProfileUri, values);
+    int result = dataShareHelper->BatchInsert(pdpProfileUri, values);
+    if (result < 0) {
+        dataShareHelper->Release();
+        dataShareHelper = nullptr;        
+        return false;
+    }
     dataShareHelper->Release();
     dataShareHelper = nullptr;
     return true;
