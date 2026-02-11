@@ -32,7 +32,6 @@ const int64_t DELAY_TIME = 1000;
 const int64_t DELAY_THREE_SECONDS = 3000;
 const int64_t RETRY_TIME = 3 * 60 * 1000;
 const int32_t ACTIVE_USER_ID = 100;
-const int32_t SIM_ACCOUNT_LOADED_SEND = 1;
 const int INIT_TIMES = 15;
 const int INIT_DATA_TIMES = 10;
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
@@ -309,7 +308,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
     }
     NotifySimAccountChanged();
     observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, slotId);
-    TELEPHONY_EXT_WRAPPER.ReportEventToChr(slotId, SIM_ACCOUNT_LOADED, SIM_ACCOUNT_LOADED_SEND);
+    TELEPHONY_EXT_WRAPPER.ReportEventToChr(slotId, SIM_ACCOUNT_LOADED, 1);
 }
 
 void MultiSimMonitor::InitEsimData()
