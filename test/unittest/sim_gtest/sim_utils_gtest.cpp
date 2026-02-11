@@ -217,14 +217,14 @@ HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_002, Function | Mediu
     auto simUtils = std::make_shared<SIMUtils>();
     int length = 1;
     int offset = 100;
-    unsigned char data_arr[] = {'A'};
-    auto res = simUtils->Decode8BitConvertToString(data_arr, length, offset);
+    unsigned char data[] = {'A'};
+    auto res = simUtils->Decode8BitConvertToString(data, length, offset);
     EXPECT_EQ(res, "");
  
     length = 1;
     offset = -1;
-    res = simUtils->Decode8BitConvertToString(data_arr, length, offset);
-    EXPECT_EQ(res, "");    
+    res = simUtils->Decode8BitConvertToString(data, length, offset);
+    EXPECT_EQ(res, "");
 }
  
 /**
@@ -237,8 +237,8 @@ HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_003, Function | Mediu
     auto simUtils = std::make_shared<SIMUtils>();
     int length = 4;
     int offset = 1;
-    unsigned char data_arr[] = {'A', 'A', 'A', 'A'};
-    auto res = simUtils->Decode8BitConvertToString(data_arr, length, offset);
+    unsigned char data[] = {'A', 'A', 'A', 'A'};
+    auto res = simUtils->Decode8BitConvertToString(data, length, offset);
     EXPECT_NE(res, "");
 }
 
