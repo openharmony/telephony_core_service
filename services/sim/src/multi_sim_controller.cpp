@@ -496,7 +496,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
         simLabelIndex = INVALID_VALUE;
     }
     DataShare::DataShareValuesBucket values;
-    SimDataBuilder(values, newIccId, simLabelIndex, IsEsim(slotId));
+    SimDataBuilder(values, newIccId, simLabelIndex, IsEsim(slotId), slotId);
     int64_t id;
     return simDbHelper_->InsertData(id, values);
 }
@@ -510,7 +510,7 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
     DataShare::DataShareValuesBucket values;
     DataShare::DataShareValueObject operatorNameObj(operatorName);
     values.Put(SimData::OPERATOR_NAME, operatorNameObj);
-    SimDataBuilder(values, iccId, esimLabel, true);
+    SimDataBuilder(values, iccId, esimLabel, true, INVALID_VALUE);
     int64_t id;
     std::unique_lock<ffrt::mutex> lock(writeDbMutex_);
     int32_t ret = simDbHelper_->InsertData(id, values);
@@ -521,9 +521,9 @@ int32_t MultiSimController::InsertEsimData(const std::string &iccId, int32_t esi
 }
 
 void MultiSimController::SimDataBuilder(DataShare::DataShareValuesBucket &values, const std::string &iccId,
-    int32_t simLabel, bool isEsim)
+    int32_t simLabel, bool isEsim, int slotId)
 {
-    DataShare::DataShareValueObject slotObj(INVALID_VALUE);
+    DataShare::DataShareValueObject slotObj(slotId);
     DataShare::DataShareValueObject iccidObj(iccId);
     DataShare::DataShareValueObject valueObj(ACTIVE);
     DataShare::DataShareValueObject simLabelIndexObj(simLabel);
