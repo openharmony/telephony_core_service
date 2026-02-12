@@ -803,7 +803,7 @@ int32_t EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
             LAST_DEACTIVE_PROFILE_SLOT0, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
     }
     if (slotId_ == SLOT_ID_1) {
-        OHOS::system::SetParameter( 
+        OHOS::system::SetParameter(
             LAST_DEACTIVE_PROFILE_SLOT1, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
     }
     disableProfileResult_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
