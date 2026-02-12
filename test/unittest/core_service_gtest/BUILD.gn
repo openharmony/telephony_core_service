@@ -173,6 +173,8 @@ ohos_unittest("tel_network_search_gtest") {
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
     "LOG_DOMAIN = 0xD000F00",
+    "private = public",
+    "protected = public",
   ]
   defines += telephony_extra_defines
 
