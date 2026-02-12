@@ -13,10 +13,7 @@
  * limitations under the License.
  */
 
-#define private public
-#define protected public
 #include "network_search_test.h"
-
 #include "accesstoken_kit.h"
 #include "cell_location.h"
 #include "ims_reg_info_callback_gtest.h"
@@ -68,6 +65,7 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGI("TelephonyTestService Get ISystemAbilityManager failed!!!");
+        
         return nullptr;
     }
 
