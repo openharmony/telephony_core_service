@@ -66,6 +66,7 @@ sptr<ICoreService> NetworkSearchTest::GetProxy()
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         TELEPHONY_LOGI("TelephonyTestService Get ISystemAbilityManager failed!!!");
+        
         return nullptr;
     }
 
