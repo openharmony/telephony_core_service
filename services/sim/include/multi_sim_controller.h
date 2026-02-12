@@ -173,8 +173,8 @@ private:
     void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
     int32_t GetPsimLabelIndex(int slotId);
     bool IsESimUpdateStatus(int32_t slotId);
-    void SimDataBuilder(DataShare::DataShareValuesBucket &values, const std::string &iccId,
-        int32_t simLabel, bool isEsim, int32_t slotId);
+    void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
+        int32_t simLabel, bool isEsim);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
