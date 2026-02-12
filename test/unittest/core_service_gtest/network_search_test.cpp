@@ -14,7 +14,6 @@
  */
 
 #include "network_search_test.h"
-
 #include "accesstoken_kit.h"
 #include "cell_location.h"
 #include "ims_reg_info_callback_gtest.h"
@@ -25,8 +24,6 @@
 #include "telephony_log_wrapper.h"
 #include "token_setproc.h"
 #include "mock_i_core_service.h"
-
-
 
 namespace OHOS {
 namespace Telephony {
