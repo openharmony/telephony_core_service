@@ -208,6 +208,41 @@ HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_001, Function | Mediu
 }
 
 /**
+ * @tc.number   Telephony_UcsWideConvertToString_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_002, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    int length = 1;
+    int offset = 100;
+    unsigned char data[] = {'A'};
+    auto res = simUtils->Decode8BitConvertToString(data, length, offset);
+    EXPECT_EQ(res, "");
+ 
+    length = 1;
+    offset = -1;
+    res = simUtils->Decode8BitConvertToString(data, length, offset);
+    EXPECT_EQ(res, "");
+}
+ 
+/**
+ * @tc.number   Telephony_UcsWideConvertToString_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimUtilsTest, Telephony_Decode8BitConvertToString_003, Function | MediumTest | Level1)
+{
+    auto simUtils = std::make_shared<SIMUtils>();
+    int length = 4;
+    int offset = 1;
+    unsigned char data[] = {'A', 'A', 'A', 'A'};
+    auto res = simUtils->Decode8BitConvertToString(data, length, offset);
+    EXPECT_NE(res, "");
+}
+
+/**
  * @tc.number   Telephony_telephony_permission_001
  * @tc.name     test error branch
  * @tc.desc     Function test
