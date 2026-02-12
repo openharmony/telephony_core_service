@@ -41,7 +41,8 @@ static constexpr const char *KEY_IMEI = "kIMEI";
 static constexpr const char *KEY_IMEI2 = "kIMEI2";
 static constexpr const char *KEY_NONCE = "kNonce";
 static constexpr const char *KEY_TIMESTAMP = "kTimestamp";
-const std::string LAST_DEACTIVE_PROFILE = "persist.telephony.last_deactive_profile";
+const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_deactive_profile_slot0";
+const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 static constexpr int32_t COMMAND_PORT = 0;
 const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
 
@@ -797,8 +798,13 @@ void EsimFile::BuildOperatorId(EuiccProfileInfo *eProfileInfo, std::shared_ptr<A
 
 int32_t EsimFile::DisableProfile(int32_t portIndex, const std::u16string &iccId)
 {
-    OHOS::system::SetParameter(
-        LAST_DEACTIVE_PROFILE, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
+    if (slotId_ == SLOT_ID_0) {
+        OHOS::system::SetParameter(
+            LAST_DEACTIVE_PROFILE_SLOT0, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
+    }
+    if (slotId_ == SLOT_ID_1) {
+        OHOS::system::SetParameter( 
+            LAST_DEACTIVE_PROFILE_SLOT1, std::to_string(CoreManagerInner::GetInstance().GetSimId(slotId_)));
     }
     disableProfileResult_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
     esimProfile_.portIndex = portIndex;
