@@ -1012,7 +1012,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isUserSet)
 {
     if ((IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
         CoreManagerInner::GetInstance().IsSatelliteEnabled()) || IsSimSlotsMapping()) {
-        SendEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_TIMEOUT, WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT);
+        SendEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT, WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT);
         TELEPHONY_LOGW("satelliteStatusOn or simslots is mapping, no need check main slotId");
         return;
     }
@@ -1516,7 +1516,7 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         case RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT:
             OnRilSetPrimarySlotTimeout(event);
             break;
-        case WAIT_FOR_ALL_CARDS_READY_TIMEOUT:
+        case WAIT_FOR_ALL_CARDS_READY_EVENT:
             waitCardsReady_ = false;
             ReCheckPrimary();
             break;
