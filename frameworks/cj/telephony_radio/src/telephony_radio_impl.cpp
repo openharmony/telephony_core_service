@@ -179,8 +179,8 @@ namespace Telephony {
         int32_t psRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         int32_t csRadioTech = static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_INVALID);
         CNetworkRadioTech networkRadioTech = {
-            .csRadioTech = WrapRadioTech(csRadioTech),
-            .psRadioTech = WrapRadioTech(psRadioTech)
+            .psRadioTech = WrapRadioTech(psRadioTech),
+            .csRadioTech = WrapRadioTech(csRadioTech)
         };
         if (!IsValidSlotId(slotId)) {
             TELEPHONY_LOGE("TelephonyRadioImpl::GetRadioTech slotId is invalid");
@@ -206,8 +206,8 @@ namespace Telephony {
             .shortOperatorName = nullptr,
             .plmnNumeric = nullptr,
             .isRoaming = false,
-            .isCaActive = false,
-            .nsaState = static_cast<int32_t>(NsaState::NSA_STATE_NOT_SUPPORT)
+            .nsaState = static_cast<int32_t>(NsaState::NSA_STATE_NOT_SUPPORT),
+            .isCaActive = false
         };
         if (!IsValidSlotIdEx(slotId)) {
             TELEPHONY_LOGE("NativeGetNetworkState slotId is invalid");
@@ -315,7 +315,7 @@ namespace Telephony {
             return csignalInfoList;
         }
         int i = 0;
-        for (const sptr<SignalInformation> infoItem : signalInfoList) {
+        for (const sptr<SignalInformation>& infoItem : signalInfoList) {
             int32_t signalType = static_cast<int32_t>(NetworkType::NETWORK_TYPE_UNKNOWN);
             int32_t signalLevel = 0;
             int32_t signalIntensity = 0;
