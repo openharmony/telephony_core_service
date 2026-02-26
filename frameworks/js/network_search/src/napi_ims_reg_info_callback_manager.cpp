@@ -86,8 +86,13 @@ void NapiImsRegInfoCallbackManager::RemoveImsRegCallback(int32_t slotId, ImsServ
             if (iter->imsCallback != nullptr) {
                 iter->imsCallback = nullptr;
             }
-            napi_delete_reference(iter->env, iter->callbackRef);
-            napi_delete_reference(iter->env, iter->thisVar);
+            uint32_t refCount = 0;
+            if (napi_reference_unref(iter->env, iter->thisVar, &refCount) == napi_ok && refCount == 0) {
+                napi_delete_reference(iter->env, iter->thisVar);
+            }
+            if (napi_reference_unref(iter->env, iter->callbackRef, &refCount) == napi_ok && refCount == 0) {
+                napi_delete_reference(iter->env, iter->callbackRef);
+            }
             listImsRegStateCallback_.erase(iter);
             break;
         }
@@ -123,8 +128,17 @@ int32_t NapiImsRegInfoCallbackManager::ReportImsRegInfoInner(
         TELEPHONY_LOGE("stateCallback.env is null");
         return TELEPHONY_ERROR;
     }
+    napi_reference_ref(stateCallback.env, stateCallback.thisVar, nullptr);
+    napi_reference_ref(stateCallback.env, stateCallback.callbackRef, nullptr);
     auto task = [stateCallback, info]() {
         int32_t ret = ReportImsRegInfo(info, stateCallback);
+        uint32_t refCount = 0;
+        if (napi_reference_unref(stateCallback.env, stateCallback.thisVar, &refCount) == napi_ok && refCount == 0) {
+            napi_delete_reference(stateCallback.env, stateCallback.thisVar);
+        }
+        if (napi_reference_unref(stateCallback.env, stateCallback.callbackRef, &refCount) == napi_ok && refCount == 0) {
+            napi_delete_reference(stateCallback.env, stateCallback.callbackRef);
+        }
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("ReportImsRegInfo failed, result: %{public}d", ret);
             return;
