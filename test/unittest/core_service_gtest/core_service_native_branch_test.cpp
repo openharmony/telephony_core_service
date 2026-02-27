@@ -260,6 +260,14 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_003, Function |
     EXPECT_EQ(coreServiceProxy.UnregisterImsRegInfoCallback(INVALID_SLOTID, imsSrvType), TELEPHONY_ERR_SLOTID_INVALID);
 }
 
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_004, Function | MediumTest | Level1)
+{
+    CoreServiceProxy coreServiceProxy(nullptr);
+    EXPECT_EQ(coreServiceProxy.GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(coreServiceProxy.StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(coreServiceProxy.StopManualNetworkScanCallback(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;

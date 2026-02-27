@@ -489,6 +489,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
     "security_token.cpp",
     "sim_operator_brocast_test.cpp",
     "sim_test_util.cpp",
+    "network_search_test_callback_stub.cpp",
 
     # Test cases
     "zero_branch_test.cpp",
@@ -995,6 +996,7 @@ ohos_unittest("tel_network_search_zero_branch_gtest") {
   sources = [
     # Depends files
     "ims_reg_info_callback_gtest.cpp",
+    "network_search_test_callback_stub.cpp",
  
     # Test cases
     "zero_branch_test_network_search.cpp",
