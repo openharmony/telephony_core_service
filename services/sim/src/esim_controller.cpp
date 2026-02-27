@@ -70,14 +70,6 @@ bool EsimController::ChecIsVerifyBindCommand(const std::string &cmdData)
 void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdData)
 {
     TELEPHONY_LOGI("EsimController:Start process verify bind message.");
-    ffrt::submit([=]() {
-        this->ProcessCommandByCa(slotId, cmdData);
-    });
-}
-
-void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdData)
-{
-    TELEPHONY_LOGI("EsimController:Start process verify bind message.");
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(DEFAULT_SLOT_ID, hasSimCard);
     int32_t primarySlot = CoreManagerInner::GetInstance().GetEmcRescueSlot();
