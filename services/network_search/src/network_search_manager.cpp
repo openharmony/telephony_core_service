@@ -1033,8 +1033,10 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
     }
 #ifdef CORE_SERVICE_SATELLITE
     std::shared_ptr<SatelliteServiceClient> satelliteClient = DelayedSingleton<SatelliteServiceClient>::GetInstance();
-    int32_t satelliteSlotId = satelliteClient->GetSatelliteSlotId();
-    if (IsSatelliteEnabled() && slotId == satelliteSlotId) {
+    if (satelliteClient == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (IsSatelliteEnabled() && slotId == satelliteClient->GetSatelliteSlotId()) {
         imei = Str8ToStr16(satelliteClient->GetImei());
         return TELEPHONY_ERR_SUCCESS;
     }
