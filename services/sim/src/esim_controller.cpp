@@ -36,6 +36,7 @@ constexpr size_t CHECK_CMD_TAG_START = 4;
 constexpr size_t CHECK_GET_INPUT_TAG_START = 10;
 constexpr size_t GET_INPUT_DATA_START = 26;
 constexpr size_t COMPARE_EQUAL_VALUE = 0;
+constexpr int32_t DEFAULT_SLOT_ID = 0;
 
 EsimController::EsimController() {}
 
