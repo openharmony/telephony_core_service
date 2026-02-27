@@ -37,7 +37,7 @@ public:
 private:
     bool WriteInterfaceToken(MessageParcel &data);
     __attribute__((noinline)) int32_t SendRequest(uint32_t msgId, MessageParcel &dataParcel, MessageParcel &replyParcel,
-        MessageParcel &option);
+        MessageOption &option);
 
 private:
     static inline BrokerDelegator<SatelliteServiceProxy> delegator_;
