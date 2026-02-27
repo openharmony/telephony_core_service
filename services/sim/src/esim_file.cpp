@@ -182,6 +182,7 @@ std::string EsimFile::ObtainEid()
 
 GetEuiccProfileInfoListInnerResult EsimFile::GetEuiccProfileInfoList()
 {
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     euiccProfileInfoList_ = GetEuiccProfileInfoListInnerResult();
     euiccProfileInfoList_.result_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_REQUEST_ALL_PROFILES);
@@ -2881,6 +2882,7 @@ bool EsimFile::ProcessSetNicknameDone(const AppExecFwk::InnerEvent::Pointer &eve
 
 EuiccInfo2 EsimFile::ObtainEuiccInfo2(int32_t portIndex)
 {
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     euiccInfo2Result_ = EuiccInfo2();
     esimProfile_.portIndex = portIndex;
 

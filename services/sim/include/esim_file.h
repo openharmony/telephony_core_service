@@ -381,6 +381,8 @@ private:
     std::mutex getContractInfoMutex_;
     std::condition_variable getContractInfoCv_;
     bool isGetContractInfoReady_ = false;
+
+    std::mutex currentChannelIdOccupiedMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
