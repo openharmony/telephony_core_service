@@ -37,6 +37,7 @@ constexpr size_t CHECK_GET_INPUT_TAG_START = 10;
 constexpr size_t GET_INPUT_DATA_START = 26;
 constexpr size_t COMPARE_EQUAL_VALUE = 0;
 constexpr int32_t DEFAULT_SLOT_ID = 0;
+constexpr int32_t RETRY_CA_TIMEOUT = 4 * 1000; // 4s
 
 EsimController::EsimController() {}
 
@@ -72,6 +73,22 @@ void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdDat
     ffrt::submit([=]() {
         this->ProcessCommandByCa(slotId, cmdData);
     });
+}
+
+void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdData)
+{
+    TELEPHONY_LOGI("EsimController:Start process verify bind message.");
+    bool hasSimCard = false;
+    CoreManagerInner::GetInstance().HasSimCard(DEFAULT_SLOT_ID, hasSimCard);
+    int32_t primarySlot = CoreManagerInner::GetInstance().GetEmcRescueSlot();
+    if (!hasSimCard && primarySlot == DEFAULT_SLOT_ID) {
+        TELEPHONY_LOGI("EsimController:delay Ca 4s for simslot cfg change");
+        ffrt::submit([=]() { this->ProcessCommandByCa(slotId, cmdData);},
+            ffrt::task_attr().delay(RETRY_CA_TIMEOUT));
+    } else {
+        TELEPHONY_LOGI("EsimController:start verify Ca without delay");
+        ffrt::submit([=]() { this->ProcessCommandByCa(slotId, cmdData);});
+    }
 }
 
 void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
