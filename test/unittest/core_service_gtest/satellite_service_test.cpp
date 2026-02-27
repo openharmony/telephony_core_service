@@ -203,13 +203,14 @@ HWTEST_F(SatelliteServiceTest, GetImei_0001, Function | MediumTest | Level2)
 }
 
 /**
- * @tc.number   Telephony_SatelliteServiceTest_GetSatelliteSlotId_0001
+ * @tc.number   Telephony_SatelliteServiceTest_GetSatelliteSlotId
  * @tc.name     get satellite slotId
  * @tc.desc     Function test
  */
-HWTEST_F(SatelliteServiceTest, GetSatelliteSlotId_0001, Function | MediumTest | Level2)
+HWTEST_F(SatelliteServiceTest, GetSatelliteSlotId, Function | MediumTest | Level2)
 {
-    TELEPHONY_LOGI("SatelliteServiceTest::GetSatelliteSlotId_0001 -->");
+    TELEPHONY_LOGI("SatelliteServiceTest::GetSatelliteSlotId -->");
+    auto remote = sptr<MockIRemoteObject>::MakeSptr();
     sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     SatelliteServiceProxy proxy(remote);
 
