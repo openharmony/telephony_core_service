@@ -211,7 +211,6 @@ HWTEST_F(SatelliteServiceTest, GetSatelliteSlotId, Function | MediumTest | Level
 {
     TELEPHONY_LOGI("SatelliteServiceTest::GetSatelliteSlotId -->");
     auto remote = sptr<MockIRemoteObject>::MakeSptr();
-    sptr<MockIRemoteObject> remote = new (std::nothrow) MockIRemoteObject();
     SatelliteServiceProxy proxy(remote);
 
     int32_t ret = proxy.GetSatelliteSlotId();
