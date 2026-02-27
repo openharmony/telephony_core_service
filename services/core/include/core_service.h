@@ -270,6 +270,9 @@ public:
     int32_t SendApduData(int32_t slotId, const std::u16string &aid, const EsimApduData &apduData,
         ResponseEsimResult &responseResult) override;
     int32_t GetRealSimCount() override;
+    int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t StopManualNetworkScanCallback(int32_t slotId) override;
+    int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
 private:
     bool Init();
     bool NotifyCoreServiceReady();

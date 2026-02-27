@@ -14,8 +14,8 @@
  */
 
 #include <dlfcn.h>
-#include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -136,6 +136,24 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     }
     clearSignalInfoCache_ = (CLEAR_SIGNAL_INFO_CACHE)dlsym(telephonyExtWrapperHandle_, "ClearSignalInfoCache");
     if (clearSignalInfoCache_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+
+    processCellScanNetwork_ = (ProcessCellScanNetwork)dlsym(telephonyExtWrapperHandle_, "ProcessCellScanNetwork");
+    if (processCellScanNetwork_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    getManualNetworkSearchState_ = (GetManualNetworkSearchState)dlsym(telephonyExtWrapperHandle_,
+        "GetManualNetworkSearchState");
+    if (getManualNetworkSearchState_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    registryCoreNotify_ = (RegistryCoreNotify)dlsym(telephonyExtWrapperHandle_, "RegistryCoreNotify");
+    if (registryCoreNotify_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    unRegistryCoreNotify_ = (UnRegistryCoreNotify)dlsym(telephonyExtWrapperHandle_, "UnRegistryCoreNotify");
+    if (unRegistryCoreNotify_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
 }
@@ -339,6 +357,37 @@ bool TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* scenario,
         return true;
     }
     return false;
+}
+
+void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool isStart)
+{
+    if (processCellScanNetwork_ != nullptr) {
+        processCellScanNetwork_(slotId, isStart);
+    }
+}
+
+bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
+{
+    if (getManualNetworkSearchState_ != nullptr) {
+        return getManualNetworkSearchState_();
+    }
+    return false;
+}
+
+void TelephonyExtWrapper::RegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (registryCoreNotify_ != nullptr) {
+        registryCoreNotify_(slotId, handler, what);
+    }
+}
+
+void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (unRegistryCoreNotify_ != nullptr) {
+        unRegistryCoreNotify_(slotId, handler, what);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

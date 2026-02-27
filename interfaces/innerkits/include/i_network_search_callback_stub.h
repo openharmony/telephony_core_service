@@ -17,6 +17,7 @@
 #define I_NETWORK_SEARCH_CALLBACK_STUB_H
 
 #include <cstdint>
+#include <map>
 #include "i_network_search_callback.h"
 #include "iremote_stub.h"
 #include "network_search_result.h"
@@ -27,7 +28,7 @@ class INetworkSearchCallbackStub : public IRemoteStub<INetworkSearchCallback> {
 public:
     static const int32_t DEFAULT_ERROR = -1;
     static const int32_t DEFAULT_RESULT = 0;
-    INetworkSearchCallbackStub() = default;
+    INetworkSearchCallbackStub();
     virtual ~INetworkSearchCallbackStub() = default;
     int32_t OnNetworkSearchCallback(NetworkSearchCallback requestId, MessageParcel &data) override;
     int OnRemoteRequest(
@@ -42,6 +43,9 @@ public:
     virtual void OnGetPreferredNetworkCallback(const int32_t networkMode, const int32_t errorCode);
     virtual void OnSetNrOptionModeCallback(const bool setResult, const int32_t errorCode);
     virtual void OnGetNrOptionModeCallback(const int32_t mode, const int32_t errorCode);
+    virtual void OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode);
+    virtual void OnStartManualNetworkScanCallback(
+        const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish, const int32_t slotId);
 
 private:
     void OnSetNetworkModeCallback(MessageParcel &data);
@@ -53,6 +57,11 @@ private:
     void OnGetPreferredNetworkCallback(MessageParcel &data);
     void OnSetNrOptionModeCallback(MessageParcel &data);
     void OnGetNrOptionModeCallback(MessageParcel &data);
+    int32_t OnManualScanResultCallback(NetworkSearchCallback requestId, MessageParcel &data);
+    void OnGetManualNetworkScanStateCallback(MessageParcel &data);
+    void OnStartManualNetworkScanCallback(MessageParcel &data);
+    using NetworkSearchCallbackFunc = std::function<void(MessageParcel &data)>;
+    std::map<uint32_t, NetworkSearchCallbackFunc> memberFuncMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -1760,5 +1760,43 @@ int32_t CoreServiceClient::SendApduData(
     return proxy->SendApduData(slotId, aid, apduData, responseResult);
 }
 
+int32_t CoreServiceClient::GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->GetManualNetworkScanState(slotId, callback);
+}
+
+int32_t CoreServiceClient::StartManualNetworkScanCallback(int32_t slotId,
+    const sptr<INetworkSearchCallback> &callback)
+{
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->StartManualNetworkScanCallback(slotId, callback);
+}
+
+int32_t CoreServiceClient::StopManualNetworkScanCallback(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->StopManualNetworkScanCallback(slotId);
+}
 }  // namespace Telephony
 } // namespace OHOS

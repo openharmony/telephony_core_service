@@ -42,6 +42,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerPdpProfileToMap();
     AddHandlerOpkeyVersionToMap();
     AddHandlerEsimToMap();
+    AddHandlerManualScanToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -290,6 +291,16 @@ void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerManualScanToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::GET_MANUAL_NETWORK_SCAN_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetManualNetworkScanState(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::STOP_MANUAL_NETWORK_SCAN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopManualNetworkScan(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::START_MANUAL_NETWORK_SCAN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartManualNetworkScan(data, reply); };
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -1976,6 +1987,61 @@ int32_t CoreServiceStub::OnGetRealSimCount(MessageParcel &data, MessageParcel &r
     if (!ret) {
         TELEPHONY_LOGE("OnGetRealSimCount write reply failed.");
         return ERR_FLATTEN_OBJECT;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnGetManualNetworkScanState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    sptr<INetworkSearchCallback> callback = nullptr;
+    sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetManualNetworkScanState remoteCallback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetManualNetworkScanState callback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = GetManualNetworkScanState(slotId, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("CoreServiceStub::OnGetManualNetworkScanState write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnStopManualNetworkScan(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    int32_t result = StopManualNetworkScanCallback(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("CoreServiceStub::OnStopManualNetworkScan write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnStartManualNetworkScan(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    sptr<INetworkSearchCallback> callback = nullptr;
+    sptr<IRemoteObject> remoteCallback = data.ReadRemoteObject();
+    if (remoteCallback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnStartManualNetworkScan remoteCallback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callback = iface_cast<INetworkSearchCallback>(remoteCallback);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CoreServiceStub::OnStartManualNetworkScan callback is nullptr.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = StartManualNetworkScanCallback(slotId, callback);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("CoreServiceStub::OnStartManualNetworkScan write reply failed.");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     return NO_ERROR;
 }

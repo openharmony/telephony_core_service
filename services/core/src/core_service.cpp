@@ -339,12 +339,8 @@ int32_t CoreService::GetImei(int32_t slotId, const sptr<IRawParcelCallback> &cal
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (networkSearchManager_ == nullptr) {
-        TELEPHONY_LOGE("networkSearchManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("GetImei no callback");
+    if (networkSearchManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null or GetImei no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback]() {
@@ -375,12 +371,8 @@ int32_t CoreService::GetImeiSv(int32_t slotId, const sptr<IRawParcelCallback> &c
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (networkSearchManager_ == nullptr) {
-        TELEPHONY_LOGE("networkSearchManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("GetImeiSv no callback");
+    if (networkSearchManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null or GetImeiSv no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncNetSearchExecute([wp = std::weak_ptr<INetworkSearch>(networkSearchManager_), slotId, callback]() {
@@ -476,12 +468,8 @@ int32_t CoreService::GetNrOptionMode(int32_t slotId, const sptr<INetworkSearchCa
 
 int32_t CoreService::HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("HasSimCard no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null || HasSimCard no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -504,12 +492,8 @@ int32_t CoreService::HasSimCard(int32_t slotId, const sptr<IRawParcelCallback> &
 
 int32_t CoreService::GetSimState(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("GetSimState no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or GetSimState no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -627,12 +611,8 @@ int32_t CoreService::IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> 
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("IsCTSimCard no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or IsCTSimCard no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -655,12 +635,8 @@ int32_t CoreService::IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallback> 
 
 bool CoreService::IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> &callback)
 {
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return false;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("IsSimActive no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or IsSimActive no callback");
         return false;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -828,13 +804,8 @@ int32_t CoreService::GetDefaultVoiceSlotId()
 
 int32_t CoreService::GetDefaultVoiceSimId(const sptr<IRawParcelCallback> &callback)
 {
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("GetDefaultVoiceSimId no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or GetDefaultVoiceSimId no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), callback]() {
@@ -902,12 +873,8 @@ int32_t CoreService::SetShowNumber(int32_t slotId, const std::u16string &number,
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("SetShowNumber no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or SetShowNumber no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, number, callback]() {
@@ -934,12 +901,8 @@ int32_t CoreService::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallback
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("GetShowNumber no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or GetShowNumber no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -971,12 +934,8 @@ int32_t CoreService::SetShowName(int32_t slotId, const std::u16string &name,
         TELEPHONY_LOGE("permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (simManager_ == nullptr) {
-        TELEPHONY_LOGE("simManager_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("SetShowName no callback");
+    if (simManager_ == nullptr || callback == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null or SetShowName no callback");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, name, callback]() {
@@ -2164,6 +2123,45 @@ int32_t CoreService::GetRealSimCount()
         return simManager_->GetRealSimCount();
     }
     return realSlotCount;
+}
+
+int32_t CoreService::GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->GetManualNetworkScanState(slotId, callback);
+}
+
+int32_t CoreService::StopManualNetworkScanCallback(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->StopManualNetworkScanCallback(slotId);
+}
+
+int32_t CoreService::StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (networkSearchManager_ == nullptr) {
+        TELEPHONY_LOGE("networkSearchManager_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return networkSearchManager_->StartManualNetworkScanCallback(slotId, callback);
 }
 } // namespace Telephony
 } // namespace OHOS

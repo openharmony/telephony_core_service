@@ -33,6 +33,8 @@ public:
         SET_PREFERRED_NETWORK_MODE_RESULT,
         SET_NR_OPTION_MODE_RESULT,
         GET_NR_OPTION_MODE_RESULT,
+        GET_MANUAL_NETWORK_SCAN_STATUS_RESULT,
+        START_MANUAL_NETWORK_SCAN_STATUS_RESULT,
     };
     virtual int32_t OnNetworkSearchCallback(NetworkSearchCallback requestId, MessageParcel &data) = 0;
 

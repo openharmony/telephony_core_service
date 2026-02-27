@@ -31,11 +31,13 @@ ohos_shared_library("radio") {
 
   sources = [
     "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
+    "src/get_manual_network_scan_state_callback.cpp",
     "src/get_network_search_info_callback.cpp",
     "src/get_network_search_mode_callback.cpp",
     "src/get_nr_option_mode_callback.cpp",
     "src/get_preferred_network_callback.cpp",
     "src/get_radio_state_callback.cpp",
+    "src/manual_network_scan_callback_manager.cpp",
     "src/napi_ims_reg_info_callback.cpp",
     "src/napi_ims_reg_info_callback_manager.cpp",
     "src/napi_radio.cpp",
@@ -43,6 +45,7 @@ ohos_shared_library("radio") {
     "src/set_nr_option_mode_callback.cpp",
     "src/set_preferred_network_callback.cpp",
     "src/set_radio_state_callback.cpp",
+    "src/start_manual_network_scan_callback.cpp",
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
@@ -55,6 +58,7 @@ ohos_shared_library("radio") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

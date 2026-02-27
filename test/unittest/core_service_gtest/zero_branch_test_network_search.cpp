@@ -15,8 +15,8 @@
 #define private public
 #define protected public
  
-#include "gtest/gtest.h"
 #include <gmock/gmock.h>
+#include "gtest/gtest.h"
  
 #include "cell_info.h"
 #include "cell_location.h"
@@ -1149,6 +1149,35 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_011, Function |
     networkSearchManager->SetPreferredNetwork(SLOT_ID_0, 0, networkSearchCallback);
     EXPECT_NE(networkSearchManager->GetNrOptionMode(SLOT_ID_0, networkSearchCallback), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+/**
+ * @tc.number   Telephony_NetworkSearchManager_012
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_012, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    networkSearchManager->OnInit();
+    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
+
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
+    networkSearchManager->NotifyManualScanStateChanged(5, true, nullptr);
+
+    EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(5, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
  
 /**
  * @tc.number   Telephony_NetworkSearchHandler_001
@@ -1422,6 +1451,29 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_006, Function |
 #endif // CORE_SERVICE_SATELLITE
     networkSearchHandler->SetNetworkSelectionModeResponse(event);
     networkSearchHandler->ClearSignalAndCellInfoList();
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    EXPECT_TRUE(networkSearchManager->OnInit());
+
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    EXPECT_TRUE(networkSearchHandler->Init());
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+    networkSearchHandler->ManualScanStateChanged(event);
+    networkSearchHandler->networkSelection_ = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
+    event = nullptr;
+    networkSearchHandler->ManualScanStateChanged(event);
 }
  
 /**

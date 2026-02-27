@@ -128,6 +128,12 @@ public:
     typedef int32_t (*ReportEventToChrFunc)(int32_t slotId, const char* scenario, int32_t cause);
     typedef void (*RegisterEsimSwitchNotify)(
         int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
+    typedef void (*ProcessCellScanNetwork)(int32_t slotId, bool isStart);
+    typedef bool (*GetManualNetworkSearchState)();
+    typedef void (*RegistryCoreNotify)(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    typedef void (*UnRegistryCoreNotify)(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -205,6 +211,10 @@ public:
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
+    void ProcessCellScanNetworkFunc(int32_t slotId, bool isStart);
+    bool GetManualNetworkSearchStateFunc();
+    void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -213,6 +223,10 @@ private:
     GetStkBundleNameFunc getStkBundleNameFunc_ = nullptr;
     SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
     ReportEventToChrFunc reportEventToChr_ = nullptr;
+    ProcessCellScanNetwork processCellScanNetwork_ = nullptr;
+    GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
+    RegistryCoreNotify registryCoreNotify_ = nullptr;
+    UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -282,8 +296,7 @@ inline bool SetNrOptionModeExtImpl(int32_t, int32_t, int32_t, int32_t &)
 {
     return false;
 }
-inline void UpdatePlmnExtImpl(int32_t, const std::string &)
-{}
+inline void UpdatePlmnExtImpl(int32_t, const std::string &) {}
 inline bool IsInModem2OptimizationImpl(int32_t)
 {
     return false;
@@ -371,6 +384,15 @@ inline int32_t ReportEventToChrImpl(int32_t slotId, const char* scenario, int32_
 {
     return 0;
 }
+inline void ProcessCellScanNetworkImpl(int32_t slotId, bool isStart) {}
+inline bool GetManualNetworkSearchStateImpl()
+{
+    return false;
+}
+inline void RegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{}
+inline void UnRegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -429,6 +451,10 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     updatePlmnExt_ = &UpdatePlmnExtImpl;
     isInModem2Optimization_ = &IsInModem2OptimizationImpl;
     clearSignalInfoCache_ = &ClearSignalInfoCacheImpl;
+    processCellScanNetwork_ = &ProcessCellScanNetworkImpl;
+    getManualNetworkSearchState_ = &GetManualNetworkSearchStateImpl;
+    registryCoreNotify_ = &RegistryCoreNotifyImpl;
+    unRegistryCoreNotify_ = &UnRegistryCoreNotifyImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
@@ -535,6 +561,37 @@ inline bool TelephonyExtWrapper::ReportEventToChr(int32_t slotId, const char* sc
         return true;
     }
     return false;
+}
+
+inline void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool isStart)
+{
+    if (processCellScanNetwork_ != nullptr) {
+        processCellScanNetwork_(slotId, isStart);
+    }
+}
+
+inline bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
+{
+    if (getManualNetworkSearchState_ != nullptr) {
+        return getManualNetworkSearchState_();
+    }
+    return false;
+}
+
+inline void TelephonyExtWrapper::RegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (registryCoreNotify_ != nullptr) {
+        registryCoreNotify_(slotId, handler, what);
+    }
+}
+
+inline void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
+    const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
+{
+    if (unRegistryCoreNotify_ != nullptr) {
+        unRegistryCoreNotify_(slotId, handler, what);
+    }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony

@@ -172,6 +172,54 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
     NetworkUtils::RemoveCallbackFromMap(index);
 }
 
+void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Pointer &event) const
+{
+    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult slotId:%{public}d", slotId_);
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSelection::ProcessManualScanResult event is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("NetworkSelection::ProcessManualScanResult nsm is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+
+    auto manualScanResult = event->GetSharedObject<ManualScanResult>();
+    if (manualScanResult == nullptr) {
+        TELEPHONY_LOGE("ManualScanStateChanged manualScanResult is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+    bool isFinish = manualScanResult->isFinished;
+    auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
+    if (networkSearchResult == nullptr) {
+        TELEPHONY_LOGE(
+            "GetNetworkSearchInformationValue failed to create new NetWorkSearchResult slotId:%{public}d", slotId_);
+        return;
+    }
+    if (isFinish) {
+        nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
+        TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult stop end");
+        return;
+    }
+    const std::vector<AvailableNetworkInfo> &availableNetworkInfo = manualScanResult->availableNetworkInfo;
+    std::vector<NetworkInformation> networkInformation;
+    for (auto &availableNetworkInfoItem : availableNetworkInfo) {
+        std::string numeric = availableNetworkInfoItem.numeric;
+        std::string longName = GetCustomName(availableNetworkInfoItem);
+        std::string shortName = availableNetworkInfoItem.shortName;
+        int32_t status = availableNetworkInfoItem.status;
+        int32_t rat = availableNetworkInfoItem.rat;
+        NetworkInformation networkStateItem;
+        networkStateItem.SetOperateInformation(longName, shortName, numeric, status, rat);
+        networkInformation.push_back(networkStateItem);
+    }
+    networkSearchResult->SetNetworkSearchResultValue(
+        static_cast<int32_t>(networkInformation.size()), networkInformation);
+    nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
+    TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult start end");
+}
+
 bool NetworkSelection::AvailNetworkResult(
     std::shared_ptr<AvailableNetworkList> availNetworkResult, MessageParcel &data, int64_t &index) const
 {

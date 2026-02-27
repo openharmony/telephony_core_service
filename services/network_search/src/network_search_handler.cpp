@@ -211,6 +211,10 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
         [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
             handler->AirplaneModeChange(event);
         } },
+    { RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->ManualScanStateChanged(event);
+        } },
 #ifdef CORE_SERVICE_SATELLITE
     { RadioEvent::SATELLITE_STATUS_CHANGED,
         [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
@@ -1567,6 +1571,20 @@ void NetworkSearchHandler::SatelliteStatusChanged(const AppExecFwk::InnerEvent::
     }
 }
 #endif // CORE_SERVICE_SATELLITE
+
+void NetworkSearchHandler::ManualScanStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::ManualScanStateChanged event is nullptr!");
+        return;
+    }
+
+    if (networkSelection_ == nullptr) {
+        TELEPHONY_LOGE("ManualScanStateChanged NetworkSelection is nullptr!");
+        return;
+    }
+    networkSelection_->ProcessManualScanResult(event);
+}
 
 void NetworkSearchHandler::SetCellRequestMinInterval(uint32_t minInterval)
 {

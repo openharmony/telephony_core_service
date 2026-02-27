@@ -146,6 +146,7 @@ private:
     void GetNrOptionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioGetRrcConnectionState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioResidentNetworkChange(const AppExecFwk::InnerEvent::Pointer &event);
+    void ManualScanStateChanged(const AppExecFwk::InnerEvent::Pointer &event);
 #ifdef CORE_SERVICE_SATELLITE
     void SatelliteStatusChanged(const AppExecFwk::InnerEvent::Pointer &event);
 #endif // CORE_SERVICE_SATELLITE

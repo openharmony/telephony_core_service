@@ -982,6 +982,32 @@ public:
     int32_t SendApduData(
         int32_t slotId, const std::u16string &aid, const EsimApduData &apduData, ResponseEsimResult &responseResult);
 
+    /**
+     * @brief Obtain the current manual network scan state
+     *
+     * @param slotId[in], sim slot id
+     * @param callback[out], the callback of current manual network scan state
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+
+    /**
+     * @brief start manual scan information callback
+     *
+     * @param slotId[in], sim slot id
+     * @param callback[out], the callback of manual scan result network info
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
+
+    /**
+     * @brief stop manual scan
+     *
+     * @param slotId[in], sim slot id
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t StopManualNetworkScanCallback(int32_t slotId);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

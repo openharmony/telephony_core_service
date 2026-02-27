@@ -151,6 +151,9 @@ enum class CoreServiceInterfaceCode {
     SEND_APDU_DATA,
     GET_OPNAME_VERSION,
     GET_REAL_SIM_COUNT,
+    GET_MANUAL_NETWORK_SCAN_STATE,
+    STOP_MANUAL_NETWORK_SCAN,
+    START_MANUAL_NETWORK_SCAN,
 };
 } // namespace Telephony
 } // namespace OHOS
