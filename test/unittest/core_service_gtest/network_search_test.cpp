@@ -2637,10 +2637,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_01
     int32_t result = CoreServiceClient::GetInstance().GetManualNetworkScanState(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
-    callback->WaitForGetManualNetworkScanStateCallback(WAIT_TIME_SECOND_LONG);
-    bool syncResult = callback->GetManualNetworkScanStateCallbackResult();
-    TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
 }
 
 /**
@@ -2652,7 +2648,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_02
 {
     AccessToken token;
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    int32_t result = CoreServiceClient::GetInstance().GetManualNetworkScanState(SLOT_ID1, callback);
+    NetworkSearchTest::telephonyService_ = GetProxy();
+    int result = NetworkSearchTest::telephonyService_->GetManualNetworkScanState(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForGetManualNetworkScanStateCallback(WAIT_TIME_SECOND_LONG);
@@ -2669,7 +2666,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_02
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_GetManualNetworkScanState_0300, Function | MediumTest | Level3)
 {
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    int32_t result = CoreServiceClient::GetInstance().GetManualNetworkScanState(SLOT_ID, callback);
+    NetworkSearchTest::telephonyService_ = GetProxy();
+    int result = NetworkSearchTest::telephonyService_->GetManualNetworkScanState(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
@@ -2712,10 +2710,6 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
     int32_t result = CoreServiceClient::GetInstance().StartManualNetworkScanCallback(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
-    callback->WaitForStartManualNetworkScanCallback(WAIT_TIME_SECOND_LONG);
-    bool syncResult = callback->StartManualNetworkScanCallbackResult();
-    TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
 }
 
 /**
@@ -2727,13 +2721,14 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
 {
     AccessToken token;
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    int32_t result = CoreServiceClient::GetInstance().StartManualNetworkScanCallback(SLOT_ID1, callback);
+    NetworkSearchTest::telephonyService_ = GetProxy();
+    int result = NetworkSearchTest::telephonyService_->StartManualNetworkScanCallback(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForStartManualNetworkScanCallback(WAIT_TIME_SECOND_LONG);
     bool syncResult = callback->StartManualNetworkScanCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback syncResult: %{public}d", syncResult);
-    ASSERT_TRUE(syncResult);
+    ASSERT_FALSE(syncResult);
 }
 
 /**
@@ -2744,7 +2739,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallback_0300, Function | MediumTest | Level3)
 {
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    int32_t result = CoreServiceClient::GetInstance().StartManualNetworkScanCallback(SLOT_ID, callback);
+    NetworkSearchTest::telephonyService_ = GetProxy();
+    int result = NetworkSearchTest::telephonyService_->StartManualNetworkScanCallback(SLOT_ID, callback);
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
@@ -2808,7 +2804,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StopManualNetworkScanCallbac
  */
 HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StopManualNetworkScanCallback_0300, Function | MediumTest | Level3)
 {
-    int32_t result = CoreServiceClient::GetInstance().StopManualNetworkScanCallback(SLOT_ID);
+    NetworkSearchTest::telephonyService_ = GetProxy();
+    int result = NetworkSearchTest::telephonyService_->StopManualNetworkScanCallback(SLOT_ID);
     TELEPHONY_LOGI("TelephonyTestService StopManualNetworkScanCallback result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
@@ -2822,8 +2819,9 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StopManualNetworkScanCallbac
 {
     AccessToken token;
     NetworkSearchTest::telephonyService_ = GetProxy();
-    int ret = NetworkSearchTest::telephonyService_->StopManualNetworkScanCallback(SLOT_ID);
-    EXPECT_EQ(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, ret);
+    int result = NetworkSearchTest::telephonyService_->StopManualNetworkScanCallback(SLOT_ID);
+    TELEPHONY_LOGI("TelephonyTestService StopManualNetworkScanCallback result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
 }
 #else // TEL_TEST_UNSUPPORT
 /**

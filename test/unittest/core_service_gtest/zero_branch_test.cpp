@@ -68,6 +68,7 @@
 #include "network_utils.h"
 #include "mock_sim_manager.h"
 #include "mock_multi_sim_controller.h"
+#include "network_search_test_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -921,12 +922,12 @@ HWTEST_F(BranchTest, Telephony_CoreManagerInner_008, Function | MediumTest | Lev
     EXPECT_GT(mInner.SendImsRsdList(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetNetworkSliceAllowedNssai(0, buffer, -1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.GetNetworkSliceEhplmn(0, -1), TELEPHONY_ERR_SUCCESS);
-    int32_t BASE = 0x00040000;
-    int32_t event1 = BASE + 48;
-    int32_t event2 = BASE + 49;
-    int32_t event3 = BASE + 50;
-    int32_t event4 = BASE + 51;
-    int32_t event5 = BASE + 52;
+    int32_t base = 0x00040000;
+    int32_t event1 = base + 48;
+    int32_t event2 = base + 49;
+    int32_t event3 = base + 50;
+    int32_t event4 = base + 51;
+    int32_t event5 = base + 52;
     EXPECT_GT(mInner.SendUrspDecodeResult(0, buffer, event1), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.SendUePolicySectionIdentifier(0, buffer, event2), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(mInner.SendImsRsdList(0, buffer, event3), TELEPHONY_ERR_SUCCESS);
@@ -1838,7 +1839,7 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_GT(simUtils->HexCharConvertToInt(spnData), 0);
     EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) == nullptr);
     str = "123";
-    unsigned char *bytes = (unsigned char *)str.c_str();
+    unsigned char *bytes = reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
     std::shared_ptr<unsigned char> bytesTwo = std::make_shared<unsigned char>(1);
     simUtils->ArrayCopy(bytes, 1, bytes, 1, 1);
     EXPECT_TRUE(simUtils->HexStringConvertToBytes(str, byteslen) == nullptr);
@@ -2407,6 +2408,34 @@ HWTEST_F(BranchTest, Telephony_CoreServiceClient_001, Function | MediumTest | Le
     EXPECT_NE(coreServiceClient->RefreshSimState(INVALID_SLOTID), 0);
     EXPECT_GE(coreServiceClient->GetPreferredNetwork(INVALID_SLOTID, nullptr), 0);
     EXPECT_GE(coreServiceClient->SetPreferredNetwork(INVALID_SLOTID, 0, nullptr), 0);
+}
+
+/**
+ * @tc.number   Telephony_CoreServiceClient_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CoreServiceClient_002, Function | MediumTest | Level1)
+{
+    auto coreServiceClient = std::make_shared<CoreServiceClient>();
+    coreServiceClient->OnRemoteDied(nullptr);
+    auto recipient = std::make_shared<CoreServiceClient::CoreServiceDeathRecipient>(CoreServiceClient::GetInstance());
+    recipient->OnRemoteDied(nullptr);
+    EXPECT_GE(coreServiceClient->GetManualNetworkScanState(INVALID_SLOTID, nullptr), 0);
+    EXPECT_NE(coreServiceClient->StartManualNetworkScanCallback(INVALID_SLOTID, nullptr), 0);
+    EXPECT_GE(coreServiceClient->StopManualNetworkScanCallback(INVALID_SLOTID), 0);
+
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    int32_t result = CoreServiceClient::GetInstance().GetManualNetworkScanState(0, callback);
+    TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    sptr<NetworkSearchTestCallbackStub> callback1(new NetworkSearchTestCallbackStub());
+    result = CoreServiceClient::GetInstance().StartManualNetworkScanCallback(0, callback1);
+    TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    result = CoreServiceClient::GetInstance().StopManualNetworkScanCallback(0);
+    TELEPHONY_LOGI("TelephonyTestService StopManualNetworkScanCallback result: %{public}d", result);
+    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
 }
 
 /**
