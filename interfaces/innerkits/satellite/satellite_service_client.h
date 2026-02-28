@@ -40,6 +40,7 @@ public:
     int32_t SetRadioState(int32_t slotId, int32_t isRadioOn, int32_t rst);
     std::string GetImei();
     int32_t GetSatelliteCapability();
+    int32_t GetSatelliteSlotId();
     sptr<IRemoteObject> GetProxyObjectPtr(SatelliteServiceProxyType type);
 
 private:

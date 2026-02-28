@@ -203,6 +203,22 @@ HWTEST_F(SatelliteServiceTest, GetImei_0001, Function | MediumTest | Level2)
 }
 
 /**
+ * @tc.number   Telephony_SatelliteServiceTest_GetSatelliteSlotId
+ * @tc.name     get satellite slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SatelliteServiceTest, GetSatelliteSlotId, Function | MediumTest | Level2)
+{
+    TELEPHONY_LOGI("SatelliteServiceTest::GetSatelliteSlotId -->");
+    auto remote = sptr<MockIRemoteObject>::MakeSptr();
+    SatelliteServiceProxy proxy(remote);
+
+    int32_t ret = proxy.GetSatelliteSlotId();
+    ASSERT_EQ(remote->requestCode_, ToCode(SatelliteServiceInterfaceCode::GET_SATELLITE_SLOT_ID));
+    ASSERT_EQ(ret, TELEPHONY_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_SatelliteServiceTest_IsSatelliteEnabled_0001
  * @tc.name     is satellite enabled
  * @tc.desc     Function test

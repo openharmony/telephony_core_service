@@ -98,6 +98,13 @@ public:
     virtual int32_t GetSatelliteCapability() = 0;
 
     /**
+     * @brief Get satellite used slotId
+     *
+     * @return Returns slotId that enable satellite.
+     */
+    virtual int32_t GetSatelliteSlotId() = 0;
+
+    /**
      * @brief Get the pointer of service.
      *
      * @param SatelliteServiceProxyType service type, call or sms

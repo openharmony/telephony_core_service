@@ -27,6 +27,7 @@ enum class SatelliteServiceInterfaceCode {
     GET_PROXY_OBJECT_PTR,
     GET_IMEI,
     GET_SATELLITE_CAPABILITY,
+    GET_SATELLITE_SLOT_ID,
 };
 } // namespace Telephony
 } // namespace OHOS

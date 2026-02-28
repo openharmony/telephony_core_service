@@ -31,6 +31,17 @@ bool SatelliteServiceProxy::WriteInterfaceToken(MessageParcel &data)
     return true;
 }
 
+__attribute__((noinline)) int32_t SatelliteServiceProxy::SendRequest(uint32_t msgId, MessageParcel &dataParcel,
+    MessageParcel &replyParcel, MessageOption &option)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SatelliteServiceProxy Remote is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return remote->SendRequest(msgId, dataParcel, replyParcel, option);
+}
+
 bool SatelliteServiceProxy::IsSatelliteEnabled()
 {
     MessageParcel data;
@@ -42,15 +53,9 @@ bool SatelliteServiceProxy::IsSatelliteEnabled()
         return result;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("IsSatelliteEnabled Remote is null");
-        return result;
-    }
-    int32_t ret =
-        remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::IS_SATELLITE_ENABLED), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("IsSatelliteEnabled failed, error code is %{public}d ", ret);
+    int32_t error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::IS_SATELLITE_ENABLED), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("IsSatelliteEnabled failed, error code is %{public}d ", error);
         return result;
     }
 
@@ -72,15 +77,9 @@ int32_t SatelliteServiceProxy::GetSatelliteCapability()
         return result;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("GetSatelliteCapability Remote is null");
-        return result;
-    }
-    int32_t ret =
-        remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_SATELLITE_CAPABILITY), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("GetSatelliteCapability failed, error code is %{public}d ", ret);
+    int32_t error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_SATELLITE_CAPABILITY), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetSatelliteCapability failed, error code is %{public}d ", error);
         return result;
     }
 
@@ -97,14 +96,14 @@ int32_t SatelliteServiceProxy::RegisterCoreNotify(
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    int32_t error = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     if (callback == nullptr) {
         TELEPHONY_LOGE("RegisterCoreNotify callback is null");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("RegisterCoreNotify WriteInterfaceToken is false");
-        return ret;
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!data.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -116,23 +115,17 @@ int32_t SatelliteServiceProxy::RegisterCoreNotify(
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("RegisterCoreNotify Remote is null");
-        return ret;
+    error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::REGISTER_CORE_NOTIFY), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("RegisterCoreNotify failed, error code is %{public}d ", error);
+        return result;
     }
 
     TELEPHONY_LOGD("Satellite RegisterCoreNotify slotId: %{public}d, what: %{public}d", slotId, what);
-    ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::REGISTER_CORE_NOTIFY), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("RegisterCoreNotify failed, error code is %{public}d ", ret);
-        return ret;
-    }
-
-    if (!reply.ReadInt32(ret)) {
+    if (!reply.ReadInt32(error)) {
         TELEPHONY_LOGE("RegisterCoreNotify read reply failed");
     }
-    return ret;
+    return error;
 }
 
 int32_t SatelliteServiceProxy::UnRegisterCoreNotify(int32_t slotId, int32_t what)
@@ -140,10 +133,10 @@ int32_t SatelliteServiceProxy::UnRegisterCoreNotify(int32_t slotId, int32_t what
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    int32_t error = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("UnRegisterCoreNotify WriteInterfaceToken is false");
-        return ret;
+        return error;
     }
     if (!data.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -152,23 +145,17 @@ int32_t SatelliteServiceProxy::UnRegisterCoreNotify(int32_t slotId, int32_t what
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("UnRegisterCoreNotify Remote is null");
-        return ret;
+    error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::UNREGISTER_CORE_NOTIFY), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("UnRegisterCoreNotify failed, error code is %{public}d ", error);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
     TELEPHONY_LOGD("Satellite UnRegisterCoreNotify slotId: %{public}d, what: %{public}d", slotId, what);
-    ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::UNREGISTER_CORE_NOTIFY), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("UnRegisterCoreNotify failed, error code is %{public}d ", ret);
-        return ret;
-    }
-
-    if (!reply.ReadInt32(ret)) {
+    if (!reply.ReadInt32(error)) {
         TELEPHONY_LOGE("UnRegisterCoreNotify read reply failed");
     }
-    return ret;
+    return error;
 }
 
 int32_t SatelliteServiceProxy::SetRadioState(int32_t slotId, int32_t isRadioOn, int32_t rst)
@@ -176,10 +163,10 @@ int32_t SatelliteServiceProxy::SetRadioState(int32_t slotId, int32_t isRadioOn, 
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    int32_t error = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("SetRadioState WriteInterfaceToken is false");
-        return ret;
+        return error;
     }
     if (!data.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -191,23 +178,17 @@ int32_t SatelliteServiceProxy::SetRadioState(int32_t slotId, int32_t isRadioOn, 
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("SetRadioState Remote is null");
-        return ret;
+    error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::SET_RADIO_STATE), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("SetRadioState failed, error code is %{public}d ", error);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
 
     TELEPHONY_LOGD("Satellite SetRadioState slotId: %{public}d", slotId);
-    ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::SET_RADIO_STATE), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("SetRadioState failed, error code is %{public}d ", ret);
-        return ret;
-    }
-
-    if (!reply.ReadInt32(ret)) {
+    if (!reply.ReadInt32(error)) {
         TELEPHONY_LOGE("SetRadioState read reply failed");
     }
-    return ret;
+    return error;
 }
 
 std::string SatelliteServiceProxy::GetImei()
@@ -219,22 +200,39 @@ std::string SatelliteServiceProxy::GetImei()
         return imei;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("GetImei Remote is null");
-        return imei;
-    }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_IMEI), data, reply, option);
-    if (ret != ERR_NONE) {
-        TELEPHONY_LOGE("GetImei failed, error code is %{public}d ", ret);
+    int32_t error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_IMEI), data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("GetImei failed, error code is %{public}d ", error);
         return imei;
     }
     if (!reply.ReadString(imei)) {
         TELEPHONY_LOGE("GetImei read reply failed");
     }
     return imei;
+}
+
+int32_t SatelliteServiceProxy::GetSatelliteSlotId()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = 0;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("GetSatelliteSlotId WriteInterfaceToken is false");
+        return result;
+    }
+    result = SendRequest(uint32_t(SatelliteServiceInterfaceCode::GET_SATELLITE_SLOT_ID), data, reply, option);
+    if (result != ERR_NONE) {
+        TELEPHONY_LOGE("GetSatelliteSlotId failed, error code is %{public}d ", result);
+        return result;
+    }
+    if (!reply.ReadInt32(result)) {
+        TELEPHONY_LOGE("GetSatelliteSlotId read reply failed");
+    }
+    TELEPHONY_LOGD("Satellite GetSatelliteSlotId %{public}d", result);
+    return result;
 }
 
 sptr<IRemoteObject> SatelliteServiceProxy::GetProxyObjectPtr(SatelliteServiceProxyType proxyType)
@@ -245,17 +243,12 @@ sptr<IRemoteObject> SatelliteServiceProxy::GetProxyObjectPtr(SatelliteServicePro
         return nullptr;
     }
     dataParcel.WriteInt32(static_cast<int32_t>(proxyType));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return nullptr;
-    }
     MessageParcel replyParcel;
     MessageOption option;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(SatelliteServiceInterfaceCode::GET_PROXY_OBJECT_PTR), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(
+        uint32_t(SatelliteServiceInterfaceCode::GET_PROXY_OBJECT_PTR), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function GetProxyObjectPtr failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function GetProxyObjectPtr failed, error code is %{public}d ", error);
         return nullptr;
     }
     return replyParcel.ReadRemoteObject();

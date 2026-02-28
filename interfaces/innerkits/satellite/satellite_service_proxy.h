@@ -31,10 +31,13 @@ public:
     int32_t SetRadioState(int32_t slotId, int32_t isRadioOn, int32_t rst) override;
     std::string GetImei() override;
     int32_t GetSatelliteCapability() override;
+    int32_t GetSatelliteSlotId() override;
     sptr<IRemoteObject> GetProxyObjectPtr(SatelliteServiceProxyType proxyType) override;
 
 private:
     bool WriteInterfaceToken(MessageParcel &data);
+    __attribute__((noinline)) int32_t SendRequest(uint32_t msgId, MessageParcel &dataParcel, MessageParcel &replyParcel,
+        MessageOption &option);
 
 private:
     static inline BrokerDelegator<SatelliteServiceProxy> delegator_;
