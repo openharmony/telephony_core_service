@@ -249,6 +249,7 @@ impl AniPersoLockInfo {
 pub enum ContactType {
     GeneralContact = 1,
     FixedDialing = 2,
+    SDN_DIALING = 3,
 }
 
 impl From<ContactType> for i32 {
@@ -256,6 +257,7 @@ impl From<ContactType> for i32 {
         match value {
             ContactType::GeneralContact => 1,
             ContactType::FixedDialing => 2,
+            ContactType::SDN_DIALING => 3,
             _ => 1,
         }
     }
