@@ -2847,6 +2847,15 @@ declare namespace sim {
      * @since 8
      */
     FIXED_DIALING = 2,
+
+    /**
+     * Indicates the service dialing number.
+     *
+     * @syscap SystemCapability.Telephony.CoreService
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
+        SDN_DIALING = 3,
   }
 
   /**

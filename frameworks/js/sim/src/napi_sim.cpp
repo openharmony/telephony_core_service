@@ -3133,6 +3133,8 @@ napi_status InitEnumContactType(napi_env env, napi_value exports)
             "GENERAL_CONTACT", GetNapiValue(env, static_cast<int32_t>(ContactType::GENERAL_CONTACT))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "FIXED_DIALING", GetNapiValue(env, static_cast<int32_t>(ContactType::FIXED_DIALING))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "SDN_DIALING", GetNapiValue(env, static_cast<int32_t>(ContactType::SDN_DIALING))),
     };
 
     constexpr size_t arrSize = sizeof(desc) / sizeof(desc[0]);
