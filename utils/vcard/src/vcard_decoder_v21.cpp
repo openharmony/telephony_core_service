@@ -678,7 +678,7 @@ std::string VCardDecoderV21::DecodeQuotedPrintable(const std::string &encodedStr
             iss.get(hex, VALUE_INDEX_THREE);
             std::string hexStr(hex);
             if (IsValidHexValue(hexStr)) {
-                int decodedChar = std::stoi(hexStr, nullptr, DECODE_CHAR_MAX_SIZE);
+                int decodedChar = std::strtol(hexStr, nullptr, DECODE_CHAR_MAX_SIZE);
                 oss << static_cast<char>(decodedChar);
             } else {
                 TELEPHONY_LOGE("decoding QP failed");
