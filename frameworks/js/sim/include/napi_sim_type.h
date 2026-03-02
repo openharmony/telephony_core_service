@@ -19,6 +19,7 @@
 enum class ContactType {
     GENERAL_CONTACT = 1,
     FIXED_DIALING = 2,
+    SDN_DIALING = 3,
 };
 
 #endif
