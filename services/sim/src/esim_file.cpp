@@ -1563,6 +1563,7 @@ bool EsimFile::IsSupported()
 
 ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const EsimApduData &apduData)
 {
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     transApduDataResponse_ = ResponseEsimInnerResult();
     if (aid.empty()) {
         TELEPHONY_LOGE("Aid is empty");
