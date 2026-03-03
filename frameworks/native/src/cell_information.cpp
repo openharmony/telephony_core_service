@@ -277,11 +277,9 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     signalLevel_ = rat;
-    int32_t gsmSignalIntensity = 0;
-    if (!parcel.ReadInt32(gsmSignalIntensity)) {
+    if (!parcel.ReadInt32(signalIntensity_)) {
         return false;
     }
-    signalIntensity_ = gsmSignalIntensity;
     bool gsmTemCamped = false;
     if (!parcel.ReadBool(gsmTemCamped)) {
         return false;
