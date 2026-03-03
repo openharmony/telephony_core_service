@@ -239,6 +239,10 @@ GsmCellInformation *GsmCellInformation::Unmarshalling(Parcel &parcel)
 
 bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
 {
+    int32_t rat;
+    if (!parcel.ReadInt32(rat)) {
+        return false;
+    }
     std::string readString;
     if (!parcel.ReadString(readString)) {
         return false;
@@ -248,7 +252,6 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     mnc_ = readString;
-    int32_t rat;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
