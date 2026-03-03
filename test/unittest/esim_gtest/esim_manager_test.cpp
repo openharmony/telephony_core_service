@@ -131,6 +131,8 @@ HWTEST_F(EsimManagerTest, DisableProfile_001, Function | MediumTest | Level1)
 
     slotId = 0;
     ret = esimManager->DisableProfile(slotId, portIndex, iccId, refresh, enumResult);
+    std::string lastDiableSimId = system::GetParameter("persist.telephony.last_deactive_profile0", "0");
+    EXPECT_EQ(lastDiableSimId, "-1");
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
 
