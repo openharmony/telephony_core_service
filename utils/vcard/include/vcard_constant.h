@@ -172,7 +172,7 @@ constexpr const int32_t VALUE_LEN_FIVE = 5;
 constexpr const int32_t CONTACTS_NOT_DELETED = 0;
 constexpr const int32_t ENCODEN_QUOTED_PRIN_MAX_LEN = 67;
 constexpr const int32_t NUM_MINUS_ONE = -1;
-constexpr const int32_t HEX_TYPE = 16;
+constexpr const int32_t VCARD_HEX_TYPE = 16;
 constexpr const int32_t BATCH_INSERT_MAX_SIZE = 300;
 constexpr const int32_t INT_64_LENTGH = 19;
 
