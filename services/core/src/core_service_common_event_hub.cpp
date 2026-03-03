@@ -310,7 +310,7 @@ void CoreServiceCommonEventHub::HandleRadioStateChange(const EventFwk::CommonEve
 {
     const EventFwk::Want &want = data.GetWant();
     int32_t slotId = want.GetIntParam("slotId", 0);
-    int32_t state = want.GetIntParam("state", 0);
+    int32_t state = want.GetIntParam("radioState", 0);
 
     std::shared_lock<ffrt::shared_mutex> lock(callbacksMtx_);
     auto it = callbacks_.find(TelCommonEvent::RADIO_STATE_CHANGE);
