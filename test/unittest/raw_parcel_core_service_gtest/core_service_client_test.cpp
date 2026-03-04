@@ -19,6 +19,7 @@
 #include "telephony_errors.h"
 #include "sim_state_type.h"
 #include "raw_parcel_callback_stub.h"
+#include "i_network_search_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2055,6 +2056,29 @@ HWTEST_F(CoreServiceClientTest, HasOperatorPrivileges007, Function | MediumTest 
     savedCallback->OnRemoteRequest(0, data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_FALSE(hasOp);
+}
+
+HWTEST_F(CoreServiceClientTest, GetManualNetworkScanState001, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = true;
+    sptr<INetworkSearchCallback> callback = new INetworkSearchCallbackStub();
+    int32_t ret = client->GetManualNetworkScanState(0, callback);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceClientTest, StartManualNetworkScanCallback001, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = true;
+    sptr<INetworkSearchCallback> callback = new INetworkSearchCallbackStub();
+    int32_t ret = client->StartManualNetworkScanCallback(0, callback);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceClientTest, StopManualNetworkScanCallback001, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = true;
+    int32_t ret = client->StopManualNetworkScanCallback(0);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 }
 }
