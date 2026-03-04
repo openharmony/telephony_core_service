@@ -19,6 +19,7 @@
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
+#include "ffrt.h"
 #include "telephony_log_wrapper.h"
 #include "parameters.h"
 
@@ -28,6 +29,7 @@ namespace {
 const uint32_t CELL_REQUEST_SHORT_INTERVAL = 2; // This is the minimum interval in seconds for cell requests
 const uint32_t CELL_REQUEST_LONG_INTERVAL = 10; // This is the maximum interval in seconds for cell requests
 const std::string SHUTDOWN_PARAM = "sys.shutdown.requested";
+ffrt::shared_mutex mutex_;
 } // namespace
 
 DeviceStateHandler::DeviceStateHandler(
@@ -47,6 +49,7 @@ DeviceStateHandler::DeviceStateHandler(
 
 void DeviceStateHandler::ProcessWifiState(bool isWifiConnected)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     isWifiConnected_ = isWifiConnected;
     ProcessDeviceState();
 }
@@ -69,6 +72,7 @@ void DeviceStateHandler::ProcessPowerSaveMode(bool isPowerSaveModeOn)
 
 void DeviceStateHandler::ProcessChargingState(bool isCharging)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     isCharging_ = isCharging;
     SetDeviceState(TEL_CHARGING_STATE, isCharging_);
     ProcessDeviceState();
@@ -150,6 +154,7 @@ bool DeviceStateHandler::IsLowPowerConsumption() const
 
 uint32_t DeviceStateHandler::GetCellRequestMinInterval() const
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (isScreenOn_ && (!isWifiConnected_ || isCharging_)) {
         return CELL_REQUEST_SHORT_INTERVAL;
     } else {

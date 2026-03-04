@@ -15,7 +15,9 @@
 
 #include "signal_information.h"
 
+#include <shared_mutex>
 #include <string_ex.h>
+#include "ffrt.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -33,6 +35,7 @@ const int32_t *WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOL
 const int32_t *TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
 const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
 int32_t SignalInformation::signalBar_ = SIGNAL_FIVE_BARS;
+ffrt::shared_mutex mutex_;
 
 SignalInformation::SignalInformation()
 {
@@ -41,6 +44,7 @@ SignalInformation::SignalInformation()
 
 void SignalInformation::InitSignalBar(const int32_t bar)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (bar == SIGNAL_FOUR_BARS) {
         GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_4BAR;
         CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
@@ -115,6 +119,7 @@ int32_t GsmSignalInformation::GetSignalIntensity() const
 
 int32_t GsmSignalInformation::GetSignalLevel() const
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
         return signalLevel_;
     }
