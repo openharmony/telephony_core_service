@@ -40,6 +40,7 @@
 #include "telephony_ext_wrapper.h"
 #include "network_utils.h"
 #include "mock_sim_manager.h"
+#include "network_search_test_callback_stub.h"
  
 namespace OHOS {
 namespace Telephony {
@@ -49,6 +50,7 @@ namespace {
 const int32_t SLOT_ID_0 = 0;
 const int32_t INVALID_SLOTID = -1;
 const int32_t CORE_NETWORK_MODE_NR = 31;
+const int32_t SIGNAL_FOUR_BARS = 4;
 const CellInformation::CellType NONE = CellInformation::CellType::CELL_TYPE_NONE;
 const CellInformation::CellType GSM = CellInformation::CellType::CELL_TYPE_GSM;
 const CellInformation::CellType CDMA = CellInformation::CellType::CELL_TYPE_CDMA;
@@ -288,7 +290,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_CellInfo_004, Function | MediumTest 
     auto simManager = std::make_shared<SimManager>(telRilManager);
     auto networkSearchManager_ = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     auto cellInfo = std::make_shared<CellInfo>(networkSearchManager_, 1);
-    int32_t SIGNAL_FOUR_BARS = 4;
     cellInfo->InitCellSignalBar(SIGNAL_FOUR_BARS);
     cellInfo->UpdateCellLocation(0, 10, 9);
     cellInfo->UpdateCellLocation(1, 11, 8);
@@ -1160,23 +1161,53 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_012, Function |
     std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    networkSearchManager->OnInit();
-    sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, 0);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto networkSearchState1 = std::make_shared<NetworkSearchState>(networkSearchManager, 1);
+    auto networkSearchHandler1 =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 1);
 
+    EXPECT_EQ(networkSearchManager->GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->StopManualNetworkScanCallback(0), TELEPHONY_ERR_SUCCESS);
     networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchState_ = networkSearchState;
+    inner->observerHandler_ = std::make_unique<ObserverHandler>();
+    inner->networkSearchHandler_ = networkSearchHandler;
+    auto inner1 = std::make_shared<NetworkSearchManagerInner>();
+    inner1->networkSearchState_ = networkSearchState1;
+    inner1->observerHandler_ = std::make_unique<ObserverHandler>();
+    inner1->networkSearchHandler_ = networkSearchHandler1;
+    auto inner2 = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchManager->AddManagerInner(1, inner1);
+    networkSearchManager->AddManagerInner(2, inner2);
+
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    sptr<NetworkSearchTestCallbackStub> callback1(new NetworkSearchTestCallbackStub());
+    EXPECT_EQ(networkSearchManager->GetManualNetworkScanState(0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_SUCCESS);
+    networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, callback1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(1, nullptr), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(2, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
+    networkSearchManager->NotifyManualScanStateChanged(0, false, networkSearchResult);
+    networkSearchManager->NotifyManualScanStateChanged(0, true, networkSearchResult);
     networkSearchManager->NotifyManualScanStateChanged(5, true, nullptr);
 
     EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchManager->ManualNetworkScanState(5, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
     EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_SUCCESS);
 }
  
 /**
@@ -1468,8 +1499,23 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_007, Function |
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
     EXPECT_TRUE(networkSearchHandler->Init());
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
+    auto manualScanResult = std::make_shared<ManualScanResult>();
+    manualScanResult->isFinished = false;
+    std::vector<AvailableNetworkInfo> availableNetworkInfo = {
+        { "China Mobile", "CM", "46000", 1, 12 },
+        { "ChinaTelecom", "CT", "46003", 2, 13 },
+        { "China Unicom", "CUCC", "46001", 1, 14 },
+    };
+    manualScanResult->availableNetworkInfo = availableNetworkInfo;
+    AppExecFwk::InnerEvent::Pointer event =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
     networkSearchHandler->ManualScanStateChanged(event);
+
+    auto manualScanFinishResult = std::make_shared<ManualScanResult>();
+    manualScanFinishResult->isFinished = true;
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanFinishResult);
+    networkSearchHandler->ManualScanStateChanged(event);
+
     networkSearchHandler->networkSelection_ = nullptr;
     networkSearchHandler->ManualScanStateChanged(event);
     event = nullptr;

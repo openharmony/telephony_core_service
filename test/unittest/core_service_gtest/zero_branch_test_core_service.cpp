@@ -178,13 +178,84 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_002, Function | Me
 HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_003, Function | MediumTest | Level1)
 {
     SecurityToken token;
-    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
     int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetManualNetworkScanState(SLOT_ID, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    result = DelayedSingleton<CoreService>::GetInstance()->StartManualNetworkScanCallback(SLOT_ID, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+    result = DelayedSingleton<CoreService>::GetInstance()->StopManualNetworkScanCallback(SLOT_ID);
+    EXPECT_GE(result, TELEPHONY_ERR_SUCCESS);
+
+    auto networkSearchManager_ = DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_;
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = nullptr;
+    result = DelayedSingleton<CoreService>::GetInstance()->GetManualNetworkScanState(SLOT_ID, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
     result = DelayedSingleton<CoreService>::GetInstance()->StartManualNetworkScanCallback(SLOT_ID, nullptr);
     EXPECT_GE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
     result = DelayedSingleton<CoreService>::GetInstance()->StopManualNetworkScanCallback(SLOT_ID);
     EXPECT_GE(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    DelayedSingleton<CoreService>::GetInstance()->networkSearchManager_ = networkSearchManager_;
+}
+
+/**
+ * @tc.number   Telephony_CoreService_NetWork_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_004, Function | MediumTest | Level1)
+{
+    int32_t result = DelayedSingleton<CoreService>::GetInstance()->GetManualNetworkScanState(SLOT_ID, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = DelayedSingleton<CoreService>::GetInstance()->StartManualNetworkScanCallback(SLOT_ID, nullptr);
+    EXPECT_GE(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = DelayedSingleton<CoreService>::GetInstance()->StopManualNetworkScanCallback(SLOT_ID);
+    EXPECT_GE(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_NetWork_005
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_005, Function | MediumTest | Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+    data.WriteInt32(0);
+    data.WriteRemoteObject(nullptr);
+    int32_t result = DelayedSingleton<CoreService>::GetInstance()->OnGetManualNetworkScanState(data, reply);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_NetWork_006
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_006, Function | MediumTest | Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+    data.WriteInt32(0);
+    data.WriteRemoteObject(nullptr);
+    int32_t result = DelayedSingleton<CoreService>::GetInstance()->OnStartManualNetworkScan(data, reply);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Telephony_CoreService_NetWork_007
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_NetWork_007, Function | MediumTest | Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CoreServiceStub::GetDescriptor());
+    data.WriteInt32(0);
+    int32_t result = DelayedSingleton<CoreService>::GetInstance()->OnStopManualNetworkScan(data, reply);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
 }
 
 /**
