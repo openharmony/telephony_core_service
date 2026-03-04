@@ -118,7 +118,7 @@ int32_t SatelliteServiceProxy::RegisterCoreNotify(
     error = SendRequest(uint32_t(SatelliteServiceInterfaceCode::REGISTER_CORE_NOTIFY), data, reply, option);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("RegisterCoreNotify failed, error code is %{public}d ", error);
-        return result;
+        return error;
     }
 
     TELEPHONY_LOGD("Satellite RegisterCoreNotify slotId: %{public}d, what: %{public}d", slotId, what);
