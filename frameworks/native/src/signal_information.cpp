@@ -119,7 +119,6 @@ int32_t GsmSignalInformation::GetSignalIntensity() const
 
 int32_t GsmSignalInformation::GetSignalLevel() const
 {
-    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
         return signalLevel_;
     }
