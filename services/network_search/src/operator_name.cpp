@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "operator_name.h"
 
 #include "core_manager_inner.h"
@@ -835,3 +836,4 @@ void OperatorName::TrySetLongOperatorNameWithTranslation()
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
