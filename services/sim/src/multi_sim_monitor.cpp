@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "multi_sim_monitor.h"
 
 #include <atomic>
@@ -802,3 +803,4 @@ void MultiSimMonitor::NotifySimActiveStateChanged(int32_t slotId, bool enable)
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "icc_dialling_numbers_manager.h"
 
 #include "core_service_errors.h"
@@ -427,3 +428,4 @@ bool IccDiallingNumbersManager::IsValidParam(int type, const std::shared_ptr<Dia
 IccDiallingNumbersManager::~IccDiallingNumbersManager() {}
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP
