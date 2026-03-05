@@ -49,7 +49,7 @@ DeviceStateHandler::DeviceStateHandler(
 
 void DeviceStateHandler::ProcessWifiState(bool isWifiConnected)
 {
-    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lck(mutex_);
     isWifiConnected_ = isWifiConnected;
     ProcessDeviceState();
 }
@@ -72,7 +72,7 @@ void DeviceStateHandler::ProcessPowerSaveMode(bool isPowerSaveModeOn)
 
 void DeviceStateHandler::ProcessChargingState(bool isCharging)
 {
-    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lck(mutex_);
     isCharging_ = isCharging;
     SetDeviceState(TEL_CHARGING_STATE, isCharging_);
     ProcessDeviceState();
