@@ -571,7 +571,7 @@ int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
 
 int32_t SimManager::SetDsdsMode(int32_t dsdsMode)
 {
-    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
+    std::unique_lock<ffrt::shared_mutex> lck(mtx_);
     dsdsMode_ = dsdsMode;
     return TELEPHONY_ERR_SUCCESS;
 }
