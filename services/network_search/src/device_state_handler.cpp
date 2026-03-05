@@ -108,7 +108,6 @@ void DeviceStateHandler::UpdateDeviceState(bool isEnterStrMode)
 
 void DeviceStateHandler::ProcessDeviceState()
 {
-    std::lock_guard<ffrt::shared_mutex> lck(mutex_);
     uint32_t newCellRequestMinInterval = GetCellRequestMinInterval();
     TELEPHONY_LOGI(
         "ProcessDeviceState isCharging_=%{public}d, isPowerSaveModeOn_=%{public}d, isNetSharingOn_=%{public}d, "
