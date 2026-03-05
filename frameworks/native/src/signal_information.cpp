@@ -44,7 +44,7 @@ SignalInformation::SignalInformation()
 
 void SignalInformation::InitSignalBar(const int32_t bar)
 {
-    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
+    std::unique_lock<ffrt::shared_mutex> lck(mutex_);
     if (bar == SIGNAL_FOUR_BARS) {
         GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_4BAR;
         CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
@@ -567,6 +567,7 @@ int32_t WcdmaSignalInformation::GetSignalIntensity() const
 
 int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
+    std::shared<ffrt::shared_mutex> lck(mutex_);
     if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
         return signalLevel_;
     }
