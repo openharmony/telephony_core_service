@@ -18,7 +18,7 @@ import("//build/ohos.gni")
 import("//build/test.gni")
  
 ##############################fuzztest##########################################
-ohos_fuzztest("CoreServiceFuzzTest") {
+ohos_fuzztest("CoreService1FuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
@@ -96,7 +96,7 @@ ohos_fuzztest("CoreServiceFuzzTest") {
   ]
 }
 
-ohos_fuzztest("CoreServiceFuzzTest2") {
+ohos_fuzztest("CoreService2FuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
@@ -174,7 +174,7 @@ ohos_fuzztest("CoreServiceFuzzTest2") {
   ]
 }
 
-ohos_fuzztest("CoreServiceFuzzTest3") {
+ohos_fuzztest("CoreService3FuzzTest") {
   module_output_path = "core_service/core_service"
   module_out_path = module_output_path
   fuzz_config_file =
@@ -258,9 +258,9 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":CoreServiceFuzzTest",
-    ":CoreServiceFuzzTest2",
-    ":CoreServiceFuzzTest3",
+    ":CoreService1FuzzTest",
+    ":CoreService2FuzzTest",
+    ":CoreService3FuzzTest",
   ]
 }
 ###############################################################################
