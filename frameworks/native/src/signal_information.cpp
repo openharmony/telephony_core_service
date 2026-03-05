@@ -566,7 +566,7 @@ int32_t WcdmaSignalInformation::GetSignalIntensity() const
 
 int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
-    std::shared<ffrt::shared_mutex> lck(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
         return signalLevel_;
     }
