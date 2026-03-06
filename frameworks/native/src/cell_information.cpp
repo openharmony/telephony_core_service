@@ -239,10 +239,6 @@ GsmCellInformation *GsmCellInformation::Unmarshalling(Parcel &parcel)
 
 bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     std::string readString;
     if (!parcel.ReadString(readString)) {
         return false;
@@ -252,6 +248,7 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     mnc_ = readString;
+    int32_t rat;
     if (!parcel.ReadInt32(rat)) {
         return false;
     }
@@ -277,9 +274,11 @@ bool GsmCellInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     signalLevel_ = rat;
-    if (!parcel.ReadInt32(signalIntensity_)) {
+    int32_t gsmSignalIntensity = 0;
+    if (!parcel.ReadInt32(gsmSignalIntensity)) {
         return false;
     }
+    signalIntensity_ = gsmSignalIntensity;
     bool gsmTemCamped = false;
     if (!parcel.ReadBool(gsmTemCamped)) {
         return false;
