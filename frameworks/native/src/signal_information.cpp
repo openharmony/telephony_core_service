@@ -186,10 +186,6 @@ std::unique_ptr<GsmSignalInformation> GsmSignalInformation::Unmarshalling(Parcel
 
 bool GsmSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(gsmRxlev_)) {
         return false;
     }
@@ -316,10 +312,6 @@ std::unique_ptr<CdmaSignalInformation> CdmaSignalInformation::Unmarshalling(Parc
 
 bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(cdmaRssi_)) {
         return false;
     }
@@ -474,10 +466,6 @@ std::unique_ptr<LteSignalInformation> LteSignalInformation::Unmarshalling(Parcel
 
 bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(rxlev_)) {
         return false;
     }
@@ -639,10 +627,6 @@ std::unique_ptr<WcdmaSignalInformation> WcdmaSignalInformation::Unmarshalling(Pa
 
 bool WcdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(wcdmaRxlev_)) {
         return false;
     }
@@ -769,10 +753,6 @@ std::unique_ptr<TdScdmaSignalInformation> TdScdmaSignalInformation::Unmarshallin
 
 bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(tdScdmaRscp_)) {
         return false;
     }
@@ -911,10 +891,6 @@ std::unique_ptr<NrSignalInformation> NrSignalInformation::Unmarshalling(Parcel &
 
 bool NrSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(nrRsrp_)) {
         return false;
     }
