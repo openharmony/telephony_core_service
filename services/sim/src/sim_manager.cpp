@@ -651,6 +651,7 @@ int32_t SimManager::GetSimId(int32_t slotId)
 
 int32_t SimManager::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if ((!IsValidSlotId(slotId)) || (simAccountManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("simAccountManager is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
