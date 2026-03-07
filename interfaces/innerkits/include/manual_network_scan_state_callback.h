@@ -13,18 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef START_MANUAL_SCAN_CALLBACK_H
-#define START_MANUAL_SCAN_CALLBACK_H
+#ifndef MANUAL_NETWORK_SCAN_STATE_CALLBACK_H
+#define MANUAL_NETWORK_SCAN_STATE_CALLBACK_H
 
 #include "i_network_search_callback_stub.h"
+#include "napi_radio.h"
+#include "napi/native_api.h"
 
 namespace OHOS {
 namespace Telephony {
-class NapiStartManualScanCallback : public INetworkSearchCallbackStub {
+class ManualNetworkScanStateCallback : public INetworkSearchCallbackStub {
 public:
-    void OnStartManualNetworkScanCallback(const sptr<NetworkSearchResult> &networkSearchResult,
-        const bool isFinish, int32_t slotId) override;
+    explicit ManualNetworkScanStateCallback(IsManualScanningContext *context);
+    void OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode) override;
+
+private:
+    IsManualScanningContext *asyncContext_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // START_MANUAL_SCAN_CALLBACK_H
+#endif // MANUAL_NETWORK_SCAN_STATE_CALLBACK_H

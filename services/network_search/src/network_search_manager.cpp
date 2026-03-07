@@ -33,6 +33,7 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "manual_network_scan_callback_death_recipient.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2026,6 +2027,10 @@ int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     std::lock_guard<std::mutex> lock(mutexScan_);
     for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
         if (iter->slotId == slotId) {
+            if (iter->callback != nullptr && iter->callback->AsObject() != nullptr && iter->deathRecipient != nullptr) {
+                auto remoteObj = iter->callback->AsObject();
+                remoteObj->RemoveDeathRecipient(iter->deathRecipient);
+            }
             iter = listManualScanCallbackRecord_.erase(iter);
         } else {
             ++iter;
@@ -2034,6 +2039,16 @@ int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     ManualScanCallbackRecord scanRecord;
     scanRecord.slotId = slotId;
     scanRecord.callback = callback;
+    scanRecord.deathRecipient = sptr<IRemoteObject::DeathRecipient>(
+        new ManualNetworkScanCallbackDeathRecipient(shared_from_this()));
+    if (scanRecord.deathRecipient == nullptr || callback == nullptr || callback->AsObject() == nullptr) {
+        TELEPHONY_LOGE("deathRecipient or callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!callback->AsObject()->AddDeathRecipient(scanRecord.deathRecipient)) {
+        TELEPHONY_LOGE("callback remote server add death recipient failed");
+        return TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL;
+    }
     listManualScanCallbackRecord_.push_back(scanRecord);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -2050,6 +2065,7 @@ int32_t NetworkSearchManager::StopManualNetworkScanCallback(int32_t slotId)
 void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isFinish,
     const sptr<NetworkSearchResult> &networkSearchResult)
 {
+    std::lock_guard<std::mutex> lock(mutexScan_);
     for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
         if (iter->slotId == slotId) {
             if (iter->callback == nullptr) {
@@ -2074,6 +2090,29 @@ void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isF
         }
         ++iter;
     }
+}
+
+int32_t NetworkSearchManager::RemoveManualNetworkScanCallback(const sptr<INetworkSearchCallback> &callback)
+{
+    if (callback == nullptr || callback->AsObject() == nullptr) {
+        TELEPHONY_LOGE("callback is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::lock_guard<std::mutex> lock(mutexScan_);
+    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
+        if (iter->callback == nullptr || iter->callback->AsObject() == nullptr) {
+            ++iter;
+            continue;
+        }
+        auto remoteObj = iter->callback->AsObject();
+        if (remoteObj.GetRefPtr() == callback->AsObject().GetRefPtr() && iter->deathRecipient != nullptr) {
+            remoteObj->RemoveDeathRecipient(iter->deathRecipient);
+            iter = listManualScanCallbackRecord_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
