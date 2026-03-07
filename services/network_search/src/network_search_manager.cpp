@@ -23,7 +23,7 @@
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "enum_convert.h"
-#include "manual_network_scan_callback_death_recipient.h"
+#include "manual_network_scan.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "operator_name_utils.h"
@@ -34,7 +34,6 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_log_wrapper.h"
-#include "manual_network_scan_callback_death_recipient.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -177,7 +176,7 @@ bool NetworkSearchManager::OnInit()
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
-    DelayedSingleton<ManualNetworkScan>::GetInstance()->InitManagerPointer(shared_from_this());
+    manualNetworkScan_ = std::make_shared<ManualNetworkScan>(shared_from_this());
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
@@ -2003,51 +2002,47 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
 
 int32_t NetworkSearchManager::GetManualNetworkScanState(int32_t slotId, NSCALLBACK &callback)
 {
-    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
-    if (manualNetworkScan == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::GetManualNetworkScanState manualNetworkScan is null");
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return manualNetworkScan->GetManualNetworkScanState(slotId, callback);
+    return manualNetworkScan_->GetManualNetworkScanState(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     const sptr<INetworkSearchCallback> &callback)
 {
-    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
-    if (manualNetworkScan == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::StartManualNetworkScanCallback manualNetworkScan is null");
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return manualNetworkScan->StartManualNetworkScanCallback(slotId, callback);
+    return manualNetworkScan_->StartManualNetworkScanCallback(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StopManualNetworkScanCallback(int32_t slotId)
 {
-    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
-    if (manualNetworkScan == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::StopManualNetworkScanCallback manualNetworkScan is null");
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return manualNetworkScan->StopManualNetworkScanCallback(slotId);
+    return manualNetworkScan_->StopManualNetworkScanCallback(slotId);
 }
 
 void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isFinish,
     const sptr<NetworkSearchResult> &networkSearchResult)
 {
-    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
-    if (manualNetworkScan == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::NotifyManualScanStateChanged manualNetworkScan is null");
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
         return;
     }
-    manualNetworkScan->NotifyManualScanStateChanged(slotId, isFinish, networkSearchResult);
+    manualNetworkScan_->NotifyManualScanStateChanged(slotId, isFinish, networkSearchResult);
 }
 
-int32_t NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
+int32_t NetworkSearchManager::StartOrStopManualNetworkScan(int32_t slotId, bool isStart)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::ManualNetworkScanState slotId:%{public}d inner is null", slotId);
+        TELEPHONY_LOGE("StartOrStopManualNetworkScan slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto networkSearchHandler = inner->networkSearchHandler_;

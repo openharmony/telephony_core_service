@@ -33,5 +33,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // MANUAL_NETWORK_SCAN_CALLBACK_DEATH_RECIPIENT_H

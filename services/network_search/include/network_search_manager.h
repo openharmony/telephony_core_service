@@ -41,6 +41,7 @@
 
 namespace OHOS {
 namespace Telephony {
+class ManualNetworkScan;
 enum class HandleRunningState { STATE_NOT_START, STATE_RUNNING };
 /**
  * @brief inner objects for network search manager
@@ -291,7 +292,7 @@ public:
     int32_t StopManualNetworkScanCallback(int32_t slotId) override;
     void NotifyManualScanStateChanged(
 	    int32_t slotId, bool isFinish, const sptr<NetworkSearchResult> &networkSearchResult);
-    int32_t ManualNetworkScanState(int32_t slotId, bool isStart);
+    int32_t StartOrStopManualNetworkScan(int32_t slotId, bool isStart);
     bool GetManualNetworkScanState();
 
     inline void InitMsgNum(int32_t slotId)
@@ -392,6 +393,7 @@ private:
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::unique_ptr<EventSender> eventSender_ = nullptr;
+    std::shared_ptr<ManualNetworkScan> manualNetworkScan_ = nullptr;
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
     std::mutex mutexInner_;

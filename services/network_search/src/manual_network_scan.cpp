@@ -18,24 +18,20 @@
 
 namespace OHOS {
 namespace Telephony {
-ManualNetworkScan::ManualNetworkScan() {};
+ManualNetworkScan::ManualNetworkScan(const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
+    : networkSearchManager_(networkSearchManager) {};
 
 ManualNetworkScan::~ManualNetworkScan() {};
-
-void ManualNetworkScan::InitManagerPointer(const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
-{
-    networkSearchManager_ = networkSearchManager;
-}
 
 int32_t ManualNetworkScan::GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback)
 {
     if (callback == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScan::GetManualNetworkScanState callback is null");
+        TELEPHONY_LOGE("callback is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScan::GetManualNetworkScanState nsm is null");
+        TELEPHONY_LOGE("nsm is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool isScanning = nsm->GetManualNetworkScanState();
@@ -55,14 +51,14 @@ int32_t ManualNetworkScan::StartManualNetworkScanCallback(int32_t slotId,
 {
     auto nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScan::StartManualNetworkScanCallback nsm is null");
+        TELEPHONY_LOGE("nsm is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = nsm->ManualNetworkScanState(slotId, true);
+    int32_t ret = nsm->StartOrStopManualNetworkScan(slotId, true);
     if (ret != TELEPHONY_ERR_SUCCESS) {
         return ret;
     }
-    std::lock_guard<std::mutex> lock(mutexScan_);
+    std::unique_lock<ffrt::mutex> lock(mutexScan_);
     for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
         if (iter->slotId == slotId) {
             if (iter->callback != nullptr && iter->callback->AsObject() != nullptr && iter->deathRecipient != nullptr) {
@@ -95,11 +91,11 @@ int32_t ManualNetworkScan::StopManualNetworkScanCallback(int32_t slotId)
 {
     auto nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScan::StopManualNetworkScanCallback nsm is null");
+        TELEPHONY_LOGE("nsm is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (nsm->GetManualNetworkScanState()) {
-        nsm->ManualNetworkScanState(slotId, false);
+        nsm->StartOrStopManualNetworkScan(slotId, false);
     }
 
     return TELEPHONY_ERR_SUCCESS;
@@ -108,30 +104,39 @@ int32_t ManualNetworkScan::StopManualNetworkScanCallback(int32_t slotId)
 void ManualNetworkScan::NotifyManualScanStateChanged(int32_t slotId, bool isFinish,
     const sptr<NetworkSearchResult> &networkSearchResult)
 {
-    std::lock_guard<std::mutex> lock(mutexScan_);
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->slotId == slotId) {
-            if (iter->callback == nullptr) {
-                TELEPHONY_LOGE("callback is nullptr from listManualScanCallbackRecord_");
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
+    if (networkSearchResult == nullptr) {
+        TELEPHONY_LOGE("networkSearchResult is null");
+        return;
+    }
+    std::vector<ManualScanCallbackRecord> callbacksToProcess;
+    {
+        std::unique_lock<ffrt::mutex> lock(mutexScan_);
+        for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
+            if (iter->slotId == slotId) {
+                if (iter->callback == nullptr) {
+                    TELEPHONY_LOGE("callback is nullptr from listManualScanCallbackRecord_");
+                    iter = listManualScanCallbackRecord_.erase(iter);
+                    continue;
+                }
+                callbacksToProcess.push_back(*iter);
+                if (isFinish) {
+                    iter = listManualScanCallbackRecord_.erase(iter);
+                    continue;
+                }
             }
-            MessageParcel data;
-            data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
-            networkSearchResult->Marshalling(data);
-            if (!data.WriteBool(isFinish) || !data.WriteInt32(slotId)) {
-                TELEPHONY_LOGE("NotifyManualScanStateChanged fail slotId:%{public}d", slotId);
-                return;
-            }
-            iter->callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
-
-            if (isFinish) {
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
-            }
+            ++iter;
         }
-        ++iter;
+    }
+    for (const auto& record: callbacksToProcess) {
+        MessageParcel data;
+        data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
+        networkSearchResult->Marshalling(data);
+        if (!data.WriteBool(isFinish) || !data.WriteInt32(slotId)) {
+            TELEPHONY_LOGE("NotifyManualScanStateChanged fail slotId:%{public}d", slotId);
+            return;
+        }
+        record.callback->OnNetworkSearchCallback(
+            INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
     }
 }
 
@@ -141,7 +146,7 @@ int32_t ManualNetworkScan::RemoveManualNetworkScanCallback(const sptr<INetworkSe
         TELEPHONY_LOGE("callback is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutexScan_);
+    std::unique_lock<ffrt::mutex> lock(mutexScan_);
     for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
         if (iter->callback == nullptr || iter->callback->AsObject() == nullptr) {
             ++iter;
