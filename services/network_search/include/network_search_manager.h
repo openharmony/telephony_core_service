@@ -291,6 +291,7 @@ public:
     int32_t StopManualNetworkScanCallback(int32_t slotId) override;
     void NotifyManualScanStateChanged(
 	    int32_t slotId, bool isFinish, const sptr<NetworkSearchResult> &networkSearchResult);
+    int32_t RemoveManualNetworkScanCallback(const sptr<INetworkSearchCallback> &callback);
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -388,6 +389,7 @@ private:
     struct ManualScanCallbackRecord {
         int32_t slotId;
         sptr<INetworkSearchCallback> callback;
+        sptr<IRemoteObject::DeathRecipient> deathRecipient;
     };
 
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;

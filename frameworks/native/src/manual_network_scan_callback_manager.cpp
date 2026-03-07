@@ -12,21 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "manual_network_scan_callback_manager.h"
 
+#include "manual_network_scan_callback_manager.h"
 #include "core_service_client.h"
 #include "napi_util.h"
 #include "singleton.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-#include "start_manual_network_scan_callback.h"
+#include "manual_network_scan_callback.h"
 
 namespace OHOS {
 namespace Telephony {
 int32_t ManualNetworkScanCallbackManager::StartManualNetworkScanCallback(StartManualScanCallback &stateCallback)
 {
     int32_t slotId = stateCallback.slotId;
-    stateCallback.callback = new NapiStartManualScanCallback();
+    stateCallback.callback = new ManualNetworkScanCallback();
     if (stateCallback.callback == nullptr) {
         TELEPHONY_LOGE("[slot%{public}d] Creat callback failed", slotId);
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -34,9 +34,7 @@ int32_t ManualNetworkScanCallbackManager::StartManualNetworkScanCallback(StartMa
     InsertStartManualScanCallback(slotId, stateCallback);
     int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().StartManualNetworkScanCallback(
         slotId, stateCallback.callback);
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("[slot%{public}d] startManualNetworkScan successfully", slotId);
-    } else {
+    if (ret != TELEPHONY_SUCCESS) {
         if (stateCallback.callback != nullptr) {
             stateCallback.callback = nullptr;
         }
@@ -116,7 +114,6 @@ int32_t ManualNetworkScanCallbackManager::ReportManualScanInfoInner(const StartM
             TELEPHONY_LOGE("ReportManualScanInfo failed, result: %{public}d", ret);
             return;
         }
-        TELEPHONY_LOGI("ReportManualScanInfo successfully");
     };
     int32_t resultCode = napi_send_event(stateCallback.env, task, napi_eprio_immediate);
     if (resultCode != TELEPHONY_SUCCESS) {
