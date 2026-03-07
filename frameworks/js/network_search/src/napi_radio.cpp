@@ -3081,8 +3081,7 @@ static void NativeIsManualNetworkScanning(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    std::unique_ptr<ManualNetworkScanStateCallback> callback =
-        std::make_unique<ManualNetworkScanStateCallback>(asyncContext);
+    auto callback = std::make_unique<ManualNetworkScanStateCallback>(asyncContext);
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetManualNetworkScanState(
         asyncContext->slotId, callback.release());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {

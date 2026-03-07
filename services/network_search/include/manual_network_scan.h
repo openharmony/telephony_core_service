@@ -17,13 +17,14 @@
 #define MANUAL_NETWORK_SCAN_H
 
 #include "network_search_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
 class ManualNetworkScan : public std::enable_shared_from_this<ManualNetworkScan> {
-    DECLARE_DELAYED_SINGLETON(ManualNetworkScan);
 public:
-    void InitManagerPointer(const std::weak_ptr<NetworkSearchManager> &networkSearchManager);
+    explicit ManualNetworkScan(const std::weak_ptr<NetworkSearchManager> &networkSearchManager);
+    ~ManualNetworkScan();
     int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback);
     int32_t StopManualNetworkScanCallback(int32_t slotId);
@@ -37,13 +38,10 @@ private:
         sptr<INetworkSearchCallback> callback;
         sptr<IRemoteObject::DeathRecipient> deathRecipient;
     };
-
     std::list<ManualScanCallbackRecord> listManualScanCallbackRecord_;
-    std::mutex mutexScan_;
+    ffrt::mutex mutexScan_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
-
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // MANUAL_NETWORK_SCAN_H
