@@ -80,6 +80,10 @@ tel_core_service_src = [
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/device_state_observer.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/ims_reg_info_callback_proxy.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/manual_network_scan_callback_death_recipient.cpp",
+<<<<<<< HEAD
+=======
+  "$TELEPHONY_NETWORK_SEARCH_ROOT/src/manual_network_scan.cpp",
+>>>>>>> fefc0fe2 (core_service radio modify)
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_register.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_callback_proxy.cpp",
   "$TELEPHONY_NETWORK_SEARCH_ROOT/src/network_search_handler.cpp",

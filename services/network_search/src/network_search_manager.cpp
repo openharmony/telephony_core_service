@@ -23,6 +23,7 @@
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "enum_convert.h"
+#include "manual_network_scan_callback_death_recipient.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "operator_name_utils.h"
@@ -176,6 +177,7 @@ bool NetworkSearchManager::OnInit()
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
+    DelayedSingleton<ManualNetworkScan>::GetInstance()->InitManagerPointer(shared_from_this());
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
@@ -2001,118 +2003,44 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
 
 int32_t NetworkSearchManager::GetManualNetworkScanState(int32_t slotId, NSCALLBACK &callback)
 {
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("NetworSearchManager::GetManualNetworkScanState callback is null");
+    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
+    if (manualNetworkScan == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::GetManualNetworkScanState manualNetworkScan is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool isScanning = GetManualNetworkScanState();
-    MessageParcel data;
-    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
-    if (!data.WriteBool(isScanning) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-        TELEPHONY_LOGE("GetManualNetworkScanState fail slotId:%{public}d", slotId);
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    callback->OnNetworkSearchCallback(
-        INetworkSearchCallback::NetworkSearchCallback::GET_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan->GetManualNetworkScanState(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     const sptr<INetworkSearchCallback> &callback)
 {
-    int32_t ret = ManualNetworkScanState(slotId, true);
-    if (ret != TELEPHONY_ERR_SUCCESS) {
-        return ret;
-    }
-    std::lock_guard<std::mutex> lock(mutexScan_);
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->slotId == slotId) {
-            if (iter->callback != nullptr && iter->callback->AsObject() != nullptr && iter->deathRecipient != nullptr) {
-                auto remoteObj = iter->callback->AsObject();
-                remoteObj->RemoveDeathRecipient(iter->deathRecipient);
-            }
-            iter = listManualScanCallbackRecord_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-    ManualScanCallbackRecord scanRecord;
-    scanRecord.slotId = slotId;
-    scanRecord.callback = callback;
-    scanRecord.deathRecipient = sptr<IRemoteObject::DeathRecipient>(
-        new ManualNetworkScanCallbackDeathRecipient(shared_from_this()));
-    if (scanRecord.deathRecipient == nullptr || callback == nullptr || callback->AsObject() == nullptr) {
-        TELEPHONY_LOGE("deathRecipient or callback is null");
+    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
+    if (manualNetworkScan == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::StartManualNetworkScanCallback manualNetworkScan is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!callback->AsObject()->AddDeathRecipient(scanRecord.deathRecipient)) {
-        TELEPHONY_LOGE("callback remote server add death recipient failed");
-        return TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL;
-    }
-    listManualScanCallbackRecord_.push_back(scanRecord);
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan->StartManualNetworkScanCallback(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StopManualNetworkScanCallback(int32_t slotId)
 {
-    if (GetManualNetworkScanState()) {
-        ManualNetworkScanState(slotId, false);
+    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
+    if (manualNetworkScan == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::StopManualNetworkScanCallback manualNetworkScan is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan->StopManualNetworkScanCallback(slotId);
 }
 
 void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isFinish,
     const sptr<NetworkSearchResult> &networkSearchResult)
 {
-    std::lock_guard<std::mutex> lock(mutexScan_);
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->slotId == slotId) {
-            if (iter->callback == nullptr) {
-                TELEPHONY_LOGE("callback is nullptr from listManualScanCallbackRecord_");
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
-            }
-            MessageParcel data;
-            data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
-            networkSearchResult->Marshalling(data);
-            if (!data.WriteBool(isFinish) || !data.WriteInt32(slotId)) {
-                TELEPHONY_LOGE("NotifyManualScanStateChanged fail slotId:%{public}d", slotId);
-                return;
-            }
-            iter->callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
-
-            if (isFinish) {
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
-            }
-        }
-        ++iter;
+    auto manualNetworkScan = DelayedSingleton<ManualNetworkScan>::GetInstance();
+    if (manualNetworkScan == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchManager::NotifyManualScanStateChanged manualNetworkScan is null");
+        return;
     }
-}
-
-int32_t NetworkSearchManager::RemoveManualNetworkScanCallback(const sptr<INetworkSearchCallback> &callback)
-{
-    if (callback == nullptr || callback->AsObject() == nullptr) {
-        TELEPHONY_LOGE("callback is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    std::lock_guard<std::mutex> lock(mutexScan_);
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->callback == nullptr || iter->callback->AsObject() == nullptr) {
-            ++iter;
-            continue;
-        }
-        auto remoteObj = iter->callback->AsObject();
-        if (remoteObj.GetRefPtr() == callback->AsObject().GetRefPtr() && iter->deathRecipient != nullptr) {
-            remoteObj->RemoveDeathRecipient(iter->deathRecipient);
-            iter = listManualScanCallbackRecord_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-    return TELEPHONY_ERR_SUCCESS;
+    manualNetworkScan->NotifyManualScanStateChanged(slotId, isFinish, networkSearchResult);
 }
 
 int32_t NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
