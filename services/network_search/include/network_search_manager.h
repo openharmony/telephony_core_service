@@ -291,7 +291,8 @@ public:
     int32_t StopManualNetworkScanCallback(int32_t slotId) override;
     void NotifyManualScanStateChanged(
 	    int32_t slotId, bool isFinish, const sptr<NetworkSearchResult> &networkSearchResult);
-    int32_t RemoveManualNetworkScanCallback(const sptr<INetworkSearchCallback> &callback);
+    int32_t ManualNetworkScanState(int32_t slotId, bool isStart);
+    bool GetManualNetworkScanState();
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -375,8 +376,6 @@ private:
     int32_t GetDelayNotifyTime();
     int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
-    int32_t ManualNetworkScanState(int32_t slotId, bool isStart);
-    bool GetManualNetworkScanState();
 
 private:
     struct ImsRegInfoCallbackRecord {
@@ -384,12 +383,6 @@ private:
         ImsServiceType imsSrvType;
         int32_t tokenId = 0;
         sptr<ImsRegInfoCallback> imsCallback;
-    };
-
-    struct ManualScanCallbackRecord {
-        int32_t slotId;
-        sptr<INetworkSearchCallback> callback;
-        sptr<IRemoteObject::DeathRecipient> deathRecipient;
     };
 
     sptr<NetworkSearchCallBackBase> cellularDataCallBack_ = nullptr;
@@ -401,10 +394,8 @@ private:
     std::unique_ptr<EventSender> eventSender_ = nullptr;
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
-    std::list<ManualScanCallbackRecord> listManualScanCallbackRecord_;
     std::mutex mutexInner_;
     std::mutex mutexIms_;
-    std::mutex mutexScan_;
     int32_t delayTime_ = 0;
     [[maybe_unused]] NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
     [[maybe_unused]] NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;

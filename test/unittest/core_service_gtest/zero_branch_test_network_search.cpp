@@ -36,6 +36,8 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_data_helper.h"
+#include "manual_network_scan_callback_death_recipient.h"
+#include "ims_reg_info_callback_gtest.h"
 #include "nativetoken_kit.h"
 #include "telephony_ext_wrapper.h"
 #include "network_utils.h"

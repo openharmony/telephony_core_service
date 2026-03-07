@@ -17,19 +17,19 @@
 #define MANUAL_NETWORK_SCAN_CALLBACK_DEATH_RECIPIENT_H
 
 #include "iremote_broker.h"
-#include "network_search_manager.h"
+#include "manual_network_scan.h"
 
 namespace OHOS {
 namespace Telephony {
 class ManualNetworkScanCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    explicit ManualNetworkScanCallbackDeathRecipient(const std::weak_ptr<NetworkSearchManager> &networkSearchManager)
-        : networkSearchManager_(networkSearchManager) {};
+    explicit ManualNetworkScanCallbackDeathRecipient(const std::weak_ptr<ManualNetworkScan> &manualNetworkScan)
+        : manualNetworkScan_(manualNetworkScan) {};
     ~ManualNetworkScanCallbackDeathRecipient() override = default;
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 
 private:
-    std::weak_ptr<NetworkSearchManager> networkSearchManager_;
+    std::weak_ptr<ManualNetworkScan> manualNetworkScan_;
 };
 } // namespace Telephony
 } // namespace OHOS

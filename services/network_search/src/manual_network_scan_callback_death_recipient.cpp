@@ -15,7 +15,7 @@
 
 #include "manual_network_scan_callback_death_recipient.h"
 #include "iremote_broker.h"
-#include "network_search_manager.h"
+#include "manual_network_scan.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -26,9 +26,9 @@ void ManualNetworkScanCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObj
         TELEPHONY_LOGE("remote object is null");
         return;
     }
-    auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr) {
-        TELEPHONY_LOGE("networkSearchManager is null");
+    auto manualNetworkScan = manualNetworkScan_.lock();
+    if (manualNetworkScan == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan is null");
         return;
     }
     sptr<IRemoteObject> remoteObj = remote.promote();
@@ -37,7 +37,7 @@ void ManualNetworkScanCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObj
         TELEPHONY_LOGE("OnRemoteDied iface_cast failed, remote is not INetworkSearchCallback");
         return;
     }
-    std::static_pointer_cast<NetworkSearchManager>(networkSearchManager)->RemoveManualNetworkScanCallback(callback);
+    manualNetworkScan->RemoveManualNetworkScanCallback(callback);
 }
 }
 }
