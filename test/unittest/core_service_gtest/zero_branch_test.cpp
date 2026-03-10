@@ -1461,6 +1461,10 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     simStateHandle->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_SEND_NCFG_OPER_INFO_DONE);
     simStateHandle->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND);
+    stkController->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(StkController::CLOSE_CA_ESIM_EVENT);
+    stkController->ProcessEvent(event);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_RUIM_CARD), CDMA_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_SIM_CARD), GSM_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_CG_CARD), GSM_FAKE_AID);
