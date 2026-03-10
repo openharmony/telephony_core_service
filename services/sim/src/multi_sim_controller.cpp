@@ -135,6 +135,7 @@ bool MultiSimController::ForgetAllData()
         return false;
     }
     TELEPHONY_LOGI("ForgetAllData %{public}zu", loadedSimCardInfo_.size());
+    std::unique_lock<ffrt::mutex> lock(forgetAllDataMutex_);
     int32_t forgetResult = simDbHelper_->ForgetAllData();
     if (forgetResult != INVALID_VALUE) {
         std::shared_lock<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
@@ -304,6 +305,7 @@ bool MultiSimController::InitPrimary(int32_t slotId, bool isFirstInit)
         TELEPHONY_LOGI("no need to init");
         return false;
     }
+    std::unique_lock<ffrt::mutex> lock(forgetAllDataMutex_);
     if (!IsAllModemInitDone()) {
         TELEPHONY_LOGI("wait for the other modem init");
         return false;
