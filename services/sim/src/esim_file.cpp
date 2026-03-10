@@ -929,8 +929,8 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
         return false;
     }
     builder->Asn1AddChild(subNode);
-    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);
-    ApduSimIORequestInfo reqInfo;
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, !isSupportEsimMep);
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
         return false;
