@@ -559,6 +559,7 @@ int32_t SimManager::GetDefaultCellularDataSimId(int32_t &simId)
 
 int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
         TELEPHONY_LOGI(" default dsds mode is 0 for single card version");
         dsdsMode = DSDS_MODE_V2;
@@ -570,6 +571,7 @@ int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
 
 int32_t SimManager::SetDsdsMode(int32_t dsdsMode)
 {
+    std::unique_lock<ffrt::shared_mutex> lck(mtx_);
     dsdsMode_ = dsdsMode;
     return TELEPHONY_ERR_SUCCESS;
 }
