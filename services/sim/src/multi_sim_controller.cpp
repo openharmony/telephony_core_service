@@ -142,6 +142,8 @@ bool MultiSimController::ForgetAllData()
             UpdateDataByIccId(pair.first, pair.second);
             TELEPHONY_LOGI("loadedSimCardInfo_ slotid: %{public}d", pair.first);
         }
+        GetListFromDataBase();
+        GetAllListFromDataBase();
         return true;
     }
     return false;
