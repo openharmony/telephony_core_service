@@ -70,17 +70,9 @@ bool EsimController::ChecIsVerifyBindCommand(const std::string &cmdData)
 void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdData)
 {
     TELEPHONY_LOGI("EsimController:Start process verify bind message.");
-    bool hasSimCard = false;
-    CoreManagerInner::GetInstance().HasSimCard(DEFAULT_SLOT_ID, hasSimCard);
-    int32_t primarySlot = CoreManagerInner::GetInstance().GetEmcRescueSlot();
-    if (!hasSimCard && primarySlot == DEFAULT_SLOT_ID) {
-        TELEPHONY_LOGI("EsimController:delay Ca 4s for simslot cfg change");
-        ffrt::submit([=]() { this->ProcessCommandByCa(slotId, cmdData);},
-            ffrt::task_attr().delay(RETRY_CA_TIMEOUT));
-    } else {
-        TELEPHONY_LOGI("EsimController:start verify Ca without delay");
-        ffrt::submit([=]() { this->ProcessCommandByCa(slotId, cmdData);});
-    }
+    ffrt::submit([=]() {
+        this->ProcessCommandByCa(slotId, cmdData);
+    });
 }
 
 void EsimController::CloseCaEsim()
