@@ -561,7 +561,8 @@ HWTEST_F(SimManagerTest, UpdateSimPresentSuccessTest, Function | MediumTest | Le
     auto multiSimMonitor = std::make_shared(multiSimControllerMock,
         simStateManager, simFileManagerWeak);
     simManager_->multiSimController_ = multiSimControllerMock;
-    EXPECT_CALL(*multiSimControllerMock, UpdateSimPresent(, )).WillRepeatedly(Return(0));
+    EXPECT_CALL(*multiSimControllerMock, UpdateSimPresent(, ))
+        .WillRepeatedly(Return(0));
     simManager->multiSimMonitor = multiSimMonitor;
 
     int32_t slotId = 0;
