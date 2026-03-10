@@ -37,11 +37,13 @@ public:
     void ProcessCommandByCa(int slotId, const std::string &cmdData);
     void SetVerifyResult(int slotId, bool isVerifySuccess);
     bool GetVerifyResult(int slotId);
+    void CloseCaEsim();
 private:
     ffrt::mutex caMutex_;
     ffrt::mutex setVerifyResultMutex_;
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
     std::atomic<bool> isVerifySuccess_[MAX_SLOT_COUNT] = {}; // use default value - false
+    void* caEsimHandler_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

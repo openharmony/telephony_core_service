@@ -54,6 +54,7 @@ const std::string PARAM_REFRESH_RESULT = "refreshResult";
 const std::string ABILITY_NAME = "ServiceExtAbility";
 const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
+const int64_t CLOSE_ESIM_CA_DELAY_TIME = 15 * 1000; // 15s
 } // namespace
 
 StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
@@ -327,6 +328,11 @@ void StkController::ProcessEventExt(uint32_t id, const AppExecFwk::InnerEvent::P
         case RadioEvent::RADIO_STATE_CHANGED:
             OnRadioStateChanged(event);
             break;
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+        case StkController::CLOSE_CA_ESIM_EVENT:
+            EsimController::GetInstance().CloseCaEsim();
+            break;
+#endif
         default:
             TELEPHONY_LOGE("StkController[%{public}d]::ProcessEvent() unknown event", slotId_);
             break;
@@ -431,6 +437,8 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {
         if (iccCardState_ == ICC_CARD_STATE_PRESENT) {
             EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
+            RemoveEvent(StkController::CLOSE_CA_ESIM_EVENT);
+            SendEvent(StkController::CLOSE_CA_ESIM_EVENT, 0, CLOSE_ESIM_CA_DELAY_TIME);
         }
         return;
     }

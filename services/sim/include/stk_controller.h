@@ -60,6 +60,7 @@ public:
 public:
     enum {
         RETRY_SEND_RIL_PROACTIVE_COMMAND = 10000,
+        CLOSE_CA_ESIM_EVENT,
     };
 
 private:

@@ -38,6 +38,7 @@
 #include "sim_rdb_helper.h"
 #include "icc_file.h"
 #include "mock_sim_rdb_helper.h"
+#include "mock_multi_sim_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -503,6 +504,14 @@ HWTEST_F(SimManagerTest, InsertDatatest, Function | MediumTest | Level1)
     DataShare::DataShareValuesBucket values;
     int32_t result = simRdbHelper.InsertData(id, values);
     EXPECT_NE(result, 1);
+}
+
+HWTEST_F(SimManagerTest, UpdateSimPresentNullTest, Function | MediumTest | Level1)
+{
+    simManager_->multiSimController_ = nullptr;
+    int32_t slotId = 0;
+    int32_t result = simManager_->UpdateSimPresent(slotId, false);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 }
 }
