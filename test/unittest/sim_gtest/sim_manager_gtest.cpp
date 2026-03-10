@@ -38,6 +38,7 @@
 #include "sim_rdb_helper.h"
 #include "icc_file.h"
 #include "mock_sim_rdb_helper.h"
+#include "mock_multi_sim_controller.h"
 
 namespace OHOS {
 namespace Telephony {
