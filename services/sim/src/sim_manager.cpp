@@ -1486,7 +1486,11 @@ int32_t SimManager::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->UpdateSimPresent(slotId, isShowPresent);
+    int32_t ret = multiSimController_->UpdateSimPresent(slotId, isShowPresent);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)
