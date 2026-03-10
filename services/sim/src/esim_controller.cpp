@@ -90,7 +90,6 @@ void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
         return;
     }
     VerifyBind func = (VerifyBind)dlsym(caEsimHandler_, "CAEsimStartEuiccCheckBinding");
-
     if (func == NULL) {
         TELEPHONY_LOGE("dlsym CAEsimStartEuiccCheckBinding failed, error:%{public}s", dlerror());
     } else {
