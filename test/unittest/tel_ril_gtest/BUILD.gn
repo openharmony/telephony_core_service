@@ -74,7 +74,7 @@ template("tel_ril_unittest_suite") {
     install_enable = true
     subsystem_name = "telephony"
     part_name = "core_service"
-    module_out_path = "core_service/coer_service_tel_ril"
+    module_out_path = "core_service/coer_service"
     defines = [
       "TELEPHONY_LOG_TAG = \"CoreServiceGtest\"",
       "LOG_DOMAIN = 0xD000F00",
