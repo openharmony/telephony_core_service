@@ -1959,7 +1959,7 @@ HWTEST_F(EsimTest, EsimController_001, Function | MediumTest | Level2)
     EsimController::GetInstance().SetVerifyResult(slotId, true);
     EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), false);
 
-    slotId = -1;
+    slotId = 0;
     EsimController::GetInstance().SetVerifyResult(slotId, true);
     EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), false);
 }
