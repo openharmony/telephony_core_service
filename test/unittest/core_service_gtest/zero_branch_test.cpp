@@ -1460,8 +1460,6 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
     simStateHandle->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_SEND_NCFG_OPER_INFO_DONE);
-    simStateHandle->ProcessEvent(event);
-    event = AppExecFwk::InnerEvent::Get(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND);
     stkController->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(StkController::CLOSE_CA_ESIM_EVENT);
     stkController->ProcessEvent(event);
