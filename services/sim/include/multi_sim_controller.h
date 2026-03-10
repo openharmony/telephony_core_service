@@ -207,6 +207,7 @@ private:
     std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
     ffrt::mutex setPrimarySlotToRilMutex_;
     ffrt::mutex writeDbMutex_;
+    ffrt::mutex ForgetAllDataMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     bool isSettingPrimarySlotToRil_ = false;
