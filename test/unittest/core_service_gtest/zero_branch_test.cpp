@@ -1460,9 +1460,7 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_001, Function | MediumTest | Level
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_AUTHENTICATION_DONE);
     simStateHandle->ProcessEvent(event);
     event = AppExecFwk::InnerEvent::Get(MSG_SIM_SEND_NCFG_OPER_INFO_DONE);
-    stkController->ProcessEvent(event);
-    event = AppExecFwk::InnerEvent::Get(StkController::CLOSE_CA_ESIM_EVENT);
-    stkController->ProcessEvent(event);
+    simStateHandle->ProcessEvent(event);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_RUIM_CARD), CDMA_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::SINGLE_MODE_SIM_CARD), GSM_FAKE_AID);
     EXPECT_EQ(simStateHandle->GetAidByCardType(CardType::DUAL_MODE_CG_CARD), GSM_FAKE_AID);
@@ -1782,6 +1780,8 @@ HWTEST_F(BranchTest, Telephony_StkController_001, Function | MediumTest | Level1
     event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT, 1);
     stkController->ProcessEvent(event);
     event = nullptr;
+    stkController->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(StkController::CLOSE_CA_ESIM_EVENT);
     stkController->ProcessEvent(event);
     EXPECT_EQ(stkController->SendCallSetupRequestResult(true), TELEPHONY_ERR_FAIL);
     EXPECT_GT(stkController->SendTerminalResponseCmd(strCmd), TELEPHONY_ERR_SUCCESS);
