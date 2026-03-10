@@ -100,24 +100,6 @@ void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
     }
 }
 
-void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
-{
-    std::lock_guard<ffrt::mutex> locker(caMutex_);
-    void *handler = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
-    if (handler == NULL) {
-        TELEPHONY_LOGE("open lib: %{public}s failed", ESIM_CA_LIBPATH.c_str());
-        return;
-    }
-
-    VerifyBind func = (VerifyBind)dlsym(handler, "CAEsimStartEuiccCheckBinding");
-    if (func == NULL) {
-        TELEPHONY_LOGE("dlsym CAEsimStartEuiccCheckBinding failed, error:%{public}s", dlerror());
-    } else {
-        SetVerifyResult(slotId, func(slotId, cmdData.c_str(), cmdData.length()));
-    }
-    dlclose(handler);
-}
-
 void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)
 {
     if (slotId < 0 || slotId >= MAX_SLOT_COUNT) {
