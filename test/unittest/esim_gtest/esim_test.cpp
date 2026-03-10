@@ -1948,15 +1948,14 @@ HWTEST_F(EsimTest, ProcessGetContractInfo_001, Function | MediumTest | Level2)
 
 HWTEST_F(EsimTest, EsimController_001, Function | MediumTest | Level2)
 {
-    int slotId = 0;
-    EsimController::GetInstance().ProcessCommandMessage(slotId, "");
+    EsimController::GetInstance().caEsimHandler_ = nullptr;
+    EsimController::GetInstance().CloseCaEsim();
 
-    SetParameter("persist.ril.sim_slot_cfg", "0,1,2");
-    EsimController::GetInstance().ProcessCommandMessage(slotId, "");
+    int slotId = 1;
+    EsimController::GetInstance().ProcessCommandByCa(slotId, "");
+    EsimController::GetInstance().CloseCaEsim();
 
-    SetParameter("persist.ril.sim_slot_cfg", "1,0,2");
-    EsimController::GetInstance().ProcessCommandMessage(slotId, "");
-
+    slotId = -1;
     EsimController::GetInstance().SetVerifyResult(slotId, true);
     EXPECT_EQ(EsimController::GetInstance().GetVerifyResult(slotId), false);
 
