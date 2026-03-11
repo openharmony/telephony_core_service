@@ -347,10 +347,10 @@ void CoreServiceCommonEventHub::HandleUserSwitched(const EventFwk::CommonEventDa
 void CoreServiceCommonEventHub::HandleSimStateChanged(const EventFwk::CommonEventData &data)
 {
     const EventFwk::Want &want = data.GetWant();
-    int32_t slotId = want.GetIntParam("slotId", 0);
-    int32_t simType = want.GetIntParam("simType", 0);
-    int32_t simState = want.GetIntParam("simState", 0);
-    int32_t lockReason = want.GetIntParam("lockReason", 0);
+    int32_t slotId = want.GetIntParam("slotId", -1);
+    int32_t simType = want.GetIntParam("cardType", -1);
+    int32_t simState = want.GetIntParam("state", -1);
+    int32_t lockReason = want.GetIntParam("reason", -1);
 
     std::shared_lock<ffrt::shared_mutex> lock(callbacksMtx_);
     auto it = callbacks_.find(TelCommonEvent::SIM_STATE_CHANGED);
