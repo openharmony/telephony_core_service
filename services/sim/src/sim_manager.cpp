@@ -325,6 +325,9 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
         multiSimMonitor_->NotifySimAccountChanged();
         multiSimMonitor_->NotifySimActiveStateChanged(slotId, static_cast<bool>(enable));
     }
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(slotId, enable);
+    }
     return ret;
 }
 
