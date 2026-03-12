@@ -277,10 +277,12 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
     reportEventToChr_ =
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
+    setActiveSim_ = (SetActiveSim)dlsym(telephonyExtWrapperHandle_, "SetActiveSim");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr);
+        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
+        setActiveSim_ == nullpt);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -387,6 +389,13 @@ void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
 {
     if (unRegistryCoreNotify_ != nullptr) {
         unRegistryCoreNotify_(slotId, handler, what);
+    }
+}
+
+void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
+{
+    if (setActiveSim_ != nullptr) {
+        setActiveSim_(slotId, enable);
     }
 }
 } // namespace Telephony
