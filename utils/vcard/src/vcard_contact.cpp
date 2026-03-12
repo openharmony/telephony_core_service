@@ -1346,7 +1346,7 @@ void VCardContact::UpdateDisplayName()
         .family = nameData_->GetFamily(),
         .suffix = nameData_->GetSuffix(),
     };
-    // 不带地区的，双升单可能带地区
+    // 不带地区的系统语言，双升单可能带地区
     std::string language = Global::I18n::LocaleConfig::GetSystemLanguage();
     // 不带地区的系统语言列表集合
     std::unordered_set<std::string> sysLangSet = Global::I18n::LocaleConfig::GetSystemLanguages();
