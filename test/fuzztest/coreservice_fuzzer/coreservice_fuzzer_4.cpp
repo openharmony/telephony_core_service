@@ -91,35 +91,7 @@ void GetSimLabel(const uint8_t *data, size_t size)
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetSimLabel(dataMessageParcel, reply);
 }
- 
-void StartEmcRescueService(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
- 
-    int32_t ueId = static_cast<int64_t>(*data);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt64(ueId);
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CoreService>::GetInstance()->OnStartEmcRescueService(dataMessageParcel, reply);
-}
- 
-void StopEmcRescueService(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
- 
-    int32_t ueId = static_cast<int64_t>(*data);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt64(ueId);
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CoreService>::GetInstance()->OnStopEmcRescueService(dataMessageParcel, reply);
-}
- 
+
 void SendApduData(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
