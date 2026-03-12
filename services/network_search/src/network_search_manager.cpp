@@ -1942,7 +1942,8 @@ int32_t NetworkSearchManager::StartRadioOnState(int32_t slotId)
         TELEPHONY_LOGE("NetworkSearchManager::StartRadioOnState slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    inner->networkSearchHandler_->RadioOnState();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORK_STATE);
+    inner->networkSearchHandler_->SendEvent(event);
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -1991,7 +1992,8 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
         return;
     }
     if (isNeedUpdateNetworkState && inner->networkSearchHandler_ != nullptr) {
-        inner->networkSearchHandler_->RadioOnState();
+        auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORK_STATE);
+        inner->networkSearchHandler_->SendEvent(event);
     }
     if (inner->deviceStateHandler_ != nullptr) {
         inner->deviceStateHandler_->UpdateDeviceState(isEnterStrMode);
