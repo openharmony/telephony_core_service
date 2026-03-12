@@ -278,12 +278,10 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
     reportEventToChr_ =
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
-    setActiveSim_ = (SetActiveSim)dlsym(telephonyExtWrapperHandle_, "SetActiveSim");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
-        setActiveSim_ == nullpt);
+        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
