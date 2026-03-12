@@ -231,6 +231,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForSim1();
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
     void InitTelephonyExtWrapperForDynamicLoad();
