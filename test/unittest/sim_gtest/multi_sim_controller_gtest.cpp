@@ -61,6 +61,16 @@ void MultiSimControllerTest::SetUp() {}
 
 void MultiSimControllerTest::TearDown() {}
 
+class SimRdbHelperMock : public SimRdbHelper {
+public:
+    explicit SimRdbHelperMock()
+        : SimRdbHelper()
+    {
+    }
+    MOCK_METHOD(int32_t, ForgetAllData, (), (override));
+    MOCK_METHOD(int32_t, QueryDataByIccId, (std::string iccId, SimRdbInfo &simBean), (override));
+};
+
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_Init_001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -801,6 +811,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBSetActiveResult_
     multiSimController->isSetActiveSimInProgress_.resize(2, 0);
     multiSimController->radioProtocolController_ = nullptr;
     auto result = multiSimController->UpdateDBSetActiveResult(0, 1, 0);
+
     EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
  
     std::vector<SimRdbInfo> newCache;

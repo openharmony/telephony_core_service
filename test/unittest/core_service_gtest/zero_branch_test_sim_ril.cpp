@@ -957,6 +957,113 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     ASSERT_TRUE(iccFileController->BuildCallerInfo(0, 0, 0, holder) != nullptr);
 }
 
+/**
+ * @tc.number   Telephony_IccFileController_Expand001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SimRilBranchTest, Telephony_IccFileController_Expand001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
+
+    auto event = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_SIZE_OF_LINEAR_ELEMENTARY_FILE_DONE);
+    iccFileController->ProcessEvent(event);
+    auto event2 = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_SIZE_OF_FIXED_ELEMENTARY_FILE_DONE);
+    iccFileController->ProcessEvent(event2);
+    auto event3 = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_INVALID_RECORD_OF_FIXED_ELEMENTARY_FILE_DONE);
+    iccFileController->ProcessEvent(event3);
+    auto event4 = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_SIZE_OF_TRANSPARENT_ELEMENTARY_FILE_DONE);
+    iccFileController->ProcessEvent(event4);
+    auto event5 = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_FIXED_ELEMENTARY_FILE_DONE);
+    iccFileController->ProcessEvent(event5);
+    auto event6 = AppExecFwk::InnerEvent::Get(MSG_SIM_OBTAIN_ICON_DONE);
+    iccFileController->ProcessEvent(event6);
+
+    iccFileController->ProcessLinearRecordSize(event);
+
+    std::shared_ptr<IccControllerHolder> holder = std::make_shared<IccControllerHolder>(0);
+    std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
+    rcvMsg->fileData.sw1 = 0x90;
+    rcvMsg->fileData.sw2 = 0x00;
+    rcvMsg->fileData.resultData = "BF70820686A08206823082067ea0820635048206313c2a12361636c856472212e939eb2fe56715cacf";
+    auto event7 = AppExecFwk::InnerEvent::Get(0, rcvMsg);
+    iccFileController->ProcessLinearRecordSize(event7);
+
+    std::shared_ptr<IccControllerHolder> holderNullptr = nullptr;
+    std::unique_ptr<Telephony::IccFromRilMsg> rcvMsgHolderNullptr = std::make_unique<Telephony::IccFromRilMsg>(holderNullptr);
+    rcvMsgHolderNullptr->fileData.sw1 = 0x90;
+    rcvMsgHolderNullptr->fileData.sw2 = 0x00;
+    rcvMsgHolderNullptr->fileData.resultData = "BF70820686A08206823082067ea0820635048206313c2a12361636c856472212e939eb2fe56715cacf";
+    auto event8 = AppExecFwk::InnerEvent::Get(0, rcvMsgHolderNullptr);
+    iccFileController->ProcessLinearRecordSize(event8);
+
+    iccFileController->SendFixedRecordRequest(holder);
+    iccFileController->telRilManager_ = std::make_shared<TelRilManager>();
+    holder->isUseSeek = true;
+    iccFileController->SendFixedRecordRequest(holder);
+
+    iccFileController->ProcessRecordSize(event);
+    iccFileController->ProcessRecordSize(event8);
+    rcvMsg->fileData.resultData = "";
+    iccFileController->ProcessRecordSize(event7);
+    rcvMsg->fileData.resultData = "BF70840686A08206823082067ea0820635048206313c2a12361636c856472212e939eb2fe56715cacf";
+    iccFileController->ProcessRecordSize(event7);
+
+    iccFileController->ProcessInvalidRecord(event);
+    iccFileController->ProcessInvalidRecord(event8);
+    holder->fileNum = 1;
+    holder->countFiles = 0;
+    iccFileController->ProcessRecordSize(event7);
+    holder->fileNum = 1;
+    holder->countFiles = 9999;
+    iccFileController->ProcessRecordSize(event7);
+
+    iccFileController->ProcessReadRecord(event);
+    iccFileController->ProcessReadRecord(event8);
+    holder->getAllFile = true;
+    holder->fileNum = 1;
+    holder->countFiles = 0;
+    iccFileController->ProcessReadRecord(event7);
+    holder->fileNum = 1;
+    holder->countFiles = 9999;
+    iccFileController->ProcessReadRecord(event7);
+    holder->getAllFile = false;
+    iccFileController->ProcessReadRecord(event7);
+
+    iccFileController->ProcessReadBinary(event7);
+
+    iccFileController->ObtainLinearFixedFile(0, 0, event);
+
+    iccFileController->ObtainAllLinearFixedFile(0, "", event, true);
+    iccFileController->ObtainLinearFileSize(0, "", event);
+    iccFileController->ObtainLinearFileSize(0, event);
+
+    holder->fileLoaded->SetOwner(nullptr);
+    iccFileController->SendResponse(holder, &rcvMsgHolderNullptr->fileData);
+    holder->fileLoaded->SetOwner(iccFileController);
+    iccFileController->SendResponse(holder, &rcvMsgHolderNullptr->fileData);
+
+    event->SetOwner(iccFileController);
+    int intData[] = {1, 2, 3};
+    iccFileController->SendEfLinearResult(event, intData, 3);
+
+    std::vector<std::string> strData = {"123", "456", "789"};
+    iccFileController->SendMultiRecordResult(event, strData, 0);
+
+    const unsigned char cData[] = {'1', '2', '3', '\0'};
+    int dataSize = 0;
+    iccFileController->GetDataSize(nullptr, dataSize);
+    iccFileController->GetDataSize(cData, dataSize);
+
+    iccFileController->ProcessErrorResponse(event7);
+    holder->fileLoaded->SetOwner(nullptr);
+    iccFileController->ProcessErrorResponse(event7);
+    holder->fileLoaded = nullptr;
+    iccFileController->ProcessErrorResponse(event7);
+
+    EXPECT_FALSE( iccFileController->IsValidBinarySizeData(nullptr) );
+}
+
 AppExecFwk::InnerEvent::Pointer GetControllerToFileMsgEvent(int32_t code, bool withException)
 {
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);

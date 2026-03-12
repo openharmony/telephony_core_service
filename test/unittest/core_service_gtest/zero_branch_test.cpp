@@ -73,6 +73,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+using namespace testing;
 
 namespace {
 const int32_t SLOT_ID_0 = 0;
@@ -120,6 +121,18 @@ void BranchTest::SetUpTestCase()
     auto result = Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
+
+class IccFileLoadedImpl : public IccFile::IccFileLoaded {
+public:
+    IccFileLoadedImpl() = default;
+    std::string ObtainElementaryFileName() override
+    {
+        return "";
+    }
+    void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) override
+    {
+    }
+};
 
 /**
  * @tc.number   Telephony_ImsRegInfoCallbackProxy_001
@@ -1965,8 +1978,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+
     iccFile->ProcessEvent(event);
-    event = nullptr;
+    event.reset();
     iccFile->ProcessEvent(event);
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -1978,6 +1992,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_QUERY_ICCID_DONE);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_QUERY_ICCID_DONE);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_ON);
     std::string plmn = "";
     EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
     plmn = "123";
@@ -2023,8 +2040,169 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
     EXPECT_EQ(iccId, "2143BA65FT");
     std::string langData = "";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
-    langData = "000011286F050400000000010203FF";
+    langData = "123";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
+    langData = "12345678";
+    EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
+}
+
+/**
+ * @tc.number   Telephony_IccFile_Expand001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1) {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+
+    iccFile->StartLoad();
+
+    iccFile->voiceMailConfig_ = std::make_shared<VoiceMailConstants>(0);
+    iccFile->SetId(0);
+
+    iccFile->GetIsVoiceMailFixed();
+
+    iccFile->SetVoiceMailByOperator("");
+    iccFile->SetVoiceMailByOperator("123");
+
+    iccFile->ObtainGid2();
+    iccFile->ObtainSimOperator();
+    iccFile->ObtainIsoCountryCode();
+    iccFile->ObtainCallForwardStatus();
+    iccFile->UpdateMsisdnNumber("", "");
+    iccFile->ObtainDiallingNumberInfo();
+    iccFile->ObtainNAI();
+    iccFile->ObtainHomeNameOfPnn();
+    iccFile->ObtainMsisdnAlphaStatus();
+    iccFile->ObtainVoiceMailCount();
+    iccFile->ObtainSPN();
+
+    std::vector<std::shared_ptr<OperatorPlmnInfo>> oplFiles;
+    std::string eons;
+    auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+    iccFile->ObtainEonsExternRules(oplFiles, false, eons, true, "");
+    iccFile->ObtainEonsExternRules(oplFiles, false, eons, false, "");
+    iccFile->pnnFiles_.clear();
+    iccFile->spnCphs_ = "123";
+    iccFile->ObtainEonsExternRules(oplFiles, false, eons, false, "");
+    iccFile->spnCphs_ = "";
+    iccFile->spnShortCphs_ = "123";
+    iccFile->ObtainEonsExternRules(oplFiles, false, eons, false, "");
+    iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "");
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+    auto opl = std::make_shared<OperatorPlmnInfo>();
+    oplFiles.push_back(opl);
+    EXPECT_FALSE( iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") );
+}
+
+/**
+ * @tc.number   Telephony_IccFile_Expand002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1) {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+
+    auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
+    iccFile->pnnFiles_.push_back(plmnNetworkName);
+
+    iccFile->isOplFileResponsed_ = true;
+    iccFile->isOpl5gFileResponsed_ = true;
+    iccFile->oplFiles_.clear();
+    iccFile->opl5gFiles_.clear();
+    iccFile->operatorNumeric_ = "";
+    iccFile->ObtainEons("", 0, true);
+
+    iccFile->operatorNumeric_ = "123";
+    auto opl = std::make_shared<OperatorPlmnInfo>();
+    iccFile->oplFiles_.push_back(opl);
+    iccFile->opl5gFiles_.push_back(opl);
+    iccFile->ObtainEons("123", 0, true);
+
+    iccFile->ObtainVoiceMailInfo();
+    iccFile->ObtainIccLanguage();
+    iccFile->ObtainUsimFunctionHandle();
+    iccFile->ObtainSpNameFromEfSpn();
+    iccFile->ObtainLengthOfMnc();
+
+    iccFile->voiceMailConfig_ = std::make_shared<VoiceMailConstants>(0);
+    iccFile->LoadVoiceMail();
+
+    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    iccFile->imsi_ = "123";
+    iccFile->RegisterImsiLoaded(handler);
+
+    iccFile->iccId_ = "123";
+    iccFile->RegisterIccidLoaded(handler);
+    iccFile->UnregisterIccidLoaded(handler);
+
+    iccFile->BuildCallerInfo(0, 0, 0);
+    iccFile->BuildCallerInfo(0, nullptr);
+
+    std::shared_ptr<ControllerToFileMsg> fd = std::make_shared<ControllerToFileMsg>(nullptr, nullptr);
+    fd->iccLoader = nullptr;
+    AppExecFwk::InnerEvent::Pointer testEvent2 = InnerEvent::Get(0, fd);
+    iccFile->ProcessIccFileObtained(testEvent2);
+
+    iccFile->iccLanguage_ = "123";
+    iccFile->UpdateIccLanguage("", "");
+
+    std::string iccId = "";
+    iccFile->SwapPairsForIccId(iccId);
+    iccFile->GetFullIccid(iccId);
+
+    EXPECT_TRUE( iccFile->CreateDiallingNumberPointer(0, 0, 0, nullptr) != nullptr );
+}
+
+/**
+ * @tc.number   Telephony_IccFile_Expand003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1) {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+
+    std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(0);
+    iccFile->SetRilAndFileController(nullptr, nullptr, nullptr);
+    iccFile->SetRilAndFileController(telRilManager, file, nullptr);
+
+    iccFile->stateManager_.reset();
+    iccFile->HasSimCard();
+    iccFile->stateManager_ = simStateManager;
+    iccFile->HasSimCard();
+
+    iccFile->SaveCountryCode();
+    iccFile->ProcessExtGetFileResponse();
+
+    iccFile->ProcessExtGetFileDone(event);
+    iccFile->OnOpkeyLoad("123", "123");
+    iccFile->ExecutOriginalSimIoRequest(0, 0);
+
+    iccFile->recordsOverrideObser_.reset();
+    iccFile->AddRecordsOverrideObser();
+    iccFile->AddRecordsToLoadNum();
+    iccFile->DeleteOperatorCache();
+
+    iccFile->SetMatchSimStateTracker(0);
+
+    iccFile->RegisterParamsListener();
+    iccFile->UnRegisterParamsListener();
+
+    iccFile->isOnOpkeyLoaded_ = true;
+    iccFile->UpdateOpkeyConfig();
+    iccFile->isOnOpkeyLoaded_ = false;
+    iccFile->UpdateOpkeyConfig();
+    iccFile->filesFetchedObser_.reset();
+    iccFile->UpdateOpkeyConfig();
 }
 
 /**
