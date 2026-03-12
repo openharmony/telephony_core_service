@@ -251,7 +251,8 @@ void OnRemoteRequestEsim(const uint8_t *data, size_t size)
     for (uint32_t code = static_cast<uint32_t>(IEsimServiceIpcCode::COMMAND_GET_EID);
         code <= static_cast<uint32_t>(IEsimServiceIpcCode::COMMAND_GET_ESIM_FREE_STORAGE); code++) {
         DelayedSingleton<EsimService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
-    }}
+    }
+}
 
 void EsimServiceProxyTest(const uint8_t *data, size_t size)
 {
