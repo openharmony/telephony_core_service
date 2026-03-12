@@ -237,6 +237,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForSim1();
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
     void InitTelephonyExtWrapperForDynamicLoad();
@@ -407,6 +408,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
     telephonyExtWrapperHandle_ = NONULL_HANDLE;
     InitTelephonyExtWrapperForDynamicLoad();
     InitTelephonyExtWrapperForSim();
+    InitTelephonyExtWrapperForSim1();
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
@@ -521,6 +523,10 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
     sendSimChgTypeInfo_ = &SendSimChgTypeInfoImpl;
     reportEventToChr_ = &ReportEventToChrImpl;
+}
+
+inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
+{
     setActiveSim_ = &SetActiveSimImpl;
 }
 
