@@ -34,6 +34,7 @@
 #include "mock_multi_sim_controller.h"
 #include "mock_i_raw_parcel_callback.h"
 #include "mock_sim_rdb_helper.h"
+#include "telephony_ext_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1057,6 +1058,15 @@ HWTEST_F(CoreServiceBranchTest, GetSimIdtest_003, Function | MediumTest | Level1
     EXPECT_CALL(*multiSimControllerMock, GetSimAccountInfo(-1, true, _)).Times(AnyNumber())
         .WillOnce(Return(CORE_ERR_SIM_CARD_LOAD_FAILED));
     EXPECT_EQ(INVALID_VALUE, multiSimController->GetSimId(-1));
+}
+
+HWTEST_F(CoreServiceBranchTest, InitTelephonyExtWrapperForSimtest_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelephonyExtWrapper> telephonyExtWrapper = std::make_shared<TelephonyExtWrapper>();
+    telephonyExtWrapper->SetActiveSimFunc(1, 1);
+    telephonyExtWrapper->setActiveSim_ = nullptr;
+    telephonyExtWrapper->SetActiveSimFunc(1, 0);
+    EXPECT_NE(telephonyExtWrapper->cacheAssetPinForUpgrade_, nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
