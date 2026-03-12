@@ -161,8 +161,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSimIO(data, size);
     GetAllSimAccountInfoList(data, size);
     GetSimLabel(data, size);
-    StartEmcRescueService(data, size);
-    StopEmcRescueService(data, size);
     SendApduData(data, size);
     GetManualNetworkScanState(data, size);
     StartManualNetworkScan(data, size);
