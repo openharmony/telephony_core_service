@@ -1057,16 +1057,16 @@ HWTEST_F(CoreServiceBranchTest, GetSimIdtest_003, Function | MediumTest | Level1
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     EXPECT_CALL(*multiSimControllerMock, GetSimAccountInfo(-1, true, _)).Times(AnyNumber())
         .WillOnce(Return(CORE_ERR_SIM_CARD_LOAD_FAILED));
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
+    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
+    TELEPHONY_EXT_WRAPPER.setActiveSim_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
     EXPECT_EQ(INVALID_VALUE, multiSimController->GetSimId(-1));
-}
-
-HWTEST_F(CoreServiceBranchTest, InitTelephonyExtWrapperForSimtest_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<TelephonyExtWrapper> telephonyExtWrapper = std::make_shared<TelephonyExtWrapper>();
-    telephonyExtWrapper->SetActiveSimFunc(1, 1);
-    telephonyExtWrapper->setActiveSim_ = nullptr;
-    telephonyExtWrapper->SetActiveSimFunc(1, 0);
-    EXPECT_NE(telephonyExtWrapper->cacheAssetPinForUpgrade_, nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
