@@ -53,6 +53,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         return;
     }
     InitTelephonyExtWrapperForSim();
+    InitTelephonyExtWrapperForSim1();
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
@@ -283,6 +284,16 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
         getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
         setActiveSim_ == nullpt);
+    if (hasFuncNull) {
+        TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+}
+
+void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
+{
+    TELEPHONY_LOGI("[SIM] telephony ext wrapper init begin");
+    setActiveSim_ = (SetActiveSim)dlsym(telephonyExtWrapperHandle_, "SetActiveSim");
+    bool hasFuncNull = setActiveSim_ == nullptr;
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
