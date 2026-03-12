@@ -250,3 +250,4 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->simFileManager_ = simFileManager;
 }
 }
+}
