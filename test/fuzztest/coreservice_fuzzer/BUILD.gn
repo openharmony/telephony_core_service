@@ -339,6 +339,7 @@ group("fuzztest") {
     ":CoreService1FuzzTest",
     ":CoreService2FuzzTest",
     ":CoreService3FuzzTest",
-    ":CoreService4FuzzTest",  ]
+    ":CoreService4FuzzTest",
+  ]
 }
 ###############################################################################
