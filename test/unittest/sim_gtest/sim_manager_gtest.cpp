@@ -215,11 +215,24 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_009, Function | MediumTest | L
  */
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_010, Function | MediumTest | Level1)
 {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<MultiSimControllerMock> multiSimControllerMock =
+        std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager);
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t slotId = 0;
     simManager_->SetActiveSim(slotId, 0);
     slotId = -1;
     simManager_->SetActiveSim(slotId, 0);
     slotId = 4;
+    simManager_->SetActiveSim(slotId, 0);
+    EXPECT_CALL(*multiSimControllerMock, SetActiveSim(_, _, _)).Times(AnyNumber()).
+        WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    simManager_->SetActiveSim(slotId, 0);
+    EXPECT_CALL(*multiSimControllerMock, SetActiveSim(_, _, _)).Times(AnyNumber()).
+        WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID));
     simManager_->SetActiveSim(slotId, 0);
     slotId = 0;
     simManager_->multiSimController_ = nullptr;
