@@ -2191,6 +2191,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1
     iccFile->UpdateOpkeyConfig();
     iccFile->filesFetchedObser_.reset();
     iccFile->UpdateOpkeyConfig();
+    EXPECT_TRUE(iccFile->isOnOpkeyLoaded_ == false);
 }
 
 /**
