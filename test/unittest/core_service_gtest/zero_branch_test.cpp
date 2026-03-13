@@ -2083,7 +2083,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1
     iccFile->pnnFiles_.push_back(plmnNetworkName);
     auto opl = std::make_shared<OperatorPlmnInfo>();
     oplFiles.push_back(opl);
-    EXPECT_FALSE( iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") );
+    EXPECT_FALSE(iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") == false);
 }
 
 /**
@@ -2145,7 +2145,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
     iccFile->SwapPairsForIccId(iccId);
     iccFile->GetFullIccid(iccId);
 
-    EXPECT_TRUE( iccFile->CreateDiallingNumberPointer(0, 0, 0, nullptr) != nullptr );
+    EXPECT_TRUE(iccFile->CreateDiallingNumberPointer(0, 0, 0, nullptr) != nullptr);
 }
 
 /**

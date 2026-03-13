@@ -44,7 +44,7 @@ void OperatorConfigCacheTest::SetUp() {}
  
 void OperatorConfigCacheTest::TearDown() {}
 
-class IOperatorConfigHisyseventImpl : public IOperatorConfigHisysevent{
+class IOperatorConfigHisyseventImpl : public IOperatorConfigHisysevent {
 public:
     IOperatorConfigHisyseventImpl() = default;
     ~IOperatorConfigHisyseventImpl() = default;
@@ -150,8 +150,7 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
-    auto operatorConfigCache = 
-        std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
 
     operatorConfigCache->ClearAllCache(0);
     operatorConfigCache->ClearMemoryAndOpkey(0);
@@ -159,13 +158,11 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     OperatorConfig poc;
     operatorConfigCache->simFileManager_.reset();
     operatorConfigCache->ClearOperatorValue(0);
-    EXPECT_TRUE( operatorConfigCache->LoadOperatorConfigFile(0, poc)
-        == TELEPHONY_ERR_LOCAL_PTR_NULL );
+    EXPECT_TRUE( operatorConfigCache->LoadOperatorConfigFile(0, poc) == TELEPHONY_ERR_LOCAL_PTR_NULL );
     operatorConfigCache->simFileManager_ = simFileManager;
 
     simStateManager->simStateHandle_.reset();
-    AppExecFwk::InnerEvent::Pointer event = 
-        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
     operatorConfigCache->ProcessEvent(event);
     event = nullptr;
     operatorConfigCache->ProcessEvent(event);
