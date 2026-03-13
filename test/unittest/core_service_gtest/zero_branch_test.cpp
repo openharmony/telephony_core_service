@@ -122,18 +122,6 @@ void BranchTest::SetUpTestCase()
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
 
-class IccFileLoadedImpl : public IccFile::IccFileLoaded {
-public:
-    IccFileLoadedImpl() = default;
-    std::string ObtainElementaryFileName() override
-    {
-        return "";
-    }
-    void ProcessParseFile(const AppExecFwk::InnerEvent::Pointer &event) override
-    {
-    }
-};
-
 /**
  * @tc.number   Telephony_ImsRegInfoCallbackProxy_001
  * @tc.name     test error branch
@@ -2353,6 +2341,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    multiSimMonitor->isSimAccountLoaded_.resize(2, 1);
+    multiSimMonitor->initDataRemainCount_.resize(2, 1);
     auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
     multiSimMonitor->ProcessEvent(event);
