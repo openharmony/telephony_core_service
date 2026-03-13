@@ -990,8 +990,8 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_Expand001, Function | Med
     }
     {
         std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holder);
-        rcvMsg->fileData.resultData = 
-            "BF70820686A08206823082067ea0820635048206313c2a12361636c856472212e939eb2fe56715cacf";
+        rcvMsg->fileData.resultData = "BF70820686A0 \
+            8206823082067ea0820635048206313c2a12361636c856472212e939eb2fe56715cacf";
         auto event7 = AppExecFwk::InnerEvent::Get(0, rcvMsg);
         iccFileController->ProcessLinearRecordSize(event7);
     }
@@ -1076,7 +1076,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_Expand001, Function | Med
     iccFileController->ObtainLinearFileSize(0, "", event);
     iccFileController->ObtainLinearFileSize(0, event);
 
-    std::unique_ptr<Telephony::IccFromRilMsg> rcvMsgHolderNullptr = 
+    std::unique_ptr<Telephony::IccFromRilMsg> rcvMsgHolderNullptr = \
         std::make_unique<Telephony::IccFromRilMsg>(holderNullptr);
     holder->fileLoaded->SetOwner(nullptr);
     iccFileController->SendResponse(holder, &rcvMsgHolderNullptr->fileData);
