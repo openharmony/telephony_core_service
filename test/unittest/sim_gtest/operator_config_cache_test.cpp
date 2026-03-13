@@ -158,7 +158,7 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     OperatorConfig poc;
     operatorConfigCache->simFileManager_.reset();
     operatorConfigCache->ClearOperatorValue(0);
-    EXPECT_TRUE( operatorConfigCache->LoadOperatorConfigFile(0, poc) == TELEPHONY_ERR_LOCAL_PTR_NULL );
+    EXPECT_TRUE(operatorConfigCache->LoadOperatorConfigFile(0, poc) == TELEPHONY_ERR_LOCAL_PTR_NULL);
     operatorConfigCache->simFileManager_ = simFileManager;
 
     simStateManager->simStateHandle_.reset();
