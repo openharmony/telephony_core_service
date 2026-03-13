@@ -190,7 +190,20 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->UnRegisterForIccChange();
     operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
     operatorConfigCache->simFileManager_ = simFileManager;
+}
 
+HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+
+    auto Impl = std::make_shared<IOperatorConfigHisyseventImpl>();
+    operatorConfigCache->operatorConfigHisysevent_ = Impl;
+    simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManager);
+    simStateManager->simStateHandle_->iccid_ = "1234";
+    operatorConfigCache->iccidCache_ = "";
     simFileManager->opKey_ = "1234";
     operatorConfigCache->modemSimMatchedOpNameCache_ = "";
     operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
@@ -202,7 +215,6 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->simStateManager_.reset();
     operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
     operatorConfigCache->simStateManager_ = simStateManager;
-    operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
 
     operatorConfigCache->isLoadingConfig_ = true;
     operatorConfigCache->IsNeedOperatorLoad(0);
@@ -223,6 +235,8 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->GetSimState(0, state);
     operatorConfigCache->GetSimState(1, state);
     operatorConfigCache->simStateManager_ = simStateManager;
+    EXPECT_TRUE(operatorConfigCache->simStateManager_ != nullptr);
 }
+
 }
 }

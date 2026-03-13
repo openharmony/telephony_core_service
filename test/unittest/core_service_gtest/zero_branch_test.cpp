@@ -2039,7 +2039,8 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1) {
+HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1)
+{
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
@@ -2083,7 +2084,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1
     iccFile->pnnFiles_.push_back(plmnNetworkName);
     auto opl = std::make_shared<OperatorPlmnInfo>();
     oplFiles.push_back(opl);
-    EXPECT_FALSE(iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") == false);
+    EXPECT_FALSE(iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") == true);
 }
 
 /**
@@ -2091,15 +2092,14 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1) {
+HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1)
+{
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
-
     auto plmnNetworkName = std::make_shared<PlmnNetworkName>();
     iccFile->pnnFiles_.push_back(plmnNetworkName);
-
     iccFile->isOplFileResponsed_ = true;
     iccFile->isOpl5gFileResponsed_ = true;
     iccFile->oplFiles_.clear();
@@ -2121,30 +2121,23 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
 
     iccFile->voiceMailConfig_ = std::make_shared<VoiceMailConstants>(0);
     iccFile->LoadVoiceMail();
-
     std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
     iccFile->imsi_ = "123";
     iccFile->RegisterImsiLoaded(handler);
-
     iccFile->iccId_ = "123";
     iccFile->RegisterIccidLoaded(handler);
     iccFile->UnregisterIccidLoaded(handler);
-
     iccFile->BuildCallerInfo(0, 0, 0);
     iccFile->BuildCallerInfo(0, nullptr);
-
     std::shared_ptr<ControllerToFileMsg> fd = std::make_shared<ControllerToFileMsg>(nullptr, nullptr);
     fd->iccLoader = nullptr;
     AppExecFwk::InnerEvent::Pointer testEvent2 = InnerEvent::Get(0, fd);
     iccFile->ProcessIccFileObtained(testEvent2);
-
     iccFile->iccLanguage_ = "123";
     iccFile->UpdateIccLanguage("", "");
-
     std::string iccId = "";
     iccFile->SwapPairsForIccId(iccId);
     iccFile->GetFullIccid(iccId);
-
     EXPECT_TRUE(iccFile->CreateDiallingNumberPointer(0, 0, 0, nullptr) != nullptr);
 }
 
@@ -2153,7 +2146,8 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1) {
+HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1)
+{
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
