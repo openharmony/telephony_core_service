@@ -763,7 +763,6 @@ HWTEST_F(IccFileTest, Telephony_IccFile_030, Function | MediumTest | Level1)
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     iccFile->SetId(0);
     iccFile->SetId(0);
-
     EXPECT_NE(iccFile->voiceMailConfig_, nullptr);
 }
 }

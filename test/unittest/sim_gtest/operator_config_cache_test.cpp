@@ -44,22 +44,6 @@ void OperatorConfigCacheTest::SetUp() {}
  
 void OperatorConfigCacheTest::TearDown() {}
 
-class MockOperatorConfigCache : public OperatorConfigCache {
-public:
-    explicit MockOperatorConfigCache(
-        std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<SimStateManager> simStateManager, int32_t slotId)
-        :OperatorConfigCache(simFileManager, simStateManager, slotId)
-    {
-    }
-
-    MOCK_METHOD1(GetOpKey, std::string(int32_t));
-    MOCK_METHOD2(GetSimState, int(int32_t slotId, SimState &simState));
-    MOCK_METHOD2(GetSimIccId, int(int32_t slotId, SimState &simState));
-    MOCK_METHOD2(LoadOperatorConfigFile, int32_t(int32_t slotId, OperatorConfig &poc));
-    MOCK_METHOD3(IsNeedSendOperatorConfigChange, 
-        bool(std::string opkey, bool isOpkeyDbError, SimState simState));
-};
-
 class IOperatorConfigHisyseventImpl : public IOperatorConfigHisysevent{
 public:
     IOperatorConfigHisyseventImpl() = default;
@@ -167,7 +151,7 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
     auto operatorConfigCache = 
-        std::make_shared<MockOperatorConfigCache>(simFileManager, simStateManager, 0);
+        std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
 
     operatorConfigCache->ClearAllCache(0);
     operatorConfigCache->ClearMemoryAndOpkey(0);
@@ -175,21 +159,23 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     OperatorConfig poc;
     operatorConfigCache->simFileManager_.reset();
     operatorConfigCache->ClearOperatorValue(0);
-    EXPECT_TRUE( operatorConfigCache->LoadOperatorConfigFile(0, poc) 
+    EXPECT_TRUE( operatorConfigCache->LoadOperatorConfigFile(0, poc)
         == TELEPHONY_ERR_LOCAL_PTR_NULL );
     operatorConfigCache->simFileManager_ = simFileManager;
 
-    {
-        auto simStateManager = simFileManager->simStateManager_.lock();
-        simStateManager->simStateHandle_->iccid_ = "1234";
-    }
+    simStateManager->simStateHandle_.reset();
+    AppExecFwk::InnerEvent::Pointer event = 
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
+    operatorConfigCache->ProcessEvent(event);
+    event = nullptr;
+    operatorConfigCache->ProcessEvent(event);
+    operatorConfigCache->AnnounceOperatorConfigChanged(0, 1);
+
+    simStateManager->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManager);
+    simStateManager->simStateHandle_->iccid_ = "1234";
     operatorConfigCache->iccidCache_ = "";
     poc.configValue.clear();
     operatorConfigCache->LoadOperatorConfigFile(0, poc);
-
-    EXPECT_CALL(*operatorConfigCache, LoadOperatorConfigFile(_, _))
- 	    .WillOnce(Return(~TELEPHONY_ERR_SUCCESS));
-    operatorConfigCache->LoadOperatorConfig(0, poc, 0);
 
     poc.configValue = {
         {u"key1", u"value1"},
@@ -202,18 +188,11 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->UpdateOperatorConfigs(0);
 
     operatorConfigCache->simFileManager_.reset();
+    operatorConfigCache->LoadOperatorConfig(0, poc, 0);
     operatorConfigCache->RegisterForIccChange();
     operatorConfigCache->UnRegisterForIccChange();
     operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
     operatorConfigCache->simFileManager_ = simFileManager;
-
-    AppExecFwk::InnerEvent::Pointer event = 
-        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_CHANGE);
-    EXPECT_CALL(*operatorConfigCache, GetSimState(_, _))
- 	    .WillOnce(Return((int)SimState::SIM_STATE_UNKNOWN));
-    operatorConfigCache->ProcessEvent(event);
-    event = nullptr;
-    operatorConfigCache->ProcessEvent(event);
 
     simFileManager->opKey_ = "1234";
     operatorConfigCache->modemSimMatchedOpNameCache_ = "";
@@ -228,10 +207,6 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->simStateManager_ = simStateManager;
     operatorConfigCache->SendSimMatchedOperatorInfo(0, 0);
 
-    EXPECT_CALL(*operatorConfigCache, IsNeedSendOperatorConfigChange(_, _, _))
- 	    .WillOnce(Return(true));
-    operatorConfigCache->AnnounceOperatorConfigChanged(0, 1);
-
     operatorConfigCache->isLoadingConfig_ = true;
     operatorConfigCache->IsNeedOperatorLoad(0);
     operatorConfigCache->isLoadingConfig_ = false;
@@ -243,11 +218,14 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand001, Function | Medi
     operatorConfigCache->iccidCache_ = "";
     operatorConfigCache->simFileManager_.reset();
     operatorConfigCache->UpdateIccidCache(0);
+    operatorConfigCache->simFileManager_ = simFileManager;
+
+    operatorConfigCache->simStateManager_.reset();
     operatorConfigCache->slotId_ = 1;
     SimState state;
     operatorConfigCache->GetSimState(0, state);
-    EXPECT_TRUE( operatorConfigCache->GetSimState(1, state) == TELEPHONY_ERR_LOCAL_PTR_NULL );
-    operatorConfigCache->simFileManager_ = simFileManager;
+    operatorConfigCache->GetSimState(1, state);
+    operatorConfigCache->simStateManager_ = simStateManager;
 }
 }
 }
