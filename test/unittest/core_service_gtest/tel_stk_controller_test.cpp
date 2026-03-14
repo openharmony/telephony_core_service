@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int32_t INVALID_SLOTID = -1;
+const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 class TelStkControllerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -84,6 +85,17 @@ HWTEST_F(TelStkControllerTest, Telephony_StkController_StkBundleName_002, Functi
 HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | MediumTest | Level1)
 {
     TelephonyExtWrapper telephonyExtWrapper;
+    telephonyExtWrapper.telephonyExtWrapperHandle_ = nullptr;
+    telephonyExtWrapper.InitTelephonyExtWrapper();
+    telephonyExtWrapper.InitTelephonyExtWrapperForSim1();
+    telephonyExtWrapper.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    telephonyExtWrapper.InitTelephonyExtWrapper();
+    telephonyExtWrapper.InitTelephonyExtWrapperForSim1();
+    telephonyExtWrapper.setActiveSim_ = nullptr;
+    telephonyExtWrapper.SetActiveSimFunc(0, 0);
+    telephonyExtWrapper.InitTelephonyExtWrapperForSim1();
+    telephonyExtWrapper.setActiveSim_ = [](int32_t slotId, int32_t enable) {};
+    telephonyExtWrapper.SetActiveSimFunc(0, 0);
     EXPECT_FALSE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
     telephonyExtWrapper.reportEventToChr_ = [](int32_t slotId, const char* scenario, int32_t cause) { return 0; };
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
