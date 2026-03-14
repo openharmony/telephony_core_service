@@ -321,12 +321,12 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = multiSimController_->SetActiveSim(slotId, enable);
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(slotId, enable);
+    }
     if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
         multiSimMonitor_->NotifySimActiveStateChanged(slotId, static_cast<bool>(enable));
-    }
-    if (ret == TELEPHONY_ERR_SUCCESS) {
-        TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(slotId, enable);
     }
     return ret;
 }
