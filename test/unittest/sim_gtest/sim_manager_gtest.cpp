@@ -44,6 +44,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 using namespace testing;
+const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 
 class SimManagerTest : public testing::Test {
 public:
