@@ -44,7 +44,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 using namespace testing;
-const std::string TELEPHONY_EXT_WRAPPER_PATH = "libtelephony_ext_service.z.so";
 
 class SimManagerTest : public testing::Test {
 public:
@@ -224,6 +223,7 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_010, Function | MediumTest | L
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t slotId = 0;
+    simManager_->multiSimController_ = multiSimController;
     simManager_->SetActiveSim(slotId, 0);
     slotId = -1;
     simManager_->SetActiveSim(slotId, 0);
@@ -283,15 +283,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_012, Function | MediumTest | L
     simManager_->ResetSimLoadAccount(slotId);
     simManager_->ResetSimLoadAccount(slotId);
     simManager_->SetDefaultCellularDataSlotId(slotId);
-    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = nullptr;
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
-    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
-    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
-    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
-    TELEPHONY_EXT_WRAPPER.setActiveSim_ = nullptr;
-    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
     EXPECT_TRUE(simManager_->simFileManager_.empty());
 }
 
