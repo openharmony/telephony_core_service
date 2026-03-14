@@ -40,7 +40,7 @@
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
-const int SET_PRIMARY_RETRY_TIMES = 5;
+const int RETRY_TIMES = 5;
 static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const int32_t MODEM_ID_0 = 0;
@@ -121,7 +121,9 @@ void MultiSimController::Init()
     }
     maxCount_ = SIM_SLOT_COUNT;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
-    setPrimarySlotRemainCount_.resize(maxCount_, SET_PRIMARY_RETRY_TIMES);
+    setPrimarySlotRemainCount_.resize(maxCount_, RETRY_TIMES);
+    refreshLocalCacheRemainCount_ = RETRY_TIMES;
+    refreshAllLocalCacheRemainCount_ = RETRY_TIMES;
     isRilSetPrimarySlotSupport_ =
         system::GetBoolParameter(RIL_SET_PRIMARY_SLOT_SUPPORTED, false);
     isSupportEsimMep_ = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
@@ -243,11 +245,11 @@ bool MultiSimController::InitData(int32_t slotId)
         HILOG_COMM_ERROR("Can not init IccId");
         return false;
     }
-    if (!GetListFromDataBase()) { // init data base to local cache
+    if (!GetListFromDataBase(false)) { // init data base to local cache
         HILOG_COMM_ERROR("Can not get dataBase");
         return false;
     }
-    GetAllListFromDataBase();
+    GetAllListFromDataBase(false);
     if (localCacheInfo_.size() <= 0) {
         TELEPHONY_LOGE("sim not initialize");
         return false;
@@ -273,7 +275,7 @@ bool MultiSimController::InitData(int32_t slotId)
 
 bool MultiSimController::InitEsimData()
 {
-    if (!GetAllListFromDataBase()) {
+    if (!GetAllListFromDataBase(false)) {
         TELEPHONY_LOGE("cant get database");
         return false;
     }
@@ -668,7 +670,7 @@ bool MultiSimController::InitShowNumber(int slotId)
     return result == TELEPHONY_ERR_SUCCESS;
 }
 
-bool MultiSimController::GetListFromDataBase()
+bool MultiSimController::GetListFromDataBase(bool isNeedProtectiveRetry)
 {
     std::vector<SimRdbInfo> newCache;
     if (simDbHelper_ == nullptr) {
@@ -677,16 +679,24 @@ bool MultiSimController::GetListFromDataBase()
     }
     int32_t result = simDbHelper_->QueryAllValidData(newCache);
     TELEPHONY_LOGI("QueryAllValidData result is %{public}d", result);
-    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
-    if (localCacheInfo_.size() > 0) {
-        localCacheInfo_.clear();
+    if (result != TELEPHONY_SUCCESS) {
+        if (refreshLocalCacheRemainCount_ > 0 && isNeedProtectiveRetry) {
+            RemoveEvent(MultiSimController::REFRESH_LOCAL_CACHE_RETRY);
+            SendEvent(MultiSimController::REFRESH_LOCAL_CACHE_RETRY, WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT);
+            refreshLocalCacheRemainCount_--;
+        }
+    } else {
+        std::unique_lock<ffrt::shared_mutex> lock(mutex_);
+        if (localCacheInfo_.size() > 0) {
+            localCacheInfo_.clear();
+        }
+        localCacheInfo_ = newCache;
+        SortCache();
     }
-    localCacheInfo_ = newCache;
-    SortCache();
     return result != INVALID_VALUE;
 }
 
-bool MultiSimController::GetAllListFromDataBase()
+bool MultiSimController::GetAllListFromDataBase(bool isNeedProtectiveRetry)
 {
     std::vector<SimRdbInfo> newCache;
     if (simDbHelper_ == nullptr) {
@@ -695,12 +705,21 @@ bool MultiSimController::GetAllListFromDataBase()
     }
     int32_t result = simDbHelper_->QueryAllData(newCache);
     TELEPHONY_LOGI("QueryAllData result is %{public}d", result);
-    std::unique_lock<ffrt::shared_mutex> lock(mutex_);
-    if (allLocalCacheInfo_.size() > 0) {
-        allLocalCacheInfo_.clear();
+
+    if (result != TELEPHONY_SUCCESS) {
+        if (refreshAllLocalCacheRemainCount_ > 0 && isNeedProtectiveRetry) {
+            RemoveEvent(MultiSimController::REFRESH_ALL_LOCAL_CACHE_RETRY);
+            SendEvent(MultiSimController::REFRESH_ALL_LOCAL_CACHE_RETRY, WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT);
+            refreshAllLocalCacheRemainCount_--;
+        }
+    } else {
+        std::unique_lock<ffrt::shared_mutex> lock(mutex_);
+        if (allLocalCacheInfo_.size() > 0) {
+            allLocalCacheInfo_.clear();
+        }
+        allLocalCacheInfo_ = newCache;
+        SortAllCache();
     }
-    allLocalCacheInfo_ = newCache;
-    SortAllCache();
     return result != INVALID_VALUE;
 }
 
@@ -1088,7 +1107,7 @@ int32_t MultiSimController::GetDefaultMainSlotByIccId()
     } else if (lastMainCardIccId == encryptIccIdSub2) {
         mainSlot = SIM_SLOT_1;
     }
-    TELEPHONY_LOGI("slotId %{public}d", mainSlot);
+    TELEPHONY_LOGI("GetDefaultMainSlotByIccId slotId %{public}d", mainSlot);
     return mainSlot;
 }
 
@@ -1189,7 +1208,6 @@ int32_t MultiSimController::GetFirstActivedSlotId()
 
 int32_t MultiSimController::SetDefaultVoiceSlotId(int32_t slotId)
 {
-    TELEPHONY_LOGI("slotId %{public}d", slotId);
     int curSimId = 0;
     int32_t ret = GetTargetDefaultSimId(slotId, curSimId);
     if (ret != TELEPHONY_ERR_SUCCESS) {
@@ -1406,7 +1424,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         radioProtocolController_->GetRadioProtocolModemId(slotId) == MODEM_ID_0) {
         TELEPHONY_LOGI("The current slot is the main slot, no need to set primary slot");
         SavePrimarySlotIdInfo(slotId);
-        setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+        setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
         RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
         return TELEPHONY_ERR_SUCCESS;
     }
@@ -1435,7 +1453,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     SendMainCardBroadCast(slotId);
     SetDefaultCellularDataSlotId(slotId);
     SetPrimarySlotIdDone(false);
-    setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+    setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1492,7 +1510,7 @@ void MultiSimController::ResetSetPrimarySlotRemain(int32_t slotId)
         return;
     }
     TELEPHONY_LOGI("ResetSetPrimarySlotRemain, slotId = %{public}d", slotId);
-    setPrimarySlotRemainCount_[slotId] = SET_PRIMARY_RETRY_TIMES;
+    setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
 }
 
@@ -1503,7 +1521,6 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         return;
     }
     auto eventCode = event->GetInnerEventId();
-    TELEPHONY_LOGI("EventCode is %{public}d", eventCode);
     switch (eventCode) {
         case MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT: {
             auto primarySlotId = event->GetParam();
@@ -1524,6 +1541,10 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             waitCardsReady_ = false;
             ReCheckPrimary();
             break;
+        case REFRESH_LOCAL_CACHE_RETRY:
+            GetListFromDataBase();
+        case REFRESH_ALL_LOCAL_CACHE_RETRY:
+            GetAllListFromDataBase();
         default:
             break;
     }
@@ -1653,7 +1674,6 @@ int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNu
 
 int32_t MultiSimController::SetShowNumber(int32_t slotId, std::u16string number, bool force)
 {
-    TELEPHONY_LOGI("slotId %{public}d", slotId);
     if (!force && !IsValidData(slotId)) {
         TELEPHONY_LOGE("slotId %{public}d is invalid", slotId);
         return TELEPHONY_ERR_NO_SIM_CARD;
