@@ -282,6 +282,15 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_012, Function | MediumTest | L
     simManager_->ResetSimLoadAccount(slotId);
     simManager_->ResetSimLoadAccount(slotId);
     simManager_->SetDefaultCellularDataSlotId(slotId);
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
+    TELEPHONY_EXT_WRAPPER.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapperForSim1();
+    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
+    TELEPHONY_EXT_WRAPPER.setActiveSim_ = nullptr;
+    TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(0, 0);
     EXPECT_TRUE(simManager_->simFileManager_.empty());
 }
 
