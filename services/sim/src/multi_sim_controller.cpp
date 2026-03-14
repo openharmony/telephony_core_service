@@ -1541,6 +1541,10 @@ void MultiSimController::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             waitCardsReady_ = false;
             ReCheckPrimary();
             break;
+        case REFRESH_LOCAL_CACHE_RETRY:
+            GetListFromDataBase();
+        case REFRESH_ALL_LOCAL_CACHE_RETRY:
+            GetAllListFromDataBase();
         default:
             break;
     }
