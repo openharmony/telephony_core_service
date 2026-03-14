@@ -134,6 +134,7 @@ public:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*UnRegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
 
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
@@ -215,6 +216,7 @@ public:
     bool GetManualNetworkSearchStateFunc();
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void SetActiveSimFunc(int32_t slotId, int32_t enable);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -227,6 +229,7 @@ private:
     GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
+    SetActiveSim setActiveSim_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -234,6 +237,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForSim1();
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
     void InitTelephonyExtWrapperForDynamicLoad();
@@ -393,6 +397,7 @@ inline void RegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExec
 {}
 inline void UnRegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {}
+inline void SetActiveSimImpl(int32_t slotId, int32_t enable) {}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -403,6 +408,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapper()
     telephonyExtWrapperHandle_ = NONULL_HANDLE;
     InitTelephonyExtWrapperForDynamicLoad();
     InitTelephonyExtWrapperForSim();
+    InitTelephonyExtWrapperForSim1();
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
@@ -519,6 +525,11 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     reportEventToChr_ = &ReportEventToChrImpl;
 }
 
+inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
+{
+    setActiveSim_ = &SetActiveSimImpl;
+}
+
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
 {
     getOpkeyVersion_ = &GetOpkeyVersionImpl;
@@ -591,6 +602,13 @@ inline void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
 {
     if (unRegistryCoreNotify_ != nullptr) {
         unRegistryCoreNotify_(slotId, handler, what);
+    }
+}
+
+inline void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
+{
+    if (setActiveSim_ != nullptr) {
+        setActiveSim_(slotId, enable);
     }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
