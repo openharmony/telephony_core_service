@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -265,7 +265,8 @@ enum SpnShowType {
 
 enum ActiveState {
     DEACTIVE = 0,
-    ACTIVE = 1
+    ACTIVE = 1,
+    UNKNOWN = 2
 };
 
 enum CardShape {
@@ -321,29 +322,29 @@ enum CallForwardingStatus {
 
 enum class UsimService {
     USIM_PHONEBOOK = 1,
-    USIM_FDN, // Fixed Dialing Numbers
-    USIM_FDN_EXTENSION,
-    USIM_SDN,
-    USIM_SDN_EXTENSION,
-    USIM_BDN,
-    USIM_BDN_EXTENSION,
+    USIM_FDN,            // Fixed Dialing Numbers
+    USIM_FDN_EXTENSION,  // FDN extension data in EF_EXT2
+    USIM_SDN,            // Service Dialing Numbers
+    USIM_SDN_EXTENSION,  // SDN extension data in EF_EXT3
+    USIM_BDN,            // Barred Dialing Numbers
+    USIM_BDN_EXTENSION,  // BDN extension data in EF_EXT4
     USIM_OUTGOING_CALL_INFO,
     USIM_INCOMING_CALL_INFO,
     USIM_SM_STORAGE,
     USIM_SM_STATUS_REPORTS,
-    USIM_SM_SERVICE_PARAMS,
+    USIM_SERVICE_PARAMS,
     USIM_ADVICE_OF_CHARGE,
     USIM_CAP_CONFIG_PARAMS_2,
     USIM_CB_MESSAGE_ID,
     USIM_CB_MESSAGE_ID_RANGES,
     USIM_GROUP_ID_LEVEL_1,
     USIM_GROUP_ID_LEVEL_2,
-    USIM_SPN,
+    USIM_SPN,  // Service Provider Name
     USIM_USER_PLMN_SELECT,
     USIM_MSISDN,
     USIM_IMAGE,
     USIM_LOCALISED_SERVICE_AREAS,
-    USIM_EMLPP,
+    USIM_EMLPP,  // Enhanced Multi-Level Precedence and Preemption
     USIM_EMLPP_AUTO_ANSWER,
     USIM_RFU,
     USIM_GSM_ACCESS,
@@ -353,7 +354,7 @@ enum class UsimService {
     USIM_MO_SMS_CONTROL_BY_USIM,
     USIM_RUN_AT_COMMAND,
     USIM_IGNORED_1,
-    USIM_ENABLED_SERVICE_TABLE,
+    USIM_ENABLED_SERVICES_TABLE,
     USIM_APN_CONTROL_LIST,
     USIM_DEPERSONALISATION_CONTROL_KEYS,
     USIM_COOPERATIVE_NETWORK_LIST,
@@ -363,16 +364,16 @@ enum class UsimService {
     USIM_MEXE,
     USIM_OPERATOR_PLMN_SELECT,
     USIM_HPLMN_SELECT,
-    USIM_EXTENSION_5,
+    USIM_EXTENSION_5,  // Extension data for ICI, OCI, MSISDN in EF_EXT5
     USIM_PLMN_NETWORK_NAME,
     USIM_OPERATOR_PLMN_LIST,
-    USIM_MBDN,
-    USIM_MWI_STATUS,
-    USIM_CFI_STATUS,
+    USIM_MBDN,        // Mailbox Dialing Numbers
+    USIM_MWI_STATUS,  // Message Waiting Indication status
+    USIM_CFI_STATUS,  // Call Forwarding Indication status
     USIM_IGNORED_2,
     USIM_SERVICE_PROVIDER_DISPLAY_INFO,
     USIM_MMS_NOTIFICATION,
-    USIM_MMS_NOTIFICATION_EXTENSION,
+    USIM_MMS_NOTIFICATION_EXTENSION,  // MMS Notification extension data in EF_EXT8
     USIM_GPRS_CALL_CONTROL_BY_USIM,
     USIM_MMS_CONNECTIVITY_PARAMS,
     USIM_NETWORK_INDICATION_OF_ALERTING,
@@ -387,7 +388,7 @@ enum class UsimService {
     USIM_VBS_SECURITY,
     USIM_WLAN_REAUTH_IDENTITY,
     USIM_MM_STORAGE,
-    USIM_GBA,
+    USIM_GBA,  // Generic Bootstrapping Architecture
     USIM_MBMS_SECURITY,
     USIM_DATA_DL_VIA_USSD,
     USIM_EQUIVALENT_HPLMN,
@@ -424,7 +425,7 @@ enum class UsimService {
     USIM_USAT_APPLICATION_PAIRING,
     USIM_MEDIA_TYPE_SUPPORT,
     USIM_IMS_CALL_DISCONNECTION_CAUSE,
-    USIM_URI_SUPPORT_FOR_MO_SHORT_MSG_CTL,
+    USIM_URI_SOPPORT_FOR_MO_SHORT_MSG_CTL,
     USIM_EPDG_CONFIG_INFO_FOR_SERVICE_SUPPORT,
     USIM_EPDG_CONFIG_INFO_FOR_SERVICE_CONFIGURED,
     USIM_ACDC_SUPPORT,
@@ -432,7 +433,7 @@ enum class UsimService {
     USIM_EPDG_CONFIG_INFO_FOR_EMG_SERVICE_SUPPORT,
     USIM_EPDG_CONFIG_INFO_FOR_EMG_SERVICE_CONFIGURED,
     USIM_ECALL_DATA_OVER_MIS,
-    USIM_URI_SUPPORTED_FOR_SMS_PP_DOWNLOAD,
+    USIM_URI_SUPPOTRED_FOR_SMS_PP_DOWNLOAD,
     USIM_FROM_PREFERRED,
     USIM_IMS_CONFIG_DATA,
     USIM_TV_CONFIG,
@@ -454,6 +455,9 @@ enum class UsimService {
     USIM_SUPPORT_FOR_URSP_BY_USIM,
     USIM_FOR_5G_SECURITY_PARAMETERS_EXTENDED,
 };
+
+static constexpr int32_t ACTIVE_USER_ID = 100;
+static constexpr int32_t PRIVATE_USER_ID = 101;
 
 } // namespace Telephony
 } // namespace OHOS

@@ -21,6 +21,7 @@
 #include "os_account_manager_wrapper.h"
 #include "operator_file_parser.h"
 #include "radio_event.h"
+#include "sim_constant.h"
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
@@ -32,7 +33,6 @@ namespace Telephony {
 const int64_t DELAY_TIME = 1000;
 const int64_t DELAY_THREE_SECONDS = 3000;
 const int64_t RETRY_TIME = 3 * 60 * 1000;
-const int32_t ACTIVE_USER_ID = 100;
 static constexpr int32_t SIM_ACCOUNT_LOADED_SEND = 1;
 const int INIT_TIMES = 15;
 const int INIT_DATA_TIMES = 10;
@@ -48,23 +48,25 @@ MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &cont
     if (observerHandler_ == nullptr) {
         observerHandler_ = std::make_unique<ObserverHandler>();
     }
+    auto simRdbHelper = std::make_shared<SimRdbHelper>();
+    cacheSyncManager_ = std::make_unique<SimCacheSyncManager>(controller_, simRdbHelper);
 }
 
 MultiSimMonitor::~MultiSimMonitor()
 {
-    TELEPHONY_LOGD("destory");
     UnSubscribeListeners();
+    UnregisterRebootDetectCallback();
 }
 
 void MultiSimMonitor::Init()
 {
-    TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
-    initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
-    std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
-    controller_->loadedSimCardInfo_.clear();
+    initRebootDetectRemainCount_ = INIT_TIMES;
+    if (controller_ != nullptr) {
+        controller_->CleanLoadedSimInfo(INVALID_VALUE);
+    }
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
@@ -161,6 +163,10 @@ static void RebootDetectCallback(const char *key, const char *value, void *conte
 {
     TELEPHONY_LOGI("reboot detect, key = %{public}s, value = %{public}s", key, value);
     MultiSimMonitor *service = reinterpret_cast<MultiSimMonitor *>(context);
+    if (service == nullptr) {
+        TELEPHONY_LOGE("RebootDetectCallback service is nullptr");
+        return;
+    }
     service->CheckSimPresentWhenReboot();
 }
 
@@ -187,6 +193,7 @@ void MultiSimMonitor::UnregisterRebootDetectCallback()
         RemoveParameterWatcher((PROP_REBOOT_DETECT_SIM + std::to_string(SIM_SLOT_1)).c_str(),
             parameterChgPtr_, this);
     }
+    parameterChgPtr_ = nullptr;
 }
 
 void MultiSimMonitor::CheckOpcNeedUpdata(const bool isDataShareError)
@@ -275,7 +282,9 @@ void MultiSimMonitor::UpdateAllOpkeyConfigs()
 
 void MultiSimMonitor::InitData(int32_t slotId)
 {
-    TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d", slotId);
+    std::vector<int32_t> activeList = { 0 };
+    DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    TELEPHONY_LOGI("MultiSimMonitor::InitData slotId = %{public}d userId: %{public}d", slotId, activeList[0]);
     if (!IsValidSlotId(slotId)) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData slotId is invalid");
         return;
@@ -353,6 +362,7 @@ void MultiSimMonitor::RefreshData(int32_t slotId)
             CoreManagerInner::GetInstance().IsModemInitDone(slotId)))) {
         HILOG_COMM_INFO("RefreshData clear data when slotId %{public}d is absent or unknown", slotId);
         simFileManager->ClearData();
+        controller_->CleanLoadedSimInfo(slotId);
         controller_->ForgetAllData(slotId);
         controller_->GetListFromDataBase();
         controller_->GetAllListFromDataBase();
@@ -499,13 +509,15 @@ void MultiSimMonitor::SubscribeUserSwitch()
         return;
     }
     userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(shared_from_this());
-    CoreManagerInner::GetInstance().RegisterCommonEventCallback(
-        userSwitchSubscriber_, {TelCommonEvent::USER_SWITCHED});
+    CoreManagerInner::GetInstance().RegisterCommonEventCallback(userSwitchSubscriber_, {TelCommonEvent::USER_SWITCHED});
 }
 
 void MultiSimMonitor::OnDataShareReady(int32_t userId)
 {
     isDataShareReady_ = true;
+    if (controller_ != nullptr) {
+        controller_->SetDataShareReady(true);
+    }
     if (lastUserId_ != -1 || userId == ACTIVE_USER_ID) {
         CheckDataShareError();
         CheckSimNotifyRegister();
@@ -557,11 +569,21 @@ void MultiSimMonitor::OnUserSwitched(int32_t userId)
     if (userId != 0 && isDataShareReady_) {
         UpdateAllSimData(userId);
     }
+    if (cacheSyncManager_ != nullptr) {
+        cacheSyncManager_->SyncCacheOnUserSwitch(userId, lastUserId_);
+    }
     SetLastUserId(userId);
 }
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()
 {
+    if (!isForgetAllDataDone_ && initRebootDetectRemainCount_ > 0) {
+        RemoveEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
+        SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, DELAY_THREE_SECONDS);
+        TELEPHONY_LOGI("reboot detect retry remain %{public}d", initRebootDetectRemainCount_);
+        initRebootDetectRemainCount_--;
+        return;
+    }
     for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
         if (OHOS::system::GetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0") == "1" &&
             !hasCheckedSimPresent_[slotId]) {
@@ -569,13 +591,16 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
                 OHOS::system::SetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0");
                 hasCheckedSimPresent_[slotId] = true;
                 TELEPHONY_LOGI("reboot detect update sim present success");
-            } else if (initRebootDetectRemainCount_[slotId] > 0) {
-                SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, slotId, DELAY_THREE_SECONDS);
+            } else if (initRebootDetectRemainCount_ > 0) {
+                RemoveEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT);
+                SendEvent(MultiSimMonitor::INIT_REBOOT_DETECT_DATA_RETRY_EVENT, DELAY_THREE_SECONDS);
                 TELEPHONY_LOGI("reboot detect slotId=%{public}d retry remain %{public}d",
-                    slotId, initRebootDetectRemainCount_[slotId]);
-                initRebootDetectRemainCount_[slotId]--;
+                    slotId, initRebootDetectRemainCount_);
+                initRebootDetectRemainCount_--;
+                return;
             } else {
                 TELEPHONY_LOGE("reboot detect fail!!!");
+                return;
             }
         }
     }
@@ -678,7 +703,6 @@ std::list<MultiSimMonitor::SimAccountCallbackRecord> MultiSimMonitor::GetSimAcco
 void MultiSimMonitor::NotifySimAccountChanged()
 {
     std::list<SimAccountCallbackRecord> CallbackRecord = GetSimAccountCallbackRecords();
-    TELEPHONY_LOGD("CallbackRecord size is %{public}zu", CallbackRecord.size());
     for (auto iter : CallbackRecord) {
         if (iter.simAccountCallback != nullptr) {
             iter.simAccountCallback->OnSimAccountChanged();
@@ -715,12 +739,8 @@ void MultiSimMonitor::RegisterSimNotify()
 
 void MultiSimMonitor::RefreshSimAccountLoaded()
 {
-    if (controller_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimContorller is null");
-        return;
-    }
     if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("observerHandler_ is nullptr");
+        TELEPHONY_LOGE("ObserverHandler_ is null");
         return;
     }
     if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_0)) {
