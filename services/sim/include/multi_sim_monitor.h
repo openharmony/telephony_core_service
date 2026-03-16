@@ -23,7 +23,6 @@
 #include "i_operator_config_hisysevent.h"
 #include "multi_sim_controller.h"
 #include "os_account_manager_wrapper.h"
-#include "sim_cache_sync_manager.h"
 #include "sim_constant.h"
 #include "sim_file_manager.h"
 #include "system_ability_definition.h"
@@ -35,7 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using ParameterChgPtr = void (*)(const char *, const char *, void *);
+typedef void (*ParameterChgPtr)(const char *, const char *, void *);
 class MultiSimMonitor : public TelEventHandler {
 public:
     explicit MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
@@ -107,7 +106,6 @@ private:
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);
     bool GetBlockLoadOperatorConfig();
-    bool IsSwitchToProfileFromAnother(int32_t slotId);
     void UpdateSimStateToStateRegistry();
     void RegisterRebootDetectCallback();
     void UnregisterRebootDetectCallback();
@@ -118,14 +116,17 @@ private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
     public:
         explicit DataShareEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler)
-            : handler_(handler) {}
+            : handler_(handler) {};
+        ~DataShareEventSubscriber() = default;
         void OnDataShareReady() override;
         std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
 
     class UserSwitchEventSubscriber : public CoreServiceCommonEventCallback {
     public:
-        explicit UserSwitchEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler) : handler_(handler) {};
+        explicit UserSwitchEventSubscriber(std::shared_ptr<AppExecFwk::EventHandler> handler)
+            : handler_(handler) {};
+        ~UserSwitchEventSubscriber() = default;
         void OnUserSwitched(int32_t userId) override;
         std::weak_ptr<AppExecFwk::EventHandler> handler_;
     };
@@ -145,7 +146,7 @@ private:
 private:
     static constexpr const int SLOT_COUNT = 2;
     bool hasCheckedSimPresent_[SLOT_COUNT] = {false, false};
-    int32_t initRebootDetectRemainCount_ = 0;
+    std::vector<int> initRebootDetectRemainCount_;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
@@ -164,11 +165,10 @@ private:
     std::mutex mutexForData_;
     std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
-    std::atomic<bool> isDataShareReady_ = false;
+    bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
     std::atomic<int32_t> lastUserId_ = -1;
-    std::unique_ptr<SimCacheSyncManager> cacheSyncManager_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
