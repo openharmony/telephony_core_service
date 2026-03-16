@@ -589,7 +589,7 @@ HWTEST_F(SimCacheSyncManagerTest, SimCacheSyncManager_SyncCacheOnUserSwitch_016,
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
-    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager, 
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
         simStateManager, simFileManager);
     
     auto simRdbHelper = std::make_shared<MockSimRdbHelper>();
