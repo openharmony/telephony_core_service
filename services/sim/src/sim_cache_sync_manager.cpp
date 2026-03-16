@@ -129,8 +129,7 @@ int32_t SimCacheSyncManager::ExecuteSyncProcess(int32_t currentUserId, bool need
         isSyncing_ = false;
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
-    
-    controller->ClearModifiedRecords();
+
     lastSyncFailed_ = false;
     isSyncing_ = false;
     TELEPHONY_LOGI("Sync cache on user switch success");
