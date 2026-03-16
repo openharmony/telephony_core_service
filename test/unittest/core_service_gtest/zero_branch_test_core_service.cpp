@@ -34,7 +34,6 @@
 #include "mock_multi_sim_controller.h"
 #include "mock_i_raw_parcel_callback.h"
 #include "mock_sim_rdb_helper.h"
-#include "multi_sim_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -539,9 +538,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
-    std::shared_ptr<Telephony::MultiSimHelper> multiSimHelper = std::make_shared<MultiSimHelper>();
     multiSimController->PublishSetPrimaryEvent(true, false);
-    multiSimHelper->EncryptIccId("");
+    multiSimController->EncryptIccId("");
     multiSimController->GetDefaultMainSlotByIccId();
     multiSimController->lastPrimarySlotId_ = 1;
     auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
