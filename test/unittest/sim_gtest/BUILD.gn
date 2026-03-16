@@ -80,6 +80,7 @@ core_service_sim_test_sources += [
   "pdp_profile_rdb_helper_test.cpp",
   "operator_config_cache_test.cpp",
   "ruim_file_gtest.cpp",
+  "sim_cache_sync_manager_gtest.cpp",
   "sim_file_gtest.cpp",
   "sim_manager_gtest.cpp",
   "sim_sms_controller_gtest.cpp",
