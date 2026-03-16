@@ -1817,7 +1817,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimController_HasModifiedRecords_001, Func
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     
     EXPECT_FALSE(multiSimController->HasModifiedRecords());
-    
+
     std::string iccId = "12345123451234512345";
     multiSimController->MarkCacheModified(iccId, "showName");
     
