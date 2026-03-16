@@ -1098,7 +1098,6 @@ int32_t NetworkSearchManager::GetMeid(int32_t slotId, std::u16string &meid)
         eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_MEID);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    meid = inner->meid_;
     return TELEPHONY_ERR_SUCCESS;
 }
 
