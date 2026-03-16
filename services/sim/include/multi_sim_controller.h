@@ -17,9 +17,6 @@
 #define OHOS_MULTI_SIM_CONTROLLER_H
 
 #include <list>
-#include <set>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <ffrt.h>
 #include "if_system_ability_manager.h"
@@ -35,7 +32,6 @@
 namespace OHOS {
 namespace Telephony {
 class SimManager;
-class MultiSimHelper;
 class MultiSimController : public TelEventHandler {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
@@ -94,10 +90,8 @@ public:
     }
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
-    void CleanLoadedSimInfo(int32_t slotId);
     bool isNeedRefreshLoadedSlot(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
-    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, int32_t slotId);
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
     bool IsEsim(int32_t slotId);
@@ -106,17 +100,11 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
-    int32_t GetSimActiveRealState(int32_t slotId);
-    int32_t GetLocalCache(std::vector<SimRdbInfo> &cache);
-    bool IsDataShareReady();
-    void SetDataShareReady(bool ready);
-    void MarkCacheModified(const std::string &iccId, const std::string &fieldName);
-    std::unordered_map<std::string, std::set<std::string>> GetModifiedRecords();
-    void ClearModifiedRecords();
-    bool HasModifiedRecords();
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
+    std::unordered_map<int32_t, std::string> loadedSimCardInfo_;
+    ffrt::shared_mutex loadedSimCardInfoMutex_;
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
     enum {
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
@@ -140,15 +128,22 @@ private:
     void RefreshSimManagerCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
+    bool AnnouncePrimarySimIdChanged(int32_t simId);
+    bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
+    bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
+    bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
+    bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
     bool UpdateIccAccountInfoList(std::vector<IccAccountInfo> &accountInfoList,
         std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo);
+    std::string EncryptIccId(const std::string iccid);
     bool IsValidSlotId(int32_t slotId);
-    bool InitPrimary();
+    bool InitPrimary(int32_t slotId, bool isFirstInit);
     bool IsAllCardsReady();
     bool IsAllCardsLoaded();
     void SendMainCardBroadCast(int32_t slotId);
     void SendDefaultCellularDataBroadCast(int32_t slotId);
     void InitMainCardSlotId();
+    void PublishSetPrimaryEvent(bool setDone, bool isUserSet);
     int32_t GetTargetDefaultSimId(int32_t slotId, int &simId);
     size_t GetLocalCacheSize();
     int32_t GetTargetSimId(int32_t slotId, int &simId);
@@ -156,8 +151,8 @@ private:
     bool IsAllModemInitDone();
     int32_t IsSatelliteSupported();
     int32_t SetActiveCommonSim(int32_t slotId, int32_t enable, bool force, int32_t curSimId);
-    int32_t UpdataCacheActiveState(int32_t slotId, int32_t enable, int32_t curSimId);
-    int32_t UpdateDBActiveResult(int32_t slotId, int32_t enable, int32_t curSimId);
+    int32_t UpdataCacheSetActiveState(int32_t slotId, int32_t enable, int32_t curSimId);
+    int32_t UpdateDBSetActiveResult(int32_t slotId, int32_t enable, int32_t curSimId);
     void UpdateSubState(int32_t slotId, int32_t enable);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void SetPrimarySlotIdDone(bool isUserSet);
@@ -172,13 +167,16 @@ private:
     void ObtainDualSimCardStatus();
     void SetInSenseSwitchPhase(bool flag);
     bool IsNeedSetTargetPrimarySlotId();
+    bool IsSetPrimarySlotReady(int32_t slotId);
+    void ResetPrimarySlotReady();
+    void GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, int32_t slotId);
     void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
     void SavePrimaryCardInfo(int32_t slotId);
     void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
     int32_t GetPsimLabelIndex(int slotId);
     bool IsESimUpdateStatus(int32_t slotId);
-
-    int32_t GetEsimLabelIdx();
+    void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
+        int32_t simLabel, bool isEsim);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -204,17 +202,11 @@ private:
     std::vector<IccAccountInfo> allIccAccountInfoList_;
     std::vector<SimRdbInfo> allLocalCacheInfo_;
     ffrt::shared_mutex mutex_;
-    ffrt::shared_mutex loadedSimCardInfoMutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::weak_ptr<SimManager> simManager_;
     std::vector<int> setPrimarySlotRemainCount_;
     std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
-    std::atomic<bool> cacheModified_{false};
-    std::atomic<bool> isDataShareReady_{false};
-    std::unordered_map<std::string, std::set<std::string>> cacheModifiedRecords_;
-    ffrt::mutex cacheModifiedMutex_;
-    std::unordered_map<int32_t, std::string> loadedSimCardInfo_;
     ffrt::mutex setPrimarySlotToRilMutex_;
     ffrt::mutex writeDbMutex_;
     ffrt::mutex forgetAllDataMutex_;
@@ -224,7 +216,6 @@ private:
     bool setPrimarySlotResponseResult_ = false;
     bool isRilSetPrimarySlotSupport_ = false;
     bool isSupportEsimMep_ = false;
-    std::shared_ptr<MultiSimHelper>  multiSimHelper_;
     int refreshLocalCacheRemainCount_;
     int refreshAllLocalCacheRemainCount_;
 };
