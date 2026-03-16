@@ -61,11 +61,6 @@ int32_t SimCacheSyncManager::SyncCacheOnUserSwitch(int32_t currentUserId, int32_
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     
-    if (!controller->IsDataShareReady()) {
-        TELEPHONY_LOGI("Database is not ready, skip sync");
-        return TELEPHONY_SUCCESS;
-    }
-    
     bool isFirstTime = CheckFirstSwitch100To101(currentUserId, lastUserId);
     bool needFullSync = false;
     if (!DetermineSyncStrategy(isFirstTime, needFullSync)) {
@@ -106,18 +101,6 @@ bool SimCacheSyncManager::DetermineSyncStrategy(bool isFirstTime, bool &needFull
         return true;
     }
     
-    auto controller = multiSimController_.lock();
-    if (controller == nullptr) {
-        TELEPHONY_LOGE("MultiSimController is null");
-        return false;
-    }
-    
-    if (controller->HasModifiedRecords()) {
-        TELEPHONY_LOGI("Cache has modified records, need incremental sync");
-        needFullSync = false;
-        return true;
-    }
-    
     TELEPHONY_LOGI("Cache not modified and last sync succeeded, skip sync");
     return false;
 }
@@ -138,11 +121,6 @@ int32_t SimCacheSyncManager::ExecuteSyncProcess(int32_t currentUserId, bool need
     }
     
     std::vector<SimRdbInfo> localCache;
-    if (GetLocalCache(localCache) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Get local cache failed");
-        isSyncing_ = false;
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     
     int32_t syncResult = PerformSync(needFullSync, localCache);
     if (syncResult != TELEPHONY_SUCCESS) {
@@ -204,24 +182,7 @@ bool SimCacheSyncManager::CheckPreconditions()
         return false;
     }
     
-    auto controller = multiSimController_.lock();
-    if (controller == nullptr) {
-        TELEPHONY_LOGE("MultiSimController is null");
-        return false;
-    }
-    
     return true;
-}
-
-int32_t SimCacheSyncManager::GetLocalCache(std::vector<SimRdbInfo> &localCache)
-{
-    auto controller = multiSimController_.lock();
-    if (controller == nullptr) {
-        TELEPHONY_LOGE("MultiSimController is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    
-    return controller->GetLocalCache(localCache);
 }
 
 int32_t SimCacheSyncManager::QueryTargetUserData(int32_t userId, std::vector<SimRdbInfo> &targetData)
@@ -340,17 +301,7 @@ int32_t SimCacheSyncManager::SyncModifiedRecordsToDatabase(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     
-    auto controller = multiSimController_.lock();
-    if (controller == nullptr) {
-        TELEPHONY_LOGE("MultiSimController is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    
     std::vector<SimRdbInfo> localCache;
-    if (GetLocalCache(localCache) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Get local cache failed");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     
     for (const auto &entry : modifiedRecords) {
         if (SyncSingleModifiedRecord(localCache, entry) != TELEPHONY_SUCCESS) {
