@@ -842,7 +842,6 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdataCacheSetActiveStat
 
     result = multiSimController->UpdataCacheActiveState(0, 1, 0);
     EXPECT_EQ(result, TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
-
 }
  
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBSetActiveResult_001, Function | MediumTest | Level1)
