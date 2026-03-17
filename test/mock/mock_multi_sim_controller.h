@@ -95,11 +95,6 @@ public:
     MOCK_METHOD3(UpdateIccAccountInfoList, bool(std::vector<IccAccountInfo> &accountInfoList,
         std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo));
     MOCK_METHOD2(UpdateSimPresent, int32_t(int32_t slotId, bool isNeedUpdateSimLabel));
-    MOCK_METHOD1(GetLocalCache, int32_t(std::vector<SimRdbInfo> &cache));
-    MOCK_METHOD0(IsDataShareReady, bool());
-    MOCK_METHOD0(HasModifiedRecords, bool());
-    MOCK_METHOD0(GetModifiedRecords, std::unordered_map<std::string, std::set<std::string>>());
-    MOCK_METHOD0(ClearModifiedRecords, void());
 };
 } // namespace Telephony
 } // namespace OHOS
