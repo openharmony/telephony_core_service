@@ -455,9 +455,6 @@ enum class UsimService {
     USIM_FOR_5G_SECURITY_PARAMETERS_EXTENDED,
 };
 
-static constexpr int32_t ACTIVE_USER_ID = 100;
-static constexpr int32_t PRIVATE_USER_ID = 101;
-
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_SIM_CONSTANT_H
