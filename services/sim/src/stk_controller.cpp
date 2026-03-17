@@ -435,6 +435,8 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {
+        TELEPHONY_LOGI("StkController[%{public}d] iccCardState: %{public}d, stkData: %{public}s",
+            slotId_, iccCardState_, cmdData.c_str());
         if (iccCardState_ == ICC_CARD_STATE_PRESENT) {
             EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
             RemoveEvent(StkController::CLOSE_CA_ESIM_EVENT);
