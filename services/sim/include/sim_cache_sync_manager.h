@@ -29,6 +29,9 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 
+static constexpr int32_t ACTIVE_USER_ID = 100;
+static constexpr int32_t PRIVATE_USER_ID = 101;
+
 namespace OHOS {
 namespace Telephony {
 const std::string PROP_FIRST_SWITCH_100_TO_101 = "persist.telephony.first_switch_100_to_101";
