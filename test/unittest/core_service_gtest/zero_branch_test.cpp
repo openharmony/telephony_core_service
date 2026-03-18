@@ -122,6 +122,42 @@ void BranchTest::SetUpTestCase()
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
 
+class IOperatorConfigHisyseventImpl : public IOperatorConfigHisysevent {
+public:
+    IOperatorConfigHisyseventImpl() = default;
+    ~IOperatorConfigHisyseventImpl() = default;
+    void InitOperatorConfigHisysevent(int32_t slotId, int32_t simState) override
+    {
+    }
+    void SetMatchSimResult(int32_t slotId, const char* opkey, const char* opname, int32_t matchSimState) override
+    {
+    }
+    void SetMatchSimFile(int32_t slotId, MatchSimFileType simFileType, const std::string &simFile) override
+    {
+    }
+    void SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason) override
+    {
+    }
+    void SetMatchSimStateTracker(MatchSimState matchSimStateTracker, int32_t slotId = -1) override
+    {
+    }
+    void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) override
+    {
+    }
+    void ReportMatchSimChr(int32_t slotId) override
+    {
+    }
+};
+
+class IIccFileExtImpl : public IIccFileExt {
+public:
+    IIccFileExtImpl() = default;
+    ~IIccFileExtImpl() = default;
+    void SetIccFile(std::shared_ptr<OHOS::Telephony::IIccFileExt> &iccFile) override
+    {
+    }
+};
+
 /**
  * @tc.number   Telephony_ImsRegInfoCallbackProxy_001
  * @tc.name     test error branch
@@ -178,10 +214,13 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ObtainIsoCountryCode(), "");
     simFile->lengthOfMnc_ = OBTAIN_SPN_GENERAL;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     simFile->lengthOfMnc_ = UNKNOWN_MNC;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     simFile->lengthOfMnc_ = UNINITIALIZED_MNC;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     EXPECT_FALSE(simFile->CphsVoiceMailAvailable());
     EXPECT_FALSE(simFile->ProcessIccReady(event));
     EXPECT_TRUE(simFile->ProcessGetAdDone(event));
@@ -1966,10 +2005,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
-
-    iccFile->ProcessEvent(event);
+    iccFile->IccFile::ProcessEvent(event);
     event.reset();
-    iccFile->ProcessEvent(event);
+    iccFile->IccFile::ProcessEvent(event);
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -2046,19 +2084,19 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
 
-    iccFile->StartLoad();
+    iccFile->IccFile::StartLoad();
 
+    iccFile->SetVoiceMailByOperator("");
     iccFile->voiceMailConfig_ = std::make_shared<VoiceMailConstants>(0);
     iccFile->SetId(0);
 
     iccFile->GetIsVoiceMailFixed();
 
-    iccFile->SetVoiceMailByOperator("");
     iccFile->SetVoiceMailByOperator("123");
 
     iccFile->ObtainGid2();
     iccFile->ObtainSimOperator();
-    iccFile->ObtainIsoCountryCode();
+    iccFile->IccFile::ObtainIsoCountryCode();
     iccFile->ObtainCallForwardStatus();
     iccFile->UpdateMsisdnNumber("", "");
     iccFile->ObtainDiallingNumberInfo();
@@ -2109,8 +2147,10 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
 
     iccFile->operatorNumeric_ = "123";
     auto opl = std::make_shared<OperatorPlmnInfo>();
+    iccFile->oplFiles_.push_back(nullptr);
     iccFile->oplFiles_.push_back(opl);
-    iccFile->opl5gFiles_.push_back(opl);
+    opl->lacStart = 0;
+    opl->lacEnd = 0xfffe;
     iccFile->ObtainEons("123", 0, true);
 
     iccFile->ObtainVoiceMailInfo();
@@ -2174,8 +2214,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1
     iccFile->AddRecordsToLoadNum();
     iccFile->DeleteOperatorCache();
 
-    iccFile->SetMatchSimStateTracker(0);
-
     iccFile->RegisterParamsListener();
     iccFile->UnRegisterParamsListener();
 
@@ -2188,6 +2226,33 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1
     EXPECT_TRUE(iccFile->isOnOpkeyLoaded_ == false);
 }
 
+/**
+ * @tc.number   Telephony_IccFile_Expand004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IccFile_Expand004, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
+
+    IIccFileExt::FileChangeType fileChangeType = IIccFileExt::FileChangeType::INVALID_FILE_OPE;
+    auto ioperatorConfigHisyseventImpl = std::make_shared<IOperatorConfigHisyseventImpl>();
+    iccFile->operatorConfigHisysevent_ = ioperatorConfigHisyseventImpl;
+    iccFile->ProcessIccFileObtained(event);
+
+    std::shared_ptr<IIccFileExt> iiccFileExt = std::make_shared<IIccFileExtImpl>();
+    iccFile->IccFile::SetIccFile(iiccFileExt);
+
+    iccFile->SetMatchSimStateTracker(0);
+
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    iccFile->ResetVoiceMailVariable();
+    iccFile->FileChangeToExt("", fileChangeType);
+    TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
+}
 /**
  * @tc.number   Telephony_SimRdbHelper_001
  * @tc.name     test error branch
