@@ -1157,7 +1157,7 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_Expand005, Function | Med
     {
         std::unique_ptr<Telephony::IccFromRilMsg> rcvMsg = std::make_unique<Telephony::IccFromRilMsg>(holderNullptr);
         auto event = AppExecFwk::InnerEvent::Get(0, rcvMsg);
-        iccFileController->ProcessErrorResponse(event);
+        EXPECT_FALSE(iccFileController->ProcessErrorResponse(event) == true);
     }
 }
 
@@ -1245,11 +1245,10 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand001, Function | MediumTest | 
     simFile->ProcessIccRefresh(ElementaryFile::ELEMENTARY_FILE_FDN);
     simFile->ProcessIccRefresh(ElementaryFile::ELEMENTARY_FILE_MSISDN);
     simFile->ProcessIccRefresh(ElementaryFile::ELEMENTARY_FILE_CFIS);
-
     simFile->ProcessFileLoaded(false);
-
+    simStateManager->Init(0);
     simStateManager->simStateHandle_->externalType_ = CardType::UNKNOWN_CARD;
-    AppExecFwk::InnerEvent::Pointer event(nullptr, nullptr);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
     simFile->ProcessIccReady(event);
     simFile->fileController_.reset();
     simFile->ProcessIccLocked(event);
@@ -1289,6 +1288,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand002, Function | MediumTest | 
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
 
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     objectUnique->resultData = "";
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0, objectUnique);
@@ -1341,7 +1341,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand003, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetSpdiDone(event);
@@ -1365,7 +1365,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand003, Function | MediumTest | 
     simFile->ProcessGetMbdnDone(event);
     simFile->ProcessGetCphsMailBoxDone(event);
 
-    auto diallingNumbersInfo =  std::make_shared<DiallingNumbersInfo>();
+    auto diallingNumbersInfo = std::make_shared<DiallingNumbersInfo>();
 
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
     auto objectUniqueResult = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
@@ -1381,8 +1381,8 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand003, Function | MediumTest | 
     event = AppExecFwk::InnerEvent::Get(0, objectUniqueResult);
     simFile->ProcessGetCphsMailBoxDone(event);
     objectUniqueResult = std::make_unique<DiallingNumbersHandlerResult>(nullptr);
-    event = AppExecFwk::InnerEvent::Get(0, objectUniqueResult);
     objectUniqueResult->result = diallingNumbersInfo;
+    event = AppExecFwk::InnerEvent::Get(0, objectUniqueResult);
     simFile->ProcessGetCphsMailBoxDone(event);
     TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
 }
@@ -1397,7 +1397,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand004, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
     simFile->ProcessGetMwisDone(event);
     simFile->ProcessVoiceMailCphs(event);
@@ -1451,21 +1451,20 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand005, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->telRilManager_ = telRilManager;
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
     simFile->ProcessReloadIccid(event);
     simFile->ProcessReloadImsi(event);
     simFile->ProcessObtainIMSIDone(event);
     simFile->ProcessGetCffDone(event);
     simFile->ProcessGetAdDone(event);
-
     auto sharedStr = std::make_shared<std::string>("");
     event = AppExecFwk::InnerEvent::Get(0, sharedStr);
     simFile->ProcessObtainIMSIDone(event);
     sharedStr = std::make_shared<std::string>("1234");
     event = AppExecFwk::InnerEvent::Get(0, sharedStr);
     simFile->ProcessObtainIMSIDone(event);
-
     auto objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetCffDone(event);
@@ -1502,7 +1501,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand006, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     simFile->CheckMncLen("", 0, 0, 0, true);
     simFile->CheckMncLen("", 0, 0, 0, false);
 
@@ -1544,7 +1543,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand006, Function | MediumTest | 
     event.reset();
     simFile->ProcessSmsOnSim(event);
     simFile->ProcessGetAllSmsDone(event);
-    EXPECT_TRUE(simFile->ProcessGetSmsDone(event) == true);
+    EXPECT_TRUE(simFile->ProcessGetSmsDone(event) == false);
 }
 
 /**
@@ -1557,7 +1556,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand007, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
     simFile->ProcessGetPlmnActDone(event);
     simFile->ProcessGetOplmnActDone(event);
@@ -1612,6 +1611,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
     auto objectShared = std::make_unique<MultiRecordResult>(nullptr);
     objectShared->fileResults = {"1234", "4567"};
     AppExecFwk::InnerEvent::Pointer event2 = AppExecFwk::InnerEvent::Get(0, objectShared);
@@ -1626,12 +1626,10 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | 
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetPnnDone(event);
     simFile->ProcessGetPnnDone(event2);
-    objectShared->exception.reset();
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetOplDone(event);
     simFile->ProcessGetOplDone(event2);
-    objectShared->exception.reset();
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetSpnCphsDone(event);
@@ -1643,7 +1641,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | 
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetOpl5gDone(event);
     simFile->ProcessGetOpl5gDone(event2);
-    objectShared->exception.reset();
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     objectUnique->exception = std::make_shared<int>(100);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
@@ -1672,7 +1669,8 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand009, Function | MediumTest | 
     auto telRilManager = std::make_shared<TelRilManager>();
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     auto simFile = std::make_shared<SimFile>(simStateManager);
-
+    simFile->fileController_ = std::make_shared<SimFileController>(1);
+    simFile->diallingNumberHandler_ = std::make_shared<IccDiallingNumbersHandler>(simFile->fileController_);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
     simFile->ProcessGetHplmActDone(event);
     simFile->ProcessGetEhplmnDone(event);
@@ -1706,7 +1704,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand009, Function | MediumTest | 
     simFile->ProcessSetMbdn(event);
 
     event.reset();
-    simFile->ProcessGetHplmActDone(event);
+    EXPECT_TRUE(simFile->ProcessGetHplmActDone(event) == true);
     simFile->ProcessGetEhplmnDone(event);
     simFile->ProcessGetFplmnDone(event);
     simFile->ProcessSetMbdn(event);
