@@ -246,12 +246,12 @@ void OnRemoteRequestEsim(const uint8_t *data, size_t size)
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
 
-    uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
-                    (static_cast<uint32_t>(data[2]) << 8) | (static_cast<uint32_t>(data[3])) % FUCTION_SIZE;
-
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<EsimService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+    for (uint32_t code = static_cast<uint32_t>(IEsimServiceIpcCode::COMMAND_GET_EID);
+        code <= static_cast<uint32_t>(IEsimServiceIpcCode::COMMAND_GET_ESIM_FREE_STORAGE); code++) {
+        DelayedSingleton<EsimService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+    }
 }
 
 void EsimServiceProxyTest(const uint8_t *data, size_t size)

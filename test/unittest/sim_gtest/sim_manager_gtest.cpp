@@ -39,10 +39,6 @@
 #include "icc_file.h"
 #include "mock_sim_rdb_helper.h"
 #include "mock_multi_sim_controller.h"
-#include "mock_sim_fil_manage.h"
-#include "sim_state_manager.h"
-#include "multi_sim_controller.h"
-
 
 namespace OHOS {
 namespace Telephony {
@@ -579,11 +575,25 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_009, Function | MediumTest | L
  */
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_010, Function | MediumTest | Level1)
 {
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<MultiSimControllerMock> multiSimControllerMock =
+        std::make_shared<MultiSimControllerMock>(telRilManager, simStateManager, simFileManager);
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     int32_t slotId = 0;
+    simManager_->multiSimController_ = multiSimController;
     simManager_->SetActiveSim(slotId, 0);
     slotId = -1;
     simManager_->SetActiveSim(slotId, 0);
     slotId = 4;
+    simManager_->SetActiveSim(slotId, 0);
+    EXPECT_CALL(*multiSimControllerMock, SetActiveSim(_, _, _)).Times(AnyNumber()).
+        WillOnce(Return(TELEPHONY_ERR_SUCCESS));
+    simManager_->SetActiveSim(slotId, 0);
+    EXPECT_CALL(*multiSimControllerMock, SetActiveSim(_, _, _)).Times(AnyNumber()).
+        WillOnce(Return(TELEPHONY_ERR_ARGUMENT_INVALID));
     simManager_->SetActiveSim(slotId, 0);
     slotId = 0;
     simManager_->multiSimController_ = nullptr;
@@ -883,405 +893,12 @@ HWTEST_F(SimManagerTest, InsertDatatest, Function | MediumTest | Level1)
     EXPECT_NE(result, 1);
 }
 
-/**
- * @tc.number   Telephony_Sim_SimManager_013
- * @tc.name     Test GetSimTeleNumberIdentifier
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_013, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->simStateManager_.push_back(simStateManager);
-    auto result = simManager->GetSimTeleNumberIdentifier(slotId);
-    EXPECT_TRUE(result.empty());
-    slotId = -1;
-    result = simManager->GetSimTeleNumberIdentifier(slotId);
-    EXPECT_TRUE(result.empty());
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_014
- * @tc.name     Test GetSimIst
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_014, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = 0;
-    simManager->simStateManager_.push_back(simStateManager);
-    auto result = simManager->GetSimIst(slotId);
-    EXPECT_TRUE(result.empty());
-    slotId = -1;
-    result = simManager_->GetSimIst(slotId);
-    EXPECT_TRUE(result.empty());
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_015
- * @tc.name     Test IMS switch operations
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_015, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = 0;
-    int32_t switchValue = 1;
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> vecSimStateManager;
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> vecSimFileManager;
-    simManager->multiSimController_ = std::make_shared<MultiSimController>(telRilManager,
-        vecSimStateManager, vecSimFileManager);
-    int32_t ret = simManager_->SaveImsSwitch(slotId, switchValue);
-    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-    slotId = -1;
-    ret = simManager_->SaveImsSwitch(slotId, switchValue);
-    EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_INVALID);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_016
- * @tc.name     Test ESIM related functions
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_016, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    bool isEsim = simManager_->IsEsim(slotId);
-    EXPECT_FALSE(isEsim);
-    int32_t ret = simManager_->ClearSimLabel(SimType::ESIM);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-    ret = simManager_->UpdateSimPresent(slotId, true);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-    ret = simManager_->UpdateEsimOpName("test_icc", "test_op");
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_017
- * @tc.name     Test slot management functions
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_017, Function | MediumTest | Level1)
-{
-    int32_t ret = simManager_->SetTargetPrimarySlotId(true, 0);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-    bool isInitDone = simManager_->IsModemInitDone(0);
-    EXPECT_FALSE(isInitDone);
-    int32_t maxCount = simManager_->GetMaxSimCount();
-    int32_t realCount = simManager_->GetRealSimCount();
-    EXPECT_GE(maxCount, realCount);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_018
- * @tc.name     Test GetSimAccountInfo with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_018, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    bool denied = false;
-    IccAccountInfo info;
-    int32_t ret = simManager_->GetSimAccountInfo(slotId, denied, info);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_019
- * @tc.name     Test GetActiveSimAccountInfoList
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_019, Function | MediumTest | Level1)
-{
-    bool denied = false;
-    std::vector<IccAccountInfo> infoList;
-    int32_t ret = simManager_->GetActiveSimAccountInfoList(denied, infoList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_020
- * @tc.name     Test GetAllSimAccountInfoList
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_020, Function | MediumTest | Level1)
-{
-    bool denied = false;
-    std::vector<IccAccountInfo> infoList;
-    simManager_->multiSimController_ = nullptr;
-    int32_t ret = simManager_->GetAllSimAccountInfoList(denied, infoList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_021
- * @tc.name     Test SetShowNumber with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_021, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    std::u16string number = u"12345";
-    int32_t ret = simManager_->SetShowNumber(slotId, number);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_022
- * @tc.name     Test SetShowName with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_022, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    std::u16string name = u"test";
-    int32_t ret = simManager_->SetShowName(slotId, name);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_023
- * @tc.name     Test GetSimLabel with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_023, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    SimLabel label;
-    int32_t ret = simManager_->GetSimLabel(slotId, label);
-    EXPECT_EQ(ret, INVALID_VALUE);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_024
- * @tc.name     Test SetIccCardState with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_024, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    int32_t state = 0;
-    int32_t ret = simManager_->SetIccCardState(slotId, state);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_025
- * @tc.name     Test NotifySimSlotsMapping with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_025, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    int32_t ret = simManager_->NotifySimSlotsMapping(slotId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_026
- * @tc.name     Test GetSimOperatorNumeric with invalid slotId
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_026, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    std::u16string operatorNumeric;
-    int32_t ret = simManager_->GetSimOperatorNumeric(slotId, operatorNumeric);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_027
- * @tc.name     Test GetISOCountryCodeForSim with null file manager
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_027, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = 0;
-    simManager->simStateManager_.push_back(nullptr);
-    std::u16string countryCode;
-    int32_t ret = simManager->GetISOCountryCodeForSim(slotId, countryCode);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_028
- * @tc.name     Test GetSimSpn with invalid slot range
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_028, Function | MediumTest | Level1)
-{
-    int32_t slotId = MAX_SLOT_COUNT + 1;
-    std::u16string spn;
-    int32_t ret = simManager_->GetSimSpn(slotId, spn);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_029
- * @tc.name     Test GetSimIccId with empty file manager vector
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_029, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    std::u16string iccId;
-    simManager_->simFileManager_.clear();
-    int32_t ret = simManager_->GetSimIccId(slotId, iccId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_030
- * @tc.name     Test GetIMSI with null state manager
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_030, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    std::u16string imsi;
-    simManager_->simStateManager_[slotId] = nullptr;
-    int32_t ret = simManager_->GetIMSI(slotId, imsi);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_031
- * @tc.name     Test GetSimTelephoneNumber with invalid slot
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_031, Function | MediumTest | Level1)
-{
-    int32_t slotId = -1;
-    std::u16string number;
-    int32_t ret = simManager_->GetSimTelephoneNumber(slotId, number);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_Sim_SimManager_032
- * @tc.name     Test GetVoiceMailNumber with null dependencies
- * @tc.desc     Function test
- */
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_032, Function | MediumTest | Level1)
-{
-    int32_t slotId = 0;
-    std::u16string mailNumber;
-    int32_t ret = simManager_->GetVoiceMailNumber(slotId, mailNumber);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetDefaultVoiceSimId_001, Function | MediumTest | Level1)
-{
-    simManager_->multiSimController_ = nullptr;
-    int32_t simId = 0;
-    int32_t ret = simManager_->GetDefaultVoiceSimId(simId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetDefaultVoiceSimId_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> vecSimStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> vecSimFileManager = { nullptr, nullptr };
-    std::shared_ptr<MultiSimController> multiSimController = std::make_shared<MultiSimController>(telRilManager,
-        vecSimStateManager, vecSimFileManager);
-    simManager->multiSimController_ = multiSimController;
-    int32_t simId = 0;
-    int32_t ret = simManager->GetDefaultVoiceSimId(simId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(simId, INVALID_VALUE);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetDefaultVoiceSimId_003, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> vecSimStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> vecSimFileManager = { nullptr, nullptr };
-    std::shared_ptr<MultiSimController> multiSimController = std::make_shared<MultiSimController>(telRilManager,
-        vecSimStateManager, vecSimFileManager);
-    SimRdbInfo info;
-    info.isVoiceCard = MAIN_CARD;
-    info.isActive = ACTIVE;
-    multiSimController->localCacheInfo_.push_back(info);
-    simManager->multiSimController_ = multiSimController;
-    int32_t simId = 0;
-    int32_t ret = simManager->GetDefaultVoiceSimId(simId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(simId, INVALID_VALUE);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetRadioProtocol_001, Function | MediumTest | Level1)
-{
-    int32_t invalidSlotId = -1;
-    simManager_->GetRadioProtocol(invalidSlotId);
-    EXPECT_EQ(invalidSlotId, -1);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetRadioProtocol_002, Function | MediumTest | Level1)
+HWTEST_F(SimManagerTest, UpdateSimPresentNullTest, Function | MediumTest | Level1)
 {
     simManager_->multiSimController_ = nullptr;
     int32_t slotId = 0;
-    simManager_->GetRadioProtocol(slotId);
-    EXPECT_EQ(slotId, 0);
+    int32_t result = simManager_->UpdateSimPresent(slotId, false);
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetRadioProtocol_003, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> vecSimStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> vecSimFileManager = { nullptr, nullptr };
-    std::shared_ptr<MultiSimController> multiSimController = std::make_shared<MultiSimController>(telRilManager,
-        vecSimStateManager, vecSimFileManager);
-    SimRdbInfo info;
-    info.isVoiceCard = MAIN_CARD;
-    info.isActive = ACTIVE;
-    multiSimController->localCacheInfo_.push_back(info);
-    simManager->multiSimController_ = multiSimController;
-    simManager->slotCount_ = 2;
-    int32_t validSlotId = 1;
-    simManager_->GetRadioProtocol(validSlotId);
-    EXPECT_EQ(validSlotId, 1);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_GetVoiceMailCount_002, Function | MediumTest | Level1)
-{
-    int32_t invalidSlotId = -1;
-    int32_t voiceMailCount = 0;
-    int32_t ret = simManager_->GetVoiceMailCount(invalidSlotId, voiceMailCount);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_SetVoiceMailCount_001, Function | MediumTest | Level1)
-{
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    int32_t slotId = 0;
-    int32_t ret = simManager->SetVoiceMailCount(slotId, 5);
-    EXPECT_EQ(ret, TELEPHONY_ERR_NO_SIM_CARD);
-}
-
-HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_InitSingleSimObject_001, Function | MediumTest | Level1)
-{
-    simManager_->telRilManager_ = nullptr;
-    simManager_->InitSingleSimObject();
-    EXPECT_NE(simManager_->multiSimController_, nullptr);
-}
-
 }
 }

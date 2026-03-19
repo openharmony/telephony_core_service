@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+// LCOV_EXCL_START
 #include "nitz_update.h"
 
 #include <securec.h>
@@ -433,3 +434,4 @@ void NitzUpdate::AutoTimeZoneChange()
 }
 } // namespace Telephony
 } // namespace OHOS
+// LOCV_EXCL_STOP

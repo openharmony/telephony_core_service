@@ -53,6 +53,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapper()
         return;
     }
     InitTelephonyExtWrapperForSim();
+    InitTelephonyExtWrapperForSim1();
     InitTelephonyExtWrapperForNetWork();
     InitTelephonyExtWrapperForVoiceMail();
     InitTelephonyExtWrapperForCust();
@@ -286,6 +287,16 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     }
 }
 
+void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
+{
+    TELEPHONY_LOGI("[SIM] telephony ext wrapper init begin");
+    setActiveSim_ = (SetActiveSim)dlsym(telephonyExtWrapperHandle_, "SetActiveSim");
+    bool hasFuncNull = setActiveSim_ == nullptr;
+    if (hasFuncNull) {
+        TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+}
+
 void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
 {
     getOpkeyVersion_ = (GET_OPKEY_VERSION)dlsym(telephonyExtWrapperHandle_, "GetOpkeyVersion");
@@ -387,6 +398,13 @@ void TelephonyExtWrapper::UnRegistryCoreNotifyFunc(int32_t slotId,
 {
     if (unRegistryCoreNotify_ != nullptr) {
         unRegistryCoreNotify_(slotId, handler, what);
+    }
+}
+
+void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
+{
+    if (setActiveSim_ != nullptr) {
+        setActiveSim_(slotId, enable);
     }
 }
 } // namespace Telephony

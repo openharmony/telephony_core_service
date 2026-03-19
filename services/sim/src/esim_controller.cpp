@@ -73,22 +73,28 @@ void EsimController::ProcessCommandMessage(int slotId, const std::string &cmdDat
     });
 }
 
+void EsimController::CloseCaEsim()
+{
+    if (caEsimHandler_ != nullptr) {
+        dlclose(caEsimHandler_);
+    }
+}
+
 void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
 {
-    std::lock_guard<ffrt::mutex> locker(caMutex_);
-    void *handler = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
-    if (handler == NULL) {
+    TELEPHONY_LOGI("EsimController:ProcessCommandByCa start.");
+    std::lock_guardffrt::mutex locker(caMutex_);
+    caEsimHandler_ = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
+    if (caEsimHandler_ == NULL) {
         TELEPHONY_LOGE("open lib: %{public}s failed", ESIM_CA_LIBPATH.c_str());
         return;
     }
-
-    VerifyBind func = (VerifyBind)dlsym(handler, "CAEsimStartEuiccCheckBinding");
+    VerifyBind func = (VerifyBind)dlsym(caEsimHandler_, "CAEsimStartEuiccCheckBinding");
     if (func == NULL) {
         TELEPHONY_LOGE("dlsym CAEsimStartEuiccCheckBinding failed, error:%{public}s", dlerror());
     } else {
         SetVerifyResult(slotId, func(slotId, cmdData.c_str(), cmdData.length()));
     }
-    dlclose(handler);
 }
 
 void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)

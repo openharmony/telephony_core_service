@@ -956,7 +956,7 @@ HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_001, Function | MediumTest |
     EXPECT_CALL(*mocksimdbhelper, InsertData(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
     auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
         simStateManager, simFileManager);
-    EXPECT_CALL(*multiSimControllerMock, GetAllListFromDataBase()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*multiSimControllerMock, GetAllListFromDataBase(_)).WillRepeatedly(Return(false));
     result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
     EXPECT_EQ(result, INVALID_VALUE);
 }
@@ -974,7 +974,7 @@ HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_002, Function | MediumTest |
     multiSimController->simDbHelper_ = {};
     auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
         simStateManager, simFileManager);
-    EXPECT_CALL(*multiSimControllerMock, GetAllListFromDataBase()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*multiSimControllerMock, GetAllListFromDataBase(_)).WillRepeatedly(Return(false));
     int32_t result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
