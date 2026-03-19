@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 
-#include "get_manual_network_scan_state_callback.h"
-
+#include "manual_network_scan_state_callback.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-GetManualNetworkScanStateCallback::GetManualNetworkScanStateCallback(IsManualScanningContext *context)
+ManualNetworkScanStateCallback::ManualNetworkScanStateCallback(IsManualScanningContext *context)
     : asyncContext_(context) {}
 
-void GetManualNetworkScanStateCallback::OnGetManualNetworkScanStateCallback(const bool isScanning,
+void ManualNetworkScanStateCallback::OnGetManualNetworkScanStateCallback(const bool isScanning,
     const int32_t errorCode)
 {
     if (asyncContext_ == nullptr) {
@@ -30,7 +29,6 @@ void GetManualNetworkScanStateCallback::OnGetManualNetworkScanStateCallback(cons
         return;
     }
     std::unique_lock<std::mutex> callbackLock(asyncContext_->callbackMutex);
-    TELEPHONY_LOGI("OnGetManualNetworkScanStateCallback start notify");
     asyncContext_->resolved = errorCode == HRIL_ERR_SUCCESS;
     if (asyncContext_->resolved) {
         asyncContext_->isManualScanning = isScanning;

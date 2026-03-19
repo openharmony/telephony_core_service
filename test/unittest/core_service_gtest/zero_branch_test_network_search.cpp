@@ -36,6 +36,8 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_data_helper.h"
+#include "manual_network_scan_callback_death_recipient.h"
+#include "ims_reg_info_callback_gtest.h"
 #include "nativetoken_kit.h"
 #include "telephony_ext_wrapper.h"
 #include "network_utils.h"
@@ -1161,55 +1163,153 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_012, Function |
     std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<SimManager> simManager = nullptr;
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
-    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, 0);
     auto networkSearchHandler =
         std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
-    auto networkSearchState1 = std::make_shared<NetworkSearchState>(networkSearchManager, 1);
-    auto networkSearchHandler1 =
-        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 1);
-
-    EXPECT_EQ(networkSearchManager->GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchManager->StopManualNetworkScanCallback(0), TELEPHONY_ERR_SUCCESS);
-    networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
     auto inner = std::make_shared<NetworkSearchManagerInner>();
-    inner->networkSearchState_ = networkSearchState;
-    inner->observerHandler_ = std::make_unique<ObserverHandler>();
     inner->networkSearchHandler_ = networkSearchHandler;
-    auto inner1 = std::make_shared<NetworkSearchManagerInner>();
-    inner1->networkSearchState_ = networkSearchState1;
-    inner1->observerHandler_ = std::make_unique<ObserverHandler>();
-    inner1->networkSearchHandler_ = networkSearchHandler1;
-    auto inner2 = std::make_shared<NetworkSearchManagerInner>();
     networkSearchManager->AddManagerInner(0, inner);
+    auto inner1 = std::make_shared<NetworkSearchManagerInner>();
     networkSearchManager->AddManagerInner(1, inner1);
-    networkSearchManager->AddManagerInner(2, inner2);
-
+    networkSearchManager->manualNetworkScan_ = std::make_shared<ManualNetworkScan>(networkSearchManager);
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
-    sptr<NetworkSearchTestCallbackStub> callback1(new NetworkSearchTestCallbackStub());
     EXPECT_EQ(networkSearchManager->GetManualNetworkScanState(0, callback), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_SUCCESS);
-    networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, callback1), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(1, nullptr), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(2, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(
+        networkSearchManager->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL);
+    EXPECT_EQ(networkSearchManager->StopManualNetworkScanCallback(0), TELEPHONY_ERR_SUCCESS);
     auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
-    networkSearchManager->NotifyManualScanStateChanged(0, false, networkSearchResult);
     networkSearchManager->NotifyManualScanStateChanged(0, true, networkSearchResult);
-    networkSearchManager->NotifyManualScanStateChanged(5, true, nullptr);
-
     EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(5, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
-
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(1, false), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(5, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
     TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
     EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, true), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchManager->ManualNetworkScanState(0, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, false), TELEPHONY_ERR_SUCCESS);
+    networkSearchManager->manualNetworkScan_ = nullptr;
+    EXPECT_EQ(networkSearchManager->GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(networkSearchManager->StopManualNetworkScanCallback(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    networkSearchManager->NotifyManualScanStateChanged(0, true, nullptr);
 }
- 
+
+/**
+ * @tc.number   Telephony_ManualNetworkScan_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_ManualNetworkScan_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto manualNetworkScan = std::make_shared<ManualNetworkScan>(networkSearchManager);
+    EXPECT_EQ(manualNetworkScan->GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StopManualNetworkScanCallback(0), TELEPHONY_ERR_SUCCESS);
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    EXPECT_EQ(manualNetworkScan->GetManualNetworkScanState(0, callback), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    manualNetworkScan->NotifyManualScanStateChanged(0, true, nullptr);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchHandler_ = networkSearchHandler;
+    networkSearchManager->AddManagerInner(0, inner);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL);
+
+    ManualNetworkScan::ManualScanCallbackRecord scanRecord;
+    scanRecord.slotId = 0;
+    scanRecord.callback = nullptr;
+    scanRecord.deathRecipient = nullptr;
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL);
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
+    manualNetworkScan->NotifyManualScanStateChanged(0, false, networkSearchResult);
+    scanRecord.callback = callback;
+    scanRecord.deathRecipient = sptr<IRemoteObject::DeathRecipient>(
+        new ManualNetworkScanCallbackDeathRecipient(manualNetworkScan));
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    manualNetworkScan->NotifyManualScanStateChanged(0, false, networkSearchResult);
+    manualNetworkScan->NotifyManualScanStateChanged(0, true, networkSearchResult);
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    scanRecord.slotId = 1;
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    manualNetworkScan->NotifyManualScanStateChanged(5, true, nullptr);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(5, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL);
+    manualNetworkScan = std::make_shared<ManualNetworkScan>(std::weak_ptr<NetworkSearchManager>());
+    EXPECT_EQ(manualNetworkScan->GetManualNetworkScanState(0, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StartManualNetworkScanCallback(0, callback), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(manualNetworkScan->StopManualNetworkScanCallback(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   Telephony_ManualNetworkScan_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_ManualNetworkScan_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto manualNetworkScan = std::make_shared<ManualNetworkScan>(networkSearchManager);
+
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(callback), TELEPHONY_ERR_SUCCESS);
+    ManualNetworkScan::ManualScanCallbackRecord scanRecord;
+    scanRecord.slotId = 0;
+    scanRecord.callback = nullptr;
+    scanRecord.deathRecipient = nullptr;
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(callback), TELEPHONY_ERR_SUCCESS);
+    scanRecord.callback = callback;
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(callback), TELEPHONY_ERR_SUCCESS);
+    scanRecord.deathRecipient = sptr<IRemoteObject::DeathRecipient>(
+        new ManualNetworkScanCallbackDeathRecipient(manualNetworkScan));
+        manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(callback), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_ManualNetworkScanCallbackDeathRecipient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_ManualNetworkScanCallbackDeathRecipient_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = nullptr;
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto manualNetworkScan = std::make_shared<ManualNetworkScan>(networkSearchManager);
+
+    auto deathRecipient = std::make_shared<ManualNetworkScanCallbackDeathRecipient>(manualNetworkScan);
+    wptr<IRemoteObject> emptyRemote;
+    deathRecipient->OnRemoteDied(emptyRemote);
+    sptr<INetworkSearchCallback> callback1 = new INetworkSearchCallbackStub();
+    sptr<IRemoteObject> remoteObj = callback1->AsObject();
+    wptr<IRemoteObject> remote = remoteObj;
+    ManualNetworkScan::ManualScanCallbackRecord scanRecord;
+    scanRecord.slotId = 0;
+    scanRecord.callback = callback1;
+    scanRecord.deathRecipient = nullptr;
+    manualNetworkScan->listManualScanCallbackRecord_.push_back(scanRecord);
+    deathRecipient->OnRemoteDied(remote);
+    sptr<ImsRegInfoCallback> callback2 = new ImsRegInfoCallbackGtest();
+    sptr<IRemoteObject> remoteObj1 = callback2->AsObject();
+    wptr<IRemoteObject> remote1 = remoteObj1;
+    deathRecipient->OnRemoteDied(remote1);
+    deathRecipient = std::make_shared<ManualNetworkScanCallbackDeathRecipient>(std::weak_ptr<ManualNetworkScan>());
+    deathRecipient->OnRemoteDied(remote);
+    EXPECT_EQ(manualNetworkScan->RemoveManualNetworkScanCallback(nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
 /**
  * @tc.number   Telephony_NetworkSearchHandler_001
  * @tc.name     test error branch
