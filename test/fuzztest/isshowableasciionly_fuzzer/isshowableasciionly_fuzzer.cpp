@@ -22,6 +22,7 @@
 #include "napi_util.h"
 #include "sim_utils.h"
 #include "system_ability_definition.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -31,14 +32,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     auto simUtils = std::make_shared<SIMUtils>();
-    int32_t byteslen = static_cast<int32_t>(*data);
-    char argument = static_cast<char>(*data);
-    size_t offset = 0;
-    std::string str(reinterpret_cast<const char *>(data), size);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string parameter(reinterpret_cast<const char *>(data + offset), size - offset);
+    int32_t byteslen = provider->ConsumeIntegral<int32_t>();
+    char argument = provider->ConsumeIntegral<char>();
+    std::string str = provider->ConsumeRandomLengthString();
+    std::string parameter = provider->ConsumeRandomLengthString();
     simUtils->HexStringConvertToBytes(str, byteslen);
     simUtils->IsShowableAsciiOnly(str);
     simUtils->BcdPlmnConvertToString(parameter, size - offset);

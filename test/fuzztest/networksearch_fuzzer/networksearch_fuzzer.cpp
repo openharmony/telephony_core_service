@@ -29,6 +29,7 @@
 #include "network_search_handler.h"
 #include "network_search_manager.h"
 #include "network_search_state.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -67,10 +68,14 @@ void NetworkSearchHandlerInit()
     networkSearchHandler->ClearSignalAndCellInfoList();
 }
 
-void NetworkSearchHandlerOnInit(const uint8_t *data, size_t size)
+void NetworkSearchHandlerOnInit(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::int32_t eventId = static_cast<int32_t>(size);
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
+    if (provider == nullptr) {
+        return;
+    }
+    int32_t eventId = provider->ConsumeIntegral<int32_t>();
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
+        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -110,10 +115,14 @@ void NetworkSearchHandlerOnInit(const uint8_t *data, size_t size)
     networkSearchHandler->RadioOffOrUnavailableState(eventId);
 }
 
-void NetworkSearchHandlerEvents(const uint8_t *data, size_t size)
+void NetworkSearchHandlerEvents(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::int32_t eventId = static_cast<int32_t>(size);
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
+    if (provider == nullptr) {
+        return;
+    }
+    int32_t eventId = provider->ConsumeIntegral<int32_t>();
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
+        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -148,10 +157,14 @@ void NetworkSearchHandlerEvents(const uint8_t *data, size_t size)
     networkSearchHandler->RadioResidentNetworkChange(event);
 }
 
-void NetworkSearchHandlerProcesses(const uint8_t *data, size_t size)
+void NetworkSearchHandlerProcesses(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::int32_t eventId = static_cast<int32_t>(size);
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
+    if (provider == nullptr) {
+        return;
+    }
+    int32_t eventId = provider->ConsumeIntegral<int32_t>();
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
+        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -178,11 +191,15 @@ void NetworkSearchHandlerProcesses(const uint8_t *data, size_t size)
     networkSearchHandler->RadioResidentNetworkChange(event);
 }
 
-void NetworkSearchHandlerGetRegistration(const uint8_t *data, size_t size)
+void NetworkSearchHandlerGetRegistration(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    std::int32_t eventId = static_cast<int32_t>(size);
+    if (provider == nullptr) {
+        return;
+    }
+    int32_t eventId = provider->ConsumeIntegral<int32_t>();
     bool checkTime = eventId == INVALID_SLOTID;
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(*data);
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
+        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -217,11 +234,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     NetworkSearchHandlerInit();
-    NetworkSearchHandlerOnInit(data, size);
-    NetworkSearchHandlerEvents(data, size);
-    NetworkSearchHandlerProcesses(data, size);
-    NetworkSearchHandlerGetRegistration(data, size);
+    NetworkSearchHandlerOnInit(provider);
+    NetworkSearchHandlerEvents(provider);
+    NetworkSearchHandlerProcesses(provider);
+    NetworkSearchHandlerGetRegistration(provider);
     return;
 }
 } // namespace OHOS
