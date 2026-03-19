@@ -74,8 +74,7 @@ void NetworkSearchHandlerOnInit(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
     int32_t eventId = provider->ConsumeIntegral<int32_t>();
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
-        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(provider->ConsumeIntegral<uint8_t>());
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -121,8 +120,7 @@ void NetworkSearchHandlerEvents(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
     int32_t eventId = provider->ConsumeIntegral<int32_t>();
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
-        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(provider->ConsumeIntegral<uint8_t>());
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -163,8 +161,7 @@ void NetworkSearchHandlerProcesses(std::shared_ptr<FuzzedDataProvider> provider)
         return;
     }
     int32_t eventId = provider->ConsumeIntegral<int32_t>();
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
-        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(provider->ConsumeIntegral<uint8_t>());
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
@@ -198,8 +195,7 @@ void NetworkSearchHandlerGetRegistration(std::shared_ptr<FuzzedDataProvider> pro
     }
     int32_t eventId = provider->ConsumeIntegral<int32_t>();
     bool checkTime = eventId == INVALID_SLOTID;
-    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(
-        provider->ConsumeBytes(provider->ConsumeIntegral<size_t>()));
+    std::unique_ptr<uint8_t> object = std::make_unique<uint8_t>(provider->ConsumeIntegral<uint8_t>());
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, object);
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     auto simManager = std::make_shared<SimManager>(telRilManager);
