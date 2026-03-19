@@ -383,7 +383,7 @@ bool LteCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(tac_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
@@ -567,7 +567,7 @@ bool WcdmaCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(lac_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
@@ -1137,7 +1137,7 @@ bool NrCellInformation::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(rsrq_)) {
         return false;
     }
-    if (!parcel.WriteInt64(timeStamp_)) {
+    if (!parcel.WriteUint64(timeStamp_)) {
         return false;
     }
     if (!parcel.WriteInt32(signalLevel_)) {
