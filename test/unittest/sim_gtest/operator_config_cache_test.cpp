@@ -257,6 +257,7 @@ HWTEST_F(OperatorConfigCacheTest, OperatorConfigCache_Expand003, Function | Medi
     operatorConfigCache->CopyOperatorConfig(from, to);
     operatorConfigCache->opc_.configValue.clear();
     operatorConfigCache->GetOperatorConfigs(0, from);
+    EXPECT_TRUE(to.longValue.size() > 0);
 }
 
 HWTEST_F(OperatorConfigCacheTest, SimFileManager_Expand001, Function | MediumTest | Level1)
@@ -283,6 +284,7 @@ HWTEST_F(OperatorConfigCacheTest, SimFileManager_Expand001, Function | MediumTes
     simFileManager->Init(0);
     simFileManager->telRilManager_.reset();
     simFileManager->Init(0);
+    EXPECT_TRUE(simFileManager->simStateManager_.lock() == nullptr);
 }
 
 HWTEST_F(OperatorConfigCacheTest, SimFileManager_Expand002, Function | MediumTest | Level1)

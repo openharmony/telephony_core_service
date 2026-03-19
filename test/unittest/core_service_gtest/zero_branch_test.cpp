@@ -2252,6 +2252,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand004, Function | MediumTest | Level1
     iccFile->ResetVoiceMailVariable();
     iccFile->FileChangeToExt("", fileChangeType);
     TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
+    EXPECT_TRUE(iccFile->operatorConfigHisysevent_.lock() != nullptr);
 }
 /**
  * @tc.number   Telephony_SimRdbHelper_001
