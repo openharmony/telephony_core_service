@@ -35,7 +35,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_utils_wrapper.h"
-#include "get_manual_network_scan_state_callback.h"
+#include "manual_network_scan_state_callback.h"
 #include "manual_network_scan_callback_manager.h"
 
 namespace OHOS {
@@ -3081,8 +3081,7 @@ static void NativeIsManualNetworkScanning(napi_env env, void *data)
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    std::unique_ptr<GetManualNetworkScanStateCallback> callback =
-        std::make_unique<GetManualNetworkScanStateCallback>(asyncContext);
+    auto callback = std::make_unique<ManualNetworkScanStateCallback>(asyncContext);
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetManualNetworkScanState(
         asyncContext->slotId, callback.release());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {

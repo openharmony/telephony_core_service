@@ -23,6 +23,7 @@
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
 #include "enum_convert.h"
+#include "manual_network_scan.h"
 #include "mcc_pool.h"
 #include "network_search_types.h"
 #include "operator_name_utils.h"
@@ -175,6 +176,7 @@ bool NetworkSearchManager::OnInit()
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
+    manualNetworkScan_ = std::make_shared<ManualNetworkScan>(shared_from_this());
     TELEPHONY_LOGI("NetworkSearchManager::Init success");
     return true;
 }
@@ -2001,87 +2003,47 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
 
 int32_t NetworkSearchManager::GetManualNetworkScanState(int32_t slotId, NSCALLBACK &callback)
 {
-    if (callback == nullptr) {
-        TELEPHONY_LOGE("NetworSearchManager::GetManualNetworkScanState callback is null");
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool isScanning = GetManualNetworkScanState();
-    MessageParcel data;
-    data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
-    if (!data.WriteBool(isScanning) || !data.WriteInt32(TELEPHONY_SUCCESS)) {
-        TELEPHONY_LOGE("GetManualNetworkScanState fail slotId:%{public}d", slotId);
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    callback->OnNetworkSearchCallback(
-        INetworkSearchCallback::NetworkSearchCallback::GET_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan_->GetManualNetworkScanState(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StartManualNetworkScanCallback(int32_t slotId,
     const sptr<INetworkSearchCallback> &callback)
 {
-    int32_t ret = ManualNetworkScanState(slotId, true);
-    if (ret != TELEPHONY_ERR_SUCCESS) {
-        return ret;
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutexScan_);
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->slotId == slotId) {
-            iter = listManualScanCallbackRecord_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-    ManualScanCallbackRecord scanRecord;
-    scanRecord.slotId = slotId;
-    scanRecord.callback = callback;
-    listManualScanCallbackRecord_.push_back(scanRecord);
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan_->StartManualNetworkScanCallback(slotId, callback);
 }
 
 int32_t NetworkSearchManager::StopManualNetworkScanCallback(int32_t slotId)
 {
-    if (GetManualNetworkScanState()) {
-        ManualNetworkScanState(slotId, false);
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    return TELEPHONY_ERR_SUCCESS;
+    return manualNetworkScan_->StopManualNetworkScanCallback(slotId);
 }
 
 void NetworkSearchManager::NotifyManualScanStateChanged(int32_t slotId, bool isFinish,
     const sptr<NetworkSearchResult> &networkSearchResult)
 {
-    for (auto iter = listManualScanCallbackRecord_.begin(); iter != listManualScanCallbackRecord_.end();) {
-        if (iter->slotId == slotId) {
-            if (iter->callback == nullptr) {
-                TELEPHONY_LOGE("callback is nullptr from listManualScanCallbackRecord_");
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
-            }
-            MessageParcel data;
-            data.WriteInterfaceToken(INetworkSearchCallback::GetDescriptor());
-            networkSearchResult->Marshalling(data);
-            if (!data.WriteBool(isFinish) || !data.WriteInt32(slotId)) {
-                TELEPHONY_LOGE("NotifyManualScanStateChanged fail slotId:%{public}d", slotId);
-                return;
-            }
-            iter->callback->OnNetworkSearchCallback(
-                INetworkSearchCallback::NetworkSearchCallback::START_MANUAL_NETWORK_SCAN_STATUS_RESULT, data);
-
-            if (isFinish) {
-                iter = listManualScanCallbackRecord_.erase(iter);
-                continue;
-            }
-        }
-        ++iter;
+    if (manualNetworkScan_ == nullptr) {
+        TELEPHONY_LOGE("manualNetworkScan_ is null");
+        return;
     }
+    manualNetworkScan_->NotifyManualScanStateChanged(slotId, isFinish, networkSearchResult);
 }
 
-int32_t NetworkSearchManager::ManualNetworkScanState(int32_t slotId, bool isStart)
+int32_t NetworkSearchManager::StartOrStopManualNetworkScan(int32_t slotId, bool isStart)
 {
     auto inner = FindManagerInner(slotId);
     if (inner == nullptr || inner->networkSearchHandler_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchManager::ManualNetworkScanState slotId:%{public}d inner is null", slotId);
+        TELEPHONY_LOGE("StartOrStopManualNetworkScan slotId:%{public}d inner is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     auto networkSearchHandler = inner->networkSearchHandler_;
