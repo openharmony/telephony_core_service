@@ -13,8 +13,7 @@
  * limitations under the License.
  */
 
-#include "start_manual_network_scan_callback.h"
-
+#include "manual_network_scan_callback.h"
 #include "manual_network_scan_callback_manager.h"
 #include "singleton.h"
 #include "telephony_errors.h"
@@ -22,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-void NapiStartManualScanCallback::OnStartManualNetworkScanCallback(
+void ManualNetworkScanCallback::OnStartManualNetworkScanCallback(
     const sptr<NetworkSearchResult> &networkSearchResult, const bool isFinish, int32_t slotId)
 {
     if (networkSearchResult == nullptr) {
@@ -34,12 +33,7 @@ void NapiStartManualScanCallback::OnStartManualNetworkScanCallback(
         TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
         return;
     }
-    int32_t ret = manager->ReportManualScanInfo(slotId, networkSearchResult, isFinish);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("failed! errCode:%{public}d", ret);
-    } else {
-        TELEPHONY_LOGI("success! slotId:%{public}d", slotId);
-    }
+    manager->ReportManualScanInfo(slotId, networkSearchResult, isFinish);
 }
 } // namespace Telephony
 } // namespace OHOS

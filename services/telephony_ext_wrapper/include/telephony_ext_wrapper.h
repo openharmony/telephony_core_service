@@ -136,6 +136,7 @@ public:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*UnRegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -217,6 +218,7 @@ public:
     bool GetManualNetworkSearchStateFunc();
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
+    void SetActiveSimFunc(int32_t slotId, int32_t enable);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -229,6 +231,7 @@ private:
     void InitTelephonyExtWrapperForVSim();
     void InitTelephonyExtWrapperForApnCust();
     void InitTelephonyExtWrapperForSim();
+    void InitTelephonyExtWrapperForSim1();
     void InitTelephonyExtWrapperForOpkeyVersion();
     void InitTelephonyExtWrapperForOpnameVersion();
     void InitTelephonyExtWrapperForDynamicLoad();
@@ -239,6 +242,7 @@ private:
     GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
+    SetActiveSim setActiveSim_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

@@ -321,6 +321,9 @@ int32_t SimManager::SetActiveSim(int32_t slotId, int32_t enable)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = multiSimController_->SetActiveSim(slotId, enable);
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(slotId, enable);
+    }
     if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
         multiSimMonitor_->NotifySimActiveStateChanged(slotId, static_cast<bool>(enable));
@@ -559,6 +562,7 @@ int32_t SimManager::GetDefaultCellularDataSimId(int32_t &simId)
 
 int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mtx_);
     if (slotCount_ == std::atoi(DEFAULT_SLOT_COUNT)) {
         TELEPHONY_LOGI(" default dsds mode is 0 for single card version");
         dsdsMode = DSDS_MODE_V2;
@@ -570,6 +574,7 @@ int32_t SimManager::GetDsdsMode(int32_t &dsdsMode)
 
 int32_t SimManager::SetDsdsMode(int32_t dsdsMode)
 {
+    std::unique_lock<ffrt::shared_mutex> lck(mtx_);
     dsdsMode_ = dsdsMode;
     return TELEPHONY_ERR_SUCCESS;
 }
@@ -1486,7 +1491,11 @@ int32_t SimManager::UpdateSimPresent(int32_t slotId, bool isShowPresent)
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->UpdateSimPresent(slotId, isShowPresent);
+    int32_t ret = multiSimController_->UpdateSimPresent(slotId, isShowPresent);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
 }
 
 int32_t SimManager::UpdateEsimOpName(const std::string &iccId, const std::string &operatorName)

@@ -91,7 +91,7 @@ template("sim_unittest_suite") {
   ohos_unittest(target_name) {
     use_exceptions = true
     install_enable = true
-    module_out_path = "core_service/core_service_sim"
+    module_out_path = "core_service/core_service"
     sources = invoker.sources
     deps = sim_unittest_deps
     external_deps = sim_unittest_external_deps

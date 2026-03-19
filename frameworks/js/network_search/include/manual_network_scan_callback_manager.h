@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include <uv.h>
-
 #include "napi_radio.h"
 #include "ffrt.h"
 

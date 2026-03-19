@@ -21,6 +21,7 @@
 #include "vcard_configuration.h"
 #include "vcard_utils.h"
 #include "locale_config.h"
+#include "locale_matcher.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1345,16 +1346,23 @@ void VCardContact::UpdateDisplayName()
         .family = nameData_->GetFamily(),
         .suffix = nameData_->GetSuffix(),
     };
-    auto language = Global::I18n::LocaleConfig::GetSystemLanguage();
+    // 不带地区的系统语言，双升单可能带地区
+    std::string language = Global::I18n::LocaleConfig::GetSystemLanguage();
+    // 不带地区的系统语言列表集合
+    std::unordered_set<std::string> sysLangSet = Global::I18n::LocaleConfig::GetSystemLanguages();
+    std::vector<std::string> sysLangVector(sysLangSet.begin(), sysLangSet.end());
+    // 匹配到不带地区的系统语言
+    std::string fixedLanguage = Global::I18n::LocaleMatcher::GetBestMatchedLocale(language, sysLangVector);
     if (vCardType_ != VERSION_30 && VCardUtils::IsPrintableString(rawNameInfo.family) &&
         VCardUtils::IsPrintableString(rawNameInfo.given)) {
-        language = "en-Latn-US";
+        fixedLanguage = "en-Latn-US";
     }
-    std::string displayName = GenerateDisplayName(language, rawNameInfo);
+    std::string displayName = GenerateDisplayName(fixedLanguage, rawNameInfo);
     if (displayName.empty()) {
         return;
     }
-    TELEPHONY_LOGI("do UpdateDisplayName, language: %{public}s", language.c_str());
+    TELEPHONY_LOGI("do UpdateDisplayName, language: %{public}s, fixedLanguage: %{public}s",
+        language.c_str(), fixedLanguage.c_str());
     nameData_->setDispalyName(displayName);
 }
 

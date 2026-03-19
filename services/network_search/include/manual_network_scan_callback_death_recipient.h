@@ -13,18 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef START_MANUAL_SCAN_CALLBACK_H
-#define START_MANUAL_SCAN_CALLBACK_H
+#ifndef MANUAL_NETWORK_SCAN_CALLBACK_DEATH_RECIPIENT_H
+#define MANUAL_NETWORK_SCAN_CALLBACK_DEATH_RECIPIENT_H
 
-#include "i_network_search_callback_stub.h"
+#include "iremote_broker.h"
+#include "manual_network_scan.h"
 
 namespace OHOS {
 namespace Telephony {
-class NapiStartManualScanCallback : public INetworkSearchCallbackStub {
+class ManualNetworkScanCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    void OnStartManualNetworkScanCallback(const sptr<NetworkSearchResult> &networkSearchResult,
-        const bool isFinish, int32_t slotId) override;
+    explicit ManualNetworkScanCallbackDeathRecipient(const std::weak_ptr<ManualNetworkScan> &manualNetworkScan)
+        : manualNetworkScan_(manualNetworkScan) {};
+    ~ManualNetworkScanCallbackDeathRecipient() override = default;
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+
+private:
+    std::weak_ptr<ManualNetworkScan> manualNetworkScan_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // START_MANUAL_SCAN_CALLBACK_H
+#endif // MANUAL_NETWORK_SCAN_CALLBACK_DEATH_RECIPIENT_H

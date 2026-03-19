@@ -68,7 +68,7 @@ public:
     MOCK_METHOD1(GetSimId, int32_t(int32_t slotId));
     MOCK_METHOD2(SaveImsSwitch, int32_t(int32_t slotId, int32_t imsSwitchValue));
     MOCK_METHOD2(QueryImsSwitch, int32_t(int32_t slotId, int32_t &imsSwitchValue));
-    MOCK_METHOD0(GetListFromDataBase, bool());
+    MOCK_METHOD1(GetListFromDataBase, bool(bool isNeedProtectiveRetry));
     MOCK_METHOD2(GetActiveSimAccountInfoList, int32_t(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList));
     MOCK_METHOD1(GetRadioProtocolTech, int32_t(int32_t slotId));
     MOCK_METHOD1(GetRadioProtocol, void(int32_t slotId));
@@ -87,7 +87,7 @@ public:
     MOCK_METHOD3(InsertEsimData, int32_t(const std::string &iccId, int32_t esimLabel, const std::string &operatorName));
     MOCK_METHOD2(GetSimLabel, int32_t(int32_t slotId, SimLabel &simLabel));
     MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &iccId, int32_t &labelIndex));
-    MOCK_METHOD0(GetAllListFromDataBase, bool());
+    MOCK_METHOD1(GetAllListFromDataBase, bool(bool isNeedProtectiveRetry));
     MOCK_METHOD2(GetTargetSimId, int32_t(int32_t slotId, int &simId));
     MOCK_METHOD1(AnnounceDefaultVoiceSimIdChanged, bool(int simId));
     MOCK_METHOD2(GetTargetDefaultSimId, int32_t(int32_t slotId, int &simId));

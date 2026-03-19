@@ -72,8 +72,8 @@ public:
     int32_t GetSimId(int32_t slotId);
     int32_t SaveImsSwitch(int32_t slotId, int32_t imsSwitchValue);
     int32_t QueryImsSwitch(int32_t slotId, int32_t &imsSwitchValue);
-    bool GetListFromDataBase();
-    bool GetAllListFromDataBase();
+    bool GetListFromDataBase(bool isNeedProtectiveRetry = true);
+    bool GetAllListFromDataBase(bool isNeedProtectiveRetry = true);
     int32_t GetActiveSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
@@ -110,6 +110,8 @@ public:
         SET_PRIMARY_SLOT_RETRY_EVENT = 0,
         RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT,
         WAIT_FOR_ALL_CARDS_READY_EVENT,
+        REFRESH_LOCAL_CACHE_RETRY,
+        REFRESH_ALL_LOCAL_CACHE_RETRY,
     };
     std::vector<bool> isSimSlotsMapping_ = {false, false};
 
@@ -207,12 +209,15 @@ private:
     std::atomic<bool> isSetPrimarySlotIdInProgress_{false};
     ffrt::mutex setPrimarySlotToRilMutex_;
     ffrt::mutex writeDbMutex_;
+    ffrt::mutex forgetAllDataMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     bool isSettingPrimarySlotToRil_ = false;
     bool setPrimarySlotResponseResult_ = false;
     bool isRilSetPrimarySlotSupport_ = false;
     bool isSupportEsimMep_ = false;
+    int refreshLocalCacheRemainCount_;
+    int refreshAllLocalCacheRemainCount_;
 };
 } // namespace Telephony
 } // namespace OHOS

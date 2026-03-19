@@ -15,7 +15,9 @@
 
 #include "signal_information.h"
 
+#include <shared_mutex>
 #include <string_ex.h>
+#include "ffrt.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -33,6 +35,7 @@ const int32_t *WCDMA_SIGNAL_THRESHOLD = SignalInformation::WCDMA_SIGNAL_THRESHOL
 const int32_t *TD_SCDMA_SIGNAL_THRESHOLD = SignalInformation::TD_SCDMA_SIGNAL_THRESHOLD_5BAR;
 const int32_t *NR_SIGNAL_THRESHOLD = SignalInformation::NR_SIGNAL_THRESHOLD_5BAR;
 int32_t SignalInformation::signalBar_ = SIGNAL_FIVE_BARS;
+ffrt::shared_mutex mutex_;
 
 SignalInformation::SignalInformation()
 {
@@ -41,6 +44,7 @@ SignalInformation::SignalInformation()
 
 void SignalInformation::InitSignalBar(const int32_t bar)
 {
+    std::unique_lock<ffrt::shared_mutex> lck(mutex_);
     if (bar == SIGNAL_FOUR_BARS) {
         GSM_SIGNAL_THRESHOLD = SignalInformation::GSM_SIGNAL_THRESHOLD_4BAR;
         CDMA_SIGNAL_THRESHOLD = SignalInformation::CDMA_SIGNAL_THRESHOLD_4BAR;
@@ -186,10 +190,6 @@ std::unique_ptr<GsmSignalInformation> GsmSignalInformation::Unmarshalling(Parcel
 
 bool GsmSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(gsmRxlev_)) {
         return false;
     }
@@ -316,10 +316,6 @@ std::unique_ptr<CdmaSignalInformation> CdmaSignalInformation::Unmarshalling(Parc
 
 bool CdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(cdmaRssi_)) {
         return false;
     }
@@ -474,10 +470,6 @@ std::unique_ptr<LteSignalInformation> LteSignalInformation::Unmarshalling(Parcel
 
 bool LteSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(rxlev_)) {
         return false;
     }
@@ -562,6 +554,7 @@ int32_t WcdmaSignalInformation::GetSignalIntensity() const
 
 int32_t WcdmaSignalInformation::GetSignalLevel() const
 {
+    std::shared_lock<ffrt::shared_mutex> lck(mutex_);
     if (signalLevel_ != SIGNAL_LEVEL_UNSET) {
         return signalLevel_;
     }
@@ -639,10 +632,6 @@ std::unique_ptr<WcdmaSignalInformation> WcdmaSignalInformation::Unmarshalling(Pa
 
 bool WcdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(wcdmaRxlev_)) {
         return false;
     }
@@ -769,10 +758,6 @@ std::unique_ptr<TdScdmaSignalInformation> TdScdmaSignalInformation::Unmarshallin
 
 bool TdScdmaSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(tdScdmaRscp_)) {
         return false;
     }
@@ -911,10 +896,6 @@ std::unique_ptr<NrSignalInformation> NrSignalInformation::Unmarshalling(Parcel &
 
 bool NrSignalInformation::ReadFromParcel(Parcel &parcel)
 {
-    int32_t rat;
-    if (!parcel.ReadInt32(rat)) {
-        return false;
-    }
     if (!parcel.ReadInt32(nrRsrp_)) {
         return false;
     }

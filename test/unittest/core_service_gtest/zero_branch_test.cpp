@@ -1822,6 +1822,8 @@ HWTEST_F(BranchTest, Telephony_StkController_001, Function | MediumTest | Level1
     stkController->ProcessEvent(event);
     event = nullptr;
     stkController->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(StkController::CLOSE_CA_ESIM_EVENT);
+    stkController->ProcessEvent(event);
     EXPECT_EQ(stkController->SendCallSetupRequestResult(true), TELEPHONY_ERR_FAIL);
     EXPECT_GT(stkController->SendTerminalResponseCmd(strCmd), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(stkController->SendEnvelopeCmd(strCmd), TELEPHONY_ERR_SUCCESS);
