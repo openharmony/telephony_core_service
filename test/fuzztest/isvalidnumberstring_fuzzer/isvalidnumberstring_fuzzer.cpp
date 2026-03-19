@@ -24,6 +24,7 @@
 #include "sim_char_decode.h"
 #include "sim_number_decode.h"
 #include "system_ability_definition.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -33,21 +34,21 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     auto simCharDecode = std::make_shared<SimCharDecode>();
     auto simNumberDecode = std::make_shared<SimNumberDecode>();
     int32_t offset = 0;
-    int32_t bcdExtType = static_cast<int32_t>(*data + offset);
+    int32_t bcdExtType = provider->ConsumeIntegral<int32_t>() + offset;
     offset += sizeof(int32_t);
-    uint8_t result = static_cast<uint8_t>(*data + offset);
+    uint8_t result = provider->ConsumeIntegral<uint8_t>() + static_cast<uint8_t>(offset);
     offset += sizeof(int32_t);
-    char argument = static_cast<char>(*data + offset);
-    std::string str(reinterpret_cast<const char *>(data), size);
+    char argument = provider->ConsumeIntegral<char>();
+    std::string str = provider->ConsumeRandomLengthString();
     offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string number(reinterpret_cast<const char *>(data + offset), size - offset);
+    std::string number = provider->ConsumeRandomLengthString();
     std::vector<uint8_t> bcdCodes;
     bcdCodes.push_back(result);
-    bool includeLen = static_cast<int32_t>(*data % 2);
+    bool includeLen = provider->ConsumeIntegral<int32_t>() % 2;
     simCharDecode->IsChineseString(str);
     simNumberDecode->IsValidNumberString(number);
     simNumberDecode->CharToBCD(argument, result, bcdExtType);

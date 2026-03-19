@@ -233,7 +233,7 @@ EsimService::EsimService() : SystemAbility(TELEPHONY_ESIM_SERVICE_SYS_ABILITY_ID
 
 EsimService::~EsimService() {}
 
-void OnRemoteRequestEsim(const uint8_t *data, size_t size)
+void OnRemoteRequestEsim(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (size < SIZE_LIMIT) {
         return;
@@ -254,7 +254,7 @@ void OnRemoteRequestEsim(const uint8_t *data, size_t size)
     }
 }
 
-void EsimServiceProxyTest(const uint8_t *data, size_t size)
+void EsimServiceProxyTest(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (size < SIZE_LIMIT) {
         return;
@@ -298,13 +298,13 @@ void EsimServiceProxyTest(const uint8_t *data, size_t size)
 }
 #endif
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
+void OnRemoteRequest(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    if (size < SIZE_LIMIT) {
+    if (provider == nullptr) {
         return;
     }
 
@@ -315,8 +315,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
 
-    uint32_t code = (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
-                    (static_cast<uint32_t>(data[2]) << 8) | (static_cast<uint32_t>(data[3])) % FUCTION_SIZE;
+    uint32_t code = provider->ConsumeIntegral<uint32_t>() % FUCTION_SIZE;
 
     MessageParcel reply;
     MessageOption option;
@@ -329,10 +328,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     OnRemoteRequest(data, size);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
-    OnRemoteRequestEsim(data, size);
-    EsimServiceProxyTest(data, size);
+    OnRemoteRequestEsim(provider);
+    EsimServiceProxyTest(provider);
 #endif
     sleep(SLEEP_TIME_SECONDS);
     return;
