@@ -209,6 +209,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
+    GetDistributedSimCount getDistributedSimCount_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
@@ -527,6 +528,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
     sendSimChgTypeInfo_ = &SendSimChgTypeInfoImpl;
     reportEventToChr_ = &ReportEventToChrImpl;
+    getDistributedSimCount_ = &GetDistributedSimCountImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
