@@ -380,6 +380,10 @@ inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
 }
+inline int32_t GetDistributedSimCountImpl()
+{
+    return 0;
+}
 inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
     return 0;
