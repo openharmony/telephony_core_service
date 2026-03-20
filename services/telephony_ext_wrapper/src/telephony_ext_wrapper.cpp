@@ -187,8 +187,6 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
     unregisterEsimSwitchNotify_ = (RegisterEsimSwitchNotify)dlsym(telephonyExtWrapperHandle_,
         "UnregisterEsimSwitchNotify");
     getNetworkStatusExt_ = (GET_NETWORK_STATUS_EXT)dlsym(telephonyExtWrapperHandle_, "GetNetworkStatusExt");
-    getDistributedSimCount_ = (GetDistributedSimCount)dlsym(telephonyExtWrapperHandle_,
-        "GetDistributedSimCount");
     if (getVoiceMailIccidParameter_ == nullptr || setVoiceMailIccidParameter_ == nullptr ||
         initVoiceMailManagerExt_ == nullptr || deinitVoiceMailManagerExt_ == nullptr ||
         resetVoiceMailLoadedFlagExt_ == nullptr || setVoiceMailOnSimExt_ == nullptr ||
@@ -280,10 +278,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
     reportEventToChr_ =
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
+    getDistributedSimCount_ =
+        reinterpret_cast<GetDistributedSimCount>dlsym(telephonyExtWrapperHandle_, "GetDistributedSimCount");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
-        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr);
+        getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
+        getDistributedSimCount_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -408,6 +409,14 @@ void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
     if (setActiveSim_ != nullptr) {
         setActiveSim_(slotId, enable);
     }
+}
+
+int32_t TelephonyExtWrapper::GetDistributedSimCount(std::string &bundleName, int32_t realSlotCount)
+{
+    if (getDistributedSimCount_ != nullptr) {
+        return getDistributedSimCount_(bundleName, realSlotCount);
+    }
+    return realSlotCount;
 }
 } // namespace Telephony
 } // namespace OHOS
