@@ -235,15 +235,12 @@ EsimService::~EsimService() {}
 
 void OnRemoteRequestEsim(std::shared_ptr<FuzzedDataProvider> provider)
 {
-    if (size < SIZE_LIMIT) {
-        return;
-    }
 
     MessageParcel dataMessageParcel;
     if (!dataMessageParcel.WriteInterfaceToken(EsimServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
 
     MessageParcel reply;
@@ -262,7 +259,6 @@ void EsimServiceProxyTest(std::shared_ptr<FuzzedDataProvider> provider)
     
     sptr<TestIRemoteObject> remote = new (std::nothrow) TestIRemoteObject();
     EsimServiceProxy esimServiceProxy(remote);
-    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     
     sptr<IEsimServiceCallback> listener = nullptr;
     DownloadableProfile profile;
@@ -312,7 +308,7 @@ void OnRemoteRequest(std::shared_ptr<FuzzedDataProvider> provider)
     if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
 
     uint32_t code = provider->ConsumeIntegral<uint32_t>() % FUCTION_SIZE;
