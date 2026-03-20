@@ -73,7 +73,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-using namespace testing;
 
 namespace {
 const int32_t SLOT_ID_0 = 0;

@@ -52,24 +52,19 @@ public:
     void SetUp();
     void TearDown();
     static MockTelRilManager *telRilManager_;
-    static MultiSimControllerMock *multiSimController_;
     static std::shared_ptr<SimManager> simManager_;
 };
 
 MockTelRilManager *SimManagerTest::telRilManager_ = nullptr;
-MultiSimControllerMock *SimManagerTest::multiSimController_ = nullptr;
 std::shared_ptr<SimManager> SimManagerTest::simManager_ = nullptr;
 
 void SimManagerTest::SetUpTestCase()
 {
     telRilManager_ = new MockTelRilManager();
-    multiSimController_ = new MultiSimControllerMock();
     std::shared_ptr<MockTelRilManager> telRilManager(telRilManager_);
-    std::shared_ptr<MultiSimControllerMock> multiSimController(multiSimController_);
     simManager_ = std::make_shared<SimManager>(telRilManager);
     EXPECT_CALL(*telRilManager_, UnRegisterCoreNotify(_, _, _))
         .WillRepeatedly(Return(0));
-    simManager_->multiSimController_ = multiSimController;
 }
 
 void SimManagerTest::TearDownTestCase()
@@ -77,9 +72,6 @@ void SimManagerTest::TearDownTestCase()
     Mock::AllowLeak(telRilManager_);
     telRilManager_ = nullptr;
     simManager_->telRilManager_ = nullptr;
-    Mock::AllowLeak(multiSimController_);
-    multiSimController_ = nullptr;
-    simManager_->multiSimController_ = nullptr;
 }
 
 void SimManagerTest::SetUp() {}
@@ -456,7 +448,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_001, Function | MediumTest | L
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_002, Function | MediumTest | Level1)
 {
     int32_t simId = 0;
-    simManager_->multiSimController_ = nullptr;
     int32_t ret = simManager_->GetDefaultSmsSimId(simId);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
@@ -469,7 +460,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_002, Function | MediumTest | L
 HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_003, Function | MediumTest | Level1)
 {
     int32_t simId = 0;
-    simManager_->multiSimController_ = nullptr;
     int32_t ret = simManager_->GetDefaultCellularDataSimId(simId);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
@@ -652,25 +642,12 @@ HWTEST_F(SimManagerTest, GetSimIccStatustest, Function | MediumTest | Level1)
     int32_t result = simManager_->GetSimIccStatus(-1, status);
     EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
 
-    simManager_->OnInit(3);
-
     simManager_->simStateManager_.resize(MAX_SLOT_COUNT);
     result = simManager_->InitTelExtraModule(SIM_SLOT_2);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 
-    simManager_->simStateManager_.clear();
     result = simManager_->InitTelExtraModule(SIM_SLOT_2);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
-}
-
-HWTEST_F(SimManagerTest, InitBaseManagertest, Function | MediumTest | Level1)
-{
-    int32_t invalidSlotId = -1;
-    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<MockTelRilManager>();
-    std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    simManager->InitBaseManager(invalidSlotId);
-    EXPECT_TRUE(true);
 }
 
 HWTEST_F(SimManagerTest, SetModemInittest, Function | MediumTest | Level1)
