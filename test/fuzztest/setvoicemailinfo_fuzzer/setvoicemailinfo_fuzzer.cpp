@@ -83,7 +83,7 @@ void GetOperatorConfigs(std::shared_ptr<FuzzedDataProvider> provider)
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorConfig(dataMessageParcel, reply);
@@ -99,7 +99,7 @@ void GetLockState(std::shared_ptr<FuzzedDataProvider> provider)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(provider->ConsumeIntegral<int32_t>() % LOCK_TYPE);
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetLockState(dataMessageParcel, reply);

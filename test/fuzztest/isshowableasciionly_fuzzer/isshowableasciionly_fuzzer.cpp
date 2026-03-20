@@ -40,7 +40,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     std::string parameter = provider->ConsumeRandomLengthString();
     simUtils->HexStringConvertToBytes(str, byteslen);
     simUtils->IsShowableAsciiOnly(str);
-    simUtils->BcdPlmnConvertToString(parameter, ConsumeIntegral<size_t>());
+    simUtils->BcdPlmnConvertToString(parameter, provider->ConsumeIntegral<size_t>());
     simUtils->Trim(str);
     simUtils->HexCharConvertToInt(argument);
 }
