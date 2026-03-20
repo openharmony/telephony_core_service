@@ -384,7 +384,7 @@ inline bool IsDistributedCommunicationConnectedImpl()
 }
 inline int32_t GetDistributedSimCountImpl(std::string &bundleName, int32_t realSlotCount)
 {
-    return 0;
+    return realSlotCount;
 }
 inline int32_t SendSimChgTypeInfoImpl(int32_t slotId, int32_t type)
 {
