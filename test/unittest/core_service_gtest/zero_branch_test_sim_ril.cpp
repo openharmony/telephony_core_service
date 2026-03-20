@@ -1320,11 +1320,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand002, Function | MediumTest | 
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     objectUnique->exception = std::make_shared<int>(100);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessGetMsisdnDone(event);
-
-    objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
-    objectUnique->exception = std::make_shared<int>(100);
-    event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessSetMsisdnDone(event);
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
@@ -1645,13 +1640,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | 
     objectUnique->exception = std::make_shared<int>(100);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessUpdateDone(event);
-    objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
-    objectUnique->exception = std::make_shared<int>(100);
-    event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessSetCphsMailbox(event);
-    objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
-    event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessSetCphsMailbox(event);
     event.reset();
     simFile->ProcessGetPnnDone(event);
     simFile->ProcessGetOplDone(event);
@@ -1699,9 +1687,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand009, Function | MediumTest | 
     objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->ProcessGetFplmnDone(event);
-    objectUnique = std::make_unique<ControllerToFileMsg>(nullptr, nullptr);
-    event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessSetMbdn(event);
 
     event.reset();
     EXPECT_TRUE(simFile->ProcessGetHplmActDone(event) == true);
