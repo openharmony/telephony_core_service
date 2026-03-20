@@ -239,7 +239,7 @@ void OnRemoteRequestEsim(std::shared_ptr<FuzzedDataProvider> provider)
     if (!dataMessageParcel.WriteInterfaceToken(EsimServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
 
     MessageParcel reply;
@@ -307,7 +307,7 @@ void OnRemoteRequest(std::shared_ptr<FuzzedDataProvider> provider)
     if (!dataMessageParcel.WriteInterfaceToken(CoreServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
 
     uint32_t code = provider->ConsumeIntegral<uint32_t>() % FUCTION_SIZE;
