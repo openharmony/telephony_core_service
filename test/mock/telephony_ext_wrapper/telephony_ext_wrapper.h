@@ -209,7 +209,6 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
-    GetDistributedSimCount getDistributedSimCount_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
@@ -218,6 +217,7 @@ public:
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
+    int32_t GetDistributedSimCount(std::string &bundleName, int32_t realSlotCount);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -231,6 +231,7 @@ private:
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
     SetActiveSim setActiveSim_ = nullptr;
+    GetDistributedSimCountFunc getDistributedSimCount_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -381,7 +382,7 @@ inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
 }
-inline int32_t GetDistributedSimCountImpl()
+inline int32_t GetDistributedSimCountImpl(std::string &bundleName, int32_t realSlotCount)
 {
     return 0;
 }
@@ -616,6 +617,14 @@ inline void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable
     if (setActiveSim_ != nullptr) {
         setActiveSim_(slotId, enable);
     }
+}
+
+inline int32_t TelephonyExtWrapper::GetDistributedSimCount(std::string &bundleName, int32_t realSlotCount)
+{
+    if (getDistributedSimCount_ != nullptr) {
+        return getDistributedSimCount_(bundleName, realSlotCount);
+    }
+    return realSlotCount;
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
