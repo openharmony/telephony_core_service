@@ -235,7 +235,6 @@ EsimService::~EsimService() {}
 
 void OnRemoteRequestEsim(std::shared_ptr<FuzzedDataProvider> provider)
 {
-
     MessageParcel dataMessageParcel;
     if (!dataMessageParcel.WriteInterfaceToken(EsimServiceStub::GetDescriptor())) {
         return;
