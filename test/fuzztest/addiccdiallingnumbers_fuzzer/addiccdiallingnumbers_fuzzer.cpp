@@ -329,7 +329,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
-    OnRemoteRequest(data, size);
+    OnRemoteRequest(provider);
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_ESIM
     OnRemoteRequestEsim(provider);
     EsimServiceProxyTest(provider);
