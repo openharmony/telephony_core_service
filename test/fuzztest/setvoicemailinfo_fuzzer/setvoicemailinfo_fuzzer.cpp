@@ -55,7 +55,8 @@ void GetDefaultVoiceSlotId(std::shared_ptr<FuzzedDataProvider> provider)
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetDefaultVoiceSlotId(dataMessageParcel, reply);
@@ -68,7 +69,8 @@ void GetActiveSimAccountInfoList(std::shared_ptr<FuzzedDataProvider> provider)
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetActiveSimAccountInfoList(dataMessageParcel, reply);
@@ -83,7 +85,8 @@ void GetOperatorConfigs(std::shared_ptr<FuzzedDataProvider> provider)
     int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorConfig(dataMessageParcel, reply);
@@ -99,7 +102,8 @@ void GetLockState(std::shared_ptr<FuzzedDataProvider> provider)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(provider->ConsumeIntegral<int32_t>() % LOCK_TYPE);
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uint8_t>(), provider->ConsumeIntegral<size_t>());
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetLockState(dataMessageParcel, reply);
