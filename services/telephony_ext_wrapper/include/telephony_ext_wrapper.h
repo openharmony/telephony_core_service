@@ -137,6 +137,7 @@ public:
     typedef void (*UnRegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
+    typedef int32_t (*GetDistributedSimCount)(const std::string &bundleName);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -211,6 +212,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
+    GetDistributedSimCount getDistributedSimCount_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
