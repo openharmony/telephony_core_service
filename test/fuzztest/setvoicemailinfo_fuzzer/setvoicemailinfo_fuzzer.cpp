@@ -55,7 +55,7 @@ void GetDefaultVoiceSlotId(std::shared_ptr<FuzzedDataProvider> provider)
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetDefaultVoiceSlotId(dataMessageParcel, reply);
@@ -68,7 +68,7 @@ void GetActiveSimAccountInfoList(std::shared_ptr<FuzzedDataProvider> provider)
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), ConsumeIntegral<size_t>());
+    dataMessageParcel.WriteBuffer(provider->ConsumeIntegral<uin8_t>(), provider->ConsumeIntegral<size_t>());
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetActiveSimAccountInfoList(dataMessageParcel, reply);
