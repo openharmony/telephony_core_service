@@ -279,7 +279,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     reportEventToChr_ =
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
     getDistributedSimCount_ =
-        reinterpret_cast<GetDistributedSimCount>dlsym(telephonyExtWrapperHandle_, "GetDistributedSimCount");
+        reinterpret_cast<GetDistributedSimCountFunc>(dlsym(telephonyExtWrapperHandle_, "GetDistributedSimCount"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
