@@ -217,7 +217,7 @@ public:
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
-    int32_t GetDistributedSimCount(std::string &bundleName, int32_t realSlotCount);
+    int32_t GetDistributedSimCount(const std::string &bundleName, int32_t realSlotCount);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
