@@ -382,7 +382,7 @@ inline bool IsDistributedCommunicationConnectedImpl()
 {
     return false;
 }
-inline int32_t GetDistributedSimCountImpl(std::string &bundleName, int32_t realSlotCount)
+inline int32_t GetDistributedSimCountImpl(const std::string &bundleName, int32_t realSlotCount)
 {
     return realSlotCount;
 }
