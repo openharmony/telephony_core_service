@@ -619,7 +619,7 @@ inline void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable
     }
 }
 
-inline int32_t TelephonyExtWrapper::GetDistributedSimCount(std::string &bundleName, int32_t realSlotCount)
+inline int32_t TelephonyExtWrapper::GetDistributedSimCount(const std::string &bundleName, int32_t realSlotCount)
 {
     if (getDistributedSimCount_ != nullptr) {
         return getDistributedSimCount_(bundleName, realSlotCount);
