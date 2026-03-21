@@ -135,7 +135,7 @@ public:
     typedef void (*UnRegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
-
+    typedef int32_t (*GetDistributedSimCountFunc)(const std::string &bundleName, int32_t realSlotCount);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
