@@ -1572,7 +1572,7 @@ int32_t SimManager::GetRealSimCount()
     if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
         std::string bundleName = GetBundleName();
-        return TELEPHONY_EXT_WRAPPER.getDistributedSimCount_(bundleName);
+        return TELEPHONY_EXT_WRAPPER.GetDistributedSimCount(bundleName);
     }
     return realSlotCount;
 }
