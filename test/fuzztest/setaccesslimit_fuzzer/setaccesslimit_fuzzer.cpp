@@ -22,6 +22,7 @@
 #include "icc_operator_rule.h"
 #include "napi_util.h"
 #include "system_ability_definition.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -31,21 +32,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
     auto iccOperatorRule = std::make_shared<IccOperatorRule>();
-    size_t offset = 0;
-    std::string result(reinterpret_cast<const char *>(data), size);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string packageName(reinterpret_cast<const char *>(data + offset), size - offset);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string hexStr(reinterpret_cast<const char *>(data + offset), size - offset);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string certificate(reinterpret_cast<const char *>(data + offset), size - offset);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string accessLimit(reinterpret_cast<const char *>(data + offset), size - offset);
+    std::string result = provider->ConsumeRandomLengthString();
+    std::string packageName = provider->ConsumeRandomLengthString();
+    std::string hexStr = provider->ConsumeRandomLengthString();
+    std::string certificate = provider->ConsumeRandomLengthString();
+    std::string accessLimit = provider->ConsumeRandomLengthString();
     iccOperatorRule->GetPackageName(result);
     iccOperatorRule->GetPackageName(packageName);
     iccOperatorRule->SetPackageNameByHexStr(hexStr);

@@ -28,6 +28,7 @@
 #include "tel_event_handler.h"
 #include "unistd.h"
 #include "tel_ril_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -47,75 +48,76 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-void GetDefaultVoiceSlotId(const uint8_t *data, size_t size)
+void GetDefaultVoiceSlotId(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(data, size);
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetDefaultVoiceSlotId(dataMessageParcel, reply);
 }
 
-void GetActiveSimAccountInfoList(const uint8_t *data, size_t size)
+void GetActiveSimAccountInfoList(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(data, size);
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetActiveSimAccountInfoList(dataMessageParcel, reply);
 }
 
-void GetOperatorConfigs(const uint8_t *data, size_t size)
+void GetOperatorConfigs(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetOperatorConfig(dataMessageParcel, reply);
 }
 
-void GetLockState(const uint8_t *data, size_t size)
+void GetLockState(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<int32_t>(*data % LOCK_TYPE));
-    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.WriteInt32(provider->ConsumeIntegral<int32_t>() % LOCK_TYPE);
+    uint8_t byte = provider->ConsumeIntegral<uint8_t>();
+    dataMessageParcel.WriteBuffer(&byte, sizeof(byte));
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CoreService>::GetInstance()->OnGetLockState(dataMessageParcel, reply);
 }
 
-void SetVoiceMailInfo(const uint8_t *data, size_t size)
+void SetVoiceMailInfo(std::shared_ptr<FuzzedDataProvider> provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    size_t offset = 0;
-    std::string mailNumber(reinterpret_cast<const char *>(data), size);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string mailName(reinterpret_cast<const char *>(data + offset), size - offset);
+    int32_t slotId = provider->ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string mailNumber = provider->ConsumeRandomLengthString();
+    std::string mailName = provider->ConsumeRandomLengthString();
     auto mailNameU16 = Str8ToStr16(mailName);
     auto mailNumberU16 = Str8ToStr16(mailNumber);
     MessageParcel dataMessageParcel;
@@ -133,11 +135,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    GetDefaultVoiceSlotId(data, size);
-    GetOperatorConfigs(data, size);
-    GetActiveSimAccountInfoList(data, size);
-    GetLockState(data, size);
-    SetVoiceMailInfo(data, size);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    GetDefaultVoiceSlotId(provider);
+    GetOperatorConfigs(provider);
+    GetActiveSimAccountInfoList(provider);
+    GetLockState(provider);
+    SetVoiceMailInfo(provider);
     sleep(1);
     return;
 }

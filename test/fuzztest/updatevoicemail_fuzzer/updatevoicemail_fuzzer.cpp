@@ -26,6 +26,7 @@
 #include "ruim_file.h"
 #include "system_ability_definition.h"
 #include "tel_ril_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -42,21 +43,18 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
     g_flag = true;
 
-    int32_t roaming = static_cast<int32_t>(*data % BOOL_NUM);
+    std::shared_ptr<FuzzedDataProvider> provider = std::make_shared<FuzzedDataProvider>(data, size);
+    int32_t roaming = provider->ConsumeIntegral<int32_t>() % BOOL_NUM;
     int32_t offset = 0;
-    int32_t response = static_cast<int32_t>(*data + offset);
+    int32_t response = provider->ConsumeIntegral<int32_t>() + offset;
     offset += sizeof(int32_t);
-    std::int32_t eventId = static_cast<int32_t>(*data + offset);
+    std::int32_t eventId = provider->ConsumeIntegral<int32_t>() + offset;
     offset += sizeof(int32_t);
-    std::int64_t refId = static_cast<int64_t>(*data + offset);
+    std::int64_t refId = provider->ConsumeIntegral<int64_t>() + offset;
     offset = 0;
-    std::string operatorNum(reinterpret_cast<const char *>(data + offset), size - offset);
-    offset = sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string mailName(reinterpret_cast<const char *>(data + offset), size - offset);
-    offset += sizeof(int32_t);
-    offset = (offset > size) ? size : offset;
-    std::string mailNumber(reinterpret_cast<const char *>(data + offset), size - offset);
+    std::string operatorNum = provider->ConsumeRandomLengthString();
+    std::string mailName = provider->ConsumeRandomLengthString();
+    std::string mailNumber = provider->ConsumeRandomLengthString();
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId, refId);
     auto telRilManager_ = std::make_shared<TelRilManager>();
     auto stateManager_ = std::make_shared<SimStateManager>(telRilManager_);
