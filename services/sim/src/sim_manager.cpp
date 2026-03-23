@@ -24,6 +24,7 @@
 #include "telephony_errors.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_permission.h"
+#include "telephony_common_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1570,7 +1571,8 @@ int32_t SimManager::GetRealSimCount()
 
     if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
-        return DC_MAX_SLOT_COUNT;
+        std::string bundleName = GetBundleName();
+        return TELEPHONY_EXT_WRAPPER.GetDistributedSimCount(bundleName, realSlotCount);
     }
     return realSlotCount;
 }
