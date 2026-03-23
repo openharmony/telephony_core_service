@@ -2162,7 +2162,7 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
 
     iccFile->voiceMailConfig_ = std::make_shared<VoiceMailConstants>(0);
     iccFile->LoadVoiceMail();
-    std::shared_ptr<AppExecFwk::EventHandler> handler = std::make_shared<EventHandler>();
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
     iccFile->imsi_ = "123";
     iccFile->RegisterImsiLoaded(handler);
     iccFile->iccId_ = "123";
