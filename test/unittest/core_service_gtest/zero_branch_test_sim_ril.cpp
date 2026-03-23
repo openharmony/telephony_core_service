@@ -1060,13 +1060,13 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
 
     auto mccAccess = MccPool::AccessToMcc(MCC_BJ);
     EXPECT_EQ(mccAccess->iso_, "bj");
-    std::shared_ptr<MccAccess> mccAccessA = std::make_shared<MccAccess>(MCC_MK, "", 0);
-    std::shared_ptr<MccAccess> mccAccessB = std::make_shared<MccAccess>(MCC_CN_A, "", 0);
-    std::shared_ptr<MccAccess> mccAccessC = std::make_shared<MccAccess>(MCC_CD, "", 0);
-    std::shared_ptr<MccAccess> mccAccessD = nullptr;
-    ASSERT_TRUE(MccPool::MccCompare(mccAccessA, mccAccessB));
-    ASSERT_FALSE(MccPool::MccCompare(mccAccessC, mccAccessB));
-    ASSERT_FALSE(MccPool::MccCompare(mccAccessA, mccAccessD));
+    MccPool::MccAccessData dataA(MCC_MK, "mk", 0);
+    MccPool::MccAccessData dataB(MCC_CN_A, "cn", 0);
+    MccPool::MccAccessData dataC(MCC_CD, "cd", 0);
+    MccPool::MccAccessData defaultData(0, "", 0); 
+    ASSERT_TRUE(MccPool::MccCompare(dataA, dataB));
+    ASSERT_FALSE(MccPool::MccCompare(dataC, dataB));
+    ASSERT_FALSE(MccPool::MccCompare(dataA, defaultData));
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_IsChineseString001, Function | MediumTest | Level1)

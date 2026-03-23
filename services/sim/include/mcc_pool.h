@@ -289,14 +289,21 @@ public:
     static int ShortestMncLengthFromMcc(int mcc);
     static bool LengthIsThreeMnc(const std::string &mccMncCode);
     static bool LengthIsTwoMnc(const std::string &mccMncCode);
-    static std::vector<std::shared_ptr<MccAccess>> mccAccessTable_;
     static std::vector<std::string> specialMccMnc_;
     static std::vector<std::string> indiaMccMnc_;
 
 private:
+    struct MccAccessData {
+        int mcc_;
+        int mncShortestLength_;
+        const char *iso_;
+        MccAccessData(int mcc, const char *iso, int mncShort)
+        : mcc_(mcc), mncShortestLength_(mncShort), iso_(iso) {}
+    };
+
     static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
     static void InitMccTables();
-    static bool MccCompare(const std::shared_ptr<MccAccess> &mccAccessA, const std::shared_ptr<MccAccess> &mccAccessB);
+    static bool MccCompare(const MccAccessData &mccAccessDataA, const MccAccessData &mccAccessDataB);
     static void AddMccForAsia();
     static void AddMccForEurope();
     static void AddMccForAfrica();
@@ -311,6 +318,7 @@ private:
     static void AddMccMncForMy();
     static void InitIndiaTables();
 
+    static std::vector<MccAccessData> mccAccessDataTable_;
     static std::mutex mccMutex_;
 };
 } // namespace Telephony
