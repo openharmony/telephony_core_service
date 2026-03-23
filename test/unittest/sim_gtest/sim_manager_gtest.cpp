@@ -87,10 +87,12 @@ public:
     int32_t HasSimCard(int32_t slotId, bool &hasSimCard) override
     {
         if (slotId == 0) {
-            return true;
+            hasSimCard = true;
+        } else {
+            hasSimCard = false;
         }
 
-        return false;
+        return 0;
     }
 };
 
@@ -334,7 +336,6 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_Expand006, Function | MediumTe
 {
     auto telRilManager = std::make_shared<MockTelRilManager>();
     auto simManager = std::make_shared<SimManagerMock>(telRilManager);
-
     std::string pdu;
     std::string smsc;
     int32_t imsSwitch;
@@ -344,14 +345,15 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_Expand006, Function | MediumTe
     sptr<SimAccountCallback> callback;
     AuthType authType = AuthType::SIM_AUTH_EAP_AKA_TYPE;
     SimAuthenticationResponse response;
-
     simManager->IsSetPrimarySlotIdInProgress();
     simManager->IsDataShareError();
     simManager->ResetDataShareError();
     simManager->slotCount_ = 2;
+    simManager->simStateManager_.resize(1);
+    simManager->simStateManager_[0].reset();
     simManager->GetSimIO(0, 0, 0, "12345678", "", response);
-    simManager->InitSingleSimObject();
     simManager->InitMultiSimObject();
+    simManager->InitSingleSimObject();
     simManager->AddSmsToIcc(0, 0, pdu, smsc);
     simManager->UpdateSmsIcc(0, 0, 0, pdu, smsc);
     simManager->DelSmsIcc(0, 0);
@@ -401,8 +403,8 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_Expand007, Function | MediumTe
     simManager->CheckIfNeedSwitchMainSlotId(true);
     simManager->SetTargetPrimarySlotId(true, 0);
 
-    simManager->InitSingleSimObject();
     simManager->InitMultiSimObject();
+    simManager->InitSingleSimObject();
 
     simManager->GetDefaultMainSlotByIccId();
     EXPECT_TRUE(simManager->GetSimLabel(2, simLabel) == INVALID_VALUE);
