@@ -54,7 +54,7 @@ const std::string PARAM_REFRESH_RESULT = "refreshResult";
 const std::string ABILITY_NAME = "ServiceExtAbility";
 const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
-const int64_t CLOSE_ESIM_CA_DELAY_TIME = 15 * 1000; // 15s
+const int64_t CLOSE_ESIM_CA_DELAY_TIME = 25 * 1000; // 25s
 } // namespace
 
 StkController::StkController(const std::weak_ptr<Telephony::ITelRilManager> &telRilManager,
