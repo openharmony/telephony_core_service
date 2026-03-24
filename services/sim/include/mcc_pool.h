@@ -297,7 +297,7 @@ private:
         int mcc_;
         int mncShortestLength_;
         const char *iso_;
-        MccAccessData(int mcc, const char *iso, int mncShort) 
+        MccAccessData(int mcc, const char *iso, int mncShort)
             : mcc_(mcc), mncShortestLength_(mncShort), iso_(iso) {}
     };
 
