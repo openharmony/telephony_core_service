@@ -1063,7 +1063,7 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
     MccPool::MccAccessData dataA(MCC_MK, "mk", 0);
     MccPool::MccAccessData dataB(MCC_CN_A, "cn", 0);
     MccPool::MccAccessData dataC(MCC_CD, "cd", 0);
-    MccPool::MccAccessData defaultData(0, "", 0); 
+    MccPool::MccAccessData defaultData(0, "", 0);
     ASSERT_TRUE(MccPool::MccCompare(dataA, dataB));
     ASSERT_FALSE(MccPool::MccCompare(dataC, dataB));
     ASSERT_FALSE(MccPool::MccCompare(dataA, defaultData));

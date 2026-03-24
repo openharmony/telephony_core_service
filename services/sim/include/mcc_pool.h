@@ -297,8 +297,8 @@ private:
         int mcc_;
         int mncShortestLength_;
         const char *iso_;
-        MccAccessData(int mcc, const char *iso, int mncShort)
-        : mcc_(mcc), mncShortestLength_(mncShort), iso_(iso) {}
+        MccAccessData(int mcc, const char *iso, int mncShort) 
+            : mcc_(mcc), mncShortestLength_(mncShort), iso_(iso) {}
     };
 
     static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
