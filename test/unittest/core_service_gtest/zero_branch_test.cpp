@@ -2073,11 +2073,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }
 
-/**
- * @tc.number   Telephony_IccFile_Expand001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -2126,11 +2121,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand001, Function | MediumTest | Level1
     EXPECT_FALSE(iccFile->ObtainEonsExternRules(oplFiles, true, eons, false, "123") == true);
 }
 
-/**
- * @tc.number   Telephony_IccFile_Expand002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -2182,11 +2172,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand002, Function | MediumTest | Level1
     EXPECT_TRUE(iccFile->CreateDiallingNumberPointer(0, 0, 0, nullptr) != nullptr);
 }
 
-/**
- * @tc.number   Telephony_IccFile_Expand003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
@@ -2227,11 +2212,6 @@ HWTEST_F(BranchTest, Telephony_IccFile_Expand003, Function | MediumTest | Level1
     EXPECT_TRUE(iccFile->isOnOpkeyLoaded_ == false);
 }
 
-/**
- * @tc.number   Telephony_IccFile_Expand004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(BranchTest, Telephony_IccFile_Expand004, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
