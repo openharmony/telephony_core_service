@@ -966,11 +966,6 @@ HWTEST_F(SimRilBranchTest, Telephony_IccFileController_001, Function | MediumTes
     ASSERT_TRUE(iccFileController->BuildCallerInfo(0, 0, 0, holder) != nullptr);
 }
 
-/**
- * @tc.number   Telephony_IccFileController_Expand001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_IccFileController_Expand001, Function | MediumTest | Level1)
 {
     std::shared_ptr<IccFileController> iccFileController = std::make_shared<SimFileController>(1);
@@ -1234,11 +1229,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_001, Function | MediumTest | Level1
     ASSERT_FALSE(simFile->FillNumber(efCfisData, efCfisSize, number));
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand001, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1283,11 +1273,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand001, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessObtainLiLanguage(event) == true);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand002, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1332,11 +1317,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand002, Function | MediumTest | 
     simFile->ProcessSetMsisdnDone(event);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand003, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1388,11 +1368,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand003, Function | MediumTest | 
     TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand004, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1442,11 +1417,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand004, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessGetIccIdDone(event) == true);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand005
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand005, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1492,11 +1462,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand005, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessGetAdDone(event) == true);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand006
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand006, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1547,11 +1512,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand006, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessGetSmsDone(event) == false);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand007
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand007, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1602,11 +1562,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand007, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessGetSstDone(event) == true);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand008
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1653,11 +1608,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand008, Function | MediumTest | 
     EXPECT_TRUE(simFile->ProcessUpdateDone(event) == false);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand009
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand009, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1709,11 +1659,6 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand009, Function | MediumTest | 
     simFile->FillNumber(cPtr, 3, "123");
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand010
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand010, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1760,13 +1705,9 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand010, Function | MediumTest | 
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
     simFile->spn_ = "1234";
     simFile->ProcessSpnCphs(event);
+    EXPECT_TRUE(simFile->spnStatus_ == SimFile::SpnStatus::OBTAIN_SPN_NONE);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand011
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand011, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1815,14 +1756,9 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand011, Function | MediumTest | 
     objectUnique->resultData = "12345678";
     objectUnique->exception = std::make_shared<int>(100);
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessGetCfisDone(event);
+    EXPECT_TRUE(simFile->ProcessGetCfisDone(event) == true);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand012
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand012, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1870,14 +1806,9 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand012, Function | MediumTest | 
 
     event.reset();
     simFile->ProcessReloadIccid(event);
-    simFile->ProcessReloadImsi(event);
+    EXPECT_TRUE(simFile->ProcessReloadImsi(event) == false);
 }
 
-/**
- * @tc.number   Telephony_SimFile_Expand013
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
 HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand013, Function | MediumTest | Level1)
 {
     auto telRilManager = std::make_shared<TelRilManager>();
@@ -1895,7 +1826,7 @@ HWTEST_F(SimRilBranchTest, Telephony_SimFile_Expand013, Function | MediumTest | 
     objectUnique->resultData = "1234";
     objectUnique->arg1 = ICC_CONTROLLER_REQ_SEND_RESPONSE;
     event = AppExecFwk::InnerEvent::Get(0, objectUnique);
-    simFile->ProcessGetFplmnDone(event);
+    EXPECT_TRUE(simFile->ProcessGetFplmnDone(event) == false);
 
     simFile->OnParamChanged(nullptr, nullptr, nullptr);
     simFile->OnParamChanged("1234", nullptr, nullptr);
