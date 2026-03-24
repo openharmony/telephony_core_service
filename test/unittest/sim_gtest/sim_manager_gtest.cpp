@@ -80,7 +80,7 @@ void SimManagerTest::TearDown() {}
 
 class SimManagerMock : public SimManager {
 public:
-    SimManagerMock(std::shared_ptr<ITelRilManager> telRilManager) : SimManager(telRilManager)
+    explicit SimManagerMock(std::shared_ptr<ITelRilManager> telRilManager) : SimManager(telRilManager)
     {
     }
 
