@@ -255,9 +255,9 @@ std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
     std::lock_guard<std::mutex> lock(mccMutex_);
     InitMccTables();
     auto it = std::find_if(mccAccessDataTable_.begin(), mccAccessDataTable_.end(),
-        [mcc](const auto &p) { return p.mcc_ == mcc; });
+        [mcc](const auto &p) { return p.mcc == mcc; });
     if (it != mccAccessDataTable_.end()) {
-        return std::make_shared<MccAccess>(it->mcc_, it->iso_, it->mncShortestLength_);
+        return std::make_shared<MccAccess>(it->mcc, it->iso, it->mncShortestLength);
     } else {
         return std::make_shared<MccAccess>(mcc, "", 0);
     }
@@ -292,7 +292,7 @@ void MccPool::InitMccTables()
         AddMccForNorthAmerica();
         AddMccForSouthAmerica();
         AddMccForAustralia();
-        std::sort(mccAccessDataTable_.begin(), mccAccessDataTable_.end(), MccPool::MccCompare);
+        std::sort(mccAccessDataTable_.begin(), mccAccessDataTable_.end(), MccPool::CompareMcc);
     }
 }
 
@@ -577,9 +577,9 @@ void MccPool::AddMccForAustralia()
     mccAccessDataTable_.insert(mccAccessDataTable_.end(), tmp.begin(), tmp.end());
 }
 
-bool MccPool::MccCompare(const MccAccessData &mccAccessDataA, const MccAccessData &mccAccessDataB)
+bool MccPool::CompareMcc(const MccAccessData &mccAccessDataA, const MccAccessData &mccAccessDataB)
 {
-    return (mccAccessDataA.mcc_ < mccAccessDataB.mcc_);
+    return (mccAccessDataA.mcc < mccAccessDataB.mcc);
 }
 
 bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
