@@ -294,16 +294,16 @@ public:
 
 private:
     struct MccAccessData {
-        int mcc_;
-        int mncShortestLength_;
-        const char *iso_;
+        int mcc;
+        int mncShortestLength;
+        const char *iso;
         MccAccessData(int mcc, const char *iso, int mncShort)
-            : mcc_(mcc), mncShortestLength_(mncShort), iso_(iso) {}
+            : mcc(mcc), mncShortestLength(mncShort), iso(iso) {}
     };
 
     static std::shared_ptr<MccAccess> AccessToMcc(int mcc);
     static void InitMccTables();
-    static bool MccCompare(const MccAccessData &mccAccessDataA, const MccAccessData &mccAccessDataB);
+    static bool CompareMcc(const MccAccessData &mccAccessDataA, const MccAccessData &mccAccessDataB);
     static void AddMccForAsia();
     static void AddMccForEurope();
     static void AddMccForAfrica();

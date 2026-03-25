@@ -1064,9 +1064,9 @@ HWTEST_F(SimRilBranchTest, Telephony_MccPool_001, Function | MediumTest | Level1
     MccPool::MccAccessData dataB(MCC_CN_A, "cn", 0);
     MccPool::MccAccessData dataC(MCC_CD, "cd", 0);
     MccPool::MccAccessData defaultData(0, "", 0);
-    ASSERT_TRUE(MccPool::MccCompare(dataA, dataB));
-    ASSERT_FALSE(MccPool::MccCompare(dataC, dataB));
-    ASSERT_FALSE(MccPool::MccCompare(dataA, defaultData));
+    ASSERT_TRUE(MccPool::CompareMcc(dataA, dataB));
+    ASSERT_FALSE(MccPool::CompareMcc(dataC, dataB));
+    ASSERT_FALSE(MccPool::CompareMcc(dataA, defaultData));
 }
 
 HWTEST_F(SimRilBranchTest, Telephony_IsChineseString001, Function | MediumTest | Level1)
