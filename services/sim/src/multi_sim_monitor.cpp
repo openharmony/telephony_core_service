@@ -715,21 +715,25 @@ void MultiSimMonitor::RegisterSimNotify()
 
 void MultiSimMonitor::RefreshSimAccountLoaded()
 {
-    if (controller_ == nullptr) {
-        TELEPHONY_LOGE("MultiSimContorller is null");
-        return;
-    }
     if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("observerHandler_ is nullptr");
+        TELEPHONY_LOGE("ObserverHandler_ is null");
         return;
     }
+
+    bool needNotifyChange = false;
     if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_0)) {
         observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_0);
-        TELEPHONY_LOGI("slot 0 refresh send sim account Loaded");
+        TELEPHONY_LOGI("Refresh send SIM account loaded for slot 0");
+        needNotifyChange = true;
     }
     if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_1)) {
         observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_1);
-        TELEPHONY_LOGI("slot 1 refresh send sim account Loaded");
+        TELEPHONY_LOGI("Refresh send SIM account loaded for slot 1");
+        needNotifyChange = true;
+    }
+
+    if (needNotifyChange) {
+        NotifySimAccountChanged();
     }
 }
 
