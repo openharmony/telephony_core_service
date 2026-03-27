@@ -177,10 +177,13 @@ HWTEST_F(BranchTest, Telephony_SimFile_001, Function | MediumTest | Level1)
     EXPECT_EQ(simFile->ObtainIsoCountryCode(), "");
     simFile->lengthOfMnc_ = OBTAIN_SPN_GENERAL;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     simFile->lengthOfMnc_ = UNKNOWN_MNC;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     simFile->lengthOfMnc_ = UNINITIALIZED_MNC;
     simFile->CheckMncLengthForAdDone();
+    simFile->CheckMncLengthForImsiDone();
     EXPECT_FALSE(simFile->CphsVoiceMailAvailable());
     EXPECT_FALSE(simFile->ProcessIccReady(event));
     EXPECT_TRUE(simFile->ProcessGetAdDone(event));
@@ -1967,9 +1970,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<IccFile> iccFile = std::make_shared<IsimFile>(simStateManager);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(StateMessage::MSG_ICC_REFRESH, 1);
-    iccFile->ProcessEvent(event);
-    event = nullptr;
-    iccFile->ProcessEvent(event);
+    iccFile->IccFile::ProcessEvent(event);
+    event.reset();
+    iccFile->IccFile::ProcessEvent(event);
     std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_SIM_RECORDS_LOADED);
@@ -1980,6 +1983,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_001, Function | MediumTest | Level1)
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_IMSI_LOADED_READY);
     iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
     iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_OPERATOR_CONFIG_UPDATE);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_QUERY_ICCID_DONE);
+    iccFile->UnRegisterCoreNotify(handler, RadioEvent::RADIO_QUERY_ICCID_DONE);
+    iccFile->RegisterCoreNotify(handler, RadioEvent::RADIO_ON);
     std::string plmn = "";
     EXPECT_EQ(iccFile->ObtainEons(plmn, 1, true), "");
     plmn = "123";
@@ -2025,7 +2031,9 @@ HWTEST_F(BranchTest, Telephony_IccFile_002, Function | MediumTest | Level1) {
     EXPECT_EQ(iccId, "2143BA65FT");
     std::string langData = "";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
-    langData = "000011286F050400000000010203FF";
+    langData = "123";
+    EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
+    langData = "12345678";
     EXPECT_EQ(iccFile->ObtainValidLanguage(langData), "");
 }
 
@@ -2177,6 +2185,8 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_002, Function | MediumTest | Leve
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
     multiSimMonitor->AddExtraManagers(simStateManagerPtr, simFileManagerPtr);
+    multiSimMonitor->isSimAccountLoaded_.resize(2, 1);
+    multiSimMonitor->initDataRemainCount_.resize(2, 1);
     auto simStateHandle = std::make_shared<SimStateHandle>(simStateManagerPtr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_SIM_STATE_READY, 0);
     multiSimMonitor->ProcessEvent(event);
