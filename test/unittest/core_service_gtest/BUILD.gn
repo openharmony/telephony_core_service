@@ -493,6 +493,7 @@ ohos_unittest("tel_core_zero_branch_gtest") {
 
     # Test cases
     "zero_branch_test.cpp",
+    "zero_branch_test2.cpp",
   ]
 
   include_dirs = [
@@ -1092,6 +1093,7 @@ ohos_unittest("tel_sim_zero_branch_gtest") {
 
     # Test cases
     "zero_branch_test_sim_ril.cpp",
+    "zero_branch_test_sim_ril2.cpp",
   ]
 
   include_dirs = [
