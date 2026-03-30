@@ -21,51 +21,56 @@ namespace ffrt {
 
 class mutex : public ffrt_mutex_t {
 public:
-    mutex()
-    {}
+    mutex() = default;
+    ~mutex() = default;
 
-    ~mutex()
-    {
-    }
-
-    mutex(const mutex &) = delete;
-
-    void operator=(const mutex &) = delete;
+    mutex(const mutex&) = delete;
+    void operator=(const mutex&) = delete;
 
     inline bool try_lock()
     {
-        return true;
+        return internal_mutex_.try_lock();
     }
 
     inline void lock()
-    {}
+    {
+        internal_mutex_.lock();
+    }
 
     inline void unlock()
-    {}
+    {
+        internal_mutex_.unlock();
+    }
+
+private:
+    std::mutex internal_mutex_;
 };
 
 class recursive_mutex : public ffrt_mutex_t {
 public:
-    recursive_mutex()
-    {}
+    recursive_mutex() = default;
+    ~recursive_mutex() = default;
 
-    ~recursive_mutex()
-    {}
-
-    recursive_mutex(const recursive_mutex &) = delete;
-
-    void operator=(const recursive_mutex &) = delete;
+    recursive_mutex(const recursive_mutex&) = delete;
+    void operator=(const recursive_mutex&) = delete;
 
     inline bool try_lock()
     {
-        return true;
+        return internal_mutex_.try_lock();
     }
 
     inline void lock()
-    {}
+    {
+        internal_mutex_.lock();
+    }
 
     inline void unlock()
-    {}
+    {
+        internal_mutex_.unlock();
+    }
+
+private:
+    std::recursive_mutex internal_mutex_;
 };
 }  // namespace ffrt
 
