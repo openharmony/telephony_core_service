@@ -216,8 +216,8 @@ private:
     bool setPrimarySlotResponseResult_ = false;
     bool isRilSetPrimarySlotSupport_ = false;
     bool isSupportEsimMep_ = false;
-    int refreshLocalCacheRemainCount_;
-    int refreshAllLocalCacheRemainCount_;
+    int refreshLocalCacheRemainCount_ = 0;
+    int refreshAllLocalCacheRemainCount_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
