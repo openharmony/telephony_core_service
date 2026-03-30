@@ -45,11 +45,11 @@ private:
 
 class recursive_mutex : public ffrt_mutex_t {
 public:
-    mutex() = default;
-    ~mutex() = default;
+    recursive_mutex() = default;
+    ~recursive_mutex() = default;
 
-    mutex(const mutex&) = delete;
-    void operator=(const mutex&) = delete;
+    recursive_mutex(const recursive_mutex&) = delete;
+    void operator=(const recursive_mutex&) = delete;
 
     inline bool try_lock() {
         return internal_mutex_.try_lock();
