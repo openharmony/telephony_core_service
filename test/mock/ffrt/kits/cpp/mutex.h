@@ -27,15 +27,18 @@ public:
     mutex(const mutex&) = delete;
     void operator=(const mutex&) = delete;
 
-    inline bool try_lock() {
+    inline bool try_lock()
+    {
         return internal_mutex_.try_lock();
     }
 
-    inline void lock() {
+    inline void lock()
+    {
         internal_mutex_.lock();
     }
 
-    inline void unlock() {
+    inline void unlock()
+    {
         internal_mutex_.unlock();
     }
 
@@ -51,15 +54,18 @@ public:
     recursive_mutex(const recursive_mutex&) = delete;
     void operator=(const recursive_mutex&) = delete;
 
-    inline bool try_lock() {
+    inline bool try_lock()
+    {
         return internal_mutex_.try_lock();
     }
 
-    inline void lock() {
+    inline void lock()
+    {
         internal_mutex_.lock();
     }
 
-    inline void unlock() {
+    inline void unlock()
+    {
         internal_mutex_.unlock();
     }
 
