@@ -15,6 +15,7 @@
 #ifndef MOCK_FFRT_API_CPP_MUTEX_H
 #define MOCK_FFRT_API_CPP_MUTEX_H
 
+#include <mutex>
 #include "c/mutex.h"
 
 namespace ffrt {
