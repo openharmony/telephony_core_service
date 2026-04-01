@@ -1798,5 +1798,34 @@ int32_t CoreServiceClient::StopManualNetworkScanCallback(int32_t slotId)
     }
     return proxy->StopManualNetworkScanCallback(slotId);
 }
+
+int32_t CoreServiceClient::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, int64_t timeoutMs)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    auto result = std::make_shared<int32_t>(TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    auto callback =
+        sptr<RawParcelCallbackStub>::MakeSptr([wpRet = std::weak_ptr<int32_t>(result)](MessageParcel &data) {
+            auto spRet = wpRet.lock();
+            if (spRet == nullptr) {
+                return;
+            }
+            *spRet = data.ReadInt32();
+        });
+    int ret = proxy->SetSimLabelIndex(simId, simLabelIndex, callback);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("conect to stub fail with error code: %{public}d", ret);
+        return ret;
+    }
+    ret = callback->WaitForResult(timeoutMs);
+    if (!ret) {
+        TELEPHONY_LOGE("SetSimLabelIndex wait callback timeout");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return *result;
+}
 }  // namespace Telephony
 } // namespace OHOS

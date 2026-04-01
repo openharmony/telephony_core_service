@@ -32,6 +32,7 @@
 #include "sim_manager.h"
 #include "string_ex.h"
 #include "telephony_ext_wrapper.h"
+#include "multi_sim_helper.h"
 
 #ifdef  CORE_SERVICE_SUPPORT_ESIM
 #include "reset_response.h"
@@ -118,6 +119,9 @@ void MultiSimController::Init()
     }
     if (radioProtocolController_ != nullptr) {
         radioProtocolController_->Init();
+    }
+    if (multiSimHelper_ == nullptr) {
+        multiSimHelper_ = std::make_shared<MultiSimHelper>();
     }
     maxCount_ = SIM_SLOT_COUNT;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
@@ -556,7 +560,25 @@ void MultiSimController::SimDataBuilder(int slotId, DataShare::DataShareValuesBu
     }
 }
 
-int32_t MultiSimController::SetSimLabelIndex(const std::string &iccId, int32_t labelIndex)
+int32_t MultiSimController::SetSimLabelIndex(int32_t simId, int32_t labelIndex)
+{
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    auto ret = GetAllSimAccountInfoList(false, iccAccountInfoList);
+    if (ret != TELEPHONY_ERR_SUCCESS) {
+        return ret;
+    }
+
+    ret = TELEPHONY_ERR_ARGUMENT_INVALID;
+    for (const auto &accountInfo : iccAccountInfoList) {
+        if (accountInfo.simId == simId && accountInfo.isEsim) {
+            ret = SetSimLabelIndexByIccId(Str16ToStr8(accountInfo.iccId), labelIndex);
+            break;
+        }
+    }
+    return ret;
+}
+
+int32_t MultiSimController::SetSimLabelIndexByIccId(const std::string &iccId, int32_t labelIndex)
 {
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
@@ -2144,22 +2166,7 @@ int32_t MultiSimController::UpdateSimPresent(int32_t slotId, bool isShowPresent)
             ret = simDbHelper_->UpdateSimPresent(invalidIccId, true, slotId + 1);
         } else {
             DataShare::DataShareValuesBucket values;
-            DataShare::DataShareValueObject slotObj(INVALID_VALUE);
-            DataShare::DataShareValueObject iccidObj(invalidIccId);
-            DataShare::DataShareValueObject valueObj(ACTIVE);
-            DataShare::DataShareValueObject simLabelIndexObj(slotId + 1);
-            DataShare::DataShareValueObject isEsimObj(false);
-            DataShare::DataShareValueObject notMainCardObj(NOT_MAIN);
-            values.Put(SimData::SLOT_INDEX, slotObj);
-            values.Put(SimData::ICC_ID, iccidObj);
-            values.Put(SimData::CARD_ID, iccidObj);
-            values.Put(SimData::IS_ACTIVE, valueObj);
-            values.Put(SimData::SIM_LABEL_INDEX, simLabelIndexObj);
-            values.Put(SimData::IS_ESIM, isEsimObj);
-            values.Put(SimData::IS_MAIN_CARD, notMainCardObj);
-            values.Put(SimData::IS_VOICE_CARD, notMainCardObj);
-            values.Put(SimData::IS_MESSAGE_CARD, notMainCardObj);
-            values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
+            multiSimHelper_->BuildSimPresentValues(slotId, values, invalidIccId);
             ret = simDbHelper_->InsertData(id, values);
             ret = ret > SIMID_INDEX0 ? TELEPHONY_SUCCESS : INVALID_VALUE;
         }

@@ -278,6 +278,54 @@ HWTEST_F(CoreServiceClientTest2, GetImeiSv007, Function | MediumTest | Level1)
     savedCallback->OnRemoteRequest(0, data, reply, option);
     EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
+
+HWTEST_F(CoreServiceClientTest2, SetSimLabelIndex001, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = true;
+    int32_t ret = client->SetSimLabelIndex(0, 0, 0);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceClientTest2, SetSimLabelIndex002, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = false;
+    EXPECT_CALL(*proxy, SetSimLabelIndex(_, _, _))
+        .WillOnce(Invoke([](int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback) {
+            return ~TELEPHONY_ERR_SUCCESS;
+        }));
+    int32_t ret = client->SetSimLabelIndex(0, 0, 0);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(CoreServiceClientTest2, SetSimLabelIndex003, Function | MediumTest | Level1)
+{
+    client->getProxyNullptr_ = false;
+    EXPECT_CALL(*proxy, SetSimLabelIndex(_, _, _))
+        .WillOnce(Invoke([](int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback) {
+            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        }));
+    int32_t ret = client->SetSimLabelIndex(0, 0, 1000);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceClientTest2, SetSimLabelIndex004, Function | MediumTest | Level3)
+{
+    client->getProxyNullptr_ = false;
+    EXPECT_CALL(*proxy, SetSimLabelIndex(_, _, _))
+        .WillOnce(Invoke([](int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback) {
+            savedCallback = static_cast<RawParcelCallbackStub *>(callback.GetRefPtr());
+            return TELEPHONY_ERR_SUCCESS;
+        }));
+    int32_t ret = client->SetSimLabelIndex(0, 0, 0);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(u"OHOS.Telephony.IRawParcelCallback");
+    data.WriteInt32(~TELEPHONY_ERR_SUCCESS);
+    savedCallback->OnRemoteRequest(0, data, reply, option);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
+
 }
 }
 }

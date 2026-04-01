@@ -153,6 +153,7 @@ private:
     int32_t OnGetManualNetworkScanState(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopManualNetworkScan(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartManualNetworkScan(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetSimLabelIndex(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;
