@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Telephony {
 class SimManager;
+class MultiSimHelper;
 class MultiSimController : public TelEventHandler {
 public:
     MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
@@ -93,7 +94,8 @@ public:
     bool isNeedRefreshLoadedSlot(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
-    int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex);
+    int32_t SetSimLabelIndex(int32_t simId, int32_t labelIndex);
+    int32_t SetSimLabelIndexByIccId(const std::string &iccId, int32_t labelIndex);
     bool IsEsim(int32_t slotId);
     int32_t ClearSimLabel(SimType simType);
     int32_t UpdateSimPresent(int32_t slotId, bool isShowPresent);
@@ -216,6 +218,7 @@ private:
     bool setPrimarySlotResponseResult_ = false;
     bool isRilSetPrimarySlotSupport_ = false;
     bool isSupportEsimMep_ = false;
+    std::shared_ptr<MultiSimHelper>  multiSimHelper_;
     int refreshLocalCacheRemainCount_ = 0;
     int refreshAllLocalCacheRemainCount_ = 0;
 };

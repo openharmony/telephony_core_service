@@ -3539,5 +3539,40 @@ int32_t CoreServiceProxy::StopManualNetworkScanCallback(int32_t slotId)
     }
     return reply.ReadInt32();
 }
+
+int32_t CoreServiceProxy::SetSimLabelIndex(
+    int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("SetSimLabelIndex WriteInterfaceToken is false");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!data.WriteInt32(simId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!data.WriteInt32(simLabelIndex)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("IRawParcelCallback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    data.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SetSimLabelIndex Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CoreServiceInterfaceCode::SET_SIM_LABEL_INDEX),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("SetSimLabelIndex failed, error code is %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return reply.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

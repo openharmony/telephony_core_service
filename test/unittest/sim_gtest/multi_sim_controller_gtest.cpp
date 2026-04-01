@@ -942,14 +942,14 @@ HWTEST_F(MultiSimControllerTest, InsertEsimDatatest_001, Function | MediumTest |
     multiSimController->simDbHelper_ = nullptr;
     int32_t result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
     EXPECT_EQ(result, INVALID_VALUE);
-    result = multiSimController->SetSimLabelIndex(iccId, labelIndex);
+    result = multiSimController->SetSimLabelIndexByIccId(iccId, labelIndex);
     EXPECT_EQ(result, INVALID_VALUE);
 
     multiSimController->simDbHelper_ = {};
     result = multiSimController->InsertEsimData(iccId, esimLabel, operatorName);
     EXPECT_EQ(result, INVALID_VALUE);
     multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
-    result = multiSimController->SetSimLabelIndex(iccId, labelIndex);
+    result = multiSimController->SetSimLabelIndexByIccId(iccId, labelIndex);
     EXPECT_NE(result, INVALID_VALUE);
 
     auto mocksimdbhelper = std::make_shared<MockSimRdbHelper>();
@@ -990,7 +990,7 @@ HWTEST_F(MultiSimControllerTest, SetSimLabelIndextest, Function | MediumTest | L
     auto mocksimdbhelper = std::make_shared<MockSimRdbHelper>();
     EXPECT_CALL(*mocksimdbhelper, UpdateDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
     multiSimController->allLocalCacheInfo_.clear();
-    EXPECT_EQ(multiSimController->SetSimLabelIndex("iccId", 1), INVALID_VALUE);
+    EXPECT_EQ(multiSimController->SetSimLabelIndexByIccId("iccId", 1), INVALID_VALUE);
 }
 
 HWTEST_F(MultiSimControllerTest, SetActiveSimSatellitetest_001, Function | MediumTest | Level1)

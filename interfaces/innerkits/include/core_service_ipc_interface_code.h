@@ -154,6 +154,7 @@ enum class CoreServiceInterfaceCode {
     GET_MANUAL_NETWORK_SCAN_STATE,
     STOP_MANUAL_NETWORK_SCAN,
     START_MANUAL_NETWORK_SCAN,
+    SET_SIM_LABEL_INDEX,
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -584,6 +584,11 @@ public:
     {
         return 0;
     }
+
+    int32_t SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback) override
+    {
+        return 0;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

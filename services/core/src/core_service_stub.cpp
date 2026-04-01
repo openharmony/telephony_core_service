@@ -291,6 +291,8 @@ void CoreServiceStub::AddHandlerEsimToMap()
 {
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SEND_APDU_DATA)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendApduData(data, reply); };
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::SET_SIM_LABEL_INDEX)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetSimLabelIndex(data, reply); };
 }
 
 void CoreServiceStub::AddHandlerManualScanToMap()
@@ -2042,6 +2044,29 @@ int32_t CoreServiceStub::OnStartManualNetworkScan(MessageParcel &data, MessagePa
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("CoreServiceStub::OnStartManualNetworkScan write reply failed.");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnSetSimLabelIndex(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t simId = data.ReadInt32();
+    int32_t simLabelIndex = data.ReadInt32();
+    auto remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        TELEPHONY_LOGE("OnSetSimLabelIndex read callback param failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    auto callback = iface_cast<IRawParcelCallback>(remoteObject);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnSetSimLabelIndex: callback is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = SetSimLabelIndex(simId, simLabelIndex, callback);
+    bool ret = reply.WriteInt32(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::SET_SIM_LABEL_INDEX write reply failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return NO_ERROR;
 }

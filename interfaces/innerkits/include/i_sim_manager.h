@@ -155,7 +155,8 @@ public:
     virtual int32_t GetDefaultMainSlotByIccId() = 0;
     virtual int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList) = 0;
     virtual int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel) = 0;
-    virtual int32_t SetSimLabelIndex(const std::string &iccId, int32_t labelIndex) = 0;
+    virtual int32_t SetSimLabelIndex(int32_t simId, int32_t simLabelIndex) = 0;
+    virtual int32_t SetSimLabelIndexByIccId(const std::string &iccId, int32_t labelIndex) = 0;
     virtual int32_t NotifySimSlotsMapping(int32_t slotId) = 0;
     virtual int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName) = 0;
     virtual bool IsEsim(int32_t slotId) = 0;
