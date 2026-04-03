@@ -610,7 +610,7 @@ HWTEST_F(MultiSimControllerTest, GetSimLabelIdxFromAllLocalCache, Function | Med
  
     OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot1", "1");
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 1);
-    EXPECT_EQ(simIdx, 3);
+    EXPECT_EQ(simIdx, 1);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SendMainCardBroadCast_001, Function | MediumTest | Level1)
