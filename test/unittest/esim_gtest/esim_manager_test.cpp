@@ -286,12 +286,12 @@ HWTEST_F(EsimManagerTest, IsSupported_001, Function | MediumTest | Level1)
 
     slotId = 0;
     ret = esimManager->IsSupported(slotId);
-     std::shared_ptr<MockEsimManager> mockesimManager = std::make_shared<MockEsimManager>();
- 	CoreManagerInner mInner;
- 	mInner.esimManager_ = mockesimManager;
- 	EXPECT_CALL(*mockesimManager, IsSupported(testing::_)).WillRepeatedly(testing::Return(true));
- 	esimManager->esimFiles_[1] = nullptr;
- 	EXPECT_EQ(ret, true);
+    std::shared_ptr<MockEsimManager> mockesimManager = std::make_shared<MockEsimManager>();
+    CoreManagerInner mInner;
+    mInner.esimManager_ = mockesimManager;
+    EXPECT_CALL(*mockesimManager, IsSupported(testing::_)).WillRepeatedly(testing::Return(true));
+    esimManager->esimFiles_[1] = nullptr;
+    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(EsimManagerTest, SendApduData_001, Function | MediumTest | Level1)
