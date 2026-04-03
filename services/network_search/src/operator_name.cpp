@@ -37,6 +37,8 @@ const int32_t PNN_CUST_STRING_SIZE = 2;
 const int32_t OPL_CUST_STRING_SIZE = 4;
 constexpr const char *CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL =
     "persist.radio.cfg.display_rule_use_roaming_from_network_state";
+const std::string TTS_SPEC_PLMN = "46004496";
+const std::string TTS_SPEC_OPNAME = "中国电信";
 } // namespace
 
 OperatorName::OperatorName(
@@ -251,6 +253,17 @@ void OperatorName::UpdateSpn(RegServiceState regStatus, sptr<NetworkState> &netw
     }
 }
 
+bool OperatorName::ProcTtsSpecOpName()
+{
+    std::u16string imsi;
+    CoreManagerInner::GetInstance().GetIMSI(slotId_, imsi);
+    std::string::size_type pos = Str16ToStr8(imsi).find(TTS_SPEC_PLMN);
+    if (pos != std::string::npos && pos == 0) {
+        return true;
+    }
+    return false;
+}
+
 void OperatorName::NotifyGsmSpnChanged(
     RegServiceState regStatus, sptr<NetworkState> &networkState, const std::string &domesticSpn, bool isForce)
 {
@@ -292,7 +305,7 @@ void OperatorName::NotifyGsmSpnChanged(
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.showSpn = false;
-            params.plmn = domesticSpn;
+            params.plmn = ProcTtsSpecOpName() ? TTS_SPEC_OPNAME : domesticSpn;
             std::string emptyDomesticSpn = "";
             PublishEvent(params, regStatus, emptyDomesticSpn);
         } else {
