@@ -1565,16 +1565,7 @@ int32_t SimManager::GetMaxSimCount()
 int32_t SimManager::GetRealSimCount()
 {
     int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
-    if (realSlotCount > 0) { // phone or not wifi device
-        return realSlotCount;
-    }
-
-    if (TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_ != nullptr &&
-        TELEPHONY_EXT_WRAPPER.isDistributedCommunicationConnected_()) {
-        std::string bundleName = GetBundleName();
-        return TELEPHONY_EXT_WRAPPER.GetDistributedSimCount(bundleName, realSlotCount);
-    }
-    return realSlotCount;
+    return TELEPHONY_EXT_WRAPPER.GetRealSimCountExt(realSlotCount);
 }
 } // namespace Telephony
 } // namespace OHOS
