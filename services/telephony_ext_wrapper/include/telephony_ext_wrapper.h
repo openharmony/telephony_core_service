@@ -137,7 +137,7 @@ public:
     typedef void (*UnRegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
-    typedef int32_t (*GetDistributedSimCountFunc)(const std::string &bundleName, int32_t realSlotCount);
+    typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -220,7 +220,7 @@ public:
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
-    int32_t GetDistributedSimCount(const std::string &bundleName, int32_t realSlotCount);
+    int32_t GetRealSimCountExt(const std::string &bundleName, int32_t realSlotCount);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -245,7 +245,7 @@ private:
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
     SetActiveSim setActiveSim_ = nullptr;
-    GetDistributedSimCountFunc getDistributedSimCount_ = nullptr;
+    GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
