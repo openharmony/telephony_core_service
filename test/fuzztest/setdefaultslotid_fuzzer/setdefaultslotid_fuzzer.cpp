@@ -62,7 +62,7 @@ void SetDefaultSlotIdFunc(std::shared_ptr<FuzzedDataProvider> provider)
     simManager->GetPrimarySlotId(slotId);
     simManager->InsertEsimData(std::string(provider->ConsumeRandomLengthString()), voiceMailCount,
         std::string(provider->ConsumeRandomLengthString()));
-    simManager->SetSimLabelIndex(std::string(provider->ConsumeRandomLengthString()), voiceMailCount);
+    simManager->SetSimLabelIndexByIccId(std::string(provider->ConsumeRandomLengthString()), voiceMailCount);
     simManager->slotCount_ = std::atoi(DEFAULT_SLOT_COUNT);
     simManager->GetDefaultSmsSlotId();
     simManager->GetDefaultCellularDataSlotId();

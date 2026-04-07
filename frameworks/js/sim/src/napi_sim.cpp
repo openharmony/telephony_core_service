@@ -3092,6 +3092,58 @@ napi_value GetSimLabelSync(napi_env env, napi_callback_info info)
     return value;
 }
 
+void NativeSetSimLabelIndex(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        return;
+    }
+    AsyncSetSimLabelIndexInfo *context = static_cast<AsyncSetSimLabelIndexInfo *>(data);
+    if (context == nullptr) {
+        TELEPHONY_LOGE("convert parameter fail");
+        return;
+    }
+    int32_t errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().SetSimLabelIndex(
+        context->simId, context->simLabelIndex);
+    context->asyncContext.context.errorCode = errorCode;
+    context->asyncContext.context.resolved = (errorCode == ERROR_NONE);
+}
+
+void SetSimLabelIndexCallback(napi_env env, napi_status status, void *data)
+{
+    NAPI_CALL_RETURN_VOID(env, (data == nullptr) ? napi_invalid_arg : napi_ok);
+    std::unique_ptr<AsyncSetSimLabelIndexInfo> context(static_cast<AsyncSetSimLabelIndexInfo *>(data));
+    NapiAsyncPermissionCompleteCallback(
+        env, status, context->asyncContext, true, { "SetSimLabelIndex", Permission::SET_TELEPHONY_STATE });
+    TELEPHONY_LOGI("SetSimLabelIndexCallback end");
+}
+
+napi_value SetSimLabelIndex(napi_env env, napi_callback_info info)
+{
+    TELEPHONY_LOGI("SetSimLabelIndex start");
+    auto simLabelContext = std::make_unique<AsyncSetSimLabelIndexInfo>();
+    BaseContext &context = simLabelContext->asyncContext.context;
+
+    auto initPara = std::make_tuple(&simLabelContext->simId, &simLabelContext->simLabelIndex, &context.callbackRef);
+    AsyncPara para {
+        .funcName = "SetSimLabelIndex",
+        .env = env,
+        .info = info,
+        .execute = NativeSetSimLabelIndex,
+        .complete = SetSimLabelIndexCallback,
+    };
+    napi_value result = NapiCreateAsyncWork2<AsyncSetSimLabelIndexInfo>(para, simLabelContext.get(), initPara);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("create asyncwork failed");
+        return nullptr;
+    }
+    auto ret = napi_queue_async_work_with_qos(env, context.work, napi_qos_default);
+    if (ret != napi_ok) {
+        napi_delete_async_work(env, context.work);
+        return nullptr;
+    }
+    return result;
+}
+
 napi_status InitEnumSimState(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -3382,6 +3434,7 @@ napi_status InitSimInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_WRITABLE_FUNCTION("getAllSimAccountInfoList", GetAllSimAccountInfoList),
         DECLARE_NAPI_WRITABLE_FUNCTION("getSimLabel", GetSimLabel),
         DECLARE_NAPI_WRITABLE_FUNCTION("getSimLabelSync", GetSimLabelSync),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setSimLabelIndex", SetSimLabelIndex),
     };
     return napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
