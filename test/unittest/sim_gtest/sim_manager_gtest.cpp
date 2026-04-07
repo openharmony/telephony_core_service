@@ -394,7 +394,7 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_Expand007, Function | MediumTe
     simManager->slotCount_ = 2;
 
     simManager->InsertEsimData("", 0, "");
-    simManager->SetSimLabelIndex("", 0);
+    simManager->SetSimLabelIndexByIccId("", 0);
     simManager->GetAllSimAccountInfoList(true, iccAccountInfoList);
     simManager->IsEsim(0);
     simManager->ClearSimLabel(simType);
@@ -410,7 +410,7 @@ HWTEST_F(SimManagerTest, Telephony_Sim_SimManager_Expand007, Function | MediumTe
     EXPECT_TRUE(simManager->GetSimLabel(2, simLabel) == INVALID_VALUE);
     simManager->GetSimLabel(0, simLabel);
     simManager->InsertEsimData("", 0, "");
-    simManager->SetSimLabelIndex("", 0);
+    simManager->SetSimLabelIndexByIccId("", 0);
     simManager->NotifySimSlotsMapping(1);
     simManager->NotifySimSlotsMapping(0);
     simManager->GetAllSimAccountInfoList(true, iccAccountInfoList);
@@ -791,7 +791,7 @@ HWTEST_F(SimManagerTest, SetSimLabelIndex, Function | MediumTest | Level1)
     simManager_->multiSimController_ = nullptr;
     std::string iccId = "test_icc_id";
     int32_t labelIndex = 0;
-    int32_t result = simManager_->SetSimLabelIndex(iccId, labelIndex);
+    int32_t result = simManager_->SetSimLabelIndexByIccId(iccId, labelIndex);
     EXPECT_EQ(result, INVALID_VALUE);
 }
 

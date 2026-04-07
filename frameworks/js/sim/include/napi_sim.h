@@ -115,6 +115,12 @@ struct AsyncSimLabelInfo {
     AsyncContext<napi_value> asyncContext;
     SimLabel simLabel;
 };
+
+struct AsyncSetSimLabelIndexInfo {
+    AsyncContext<bool> asyncContext;
+    int32_t simId = ERROR_DEFAULT;
+    int32_t simLabelIndex = ERROR_DEFAULT;
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // OHOS_NAPI_SIM_H

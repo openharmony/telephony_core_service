@@ -1437,13 +1437,26 @@ int32_t SimManager::InsertEsimData(const std::string &iccId, int32_t esimLabel, 
     return ret;
 }
 
-int32_t SimManager::SetSimLabelIndex(const std::string &iccId, int32_t labelIndex)
+int32_t SimManager::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex)
 {
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;
     }
-    int32_t ret = multiSimController_->SetSimLabelIndex(iccId, labelIndex);
+    int32_t ret = multiSimController_->SetSimLabelIndex(simId, simLabelIndex);
+    if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
+        multiSimMonitor_->NotifySimAccountChanged();
+    }
+    return ret;
+}
+
+int32_t SimManager::SetSimLabelIndexByIccId(const std::string &iccId, int32_t labelIndex)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return INVALID_VALUE;
+    }
+    int32_t ret = multiSimController_->SetSimLabelIndexByIccId(iccId, labelIndex);
     if (ret == TELEPHONY_ERR_SUCCESS && multiSimMonitor_ != nullptr) {
         multiSimMonitor_->NotifySimAccountChanged();
     }

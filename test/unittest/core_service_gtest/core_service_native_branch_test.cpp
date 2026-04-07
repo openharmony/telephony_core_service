@@ -35,6 +35,7 @@
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
 #include "tel_ril_sim_parcel.h"
+#include "mock_i_raw_parcel_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,6 +66,7 @@ class TestIRemoteObject : public IRemoteObject {
 public:
     uint32_t requestCode_ = -1;
     int32_t result_ = 0;
+    bool sendRequestSuccess = true;
 
 public:
     TestIRemoteObject() : IRemoteObject(u"test_remote_object") {}
@@ -81,7 +83,12 @@ public:
         TELEPHONY_LOGI("Mock SendRequest");
         requestCode_ = code;
         reply.WriteInt32(result_);
-        return 0;
+
+        if (sendRequestSuccess) {
+            return ERR_NONE;
+        }
+
+        return ~ERR_NONE;
     }
 
     bool IsProxyObject() const override
@@ -266,6 +273,27 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_004, Function |
     EXPECT_EQ(coreServiceProxy.GetManualNetworkScanState(0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(coreServiceProxy.StartManualNetworkScanCallback(0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(coreServiceProxy.StopManualNetworkScanCallback(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_005, Function | MediumTest | Level1)
+{
+    sptr<TestIRemoteObject> remote = new (std::nothrow) TestIRemoteObject();
+
+    CoreServiceProxy coreServiceProxy(remote);
+    remote->sendRequestSuccess = true;
+    auto callback = sptr<MockRawParcelCallback>::MakeSptr();
+    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, callback), TELEPHONY_ERR_SUCCESS);
+
+    remote->sendRequestSuccess = false;
+    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, callback), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_006, Function | MediumTest | Level1)
+{
+    CoreServiceProxy coreServiceProxy(nullptr);
+    auto callback = sptr<MockRawParcelCallback>::MakeSptr();
+    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, callback), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_001, Function | MediumTest | Level1)

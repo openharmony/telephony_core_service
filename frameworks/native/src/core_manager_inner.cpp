@@ -2713,7 +2713,7 @@ int32_t CoreManagerInner::SetSimLabelIndex(const std::string &iccId, int32_t lab
         TELEPHONY_LOGE("simManager_ is null!");
         return INVALID_VALUE;
     }
-    return simManager_->SetSimLabelIndex(iccId, labelIndex);
+    return simManager_->SetSimLabelIndexByIccId(iccId, labelIndex);
 }
 
 int32_t CoreManagerInner::InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName)
