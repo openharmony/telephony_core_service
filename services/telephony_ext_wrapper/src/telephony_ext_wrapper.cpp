@@ -414,7 +414,7 @@ void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
 int32_t TelephonyExtWrapper::GetRealSimCountExt(int32_t realSlotCount)
 {
     if (getRealSimCountExt_ != nullptr) {
-        return GetRealSimCountExt_(realSlotCount);
+        return getRealSimCountExt_(realSlotCount);
     }
     return realSlotCount;
 }
