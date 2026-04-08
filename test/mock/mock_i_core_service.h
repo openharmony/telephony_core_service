@@ -171,6 +171,8 @@ public:
     MOCK_METHOD(int32_t, StartManualNetworkScanCallback, (int32_t slotId,
         const sptr<INetworkSearchCallback> &callback), (override));
     MOCK_METHOD(int32_t, StopManualNetworkScanCallback, (int32_t slotId), (override));
+    MOCK_METHOD(int32_t, SetSimLabelIndex, (
+        int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback), (override));
 };
 } // namespace Telephony
 } // namespace OHOS

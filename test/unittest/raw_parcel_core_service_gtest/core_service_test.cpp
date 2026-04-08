@@ -16,6 +16,7 @@
 #include <thread>
 #include "mock_i_core_service.h"
 #include "core_service.h"
+#include "core_service_sim.h"
 #include "telephony_errors.h"
 #include "sim_state_type.h"
 #include "raw_parcel_callback_stub.h"
@@ -96,6 +97,18 @@ public:
     }
 };
 
+class MockCoreServiceSim : public CoreServiceSim {
+private:
+    void AsyncSimGeneralExecute(const std::function<void()> task) override
+    {
+        AsyncRun(task);
+    }
+    void AsyncSimPinExecute(const std::function<void()> task) override
+    {
+        AsyncRun(task);
+    }
+};
+
 class CoreServiceTest : public testing::Test {
 public:
     static void SetUpTestCase()
@@ -119,16 +132,20 @@ public:
         g_mockSimManager = std::static_pointer_cast<MockSimManager>(simManager).get();
         g_mockNetworkSearchManager = std::static_pointer_cast<MockINetworkSearch>(networkSearchManager).get();
         g_mockTelRilManager = std::static_pointer_cast<MockTelRilManager>(telRilManager).get();
-        
+
         g_coreService->simManager_ = simManager;
         g_coreService->networkSearchManager_ = networkSearchManager;
         g_coreService->telRilManager_ = telRilManager;
+        auto coreServiceSim = std::make_shared<MockCoreServiceSim>();
+        coreServiceSim->SetSimManager(simManager);
+        g_coreService->coreServiceSim_ = coreServiceSim;
     }
     void TearDown()
     {
         g_coreService->simManager_ = nullptr;
         g_coreService->networkSearchManager_ = nullptr;
         g_coreService->telRilManager_ = nullptr;
+        g_coreService->coreServiceSim_ = nullptr;
     }
 };
 
@@ -1107,6 +1124,62 @@ HWTEST_F(CoreServiceTest, HasOperatorPrivileges004, Function | MediumTest | Leve
     int32_t ret = g_coreService->HasOperatorPrivileges(0, g_directCall);
     EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex001, Function | MediumTest | Level1)
+{
+    TelephonyPermissionTestHelper helper(false);
+    int32_t ret = g_coreService->SetSimLabelIndex(0, 0, nullptr);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex002, Function | MediumTest | Level1)
+{
+    TelephonyPermissionTestHelper helper(true);
+    int32_t ret = g_coreService->SetSimLabelIndex(0, 0, nullptr);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex003, Function | MediumTest | Level1)
+{
+    TelephonyPermissionTestHelper helper(true);
+    helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
+    auto simManagerTemp = g_coreService->simManager_;
+    g_coreService->simManager_ = nullptr;
+    int32_t ret = g_coreService->SetSimLabelIndex(0, 0, nullptr);
+    g_coreService->simManager_ = simManagerTemp;
+    EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex004, Function | MediumTest | Level1)
+{
+    TelephonyPermissionTestHelper helper(true);
+    helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
+    SetDelayRunInHandler();
+    int32_t ret = g_coreService->SetSimLabelIndex(0, 0, g_directCall);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex005, Function | MediumTest | Level1)
+{
+    SetRunInCaller();
+    TelephonyPermissionTestHelper helper(true);
+    helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
+    int32_t ret = g_coreService->SetSimLabelIndex(0, 0, g_directCall);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(CoreServiceTest, SetSimLabelIndex006, Function | MediumTest | Level1)
+{
+    EXPECT_CALL(*g_mockSimManager, SetSimLabelIndex(_, _))
+        .WillRepeatedly(Return(TELEPHONY_ERR_SUCCESS));
+
+    SetRunInCaller();
+    TelephonyPermissionTestHelper helper(true);
+    helper.GrantPermission(Permission::SET_TELEPHONY_STATE);
+    int32_t ret = g_coreService->SetSimLabelIndex(-1, 0, g_directCall);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_SUCCESS);
+}
+
 }
 }
 }

@@ -461,6 +461,27 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_004, Function | Mediu
 }
 
 /**
+ * @tc.number   Telephony_CoreService_Stub_006
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_006, Function | MediumTest | Level1)
+{
+    int32_t simId = 0;
+    int32_t simLabelIndex = 0;
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInt32(simId);
+    data.WriteInt32(simLabelIndex);
+
+    data.WriteRemoteObject(nullptr);
+    auto result = DelayedSingleton<CoreService>::GetInstance()->OnSetSimLabelIndex(data, reply);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_CoreService_DumpHelper_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
@@ -554,7 +575,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | Med
     std::string iccId = "";
     multiSimController->GetTargetIccId(INVALID_SLOTID, iccId);
     multiSimController->InsertEsimData("01234567890123456789", 1, "中国联通");
-    multiSimController->SetSimLabelIndex("01234567890123456789", 0);
+    multiSimController->SetSimLabelIndexByIccId("01234567890123456789", 0);
     SimLabel simLabel;
     multiSimController->GetSimLabel(0, simLabel);
 
@@ -989,11 +1010,11 @@ HWTEST_F(CoreServiceBranchTest, InsertEsimDatatest_005, Function | MediumTest | 
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
-    EXPECT_EQ(INVALID_VALUE, multiSimController->SetSimLabelIndex("12345", 1));
+    EXPECT_EQ(INVALID_VALUE, multiSimController->SetSimLabelIndexByIccId("12345", 1));
     multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
     EXPECT_CALL(*mocksimrdbhelper, UpdateDataByIccId(_, _)).Times(AnyNumber())
         .WillOnce(Return(TELEPHONY_ERR_DATABASE_WRITE_FAIL));
-    EXPECT_EQ(TELEPHONY_ERR_DATABASE_WRITE_FAIL, multiSimController->SetSimLabelIndex("12345", 1));
+    EXPECT_EQ(TELEPHONY_ERR_DATABASE_WRITE_FAIL, multiSimController->SetSimLabelIndexByIccId("12345", 1));
 }
 
 HWTEST_F(CoreServiceBranchTest, InsertEsimDatatest_006, Function | MediumTest | Level1)
@@ -1007,10 +1028,10 @@ HWTEST_F(CoreServiceBranchTest, InsertEsimDatatest_006, Function | MediumTest | 
     std::unique_ptr<SimRdbHelper> simDbHelper_ = nullptr;
     multiSimController->simDbHelper_ = std::make_unique<SimRdbHelper>();
     EXPECT_CALL(*mocksimrdbhelper, UpdateDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    EXPECT_NE(TELEPHONY_ERR_SUCCESS, multiSimController->SetSimLabelIndex("12345", 1));
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, multiSimController->SetSimLabelIndexByIccId("12345", 1));
  
     EXPECT_CALL(*mocksimrdbhelper, UpdateDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
-    EXPECT_NE(TELEPHONY_ERR_SUCCESS, multiSimController->SetSimLabelIndex("67890", 1));
+    EXPECT_NE(TELEPHONY_ERR_SUCCESS, multiSimController->SetSimLabelIndexByIccId("67890", 1));
 }
 
 HWTEST_F(CoreServiceBranchTest, GetSimIdtest_001, Function | MediumTest | Level1)

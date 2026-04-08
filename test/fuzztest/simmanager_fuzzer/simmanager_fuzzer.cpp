@@ -77,7 +77,7 @@ void SimManagerFunc(const uint8_t *data, size_t size)
     simManager->ResetSimLoadAccount(slotId);
     simManager->InsertEsimData(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount,
         std::string(reinterpret_cast<const char *>(data), size));
-    simManager->SetSimLabelIndex(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
+    simManager->SetSimLabelIndexByIccId(std::string(reinterpret_cast<const char *>(data), size), voiceMailCount);
     simManager->SaveImsSwitch(slotId, voiceMailCount);
     simManager->QueryImsSwitch(slotId, voiceMailCount);
     simManager->IsSetPrimarySlotIdInProgress();
