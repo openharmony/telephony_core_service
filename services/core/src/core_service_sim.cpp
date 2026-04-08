@@ -1347,9 +1347,6 @@ int32_t CoreServiceSim::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sp
 int32_t CoreServiceSim::GetRealSimCount()
 {
     int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
-    if (realSlotCount > 0) {
-        return realSlotCount;
-    }
     if (simManager_ != nullptr) {
         return simManager_->GetRealSimCount();
     }
