@@ -2116,9 +2116,6 @@ int32_t CoreService::SendApduData(
 int32_t CoreService::GetRealSimCount()
 {
     int32_t realSlotCount = SIM_SLOT_COUNT_REAL;
-    if (realSlotCount > 0) {
-        return realSlotCount;
-    }
     if (simManager_ != nullptr) {
         return simManager_->GetRealSimCount();
     }
