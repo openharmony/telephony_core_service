@@ -305,7 +305,7 @@ void OperatorName::NotifyGsmSpnChanged(
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.showSpn = false;
-            params.plmn = ISTtsSpecOpName() ? TTS_SPEC_OPNAME : domesticSpn;
+            params.plmn = IsTtsSpecOpName() ? TTS_SPEC_OPNAME : domesticSpn;
             std::string emptyDomesticSpn = "";
             PublishEvent(params, regStatus, emptyDomesticSpn);
         } else {
