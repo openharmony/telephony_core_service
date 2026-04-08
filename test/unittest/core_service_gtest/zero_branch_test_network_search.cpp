@@ -601,7 +601,7 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_006, Function | MediumT
         networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
     sptr<NetworkState> networkState = new NetworkState;
     operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
-    EXPECT_FALSE(operatorName->ProcTtsSpecOpName());
+    EXPECT_FALSE(operatorName->IsTtsSpecOpName());
 }
  
 /**
