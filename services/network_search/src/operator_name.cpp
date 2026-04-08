@@ -253,7 +253,7 @@ void OperatorName::UpdateSpn(RegServiceState regStatus, sptr<NetworkState> &netw
     }
 }
 
-bool OperatorName::ProcTtsSpecOpName()
+bool OperatorName::IsTtsSpecOpName()
 {
     std::u16string imsi;
     CoreManagerInner::GetInstance().GetIMSI(slotId_, imsi);
@@ -305,7 +305,7 @@ void OperatorName::NotifyGsmSpnChanged(
         bool isSatelliteOn = CoreManagerInner::GetInstance().IsSatelliteEnabled();
         if (isSatelliteOn && !domesticSpn.empty()) {
             params.showSpn = false;
-            params.plmn = ProcTtsSpecOpName() ? TTS_SPEC_OPNAME : domesticSpn;
+            params.plmn = ISTtsSpecOpName() ? TTS_SPEC_OPNAME : domesticSpn;
             std::string emptyDomesticSpn = "";
             PublishEvent(params, regStatus, emptyDomesticSpn);
         } else {
