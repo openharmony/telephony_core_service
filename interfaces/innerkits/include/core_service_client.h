@@ -1008,6 +1008,15 @@ public:
      */
     int32_t StopManualNetworkScanCallback(int32_t slotId);
 
+    /**
+     * @brief Set the label index of sim card
+     *
+     * @param simId[in], primary sim id
+     * @param simLabelIndex[in], the label index of sim card
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

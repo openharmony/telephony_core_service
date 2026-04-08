@@ -26,6 +26,8 @@
 #include "system_ability.h"
 #include "tel_ril_sim_parcel.h"
 
+#include "core_service_sim.h"
+
 namespace OHOS {
 namespace Telephony {
 static const int32_t DEFAULT_SLOT_ID = 0;
@@ -273,6 +275,7 @@ public:
     int32_t GetManualNetworkScanState(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
     int32_t StopManualNetworkScanCallback(int32_t slotId) override;
     int32_t StartManualNetworkScanCallback(int32_t slotId, const sptr<INetworkSearchCallback> &callback) override;
+    int32_t SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback) override;
 private:
     bool Init();
     bool NotifyCoreServiceReady();
@@ -286,6 +289,7 @@ private:
     sptr<ISystemAbilityManager> systemManager_ = nullptr;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
+    std::shared_ptr<CoreServiceSim> coreServiceSim_ = nullptr;
     std::shared_ptr<IEsimManager> esimManager_ = nullptr;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;

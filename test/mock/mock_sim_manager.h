@@ -129,7 +129,8 @@ public:
     MOCK_METHOD2(GetAllSimAccountInfoList, int32_t(bool, std::vector<IccAccountInfo> &));
     MOCK_METHOD3(InsertEsimData, int32_t(const std::string &, int32_t, const std::string &));
     MOCK_METHOD2(GetSimLabel, int32_t(int32_t, SimLabel &));
-    MOCK_METHOD2(SetSimLabelIndex, int32_t(const std::string &, int32_t));
+    MOCK_METHOD2(SetSimLabelIndex, int32_t(int32_t, int32_t));
+    MOCK_METHOD2(SetSimLabelIndexByIccId, int32_t(const std::string &, int32_t));
     MOCK_METHOD1(NotifySimSlotsMapping, int32_t(int32_t));
     MOCK_METHOD1(IsEsim, bool(int32_t));
     MOCK_METHOD1(ClearSimLabel, int32_t(SimType));
