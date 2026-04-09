@@ -258,7 +258,7 @@ bool OperatorName::IsTtsSpecOpName()
     std::u16string imsi;
     CoreManagerInner::GetInstance().GetIMSI(slotId_, imsi);
     std::string::size_type pos = Str16ToStr8(imsi).find(TTS_SPEC_PLMN);
-    return pos != std::string::npos && pos == 0;
+    return pos == 0;
 }
 
 void OperatorName::NotifyGsmSpnChanged(
