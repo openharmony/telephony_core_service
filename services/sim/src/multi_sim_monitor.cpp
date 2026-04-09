@@ -111,6 +111,7 @@ void MultiSimMonitor::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
             InitData(event->GetParam());
             break;
         case RadioEvent::RADIO_SIM_STATE_CHANGE:
+            ClearUserId();
             RefreshData(event->GetParam());
             break;
         case MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT:
@@ -536,14 +537,47 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
     std::static_pointer_cast<MultiSimMonitor>(handler)->OnUserSwitched(userId);
 }
 
+bool MultiSimMonitor::IsUserIdRecord(int32_t userId)
+{
+    for (int i = 0; i < MAX_USERID_NUM; i++) {
+        if (userIdRecord_[i] == userId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void MultiSimMonitor::ClearUserId()
+{
+    std::lock_guard<std::mutex> lock(mutexForUserId_);
+    userIdRecord_.fill(0);
+}
+
 void MultiSimMonitor::SetLastUserId(int32_t userId)
 {
     lastUserId_ = userId;
+    bool isRecord = false;
+    if (userId == 0) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutexForUserId_);
+    isRecord = IsUserIdRecord(userId);
+    if (!isRecord) {
+        if (userId == NORMAL_USERID) {
+            userIdRecord_[0] = userId;
+            return;
+        }
+        userIdRecord_[userIdRecordIndex_++] = userId;
+        userIdRecordIndex_ = userIdRecordIndex_ % MAX_USERID_NUM;
+        userIdRecordIndex_ = userIdRecordIndex_ == 0 ? userIdRecordIndex_ + 1 : userIdRecordIndex_;
+    }
 }
 
 void MultiSimMonitor::UpdateAllSimData(int32_t userId)
 {
-    if (userId != lastUserId_) {
+    std::lock_guard<std::mutex> lock(mutexForUserId_);
+    bool isRecord = IsUserIdRecord(userId);
+    if (!isRecord) {
         SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
     }
 }

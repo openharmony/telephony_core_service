@@ -2355,6 +2355,38 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Fu
 }
 
 /**
+ * @tc.number   Telephony_MultiSimMonitor_SetLastUserId
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_SetLastUserId, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = {simStateManagerPtr,
+                                                                                 simStateManagerPtr};
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = {simFileManagerPtr, simFileManagerPtr};
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)};
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
+    int32_t userId = 100;
+    multiSimMonitor->lastUserId_ = userId;
+    multiSimMonitor->SetLastUserId(0);
+    EXPECT_EQ(multiSimMonitor->lastUserId_, 0);
+    multiSimMonitor->SetLastUserId(101);
+    EXPECT_EQ(multiSimMonitor->userIdRecord_[1], 101);
+    multiSimMonitor->ClearUserId();
+    multiSimMonitor->SetLastUserId(userId);
+    EXPECT_EQ(multiSimMonitor->userIdRecord_[0], userId);
+}
+
+/**
  * @tc.number   Telephony_ImsCoreServiceCallbackProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
