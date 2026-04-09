@@ -46,6 +46,7 @@ private:
     void CdmaOperatorInfo(const std::shared_ptr<OperatorInfoResult> operatorInfoResult);
     void PublishEvent(OperatorNameParams params, RegServiceState state, const std::string &domesticSpn);
     sptr<NetworkState> GetNetworkStatus();
+    bool IsTtsSpecOpName();
     void NotifyGsmSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,
         const std::string &domesticSpn, bool isForce = false);
     void NotifyCdmaSpnChanged(RegServiceState regStatus, sptr<NetworkState> &networkState,

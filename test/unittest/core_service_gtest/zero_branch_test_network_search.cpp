@@ -585,6 +585,24 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_005, Function | MediumT
     operatorName->simManager_ = nullptr;
     EXPECT_EQ(operatorName->GetRoamStateBySimFile(netPlmn), false);
 }
+
+/**
+ * @tc.number   Telephony_OperatorName_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_OperatorName_006, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, INVALID_SLOTID);
+    auto operatorName = std::make_shared<OperatorName>(
+        networkSearchState, simManager, networkSearchManager, INVALID_SLOTID);
+    sptr<NetworkState> networkState = new NetworkState;
+    operatorName->NotifyGsmSpnChanged(RegServiceState::REG_STATE_IN_SERVICE, networkState, "");
+    EXPECT_FALSE(operatorName->IsTtsSpecOpName());
+}
  
 /**
  * @tc.number   Telephony_NetworkSearchState_001
