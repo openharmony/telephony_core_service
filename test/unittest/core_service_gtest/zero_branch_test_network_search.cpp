@@ -901,8 +901,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_005, Function |
     EXPECT_NE(networkSearchManager->GetUniqueDeviceId(INVALID_SLOTID, result), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->HandleRrcStateChanged(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->HandleRrcStateChanged(slotId, status), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->RevertLastTechnology(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->RevertLastTechnology(slotId), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->GetRrcConnectionState(INVALID_SLOTID, status), TELEPHONY_ERR_SUCCESS);
     EXPECT_NE(networkSearchManager->UpdateRrcConnectionState(slotId, status), TELEPHONY_ERR_SUCCESS);
     NrMode mode = NrMode::NR_MODE_UNKNOWN;
@@ -911,8 +909,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_005, Function |
     EXPECT_NE(networkSearchManager->SetNrOptionMode(slotId, 1, networkSearchCallback), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkSearchManager->GetNrState(slotId), NrState::NR_STATE_NOT_SUPPORT);
     EXPECT_NE(networkSearchManager->NotifyCallStatusToNetworkSearch(slotId, 0), TELEPHONY_ERR_SUCCESS);
-    EXPECT_NE(networkSearchManager->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, false), TELEPHONY_ERR_SUCCESS);
-    EXPECT_FALSE(networkSearchManager->IsNeedDelayNotify(INVALID_SLOTID));
     EXPECT_NE(networkSearchManager->ProcessNotifyStateChangeEvent(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(networkSearchManager->RemoveManagerInner(INVALID_SLOTID));
     networkSearchManager->UnRegisterCoreNotify(slotId, networkSearchHandler, 1);
@@ -943,10 +939,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_006, Function |
     ImsRegInfo info;
     sptr<INetworkSearchCallback> networkSearchCallback = nullptr;
     nsm->AddManagerInner(INVALID_SLOTID, inner);
-    nsm->RevertLastTechnology(INVALID_SLOTID);
-    nsm->IsNeedDelayNotify(INVALID_SLOTID);
-    nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, true);
-    nsm->HandleNotifyStateChangeWithDelay(INVALID_SLOTID, false);
     nsm->InitSimRadioProtocol(INVALID_SLOTID);
     nsm->UnregisterImsRegInfoCallback(INVALID_SLOTID, ImsServiceType::TYPE_SMS, tokenId);
     EXPECT_EQ(nsm->HandleRrcStateChanged(INVALID_SLOTID, 0), TELEPHONY_ERR_FAIL);
@@ -958,7 +950,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_006, Function |
     EXPECT_EQ(nsm->NotifyCallStatusToNetworkSearch(INVALID_SLOTID, -1), TELEPHONY_ERR_SUCCESS);
     inner->networkSearchState_ = nullptr;
     EXPECT_EQ(nsm->GetImsRegStatus(0, ImsServiceType::TYPE_VOICE, info), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_FALSE(nsm->IsNeedDelayNotify(INVALID_SLOTID));
     inner->networkSearchHandler_ = nullptr;
     EXPECT_EQ(nsm->SendUpdateCellLocationRequest(INVALID_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_TRUE(nsm->RemoveManagerInner(INVALID_SLOTID));
@@ -1444,7 +1435,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->RadioGetImeiSv(event);
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);
  
     EXPECT_TRUE(networkSearchHandler->Init());
     event = AppExecFwk::InnerEvent::Get(RadioEvent::DELAY_NOTIFY_STATE_CHANGE);
@@ -1455,7 +1445,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_003, Function |
     networkSearchHandler->RadioGetNeighboringCellInfo(event);
     networkSearchHandler->SetRadioOffWhenSimDeactive();
     EXPECT_EQ(networkSearchHandler->HandleRrcStateChanged(status), TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(networkSearchHandler->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     networkSearchHandler->IsPowerOnPrimaryRadioWhenNoSim();
     networkSearchHandler->UpdateOperatorName();
     networkSearchHandler->CheckRegistrationState(networkSearchManager);
@@ -1687,7 +1676,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_002, Function | Medi
     EXPECT_GT(
         networkRegister->GetTechnologyByNrConfig(RadioTech::RADIO_TECHNOLOGY_LTE), RadioTech::RADIO_TECHNOLOGY_INVALID);
     EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GE(networkRegister->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkRegister->GetSystemPropertiesConfig(config), TELEPHONY_ERR_SUCCESS);
     int32_t nsaState = 1;
     EXPECT_EQ(networkRegister->UpdateNsaState(nsaState), nsaState);

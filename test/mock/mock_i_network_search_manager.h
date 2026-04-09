@@ -102,7 +102,6 @@ public:
     MOCK_METHOD(bool, IsSatelliteEnabled, (), (override));
     MOCK_METHOD(void, DcPhysicalLinkActiveUpdate, (int32_t slotId, bool isActive), (override));
     MOCK_METHOD(int32_t, NotifyCallStatusToNetworkSearch, (int32_t slotId, int32_t callStatus), (override));
-    MOCK_METHOD(int32_t, HandleNotifyStateChangeWithDelay, (int32_t slotId, bool isNeedDelay), (override));
     MOCK_METHOD(int32_t, StartRadioOnState, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, StartGetRilSignalIntensity, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, ProcessSignalIntensity, (int32_t slotId, const struct Rssi &signalIntensity), (override));

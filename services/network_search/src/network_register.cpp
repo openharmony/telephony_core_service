@@ -180,29 +180,6 @@ void NetworkRegister::PrintCurrentRegistrationState(RilRegister regStatus, TelRi
     }
 }
 
-int32_t NetworkRegister::RevertLastTechnology()
-{
-    if (networkSearchState_ == nullptr) {
-        TELEPHONY_LOGE("networkSearchState_ is nullptr slotId:%{public}d", slotId_);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    RadioTech lastCfgTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
-    RadioTech lastPsRadioTech = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
-    RadioTech lastCfgTechV2 = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
-    RadioTech lastPsRadioTechV2 = RadioTech::RADIO_TECHNOLOGY_UNKNOWN;
-    networkSearchState_->GetLastCfgTech(lastCfgTech);
-    networkSearchState_->GetLastPsRadioTech(lastPsRadioTech);
-    networkSearchState_->SetCfgTech(lastCfgTech);
-    networkSearchState_->SetNetworkType(lastPsRadioTech, DomainType::DOMAIN_TYPE_PS);
-    networkSearchState_->GetLastCfgTechV2(lastCfgTechV2);
-    networkSearchState_->GetLastPsRadioTechV2(lastPsRadioTechV2);
-    networkSearchState_->SetCfgTechV2(lastCfgTechV2);
-    networkSearchState_->SetNetworkTypeV2(lastPsRadioTechV2, DomainType::DOMAIN_TYPE_PS);
-    TELEPHONY_LOGI(
-        "lastCfgTech:%{public}d lastPsRadioTech:%{public}d slotId:%{public}d", lastCfgTech, lastPsRadioTech, slotId_);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
 int32_t NetworkRegister::NotifyStateChange()
 {
     if (networkSearchState_ == nullptr) {

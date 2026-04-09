@@ -36,7 +36,6 @@ public:
     void ProcessRestrictedState(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessPsAttachStatus(const AppExecFwk::InnerEvent::Pointer &event) const;
     void ProcessChannelConfigInfo(const AppExecFwk::InnerEvent::Pointer &event);
-    int32_t RevertLastTechnology();
     int32_t NotifyStateChange();
     void DcPhysicalLinkActiveUpdate(bool isActive);
     void UpdateCfgTech();

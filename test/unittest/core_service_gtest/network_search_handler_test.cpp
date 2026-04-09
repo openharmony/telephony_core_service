@@ -300,7 +300,6 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchManager_SignalAndCellI
     EXPECT_EQ(networkSearchManager->GetSignalInfoList(SLOT_ID_0, signals), TELEPHONY_ERR_SUCCESS);
  
     networkSearchManager->delayTime_ = SLOT_ID_0;
-    EXPECT_EQ(networkSearchManager->IsNeedDelayNotify(SLOT_ID_0), false);
  
     TELEPHONY_EXT_WRAPPER.getCellInfoList_ = nullptr;
     EXPECT_EQ(networkSearchManager->GetCellInfoList(SLOT_ID_0, cellInfo), TELEPHONY_ERR_SUCCESS);

@@ -1284,7 +1284,6 @@ void NetworkSearchHandler::HandleDelayNotifyEvent(const AppExecFwk::InnerEvent::
         TELEPHONY_LOGE("NetworkSearchHandler::NotifyStateChange networkRegister_ is nullptr!");
         return;
     }
-    RevertLastTechnology();
     RadioOnState();
 }
 
@@ -1296,17 +1295,6 @@ int32_t NetworkSearchHandler::HandleRrcStateChanged(int32_t status)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     networkRegister_->HandleRrcStateChanged(status);
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t NetworkSearchHandler::RevertLastTechnology()
-{
-    TELEPHONY_LOGI("NetworkSearchHandler::RevertLastTechnology slotId:%{public}d", slotId_);
-    if (networkRegister_ == nullptr) {
-        TELEPHONY_LOGE("NetworkSearchHandler::RevertLastTechnology networkRegister_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    networkRegister_->RevertLastTechnology();
     return TELEPHONY_ERR_SUCCESS;
 }
 
