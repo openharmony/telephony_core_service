@@ -68,9 +68,7 @@ void OperatorName::OnOperatorConfigChanged(int32_t slotId, int32_t state)
             TELEPHONY_LOGE("networkSearchManager is nullptr slotId:%{public}d", slotId_);
             return;
         }
-        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-            networkSearchManager->ProcessNotifyStateChangeEvent(slotId_);
-        }
+        networkSearchManager->StartRadioOnState(slotId_);
     }
 }
 
