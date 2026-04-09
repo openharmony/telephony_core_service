@@ -1421,9 +1421,9 @@ int32_t NetworkSearchManager::ProcessNotifyStateChangeEvent(int32_t slotId)
     }
 
     uint32_t notifyStateEventId = static_cast<uint32_t>(RadioEvent::NOTIFY_STATE_CHANGE);
- 	if (!(inner->networkSearchHandler_->HasInnerEvent(notifyStateEventId))) {
-    	auto event = AppExecFwk::InnerEvent::Get(RadioEvent::NOTIFY_STATE_CHANGE);
-    	inner->networkSearchHandler_->SendEvent(event);
+    if (!(inner->networkSearchHandler_->HasInnerEvent(notifyStateEventId))) {
+        auto event = AppExecFwk::InnerEvent::Get(RadioEvent::NOTIFY_STATE_CHANGE);
+        inner->networkSearchHandler_->SendEvent(event);
     }
     return TELEPHONY_ERR_SUCCESS;
 }
