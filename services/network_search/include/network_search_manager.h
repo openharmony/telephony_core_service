@@ -208,8 +208,6 @@ public:
     NrState GetNrState(int32_t slotId) override;
     void DcPhysicalLinkActiveUpdate(int32_t slotId, bool isActive) override;
     int32_t NotifyCallStatusToNetworkSearch(int32_t slotId, int32_t callStatus) override;
-    int32_t HandleNotifyStateChangeWithDelay(int32_t slotId, bool isNeedDelay) override;
-    bool IsNeedDelayNotify(int32_t slotId);
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode) override;
     int32_t SetNrOptionMode(int32_t slotId, int32_t mode, NSCALLBACK &callback) override;
     int32_t GetNrOptionMode(int32_t slotId, NrMode &mode) override;
@@ -375,7 +373,6 @@ private:
     bool RemoveManagerInner(int32_t slotId);
     int32_t InitModuleBySlotId(int32_t slotId);
     int32_t GetDelayNotifyTime();
-    int32_t RevertLastTechnology(int32_t slotId);
     int32_t ConvertNetworkModeToCapabilityType(int32_t preferredNetwork);
 
 private:

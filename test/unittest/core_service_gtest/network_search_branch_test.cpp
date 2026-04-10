@@ -237,7 +237,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_001, TestSize.Level0
 
     networkRegister->ProcessPsRegister(psRegInfo);
     networkRegister->ProcessCsRegister(csRegInfo);
-    EXPECT_EQ(networkRegister->RevertLastTechnology(), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_EQ(networkRegister->UpdateNsaState(static_cast<int32_t>(NrState::NR_STATE_NOT_SUPPORT)),
         static_cast<int32_t>(NrState::NR_STATE_NOT_SUPPORT));
@@ -252,7 +251,6 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkRegister_001, TestSize.Level0
 
     networkRegister->networkSearchState_ = networkSearchState;
     networkRegister->networkSearchState_->networkState_ = nullptr;
-    EXPECT_EQ(networkRegister->RevertLastTechnology(), TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(networkRegister->NotifyStateChange(), TELEPHONY_ERR_SUCCESS);
 }
 
