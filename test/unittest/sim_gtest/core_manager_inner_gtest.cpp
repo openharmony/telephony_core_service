@@ -967,7 +967,7 @@ HWTEST_F(CoreManagerInnerTest, SetSimLabelIndex_001, Function | MediumTest | Lev
     EXPECT_EQ(ret, INVALID_VALUE);
 
     mInner.simManager_ = mockeSimManager;
-    EXPECT_CALL(*mockeSimManager, SetSimLabelIndex(_, _)).WillOnce(
+    EXPECT_CALL(*mockeSimManager, SetSimLabelIndex(_, _)).WillRepeatedly(
         Return(TELEPHONY_ERR_SUCCESS));
     ret = mInner.SetSimLabelIndex(iccId, labelIndex);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
