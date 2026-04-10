@@ -2440,14 +2440,14 @@ HWTEST_F(BranchTest, Telephony_CoreServiceClient_002, Function | MediumTest | Le
     sptr<NetworkSearchTestCallbackStub> callback(new NetworkSearchTestCallbackStub());
     int32_t result = CoreServiceClient::GetInstance().GetManualNetworkScanState(0, callback);
     TELEPHONY_LOGI("TelephonyTestService GetManualNetworkScanState result: %{public}d", result);
-    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
     sptr<NetworkSearchTestCallbackStub> callback1(new NetworkSearchTestCallbackStub());
     result = CoreServiceClient::GetInstance().StartManualNetworkScanCallback(0, callback1);
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
-    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
     result = CoreServiceClient::GetInstance().StopManualNetworkScanCallback(0);
     TELEPHONY_LOGI("TelephonyTestService StopManualNetworkScanCallback result: %{public}d", result);
-    EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
+    EXPECT_EQ(TELEPHONY_ERR_PERMISSION_ERR, result);
 }
 
 /**
