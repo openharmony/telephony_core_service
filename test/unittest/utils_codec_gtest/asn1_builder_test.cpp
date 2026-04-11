@@ -167,7 +167,7 @@ HWTEST_F(Asn1BuilderTest, AesCryptoEncrypttest_001, Function | MediumTest | Leve
     std::string srcData = "";
     const uint8_t nonce[16] = {0};
     size_t len = 16;
-    std:: string result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
+    std::string result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
     EXPECT_EQ(result, "");
     srcData = "test_data";
     uint8_t* nonce1 = nullptr;
@@ -183,16 +183,16 @@ HWTEST_F(Asn1BuilderTest, AesCryptoEncrypttest_001, Function | MediumTest | Leve
     EXPECT_FALSE(result.empty());
     uint8_t nonce4[16] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
                          0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
-    size_t nonce_size1 = 16;
-    uint8_t g_nonce[nonce_size1];
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce4, nonce_size1);
-    for(size_t i = 0; i < nonce_size1; ++i){
+    size_t NONCE_SIZE1 = 16;
+    uint8_t g_nonce[NONCE_SIZE1];
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce4, NONCE_SIZE1);
+    for (size_t i = 0; i < NONCE_SIZE1; ++i){
         EXPECT_EQ(g_nonce[i], nonce[i]);
     }
-    size_t nonce_size2 = 17;
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce3, nonce_size2);
+    size_t NONCE_SIZE2 = 17;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce3, NONCE_SIZE2);
     EXPECT_NE(result, "");
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, nonce_size1);
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, NONCE_SIZE1);
     EXPECT_EQ(result, "");
 }
 
@@ -201,7 +201,7 @@ HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Leve
     std::string srcData = "";
     const uint8_t nonce[16] = {0};
     size_t len = 16;
-    std:: string result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
+    std::string result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
     EXPECT_EQ(result, "");
     srcData = "test_data";
     uint8_t* nonce1 = nullptr;
@@ -217,16 +217,16 @@ HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Leve
     EXPECT_TRUE(result.empty());
     uint8_t nonce4[16] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
                          0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
-    size_t nonce_size1 = 16;
-    uint8_t g_nonce[nonce_size1];
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce4, nonce_size1);
-    for(size_t i = 0; i < nonce_size1; ++i){
+    size_t NONCE_SIZE1 = 16;
+    uint8_t g_nonce[NONCE_SIZE1];
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce4, NONCE_SIZE1);
+    for (size_t i = 0; i < NONCE_SIZE1; ++i){
         EXPECT_EQ(g_nonce[i], nonce[i]);
     }
-    size_t nonce_size2 = 17;
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce3, nonce_size2);
+    size_t NONCE_SIZE2 = 17;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce3, NONCE_SIZE2);
     EXPECT_EQ(result, "");
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, nonce_size1);
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, NONCE_SIZE1);
     EXPECT_EQ(result, "");
 }
 #endif // TEL_TEST_UNSUPPORT

@@ -98,7 +98,7 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, cons
         return "";
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    if(memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
+    if (memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
@@ -149,9 +149,8 @@ std::string TelAesCryptoUtils::AesCryptoDecrypt(std::string &srcData, const uint
     if (srcData.empty() || nonce == nullptr || len < NONCE_SIZE) {
         return "";
     }
-    
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    if(memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
+    if (memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
