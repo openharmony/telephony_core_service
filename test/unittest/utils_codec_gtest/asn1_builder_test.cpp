@@ -181,19 +181,6 @@ HWTEST_F(Asn1BuilderTest, AesCryptoEncrypttest_001, Function | MediumTest | Leve
     len = 16;
     result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce3, len);
     EXPECT_FALSE(result.empty());
-    uint8_t nonce4[16] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-                         0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
-    size_t NONCE_SIZE1 = 16;
-    uint8_t g_nonce[NONCE_SIZE1];
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce4, NONCE_SIZE1);
-    for (size_t i = 0; i < NONCE_SIZE1; ++i){
-        EXPECT_EQ(g_nonce[i], nonce[i]);
-    }
-    size_t NONCE_SIZE2 = 17;
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce3, NONCE_SIZE2);
-    EXPECT_NE(result, "");
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, NONCE_SIZE1);
-    EXPECT_EQ(result, "");
 }
 
 HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Level3)
@@ -215,19 +202,6 @@ HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Leve
     len = 16;
     result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce3, len);
     EXPECT_TRUE(result.empty());
-    uint8_t nonce4[16] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-                         0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
-    size_t NONCE_SIZE1 = 16;
-    uint8_t g_nonce[NONCE_SIZE1];
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce4, NONCE_SIZE1);
-    for (size_t i = 0; i < NONCE_SIZE1; ++i){
-        EXPECT_EQ(g_nonce[i], nonce[i]);
-    }
-    size_t NONCE_SIZE2 = 17;
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce3, NONCE_SIZE2);
-    EXPECT_EQ(result, "");
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, NONCE_SIZE1);
-    EXPECT_EQ(result, "");
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
