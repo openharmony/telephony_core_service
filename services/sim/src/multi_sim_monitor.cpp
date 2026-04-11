@@ -549,8 +549,9 @@ bool MultiSimMonitor::IsUserIdRecord(int32_t userId)
 
 void MultiSimMonitor::ClearUserId()
 {
-    std::lock_guard<std::mutex> lock(mutexForUserId_);
-    userIdRecord_.fill(0);
+    for (int i = 0; i < MAX_USERID_NUM; i++) {
+        userIdRecord_[i] = 0;
+    }
 }
 
 void MultiSimMonitor::SetLastUserId(int32_t userId)
@@ -560,7 +561,6 @@ void MultiSimMonitor::SetLastUserId(int32_t userId)
     if (userId == 0) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mutexForUserId_);
     isRecord = IsUserIdRecord(userId);
     if (!isRecord) {
         if (userId == NORMAL_USERID) {
@@ -569,13 +569,12 @@ void MultiSimMonitor::SetLastUserId(int32_t userId)
         }
         userIdRecord_[userIdRecordIndex_++] = userId;
         userIdRecordIndex_ = userIdRecordIndex_ % MAX_USERID_NUM;
-        userIdRecordIndex_ = userIdRecordIndex_ == 0 ? userIdRecordIndex_ + 1 : userIdRecordIndex_;
+        userIdRecordIndex_ = userIdRecordIndex_ == 0 ? userIdRecordIndex_ + 1 : userIdRecordIndex_.load();
     }
 }
 
 void MultiSimMonitor::UpdateAllSimData(int32_t userId)
 {
-    std::lock_guard<std::mutex> lock(mutexForUserId_);
     bool isRecord = IsUserIdRecord(userId);
     if (!isRecord) {
         SendEvent(MultiSimMonitor::RESET_OPKEY_CONFIG);
