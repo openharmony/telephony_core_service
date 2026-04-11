@@ -155,7 +155,7 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<int> isSimAccountLoaded_;
-    std::array<int32_t, MAX_USERID_NUM> userIdRecord_ = {NORMAL_USERID};
+    std::atomic<int32_t> userIdRecord_[MAX_USERID_NUM];
     bool isAllSimAccountLoaded_ = false;
     std::vector<int> initDataRemainCount_;
     int initEsimDataRemainCount_ = 0;
@@ -171,7 +171,7 @@ private:
     std::mutex mutexForUserId_;
     std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
-    int32_t userIdRecordIndex_ = 1;
+    std::atomic<int32_t> userIdRecordIndex_ = 1;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
