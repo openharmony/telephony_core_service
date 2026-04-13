@@ -94,7 +94,7 @@ inline T GetMaxSlotCount()
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
         maxSlotCount_ = std::atoi(simSlotCount);
-        if (GetVirtualModemSwitch<bool>() && maxSlotCount_ == 0) {
+        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
     }

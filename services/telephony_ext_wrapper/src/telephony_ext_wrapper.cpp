@@ -278,13 +278,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<SendSimChgTypeInfoFunc>(dlsym(telephonyExtWrapperHandle_, "SendSimChgTypeInfo"));
     reportEventToChr_ =
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
-    getDistributedSimCount_ =
-        reinterpret_cast<GetDistributedSimCountFunc>(dlsym(telephonyExtWrapperHandle_, "GetDistributedSimCount"));
+    getRealSimCountExt_ =
+        reinterpret_cast<GetRealSimCountExtFunc>(dlsym(telephonyExtWrapperHandle_, "GetRealSimCountExt"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
         getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
-        getDistributedSimCount_ == nullptr);
+        getRealSimCountExt_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -411,10 +411,10 @@ void TelephonyExtWrapper::SetActiveSimFunc(int32_t slotId, int32_t enable)
     }
 }
 
-int32_t TelephonyExtWrapper::GetDistributedSimCount(const std::string &bundleName, int32_t realSlotCount)
+int32_t TelephonyExtWrapper::GetRealSimCountExt(int32_t realSlotCount)
 {
-    if (getDistributedSimCount_ != nullptr) {
-        return getDistributedSimCount_(bundleName, realSlotCount);
+    if (getRealSimCountExt_ != nullptr) {
+        return getRealSimCountExt_(realSlotCount);
     }
     return realSlotCount;
 }
