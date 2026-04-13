@@ -420,7 +420,6 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDataByIccId_002, F
 
     OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
     EXPECT_CALL(*simDb, UpdateDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
-    multiSimController->lastUserAddEsimIccid_ = "00002222";
     auto ret = multiSimController->UpdateDataByIccId(0, "00002222");
     multiSimController->UpdateDataByIccId(1, "00002222");
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
