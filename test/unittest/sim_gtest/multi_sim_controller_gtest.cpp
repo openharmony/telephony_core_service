@@ -420,6 +420,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDataByIccId_002, F
 
     OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
     EXPECT_CALL(*simDb, UpdateDataByIccId(_, _)).WillRepeatedly(Return(TELEPHONY_SUCCESS));
+    multiSimController->lastUserAddEsimIccid_ = "00002222";
     auto ret = multiSimController->UpdateDataByIccId(0, "00002222");
     multiSimController->UpdateDataByIccId(1, "00002222");
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
@@ -1610,7 +1611,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
         std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    std::unordered_map<int32_t, std::string> simInfo;
+    std::map<int32_t, std::string> simInfo;
     simInfo[0] = "000000000";
     simInfo[1] = "000000001";
  
