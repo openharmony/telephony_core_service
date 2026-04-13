@@ -998,6 +998,8 @@ int32_t NetworkSearchManager::GetImei(int32_t slotId, std::u16string &imei)
             if (otherImei.empty()) {
                 TELEPHONY_LOGI("otherImei is empty");
             } else if (otherImei == imei) {
+                eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_IMEI);
+                eventSender_->SendBase(otherSlotId, RadioEvent::RADIO_GET_IMEI);
                 TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is same", slotId, otherSlotId);
             } else {
                 TELEPHONY_LOGI("slotId:%{public}d, otherSlotId:%{public}d, imei is different", slotId, otherSlotId);

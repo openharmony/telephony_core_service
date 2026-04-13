@@ -1610,7 +1610,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
         std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
     };
     auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimController, simStateManager, simFileManagerWeak);
-    std::unordered_map<int32_t, std::string> simInfo;
+    std::map<int32_t, std::string> simInfo;
     simInfo[0] = "000000000";
     simInfo[1] = "000000001";
  
