@@ -59,6 +59,8 @@ public:
     void UpdateAllSimData(int32_t userId);
     void OnUserSwitched(int32_t userId);
     void OnDataShareReady(int32_t userId);
+    bool IsUserIdRecord(int32_t userId);
+    void ClearUserId();
     void CheckSimPresentWhenReboot();
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {
@@ -145,12 +147,15 @@ private:
 
 private:
     static constexpr const int SLOT_COUNT = 2;
+    static constexpr const int MAX_USERID_NUM = 2;
+    static constexpr const int NORMAL_USERID = 100;
     bool hasCheckedSimPresent_[SLOT_COUNT] = {false, false};
     std::vector<int> initRebootDetectRemainCount_;
     std::shared_ptr<MultiSimController> controller_ = nullptr;
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<int> isSimAccountLoaded_;
+    int32_t userIdRecord_[MAX_USERID_NUM];
     bool isAllSimAccountLoaded_ = false;
     std::vector<int> initDataRemainCount_;
     int initEsimDataRemainCount_ = 0;
@@ -163,8 +168,10 @@ private:
     ParameterChgPtr parameterChgPtr_ = nullptr;
     std::mutex mutexInner_;
     std::mutex mutexForData_;
+    std::mutex mutexForUserId_;
     std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
+    int32_t userIdRecordIndex_ = 1;
     bool isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
