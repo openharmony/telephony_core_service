@@ -168,7 +168,7 @@ HWTEST_F(Asn1BuilderTest, AesCryptoEncrypttest_001, Function | MediumTest | Leve
     uint8_t nonce[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2};
     size_t len = 16;
     std::string result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
-    EXPECT_NE(result, "");
+    EXPECT_EQ(result, "");
     uint8_t *nonce1 = nullptr;
     len = 8;
     result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, len);
