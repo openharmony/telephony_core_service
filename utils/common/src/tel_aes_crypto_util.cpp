@@ -25,10 +25,8 @@ namespace OHOS {
 namespace Telephony {
 constexpr uint32_t MAX_UPDATE_SIZE = 1024;
 constexpr uint32_t AAD_SIZE = 16;
-constexpr uint32_t NONCE_SIZE = 12;
 constexpr uint32_t AEAD_SIZE = 16;
 constexpr uint8_t AAD[AAD_SIZE] = {0};
-constexpr uint8_t NONCE[NONCE_SIZE] = {0};
 constexpr uint8_t AEAD[AEAD_SIZE] = {0};
 constexpr const char TEL_AES_KEY_ALIAS[] = "TelAesKeyAlias";
 
@@ -36,6 +34,9 @@ constexpr size_t HEX_UNIT_LEN = 2;
 constexpr int32_t ENCODE_UNIT_LEN = 3;
 constexpr int32_t HEX_OFFSET = 16;
 constexpr int32_t DEC_OFFSET = 10;
+
+ffrt::mutex TelAesCryptoUtils::mutex_;
+uint8_t TelAesCryptoUtils::nonce_[NONCE_SIZE];
 
 #define AES_ALGORITHM_PARAM                     \
     {                                           \
@@ -68,33 +69,40 @@ constexpr int32_t DEC_OFFSET = 10;
     }, {                                        \
         .tag = HKS_TAG_NONCE,                   \
         .blob = {                               \
-            .size = NONCE_SIZE,                 \
-            .data = (uint8_t *)NONCE            \
+            .size = TelAesCryptoUtils::NONCE_SIZE,    \
+            .data = TelAesCryptoUtils::nonce_         \
         }                                       \
     }
 
-int TelAesCryptoUtils::SaveEncryptString(const std::string &key, int32_t id, const std::string &rawData)
+int TelAesCryptoUtils::SaveEncryptString(const std::string &key, int32_t id, const std::string &rawData,
+    const uint8_t *nonce, size_t len)
 {
     auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
-    std::string encryptValue = AesCryptoEncrypt(rawData);
+    std::string encryptValue = AesCryptoEncrypt(rawData, nonce, len);
     return telProfileUtil->SaveString(key + std::to_string(id), encryptValue);
 }
 
-std::string TelAesCryptoUtils::ObtainDecryptString(const std::string &key, int32_t id, const std::string &defValue)
+std::string TelAesCryptoUtils::ObtainDecryptString(const std::string &key, int32_t id, const std::string &defValue,
+    const uint8_t *nonce, size_t len)
 {
     auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
     std::string encryptValue = telProfileUtil->ObtainString(key + std::to_string(id), defValue);
-    std::string str = AesCryptoDecrypt(encryptValue);
+    std::string str = AesCryptoDecrypt(encryptValue, nonce, len);
     return str;
 }
 
-std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData)
+std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, const uint8_t *nonce, size_t len)
 {
-    if (srcData.empty()) {
+    if (srcData.empty() || nonce == nullptr || len < NONCE_SIZE) {
         return "";
     }
-    struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
 
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (memcpy_s(TelAesCryptoUtils::nonce_, sizeof(TelAesCryptoUtils::nonce_), nonce, NONCE_SIZE) != EOK) {
+        return "";
+    }
+
+    struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
     struct HksParamSet *genParamSet = nullptr;
     struct HksParam genParams[] = {
         {
@@ -132,16 +140,20 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData)
         HksFreeParamSet(&encryptParamSet);
         return "";
     }
-
+    
     std::string encryptData = AesCryptoEncryptInner(&keyAlias, genParamSet, encryptParamSet, srcData);
     HksFreeParamSet(&genParamSet);
     HksFreeParamSet(&encryptParamSet);
     return encryptData;
 }
 
-std::string TelAesCryptoUtils::AesCryptoDecrypt(std::string &srcData)
+std::string TelAesCryptoUtils::AesCryptoDecrypt(std::string &srcData, const uint8_t *nonce, size_t len)
 {
-    if (srcData.empty()) {
+    if (srcData.empty() || nonce == nullptr || len < NONCE_SIZE) {
+        return "";
+    }
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (memcpy_s(TelAesCryptoUtils::nonce_, sizeof(TelAesCryptoUtils::nonce_), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };

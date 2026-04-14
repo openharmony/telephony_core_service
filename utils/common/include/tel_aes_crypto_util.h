@@ -17,6 +17,7 @@
 #define TEL_AES_CRYPTO_UTILS_H
 
 #include <string>
+#include <ffrt.h>
 
 #include "hks_api.h"
 #include "hks_param.h"
@@ -26,10 +27,12 @@ namespace OHOS {
 namespace Telephony {
 class TelAesCryptoUtils {
 public:
-    static std::string AesCryptoEncrypt(const std::string &srcData);
-    static std::string AesCryptoDecrypt(std::string &srcData);
-    static int SaveEncryptString(const std::string &key, int32_t id, const std::string &rawData);
-    static std::string ObtainDecryptString(const std::string &key, int32_t id, const std::string &defValue);
+    static std::string AesCryptoEncrypt(const std::string &srcData, const uint8_t *nonce, size_t len);
+    static std::string AesCryptoDecrypt(std::string &srcData, const uint8_t *nonce, size_t len);
+    static int SaveEncryptString(const std::string &key, int32_t id, const std::string &rawData,
+        const uint8_t *nonce, size_t len);
+    static std::string ObtainDecryptString(const std::string &key, int32_t id, const std::string &defValue,
+        const uint8_t *nonce, size_t len);
 
 private:
     static int32_t InitParamSet(struct HksParamSet **paramSet, const struct HksParam *params, uint32_t paramCount);
@@ -42,6 +45,10 @@ private:
     static bool HexToDec(char hex, uint8_t &decodeValue);
     static std::string DecToHexString(const uint8_t *data, size_t len);
     static std::pair<uint8_t *, size_t> HexToDecString(const std::string &hexString);
+    
+    static ffrt::mutex mutex_;
+    static constexpr uint32_t NONCE_SIZE = 12;
+    static uint8_t nonce_[NONCE_SIZE];
 };
 } // namespace Telephony
 } // namespace OHOS
