@@ -1008,5 +1008,23 @@ HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSelection_NetworkSearchResul
     std::shared_ptr<SetNetworkModeInfo> selectModeResult = nullptr;
     EXPECT_FALSE(networkSelection->SelectModeResult(selectModeResult, data, index));
 }
+
+HWTEST_F(NetworkSearchHandlerTest, Telephony_NetworkSearchHandler_GetNetworkStateInfoPowerOn,
+    Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, SLOT_ID_0);
+    auto networkSearchState = std::make_shared<NetworkSearchState>(networkSearchManager, SLOT_ID_0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchState_ = networkSearchState;
+    networkSearchHandler->networkSearchManager_ = networkSearchManager;
+    networkSearchManager->AddManagerInner(SLOT_ID_0, inner);
+    networkSearchManager->SetRadioStateValue(SLOT_ID_0, ModemPowerState::CORE_SERVICE_POWER_ON);
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORK_STATE, true);
+    networkSearchHandler->GetNetworkStateInfo(event);
+}
 } // namespace Telephony
 } // namespace OHOS

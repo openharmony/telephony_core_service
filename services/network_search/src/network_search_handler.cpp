@@ -763,7 +763,7 @@ void NetworkSearchHandler::GetRilSignalIntensity(bool checkTime)
     }
 }
 
-void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &)
+void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
@@ -785,7 +785,7 @@ void NetworkSearchHandler::GetNetworkStateInfo(const AppExecFwk::InnerEvent::Poi
             break;
         case CORE_SERVICE_POWER_ON: {
             firstInit_ = false;
-            RadioOnState(false);
+            RadioOnState(event->GetParam());
             break;
         }
         default:
