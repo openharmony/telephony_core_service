@@ -25,12 +25,10 @@ namespace OHOS {
 namespace Telephony {
 constexpr uint32_t MAX_UPDATE_SIZE = 1024;
 constexpr uint32_t AAD_SIZE = 16;
-constexpr uint32_t NONCE_SIZE = 12;
 constexpr uint32_t AEAD_SIZE = 16;
 constexpr uint8_t AAD[AAD_SIZE] = {0};
 constexpr uint8_t AEAD[AEAD_SIZE] = {0};
 constexpr const char TEL_AES_KEY_ALIAS[] = "TelAesKeyAlias";
-uint8_t g_nonce[NONCE_SIZE];
 
 constexpr size_t HEX_UNIT_LEN = 2;
 constexpr int32_t ENCODE_UNIT_LEN = 3;
@@ -38,6 +36,7 @@ constexpr int32_t HEX_OFFSET = 16;
 constexpr int32_t DEC_OFFSET = 10;
 
 ffrt::mutex TelAesCryptoUtils::mutex_;
+uint8_t TelAesCryptoUtils::nonce_[NONCE_SIZE];
 
 #define AES_ALGORITHM_PARAM                     \
     {                                           \
@@ -70,8 +69,8 @@ ffrt::mutex TelAesCryptoUtils::mutex_;
     }, {                                        \
         .tag = HKS_TAG_NONCE,                   \
         .blob = {                               \
-            .size = NONCE_SIZE,                 \
-            .data = (uint8_t *)g_nonce          \
+            .size = TelAesCryptoUtils::NONCE_SIZE,    \
+            .data = TelAesCryptoUtils::nonce_         \
         }                                       \
     }
 
@@ -98,7 +97,7 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, cons
         return "";
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    if (memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
+    if (memcpy_s(TelAesCryptoUtils::nonce_, sizeof(TelAesCryptoUtils::nonce_), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
@@ -150,7 +149,7 @@ std::string TelAesCryptoUtils::AesCryptoDecrypt(std::string &srcData, const uint
         return "";
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    if (memcpy_s(g_nonce, sizeof(g_nonce), nonce, NONCE_SIZE) != EOK) {
+    if (memcpy_s(TelAesCryptoUtils::nonce_, sizeof(TelAesCryptoUtils::nonce_), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
