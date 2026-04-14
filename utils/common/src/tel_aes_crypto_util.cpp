@@ -96,10 +96,12 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, cons
     if (srcData.empty() || nonce == nullptr || len < NONCE_SIZE) {
         return "";
     }
+
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (memcpy_s(TelAesCryptoUtils::nonce_, sizeof(TelAesCryptoUtils::nonce_), nonce, NONCE_SIZE) != EOK) {
         return "";
     }
+
     struct HksBlob keyAlias = { strlen(TEL_AES_KEY_ALIAS), (uint8_t *)TEL_AES_KEY_ALIAS };
     struct HksParamSet *genParamSet = nullptr;
     struct HksParam genParams[] = {
@@ -115,6 +117,7 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, cons
         TELEPHONY_LOGE("InitParamSet genParamSet failed");
         return "";
     }
+
     struct HksParamSet *encryptParamSet = nullptr;
     static struct HksParam encryptParams[] = {
         {
@@ -137,6 +140,7 @@ std::string TelAesCryptoUtils::AesCryptoEncrypt(const std::string &srcData, cons
         HksFreeParamSet(&encryptParamSet);
         return "";
     }
+    
     std::string encryptData = AesCryptoEncryptInner(&keyAlias, genParamSet, encryptParamSet, srcData);
     HksFreeParamSet(&genParamSet);
     HksFreeParamSet(&encryptParamSet);

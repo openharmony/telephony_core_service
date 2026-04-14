@@ -164,44 +164,66 @@ HWTEST_F(Asn1BuilderTest, Asn1BuilderToHexStr_001, Function | MediumTest | Level
 
 HWTEST_F(Asn1BuilderTest, AesCryptoEncrypttest_001, Function | MediumTest | Level3)
 {
-    std::string srcData = "";
-    uint8_t nonce[16];
+    std::string srcData = "test_data";
+    uint8_t nonce[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2};
     size_t len = 16;
     std::string result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
-    EXPECT_EQ(result, "");
-    srcData = "test_data";
+    EXPECT_NE(result, "");
     uint8_t *nonce1 = nullptr;
+    len = 8;
     result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, len);
     EXPECT_EQ(result, "");
-    uint8_t nonce2[8] = {0};
-    len = 8;
-    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce2, len);
+    len = 18;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, len);
     EXPECT_EQ(result, "");
-    nonce[15] = {0};
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
+    EXPECT_EQ(result, "");
+    srcData = "";
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, len);
+    EXPECT_EQ(result, "");
+    len = 16;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce1, len);
+    EXPECT_EQ(result, "");
     len = 16;
     result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
-    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result, "");
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoEncrypt(srcData, nonce, len);
+    EXPECT_EQ(result, "");
 }
 
 HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Level3)
 {
-    std::string srcData = "";
-    uint8_t nonce[16];
+    std::string srcData = "test_data";
+    uint8_t nonce[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2};
     size_t len = 16;
     std::string result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
-    EXPECT_EQ(result, "");
-    srcData = "test_data";
+    EXPECT_NE(result, "");
     uint8_t *nonce1 = nullptr;
+    len = 8;
     result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, len);
     EXPECT_EQ(result, "");
-    uint8_t nonce2[8] = {0};
-    len = 8;
-    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce2, len);
+    len = 18;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, len);
     EXPECT_EQ(result, "");
-    nonce[15] = {0};
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
+    EXPECT_EQ(result, "");
+    srcData = "";
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, len);
+    EXPECT_EQ(result, "");
+    len = 16;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce1, len);
+    EXPECT_EQ(result, "");
     len = 16;
     result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
-    EXPECT_TRUE(result.empty());
+    EXPECT_EQ(result, "");
+    len = 8;
+    result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
+    EXPECT_EQ(result, "");
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
