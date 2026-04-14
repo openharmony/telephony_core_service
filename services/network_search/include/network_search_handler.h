@@ -115,7 +115,7 @@ private:
     void ImsiLoadedReady(const AppExecFwk::InnerEvent::Pointer &event);
     void SimRecordsLoaded(const AppExecFwk::InnerEvent::Pointer &);
     void RadioStateChange(const AppExecFwk::InnerEvent::Pointer &event);
-    void GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &);
+    void GetNetworkStateInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioRestrictedState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioRilDataRegState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event);
