@@ -2726,6 +2726,8 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback result: %{public}d", result);
     EXPECT_EQ(TELEPHONY_ERR_SUCCESS, result);
     callback->WaitForStartManualNetworkScanCallback(WAIT_TIME_SECOND_LONG);
+    sptr<NetworkSearchResult> networkSearchResult = new NetworkSearchResult();
+    callback->OnStartManualNetworkScanCallback(NetworkSearchResult, true, SLOT_ID);
     bool syncResult = callback->StartManualNetworkScanCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback syncResult: %{public}d", syncResult);
     ASSERT_FALSE(syncResult);
