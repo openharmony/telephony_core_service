@@ -42,12 +42,17 @@ ohos_unittest("utils_codec_gtest") {
     "$SOURCE_DIR/utils/log/include",
   ]
 
-  deps = [ "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api" ]
+  deps = [ 
+    "$SOURCE_DIR/test:core_service_test_base",
+    "$SOURCE_DIR/interfaces/innerkits:tel_core_service_api",
+    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
+    ]
 
   external_deps = [
     "c_utils:utils",
     "googletest:gtest_main",
     "hilog:libhilog",
+    "huks:libhukssdk"
   ]
 
   defines = [
