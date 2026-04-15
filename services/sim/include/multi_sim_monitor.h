@@ -59,7 +59,7 @@ public:
     void UpdateAllSimData(int32_t userId);
     void OnUserSwitched(int32_t userId);
     void OnDataShareReady(int32_t userId);
-    bool IsUserIdRecord(int32_t userId);
+    void UpdateUserIdRecord(int32_t userId, bool &isRecord);
     void ClearUserId();
     void CheckSimPresentWhenReboot();
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
@@ -172,7 +172,8 @@ private:
     std::atomic<int32_t> remainCount_ = 15;
     int32_t maxSlotCount_ = 0;
     int32_t userIdRecordIndex_ = 1;
-    bool isDataShareReady_ = false;
+    std::atomic<bool> isSimStateChange_ = false;
+    std::atomic<bool> isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
     std::atomic<int32_t> lastUserId_ = -1;
