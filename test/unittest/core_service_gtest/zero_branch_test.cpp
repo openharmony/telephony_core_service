@@ -2359,7 +2359,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Fu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_MultiSimMonitor_UpdateAllSimData, Function | MediumTest | Level1) +
+HWTEST_F(BranchTest, Telephony_MultiSimMonitor_UpdateAllSimData, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
