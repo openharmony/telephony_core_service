@@ -282,7 +282,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_005, Function |
     CoreServiceProxy coreServiceProxy(remote);
     remote->sendRequestSuccess = true;
     auto callback = sptr<MockRawParcelCallback>::MakeSptr();
-    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, nullptr), TELEPHONY_ERR_ARGUMENT_INVALID);
     EXPECT_EQ(coreServiceProxy.SetSimLabelIndex(INVALID_SLOTID, 0, callback), TELEPHONY_ERR_SUCCESS);
 
     remote->sendRequestSuccess = false;
