@@ -25,7 +25,7 @@ TelRilData::TelRilData(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
     std::shared_ptr<ObserverHandler> observerHandler, std::shared_ptr<TelRilHandler> handler)
     : TelRilBase(slotId, rilInterface, observerHandler, handler)
 {
-    whiteReqList_ = {"DeactivatePdpContext"};
+    whiteReqList_ = {"DeactivatePdpContext", "ActivatePdpContext"};
 }
 
 HDI::Ril::V1_1::DataProfileDataInfo TelRilData::ChangeDPToHalDataProfile(DataProfile dataProfile)
