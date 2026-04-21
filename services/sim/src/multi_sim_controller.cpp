@@ -452,6 +452,10 @@ bool MultiSimController::InitIccId(int slotId)
         TELEPHONY_LOGE("failed to init data");
         return false;
     }
+    bool isActive = false;
+    if (TELEPHONY_EXT_WRAPPER.GetResetActiveFlag(slotId, isActive)) {
+        result = UpdateDBActiveByIccId(newIccId, static_cast<int32_t>(isActive));
+    }
     HILOG_COMM_INFO("result is %{public}d", result);
     return true;
 }
@@ -2209,6 +2213,23 @@ void MultiSimController::ResetPrimarySlotReady()
             simStateManager_[i]->SetInitPrimarySlotReady(false);
         }
     }
+}
+
+int32_t MultiSimController::UpdateDBActiveByIccId(const std::string iccId, int32_t enable)
+{
+    if (simDbHelper_ == nullptr) {
+        TELEPHONY_LOGE("failed by nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataShareValueObject valueObj(enable);
+    values.Put(SimData::IS_ACTIVE, valueObj);
+    int32_t result = simDbHelper_->UpdateDataByIccId(iccId, values);
+    if (result == INVALID_VALUE) {
+        TELEPHONY_LOGE("failed by database");
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -288,6 +288,7 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    getResetActiveFlag_ = (GetResetActiveFlagFunc)dlsym(telephonyExtWrapperHandle_, "GetResetActiveFlag");
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
@@ -417,6 +418,14 @@ int32_t TelephonyExtWrapper::GetRealSimCountExt(int32_t realSlotCount)
         return getRealSimCountExt_(realSlotCount);
     }
     return realSlotCount;
+}
+
+bool GetResetActiveFlag(int32_t slotId, bool &isActive)
+{
+    if (getResetActiveFlag_ != nullptr) {
+        return getResetActiveFlag_(slotId, isActive);
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
