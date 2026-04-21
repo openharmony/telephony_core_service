@@ -1640,8 +1640,9 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBActiveByIccId001
     multiSimController->simDbHelper_ = nullptr;
     std::string iccid = "123456";
     multiSimController->UpdateDBActiveByIccId(iccid, 0);
-    multiSimController->simDbHelper_ = std::make_unique<MockSimRdbHelper>();
-    EXPECT_CALL(*(multiSimController->simDbHelper_), UpdateDataByIccId(_, _)).WillRepeatedly(Return(INVALID_VALUE));
+    auto mockSimRdbHelper = std::make_unique<MockSimRdbHelper>();
+    EXPECT_CALL(*(mockSimRdbHelper), UpdateDataByIccId(_, _)).WillRepeatedly(Return(INVALID_VALUE));
+    multiSimController->simDbHelper_ = std::move(mockSimRdbHelper);
     int32_t ret = multiSimController->UpdateDBActiveByIccId(iccid, 0);
     EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
 }
