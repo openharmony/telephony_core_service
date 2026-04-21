@@ -420,7 +420,7 @@ int32_t TelephonyExtWrapper::GetRealSimCountExt(int32_t realSlotCount)
     return realSlotCount;
 }
 
-bool GetResetActiveFlag(int32_t slotId, bool &isActive)
+bool TelephonyExtWrapper::GetResetActiveFlag(int32_t slotId, bool &isActive)
 {
     if (getResetActiveFlag_ != nullptr) {
         return getResetActiveFlag_(slotId, isActive);
