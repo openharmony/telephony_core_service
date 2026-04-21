@@ -536,13 +536,13 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
     isDistributedCommunicationConnected_ = &IsDistributedCommunicationConnectedImpl;
     sendSimChgTypeInfo_ = &SendSimChgTypeInfoImpl;
     reportEventToChr_ = &ReportEventToChrImpl;
-    getResetActiveFlag_ = &GetResetActiveFlagImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
 {
     setActiveSim_ = &SetActiveSimImpl;
     getRealSimCountExt_ = &GetRealSimCountExtImpl;
+    getResetActiveFlag_ = &GetResetActiveFlagImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
