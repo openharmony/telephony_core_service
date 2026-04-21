@@ -1492,7 +1492,8 @@ void MultiSimController::SavePrimaryCardInfo(int32_t slotId)
     TELEPHONY_LOGI("save data is empty %{public}d", iccId.empty());
     if (!iccId.empty()) {
         std::string encryptIccId = EncryptIccId(iccId);
-        SetParameter(MAIN_CARD_ICCID_KEY.c_str(), encryptIccId.c_str());
+        auto ret = SetParameter(MAIN_CARD_ICCID_KEY.c_str(), encryptIccId.c_str());
+        TELEPHONY_LOGI("SetParameter main card ret %{public}d", ret);
     }
 }
  
@@ -1659,7 +1660,6 @@ void MultiSimController::InitMainCardSlotId()
 int32_t MultiSimController::GetShowNumber(int32_t slotId, std::u16string &showNumber)
 {
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     if (simFileManager_[slotId] == nullptr) {
@@ -1750,7 +1750,6 @@ int32_t MultiSimController::SetShowNumberToDB(int32_t slotId, std::u16string num
 int32_t MultiSimController::GetShowName(int32_t slotId, std::u16string &showName)
 {
     if (!IsValidData(slotId)) {
-        TELEPHONY_LOGE("InValidData");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     std::shared_lock<ffrt::shared_mutex> lock(mutex_);
