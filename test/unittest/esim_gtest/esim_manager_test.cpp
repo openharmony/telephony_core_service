@@ -289,7 +289,7 @@ HWTEST_F(EsimManagerTest, IsSupported_001, Function | MediumTest | Level1)
     std::shared_ptr<MockEsimManager> mockesimManager = std::make_shared<MockEsimManager>();
     CoreManagerInner mInner;
     mInner.esimManager_ = mockesimManager;
-    EXPECT_CALL(*mockesimManager, IsSupported(testing::_)).WillRepeatedly(testing::Return(true));
+    EXPECT_CALL(*mockesimManager, IsSupported(testing::_)).WillRepeatedly(testing::Return(false));
     esimManager->esimFiles_[1] = nullptr;
     EXPECT_EQ(ret, true);
 }
