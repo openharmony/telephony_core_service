@@ -1629,5 +1629,22 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Fun
 
     EXPECT_TRUE(multiSimMonitor1->controller_->loadedSimCardInfo_[0] == "000000000");
 }
+
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBActiveByIccId001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    multiSimController->simDbHelper_ = nullptr;
+    std::string iccid = "123456";
+    multiSimController->UpdateDBActiveByIccId(iccid, 0);
+    auto mockSimRdbHelper = std::make_unique<MockSimRdbHelper>();
+    EXPECT_CALL(*(mockSimRdbHelper), UpdateDataByIccId(_, _)).WillRepeatedly(Return(INVALID_VALUE));
+    multiSimController->simDbHelper_ = std::move(mockSimRdbHelper);
+    int32_t ret = multiSimController->UpdateDBActiveByIccId(iccid, 0);
+    EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
+}
 }
 }
