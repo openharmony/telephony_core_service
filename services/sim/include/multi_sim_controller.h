@@ -179,6 +179,7 @@ private:
     bool IsESimUpdateStatus(int32_t slotId);
     void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
         int32_t simLabel, bool isEsim);
+    int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;

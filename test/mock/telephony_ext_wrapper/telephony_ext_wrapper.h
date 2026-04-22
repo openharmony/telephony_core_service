@@ -136,6 +136,7 @@ public:
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
     typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
+    typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -218,6 +219,7 @@ public:
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
     int32_t GetRealSimCountExt(int32_t realSlotCount);
+    bool GetResetActiveFlag(int32_t slotId, bool &isActive);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -232,6 +234,7 @@ private:
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
     SetActiveSim setActiveSim_ = nullptr;
     GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
+    GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -404,6 +407,10 @@ inline void RegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExec
 inline void UnRegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {}
 inline void SetActiveSimImpl(int32_t slotId, int32_t enable) {}
+inline bool GetResetActiveFlagImpl(int32_t slotId, bool &isActive)
+{
+    return false;
+}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -535,6 +542,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
 {
     setActiveSim_ = &SetActiveSimImpl;
     getRealSimCountExt_ = &GetRealSimCountExtImpl;
+    getResetActiveFlag_ = &GetResetActiveFlagImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForOpkeyVersion()
@@ -625,6 +633,14 @@ inline int32_t TelephonyExtWrapper::GetRealSimCountExt(int32_t realSlotCount)
         return getRealSimCountExt_(realSlotCount);
     }
     return realSlotCount;
+}
+
+inline bool TelephonyExtWrapper::GetResetActiveFlag(int32_t slotId, bool &isActive)
+{
+    if (getResetActiveFlag_ != nullptr) {
+        return getResetActiveFlag_(slotId, isActive);
+    }
+    return false;
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
