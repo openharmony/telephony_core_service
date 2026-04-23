@@ -155,7 +155,7 @@ private:
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_;
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager_;
     std::vector<int> isSimAccountLoaded_;
-    int32_t userIdRecord_[MAX_USERID_NUM];
+    int32_t userIdRecord_[MAX_USERID_NUM] = {0};
     bool isAllSimAccountLoaded_ = false;
     std::vector<int> initDataRemainCount_;
     int initEsimDataRemainCount_ = 0;
