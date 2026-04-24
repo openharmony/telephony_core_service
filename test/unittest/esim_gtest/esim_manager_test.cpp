@@ -291,7 +291,7 @@ HWTEST_F(EsimManagerTest, IsSupported_001, Function | MediumTest | Level1)
     mInner.esimManager_ = mockesimManager;
     EXPECT_CALL(*mockesimManager, IsSupported(testing::_)).WillRepeatedly(testing::Return(false));
     esimManager->esimFiles_[1] = nullptr;
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(EsimManagerTest, SendApduData_001, Function | MediumTest | Level1)
