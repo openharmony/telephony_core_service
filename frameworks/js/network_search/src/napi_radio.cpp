@@ -959,7 +959,6 @@ static void NativeSetNetworkSelectionMode(napi_env env, void *data)
     sptr<NetworkInformation> networkInfo = std::make_unique<NetworkInformation>().release();
     networkInfo->SetOperateInformation(asyncContext->operatorName, "", asyncContext->operatorNumeric,
         WrapPlmnState(asyncContext->state), GetRatTechValue(asyncContext->radioTech));
-    TELEPHONY_LOGI("NativeSetNetworkSelectionMode operatorName = %{public}s", asyncContext->operatorName.c_str());
     std::unique_ptr<SetNetworkSearchModeCallback> callback =
         std::make_unique<SetNetworkSearchModeCallback>(asyncContext);
     std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
@@ -1421,7 +1420,6 @@ static void NativeGetOperatorName(napi_env env, void *data)
     context->errorCode =
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetOperatorName(context->slotId, u16OperatorName);
     std::string operatorName = NapiUtil::ToUtf8(u16OperatorName);
-    TELEPHONY_LOGD("NativeGetOperatorName operatorName = %{public}s", operatorName.c_str());
     if (context->errorCode == TELEPHONY_ERR_SUCCESS) {
         context->resolved = true;
         context->operatorNameLength = (operatorName.size() < BUF_SIZE) ? operatorName.size() : BUF_SIZE;

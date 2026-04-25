@@ -113,10 +113,6 @@ void OperatorName::GsmOperatorInfo(const std::shared_ptr<OperatorInfoResult> ope
         numeric = operatorInfoResult->numeric;
         UpdateOperatorLongName(longName, numeric);
     }
-    TELEPHONY_LOGI(
-        "OperatorName::GsmOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : %{public}s "
-        "slotId:%{public}d",
-        longName.c_str(), shortName.c_str(), numeric.c_str(), slotId_);
     if (networkSearchState_ != nullptr) {
         networkSearchState_->SetOperatorInfo(longName, shortName, numeric, DomainType::DOMAIN_TYPE_CS);
         networkSearchState_->SetOperatorInfo(longName, shortName, numeric, DomainType::DOMAIN_TYPE_PS);
