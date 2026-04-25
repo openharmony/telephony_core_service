@@ -3120,7 +3120,7 @@ void SetSimLabelIndexCallback(napi_env env, napi_status status, void *data)
 napi_value SetSimLabelIndex(napi_env env, napi_callback_info info)
 {
     TELEPHONY_LOGI("SetSimLabelIndex start");
-    auto simLabelContext = std::make_unique<AsyncSetSimLabelIndexInfo>();
+    auto simLabelContext = new AsyncSetSimLabelIndexInfo();
     BaseContext &context = simLabelContext->asyncContext.context;
 
     auto initPara = std::make_tuple(&simLabelContext->simId, &simLabelContext->simLabelIndex, &context.callbackRef);
@@ -3131,15 +3131,9 @@ napi_value SetSimLabelIndex(napi_env env, napi_callback_info info)
         .execute = NativeSetSimLabelIndex,
         .complete = SetSimLabelIndexCallback,
     };
-    napi_value result = NapiCreateAsyncWork2<AsyncSetSimLabelIndexInfo>(para, simLabelContext.get(), initPara);
-    if (result == nullptr) {
-        TELEPHONY_LOGE("create asyncwork failed");
-        return nullptr;
-    }
-    auto ret = napi_queue_async_work_with_qos(env, context.work, napi_qos_default);
-    if (ret != napi_ok) {
-        napi_delete_async_work(env, context.work);
-        return nullptr;
+    napi_value result = NapiCreateAsyncWork2<AsyncSetSimLabelIndexInfo>(para, simLabelContext, initPara);
+    if (result) {
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
     }
     return result;
 }
