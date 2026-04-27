@@ -63,6 +63,8 @@ static constexpr const char *JS_ERROR_TELEPHONY_DIAL_IS_BUSY_STRING =
 static constexpr const char *JS_ERROR_ESIM_SUCCESS_STRING = "Success.";
 static constexpr const char *JS_ERROR_ESIM_SERVICE_ERROR_STRING = "Service connection failed.";
 static constexpr const char *JS_ERROR_ESIM_SYSTEM_ERROR_STRING = "System internal error.";
+static constexpr const char *JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER_STRING = "Invalid input call number.";
+static constexpr const char *JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT_STRING = "Operation too frequent.";
 
 static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
@@ -99,6 +101,8 @@ static std::unordered_map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_STATE_REGISTRY_SERVICE_ERROR, JS_ERROR_TELEPHONY_SERVICE_ERROR_STRING },
     { JsErrorCode::JS_ERROR_STATE_REGISTRY_SYSTEM_ERROR, JS_ERROR_TELEPHONY_SYSTEM_ERROR_STRING },
     { JsErrorCode::JS_ERROR_STATE_REGISTRY_UNKNOW_ERROR, JS_ERROR_TELEPHONY_UNKNOW_ERROR_STRING },
+    { JsErrorCode::JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER, JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER_STRING },
+    { JsErrorCode::JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT, JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT_STRING },
 };
 const std::string ERROR_STRING = "error";
 const std::u16string ERROR_USTRING = u"error";
@@ -1007,6 +1011,12 @@ bool NapiUtil::CreateSupplementServiceCallErrorMessageForJs(int32_t errorCode, J
             break;
         case TELEPHONY_CALL_ERR_UT_NO_CONNECTION:
             jsErrorCode = JS_ERROR_CALL_UT_NO_CONNECTION;
+            break;
+        case TELEPHONY_CALL_ERR_INVALID_INPUT_CALL_NUMBER:
+            jsErrorCode = JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER;
+            break;
+        case TELEPHONY_CALL_ERR_OPERATION_TOO_FREQUENT:
+            jsErrorCode = JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT;
             break;
         default:
             flag = false;
