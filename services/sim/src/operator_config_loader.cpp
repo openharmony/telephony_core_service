@@ -129,7 +129,7 @@ int OperatorConfigLoader::InsertOpkeyToSimDb(
         result = helper->Update(simUri, predicates, values);
     }
     helper->Release();
-    TELEPHONY_LOGI("InsertOpkeyToSimDb result is %{public}d, Opkey is: %{public}s", result, opKeyValue.data());
+    TELEPHONY_LOGI("InsertOpkeyToSimDb result is %{public}d", result);
     return result;
 }
 
