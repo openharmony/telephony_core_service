@@ -2919,8 +2919,11 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
         TELEPHONY_LOGE("IsNrSupported WriteInterfaceToken is false");
         return false;
     }
+    if (!data.WriteInt32(slotId)) {
+ 	    TELEPHONY_LOGE("IsNrSupported WriteInt32 is false");
+ 	    return false;
+ 	}
     auto remote = Remote();
-    data.WriteInt32(slotId);
     if (remote == nullptr) {
         TELEPHONY_LOGE("SimAuthentication Remote is null");
         return false;

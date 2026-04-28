@@ -59,7 +59,8 @@ public:
 private:
     static std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
     static std::mutex callbackMapMutex_;
-    static std::atomic<int64_t> callbackIndex64bit_;
+    static std::mutex callbackIndexMutex_;
+    static int64_t callbackIndex64bit_;
     static const int64_t MIN_INDEX = 0x100; // 256
     static const int64_t MAX_INDEX = 0x7FFFFFFF;
 };

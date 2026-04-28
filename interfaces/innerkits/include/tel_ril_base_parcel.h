@@ -174,8 +174,8 @@ struct CommonParcel : public TelRilBaseParcel {
             " please use the StringParcel(const std::string &) constructor.");
         static_assert((bufLen % sizeof(T)) == 0, "bufLen less than sizeof T");
 
-        if (buf != nullptr) {
-            data = *(T *)buf;
+        if (buf != nullptr && bufLen > 0) {
+ 	        data = reinterpret_cast<T*>(const_cast<uint8_t*>(buf));
         } else {
             data = 0;
         }
@@ -216,4 +216,4 @@ using StringParcel = struct CommonParcel<std::string>;
 static constexpr int32_t TELEPHONY_PARCEL_MAX_COUNT = 1024;
 } // namespace Telephony
 } // namespace OHOS
-#endif // OHOS_TEL_RIL_BASE_PARCEL_H
+#endif // OHOS_TEL_RIL_BASE_PARCEL_H
