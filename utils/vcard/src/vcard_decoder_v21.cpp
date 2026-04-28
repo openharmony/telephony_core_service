@@ -648,6 +648,11 @@ std::string VCardDecoderV21::GetQuotedPrintableValue(const std::string &str, int
             return target;
         }
         target += VCardUtils::Trim(line) + "\r\n";
+        size_t MAX_VCARD_INPUT_SIZE = 100 * 1024 * 1024;
+        if (target.length() > MAX_VCARD_INPUT_SIZE) {
+        TELEPHONY_LOGE("ConvertCharset: input too large");
+        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+        return "";
     }
 }
 
@@ -749,7 +754,10 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
         }
         GetLine();
         str += VCardUtils::Trim(line);
-    }
+        size_t MAX_VCARD_INPUT_SIZE = 100 * 1024 * 1024;
+        if (str.length() > MAX_VCARD_INPUT_SIZE) {
+            break;
+        }
     return str;
 }
 
