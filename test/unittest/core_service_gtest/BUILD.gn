@@ -475,6 +475,7 @@ ohos_unittest("tel_sim_manager_gtest") {
 }
 
 ohos_unittest("tel_core_zero_branch_gtest") {
+  use_exceptions = true
   install_enable = true
   subsystem_name = "telephony"
   part_name = "core_service"
