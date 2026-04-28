@@ -151,7 +151,6 @@ HWTEST_F(UtilsVcardTest, GetQuotedPrintableValuetest_001, Function | MediumTest 
     lines = {"Line2=", "Line3"};
     result = decoder.GetQuotedPrintableValue(str, errorCode);
     EXPECT_EQ(result, str);
-
 }
 
 HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumTest | Level3)
