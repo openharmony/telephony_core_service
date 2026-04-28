@@ -162,13 +162,6 @@ bool VCardUtils::EndWith(const std::string &fullString, const std::string &endin
 std::string VCardUtils::ConvertCharset(
     const std::string &input, const std::string &fromCharset, const std::string &toCharset, int32_t &errorCode)
 {
-    iconv_t converter = iconv_open(toCharset.c_str(), fromCharset.c_str());
-    if (converter == (iconv_t)(-1)) {
-        TELEPHONY_LOGE("ConvertCharset_old open fail");
-        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
-        return "";
-    }
- 
     size_t inBytes = input.size();
     size_t MAX_VCARD_INPUT_SIZE = 100 * 1024 * 1024;
     if (inBytes > MAX_VCARD_INPUT_SIZE) {
@@ -176,6 +169,13 @@ std::string VCardUtils::ConvertCharset(
         errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
         return "";
     }
+    iconv_t converter = iconv_open(toCharset.c_str(), fromCharset.c_str());
+    if (converter == (iconv_t)(-1)) {
+        TELEPHONY_LOGE("ConvertCharset_old open fail");
+        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+        return "";
+    }
+ 
     size_t outBytes = inBytes * 4; // Allocate enough space for the worst-case scenario
     char *inBuf = const_cast<char *>(input.c_str());
     char *outBuf = new char[outBytes];
