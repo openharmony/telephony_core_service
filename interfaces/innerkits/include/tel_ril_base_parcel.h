@@ -175,7 +175,7 @@ struct CommonParcel : public TelRilBaseParcel {
         static_assert((bufLen % sizeof(T)) == 0, "bufLen less than sizeof T");
 
         if (buf != nullptr && bufLen > 0) {
- 	        data = reinterpret_cast<T*>(const_cast<uint8_t*>(buf));
+            data = reinterpret_cast<T*>(const_cast<uint8_t*>(buf));
         } else {
             data = 0;
         }
