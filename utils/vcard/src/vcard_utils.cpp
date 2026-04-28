@@ -170,6 +170,12 @@ std::string VCardUtils::ConvertCharset(
     }
  
     size_t inBytes = input.size();
+    size_t MAX_VCRD_INPUT_SIZE = 100 * 1024 * 1024;
+    if (inBytes > MAX_VCRD_INPUT_SIZE) {
+        TELEPHONY_LOGE("ConvertCharset: input too large");
+        errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+        return "";
+    }
     size_t outBytes = inBytes * 4; // Allocate enough space for the worst-case scenario
     char *inBuf = const_cast<char *>(input.c_str());
     char *outBuf = new char[outBytes];
