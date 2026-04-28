@@ -148,6 +148,16 @@ enum JsErrorCode {
     JS_ERROR_CALL_UT_NO_CONNECTION,
 
     /**
+     * UT is invalid input call number.
+     */
+    JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER,
+
+    /**
+     * UT is operation too frequent.
+     */
+    JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT,
+
+    /**
      * Cellular call module cs base error code.
      */
     JS_ERROR_CELLULAR_CALL_CS_BASE_ERROR = 8501000,
