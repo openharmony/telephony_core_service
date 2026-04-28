@@ -202,7 +202,7 @@ HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Leve
     std::string result = TelAesCryptoUtils::AesCryptoDecrypt(srcData, nonce, len);
     EXPECT_EQ(result, "");
     HksBlob keyAlias;
-    char TEL_AES_KEY_ALIAS[] = "TelAesKeyAlias";
+    const char TEL_AES_KEY_ALIAS[] = "TelAesKeyAlias";
     keyAlias.size = strlen(TEL_AES_KEY_ALIAS);
     keyAlias.data = (uint8_t *)TEL_AES_KEY_ALIAS;
     HksParam *decryptGcmParamSet = nullptr;
