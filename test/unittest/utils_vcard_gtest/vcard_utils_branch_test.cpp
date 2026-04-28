@@ -22,6 +22,8 @@
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
+#include "vcard_file_utils.h"
+#include "vcard_decoder_v21.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -123,6 +125,34 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_DecodeBase64_001, Function | MediumTes
     EXPECT_EQ(decodedData_string, nullptr);
     decodeBase64testStr = VCardUtils::DecodeBase64(testStr);
     EXPECT_EQ(decodeBase64testStr, answerStr);
+}
+
+HWTEST_F(UtilsVcardTest, GetBase64test_001, Function | MediumTest | Level3)
+{
+    int32_t errorCode = 0;
+    string value = string(150 * 1024 * 1024, 'A');
+    vector<string> lines = {"NextPart"};
+    VCardFileUtils fileUtils;
+    VCardDecoderV21 decoder;
+    decoder.fileUtils_ = fileUtils;
+    string result = decoder.GetBase64(value, errorCode);
+    EXPECT_EQ(result, value);
+}
+
+HWTEST_F(UtilsVcardTest, GetQuotedPrintableValuetest_001, Function | MediumTest | Level3)
+{
+    int32_t errorCode = 0;
+    string str = string(150 * 1024 * 1024, '=');
+    vector<string> lines = {"NextPart"};
+    VCardFileUtils fileUtils;
+    VCardDecoderV21 decoder;
+    decoder.fileUtils_ = fileUtils;
+    string result = decoder.GetQuotedPrintableValue(str, errorCode);
+    EXPECT_EQ(result, "");
+    str = "Line1";
+    lines = {"Line2=", "Line3"};
+    result = decoder.GetQuotedPrintableValue(str, errorCode);
+    EXPECT_EQ(result, str);
 }
 
 HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumTest | Level3)
