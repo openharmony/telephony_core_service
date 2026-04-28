@@ -758,8 +758,8 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
         if (str.length() > MAX_VCARD_INPUT_SIZE) {
             break;
         }
-        return str;
     }
+    return str;  
 }
 
 std::string VCardDecoderV21::UnescapeText(const std::string &from)
