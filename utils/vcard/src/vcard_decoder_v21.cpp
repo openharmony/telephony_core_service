@@ -36,6 +36,7 @@ namespace {
 constexpr int32_t STATUS_GROUP_OR_TYPE_NAME = 1;
 constexpr int32_t STATUS_PARAMS = 2;
 constexpr int32_t STATUS_PARAMS_IN_DQUOTE = 3;
+constexpr size_t MAX_VCARD_INPUT_SIZE = 100 * 1024 * 1024;
 } // namespace
 
 void VCardDecoderV21::AddVCardDecodeListener(std::shared_ptr<VCardDecodeListener> listener)
@@ -648,6 +649,11 @@ std::string VCardDecoderV21::GetQuotedPrintableValue(const std::string &str, int
             return target;
         }
         target += VCardUtils::Trim(line) + "\r\n";
+        if (target.length() > MAX_VCARD_INPUT_SIZE) {
+            TELEPHONY_LOGE("ConvertCharset: input too large");
+            errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
+            return "";
+        }
     }
 }
 
@@ -749,6 +755,9 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
         }
         GetLine();
         str += VCardUtils::Trim(line);
+        if (str.length() > MAX_VCARD_INPUT_SIZE) {
+            break;
+        }
     }
     return str;
 }
