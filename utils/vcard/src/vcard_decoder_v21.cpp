@@ -759,7 +759,7 @@ std::string VCardDecoderV21::GetBase64(const std::string &value, int32_t &errorC
             break;
         }
     }
-    return str;  
+    return str;
 }
 
 std::string VCardDecoderV21::UnescapeText(const std::string &from)
