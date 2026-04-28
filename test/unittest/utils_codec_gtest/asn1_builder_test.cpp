@@ -205,7 +205,7 @@ HWTEST_F(Asn1BuilderTest, AesCryptoDecrypttest_001, Function | MediumTest | Leve
     const char TEL_AES_KEY_ALIAS[] = "TelAesKeyAlias";
     keyAlias.size = strlen(TEL_AES_KEY_ALIAS);
     keyAlias.data = (uint8_t *)TEL_AES_KEY_ALIAS;
-    struct HksParam *decryptGcmParamSet = nullptr;
+    struct HksParamSet *decryptGcmParamSet = nullptr;
     std::pair<char*, size_t> decryptDataPair;
     decryptDataPair.first = nullptr;
     decryptDataPair.second = 100;
