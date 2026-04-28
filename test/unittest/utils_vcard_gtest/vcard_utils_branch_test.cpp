@@ -22,8 +22,6 @@
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
-#include "vcard_file_utils.h"
-#include "vcard_decoder_v21.h"
 
 namespace OHOS {
 namespace Telephony {
