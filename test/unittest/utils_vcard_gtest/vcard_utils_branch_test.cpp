@@ -158,7 +158,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_002, Function | MediumT
     EXPECT_EQ(resultConvert, convertCharseOutput);
 
     convertCharseInput = "Hello, world! こんにちは、世界!";
-    convertCharseOutput = "Hello, world! ±ñÉ¿ÍAE!";
+    convertCharseOutput = "Hello, world! こんにちは、世界!";
     fromCharset = "UTF-8";
     toCharset = "SHIFT_JIS";
     std::string input = string(150 * 1024 * 1024, 'A');
