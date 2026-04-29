@@ -36,7 +36,6 @@ constexpr int32_t OPKEY_VMSG_LENTH = 3;
 constexpr int32_t VMSG_SLOTID_INDEX = 0;
 constexpr int32_t VMSG_OPKEY_INDEX = 1;
 constexpr int32_t VMSG_OPNAME_INDEX = 2;
-std::unique_ptr<ObserverHandler> IccFile::filesFetchedObser_ = nullptr;
 constexpr const char *IS_UPDATE_OPERATORCONFIG = "telephony.is_update_operatorconfig";
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 IccFile::IccFile(const std::string &name, std::shared_ptr<SimStateManager> simStateManager)
