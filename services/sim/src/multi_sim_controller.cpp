@@ -84,6 +84,7 @@ const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary
 static const std::string SIM_LABEL_STATE_PROP = "persist.ril.sim_switch";
 static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
 static const std::string GSM_SIM_ATR1 = "gsm.sim.hw_atr1";
+static const std::string GSM_SIM_ATR2 = "gsm.sim.hw_atr2";
 static const std::string IS_SIMSLOTS_MAPPING_PROP = "persist.telephony.is_simslots_mapping";
 static const std::string INVALID_ICCID = "INVALID_ICCID";
 static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
@@ -91,7 +92,7 @@ static const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_d
 static const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 static const std::string TYPE_ESIM_ONLY = "6";
 const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
-
+static const int32_t MODEM_ID_2 = 2;
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
@@ -2119,6 +2120,7 @@ bool MultiSimController::IsEsim(int32_t slotId)
     std::string propAtr = "";
     propAtr = (modemId == MODEM_ID_0) ? GSM_SIM_ATR : propAtr;
     propAtr = (modemId == MODEM_ID_1) ? GSM_SIM_ATR1 : propAtr;
+    propAtr = (modemId == MODEM_ID_2) ? GSM_SIM_ATR2 : propAtr;
     if (propAtr.empty()) {
         TELEPHONY_LOGE("modemId invalid, can't get atr prop.");
         return false;
