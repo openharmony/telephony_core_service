@@ -46,6 +46,7 @@ static const int32_t EVENT_CODE = 1;
 static const int32_t IMS_SWITCH_VALUE_UNKNOWN = -1;
 static const int32_t MODEM_ID_0 = 0;
 [[maybe_unused]] const int32_t MODEM_ID_1 = 1;
+[[maybe_unused]] const int32_t MODEM_ID_2 = 2;
 [[maybe_unused]] const int32_t CARD_ATR_LEN = 65;
 const int32_t SYSTEM_PARAMETER_LENGTH = 128;
 constexpr int32_t IS_ESIM = 1;
@@ -92,7 +93,6 @@ static const std::string LAST_DEACTIVE_PROFILE_SLOT0 = "persist.telephony.last_d
 static const std::string LAST_DEACTIVE_PROFILE_SLOT1 = "persist.telephony.last_deactive_profile_slot1";
 static const std::string TYPE_ESIM_ONLY = "6";
 const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
-static const int32_t MODEM_ID_2 = 2;
 
 MultiSimController::MultiSimController(std::shared_ptr<Telephony::ITelRilManager> telRilManager,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
