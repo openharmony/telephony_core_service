@@ -175,7 +175,7 @@ HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_001, Function | MediumT
     EXPECT_NE(resultConvert, convertCharseInput);
 }
 
-HWTEST_F(UtilsVcardTest, convertcharset_utilsvcardtest, Function | MediumTest | Level3)
+HWTEST_F(UtilsVcardTest, Telephony_Common_ConvertCharset_002, Function | MediumTest | Level3)
 {
     std::string convertCharseInput = "Hello, world! 你好，世界！";
     std::string convertCharseOutput = "Hello, world! ******";
