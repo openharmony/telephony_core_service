@@ -28,6 +28,7 @@
 #include "securec.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -59,7 +60,7 @@ public:
 private:
     static std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
     static std::mutex callbackMapMutex_;
-    static std::mutex callbackIndexMutex_;
+    static ffrt::mutex callbackIndexMutex_;
     static int64_t callbackIndex64bit_;
     static const int64_t MIN_INDEX = 0x100; // 256
     static const int64_t MAX_INDEX = 0x7FFFFFFF;
