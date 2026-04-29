@@ -879,5 +879,26 @@ HWTEST_F(SimManagerTest, UpdateSimPresentNullTest, Function | MediumTest | Level
     int32_t result = simManager_->UpdateSimPresent(slotId, false);
     EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
+
+HWTEST_F(SimManagerTest, SetSimLabelIndexTest_001, Function | MediumTest | Level1)
+{
+    int32_t simId = 1;
+    int32_t result = simManager_->SetSimLabelIndex(simId, 0);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(SimManagerTest, SetSimLabelIndexTest_002, Function | MediumTest | Level1)
+{
+    int32_t simId = 1;
+    int32_t result = simManager_->SetSimLabelIndex(simId, -1);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+HWTEST_F(SimManagerTest, SetSimLabelIndexTest_003, Function | MediumTest | Level1)
+{
+    int32_t simId = 1;
+    int32_t result = simManager_->SetSimLabelIndex(simId, 11);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
 }
 }
