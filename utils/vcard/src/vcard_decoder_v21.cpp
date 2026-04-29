@@ -650,7 +650,7 @@ std::string VCardDecoderV21::GetQuotedPrintableValue(const std::string &str, int
         }
         target += VCardUtils::Trim(line) + "\r\n";
         if (target.length() > MAX_VCARD_INPUT_SIZE) {
-            TELEPHONY_LOGE("ConvertCharset: input too large");
+            TELEPHONY_LOGE("input too large");
             errorCode = TELEPHONY_ERR_VCARD_FILE_INVALID;
             return "";
         }
