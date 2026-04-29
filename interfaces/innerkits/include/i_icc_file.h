@@ -40,7 +40,7 @@ public:
     {
     }
 
-    std::weak_ptr<OHOS::Telephony::IIccFileExt>& GetIccFile()
+    std::weak_ptr<OHOS::Telephony::IIccFileExt> GetIccFile() const
     {
         return iccFile_;
     }
