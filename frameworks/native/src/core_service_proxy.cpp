@@ -2920,7 +2920,7 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
         return false;
     }
     if (!data.WriteInt32(slotId)) {
-        TELEPHONY_LOGE("IsNrSupported wirte slotId failed");
+        TELEPHONY_LOGE("IsNrSupported WriteInt32 slotId failed");
         return false;
     }
     auto remote = Remote();
