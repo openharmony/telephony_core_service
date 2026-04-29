@@ -140,7 +140,7 @@ static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
 
 std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
 std::mutex NetworkUtils::callbackMapMutex_;
-std::mutex NetworkUtils::callbackIndexMutex_;
+ffrt::mutex NetworkUtils::callbackIndexMutex_;
 int64_t NetworkUtils::callbackIndex64bit_ = MIN_INDEX;
 int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetworkMode)
 {
@@ -184,7 +184,7 @@ bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<Netwo
 
 int64_t NetworkUtils::GetCallbackIndex64bit()
 {
-    std::lock_guard<std::mutex> guard(callbackIndexMutex_);
+    std::lock_guard<ffrt::mutex> guard(callbackIndexMutex_);
     if (callbackIndex64bit_ > MAX_INDEX || callbackIndex64bit_ < MIN_INDEX) {
         callbackIndex64bit_ = MIN_INDEX;
     }
