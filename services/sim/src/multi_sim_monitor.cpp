@@ -82,7 +82,9 @@ void MultiSimMonitor::AddExtraManagers(std::shared_ptr<Telephony::SimStateManage
             isSimAccountLoaded_.push_back(0);
             initDataRemainCount_.push_back(INIT_DATA_TIMES);
         }
-        RegisterSimNotify(SIM_SLOT_2);
+        if (isForgetAllDataDone_) {
+            RegisterSimNotify(SIM_SLOT_2);
+        }
     }
 }
 
