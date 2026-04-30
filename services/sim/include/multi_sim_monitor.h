@@ -169,7 +169,7 @@ private:
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::mutex mutexForUserId_;
-    std::atomic<int32_t> remainCount_ = 15;
+    std::atomic<int32_t> remainCount_ = 2;
     int32_t maxSlotCount_ = 0;
     int32_t userIdRecordIndex_ = 1;
     std::atomic<bool> isSimStateChange_ = false;
