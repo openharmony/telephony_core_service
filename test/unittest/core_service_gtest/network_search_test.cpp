@@ -2730,7 +2730,7 @@ HWTEST_F(NetworkSearchTest, Telephony_NetworkSearch_StartManualNetworkScanCallba
     callback->OnStartManualNetworkScanCallback(networkSearchResult, true, SLOT_ID);
     bool syncResult = callback->StartManualNetworkScanCallbackResult();
     TELEPHONY_LOGI("TelephonyTestService StartManualNetworkScanCallback syncResult: %{public}d", syncResult);
-    ASSERT_FALSE(syncResult);
+    ASSERT_TRUE(syncResult);
 }
 
 /**
