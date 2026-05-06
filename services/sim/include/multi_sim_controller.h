@@ -91,7 +91,6 @@ public:
     }
     int32_t SavePrimarySlotId(int32_t slotId);
     int32_t GetDefaultMainSlotByIccId();
-    bool isNeedRefreshLoadedSlot(int32_t slotId);
     int32_t InsertEsimData(const std::string &iccId, int32_t esimLabel, const std::string &operatorName);
     int32_t GetSimLabel(int32_t slotId, SimLabel &simLabel);
     int32_t SetSimLabelIndex(int32_t simId, int32_t labelIndex);
@@ -105,7 +104,6 @@ public:
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
-    std::map<int32_t, std::string> loadedSimCardInfo_;
     ffrt::shared_mutex loadedSimCardInfoMutex_;
     static constexpr const char *PHONE_NUMBER_PREF = "sim_number_";
     enum {
