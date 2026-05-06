@@ -255,7 +255,7 @@ std::string TelAesCryptoUtils::AesCryptoDecryptInner(const struct HksBlob *keyAl
     struct HksParamSet *decryptGcmParamSet, std::string &srcData)
 {
     std::pair<uint8_t *, size_t> decryptDataPair = HexToDecString(srcData);
-    if (decryptDataPair.first == nullptr || decryptDataPair.second <= 0) {
+    if (decryptDataPair.first == nullptr || decryptDataPair.second <= AEAD_SIZE) {
         TELEPHONY_LOGE("decryptDataPair is invalid");
         if (decryptDataPair.first != nullptr) {
             free(decryptDataPair.first);

@@ -191,7 +191,7 @@ protected:
     const uint8_t BYTE_NUM7 = 0xF0;
     const int DATA_STEP = 2;
     const unsigned long LENGTH_TWO = 2;
-    static std::unique_ptr<ObserverHandler> filesFetchedObser_;
+    std::unique_ptr<ObserverHandler> filesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> lockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> networkLockedFilesFetchedObser_ = nullptr;
     std::unique_ptr<ObserverHandler> recordsEventsObser_ = nullptr;
