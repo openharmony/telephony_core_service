@@ -42,7 +42,16 @@ const std::string NET_TYPE = "NetType";
 
 void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
 {
-    subscriber_ = std::make_shared<DeviceStateEventSubscriber>();
+    subscriber_ = std::make_shared<DeviceStateEventSubscriber>(deviceStateHandler);
+#ifdef ABILITY_POWER_SUPPORT
+    syncShutdownCallback_ = OHOS::sptr<SyncShutdownCallback>::MakeSptr(deviceStateHandler);
+    if (syncShutdownCallback_ != nullptr) {
+        PowerMgr::ShutdownClient::GetInstance().RegisterShutdownCallback(
+            syncShutdownCallback_, PowerMgr::ShutdownPriority::LOW);
+    } else {
+        TELEPHONY_LOGE("syncShutdownCallback new fail");
+    }
+#endif
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 #if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     std::unique_lock<ffrt::mutex> lck(callbackMutex_);
@@ -69,6 +78,12 @@ void DeviceStateObserver::StartEventSubscriber(const std::shared_ptr<DeviceState
 
 void DeviceStateObserver::StopEventSubscriber()
 {
+#ifdef ABILITY_POWER_SUPPORT
+    if (syncShutdownCallback_ != nullptr) {
+        PowerMgr::ShutdownClient::GetInstance().UnRegisterShutdownCallback(syncShutdownCallback_);
+        syncShutdownCallback_ = nullptr;
+    }
+#endif
     CoreManagerInner::GetInstance().UnregisterCommonEventCallback(subscriber_);
     subscriber_ = nullptr;
 #if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
@@ -119,15 +134,6 @@ void DeviceStateEventSubscriber::OnDischarging(uint32_t chargeType)
         return;
     }
     deviceStateHandler_->ProcessChargingState(false);
-}
-
-void DeviceStateEventSubscriber::OnShutdown()
-{
-    if (deviceStateHandler_ == nullptr) {
-        TELEPHONY_LOGE("deviceStateHandler_ is nullptr");
-        return;
-    }
-    deviceStateHandler_->ProcessShutDown();
 }
 
 void DeviceStateEventSubscriber::OnConnectivityChange(int32_t netType, int32_t netConnState)
@@ -213,7 +219,7 @@ void DeviceStateObserver::SystemAbilityStatusChangeListener::OnAddSystemAbility(
         case COMMON_EVENT_SERVICE_ID: {
             CoreManagerInner::GetInstance().RegisterCommonEventCallback(sub_,
                 {TelCommonEvent::SCREEN_ON, TelCommonEvent::SCREEN_OFF, TelCommonEvent::CHARGING,
-                    TelCommonEvent::DISCHARGING, TelCommonEvent::SHUTDOWN, TelCommonEvent::CONNECTIVITY_CHANGE,
+                    TelCommonEvent::DISCHARGING, TelCommonEvent::CONNECTIVITY_CHANGE,
                     TelCommonEvent::POWER_SAVE_MODE_CHANGED});
             break;
         }

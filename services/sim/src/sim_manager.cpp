@@ -28,6 +28,9 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr int32_t SIM_LABEL_INDEX_MIN = 1;
+static constexpr int32_t SIM_LABEL_INDEX_MAX = 10;
+
 SimManager::SimManager(std::shared_ptr<ITelRilManager> telRilManager) : telRilManager_(telRilManager)
 {
     TELEPHONY_LOGI("SimManager::SimManager()");
@@ -1439,6 +1442,10 @@ int32_t SimManager::InsertEsimData(const std::string &iccId, int32_t esimLabel, 
 
 int32_t SimManager::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex)
 {
+    if (simLabelIndex < SIM_LABEL_INDEX_MIN || simLabelIndex > SIM_LABEL_INDEX_MAX) {
+        TELEPHONY_LOGE("simLabelIndex is invalid, simLabelIndex = %{public}d", simLabelIndex);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;
