@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
+#undef TELEPHONY_LOG_TAG
+#define TELEPHONY_LOG_TAG "SimRdbHelper"
 SimRdbHelper::SimRdbHelper() {}
 
 SimRdbHelper::~SimRdbHelper() {}

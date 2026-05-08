@@ -19,6 +19,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <list>
+#include <ffrt.h>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -229,6 +230,7 @@ private:
     bool needReupdate_ = false;
     bool isInSenseSwitchPhase_ = false;
     bool isInitPrimarySlotReady = false;
+    ffrt::shared_mutex simStateInitMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

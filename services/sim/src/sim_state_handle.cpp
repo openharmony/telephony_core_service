@@ -164,6 +164,7 @@ bool SimStateHandle::HasSimCard()
 
 SimState SimStateHandle::GetSimState()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     return externalState_;
 }
 
@@ -632,6 +633,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
         return;
     }
+    std::unique_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
@@ -1098,6 +1100,7 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
 
 void SimStateHandle::ProcessRadioStateUnavailable()
 {
+    std::unique_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     modemInitDone_ = false;
     if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
         IccState iccState;

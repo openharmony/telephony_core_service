@@ -29,12 +29,14 @@
 
 namespace OHOS {
 namespace Telephony {
+#undef TELEPHONY_LOG_TAG
+#define TELEPHONY_LOG_TAG "MultiSimMonitor"
 const int64_t DELAY_TIME = 1000;
 const int64_t DELAY_THREE_SECONDS = 3000;
 const int64_t RETRY_TIME = 3 * 60 * 1000;
 const int32_t ACTIVE_USER_ID = 100;
 static constexpr int32_t SIM_ACCOUNT_LOADED_SEND = 1;
-const int INIT_TIMES = 15;
+const int INIT_TIMES = 3;
 const int INIT_DATA_TIMES = 10;
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
@@ -64,7 +66,6 @@ void MultiSimMonitor::Init()
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
     initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
-    controller_->loadedSimCardInfo_.clear();
     SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_EVENT);
     InitListener();
     SendEvent(MultiSimMonitor::INIT_ESIM_DATA_EVENT);
@@ -301,7 +302,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
         TELEPHONY_LOGE("MultiSimMonitor::InitData failed");
         if (initDataRemainCount_[slotId] > 0) {
             SendEvent(MultiSimMonitor::INIT_DATA_RETRY_EVENT, slotId, DELAY_TIME);
-            TELEPHONY_LOGI("retry remain %{public}d", initDataRemainCount_[slotId]);
+            TELEPHONY_LOGI("InitData retry remain %{public}d", initDataRemainCount_[slotId]);
             initDataRemainCount_[slotId]--;
         }
         return;
@@ -318,6 +319,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
 
 void MultiSimMonitor::InitEsimData()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(forgetAllDataDoneMutex_);
     if (isAllSimAccountLoaded_) {
         TELEPHONY_LOGE("MultiSimMonitor::InitEsimData already loaded");
         return;
@@ -330,7 +332,7 @@ void MultiSimMonitor::InitEsimData()
         TELEPHONY_LOGE("MultiSimMonitor::InitEsimData failed");
         if (initEsimDataRemainCount_ > 0) {
             SendEvent(MultiSimMonitor::INIT_ESIM_DATA_RETRY_EVENT, DELAY_THREE_SECONDS);
-            TELEPHONY_LOGI("retry remain %{public}d", initEsimDataRemainCount_);
+            TELEPHONY_LOGI("InitEsimData retry remain %{public}d", initEsimDataRemainCount_);
             initEsimDataRemainCount_--;
         }
         return;
@@ -718,6 +720,7 @@ void MultiSimMonitor::NotifySimAccountChanged()
 
 void MultiSimMonitor::RegisterSimNotify()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(forgetAllDataDoneMutex_);
     if (isForgetAllDataDone_) {
         TELEPHONY_LOGI("RegisterSimNotify has done");
         return;
@@ -726,43 +729,20 @@ void MultiSimMonitor::RegisterSimNotify()
         TELEPHONY_LOGE("MultiSimController is null");
         return;
     }
+    lock.unlock();
     if (!controller_->ForgetAllData()) {
         if (remainCount_ > 0) {
             SendEvent(MultiSimMonitor::REGISTER_SIM_NOTIFY_RETRY_EVENT, 0, DELAY_TIME);
-            TELEPHONY_LOGI("retry remain %{public}d", static_cast<int32_t>(remainCount_));
+            TELEPHONY_LOGI("ForgetAllData retry remain %{public}d", static_cast<int32_t>(remainCount_));
             remainCount_--;
         }
         return;
     }
+    std::unique_lock<ffrt::shared_mutex> uniqueLock(forgetAllDataDoneMutex_);
     isForgetAllDataDone_ = true;
-    RefreshSimAccountLoaded();
-    TELEPHONY_LOGI("Register with time left %{public}d", static_cast<int32_t>(remainCount_));
+    TELEPHONY_LOGI("ForgetAllData end, Register with time left %{public}d", static_cast<int32_t>(remainCount_));
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         RegisterSimNotify(static_cast<int32_t>(slotId));
-    }
-}
-
-void MultiSimMonitor::RefreshSimAccountLoaded()
-{
-    if (observerHandler_ == nullptr) {
-        TELEPHONY_LOGE("ObserverHandler_ is null");
-        return;
-    }
-
-    bool needNotifyChange = false;
-    if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_0)) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_0);
-        TELEPHONY_LOGI("Refresh send SIM account loaded for slot 0");
-        needNotifyChange = true;
-    }
-    if (controller_->isNeedRefreshLoadedSlot(SIM_SLOT_1)) {
-        observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_ACCOUNT_LOADED, SIM_SLOT_1);
-        TELEPHONY_LOGI("Refresh send SIM account loaded for slot 1");
-        needNotifyChange = true;
-    }
-
-    if (needNotifyChange) {
-        NotifySimAccountChanged();
     }
 }
 
@@ -797,7 +777,7 @@ void MultiSimMonitor::RegisterSimNotify(int32_t slotId)
     simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_CHANGE);
     simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_LOCKED);
     simStateManager_[slotId]->RegisterCoreNotify(shared_from_this(), RadioEvent::RADIO_SIM_STATE_READY);
-    TELEPHONY_LOGI("RegisterSimNotify %{public}d", slotId);
+    TELEPHONY_LOGI("RegisterSimNotify slot %{public}d", slotId);
 }
 
 void MultiSimMonitor::UnRegisterSimNotify()
