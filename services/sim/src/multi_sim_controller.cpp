@@ -977,7 +977,11 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         TELEPHONY_LOGE("failed by out of range");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return SetActiveCommonSim(slotId, enable, force, curSimId);
+    int32_t ret = SetActiveCommonSim(slotId, enable, force, curSimId);
+    if (ret == TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_EXT_WRAPPER.SetActiveSimFunc(slotId, enable);
+    }
+    return ret;
 }
 
 int32_t MultiSimController::SetActiveSimSatellite(int32_t slotId, int32_t enable, bool force)
