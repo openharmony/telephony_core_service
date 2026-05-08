@@ -1592,5 +1592,45 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SavePrimarySlotId001, Fu
     EXPECT_EQ(multiSimController->SavePrimarySlotId(SLOT_COUNT), TELEPHONY_ERR_ARGUMENT_INVALID);
     EXPECT_EQ(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(MultiSimControllerTest, SetActiveSim001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager0 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager0->Init(0);
+    simStateManager0->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+ 
+    auto simStateManager1 = std::make_shared<Telephony::SimStateManager>(telRilManager);
+    simStateManager1->Init(1);
+    simStateManager1->simStateHandle_->iccState_.simStatus_ = ICC_CONTENT_READY;
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager_ = { simStateManager0, simStateManager1 };
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager0);
+    simFileManager->simFile_ = std::make_shared<SimFile>(simStateManager0);
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager_ = { simFileManager, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager_, simFileManager_);
+    multiSimController->maxCount_ = 2;
+    multiSimController->radioProtocolController_ = nullptr;
+    multiSimController->Init();
+
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
+        simStateManager_, simFileManager_);
+    std::vector<SimRdbInfo> newCache;
+    newCache.resize(2);
+    newCache[0].iccId = "2164181618486135";
+    newCache[1].iccId.clear();
+    newCache[0].simId = 1;
+    newCache[1].simId = 2;
+    multiSimController->localCacheInfo_ = newCache;
+    multiSimController->isSetPrimarySlotIdInProgress_ = true;
+    multiSimController->isSetActiveSimInProgress_.resize(2, 0);
+    multiSimController->SetActiveSim(0, 0);
+    multiSimController->SetActiveSim(-1, 1);
+    EXPECT_CALL(*multiSimControllerMock, SetActiveCommonSim(0, 0, true, 0)).Times(AnyNumber())
+        .WillRepeatedly(Return(TELEPHONY_ERR_SUCCESS));
+    int32_t ret = multiSimController->SetActiveSim(0, 0, true);
+    multiSimController->SetActiveSim(-1, 1);
+    EXPECT_TRUE(ret != TELEPHONY_ERR_SUCCESS);
+}
 }
 }
