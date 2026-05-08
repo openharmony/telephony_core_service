@@ -258,7 +258,8 @@ bool MultiSimController::InitData(int32_t slotId)
     }
     std::lock_guard<ffrt::shared_mutex> lock(loadedSimCardInfoMutex_);
     std::string iccid = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
-    HILOG_COMM_INFO("sim account loaded, slotId %{public}d, simId %{public}d", slotId);
+    HILOG_COMM_INFO("sim account loaded, slotId %{public}d, simId %{public}d", slotId,
+        localCacheInfo_[slotId].simId);
     return true;
 }
 
