@@ -112,7 +112,6 @@ private:
     void RegisterRebootDetectCallback();
     void UnregisterRebootDetectCallback();
     void SetMatchSimStateTracker(MatchSimState matchSimStateTracker);
-    void RefreshSimAccountLoaded();
 
 private:
     class DataShareEventSubscriber : public CoreServiceCommonEventCallback {
@@ -169,13 +168,14 @@ private:
     std::mutex mutexInner_;
     std::mutex mutexForData_;
     std::mutex mutexForUserId_;
-    std::atomic<int32_t> remainCount_ = 2;
+    std::atomic<int32_t> remainCount_ = 3;
     int32_t maxSlotCount_ = 0;
     int32_t userIdRecordIndex_ = 1;
     std::atomic<bool> isSimStateChange_ = false;
     std::atomic<bool> isDataShareReady_ = false;
     bool isForgetAllDataDone_ = false;
     ffrt::shared_mutex simStateMgrMutex_;
+    ffrt::shared_mutex forgetAllDataDoneMutex_;
     std::atomic<int32_t> lastUserId_ = -1;
 };
 } // namespace Telephony
