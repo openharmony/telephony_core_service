@@ -95,6 +95,7 @@ public:
     MOCK_METHOD3(UpdateIccAccountInfoList, bool(std::vector<IccAccountInfo> &accountInfoList,
         std::vector<SimRdbInfo> &localCacheInfo, bool isGetActiveAccountInfo));
     MOCK_METHOD2(UpdateSimPresent, int32_t(int32_t slotId, bool isNeedUpdateSimLabel));
+    MOCK_METHOD4(SetActiveCommonSim, int32_t(int32_t slotId, int32_t enable, bool force, int32_t curSimId));
 };
 } // namespace Telephony
 } // namespace OHOS
