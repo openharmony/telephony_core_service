@@ -24,6 +24,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ffrt.h>
 
 #include "i_sim_manager.h"
 #include "i_tel_ril_manager.h"
@@ -184,7 +185,8 @@ private:
     void GetSetLockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void GetUnlockResult(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
-    void ProcessIccCardState(IccState &ar, int32_t slotId);
+    void ProcessIccCardState(IccState &ar, int32_t slotId, bool modemInitDone);
+    void HandleSimAbsent(int32_t slotId);
     void UpdateAppInfo(IccState &ar, int32_t slotId);
     bool PublishSimStateEvent(std::string event, int32_t eventCode, std::string eventData);
     void SimStateEscape(int32_t simState, int32_t slotId, LockReason &reason);

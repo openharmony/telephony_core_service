@@ -2547,7 +2547,7 @@ HWTEST_F(BranchTest, Telephony_SimStateHandle_003, Function | MediumTest | Level
     iccState.iccid_ = "123456789012345";
     simStateManager[0]->simStateHandle_->oldSimType_ = ICC_USIM_TYPE;
     simStateManager[0]->simStateHandle_->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
-    simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0);
+    simStateManager[0]->simStateHandle_->ProcessIccCardState(iccState, 0, true);
     EXPECT_EQ(simStateManager[0]->simStateHandle_->externalState_, SimState::SIM_STATE_READY);
 }
 

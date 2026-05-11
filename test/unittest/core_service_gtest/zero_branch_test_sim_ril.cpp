@@ -1948,10 +1948,10 @@ HWTEST_F(SimRilBranchTest, Telephony_SimStateHandle_008, Function | MediumTest |
     simStateHandle->oldSimStatus_ = ICC_CONTENT_UNKNOWN;
     simStateHandle->iccid_ = "";
     simStateHandle->needReupdate_ = true;
-    simStateHandle->ProcessIccCardState(ar, slotId);
+    simStateHandle->ProcessIccCardState(ar, slotId, true);
  
     simStateHandle->needReupdate_ = false;
-    simStateHandle->ProcessIccCardState(ar, slotId);
+    simStateHandle->ProcessIccCardState(ar, slotId, true);
     EXPECT_EQ(simStateHandle->observerHandler_, nullptr);
 }
 
