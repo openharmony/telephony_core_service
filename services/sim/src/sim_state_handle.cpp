@@ -164,7 +164,6 @@ bool SimStateHandle::HasSimCard()
 
 SimState SimStateHandle::GetSimState()
 {
-    std::shared_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     return externalState_;
 }
 
