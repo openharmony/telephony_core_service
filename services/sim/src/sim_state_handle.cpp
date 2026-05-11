@@ -164,7 +164,6 @@ bool SimStateHandle::HasSimCard()
 
 SimState SimStateHandle::GetSimState()
 {
-    std::shared_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     return externalState_;
 }
 
@@ -392,7 +391,7 @@ void SimStateHandle::PublishHotZoneInd(int32_t newSimStatus, int32_t slotId)
     }
 }
 
-void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
+void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId, bool modemInitDone)
 {
     LockReason reason = LockReason::SIM_NONE;
     const int32_t newSimType = ar.simType_;
@@ -406,24 +405,19 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
         oldSimType_ = newSimType;
     }
     PublishHotZoneInd(newSimStatus, slotId);
+    std::unique_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
+    modemInitDone_ = modemInitDone;
     ProcessNewSimStatus(newSimStatus);
     if (oldSimStatus_ != newSimStatus) {
         iccid_ = ar.iccid_;
         SimStateEscape(newSimStatus, slotId, reason);
+        lock.unlock();
         InitMatchSimInfo(slotId, newSimStatus);
         oldSimStatus_ = newSimStatus;
         iter = simIccStatusMap_.find(newSimStatus);
         TELEPHONY_LOGI("will to NotifyIccStateChanged at newSimStatus %{public}d", newSimStatus);
         if (newSimStatus == ICC_CARD_ABSENT) {
-            TELEPHONY_LOGI("SimStateHandle::ProcessIccCardState slotId: %{public}d ICC_CARD_ABSENT", slotId);
-            CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-            EsimController::GetInstance().SetVerifyResult(slotId, false);
-#endif
-            if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
-                TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(
-                    slotId, GetIccid(), PinOperationType::SIM_ABSENT, "");
-            }
+            HandleSimAbsent(slotId);
         }
         if (observerHandler_ != nullptr) {
             observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_CHANGE, slotId);
@@ -439,6 +433,17 @@ void SimStateHandle::ProcessIccCardState(IccState &ar, int32_t slotId)
     }
     if (needReupdate_) {
         UpdateSimStateToStateRegistry(slotId, lockReason_);
+    }
+}
+
+void SimStateHandle::HandleSimAbsent(int32_t slotId)
+{
+    CoreManagerInner::GetInstance().ResetSimLoadAccount(slotId);
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    EsimController::GetInstance().SetVerifyResult(slotId, false);
+#endif
+    if (TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.cacheAssetPinForUpgrade_(slotId, iccid_, PinOperationType::SIM_ABSENT, "");
     }
 }
 
@@ -633,12 +638,12 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
         TELEPHONY_LOGE("SimStateHandle::GetSimCardData() fail");
         return;
     }
-    std::unique_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
+    bool modemInitDone = modemInitDone_;
     if (param != nullptr) {
         iccState.simType_ = param->simType;
         iccState.simStatus_ = param->simState;
         iccState.iccid_ = param->iccid;
-        modemInitDone_ = true;
+        modemInitDone = true;
         TELEPHONY_LOGI("SimStateHandle::GetSimCardData(), slot%{public}d, type = %{public}d, status = %{public}d",
             slotId, iccState.simType_, iccState.simStatus_);
     } else {
@@ -664,7 +669,7 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
             return;
         }
     }
-    ProcessIccCardState(iccState, slotId);
+    ProcessIccCardState(iccState, slotId, modemInitDone);
 }
 
 void SimStateHandle::GetSimLockState(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
@@ -1100,13 +1105,12 @@ bool SimStateHandle::IsRadioStateUnavailable(const AppExecFwk::InnerEvent::Point
 
 void SimStateHandle::ProcessRadioStateUnavailable()
 {
-    std::unique_lock<ffrt::shared_mutex> lock(simStateInitMutex_);
     modemInitDone_ = false;
     if (iccState_.simStatus_ != ICC_CARD_ABSENT) {
         IccState iccState;
         iccState.simType_ = ICC_UNKNOWN_TYPE;
         iccState.simStatus_ = ICC_CONTENT_UNKNOWN;
-        ProcessIccCardState(iccState, slotId_);
+        ProcessIccCardState(iccState, slotId_, modemInitDone_);
     }
 }
 
@@ -1150,7 +1154,7 @@ int32_t SimStateHandle::SetIccCardState(int32_t slotId, int32_t simStatus)
     IccState iccState;
     iccState.simType_ = ICC_UNKNOWN_TYPE;
     iccState.simStatus_ = simStatus;
-    ProcessIccCardState(iccState, slotId);
+    ProcessIccCardState(iccState, slotId, modemInitDone_);
     return TELEPHONY_ERR_SUCCESS;
 }
 
