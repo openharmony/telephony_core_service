@@ -90,13 +90,13 @@ ohos_shared_library("tel_core_service_api") {
     "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/telephony_state_registry_proxy.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_callback_proxy.cpp",
     "$TELEPHONY_IMS_CORE_SERVICE_ROOT/src/ims_core_service_proxy.cpp",
+    "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/downloadable_profile_parcel.cpp",
   ]
 
   if (core_service_support_esim) {
     sources += [
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_config_info_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/download_profile_result_parcel.cpp",
-      "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/downloadable_profile_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/esim_service_client.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/euicc_info_parcel.cpp",
       "$TELEPHONY_FRAMEWORKS_NATIVE_ROOT/src/get_downloadable_profiles_result_parcel.cpp",
