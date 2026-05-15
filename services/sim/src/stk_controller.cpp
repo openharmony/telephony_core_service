@@ -435,8 +435,8 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     if (EsimController::GetInstance().ChecIsVerifyBindCommand(cmdData)) {
-        TELEPHONY_LOGI("StkController[%{public}d] iccCardState: %{public}d, stkData: %{public}s",
-            slotId_, iccCardState_, cmdData.c_str());
+        TELEPHONY_LOGI("StkController[%{public}d] iccCardState: %{public}d",
+            slotId_, iccCardState_);
         if (iccCardState_ == ICC_CARD_STATE_PRESENT) {
             EsimController::GetInstance().ProcessCommandMessage(slotId_, cmdData);
             RemoveEvent(StkController::CLOSE_CA_ESIM_EVENT);
@@ -451,8 +451,8 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     want.SetParam(PARAM_SLOTID, slotId_);
     want.SetParam(PARAM_MSG_CMD, cmdData);
     bool publishResult = PublishStkEvent(want);
-    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilProactiveCommand() stkData = %{public}s "
-        "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
+    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilProactiveCommand() "
+        "publishResult = %{public}d", slotId_, publishResult);
     if (!publishResult) {
         retryWant_ = want;
         remainTryCount_ = MAX_RETRY_COUNT;
@@ -493,8 +493,8 @@ void StkController::OnSendRilAlphaNotify(const AppExecFwk::InnerEvent::Pointer &
     want.SetParam(PARAM_SLOTID, slotId_);
     want.SetParam(PARAM_ALPHA_STRING, cmdData);
     bool publishResult = PublishStkEvent(want);
-    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilAlphaNotify() alphaData = %{public}s "
-        "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
+    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilAlphaNotify() "
+        "publishResult = %{public}d", slotId_, publishResult);
 }
 
 void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &event)
@@ -510,8 +510,8 @@ void StkController::OnSendRilEventNotify(const AppExecFwk::InnerEvent::Pointer &
     want.SetParam(PARAM_SLOTID, slotId_);
     want.SetParam(PARAM_MSG_CMD, cmdData);
     bool publishResult = PublishStkEvent(want);
-    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilEventNotify() eventData = %{public}s "
-        "publishResult = %{public}d", slotId_, cmdData.c_str(), publishResult);
+    TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilEventNotify() "
+        "publishResult = %{public}d", slotId_, publishResult);
 }
 
 void StkController::OnIccRefresh(const AppExecFwk::InnerEvent::Pointer &event)
