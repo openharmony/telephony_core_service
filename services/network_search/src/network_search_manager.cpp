@@ -513,9 +513,6 @@ int32_t NetworkSearchManager::GetNetworkStatus(int32_t slotId, sptr<NetworkState
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr && inner->networkSearchState_ != nullptr) {
         networkState = inner->networkSearchState_->GetNetworkStatus().release();
-        if (networkState != nullptr) {
-            TELEPHONY_LOGI("NetworkSearchManager::GetNetworkStatus cfgTech:%{public}d", networkState->GetCfgTech());
-        }
         if (TELEPHONY_EXT_WRAPPER.getNetworkStatusExt_ != nullptr) {
             TELEPHONY_EXT_WRAPPER.getNetworkStatusExt_(slotId, networkState);
         }
