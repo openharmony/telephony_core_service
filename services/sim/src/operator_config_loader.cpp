@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t SIM_SLOTS = 2;
 OperatorConfigLoader::OperatorConfigLoader(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache)
     : simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache)
@@ -39,6 +40,10 @@ OperatorConfigLoader::~OperatorConfigLoader() {}
 OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId, int32_t state)
 {
     OperatorConfig opc;
+    if (slotId < 0 || slotId >= SIM_SLOTS) {
+        TELEPHONY_LOGE("Invalid slotId: %{public}d", slotId);
+        return opc;
+    }
     if (operatorConfigCache_ == nullptr) {
         TELEPHONY_LOGE("operatorConfigCache_ is nullptr");
         return opc;

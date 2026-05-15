@@ -55,8 +55,9 @@ int32_t VCardGroupData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
     std::string groupName;
     if (nameResultSet->GoToFirstRow() == TELEPHONY_ERR_SUCCESS) {
         int curValueIndex;
-        nameResultSet->GetColumnIndex(Group::GROUP_NAME, curValueIndex);
-        nameResultSet->GetString(curValueIndex, groupName);
+        if (nameResultSet->GetColumnIndex(Group::GROUP_NAME, curValueIndex) == DataShare::E_OK) {
+            nameResultSet->GetString(curValueIndex, groupName);
+        }
     }
     nameResultSet->Close();
     groupName_ = groupName;
