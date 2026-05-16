@@ -303,7 +303,7 @@ int32_t VCardUtils::GetLabelIdFromImType(std::string type)
 std::vector<std::string> VCardUtils::GetTypeFromPhoneLabelId(std::string labelId)
 {
     std::vector<std::string> paramTypes = {};
-    if (!IsNum(labelId) || labelId.size() > INT_64_LENTGH) {
+    if (!IsNum(labelId) || labelId.size() > INT_64_LENGTH) {
         return paramTypes;
     }
     int64_t num = std::stoll(labelId);

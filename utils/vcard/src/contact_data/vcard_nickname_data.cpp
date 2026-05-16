@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace Telephony {
-
+constexpr const size_t MAX_LENGTH= 500;
 int32_t VCardNicknameData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::NICKNAME);
@@ -39,6 +39,9 @@ int32_t VCardNicknameData::BuildData(std::shared_ptr<DataShare::DataShareResultS
 
 void VCardNicknameData::SetNickName(const std::string &nickname)
 {
+    if (nickname.length() > MAX_LENGTH) {
+        return;
+    }
     nickname_ = nickname;
 }
 
