@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t SIM_SLOTS = 2;
+constexpr int32_t SIM_SLOTS = 3;
 OperatorConfigLoader::OperatorConfigLoader(
     std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache)
     : simFileManager_(simFileManager), operatorConfigCache_(operatorConfigCache)
