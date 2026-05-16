@@ -23,7 +23,7 @@ static constexpr const char *SLOT_ID = "slotId";
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t SIM_SLOTS = 2;
+constexpr int32_t SIM_SLOTS = 3;
 PdpProfileRdbHelper::PdpProfileRdbHelper() {}
 
 PdpProfileRdbHelper::~PdpProfileRdbHelper() = default;
