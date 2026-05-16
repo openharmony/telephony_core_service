@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr const size_t MAX_LENGTH= 500;
+constexpr const size_t MAX_LENGTH = 500;
 int32_t VCardNicknameData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::NICKNAME);

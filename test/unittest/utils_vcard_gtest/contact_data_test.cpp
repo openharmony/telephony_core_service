@@ -225,7 +225,7 @@ HWTEST_F(ContactDataTest, VCardPhotoData_BuildData, Function | MediumTest | Leve
     VCardPhotoData photoData;
     std::vector<uint8_t> photoBlobData(150 * 1024 * 1024);
     int32_t index = 0;
-    resultSet->GetBlob(index,photoBlobData);
+    resultSet->GetBlob(index, photoBlobData);
     EXPECT_EQ(photoData.BuildData(resultSet), TELEPHONY_SUCCESS);
     EXPECT_EQ(photoData.BuildData(nullptr), TELEPHONY_ERROR);
 }
@@ -429,7 +429,7 @@ HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData, Function | MediumTest 
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     std::string largeString(300, 'A');
     propValueList.push_back(largeString);
-     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     EXPECT_EQ(postalData.BuildData(nullptr), TELEPHONY_ERROR);
     EXPECT_EQ(postalData.BuildData(resultSet), TELEPHONY_SUCCESS);
@@ -1153,14 +1153,13 @@ HWTEST_F(ContactDataTest, GetVersionFromFileUtils_001, Function | MediumTest | L
 
 HWTEST_F(ContactDataTest, EncodeQuotedPrintable_001, Function | MediumTest | Level3)
 {
-    VCardConstructor,vCardConstructor;
+    VCardConstructor vCardConstructor;
     std::string input = std::string(170, 'A');
     string result = vCardConstructor.EncodeQuotedPrintable(input);
     EXPECT_EQ(result, "");
     input = "inPUT";
     result = vCardConstructor.EncodeQuotedPrintable(input);
     EXPECT_NE(result, "");
-    
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
