@@ -391,7 +391,6 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
     }
     if (resultPtr->channelId <= 0) {
         TELEPHONY_LOGE("channelId is invalid!");
-        openChannelCv_.notify_all();
         return false;
     }
 
@@ -406,7 +405,6 @@ bool EsimFile::ProcessEsimOpenChannelDone(const AppExecFwk::InnerEvent::Pointer 
         // caller exits waiting, thus lock is obtained and the channel needs released
         ProcessEsimCloseSpareChannel();
         occupyChannelMutex_.unlock();
-        openChannelCv_.notify_all();
         return false;
     }
 
