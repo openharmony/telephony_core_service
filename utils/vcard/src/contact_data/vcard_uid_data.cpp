@@ -20,7 +20,7 @@
  
 namespace OHOS {
 namespace Telephony {
-constexpr const size_t MAX_LENGTH = 100;
+constexpr size_t MAX_LENGTH = 100;
 int32_t VCardUidData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(RawContact::UUID, uid_);
