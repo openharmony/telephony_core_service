@@ -955,7 +955,7 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     groupData.SetGroupId(groupId);
     groupData.SetGroupName(groupName);
     VCardUidData uidData;
-    std::string uidString(300, 'A');
+    std::string uidString(600, 'A');
     uidData.SetUid(uidString);
     uidData.SetUid("1111111");
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
