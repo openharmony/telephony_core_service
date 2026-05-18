@@ -34,12 +34,24 @@ int32_t VCardEventData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, eventDate_);
-    resultSet->GetColumnIndex(ContactData::LABEL_NAME, index);
-    resultSet->GetString(index, labelName_);
-    resultSet->GetColumnIndex(ContactData::LABEL_ID, index);
-    resultSet->GetString(index, labelId_);
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, eventDate_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_NAME, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, labelName_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_ID, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, labelId_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
     return TELEPHONY_SUCCESS;
 }
 

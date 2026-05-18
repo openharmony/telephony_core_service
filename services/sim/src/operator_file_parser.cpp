@@ -100,6 +100,10 @@ std::string OperatorFileParser::GetOperatorConfigFilePath(std::string filename)
         TELEPHONY_LOGE("filename is empty");
         return filename;
     }
+    if (filename.find("../") != std::string::npos || filename.find("..\\") != std::string::npos) {
+        TELEPHONY_LOGE("path traversal detected");
+        return "";
+    }
     return std::string(DEFAULT_OPERATE_CONFIG_DIR) + "/" + filename;
 }
 

@@ -33,10 +33,18 @@ int32_t VCardImData::BuildData(std::shared_ptr<DataShare::DataShareResultSet> re
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, address_);
-    resultSet->GetColumnIndex(ContactData::LABEL_ID, index);
-    resultSet->GetString(index, labelId_);
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, address_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_ID, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, labelId_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
     return TELEPHONY_SUCCESS;
 }
 

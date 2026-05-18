@@ -23,6 +23,7 @@ static constexpr const char *SLOT_ID = "slotId";
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t SIM_SLOTS = 3;
 PdpProfileRdbHelper::PdpProfileRdbHelper() {}
 
 PdpProfileRdbHelper::~PdpProfileRdbHelper() = default;
@@ -40,6 +41,10 @@ std::shared_ptr<DataShare::DataShareHelper> PdpProfileRdbHelper::CreatePdpProfil
 
 bool PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
 {
+    if (slotId < 0 || slotId >= SIM_SLOTS) {
+        TELEPHONY_LOGE("Invalid slotId: %{public}d", slotId);
+        return false;
+    }
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper = CreatePdpProfileDataHelper();
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("dataShareHelper is nullptr");

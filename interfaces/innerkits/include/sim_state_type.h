@@ -474,8 +474,8 @@ struct IccAccountInfo : public Parcelable {
     std::shared_ptr<IccAccountInfo> UnMarshalling(Parcel &parcel)
     {
         std::shared_ptr<IccAccountInfo> param = std::make_shared<IccAccountInfo>();
-        if (param == nullptr || !param->ReadFromParcel(parcel)) {
-            param = nullptr;
+        if (!param->ReadFromParcel(parcel)) {
+            return nullptr;
         }
         return param;
     };
