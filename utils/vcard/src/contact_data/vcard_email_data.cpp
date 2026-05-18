@@ -35,14 +35,30 @@ int32_t VCardEmailData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, address_);
-    resultSet->GetColumnIndex(ContactData::LABEL_NAME, index);
-    resultSet->GetString(index, labelName_);
-    resultSet->GetColumnIndex(ContactData::LABEL_ID, index);
-    resultSet->GetString(index, labelId_);
-    resultSet->GetColumnIndex(ContactData::ALIAS_DETAIL_INFO_KEY, index);
-    resultSet->GetString(index, displayName_);
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, address_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_NAME, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, labelName_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_ID, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, labelId_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetColumnIndex(ContactData::ALIAS_DETAIL_INFO_KEY, index) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
+    if (resultSet->GetString(index, displayName_) != DataShare::E_OK) {
+        return TELEPHONY_ERROR;
+    }
     return TELEPHONY_SUCCESS;
 }
 

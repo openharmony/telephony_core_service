@@ -142,8 +142,12 @@ int32_t VCardRdbHelper::QueryGroupId(std::string groupName)
     int32_t groupId;
     if (resultSet->GoToFirstRow() == TELEPHONY_ERR_SUCCESS) {
         int curValueIndex;
-        resultSet->GetColumnIndex(Group::GROUP_ID, curValueIndex);
-        resultSet->GetInt(curValueIndex, groupId);
+        if (resultSet->GetColumnIndex(Group::GROUP_ID, curValueIndex) != DataShare::E_OK) {
+            return DB_FAILD;
+        }
+        if (resultSet->GetInt(curValueIndex, groupId) != DataShare::E_OK) {
+            return DB_FAILD;
+        }
         resultSet->Close();
         return groupId;
     }
