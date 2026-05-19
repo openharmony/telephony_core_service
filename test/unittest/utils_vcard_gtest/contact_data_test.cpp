@@ -427,7 +427,7 @@ HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData, Function | MediumTest 
     EXPECT_STREQ((postalData.GetPOBox()).c_str(), "pobox");
     propValueList = {};
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
-    std::string largeString(300, 'A');
+    std::string largeString(320, 'A');
     propValueList.push_back(largeString);
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
@@ -1154,7 +1154,7 @@ HWTEST_F(ContactDataTest, GetVersionFromFileUtils_001, Function | MediumTest | L
 HWTEST_F(ContactDataTest, EncodeQuotedPrintable_001, Function | MediumTest | Level3)
 {
     VCardConstructor vCardConstructor;
-    std::string input = std::string(170, 'A');
+    std::string input = std::string(550, 'A');
     string result = vCardConstructor.EncodeQuotedPrintable(input);
     EXPECT_EQ(result, "");
     input = "inPUT";

@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t MAX_LENGTH = 500;
+constexpr size_t VCARD_INPUT_MAX_LENGTH = 500;
 VCardConstructor::VCardConstructor(int32_t cardType, const std::string &charset)
     : cardType_(cardType), charset_(charset)
 {
@@ -353,7 +353,7 @@ int32_t VCardConstructor::ConstructPhones(std::shared_ptr<VCardContact> contact)
         std::string labelId = data->GetLabelId();
         std::string labelName = data->GetLabelName();
         int64_t type = static_cast<int64_t>(PhoneVcType::NUM_HOME);
-        if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENGTH + 1) {
+        if (VCardUtils::IsNum(labelId) && labelId.size() < LABEL_ID_MAX_LENGTH + 1) {
             type = std::stoll(labelId);
         }
         if (phoneNumberEncodedCallback_ != nullptr) {
@@ -764,7 +764,7 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
     auto paramTypes = VCardUtils::GetTypeFromPhoneLabelId(labelId);
     if (!paramTypes.empty()) {
         AddParamTypes(paramTypes);
-    } else if (VCardUtils::IsNum(labelId) && labelId.size() < INT_64_LENGTH + 1) {
+    } else if (VCardUtils::IsNum(labelId) && labelId.size() < LABEL_ID_MAX_LENGTH + 1) {
         auto phoneType = static_cast<PhoneVcType>(std::stoll(labelId));
         if (phoneType == PhoneVcType::CUSTOM_LABEL && !VCardUtils::IsContainsInvisibleChar(labelName)) {
             paramTypes.push_back("X-" + labelName);
@@ -994,7 +994,7 @@ std::string VCardConstructor::EncodeQuotedPrintable(const std::string &input)
     size_t maxEncodedLen = (inputSize * 3) + // 3: one byte encode three char
         3 * (inputSize * 3 / ENCODEN_QUOTED_PRIN_MAX_LEN);  // 3: size of "=\r\n"
     std::string encoded;
-    if (maxEncodedLen > MAX_LENGTH) {
+    if (maxEncodedLen > VCARD_INPUT_MAX_LENGTH) {
         return "";
     }
     encoded.reserve(maxEncodedLen);

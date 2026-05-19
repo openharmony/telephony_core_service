@@ -35,7 +35,7 @@ int32_t VCardUidData::BuildData(std::shared_ptr<DataShare::DataShareResultSet> r
 void VCardUidData::SetUid(std::string uid)
 {
     if (uid.length() > MAX_LENGTH) {
-    return;
+        return;
     }
     uid_ = uid;
 }
