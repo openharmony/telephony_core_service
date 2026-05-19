@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace Telephony {
-
+constexpr size_t MAX_VCARD_INPUT_SIZE = 100 * 1024 *1024;
 int32_t VCardPhotoData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(ContactData::TYPE_ID, TypeId::PHOTO);
@@ -35,6 +35,9 @@ int32_t VCardPhotoData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
     std::vector<uint8_t> photoBlobData;
     resultSet->GetColumnIndex(ContactData::BLOB_DATA, index);
     resultSet->GetBlob(index, photoBlobData);
+    if (photoBlobData.size() > MAX_VCARD_INPUT_SIZE) {
+        return TELEPHONY_ERROR;
+    }
     bytes_.assign(reinterpret_cast<const char *>(photoBlobData.data()), photoBlobData.size());
     return TELEPHONY_SUCCESS;
 }

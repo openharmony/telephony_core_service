@@ -20,7 +20,7 @@
  
 namespace OHOS {
 namespace Telephony {
- 
+constexpr size_t MAX_LENGTH = 500;
 int32_t VCardUidData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
 {
     valuesBucket.Put(RawContact::UUID, uid_);
@@ -34,6 +34,9 @@ int32_t VCardUidData::BuildData(std::shared_ptr<DataShare::DataShareResultSet> r
  
 void VCardUidData::SetUid(std::string uid)
 {
+    if (uid.length() > MAX_LENGTH) {
+        return;
+    }
     uid_ = uid;
 }
  

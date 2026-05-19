@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 constexpr int32_t ADDR_MAX_DATA_SIZE = 7;
+constexpr size_t MAX_ADDRESS_LENGTH = 300;
 } // namespace
 
 int32_t VCardPostalData::BuildValuesBucket(OHOS::DataShare::DataShareValuesBucket &valuesBucket)
@@ -75,6 +76,9 @@ void VCardPostalData::InitPostalData(std::vector<std::string> propValueList, int
     }
     int32_t i = 0;
     for (std::string addressElement : propValueList) {
+        if (addressElement.length() > MAX_ADDRESS_LENGTH) {
+            break;
+        }
         dataArray[i] = addressElement;
         if (++i >= size) {
             break;

@@ -169,6 +169,10 @@ HWTEST_F(ContactDataTest, VCardNicknameData_BuildData, Function | MediumTest | L
 {
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     VCardNicknameData nickNameData;
+    std::string nickname(600, 'A');
+    nickNameData.SetNickName(nickname);
+    nickname = "1212";
+    nickNameData.SetNickName(nickname);
     EXPECT_EQ(nickNameData.BuildData(resultSet), TELEPHONY_SUCCESS);
     EXPECT_EQ(nickNameData.BuildData(nullptr), TELEPHONY_ERROR);
 }
@@ -219,6 +223,9 @@ HWTEST_F(ContactDataTest, VCardPhotoData_BuildData, Function | MediumTest | Leve
 {
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     VCardPhotoData photoData;
+    std::vector<uint8_t> photoBlobData(150 * 1024 * 1024);
+    int32_t index = 0;
+    resultSet->GetBlob(index, photoBlobData);
     EXPECT_EQ(photoData.BuildData(resultSet), TELEPHONY_SUCCESS);
     EXPECT_EQ(photoData.BuildData(nullptr), TELEPHONY_ERROR);
 }
@@ -418,14 +425,18 @@ HWTEST_F(ContactDataTest, VCardPostalData_InitPostalData, Function | MediumTest 
         {"pobox", "postalAddress", "street", "city", "region", "postCode", "country"};
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     EXPECT_STREQ((postalData.GetPOBox()).c_str(), "pobox");
-
+    propValueList = {};
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
+    std::string largeString(320, 'A');
+    propValueList.push_back(largeString);
+    postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
     std::shared_ptr<DataShare::DataShareResultSet> resultSet = std::make_shared<DataShare::DataShareResultSet>();
     EXPECT_EQ(postalData.BuildData(nullptr), TELEPHONY_ERROR);
     EXPECT_EQ(postalData.BuildData(resultSet), TELEPHONY_SUCCESS);
 
     propValueList.push_back("default");
     postalData.InitPostalData(propValueList, static_cast<int32_t>(PostalType::ADDR_HOME), "labelName_");
-    EXPECT_STREQ((postalData.GetPostCode()).c_str(), "postCode");
+    EXPECT_STRNE((postalData.GetPostCode()).c_str(), "postCode");
 }
 
 HWTEST_F(ContactDataTest, VCardRelationData_BuildData, Function | MediumTest | Level3)
@@ -943,6 +954,10 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTes
     int32_t groupId = 0;
     groupData.SetGroupId(groupId);
     groupData.SetGroupName(groupName);
+    VCardUidData uidData;
+    std::string uidString(600, 'A');
+    uidData.SetUid(uidString);
+    uidData.SetUid("1111111");
     EXPECT_EQ(groupData.BuildValuesBucket(valuesBucket), TELEPHONY_SUCCESS);
 }
 
@@ -1134,6 +1149,17 @@ HWTEST_F(ContactDataTest, GetVersionFromFileUtils_001, Function | MediumTest | L
     ASSERT_EQ(decoder.GetVersionFromFileUtils(line, 0), "2.1");
     line = "VERSION:";
     ASSERT_EQ(decoder.GetVersionFromFileUtils(line, 0), "");
+}
+
+HWTEST_F(ContactDataTest, EncodeQuotedPrintable_001, Function | MediumTest | Level3)
+{
+    VCardConstructor vCardConstructor;
+    std::string input = std::string(550, 'A');
+    string result = vCardConstructor.EncodeQuotedPrintable(input);
+    EXPECT_EQ(result, "");
+    input = "inPUT";
+    result = vCardConstructor.EncodeQuotedPrintable(input);
+    EXPECT_NE(result, "");
 }
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
