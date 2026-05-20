@@ -28,6 +28,10 @@
 #include "net_supplier_info.h"
 #include "system_ability_status_change_stub.h"
 #include "core_service_common_event_callback.h"
+#ifdef ABILITY_POWER_SUPPORT
+#include "shutdown_client.h"
+#include "sync_shutdown_callback_stub.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -42,14 +46,13 @@ using NetConnState = OHOS::NetManagerStandard::NetConnState;
 
 class DeviceStateEventSubscriber : public CoreServiceCommonEventCallback {
 public:
-    DeviceStateEventSubscriber() = default;
-    ~DeviceStateEventSubscriber() = default;
+    explicit DeviceStateEventSubscriber(const std::shared_ptr<DeviceStateHandler> &deviceStateHandler)
+        : deviceStateHandler_(deviceStateHandler) {};
     std::shared_ptr<DeviceStateHandler> GetEventHandler();
     void OnScreenOn() override;
     void OnScreenOff() override;
     void OnCharging(uint32_t chargeType) override;
     void OnDischarging(uint32_t chargeType) override;
-    void OnShutdown() override;
     void OnConnectivityChange(int32_t netType, int32_t netConnState) override;
     void OnPowerSaveModeChanged(uint32_t powerMode) override;
 
@@ -79,12 +82,30 @@ public:
     void StopEventSubscriber();
 
 private:
+
+#ifdef ABILITY_POWER_SUPPORT
+    class SyncShutdownCallback : public PowerMgr::SyncShutdownCallbackStub {
+    public:
+        explicit SyncShutdownCallback(const std::shared_ptr<DeviceStateHandler> &handler) : handler_(handler) {}
+        void OnSyncShutdownOrReboot(bool isReboot) override
+        {
+            if (handler_ != nullptr) {
+                handler_->ProcessShutDown();
+            }
+        }
+    private:
+        std::shared_ptr<DeviceStateHandler> handler_;
+    };
+#endif
     std::shared_ptr<DeviceStateEventSubscriber> subscriber_;
 #if defined(DEPS_NETMANAGER_EXT) && !defined(CORE_SERVICE_LOW_POW_CLASS_2)
     sptr<NetManagerStandard::ISharingEventCallback> sharingEventCallback_ = nullptr;
     ffrt::mutex callbackMutex_;
 #endif
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+#ifdef ABILITY_POWER_SUPPORT
+    sptr<PowerMgr::ISyncShutdownCallback> syncShutdownCallback_ = nullptr;
+#endif
 
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {
