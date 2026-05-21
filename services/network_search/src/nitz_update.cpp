@@ -46,6 +46,7 @@ const int32_t MAX_UPDATE_TIME = 5;
 const int32_t TIME_STRING_SPLIT_NUM = 2;
 const uint32_t TIME_SPLIT_NUM = 3;
 const uint32_t TIMEZONE_SPLIT_NUM = 2;
+const uint32_t NITZ_SPLIT_NUM = 3;
 const uint32_t YEAR_LENGTH_TWO = 2;
 const uint32_t YEAR_LENGTH_FOUR = 4;
 const uint32_t CST_YEAR = 1900;
@@ -119,7 +120,7 @@ bool NitzUpdate::NitzParse(std::string &nitzStr, NetworkTime &networkTime)
     std::string strSep = ",";
     std::vector<std::string> strsRet;
     SplitStr(nitzInfo, strSep, strsRet);
-    if (static_cast<uint32_t>(strsRet.size()) < static_cast<uint32_t>(TIMEZONE_SPLIT_NUM)) {
+    if (static_cast<uint32_t>(strsRet.size()) < static_cast<uint32_t>(NITZ_SPLIT_NUM)) {
         TELEPHONY_LOGE("NitzUpdate::NitzParse nitz string error slotId:%{public}d", slotId_);
         return false;
     }

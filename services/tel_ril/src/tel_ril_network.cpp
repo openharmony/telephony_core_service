@@ -519,6 +519,9 @@ void TelRilNetwork::BuildOperatorInfo(
 void TelRilNetwork::BuildAvailableNetworkList(std::shared_ptr<AvailableNetworkList> availableNetworkInfos,
     const HDI::Ril::V1_1::AvailableNetworkList &availableNetworkList)
 {
+    if (availableNetworkList.itemNum != availableNetworkList.availableNetworkInfo.size()) {
+        return;
+    }
     AvailableNetworkInfo operInfo = {};
     availableNetworkInfos->itemNum = availableNetworkList.itemNum;
     for (auto availableInfo : availableNetworkList.availableNetworkInfo) {
@@ -1098,6 +1101,9 @@ void TelRilNetwork::FillNrCurrentCellInformation(
 void TelRilNetwork::BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfoList> channelConfigList,
     const HDI::Ril::V1_1::ChannelConfigInfoList &channelConfigInfoList)
 {
+    if (channelConfigInfoList.itemNum > channelConfigInfoList.channelConfigInfos.size()) {
+        return;
+    }
     channelConfigList->itemNum = channelConfigInfoList.itemNum;
     for (int32_t i = 0; i < channelConfigList->itemNum; i++) {
         PhysicalChannelConfig phyChnlCfg;
@@ -1110,6 +1116,11 @@ void TelRilNetwork::BuildChannelConfigInfoList(std::shared_ptr<ChannelConfigInfo
         phyChnlCfg.downlinkChannelNum = channelConfigInfoList.channelConfigInfos[i].downlinkChannelNum;
         phyChnlCfg.uplinkChannelNum = channelConfigInfoList.channelConfigInfos[i].uplinkChannelNum;
         phyChnlCfg.physicalCellId = channelConfigInfoList.channelConfigInfos[i].physicalCellId;
+        if (channelConfigInfoList.channelConfigInfos[i].contextIdNum >
+            channelConfigInfoList.channelConfigInfos[i].contextIds.size()) {
+            channelConfigList->channelConfigInfos.push_back(phyChnlCfg);
+            continue;
+        }
         phyChnlCfg.contextIdNum = channelConfigInfoList.channelConfigInfos[i].contextIdNum;
         for (int32_t j = 0; j < phyChnlCfg.contextIdNum; j++) {
             phyChnlCfg.contextIds.push_back(channelConfigInfoList.channelConfigInfos[i].contextIds[j]);
