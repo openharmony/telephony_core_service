@@ -498,8 +498,8 @@ void NetworkSearchState::NotifyStateChange()
         if (networkSearchManager != nullptr) {
             networkSearchManager->UpdateOperatorName(slotId_);
         }
-        lock.lock();
         DelayedSingleton<NetworkSearchNotify>::GetInstance()->NotifyNetworkStateUpdated(slotId_, ns);
+        lock.lock();
         networkState_->Marshalling(data);
         networkStateOld_->ReadFromParcel(data);
     }
