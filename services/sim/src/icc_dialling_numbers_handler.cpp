@@ -511,6 +511,9 @@ void IccDiallingNumbersHandler::FetchDiallingNumberContent(
     /* parse name */
     int offset = 0;
     int length = recordLen - PRE_BYTES_NUM;
+    if (length < 0) {
+        return;
+    }
     unsigned char *record = data.get();
     std::string tempStrTag = SIMUtils::DiallingNumberStringFieldConvertToString(data, offset, length, NAME_CHAR_POS);
     diallingNumber->name_ = Str8ToStr16(tempStrTag);
