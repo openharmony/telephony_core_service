@@ -538,9 +538,16 @@ HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
 
     result = manager.Export(path, predicates, cardType, charset);
 
+    path = "/tmp/test/";
+    predicates.EqualTo(RawContact::ACCOUNT_ID, "1");
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+ 
+    manager.Export(path, predicates, cardType, charset);
+
     EXPECT_NE(result, TELEPHONY_SUCCESS);
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(path.find("/tmp/test_") != string::npos);
+    EXPECT_TRUE(path.find("/tmp/test/") != string::npos);
 }
 } // namespace Telephony
 } // namespace OHOS
