@@ -351,6 +351,8 @@ int32_t VCardManager::Export(
     if (path.empty()) {
         std::string fileName = VCardUtils::CreateFileName();
         path = VCARD_EXPORT_FILE_PATH + fileName;
+    } else if (path[path.size() - 1] != '/') {
+        path = path + '/' + VCardUtils::CreateFileName();
     } else {
         path = path + VCardUtils::CreateFileName();
     }
