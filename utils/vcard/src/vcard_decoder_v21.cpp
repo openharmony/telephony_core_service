@@ -31,7 +31,8 @@
 
 namespace OHOS {
 namespace Telephony {
-std::mutex rawDataMutex_;
+std::shared_mutex listenersMutex_;
+std::shared_mutex rawDataMutex_;
 namespace {
 constexpr int32_t STATUS_GROUP_OR_TYPE_NAME = 1;
 constexpr int32_t STATUS_PARAMS = 2;
@@ -45,12 +46,13 @@ void VCardDecoderV21::AddVCardDecodeListener(std::shared_ptr<VCardDecodeListener
         TELEPHONY_LOGE("listener is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(rawDataMutex_);
+    std::unique_lock<std::shared_mutex> lock(listenersMutex_);
     listeners_.push_back(listener);
 }
 
 void VCardDecoderV21::NotifyStarted()
 {
+    std::shared_lock<std::shared_mutex> lock(listenersMutex_);
     for (auto it : listeners_) {
         if (it == nullptr) {
             continue;
@@ -61,6 +63,7 @@ void VCardDecoderV21::NotifyStarted()
 
 void VCardDecoderV21::NotifyEnded()
 {
+    std::shared_lock<std::shared_mutex> lock(listenersMutex_);
     for (auto it : listeners_) {
         if (it == nullptr) {
             continue;
@@ -71,6 +74,7 @@ void VCardDecoderV21::NotifyEnded()
 
 void VCardDecoderV21::NotifyOneContactStarted()
 {
+    std::shared_lock<std::shared_mutex> lock(listenersMutex_);
     for (auto it : listeners_) {
         if (it == nullptr) {
             continue;
@@ -81,6 +85,7 @@ void VCardDecoderV21::NotifyOneContactStarted()
 
 void VCardDecoderV21::NotifyOneContactEnded()
 {
+    std::shared_lock<std::shared_mutex> lock(listenersMutex_);
     for (auto it : listeners_) {
         if (it == nullptr) {
             continue;
@@ -91,6 +96,7 @@ void VCardDecoderV21::NotifyOneContactEnded()
 
 void VCardDecoderV21::NotifyRawDataCreated(std::shared_ptr<VCardRawData> rawData)
 {
+    std::shared_lock<std::shared_mutex> lock(listenersMutex_);
     for (auto it : listeners_) {
         if (it == nullptr) {
             continue;
@@ -167,7 +173,7 @@ bool VCardDecoderV21::ParseItem(int32_t &errorCode)
         TELEPHONY_LOGI("File is finish");
         return false;
     }
-    std::lock_guard<std::mutex> lock(rawDataMutex_);
+    std::unique_lock<std::shared_mutex> lock(rawDataMutex_);
     auto rawData = std::make_shared<VCardRawData>();
     if (rawData == nullptr) {
         TELEPHONY_LOGE("rawData is nullptr!");
