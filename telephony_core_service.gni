@@ -53,3 +53,10 @@ if (defined(global_parts_info) &&
   deps_netmanager_ext = true
   telephony_extra_defines += [ "DEPS_NETMANAGER_EXT" ]
 }
+
+if (defined(global_parts_info) &&
+      defined(global_parts_info.powermgr_power_manager) &&
+      global_parts_info.powermgr_power_manager) {
+    deps_powermgr_ext = true
+    telephony_extra_defines += [ "ABILITY_POWER_SUPPORT" ]
+}
