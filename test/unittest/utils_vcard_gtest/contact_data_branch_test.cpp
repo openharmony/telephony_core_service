@@ -559,15 +559,16 @@ HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
     manager.SetDataHelper(dataShareHelper);
     DataShare::DataSharePredicates predicates1;
     predicates1.EqualTo(Contact::ID, "1")->Or()->EqualTo(Contact::ID, "3");
-    path = "/tmp/test/";
+    path1 = "/tmp/test/";
     cardType = VERSION_21_NUM + 1;
     charset = DEFAULT_CHARSET;
 
+    manager.Export(path1, predicates1, cardType, charset);
     manager.Export(path, predicates1, cardType, charset);
 
     EXPECT_NE(result, TELEPHONY_SUCCESS);
     EXPECT_FALSE(path.empty());
-    EXPECT_TRUE(path.find("/tmp/test/") != string::npos);
+    EXPECT_TRUE(path.find("/tmp/test_") != string::npos);
 }
 } // namespace Telephony
 } // namespace OHOS
