@@ -748,10 +748,9 @@ void VCardContact::AddIms(std::string name, std::string rawValue, std::string pr
     int32_t labeId = VCardUtils::GetLabelIdFromImType(name);
     std::shared_ptr<VCardImData> object = std::make_shared<VCardImData>();
     std::vector<std::string> valueList = GetValueListFromParasMap(rawValue, propValue, parasMap);
-    for (std::string value : valueList) {
-        object->SetAddress(value);
-    }
-    if (object->GetAddress().empty()) {
+    if (valueList.size() > 0) {
+        object->SetAddress(valueList[valueList.size() - 1]);
+    } else {
         object->SetAddress(rawValue);
     }
     object->SetLabelId(std::to_string(labeId));
@@ -1016,7 +1015,7 @@ void VCardContact::AddEmailsData(std::string rawValue, std::string propValue, st
             } else if (typeStringUpperCase == VCARD_PARAM_TYPE_WORK) {
                 type = static_cast<int32_t>(EmailType::EMAIL_WORK);
             } else if (typeStringUpperCase == VCARD_PARAM_TYPE_CELL) {
-                type = VALUE_INDEX_FOUR;
+                type = static_cast<int32_t>(VALUE_INDEX_FOUR);
             } else if (type < 0) {
                 label = (VCardUtils::StartWith(typeStringUpperCase, "X-")) ? typeStringOrg.substr(VALUE_INDEX_TWO)
                                                                            : typeStringOrg;
