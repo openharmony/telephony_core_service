@@ -559,7 +559,7 @@ HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
     manager.SetDataHelper(dataShareHelper);
     DataShare::DataSharePredicates predicates1;
     predicates1.EqualTo(Contact::ID, "1")->Or()->EqualTo(Contact::ID, "3");
-    path1 = "/tmp/test/";
+    string path1 = "/tmp/test/";
     cardType = VERSION_21_NUM + 1;
     charset = DEFAULT_CHARSET;
 
