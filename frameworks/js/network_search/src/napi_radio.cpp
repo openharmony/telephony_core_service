@@ -2810,6 +2810,8 @@ static bool RegisterImsRegStateCallback(
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Register imsRegState callback failed");
         ReportFunctionFailed(env, ret, "on_imsRegStateChange");
+        napi_delete_reference(env, stateCallback.thisVar);
+        napi_delete_reference(env, stateCallback.callbackRef);
         return false;
     }
     return true;
@@ -3148,6 +3150,8 @@ static bool StartManualNetworkScanCallback(
     auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
     if (manager == nullptr) {
         TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
+        napi_delete_reference(env, startCallback.callbackRef);
+        napi_delete_reference(env, startCallback.thisVar);
         return false;
     }
     int32_t ret = manager->StartManualNetworkScanCallback(startCallback);
