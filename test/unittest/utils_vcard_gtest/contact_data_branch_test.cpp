@@ -179,6 +179,10 @@ HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_004, Function | MediumTes
     std::vector<std::string> values;
     std::map<std::string, std::vector<std::string>> parasMap;
     contact->nameData_ = nullptr;
+    std::string name = "zhangsan";
+    std::string rawValue = "";
+    std::string propValue = "";
+    contact->AddIms(name, rawValue, propValue, values, parasMap);
 
     contact->AddNameData("", "", values, parasMap, "");
 
