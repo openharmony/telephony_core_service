@@ -1015,7 +1015,7 @@ void VCardContact::AddEmailsData(std::string rawValue, std::string propValue, st
             } else if (typeStringUpperCase == VCARD_PARAM_TYPE_WORK) {
                 type = static_cast<int32_t>(EmailType::EMAIL_WORK);
             } else if (typeStringUpperCase == VCARD_PARAM_TYPE_CELL) {
-                type = static_cast<int32_t>(VALUE_INDEX_FOUR);
+                type = static_cast<int32_t>(EmailType::EMAIL_OTHER);
             } else if (type < 0) {
                 label = (VCardUtils::StartWith(typeStringUpperCase, "X-")) ? typeStringOrg.substr(VALUE_INDEX_TWO)
                                                                            : typeStringOrg;
