@@ -53,6 +53,7 @@ std::shared_ptr<VCardDecoder> VCardDecoder::Create(std::shared_ptr<std::ifstream
     if (file == nullptr) {
         TELEPHONY_LOGE("file is nullptr");
         errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return nullptr;
     }
     fileUtils_.SetInputStream(file);
     errorCode = TELEPHONY_SUCCESS;

@@ -510,6 +510,13 @@ HWTEST_F(SimRilBranchTest, Telephony_IccDiallingNumbersHandler_001, Function | M
     std::u16string name = u"电话联系人";
     int seqLength;
     auto result = diallingNumberHandler->CreateNameSequence(name, seqLength);
+
+    std::shared_ptr<DiallingNumbersInfo> telNumber1 = std::make_shared<DiallingNumbersInfo>();
+    auto diallingNumberHandler1 = std::make_shared<IccDiallingNumbersHandler>(iccFileController);
+    std::string Data1 = "12345789123456789";
+    diallingNumberHandler1->FetchDiallingNumberContent(telNumber1, Data1, nullptr);
+    std::string Data2 = "123456";
+    diallingNumberHandler1->FetchDiallingNumberContent(telNumber1, Data2, nullptr);
     EXPECT_NE(result, nullptr);
 }
 

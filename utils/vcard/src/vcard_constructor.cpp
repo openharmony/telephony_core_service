@@ -510,7 +510,7 @@ int32_t VCardConstructor::ConstructPostals(std::shared_ptr<VCardContact> contact
         }
         int32_t labelId = static_cast<int32_t>(PostalType::ADDR_HOME);
         if (VCardUtils::IsNum(data->GetLabelId())) {
-            labelId = std::stoi(data->GetLabelId());
+            labelId = std::atoi(data->GetLabelId().c_str());
         }
         AddPostalLine(data, labelId, data->GetLabelName());
     }

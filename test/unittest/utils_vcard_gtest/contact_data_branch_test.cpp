@@ -18,6 +18,8 @@
 #include "vcard_contact.h"
 #include "vcard_manager.h"
 #include "telephony_errors.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 #include <fcntl.h>
 #include <iostream>
 #include <gtest/gtest.h>
@@ -36,6 +38,7 @@ const std::string TEST_VCARD_PARAM_TYPE = "TYPE";
 constexpr const int32_t MIN_INVALID_VERSION = -1;
 constexpr const int32_t TEST_VERSION_21_NUM = 0;
 constexpr const int32_t MAX_INVALID_VERSION = 3;
+std::string g_contactUri = "datashare:///com.ohos.contactsdataability";
 } // namespace
 
 class ContactDataBranchTest : public testing::Test {
@@ -45,6 +48,19 @@ public:
     void SetUp();
     void TearDown();
 };
+
+std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, std::string &uri)
+{
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        return nullptr;
+    }
+    auto remoteObj = saManager->GetSystemAbility(systemAbilityId);
+    if (remoteObj == nullptr) {
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, uri);
+}
 
 void ContactDataBranchTest::SetUpTestCase() {}
 
@@ -163,6 +179,10 @@ HWTEST_F(ContactDataBranchTest, Telephony_VCardContact_004, Function | MediumTes
     std::vector<std::string> values;
     std::map<std::string, std::vector<std::string>> parasMap;
     contact->nameData_ = nullptr;
+    std::string name = "zhangsan";
+    std::string rawValue = "";
+    std::string propValue = "";
+    contact->AddIms(name, rawValue, propValue, values, parasMap);
 
     contact->AddNameData("", "", values, parasMap, "");
 
@@ -537,6 +557,18 @@ HWTEST_F(ContactDataBranchTest, Exporttest_002, Function | MediumTest | Level3)
     charset = DEFAULT_CHARSET;
 
     result = manager.Export(path, predicates, cardType, charset);
+
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        CreateDataShareHelper(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID, g_contactUri);
+    manager.SetDataHelper(dataShareHelper);
+    DataShare::DataSharePredicates predicates1;
+    predicates1.EqualTo(Contact::ID, "1")->Or()->EqualTo(Contact::ID, "3");
+    string path1 = "/tmp/test/";
+    cardType = VERSION_21_NUM + 1;
+    charset = DEFAULT_CHARSET;
+
+    manager.Export(path1, predicates1, cardType, charset);
+    manager.Export(path, predicates1, cardType, charset);
 
     EXPECT_NE(result, TELEPHONY_SUCCESS);
     EXPECT_FALSE(path.empty());

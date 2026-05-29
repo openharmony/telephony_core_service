@@ -47,7 +47,7 @@ int32_t VCardSipData::BuildData(std::shared_ptr<DataShare::DataShareResultSet> r
 
 void VCardSipData::InitSipData(std::string rawSip, int32_t type, std::string label)
 {
-    if (VCardUtils::StartWith(rawSip, "sip:")) {
+    if (VCardUtils::StartWith(rawSip, "sip:") && rawSip.length() > SIP_ADDRESS_VALUE_INDEX) {
         address_ = rawSip.substr(SIP_ADDRESS_VALUE_INDEX);
     } else {
         address_ = rawSip;

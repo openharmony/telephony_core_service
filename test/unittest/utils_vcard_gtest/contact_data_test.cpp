@@ -454,6 +454,8 @@ HWTEST_F(ContactDataTest, VCardSipData_InitSipData, Function | MediumTest | Leve
     EXPECT_STREQ((sipData.GetAddress()).c_str(), "john@example.com");
     sipData.InitSipData("", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
     EXPECT_STREQ((sipData.GetAddress()).c_str(), "");
+    sipData.InitSipData("ssss", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
+    EXPECT_STREQ((sipData.GetAddress()).c_str(), "ssss");
 
     sipData.InitSipData("pis:john@example.com", static_cast<int32_t>(SipType::SIP_HOME), "Jhon");
     EXPECT_STREQ((sipData.GetAddress()).c_str(), "pis:john@example.com");

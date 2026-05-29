@@ -130,10 +130,8 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager2_001, Function 
     auto telRilManager = std::make_shared<TelRilManager>();
     EXPECT_TRUE(telRilManager->OnInit());
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager);
-    auto &client = CoreServiceClient::GetInstance();
-    auto slotCount = client.GetMaxSimCount();
     std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    EXPECT_TRUE(simManager->OnInit(slotCount));
+    EXPECT_TRUE(simManager->OnInit(3));
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     EXPECT_TRUE(networkSearchManager->OnInit());
 
@@ -174,10 +172,8 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_002, Function |
     auto telRilManager = std::make_shared<TelRilManager>();
     EXPECT_TRUE(telRilManager->OnInit());
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager);
-    auto &client = CoreServiceClient::GetInstance();
-    auto slotCount = client.GetMaxSimCount();
     std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    EXPECT_TRUE(simManager->OnInit(slotCount));
+    EXPECT_TRUE(simManager->OnInit(3));
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     EXPECT_TRUE(networkSearchManager->OnInit());
 
