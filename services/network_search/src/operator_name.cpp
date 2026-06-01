@@ -209,17 +209,11 @@ void OperatorName::UpdatePlmn(RegServiceState regStatus, sptr<NetworkState> &net
             case RegServiceState::REG_STATE_NO_SERVICE:
             case RegServiceState::REG_STATE_EMERGENCY_ONLY:
             case RegServiceState::REG_STATE_SEARCH:
-                if (networkState->IsEmergency()) {
-                    ResourceUtils::Get().GetStringValueByName(ResourceUtils::EMERGENCY_CALLS_ONLY, params.plmn);
-                } else {
-                    ResourceUtils::Get().GetStringValueByName(ResourceUtils::OUT_OF_SERIVCE, params.plmn);
-                }
                 params.showPlmn = true;
                 break;
             case RegServiceState::REG_STATE_UNKNOWN:
             case RegServiceState::REG_STATE_POWER_OFF:
             default:
-                ResourceUtils::Get().GetStringValueByName(ResourceUtils::OUT_OF_SERIVCE, params.plmn);
                 params.showPlmn = true;
                 break;
         }
