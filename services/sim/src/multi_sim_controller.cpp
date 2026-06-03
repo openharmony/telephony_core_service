@@ -65,6 +65,7 @@ constexpr int32_t SWITCH_SLOT_SIM_DONE = 2;
 constexpr int32_t ESIM_INDEX_UNKNOWN = -1;
 static constexpr int32_t SLOT_ID_0 = 0;
 static constexpr int32_t SLOT_ID_1 = 1;
+static constexpr int32_t SLOT_ID_2 = 2;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
@@ -2101,18 +2102,12 @@ bool MultiSimController::IsEsim(int32_t slotId)
     if (!CoreManagerInner::GetInstance().IsSupported(slotId)) {
         return false;
     }
-    if ((radioProtocolController_ == nullptr) ||
-        (slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
-            TELEPHONY_LOGE("slotId[%{public}d] invalid or radioProtocolController_ is null", slotId);
-            return false;
-    }
-    int32_t modemId = radioProtocolController_->GetRadioProtocolModemId(slotId);
     std::string propAtr = "";
-    propAtr = (modemId == MODEM_ID_0) ? GSM_SIM_ATR : propAtr;
-    propAtr = (modemId == MODEM_ID_1) ? GSM_SIM_ATR1 : propAtr;
-    propAtr = (modemId == MODEM_ID_2) ? GSM_SIM_ATR2 : propAtr;
+    propAtr = (slotId == SLOT_ID_0) ? GSM_SIM_ATR : propAtr;
+    propAtr = (slotId == SLOT_ID_1) ? GSM_SIM_ATR1 : propAtr;
+    propAtr = (slotId == SLOT_ID_2) ? GSM_SIM_ATR2 : propAtr;
     if (propAtr.empty()) {
-        TELEPHONY_LOGE("modemId invalid, can't get atr prop.");
+        TELEPHONY_LOGE("slotId %{public}d invalid, can't get atr prop.", slotId);
         return false;
     }
 
