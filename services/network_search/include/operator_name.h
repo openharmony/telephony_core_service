@@ -90,7 +90,7 @@ private:
     int32_t slotId_ = 0;
     std::string csSpnFormat_;
     const std::vector<std::string> cmMccMnc_ { "46000", "46002", "46004", "46007", "46008", "46013" };
-    const std::vector<std::string> cuMccMnc_ { "46001", "46006", "46009" };
+    const std::vector<std::string> cuMccMnc_ { "46001", "46006", "46009", "46030" };
     const std::vector<std::string> ctMccMnc_ { "46003", "46011" };
     const std::vector<std::string> cbnMccMnc_ { "46015" };
     const std::vector<std::string> cmDomesticMccMnc_ { "46031", "46050", "46059" };

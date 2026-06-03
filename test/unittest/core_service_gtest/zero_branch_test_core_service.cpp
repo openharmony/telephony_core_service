@@ -700,6 +700,12 @@ HWTEST_F(CoreServiceBranchTest, Telephony_OperatorCUCC_001, Function | MediumTes
     simPlmn = "46018";
     netPlmn = "46061";
     EXPECT_FALSE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46030";
+    netPlmn = "46022";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
+    simPlmn = "46030";
+    netPlmn = "46061";
+    EXPECT_TRUE(operatorName->isDomesticRoaming(simPlmn, netPlmn));
 }
 
 /**
