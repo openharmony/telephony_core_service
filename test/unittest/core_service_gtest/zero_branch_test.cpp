@@ -2347,11 +2347,11 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_OnDataShareReady_isUserSwitch, Fu
     multiSimMonitor->lastUserId_ = 100;
     multiSimMonitor->remainCount_ = 30;
     multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
-    EXPECT_EQ(multiSimMonitor->remainCount_, 14);
+    EXPECT_EQ(multiSimMonitor->remainCount_, 2);
     multiSimMonitor->remainCount_ = 30;
     multiSimMonitor->lastUserId_ = -1;
     multiSimMonitor->dataShareSubscriber_->OnDataShareReady();
-    EXPECT_EQ(multiSimMonitor->remainCount_, 14);
+    EXPECT_EQ(multiSimMonitor->remainCount_, 2);
 }
 
 /**
