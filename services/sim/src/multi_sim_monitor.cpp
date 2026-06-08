@@ -41,7 +41,6 @@ const int INIT_DATA_TIMES = 10;
 constexpr const char *SIM_ACCOUNT_LOADED = "SIM_ACCOUNT_LOADED";
 constexpr const char *IS_BLOCK_LOAD_OPERATORCONFIG = "telephony.is_block_load_operatorconfig";
 const std::string PROP_REBOOT_DETECT_SIM = "persist.ril.reboot_detect_sim";
-constexpr const int32_t SLOT_COUNT_MAX = 2;
 MultiSimMonitor::MultiSimMonitor(const std::shared_ptr<MultiSimController> &controller,
     std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager,
     std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManager)
@@ -594,7 +593,7 @@ void MultiSimMonitor::OnUserSwitched(int32_t userId)
 
 void MultiSimMonitor::CheckSimPresentWhenReboot()
 {
-    for (int32_t slotId = 0; slotId < SLOT_COUNT_MAX; slotId++) {
+    for (int32_t slotId = 0; slotId < SLOT_COUNT; slotId++) {
         if (OHOS::system::GetParameter(PROP_REBOOT_DETECT_SIM + std::to_string(slotId), "0") == "1" &&
             !hasCheckedSimPresent_[slotId]) {
             if (controller_->UpdateSimPresent(slotId, true) == TELEPHONY_SUCCESS) {
