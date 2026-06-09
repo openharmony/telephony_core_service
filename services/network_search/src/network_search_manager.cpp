@@ -22,6 +22,7 @@
 
 #include "core_service_errors.h"
 #include "core_service_hisysevent.h"
+#include "core_manager_inner.h"
 #include "enum_convert.h"
 #include "manual_network_scan.h"
 #include "mcc_pool.h"
@@ -1973,13 +1974,41 @@ int32_t NetworkSearchManager::StartOrStopManualNetworkScan(int32_t slotId, bool 
             RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST);
     }
 
-    TELEPHONY_EXT_WRAPPER.ProcessCellScanNetworkFunc(slotId, isStart);
+    std::unique_lock<ffrt::shared_mutex> lock(mutexManual_);
+    isManualNetworkSearching_ = isStart;
+    SimState simState = SimState::SIM_STATE_UNKNOWN;
+    if (simManager_ != nullptr) {
+        simManager_->GetSimState(slotId, simState);
+    }
+    if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_UNKNOWN) {
+        isManualSearchNeedFilterInfo_ = false;
+        TELEPHONY_EXT_WRAPPER.ProcessCellScanNetworkFunc(slotId, isStart);
+    } else {
+        isManualSearchNeedFilterInfo_ = true;
+        if (isStart) {
+            int32_t ret = CoreManagerInner::GetInstance().GetNetworkSearchInformation(
+                slotId, static_cast<int32_t>(RadioEvent::RADIO_MANUAL_GET_PLMN_LIST_RESULT), networkSearchHandler);
+            if (ret != Telephony::TELEPHONY_ERR_SUCCESS) {
+                auto manualScanResult = std::make_shared<ManualScanResult>();
+                manualScanResult->isFinished = true;
+                auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+                networkSearchHandler->SendEvent(event);
+            }
+        }
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
 bool NetworkSearchManager::GetManualNetworkScanState()
 {
-    return TELEPHONY_EXT_WRAPPER.GetManualNetworkSearchStateFunc();
+    std::shared_lock<ffrt::shared_mutex> lock(mutexManual_);
+    return isManualNetworkSearching_;
+}
+
+bool NetworkSearchManager::IsManualSearchNeedFilterInfo()
+{
+    std::shared_lock<ffrt::shared_mutex> lock(mutexManual_);
+    return isManualSearchNeedFilterInfo_;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -292,6 +292,7 @@ public:
 	    int32_t slotId, bool isFinish, const sptr<NetworkSearchResult> &networkSearchResult);
     int32_t StartOrStopManualNetworkScan(int32_t slotId, bool isStart);
     bool GetManualNetworkScanState();
+    bool IsManualSearchNeedFilterInfo();
 
     inline void InitMsgNum(int32_t slotId)
     {
@@ -398,6 +399,9 @@ private:
     int32_t delayTime_ = 0;
     [[maybe_unused]] NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
     [[maybe_unused]] NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;
+    bool isManualNetworkSearching_ = false;
+    bool isManualSearchNeedFilterInfo_ = false;
+    ffrt::shared_mutex mutexManual_{};
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -56,6 +56,9 @@ struct AvailableNetworkInfo {
 
     /** Radio access technology type. For details, see {@link RilRadioTech}. */
     int32_t rat = 0;
+
+    /** Signal strength. RSRP if NR or LTE, RCSP if WCDMA, RSSI if GSM. */
+    int32_t rscp = 0;
 };
 
 /**

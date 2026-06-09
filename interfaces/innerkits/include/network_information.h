@@ -33,11 +33,14 @@ class NetworkInformation : public Parcelable {
 public:
     void SetOperateInformation(const std::string &operatorLongName, const std::string &operatorShortName,
         const std::string &operatorNumeric, int32_t state, int32_t rat_);
+    void SetOperateInformation(const std::string &operatorLongName, const std::string &operatorShortName,
+        const std::string &operatorNumeric, int32_t state, int32_t rat_, int32_t rscp);
     int32_t GetNetworkState() const;
     std::string GetOperatorShortName() const;
     std::string GetOperatorLongName() const;
     std::string GetOperatorNumeric() const;
     int32_t GetRadioTech() const;
+    int32_t GetSignalStrength() const;
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;
     static NetworkInformation *Unmarshalling(Parcel &parcel);
@@ -48,6 +51,7 @@ private:
     std::string operatorLongName_;
     std::string operatorNumeric_;
     NetworkRat rat_ = NetworkRat::NETWORK_GSM_OR_GPRS;
+    int32_t rscp_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

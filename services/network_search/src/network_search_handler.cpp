@@ -211,6 +211,10 @@ const std::map<uint32_t, NetworkSearchHandler::NsHandlerFunc> NetworkSearchHandl
         [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
             handler->AirplaneModeChange(event);
         } },
+    { RadioEvent::RADIO_MANUAL_GET_PLMN_LIST_RESULT,
+        [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
+            handler->ManualGetPlmnListResult(event);
+        } },
     { RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST,
         [](NetworkSearchHandler *handler, const AppExecFwk::InnerEvent::Pointer &event) {
             handler->ManualScanStateChanged(event);
@@ -1560,6 +1564,25 @@ void NetworkSearchHandler::SatelliteStatusChanged(const AppExecFwk::InnerEvent::
 }
 #endif // CORE_SERVICE_SATELLITE
 
+void NetworkSearchHandler::ManualGetPlmnListResult(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler::ManualGetPlmnListResult event is nullptr!");
+        return;
+    }
+    std::shared_ptr<AvailableNetworkList> info = event->GetSharedObject<AvailableNetworkList>();
+    if (info == nullptr) {
+        TELEPHONY_LOGE("ManualGetPlmnListResult info is nullptr slotId:%{public}d", slotId_);
+        return;
+    }
+
+    auto manualScanResult = std::make_shared<ManualScanResult>();
+    manualScanResult->isFinished = true;
+    manualScanResult->availableNetworkInfo = info->availableNetworkInfo;
+    auto result = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+    this->SendEvent(result);
+}
+
 void NetworkSearchHandler::ManualScanStateChanged(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -1567,6 +1590,15 @@ void NetworkSearchHandler::ManualScanStateChanged(const AppExecFwk::InnerEvent::
         return;
     }
 
+    auto nsm = networkSearchManager_.lock();
+    if (nsm == nullptr) {
+        TELEPHONY_LOGE("ManualScanStateChanged networkSearchManager is nullptr");
+        return;
+    }
+    if (!nsm->GetManualNetworkScanState()) {
+        TELEPHONY_LOGE("ManualScanStateChanged is not searching");
+        return;
+    }
     if (networkSelection_ == nullptr) {
         TELEPHONY_LOGE("ManualScanStateChanged NetworkSelection is nullptr!");
         return;

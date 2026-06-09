@@ -138,6 +138,29 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_002, TestSize.Level
     EXPECT_EQ(NetworkSelection::GetCustomName({"00000", "00000", "00000", 0, 0}), "00000");
 }
 
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSelection_003, TestSize.Level0)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSelection = std::make_unique<NetworkSelection>(networkSearchManager, INVALID_SLOTID);
+
+    auto manualScanResult = std::make_shared<ManualScanResult>();
+    manualScanResult->isFinished = true;
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+    networkSelection->ProcessManualScanResult(event);
+    manualScanResult->isFinished = false;
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+    networkSearchManager->isManualSearchNeedFilterInfo_ = false;
+    EXPECT_FALSE(networkSearchManager->IsManualSearchNeedFilterInfo());
+    networkSelection->ProcessManualScanResult(event);
+    networkSearchManager->isManualSearchNeedFilterInfo_ = true;
+    EXPECT_TRUE(networkSearchManager->IsManualSearchNeedFilterInfo());
+    networkSelection->ProcessManualScanResult(event);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    networkSelection->ProcessManualScanResult(event);
+}
+
 HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateObserver, TestSize.Level0)
 {
     auto deviceStateObserver = std::make_shared<DeviceStateObserver>();

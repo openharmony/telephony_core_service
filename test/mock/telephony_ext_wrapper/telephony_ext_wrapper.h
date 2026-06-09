@@ -129,7 +129,6 @@ public:
     typedef void (*RegisterEsimSwitchNotify)(
         int32_t slotId, const std::shared_ptr<OHOS::AppExecFwk::EventHandler> &handler, int32_t what);
     typedef void (*ProcessCellScanNetwork)(int32_t slotId, bool isStart);
-    typedef bool (*GetManualNetworkSearchState)();
     typedef void (*RegistryCoreNotify)(
         int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     typedef void (*UnRegistryCoreNotify)(
@@ -214,7 +213,6 @@ public:
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
     void ProcessCellScanNetworkFunc(int32_t slotId, bool isStart);
-    bool GetManualNetworkSearchStateFunc();
     void RegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void UnRegistryCoreNotifyFunc(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what);
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
@@ -229,7 +227,6 @@ private:
     SendSimChgTypeInfoFunc sendSimChgTypeInfo_ = nullptr;
     ReportEventToChrFunc reportEventToChr_ = nullptr;
     ProcessCellScanNetwork processCellScanNetwork_ = nullptr;
-    GetManualNetworkSearchState getManualNetworkSearchState_ = nullptr;
     RegistryCoreNotify registryCoreNotify_ = nullptr;
     UnRegistryCoreNotify unRegistryCoreNotify_ = nullptr;
     SetActiveSim setActiveSim_ = nullptr;
@@ -398,10 +395,6 @@ inline int32_t ReportEventToChrImpl(int32_t slotId, const char* scenario, int32_
     return 0;
 }
 inline void ProcessCellScanNetworkImpl(int32_t slotId, bool isStart) {}
-inline bool GetManualNetworkSearchStateImpl()
-{
-    return false;
-}
 inline void RegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
 {}
 inline void UnRegistryCoreNotifyImpl(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int what)
@@ -471,7 +464,6 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     isInModem2Optimization_ = &IsInModem2OptimizationImpl;
     clearSignalInfoCache_ = &ClearSignalInfoCacheImpl;
     processCellScanNetwork_ = &ProcessCellScanNetworkImpl;
-    getManualNetworkSearchState_ = &GetManualNetworkSearchStateImpl;
     registryCoreNotify_ = &RegistryCoreNotifyImpl;
     unRegistryCoreNotify_ = &UnRegistryCoreNotifyImpl;
 }
@@ -594,14 +586,6 @@ inline void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool
     if (processCellScanNetwork_ != nullptr) {
         processCellScanNetwork_(slotId, isStart);
     }
-}
-
-inline bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
-{
-    if (getManualNetworkSearchState_ != nullptr) {
-        return getManualNetworkSearchState_();
-    }
-    return false;
 }
 
 inline void TelephonyExtWrapper::RegistryCoreNotifyFunc(int32_t slotId,
