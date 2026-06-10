@@ -416,8 +416,8 @@ private:
     CoreManagerInner();
 
 private:
-    bool isInitAllObj_ = false;
-    bool isInitExtraObj_ = false;
+    std::atomic<bool> isInitAllObj_ = false;
+    std::atomic<bool> isInitExtraObj_ = false;
     std::shared_ptr<INetworkSearch> networkSearchManager_ = nullptr;
     std::shared_ptr<ISimManager> simManager_ = nullptr;
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
