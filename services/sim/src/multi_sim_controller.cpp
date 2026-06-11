@@ -216,7 +216,7 @@ int32_t MultiSimController::UpdateEsimOpName(const std::string &iccId, const std
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
-    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     if (static_cast<int>(simStateManager_.size()) == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
