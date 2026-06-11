@@ -66,6 +66,7 @@
                 "netmanager_ext",
                 "power_manager",
                 "preferences",
+                "protobuf",
                 "resource_management",
                 "safwk",
                 "samgr",
