@@ -23,6 +23,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "raw_parcel_callback_stub.h"
+#include "histogram_plugin_macros.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1495,6 +1496,7 @@ int32_t CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lo
 
 int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges, int64_t timeoutMs)
 {
+    HISTOGRAM_BOOLEAN("Telephony.APIsim.hasOperatorPrivileges", true);
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
