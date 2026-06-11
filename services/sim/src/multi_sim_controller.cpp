@@ -277,6 +277,7 @@ bool MultiSimController::InitEsimData()
 bool MultiSimController::InitActive(int slotId)
 {
     bool result = true;
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     if (simStateManager_[slotId] == nullptr) {
         return result;
     }
@@ -328,6 +329,7 @@ void MultiSimController::ReCheckPrimary()
 
 bool MultiSimController::IsAllCardsReady()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
             || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
@@ -346,6 +348,7 @@ bool MultiSimController::IsAllCardsReady()
 
 bool MultiSimController::IsAllModemInitDone()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IsModemInitDone())) {
             TELEPHONY_LOGI("slotId %{public}d modem init not done", i);
@@ -793,6 +796,7 @@ void MultiSimController::SortAllCache()
  */
 bool MultiSimController::IsValidData(int32_t slotId)
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     if ((slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
         TELEPHONY_LOGE("can not get simStateManager");
         return false;
@@ -1394,6 +1398,7 @@ void MultiSimController::SetSimManagerPtr(std::weak_ptr<SimManager> simManager)
 
 void MultiSimController::ObtainDualSimCardStatus()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->ObtainIccStatus();
@@ -1404,6 +1409,7 @@ void MultiSimController::ObtainDualSimCardStatus()
 void MultiSimController::SetInSenseSwitchPhase(bool flag)
 {
     TELEPHONY_LOGI("SetInSenseSwitchPhase to %{public}d", flag);
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->SetInSenseSwitchPhase(flag);
