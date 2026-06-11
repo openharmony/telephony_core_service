@@ -144,6 +144,13 @@ ohos_shared_library("tel_core_service_api") {
     "time_service:time_client",
   ]
 
+  if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_api_metrics)) {
+      external_deps += [ 
+        "api_metrics:histogrammanager",
+      ]
+  }
+  
   if (core_service_support_esim) {
     external_deps += [ "ipc:ipc_core" ]
   }
