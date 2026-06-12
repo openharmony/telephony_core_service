@@ -591,6 +591,11 @@ int32_t MultiSimController::SetSimLabelIndexByIccId(const std::string &iccId, in
                 allLocalCacheInfo_[i].simLabelIndex = labelIndex;
             }
         }
+        for (size_t i = 0; i < localCacheInfo_.size(); i++) {
+            if (iccId == localCacheInfo_[i].iccId) {
+                localCacheInfo_[i].simLabelIndex = labelIndex;
+            }
+        }
         return TELEPHONY_ERR_SUCCESS;
     }
     return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
@@ -647,7 +652,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
             }
         }
     }
-    TELEPHONY_LOGI("GetSimLabel simLabel.index = %{public}d", simLabel.index);
+    TELEPHONY_LOGI("GetSimLabel slotId:%{public}d, simLabel.index = %{public}d", slotId, simLabel.index);
     return TELEPHONY_ERR_SUCCESS;
 }
 
