@@ -1499,7 +1499,7 @@ int32_t CoreServiceClient::UnlockSimLock(int32_t slotId, const PersoLockInfo &lo
 int32_t CoreServiceClient::HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges, int64_t timeoutMs)
 {
 #ifndef API_METRICS_SUPPORT
-    HISTOGRAM_BOOLEAN("Telephony.APIsim.hasOperatorPrivileges", true);
+    HISTOGRAM_BOOLEAN("TelephonyKit.APIsim.hasOperatorPrivileges", true);
 #endif
     auto proxy = GetProxy();
     if (proxy == nullptr) {
