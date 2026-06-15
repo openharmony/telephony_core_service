@@ -210,9 +210,14 @@ void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Poi
         std::string shortName = availableNetworkInfoItem.shortName;
         int32_t status = availableNetworkInfoItem.status;
         int32_t rat = availableNetworkInfoItem.rat;
+        int32_t rscp = availableNetworkInfoItem.rscp;
         NetworkInformation networkStateItem;
-        networkStateItem.SetOperateInformation(longName, shortName, numeric, status, rat);
+        networkStateItem.SetOperateInformation(longName, shortName, numeric, status, rat, rscp);
         networkInformation.push_back(networkStateItem);
+    }
+    int32_t availableSize = static_cast<int32_t>(networkInformation.size());
+    if (nsm->IsManualSearchNeedFilterInfo() && TELEPHONY_EXT_WRAPPER.onGetNetworkSearchInformationExt_ != nullptr) {
+        TELEPHONY_EXT_WRAPPER.onGetNetworkSearchInformationExt_(availableSize, networkInformation);
     }
     networkSearchResult->SetNetworkSearchResultValue(
         static_cast<int32_t>(networkInformation.size()), networkInformation);

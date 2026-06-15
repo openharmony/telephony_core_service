@@ -1204,6 +1204,44 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_012, Function |
 }
 
 /**
+ * @tc.number   Telephony_NetworkSearchManager_013
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_013, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<MockSimManager>();
+    using ::testing::_;
+    EXPECT_CALL(*simManager, GetSimState(_, _))
+        .WillOnce([=](int32_t arg1, SimState &outParam) {
+            outParam = SimState::SIM_STATE_NOT_PRESENT;
+            return 0;
+        })
+        .WillOnce([=](int32_t arg1, SimState &outParam) {
+            outParam = SimState::SIM_STATE_UNKNOWN;
+            return 0;
+        })
+        .WillRepeatedly([=](int32_t arg1, SimState &outParam) {
+            outParam = SimState::SIM_STATE_READY;
+            return 0;
+        });
+    
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    inner->networkSearchHandler_ = networkSearchHandler;
+    networkSearchManager->AddManagerInner(0, inner);
+    TELEPHONY_EXT_WRAPPER.InitTelephonyExtWrapper();
+    EXPECT_FALSE(networkSearchManager->IsManualSearchNeedFilterInfo());
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, false), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, true), TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(networkSearchManager->StartOrStopManualNetworkScan(0, false), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_ManualNetworkScan_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1627,6 +1665,43 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_007, Function |
     networkSearchHandler->ManualScanStateChanged(event);
     event = nullptr;
     networkSearchHandler->ManualScanStateChanged(event);
+}
+
+/**
+ * @tc.number   Telephony_NetworkSearchHandler_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchHandler_010, Function | MediumTest | Level1)
+{
+    std::shared_ptr<ITelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    
+    auto manualScanResult = std::make_shared<ManualScanResult>();
+    auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+    networkSearchManager->isManualNetworkSearching_ = true;
+    EXPECT_TRUE(networkSearchManager->GetManualNetworkScanState());
+    networkSearchHandler->ManualScanStateChanged(event);
+
+    networkSearchManager->isManualNetworkSearching_ = false;
+    EXPECT_FALSE(networkSearchManager->GetManualNetworkScanState());
+    networkSearchHandler->ManualScanStateChanged(event);
+
+    networkSearchHandler->networkSearchManager_.reset();
+    networkSearchHandler->ManualScanStateChanged(event);
+
+    auto availableNetworkList = std::make_shared<AvailableNetworkList>();
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_GET_PLMN_LIST_RESULT, availableNetworkList);
+    networkSearchHandler->ManualGetPlmnListResult(event);
+
+    event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_GET_PLMN_LIST_RESULT);
+    networkSearchHandler->ManualGetPlmnListResult(event);
+
+    event = nullptr;
+    networkSearchHandler->ManualGetPlmnListResult(event);
 }
  
 /**

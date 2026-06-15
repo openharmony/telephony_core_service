@@ -144,11 +144,6 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     if (processCellScanNetwork_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
-    getManualNetworkSearchState_ = (GetManualNetworkSearchState)dlsym(telephonyExtWrapperHandle_,
-        "GetManualNetworkSearchState");
-    if (getManualNetworkSearchState_ == nullptr) {
-        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
-    }
     registryCoreNotify_ = (RegistryCoreNotify)dlsym(telephonyExtWrapperHandle_, "RegistryCoreNotify");
     if (registryCoreNotify_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
@@ -379,14 +374,6 @@ void TelephonyExtWrapper::ProcessCellScanNetworkFunc(int32_t slotId, bool isStar
     if (processCellScanNetwork_ != nullptr) {
         processCellScanNetwork_(slotId, isStart);
     }
-}
-
-bool TelephonyExtWrapper::GetManualNetworkSearchStateFunc()
-{
-    if (getManualNetworkSearchState_ != nullptr) {
-        return getManualNetworkSearchState_();
-    }
-    return false;
 }
 
 void TelephonyExtWrapper::RegistryCoreNotifyFunc(int32_t slotId,

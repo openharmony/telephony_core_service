@@ -35,6 +35,13 @@ void NetworkInformation::SetOperateInformation(const std::string &operatorLongNa
     rat_ = static_cast<NetworkRat>(rat);
 }
 
+void NetworkInformation::SetOperateInformation(const std::string &operatorLongName,
+    const std::string &operatorShortName, const std::string &operatorNumeric, int32_t state, int32_t rat, int32_t rscp)
+{
+    SetOperateInformation(operatorLongName, operatorShortName, operatorNumeric, state, rat);
+    rscp_ = rscp;
+}
+
 int32_t NetworkInformation::GetNetworkState() const
 {
     return static_cast<int32_t>(networkPlmnState_);
@@ -60,6 +67,11 @@ int32_t NetworkInformation::GetRadioTech() const
     return static_cast<int32_t>(rat_);
 }
 
+int32_t NetworkInformation::GetSignalStrength() const
+{
+    return rscp_;
+}
+
 bool NetworkInformation::ReadFromParcel(Parcel &parcel)
 {
     operatorLongName_ = Str16ToStr8(parcel.ReadString16());
@@ -77,6 +89,12 @@ bool NetworkInformation::ReadFromParcel(Parcel &parcel)
         return false;
     }
     rat_ = static_cast<NetworkRat>(rat);
+
+    int32_t rscp;
+    if (!parcel.ReadInt32(rscp)) {
+        return false;
+    }
+    rscp_ = rscp;
     return true;
 }
 
@@ -95,6 +113,9 @@ bool NetworkInformation::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(rat_))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(rscp_)) {
         return false;
     }
     return true;
