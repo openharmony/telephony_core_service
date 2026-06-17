@@ -149,6 +149,7 @@ ohos_shared_library("tel_core_service_api") {
       external_deps += [ 
         "api_metrics:histogrammanager",
       ]
+    defines += [ "API_METRICS_SUPPORT" ]  
   }
   
   if (core_service_support_esim) {
