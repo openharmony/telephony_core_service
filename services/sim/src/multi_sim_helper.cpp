@@ -165,9 +165,6 @@ void MultiSimHelper::BuildSimPresentValues(int32_t slotId, DataShare::DataShareV
 
 bool MultiSimHelper::IsValidSlotId(const char* oldPrimarySlotId)
 {
-    if (oldPrimarySlotId == nullptr || oldPrimarySlotId[0] == '\0') {
-        return false;
-    }
     bool isValid = true;
     for (int i = 0; oldPrimarySlotId[i] != '\0'; ++i) {
         if (!std::isdigit(oldPrimarySlotId[i])) {
@@ -175,10 +172,7 @@ bool MultiSimHelper::IsValidSlotId(const char* oldPrimarySlotId)
             break;
         }
     }
-    if (!isValid) {
-        return false;
-    }
-    return true;
+    return isValid;
 }
 }
 }
