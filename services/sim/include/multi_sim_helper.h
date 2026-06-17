@@ -35,7 +35,7 @@ public:
     void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
         int32_t simLabel, bool isEsim);
     void BuildSimPresentValues(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId);
-    int32_t ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
+    bool IsValidSlotId(const char* oldPrimarySlotId);
 
 private:
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
