@@ -280,10 +280,7 @@ bool MultiSimController::InitActive(int slotId)
     bool result = true;
     {
         std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-        if (simStateManager_[slotId] == nullptr) {
-            return result;
-        }
-        if (!simStateManager_[slotId]->HasSimCard()) {
+        if (simStateManager_[slotId] == nullptr || !simStateManager_[slotId]->HasSimCard()) {
             TELEPHONY_LOGI("has no sim and not need to active");
             return result;
         }
