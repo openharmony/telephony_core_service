@@ -163,7 +163,7 @@ void MultiSimHelper::BuildSimPresentValues(int32_t slotId, DataShare::DataShareV
     values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
 }
 
-bool MultiSimHelper::IsValidSlotId(const char* oldPrimarySlotId)
+bool MultiSimHelper::IsValidSlotString(const char* oldPrimarySlotId)
 {
     bool isValid = true;
     for (int i = 0; oldPrimarySlotId[i] != '\0'; ++i) {
