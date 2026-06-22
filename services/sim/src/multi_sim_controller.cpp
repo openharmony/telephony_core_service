@@ -1507,7 +1507,7 @@ void MultiSimController::ResumePrimaryCardInfo(const char* oldPrimarySlotId, con
     if (oldPrimarySlotId[0] == '\0') {
         return;
     }
-    if (!multiSimHelper_->IsValidSlotId(oldPrimarySlotId)) {
+    if (!multiSimHelper_->IsValidSlotString(oldPrimarySlotId)) {
         return;
     }
     lastPrimarySlotId_ = std::strtol(oldPrimarySlotId, nullptr, DEC_TYPE);
