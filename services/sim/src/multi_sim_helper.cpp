@@ -165,7 +165,7 @@ void MultiSimHelper::BuildSimPresentValues(int32_t slotId, DataShare::DataShareV
 
 bool MultiSimHelper::IsValidSlotString(const char* slotIdStr)
 {
-    if (slotIdStr = nullptr) {
+    if (slotIdStr == nullptr) {
         return false;
     }
     bool isValid = true;
