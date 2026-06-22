@@ -1366,7 +1366,14 @@ HWTEST_F(BranchTest, Telephony_SimManager_005, Function | MediumTest | Level1)
     bool isCTSimCard = false;
     EXPECT_GT(simManager->IsCTSimCard(0, isCTSimCard), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->IsCTSimCard(INVALID_SLOTID, isCTSimCard), TELEPHONY_ERR_SUCCESS);
-    EXPECT_GT(simManager->NotifySimSlotsMapping(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::SimStateManager> simStateManagerTwo = std::make_shared<SimStateManager>(telRilManager);
+    simManager->simStateManager_.clear();
+    simManager->simStateManager_.emplace_back(simStateManagerTwo);
+    auto multiSimController = std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    simManager.multiSimController_ = multiSimController;
+    EXPECT_GE(simManager->NotifySimSlotsMapping(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     EXPECT_GT(simManager->SetIccCardState(INVALID_SLOTID, 0), TELEPHONY_ERR_SUCCESS);
     EXPECT_FALSE(simManager->IsModemInitDone(0));
 }
