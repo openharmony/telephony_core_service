@@ -216,6 +216,7 @@ int32_t MultiSimController::UpdateEsimOpName(const std::string &iccId, const std
 void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateManager> simStateManager,
     std::shared_ptr<Telephony::SimFileManager> simFileManager)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     if (static_cast<int>(simStateManager_.size()) == SIM_SLOT_COUNT) {
         simStateManager_.push_back(simStateManager);
         simFileManager_.push_back(simFileManager);
@@ -277,12 +278,12 @@ bool MultiSimController::InitEsimData()
 bool MultiSimController::InitActive(int slotId)
 {
     bool result = true;
-    if (simStateManager_[slotId] == nullptr) {
-        return result;
-    }
-    if (!simStateManager_[slotId]->HasSimCard()) {
-        TELEPHONY_LOGI("has no sim and not need to active");
-        return result;
+    {
+        std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
+        if (simStateManager_[slotId] == nullptr || !simStateManager_[slotId]->HasSimCard()) {
+            TELEPHONY_LOGI("has no sim and not need to active");
+            return result;
+        }
     }
     if (!IsSimActive(slotId)) {
         result = (SetActiveSim(slotId, DEACTIVE, true) == TELEPHONY_ERR_SUCCESS);
@@ -328,6 +329,7 @@ void MultiSimController::ReCheckPrimary()
 
 bool MultiSimController::IsAllCardsReady()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
             || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
@@ -346,6 +348,7 @@ bool MultiSimController::IsAllCardsReady()
 
 bool MultiSimController::IsAllModemInitDone()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IsModemInitDone())) {
             TELEPHONY_LOGI("slotId %{public}d modem init not done", i);
@@ -798,6 +801,7 @@ void MultiSimController::SortAllCache()
  */
 bool MultiSimController::IsValidData(int32_t slotId)
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     if ((slotId < DEFAULT_SIM_SLOT_ID) || (static_cast<uint32_t>(slotId) >= simStateManager_.size())) {
         TELEPHONY_LOGE("can not get simStateManager");
         return false;
@@ -1399,6 +1403,7 @@ void MultiSimController::SetSimManagerPtr(std::weak_ptr<SimManager> simManager)
 
 void MultiSimController::ObtainDualSimCardStatus()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->ObtainIccStatus();
@@ -1409,6 +1414,7 @@ void MultiSimController::ObtainDualSimCardStatus()
 void MultiSimController::SetInSenseSwitchPhase(bool flag)
 {
     TELEPHONY_LOGI("SetInSenseSwitchPhase to %{public}d", flag);
+    std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->SetInSenseSwitchPhase(flag);
@@ -1506,14 +1512,7 @@ void MultiSimController::ResumePrimaryCardInfo(const char* oldPrimarySlotId, con
     if (oldPrimarySlotId[0] == '\0') {
         return;
     }
-    bool isValid = true;
-    for (int i = 0; oldPrimarySlotId[i] != '\0'; ++i) {
-        if (!std::isdigit(oldPrimarySlotId[i])) {
-            isValid = false;
-            break;
-        }
-    }
-    if (!isValid) {
+    if (!multiSimHelper_->IsValidSlotString(oldPrimarySlotId)) {
         return;
     }
     lastPrimarySlotId_ = std::strtol(oldPrimarySlotId, nullptr, DEC_TYPE);

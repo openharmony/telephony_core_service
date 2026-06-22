@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Telephony {
 static const std::string PARAM_SIMID = "simId";
 static const int32_t EVENT_CODE = 1;
+static constexpr int32_t DEC_TYPE = 10;
 static const std::string DEFAULT_SMS_SIMID_CHANGED = "defaultSmsSimIdChanged";
 static const std::string DEFAULT_MAIN_SIMID_CHANGED = "defaultMainSimIdChanged";
 static const std::string DEFAULT_VOICE_SIMID_CHANGED = "defaultVoiceSimIdChanged";
@@ -162,5 +163,19 @@ void MultiSimHelper::BuildSimPresentValues(int32_t slotId, DataShare::DataShareV
     values.Put(SimData::IS_CELLULAR_DATA_CARD, notMainCardObj);
 }
 
+bool MultiSimHelper::IsValidSlotString(const char* slotIdStr)
+{
+    if (slotIdStr == nullptr) {
+        return false;
+    }
+    bool isValid = true;
+    for (int i = 0; slotIdStr[i] != '\0'; ++i) {
+        if (!std::isdigit(slotIdStr[i])) {
+            isValid = false;
+            break;
+        }
+    }
+    return isValid;
+}
 }
 }

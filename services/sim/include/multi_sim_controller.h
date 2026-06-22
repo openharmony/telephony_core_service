@@ -203,6 +203,7 @@ private:
     std::vector<IccAccountInfo> allIccAccountInfoList_;
     std::vector<SimRdbInfo> allLocalCacheInfo_;
     ffrt::shared_mutex mutex_;
+    ffrt::shared_mutex simStateManagerMutex_;
     std::shared_ptr<RadioProtocolController> radioProtocolController_ = nullptr;
     std::vector<int> isSetActiveSimInProgress_;
     std::weak_ptr<SimManager> simManager_;
