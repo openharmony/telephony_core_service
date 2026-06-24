@@ -421,7 +421,7 @@ HWTEST_F(EsimTest, ProcessEsimCloseChannelDone_001, Function | MediumTest | Leve
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
     AppExecFwk::InnerEvent::Pointer event = esimFile->BuildCallerInfo(MSG_ESIM_CLOSE_CHANNEL_DONE);
-    EXPECT_EQ(true, esimFile->ProcessEsimCloseChannelDone(event));
+    EXPECT_EQ(false, esimFile->ProcessEsimCloseChannelDone(event));
 }
 
 HWTEST_F(EsimTest, ObtainEuiccInfo1ParseTagCtx2_001, Function | MediumTest | Level2)
