@@ -621,9 +621,8 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
         return;
     }
     auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr ||
-        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
-        TELEPHONY_LOGI("radio is power off, no need update data reg state");
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -638,6 +637,10 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
         return;
     }
     networkSearchManager->decMsgNum(slotId_);
+    if (networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        TELEPHONY_LOGI("radio is power off, no need update data reg state");
+        return;
+    }
     TelRilRegStatus regStatus = psRegStatusResultInfo_->regStatus;
     bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
@@ -653,9 +656,8 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         return;
     }
     auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr ||
-        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
-        TELEPHONY_LOGI("radio is power off, no need update voice reg state");
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -670,6 +672,10 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         return;
     }
     networkSearchManager->decMsgNum(slotId_);
+    if (networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        TELEPHONY_LOGI("radio is power off, no need update voice reg state");
+        return;
+    }
     TelRilRegStatus regStatus = csRegStatusInfo_->regStatus;
     bool isEmergency = (regStatus == TelRilRegStatus::REG_MT_EMERGENCY) && isCsCapable_;
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
@@ -726,9 +732,8 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         return;
     }
     auto networkSearchManager = networkSearchManager_.lock();
-    if (networkSearchManager == nullptr ||
-        networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
-        TELEPHONY_LOGI("radio is power off, no need update operator info");
+    if (networkSearchManager == nullptr) {
+        TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -738,13 +743,17 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         HandleResponseError(event);
         return;
     }
-    if (operatorInfoResult_->flag == networkSearchManager->GetSerialNum(slotId_)) {
-        networkSearchManager->decMsgNum(slotId_);
-        if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
-            UpdateNetworkState();
-        }
-    } else {
+    if (operatorInfoResult_->flag != networkSearchManager->GetSerialNum(slotId_)) {
         TELEPHONY_LOGI("Aborting outdated operator info event slotId:%{public}d", slotId_);
+        return;
+    }
+    networkSearchManager->decMsgNum(slotId_);
+    if (networkSearchManager->GetRadioState(slotId_) == static_cast<int>(ModemPowerState::CORE_SERVICE_POWER_OFF)) {
+        TELEPHONY_LOGI("radio is power off, no need update operator info");
+        return;
+    }
+    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        UpdateNetworkState();
     }
     TELEPHONY_LOGD("NetworkSearchHandler::RadioRilOperator slotId:%{public}d", slotId_);
 }
