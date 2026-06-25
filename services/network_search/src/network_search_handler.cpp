@@ -630,6 +630,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     psRegStatusResultInfo_ = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResultInfo_ == nullptr) {
         TELEPHONY_LOGE("psRegStatusResult is nullptr slotId:%{public}d", slotId_);
+        HandleResponseError(event);
         return;
     }
     if (psRegStatusResultInfo_->flag != networkSearchManager->GetSerialNum(slotId_)) {
@@ -661,6 +662,7 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
     csRegStatusInfo_ = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStatusInfo_ == nullptr) {
         TELEPHONY_LOGE("csRegStatusResult is nullptr slotId:%{public}d", slotId_);
+        HandleResponseError(event);
         return;
     }
     if (csRegStatusInfo_->flag != networkSearchManager->GetSerialNum(slotId_)) {
@@ -698,6 +700,25 @@ void NetworkSearchHandler::RadioSignalStrength(const AppExecFwk::InnerEvent::Poi
     TELEPHONY_LOGD("NetworkSearchHandler::RadioSignalStrength slotId:%{public}d", slotId_);
 }
 
+void NetworkSearchHandler::HandleResponseError(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto respInfo = event->GetSharedObject<RadioResponseInfo>();
+    if (respInfo == nullptr) {
+        return;
+    }
+    auto networkSearchManager = networkSearchManager_.lock();
+    if (static_cast<int64_t>(respInfo->flag) != networkSearchManager->GetSerialNum(slotId_)) {
+        TELEPHONY_LOGI("Aborting outdated error response slotId:%{public}d", slotId_);
+        return;
+    }
+    TELEPHONY_LOGE("Error response slotId:%{public}d error:%{public}d",
+        slotId_, static_cast<int32_t>(respInfo->error));
+    networkSearchManager->decMsgNum(slotId_);
+    if (networkSearchManager->CheckIsNeedNotify(slotId_)) {
+        UpdateNetworkState();
+    }
+}
+
 void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -714,6 +735,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
     operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult_ == nullptr) {
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
+        HandleResponseError(event);
         return;
     }
     if (operatorInfoResult_->flag == networkSearchManager->GetSerialNum(slotId_)) {

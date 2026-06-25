@@ -121,6 +121,7 @@ private:
     void RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioSignalStrength(const AppExecFwk::InnerEvent::Pointer &event);
     void RadioRilOperator(const AppExecFwk::InnerEvent::Pointer &event);
+    void HandleResponseError(const AppExecFwk::InnerEvent::Pointer &event);
     bool TimeOutCheck(int64_t &lastTime, bool checkTime = true);
     void NetworkSearchResult(const AppExecFwk::InnerEvent::Pointer &event);
     void GetNetworkSelectionModeResponse(const AppExecFwk::InnerEvent::Pointer &event);

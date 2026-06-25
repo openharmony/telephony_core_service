@@ -1957,5 +1957,113 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_UpdateDeviceState, Function | Medium
     networkSearchManager->UpdateDeviceState(0, true, false);
     EXPECT_TRUE(inner->networkSearchHandler_ != nullptr);
 }
+
+/**
+ * @tc.number   Telephony_HandleResponseError_001
+ * @tc.name     test HandleResponseError with error response flag matched
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_HandleResponseError_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchHandler->networkSearchManager_ = networkSearchManager;
+    networkSearchManager->SetRadioStateValue(0, ModemPowerState::CORE_SERVICE_POWER_ON);
+
+    inner->InitMsgNum();
+    inner->IncreaseSerialNum();
+    auto respInfo = std::make_shared<RadioResponseInfo>();
+    respInfo->flag = static_cast<int32_t>(inner->GetSerialNum());
+    respInfo->error = ErrType::ERR_GENERIC_FAILURE;
+    AppExecFwk::InnerEvent::Pointer errorEvent =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE, respInfo);
+    networkSearchHandler->RadioRilDataRegState(errorEvent);
+    EXPECT_EQ(inner->msgNum_, 2);
+}
+
+/**
+ * @tc.number   Telephony_HandleResponseError_002
+ * @tc.name     test HandleResponseError with error response flag not matched
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_HandleResponseError_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchHandler->networkSearchManager_ = networkSearchManager;
+    networkSearchManager->SetRadioStateValue(0, ModemPowerState::CORE_SERVICE_POWER_ON);
+
+    inner->InitMsgNum();
+    int64_t currentSerial = inner->IncreaseSerialNum();
+    auto respInfo = std::make_shared<RadioResponseInfo>();
+    respInfo->flag = static_cast<int32_t>(currentSerial - 1);
+    AppExecFwk::InnerEvent::Pointer outdatedEvent =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE, respInfo);
+    networkSearchHandler->RadioRilVoiceRegState(outdatedEvent);
+    EXPECT_EQ(inner->msgNum_, 3);
+}
+
+/**
+ * @tc.number   Telephony_HandleResponseError_003
+ * @tc.name     test HandleResponseError with no shared object in event
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_HandleResponseError_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchHandler->networkSearchManager_ = networkSearchManager;
+    networkSearchManager->SetRadioStateValue(0, ModemPowerState::CORE_SERVICE_POWER_ON);
+
+    inner->InitMsgNum();
+    inner->IncreaseSerialNum();
+    AppExecFwk::InnerEvent::Pointer emptyEvent =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE, 0);
+    networkSearchHandler->RadioRilOperator(emptyEvent);
+    EXPECT_EQ(inner->msgNum_, 3);
+}
+
+/**
+ * @tc.number   Telephony_HandleResponseError_004
+ * @tc.name     test normal PsRegStatusResultInfo with flag matched
+ * @tc.desc     Function test
+ */
+HWTEST_F(NetworkSearchBranchTest, Telephony_HandleResponseError_004, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    auto networkSearchHandler =
+        std::make_shared<NetworkSearchHandler>(networkSearchManager, telRilManager, simManager, 0);
+    auto inner = std::make_shared<NetworkSearchManagerInner>();
+    networkSearchManager->AddManagerInner(0, inner);
+    networkSearchHandler->networkSearchManager_ = networkSearchManager;
+    networkSearchManager->SetRadioStateValue(0, ModemPowerState::CORE_SERVICE_POWER_ON);
+
+    inner->InitMsgNum();
+    int64_t currentSerial = inner->IncreaseSerialNum();
+    auto psRegInfo = std::make_shared<PsRegStatusResultInfo>();
+    psRegInfo->flag = currentSerial;
+    psRegInfo->regStatus = TelRilRegStatus::REG_MT_HOME;
+    AppExecFwk::InnerEvent::Pointer normalEvent =
+        AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_DATA_REG_STATE, psRegInfo);
+    networkSearchHandler->RadioRilDataRegState(normalEvent);
+    EXPECT_EQ(inner->msgNum_, 2);
+}
 } // namespace Telephony
 } // namespace OHOS
