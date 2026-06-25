@@ -49,6 +49,8 @@ static const int UCS_BASE_POS = 2;
 static const int START_POS = 3;
 static const int END_POS = 4;
 static const int POS_NOT_BLANK = 1;
+static const int NETWORK_NAME_CODING_SCHEME_OFFSET = 4;
+static const int EXTRA_7BIT = 7;
 static char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 //GSM 03.38
 static wchar_t LANGUAGE_TABLE[] = {
