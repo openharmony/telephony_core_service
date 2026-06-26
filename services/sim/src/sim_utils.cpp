@@ -162,7 +162,7 @@ std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset
     return plmn;
 }
 
-std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen)
+std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen, const unsigned char state)
 {
     std::wstring wide_str = L"";
     int i = 0;
@@ -172,6 +172,7 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
     uint8_t high = 0;
     uint8_t low = 0;
     uint8_t gsmVal = 0;
+    uint8_t extraBit = 0;
     left = BYTE_LENGTH;
     n = (byteLen * BYTE_LENGTH) / CHAR_GSM_7BIT;
     TELEPHONY_LOGI("Gsm7bitConvertToString byteLen:%{public}d", byteLen);
@@ -197,10 +198,9 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
         wchar_t c = LANGUAGE_TABLE[gsmValIndex];
         wide_str += c;
     }
-    if (byteLen > 0 && byteLen % CHAR_GSM_7BIT == 0) {
-        wide_str = static_cast<int>(bytes[byteLen - 1]) > 1 ? wide_str : wide_str.substr(0, n);
-    } else {
-        wide_str = wide_str.substr(0, n);
+    extraBit = state & 0x0F; // 0x0F: Get low 4 bit
+    if (extraBit == EXTRA_7BIT) {
+        wide_str = wide_str.substr(0, n - 1);
     }
     TELEPHONY_LOGI("Gsm7bitConvertToString str:%{public}s", ToUtf8(wide_str).c_str());
     return ToUtf8(wide_str);
