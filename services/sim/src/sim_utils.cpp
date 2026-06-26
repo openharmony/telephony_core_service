@@ -162,7 +162,7 @@ std::string SIMUtils::BcdPlmnConvertToString(const std::string &data, int offset
     return plmn;
 }
 
-std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen, const unsigned char *state)
+std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byteLen, const unsigned char state)
 {
     std::wstring wide_str = L"";
     int i = 0;
@@ -198,7 +198,7 @@ std::string SIMUtils::Gsm7bitConvertToString(const unsigned char *bytes, int byt
         wchar_t c = LANGUAGE_TABLE[gsmValIndex];
         wide_str += c;
     }
-    extraBit = state[0] & (~(0xFF << (NETWORK_NAME_CODING_SCHEME_OFFSET)));
+    extraBit = state & 0x0F; // 0x0F: Get low 4 bit
     if (extraBit == EXTRA_7BIT) {
         wide_str = wide_str.substr(0, n - 1);
     }
