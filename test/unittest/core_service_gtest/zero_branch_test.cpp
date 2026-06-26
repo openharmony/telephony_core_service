@@ -1873,11 +1873,16 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
     EXPECT_FALSE(simUtils->CharsConvertToChar16(bytes, MAX_ENGLISH_NAME * OBTAIN_SPN_GENERAL, outChar16Len, false)
         == nullptr);
     str = "4308875066D309AA1D01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-    unsigned char *bytes1 = reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
-    simUtils->Gsm7bitConvertToString(bytes1 + 3, 7, bytes1[2]);
+    int recordLen = 0;
+    std::shared_ptr<unsigned char> data = simUtils->HexStringConvertToBytes(str, recordLen);
+    unsigned char *tlv = data.get();
+    simUtils->Gsm7bitConvertToString(tlv + 3, 7, tlv[2]);
+ 
     str = "4308805066D309AA1D01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-    unsigned char *bytes2 = reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
-    simUtils->Gsm7bitConvertToString(bytes2 + 3, 7, bytes2[2]);
+    recordLen = 0;
+    std::shared_ptr<unsigned char> data1 = simUtils->HexStringConvertToBytes(str, recordLen);
+    unsigned char *tlv1 = data1.get();
+    simUtils->Gsm7bitConvertToString(tlv1 + 3, 7, tlv1[2]);
     EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1, bytes[1]), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
