@@ -109,7 +109,7 @@ public:
     static std::shared_ptr<char16_t> CharsConvertToChar16(
         const unsigned char *charBytes, int charBytesLen, int &outChar16Len, bool bigEndian);
     static std::string Trim(std::string& str);
-    static std::string Gsm7bitConvertToString(const unsigned char *bytes, int byteLen, const unsigned char *state);
+    static std::string Gsm7bitConvertToString(const unsigned char *bytes, int byteLen, const unsigned char state);
     static std::string Cphs7bitConvertToString(const std::string &rawData);
     static std::string HexVecToHexStr(const std::vector<uint8_t> &arr);
 
