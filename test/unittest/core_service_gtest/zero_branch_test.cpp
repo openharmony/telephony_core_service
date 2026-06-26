@@ -1874,11 +1874,11 @@ HWTEST_F(BranchTest, Telephony_SIMUtils_001, Function | MediumTest | Level1)
         == nullptr);
     str = "4308875066D309AA1D01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
     unsigned char *bytes1 = reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
-    simUtils->Gsm7bitConvertToString(bytes1 + 3, 7, bytes1 + 2);
+    simUtils->Gsm7bitConvertToString(bytes1 + 3, 7, bytes1[2]);
     str = "4308805066D309AA1D01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
     unsigned char *bytes2 = reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
-    simUtils->Gsm7bitConvertToString(bytes2 + 3, 7, bytes2 + 2);
-    EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1, bytes + 1), "");
+    simUtils->Gsm7bitConvertToString(bytes2 + 3, 7, bytes2[2]);
+    EXPECT_NE(simUtils->Gsm7bitConvertToString(bytes, 1, bytes[1]), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(bytesTwo, 0, 0, 1), "");
     EXPECT_EQ(simUtils->DiallingNumberStringFieldConvertToString(nullptr, 0, 1, 1), "");
 }
