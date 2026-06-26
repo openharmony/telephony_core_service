@@ -85,7 +85,7 @@ void SimFileParse::ParsePnn(const std::vector<std::string> &records, SimFile &si
             tlv[NETWORK_NAME_IEI] == (unsigned char)LONG_NAME_FLAG) {
             file->longName =
                 SIMUtils::Gsm7bitConvertToString(tlv + NETWORK_NAME_TEXT_STRING, tlv[NETWORK_NAME_LENGTH] - 1,
-                    tlv + NETWORK_NAME_CODING_SCHEME);
+                    tlv[NETWORK_NAME_CODING_SCHEME]);
         }
         const int shortNameOffset = tagAndLength + tlv[NETWORK_NAME_LENGTH];
         if (recordLen > (shortNameOffset + tagAndLength) &&
@@ -93,7 +93,7 @@ void SimFileParse::ParsePnn(const std::vector<std::string> &records, SimFile &si
             (shortNameOffset + tagAndLength + static_cast<int>(tlv[shortNameOffset + NETWORK_NAME_LENGTH])) &&
             tlv[shortNameOffset + NETWORK_NAME_IEI] == (unsigned char)SHORT_NAME_FLAG) {
             file->shortName = SIMUtils::Gsm7bitConvertToString(tlv + (shortNameOffset + NETWORK_NAME_TEXT_STRING),
-                tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1, tlv + (shortNameOffset + NETWORK_NAME_CODING_SCHEME));
+                tlv[shortNameOffset + NETWORK_NAME_LENGTH] - 1, tlv[shortNameOffset + NETWORK_NAME_CODING_SCHEME]);
         }
         TELEPHONY_LOGI("longName: %{public}s, shortName: %{public}s", file->longName.c_str(), file->shortName.c_str());
         simFile.pnnFiles_.push_back(file);
