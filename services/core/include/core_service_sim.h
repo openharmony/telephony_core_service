@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 
+static const std::string USER_PREFER_PRIMARY_SLOT = "persist.telephony.userPreferPrimarySlot";
 class CoreServiceSim {
 public:
     CoreServiceSim() = default;
