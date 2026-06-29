@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t TELEPHONY_ESIM_SERVICE_SYS_ABILITY_ID = 66250;
-constexpr int32_t WAIT_REMOTE_TIME_SEC = 4;
+constexpr int32_t WAIT_REMOTE_TIME_SEC = 8;
 std::mutex g_loadMutex;
 std::condition_variable g_cv;
 void EsimServiceClientCallback::OnLoadSystemAbilitySuccess(
