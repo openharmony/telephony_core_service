@@ -417,6 +417,7 @@ int32_t CoreServiceSim::SetPrimarySlotId(int32_t slotId)
         TELEPHONY_LOGE("sim is not active");
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
+    SetParameter(USER_PREFER_PRIMARY_SLOT.c_str(), "true");
     return simManager_->SetPrimarySlotId(slotId, true);
 }
 
@@ -931,6 +932,7 @@ int32_t CoreServiceSim::SetActiveSim(int32_t slotId, int32_t enable)
         TELEPHONY_LOGE("simManager_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    SetParameter(USER_PREFER_PRIMARY_SLOT.c_str(), "true");
     return simManager_->SetActiveSim(slotId, enable);
 }
 
