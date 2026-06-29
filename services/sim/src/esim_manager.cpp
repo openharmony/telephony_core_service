@@ -301,6 +301,7 @@ int32_t EsimManager::SwitchToProfile(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     enumResult = esimFiles_[slotId]->SwitchToProfile(portIndex, iccId, forceDisableProfile);
+    SetParameter(USER_PREFER_PRIMARY_SLOT.c_str(), "true");
     return TELEPHONY_ERR_SUCCESS;
 }
 
