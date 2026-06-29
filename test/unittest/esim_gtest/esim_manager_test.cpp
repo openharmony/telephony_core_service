@@ -817,6 +817,7 @@ HWTEST_F(EsimManagerTest, SetEsimCaVerifyResult_002, Function | MediumTest | Lev
     int32_t ret = esimManager->SetEsimCaVerifyResult(slotId, result);
     EXPECT_EQ(ret, TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM);
 }
+
 #endif
 } // Telephony
 } // OHOS
