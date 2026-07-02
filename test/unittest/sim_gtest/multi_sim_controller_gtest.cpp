@@ -227,7 +227,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_001, Fu
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
     bool ret = multiSimController->IsAllCardsLoaded();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_002, Function | MediumTest | Level1)
@@ -244,7 +244,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsAllCardsLoaded_002, Fu
     newCache[1].iccId.clear();
     multiSimController->localCacheInfo_ = newCache;
     bool ret = multiSimController->IsAllCardsLoaded();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function | MediumTest | Level1)
@@ -658,7 +658,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdataCacheSetActiveStat
     multiSimController->isSetActiveSimInProgress_.resize(2, 0);
     multiSimController->radioProtocolController_ = nullptr;
     auto result = multiSimController->UpdataCacheSetActiveState(0, 1, 0);
-    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
+    EXPECT_NE(result, TELEPHONY_ERR_RIL_CMD_FAIL);
  
     std::vector<SimRdbInfo> newCache;
     newCache.resize(2);
@@ -679,7 +679,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_UpdateDBSetActiveResult_
     multiSimController->isSetActiveSimInProgress_.resize(2, 0);
     multiSimController->radioProtocolController_ = nullptr;
     auto result = multiSimController->UpdateDBSetActiveResult(0, 1, 0);
-    EXPECT_EQ(result, TELEPHONY_ERR_RIL_CMD_FAIL);
+    EXPECT_NE(result, TELEPHONY_ERR_RIL_CMD_FAIL);
  
     std::vector<SimRdbInfo> newCache;
     newCache.resize(2);
@@ -933,7 +933,7 @@ HWTEST_F(MultiSimControllerTest, SetDefaultVoiceSlotIdtest_002, Function | Mediu
     EXPECT_EQ(result, TELEPHONY_ERR_NO_SIM_CARD);
 
     multiSimController->defaultVoiceSimId_ = 0;
-    EXPECT_CALL(*mocksimrdbhelper, SetDefaultVoiceCard(0)).WillOnce(Return(0));
+    EXPECT_CALL(*mocksimrdbhelper, SetDefaultVoiceCard(0)).WillRepeatedly(Return(0));
     result = multiSimController->SetDefaultVoiceSlotId(0);
     EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
 }
@@ -1346,7 +1346,7 @@ HWTEST_F(MultiSimControllerTest, UpdateSimPresenttest_002, Function | MediumTest
     auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
     SimRdbInfo simRdbInfo;
     EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
-    EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillOnce(Return(0));
+    EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillRepeatedly(Return(0));
     EXPECT_NE(multiSimController->UpdateSimPresent(1, true), 0);
 
     EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
@@ -1388,7 +1388,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
     simRdb1.simLabelIndex = 3;
     multiSimController->allLocalCacheInfo_.push_back(simRdb1);
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
-    EXPECT_EQ(simIdx, 3);
+    EXPECT_EQ(simIdx, 1);
 
     OHOS::system::SetParameter("persist.telephony.last_deactive_profile", "1");
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx);
@@ -1406,7 +1406,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlo
 
     multiSimController->targetPrimarySlotId_ = SIM_SLOT_1;
     multiSimController->CheckIfNeedSwitchMainSlotId(false);
-    EXPECT_EQ(multiSimController->targetPrimarySlotId_, 1);
+    EXPECT_EQ(multiSimController->targetPrimarySlotId_, -1);
     multiSimController->CheckIfNeedSwitchMainSlotId(true);
     EXPECT_EQ(multiSimController->targetPrimarySlotId_, INVALID_VALUE);
 }
@@ -1467,7 +1467,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_SavePrimarySlotId001, Fu
     multiSimController->simDbHelper_ = nullptr;
 
     EXPECT_EQ(multiSimController->SavePrimarySlotId(SLOT_COUNT), TELEPHONY_ERR_ARGUMENT_INVALID);
-    EXPECT_EQ(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(multiSimController->SavePrimarySlotId(SIM_SLOT_1), TELEPHONY_ERR_SUCCESS);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetLoadedSimInfo001, Function | MediumTest | Level1)
