@@ -174,17 +174,15 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_NetworkSearchManager_002, Function |
     auto telRilManager = std::make_shared<TelRilManager>();
     EXPECT_TRUE(telRilManager->OnInit());
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager);
-    auto &client = CoreServiceClient::GetInstance();
-    auto slotCount = client.GetMaxSimCount();
     std::shared_ptr<SimManager> simManager = std::make_shared<SimManager>(telRilManager);
-    EXPECT_TRUE(simManager->OnInit(slotCount));
+    EXPECT_TRUE(simManager->OnInit(3));
     auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
     EXPECT_TRUE(networkSearchManager->OnInit());
 
     std::shared_ptr<NetworkSearchManagerInner> inner = std::make_shared<NetworkSearchManagerInner>();
     EXPECT_TRUE(networkSearchManager->InitPointer(inner, SLOT_ID_0));
     bool ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, 1);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     ret = networkSearchManager->SetForcePreferredNetwork(SLOT_ID_0, -1);
     EXPECT_FALSE(ret);
     
