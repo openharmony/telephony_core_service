@@ -294,7 +294,7 @@ void MultiSimMonitor::InitData(int32_t slotId)
     }
     // InitData is triggered when the sim card file changes.
     // However, it should not be excuted when the eSIM profile is disabled.
-    if ((simStateManager_[slotId]->GetSimState() == SimState::SIM_STATE_UNKNOWN) && controller_->IsEsim(slotId)) {
+    if (simStateManager_[slotId]->GetSimState() <= SimState::SIM_STATE_NOT_PRESENT) {
         TELEPHONY_LOGE("MultiSimMonitor::InitData not init when esim is deactivated");
         return;
     }
