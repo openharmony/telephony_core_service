@@ -215,6 +215,7 @@ private:
     ffrt::mutex writeDbMutex_;
     ffrt::mutex forgetAllDataMutex_;
     ffrt::mutex activeSimInProgressMutex_;
+    ffrt::mutex setPrimarySlotRemainCountMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     bool isSettingPrimarySlotToRil_ = false;
