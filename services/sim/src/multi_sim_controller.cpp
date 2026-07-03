@@ -1475,13 +1475,7 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
         ResumePrimaryCardInfo(oldPrimarySlotId, oldMainCardIccId);
         TELEPHONY_LOGE("SetRadioProtocol failed");
         SetPrimarySlotIdDone(false);
-        std::unique_lock<ffrt::mutex> lock(setPrimarySlotRemainCountMutex_);
-        if (setPrimarySlotRemainCount_[slotId] > 0) {
-            SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
-            TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
-                setPrimarySlotRemainCount_[slotId], slotId);
-            setPrimarySlotRemainCount_[slotId]--;
-        }
+        RetrySetPrimarySlotId(slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     SendMainCardBroadCast(slotId);
@@ -1491,6 +1485,17 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
     return TELEPHONY_ERR_SUCCESS;
+}
+
+void MultiSimController::RetrySetPrimarySlotId(int32_t slotId)
+{
+    std::unique_lock<ffrt::mutex> lock(setPrimarySlotRemainCountMutex_);
+    if (setPrimarySlotRemainCount_[slotId] > 0) {
+        SendEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT, slotId, DELAY_TIME);
+        TELEPHONY_LOGI("SetPrimarySlotId retry remain %{public}d, slotId = %{public}d",
+            setPrimarySlotRemainCount_[slotId], slotId);
+        setPrimarySlotRemainCount_[slotId]--;
+    }
 }
 
 void MultiSimController::SavePrimaryCardInfo(int32_t slotId)
