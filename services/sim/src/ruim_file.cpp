@@ -245,7 +245,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
                 mcc = imsi_.substr(0, MCC_LEN);
             }
             std::string mnc = "";
-            isSizeEnough = imsiSize >= MCC_LEN + lengthOfMnc_;
+            isSizeEnough = static_cast<int>(imsiSize) >= static_cast<int>(MCC_LEN) + lengthOfMnc_;
             if ((lengthOfMnc_ != UNINITIALIZED_MNC) && (lengthOfMnc_ != UNKNOWN_MNC) && isSizeEnough) {
                 mnc = imsi_.substr(MCC_LEN, lengthOfMnc_);
             }
@@ -254,7 +254,7 @@ bool RuimFile::ProcessGetImsiDone(const AppExecFwk::InnerEvent::Pointer &event)
                 return false;
             }
             int mncLength = MccPool::ShortestMncLengthFromMcc(std::stoi(mcc));
-            isSizeEnough = imsiSize >= MCC_LEN + mncLength;
+            isSizeEnough = static_cast<int>(imsiSize) >= static_cast<int>(MCC_LEN) + mncLength;
             if (mnc.empty() && IsValidDecValue(mcc) && isSizeEnough) {
                 mnc = imsi_.substr(MCC_LEN, mncLength);
             }
