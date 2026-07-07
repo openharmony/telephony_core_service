@@ -178,6 +178,8 @@ private:
     void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
         int32_t simLabel, bool isEsim);
     int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
+    void UpdateActiveSimInProgress(int32_t slotId, int32_t enable);
+    void RetrySetPrimarySlotId(int32_t slotId);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -212,6 +214,8 @@ private:
     ffrt::mutex setPrimarySlotToRilMutex_;
     ffrt::mutex writeDbMutex_;
     ffrt::mutex forgetAllDataMutex_;
+    ffrt::mutex activeSimInProgressMutex_;
+    ffrt::mutex setPrimarySlotRemainCountMutex_;
     ffrt::condition_variable setPrimarySlotToRilCv_;
     std::weak_ptr<Telephony::ITelRilManager> telRilManager_;
     bool isSettingPrimarySlotToRil_ = false;

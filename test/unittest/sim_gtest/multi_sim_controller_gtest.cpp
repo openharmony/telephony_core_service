@@ -76,6 +76,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_Init_001, Function | Med
     multiSimController->Init();
     multiSimController->radioProtocolController_ = radioProtocolController;
     multiSimController->GetRadioProtocol(1);
+    multiSimController->UpdateActiveSimInProgress(0, 0);
+    
     EXPECT_EQ(multiSimController->isSetActiveSimInProgress_.size(), SIM_SLOT_COUNT);
 }
 
