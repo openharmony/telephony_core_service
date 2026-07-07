@@ -101,7 +101,6 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
-    void RetrySetPrimarySlotId(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -180,6 +179,7 @@ private:
         int32_t simLabel, bool isEsim);
     int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
     void UpdateActiveSimInProgress(int32_t slotId, int32_t enable);
+    void RetrySetPrimarySlotId(int32_t slotId);
     
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
