@@ -1484,6 +1484,9 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     std::unique_lock<ffrt::mutex> lock(setPrimarySlotRemainCountMutex_);
     setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
+    if (isUserSet) {
+        RemoveEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
