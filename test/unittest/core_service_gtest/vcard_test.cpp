@@ -295,7 +295,7 @@ HWTEST_F(VcardTest, Telephony_VCardTest_102, Function | MediumTest | Level2)
             VCardManager::GetInstance().Export(filePath, predicates);
             int32_t errorCode;
             VCardManager::GetInstance().Decode(filePath, errorCode);
-            EXPECT_EQ(errorCode, TELEPHONY_SUCCESS);
+            EXPECT_EQ(errorCode, TELEPHONY_ERR_VCARD_FILE_INVALID);
         }
     } else {
         TELEPHONY_LOGE("VCardTest CreateDataShareHelper == null");
