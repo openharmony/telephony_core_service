@@ -1994,6 +1994,14 @@ int32_t NetworkSearchManager::StartOrStopManualNetworkScan(int32_t slotId, bool 
                 auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
                 networkSearchHandler->SendEvent(event);
             }
+        } else {
+            auto networkInfo = OHOS::sptr<NetworkInformation>::MakeSptr();
+            networkInfo->SetOperateInformation("", "", "", 0, -1);
+            SetNetworkSelectionMode(slotId, static_cast<int32_t>(SelectionMode::MODE_TYPE_MANUAL), networkInfo, true);
+            auto manualScanResult = std::make_shared<ManualScanResult>();
+            manualScanResult->isFinished = true;
+            auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_MANUAL_SEARCH_PLMN_LIST, manualScanResult);
+            networkSearchHandler->SendEvent(event);
         }
     }
     return TELEPHONY_ERR_SUCCESS;
