@@ -138,6 +138,7 @@ public:
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
     typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
+    typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -221,6 +222,7 @@ public:
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
+    void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -246,6 +248,7 @@ private:
     SetActiveSim setActiveSim_ = nullptr;
     GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
+    SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
