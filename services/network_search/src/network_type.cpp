@@ -86,6 +86,7 @@ void NetworkType::ProcessSetPreferredNetwork(const AppExecFwk::InnerEvent::Point
         if (networkMode >= static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_AUTO) &&
             networkMode < static_cast<int32_t>(PreferredNetworkMode::CORE_NETWORK_MODE_MAX_VALUE)) {
             networkSearchManager->SavePreferredNetworkValue(slotId_, networkMode);
+            TELEPHONY_EXT_WRAPPER.SavePreferredNetworkValueFunc(slotId_, networkMode);
         }
     } else {
         networkMode = networkSearchManager->GetPreferredNetworkValue(slotId_);
