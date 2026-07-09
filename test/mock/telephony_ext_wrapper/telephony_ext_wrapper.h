@@ -136,6 +136,7 @@ public:
     typedef void (*SetActiveSim)(int32_t slotId, int32_t enable);
     typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
+    typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -218,6 +219,7 @@ public:
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
+    void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -232,6 +234,7 @@ private:
     SetActiveSim setActiveSim_ = nullptr;
     GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
+    SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -404,6 +407,7 @@ inline bool GetResetActiveFlagImpl(int32_t slotId, bool &isActive)
 {
     return false;
 }
+inline void SavePreferredNetworkValueImpl(int32_t slotId, int32_t networkMode) {}
 // =================== TelephonyExtWrapper 成员 inline 实现（绑定空实现） ===================
 inline TelephonyExtWrapper::TelephonyExtWrapper() = default;
 
@@ -466,6 +470,7 @@ inline void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     processCellScanNetwork_ = &ProcessCellScanNetworkImpl;
     registryCoreNotify_ = &RegistryCoreNotifyImpl;
     unRegistryCoreNotify_ = &UnRegistryCoreNotifyImpl;
+    savePreferredNetworkValue_ = &SavePreferredNetworkValueImpl;
 }
 
 inline void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
@@ -625,6 +630,13 @@ inline bool TelephonyExtWrapper::GetResetActiveFlag(int32_t slotId, bool &isActi
         return getResetActiveFlag_(slotId, isActive);
     }
     return false;
+}
+
+inline void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode)
+{
+    if (savePreferredNetworkValue_ != nullptr) {
+        savePreferredNetworkValue_(slotId, networkMode);
+    }
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
