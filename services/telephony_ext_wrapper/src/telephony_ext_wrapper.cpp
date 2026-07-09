@@ -152,6 +152,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForNetWork1()
     if (unRegistryCoreNotify_ == nullptr) {
         TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
+    savePreferredNetworkValue_ = (SavePreferredNetworkValue)dlsym(telephonyExtWrapperHandle_,
+        "SavePreferredNetworkValue");
+    if (savePreferredNetworkValue_ == nullptr) {
+        TELEPHONY_LOGE("telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
 }
 
 void TelephonyExtWrapper::InitTelephonyExtWrapperForVoiceMail()
@@ -413,6 +418,13 @@ bool TelephonyExtWrapper::GetResetActiveFlag(int32_t slotId, bool &isActive)
         return getResetActiveFlag_(slotId, isActive);
     }
     return false;
+}
+
+void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode)
+{
+    if (savePreferredNetworkValue_ != nullptr) {
+        savePreferredNetworkValue_(slotId, networkMode);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
