@@ -101,5 +101,15 @@ HWTEST_F(TelStkControllerTest, Telephony_Sim_ReportEventToChr, Function | Medium
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 1));
     EXPECT_TRUE(telephonyExtWrapper.ReportEventToChr(0, "SIM_ACCOUNT_LOADED", 0));
 }
+
+HWTEST_F(TelStkControllerTest, Telephony_SavePreferredNetworkValue, Function | MediumTest | Level1)
+{
+    TelephonyExtWrapper telephonyExtWrapper;
+    telephonyExtWrapper.telephonyExtWrapperHandle_ = dlopen(TELEPHONY_EXT_WRAPPER_PATH.c_str(), RTLD_NOW);
+    telephonyExtWrapper.InitTelephonyExtWrapperForNetWork1();
+    telephonyExtWrapper.savePreferredNetworkValue_ = [](int32_t slotId, int32_t networkMode) {};
+    telephonyExtWrapper.SavePreferredNetworkValueFunc(0, 0);
+    EXPECT_TRUE(telephonyExtWrapper.savePreferredNetworkValue_ != nullptr);
+}
 } // namespace Telephony
 } // namespace OHOS
