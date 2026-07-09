@@ -1346,7 +1346,7 @@ HWTEST_F(MultiSimControllerTest, UpdateSimPresenttest_002, Function | MediumTest
     auto mocksimrdbhelper = std::make_shared<MockSimRdbHelper>();
     SimRdbInfo simRdbInfo;
     EXPECT_CALL(*mocksimrdbhelper, QueryDataByIccId(_, _)).Times(AnyNumber()).WillOnce(Return(0));
-    EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillRepeatedly(Return(0));
+    EXPECT_CALL(*mocksimrdbhelper, InsertData(_, _)).Times(AnyNumber()).Times(AnyNumber()).WillOnce(Return(0));
     EXPECT_NE(multiSimController->UpdateSimPresent(1, true), 0);
 
     EXPECT_CALL(*mockmultisimcontroller, SetSimLabelIndex(_, _)).Times(AnyNumber()).WillOnce(Return(0));
