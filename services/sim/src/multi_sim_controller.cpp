@@ -1065,6 +1065,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isUserSet)
 {
     if ((IsSatelliteSupported() == static_cast<int32_t>(SatelliteValue::SATELLITE_SUPPORTED) &&
         CoreManagerInner::GetInstance().IsSatelliteEnabled()) || IsSimSlotsMapping()) {
+        RemoveEvent(WAIT_FOR_ALL_CARDS_READY_EVENT);
         SendEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT, WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT);
         TELEPHONY_LOGW("satelliteStatusOn or simslots is mapping, no need check main slotId");
         return;
@@ -1484,9 +1485,6 @@ int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
     std::unique_lock<ffrt::mutex> lock(setPrimarySlotRemainCountMutex_);
     setPrimarySlotRemainCount_[slotId] = RETRY_TIMES;
     RemoveEvent(MultiSimController::SET_PRIMARY_SLOT_RETRY_EVENT);
-    if (isUserSet) {
-        RemoveEvent(MultiSimController::WAIT_FOR_ALL_CARDS_READY_EVENT);
-    }
     return TELEPHONY_ERR_SUCCESS;
 }
 
@@ -2037,6 +2035,7 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     isSetPrimarySlotIdInProgress_ = true;
+    targetPrimarySlotId_ = slotId;
     PublishSetPrimaryEvent(false, true);
     if (!SetPrimarySlotToRil(slotId)) {
         TELEPHONY_LOGE("SetPrimarySlotToRil failed");
