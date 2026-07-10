@@ -377,7 +377,7 @@ void RadioProtocolController::UpdateRadioProtocol(std::shared_ptr<RadioProtocol>
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
     int32_t slotId = radioProtocol->slotId;
-    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT)) {
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < static_cast<int32_t>(radioProtocol_.size()))) {
         radioProtocol_[slotId].sessionId = radioProtocol->sessionId;
         radioProtocol_[slotId].phase = radioProtocol->phase;
         radioProtocol_[slotId].technology = radioProtocol->technology;
