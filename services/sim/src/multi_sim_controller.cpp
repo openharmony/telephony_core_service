@@ -1440,8 +1440,21 @@ bool MultiSimController::IsSetPrimarySlotIdAllowed()
     return true;
 }
 
+void MultiSimController::SetTargetPrimarySlotId(int32_t slotId) {
+    TELEPHONY_LOGI("set target primary slotId, slotId:%{public}d", slotId);
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("no sim card");
+        return;
+    if (!IsSimActive(slotId)) {
+        TELEPHONY_LOGE("no sim active");
+        return;
+    };
+    targetPrimarySlotId_ = slotId;
+}
+
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
+    SetTargetPrimarySlotId(slotId);
     if (isUserSet && isRilSetPrimarySlotSupport_) {
         return SetPrimarySlotIdWithoutModemReboot(slotId);
     }
@@ -2035,7 +2048,6 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     isSetPrimarySlotIdInProgress_ = true;
-    targetPrimarySlotId_ = slotId;
     PublishSetPrimaryEvent(false, true);
     if (!SetPrimarySlotToRil(slotId)) {
         TELEPHONY_LOGE("SetPrimarySlotToRil failed");
