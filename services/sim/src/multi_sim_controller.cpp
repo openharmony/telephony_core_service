@@ -1445,10 +1445,11 @@ void MultiSimController::SetTargetPrimarySlotId(int32_t slotId) {
     if (!IsValidData(slotId)) {
         TELEPHONY_LOGE("no sim card");
         return;
+    }
     if (!IsSimActive(slotId)) {
         TELEPHONY_LOGE("no sim active");
         return;
-    };
+    }
     targetPrimarySlotId_ = slotId;
 }
 
