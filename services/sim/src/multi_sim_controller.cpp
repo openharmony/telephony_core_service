@@ -1442,6 +1442,7 @@ bool MultiSimController::IsSetPrimarySlotIdAllowed()
 
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
+    TELEPHONY_LOGI("set primary slotId:%{public}d, isUserSet:%{public}d", slotId, isUserSet);
     if (isUserSet && isRilSetPrimarySlotSupport_) {
         return SetPrimarySlotIdWithoutModemReboot(slotId);
     }
@@ -2045,6 +2046,7 @@ int32_t MultiSimController::SetPrimarySlotIdWithoutModemReboot(int32_t slotId)
     SetPrimarySlotIdDone(true);
     RemoveEvent(RIL_SET_PRIMARY_SLOT_TIMEOUT_EVENT);
     targetPrimarySlotId_ = INVALID_VALUE;
+    TELEPHONY_LOGI("target primary slotId:%{public}d", targetPrimarySlotId_);
     return TELEPHONY_ERR_SUCCESS;
 }
 
