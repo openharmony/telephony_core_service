@@ -932,8 +932,12 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
         return false;
     }
     builder->Asn1AddChild(subNode);
+    bool refreshFlag = true;
     bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
-    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, !isSupportEsimMep);
+    if (isSupportEsimMep) {
+        refreshFlag = OHOS::system::GetBoolParameter("const.ril.sim.esim_mep_refresh_flag", false);
+    }
+    builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, refreshFlag);
     ApduSimIORequestInfo reqInfo;
     CommBuildOneApduReqInfo(reqInfo, builder);
     if (telRilManager_ == nullptr) {
@@ -2829,7 +2833,8 @@ bool EsimFile::ProcessSwitchToProfile(int32_t slotId, const AppExecFwk::InnerEve
     builder->Asn1AddChild(subNode);
     bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, true);
     if (isSupportEsimMep) {
-        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, false);
+        bool refreshFlag = OHOS::system::GetBoolParameter("const.ril.sim.esim_mep_refresh_flag", false);
+        builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, refreshFlag);
         builder->Asn1AddChildAsInteger(TAG_ESIM_CTX_2, esimProfile_.portIndex);
     } else {
         builder->Asn1AddChildAsBoolean(TAG_ESIM_CTX_1, true);

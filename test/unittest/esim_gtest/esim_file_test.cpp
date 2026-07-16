@@ -610,7 +610,7 @@ HWTEST_F(EsimFileTest, SendApduData002, TestSize.Level1)
     std::u16string aid = u"test";
     EsimApduData apduData;
     apduData.closeChannelFlag_ = true;
-    esimFile->aidStr_ = u"test";
+    esimFile->aidStr_ = aid;
     esimFile->SendApduData(aid, apduData);
     ASSERT_TRUE(esimFile != nullptr);
 }
