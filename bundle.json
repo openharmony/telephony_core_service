@@ -61,6 +61,7 @@
                 "i18n",
                 "init",
                 "ipc",
+                "kv_store",
                 "location",
                 "napi",
                 "netmanager_base",
