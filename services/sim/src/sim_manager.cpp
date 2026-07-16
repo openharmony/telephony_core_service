@@ -94,7 +94,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
         return TELEPHONY_ERROR;
     }
     std::lock_guard<ffrt::shared_mutex> lck(mtx_);
-    if (simStateManager_.size() == MAX_SLOT_COUNT) {
+    if (simStateManager_.size() >= MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("SimManager InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;
     }

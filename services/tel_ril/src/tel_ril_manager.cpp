@@ -125,7 +125,7 @@ int32_t TelRilManager::InitTelExtraModule(int32_t slotId)
     if (slotId != SIM_SLOT_2) {
         return TELEPHONY_ERROR;
     }
-    if (telRilCall_.size() == MAX_SLOT_COUNT) {
+    if (telRilCall_.size() >= MAX_SLOT_COUNT) {
         TELEPHONY_LOGI("InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;
     }
