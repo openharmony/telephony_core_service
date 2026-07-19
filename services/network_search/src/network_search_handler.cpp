@@ -1563,7 +1563,7 @@ bool NetworkSearchHandler::CheckRegistrationState(const std::shared_ptr<NetworkS
         TELEPHONY_LOGE("NetworkSearchHandler::CheckRegistrationState manager is nullptr!");
         return false;
     }
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         if (networkSearchManager->GetCsRegState(slotId) ==
             static_cast<int32_t>(RegServiceState::REG_STATE_IN_SERVICE) ||
             networkSearchManager->GetPsRegState(slotId) ==

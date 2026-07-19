@@ -125,7 +125,7 @@ void MultiSimController::Init()
     if (multiSimHelper_ == nullptr) {
         multiSimHelper_ = std::make_shared<MultiSimHelper>();
     }
-    maxCount_ = SIM_SLOT_COUNT;
+    maxCount_ = SIM_SLOT_COUNT_MD;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
     setPrimarySlotRemainCount_.resize(maxCount_, RETRY_TIMES);
     refreshLocalCacheRemainCount_ = RETRY_TIMES;
@@ -224,6 +224,7 @@ void MultiSimController::AddExtraManagers(std::shared_ptr<Telephony::SimStateMan
             std::unique_lock<ffrt::mutex> lock(activeSimInProgressMutex_);
             isSetActiveSimInProgress_.push_back(0);
         }
+
         maxCount_ = MAX_SLOT_COUNT;
         size_t count = localCacheInfo_.size();
         TELEPHONY_LOGI("localCacheInfo_.size() = %{public}lu, maxCount_ = %{public}d",
@@ -1144,7 +1145,7 @@ int32_t MultiSimController::GetDefaultMainSlotByIccId()
 
 bool MultiSimController::IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT_MD));
 }
 
 bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
@@ -1394,7 +1395,7 @@ void MultiSimController::RefreshSimManagerCache()
 {
     auto simManager = simManager_.lock();
     if (simManager != nullptr) {
-        for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
             simManager->RefreshCache(i);
         }
     }
@@ -1408,7 +1409,7 @@ void MultiSimController::SetSimManagerPtr(std::weak_ptr<SimManager> simManager)
 void MultiSimController::ObtainDualSimCardStatus()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->ObtainIccStatus();
         }
@@ -1419,7 +1420,7 @@ void MultiSimController::SetInSenseSwitchPhase(bool flag)
 {
     TELEPHONY_LOGI("SetInSenseSwitchPhase to %{public}d", flag);
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->SetInSenseSwitchPhase(flag);
         }

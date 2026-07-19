@@ -323,9 +323,9 @@ private:
 
     inline int32_t GetMaxSimSlot() const
     {
-        auto maxSimCount = SIM_SLOT_COUNT;
+        auto maxSimCount = SIM_SLOT_COUNT_MD;
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
-        if (SIM_SLOT_COUNT == DUAL_SLOT_COUNT) {
+        if (maxSimCount == DUAL_SLOT_COUNT) {
             maxSimCount = MAX_SLOT_COUNT;
         }
 #endif

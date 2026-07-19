@@ -98,7 +98,7 @@ static Telephony_RadioResult TelephonyErrorCodeTrans(int32_t err)
 
 static bool IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT_MD + 1));
 }
 
 Telephony_RadioResult Conv2TelNetworkState(const OHOS::sptr<NetworkState> &networkState, Telephony_NetworkState *state)

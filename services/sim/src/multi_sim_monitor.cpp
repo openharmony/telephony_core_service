@@ -61,8 +61,8 @@ MultiSimMonitor::~MultiSimMonitor()
 void MultiSimMonitor::Init()
 {
     TELEPHONY_LOGD("init");
-    isSimAccountLoaded_.resize(SIM_SLOT_COUNT, 0);
-    initDataRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
+    isSimAccountLoaded_.resize(SIM_SLOT_COUNT_MD, 0);
+    initDataRemainCount_.resize(SIM_SLOT_COUNT_MD, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
     initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
@@ -243,7 +243,7 @@ void MultiSimMonitor::SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig)
     if (!isBlockLoadOperatorConfig) {
         return;
     }
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         std::string key = "";
         SetParameter(key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId)).c_str(), "true");
     }
@@ -253,7 +253,7 @@ bool MultiSimMonitor::GetBlockLoadOperatorConfig()
 {
     std::string key = "";
     char isBlockLoadOperatorConfig[SYSPARA_SIZE] = {0};
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         key.clear();
         key.append(IS_BLOCK_LOAD_OPERATORCONFIG).append(std::to_string(slotId));
         GetParameter(key.c_str(), "false", isBlockLoadOperatorConfig, SYSPARA_SIZE);
