@@ -35,6 +35,7 @@ namespace {
 const int32_t FORMAT_IDX_SPN_CS = 0;
 const int32_t PNN_CUST_STRING_SIZE = 2;
 const int32_t OPL_CUST_STRING_SIZE = 4;
+const int32_t REAL_SIM_MAX_COUNT = 3;
 constexpr const char *CFG_DISPLAY_RULE_USE_ROAMING_FROM_NETWORK_STATE_BOOL =
     "persist.radio.cfg.display_rule_use_roaming_from_network_state";
 constexpr const char *TTS_SPEC_PLMN = "46004496";
@@ -392,7 +393,10 @@ void OperatorName::PublishEvent(OperatorNameParams params, const RegServiceState
 
     CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
-    bool publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    bool publishResult = true;
+    if (slotId_ < REAL_SIM_MAX_COUNT) {
+        publishResult = CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    }
     if (TELEPHONY_EXT_WRAPPER.publishSpnInfoChangedExt_ != nullptr) {
         TELEPHONY_EXT_WRAPPER.publishSpnInfoChangedExt_(want);
     }

@@ -81,7 +81,7 @@ int32_t CoreManagerInner::InitExtraModule(int32_t slotId)
         TELEPHONY_LOGE("InitExtraModule, has been inited, return!");
         return TELEPHONY_SUCCESS;
     }
-    if (SIM_SLOT_COUNT != DUAL_SLOT_COUNT) {
+    if (SIM_SLOT_COUNT_REAL != DUAL_SLOT_COUNT) {
         TELEPHONY_LOGE("InitExtraModule, can not been inited because of slot number, return!");
         return TELEPHONY_ERROR;
     }

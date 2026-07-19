@@ -82,6 +82,7 @@ public:
     bool IsValidSlotId(int32_t slotId);
     bool IsValidSlotIdEx(int32_t slotId);
     bool IsValidSlotIdForDefault(int32_t slotId);
+    int32_t GetCurMaxSimCount();
     bool IsValidStringLength(std::u16string str);
     bool IsValidServiceType(ImsServiceType serviceType);
 
@@ -129,6 +130,8 @@ public:
     int32_t SetVoiceMailCount(int32_t slotId, int32_t voiceMailCount) override;
     int32_t GetImsRegStatus(int32_t slotId, ImsServiceType imsSrvType, ImsRegInfo &info) override;
     int32_t GetMaxSimCount() override;
+    int32_t GetMaxSimCountExt();
+    bool GetDistributeModemMultiDeviceSwitch();
     int32_t GetOpKey(int32_t slotId, std::u16string &opkey) override;
     int32_t GetOpKeyExt(int32_t slotId, std::u16string &opkeyExt) override;
     int32_t GetOpName(int32_t slotId, std::u16string &opname) override;

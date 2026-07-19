@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t SIM_SLOTS = 2;
+constexpr int32_t SIM_SLOTS = 8;
 class OperatorConfigHisysevent : public IOperatorConfigHisysevent {
 public:
     OperatorConfigHisysevent();
