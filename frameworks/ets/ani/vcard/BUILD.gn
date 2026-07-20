@@ -52,6 +52,7 @@ ohos_static_library("vcard_ani_cxx") {
   external_deps = [
     "ability_runtime:ani_base_context",
     "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
