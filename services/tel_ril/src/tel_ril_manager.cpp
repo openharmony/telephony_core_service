@@ -37,7 +37,7 @@ TelRilManager::TelRilManager() {}
 bool TelRilManager::OnInit()
 {
     CreatTelRilHandler();
-    for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = SIM_SLOT_0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         InitTelModule(slotId);
     }
     int32_t res = RegisterHdfStatusListener();

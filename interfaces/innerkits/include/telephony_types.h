@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 #define SIM_SLOT_COUNT GetMaxSlotCount<int32_t>()
+#define SIM_SLOT_COUNT_MD GetMaxSlotCountMd<int32_t>()
 #define SIM_SLOT_COUNT_REAL GetRealMaxSlotCount<int32_t>()
 #define PREFERRED_NETWORK_TYPE GetPreferredNetworkType<int32_t>()
 #define VSIM_MODEM_COUNT GetVSimModemCount<int32_t>()
@@ -48,6 +49,7 @@ const int32_t MAX_SLOT_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
 const int32_t DC_MAX_SLOT_COUNT = 2;
+const int32_t DC_MD_MAX_SLOT_COUNT = 8;
 std::atomic<int32_t> maxRealSlotCount_ = 0;
 int32_t maxSlotCount_ = 0;
 int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
@@ -74,6 +76,9 @@ constexpr const char *DYNAMIC_POWEROFF_MODEM = "telephony.dynamic_poweroff_modem
 constexpr const char *DYNAMIC_POWEROFF_MODEM_WITH_STR = "telephony.dynamic_poweroff_modem_with_str";
 constexpr const char *ENTER_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_ENTER_STR"; // enter tele power mode broadcast
 constexpr const char *EXIT_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_EXIT_STR"; // exit tele power mode broadcast
+constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE = "persist.distributedmodem.multidevice.enable";
+constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT = "false";
+constexpr const char *ENABLE_TRUE = "true";
 }
 
 template<typename T>
@@ -88,7 +93,7 @@ inline T GetVirtualModemSwitch()
 }
 
 template<typename T>
-inline T GetMaxSlotCount()
+T GetMaxSlotCount()
 {
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
@@ -98,6 +103,28 @@ inline T GetMaxSlotCount()
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
     }
+    return maxSlotCount_;
+}
+
+template<typename T>
+T GetMaxSlotCountMd()
+{
+// LCOV_EXCL_START
+    if (maxSlotCount_ == 0) {
+        char simSlotCount[SYSPARA_SIZE] = { 0 };
+        GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
+        maxSlotCount_ = std::atoi(simSlotCount);
+        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ <= DC_MAX_SLOT_COUNT)) {
+            maxSlotCount_ = DC_MAX_SLOT_COUNT;
+            char multiDeviceEnable[SYSPARA_SIZE] = { 0 };
+            GetParameter(DISTRIBUTEMODEM_MULTIDEVICE_ENABLE, DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT,
+                multiDeviceEnable, SYSPARA_SIZE);
+            if (strcmp(multiDeviceEnable, ENABLE_TRUE) == 0 && (maxSlotCount_ < DC_MD_MAX_SLOT_COUNT)) {
+                maxSlotCount_ = DC_MD_MAX_SLOT_COUNT;
+            }
+        }
+    }
+// LCOV_EXCL_STOP
     return maxSlotCount_;
 }
 

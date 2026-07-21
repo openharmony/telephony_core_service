@@ -173,7 +173,7 @@ bool NetworkSearchManager::OnInit()
         return false;
     }
     ClearManagerInner();
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         InitModuleBySlotId(slotId);
     }
     delayTime_ = GetDelayNotifyTime();
@@ -184,7 +184,7 @@ bool NetworkSearchManager::OnInit()
 
 void NetworkSearchManager::DeInit()
 {
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
         if (inner != nullptr) {
             inner->UnRegisterDeviceStateObserver();
@@ -199,7 +199,7 @@ int32_t NetworkSearchManager::InitTelExtraModule(int32_t slotId)
 
 int32_t NetworkSearchManager::InitModuleBySlotId(int32_t slotId)
 {
-    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT_MD) {
         return TELEPHONY_ERROR;
     }
     std::shared_ptr<NetworkSearchManagerInner> inner = FindManagerInner(slotId);
@@ -838,7 +838,7 @@ bool NetworkSearchManager::SetPreferredNetwork(int32_t slotId, int32_t networkMo
 
 bool NetworkSearchManager::SetForcePreferredNetwork(int32_t slotId, int32_t networkMode)
 {
-    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT_MD) {
         return false;
     }
     if (eventSender_ == nullptr) {
@@ -873,7 +873,7 @@ void NetworkSearchManager::SavePreferredNetworkValue(int32_t slotId, int32_t net
 
 int32_t NetworkSearchManager::UpdateRadioOn(int32_t slotId)
 {
-    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT_MD) {
         return TELEPHONY_ERROR;
     }
     std::shared_ptr<SettingUtils> settingHelper = SettingUtils::GetInstance();
@@ -1513,7 +1513,7 @@ void NetworkSearchManager::TriggerTimezoneRefresh(int32_t slotId)
 
 void NetworkSearchManager::InitAirplaneMode(int32_t slotId)
 {
-    if (slotId < 0 || slotId > SIM_SLOT_COUNT) {
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT_MD) {
         return;
     }
     bool mode = false;

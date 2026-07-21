@@ -1486,7 +1486,7 @@ int32_t CoreServiceProxy::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc
 
 bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 {
-    int32_t count = GetMaxSimCount();
+    int32_t count = GetCurMaxSimCount();
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count)) {
         return true;
     }
@@ -1497,7 +1497,7 @@ bool CoreServiceProxy::IsValidSlotId(int32_t slotId)
 
 bool CoreServiceProxy::IsValidSlotIdEx(int32_t slotId)
 {
-    int32_t count = GetMaxSimCount();
+    int32_t count = GetCurMaxSimCount();
     // One more slot for VSim.
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count + 1)) {
         return true;
@@ -1509,7 +1509,7 @@ bool CoreServiceProxy::IsValidSlotIdEx(int32_t slotId)
 
 bool CoreServiceProxy::IsValidSlotIdForDefault(int32_t slotId)
 {
-    int32_t count = GetMaxSimCount();
+    int32_t count = GetCurMaxSimCount();
     if ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < count)) {
         return true;
     }
@@ -2531,6 +2531,30 @@ int32_t CoreServiceProxy::GetMaxSimCount()
 {
     return GetRealSimCount();
 }
+
+// LCOV_EXCL_START
+int32_t CoreServiceProxy::GetMaxSimCountExt()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("WriteInterfaceToken failed");
+        return TELEPHONY_ERROR;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Remote is null");
+        return TELEPHONY_ERROR;
+    }
+    int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_MAX_SIM_COUNT), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("failed, error code is %{public}d", st);
+        return TELEPHONY_ERROR;
+    }
+    return reply.ReadInt32();
+}
+// LCOV_EXCL_STOP
 
 int32_t CoreServiceProxy::GetRealSimCount()
 {
@@ -3577,5 +3601,30 @@ int32_t CoreServiceProxy::SetSimLabelIndex(
     }
     return reply.ReadInt32();
 }
+
+// LCOV_EXCL_START
+bool CoreServiceProxy::GetDistributeModemMultiDeviceSwitch()
+{
+    char multiDeviceEnable[SYSPARA_SIZE] = { 0 };
+    GetParameter(DISTRIBUTEMODEM_MULTIDEVICE_ENABLE, DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT,
+        multiDeviceEnable, SYSPARA_SIZE);
+    if (strcmp(multiDeviceEnable, ENABLE_TRUE) == 0) {
+        return true;
+    }
+    return false;
+}
+
+int32_t CoreServiceProxy::GetCurMaxSimCount()
+{
+    int32_t count = GetMaxSimCount();
+    if (GetDistributeModemMultiDeviceSwitch()) {
+        int32_t ret = GetMaxSimCountExt();
+        if (ret != TELEPHONY_ERROR) {
+            count = ret;
+        }
+    }
+    return count;
+}
+// LCOV_EXCL_STOP
 } // namespace Telephony
 } // namespace OHOS

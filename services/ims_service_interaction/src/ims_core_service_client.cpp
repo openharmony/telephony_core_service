@@ -139,7 +139,7 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallback()
         TELEPHONY_LOGE("RegisterImsCoreServiceCallback return, register callback error.");
         return TELEPHONY_ERR_FAIL;
     }
-    for (int32_t slotId = SimSlotId::SIM_SLOT_0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = SimSlotId::SIM_SLOT_0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         if (GetHandler(slotId) != nullptr) {
             GetImsRegistrationStatus(slotId);
         }

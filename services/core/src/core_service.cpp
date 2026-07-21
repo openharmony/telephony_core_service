@@ -103,7 +103,7 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager_);
-    int32_t slotCount = GetMaxSimCount();
+    int32_t slotCount = SIM_SLOT_COUNT_MD;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     esimManager_ = std::make_shared<EsimManager>(telRilManager_);
     esimManager_->OnInit(SIM_SLOT_COUNT_REAL);
@@ -120,7 +120,7 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().OnInit(networkSearchManager_, simManager_, telRilManager_);
-    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT; slotId++) {
+    for (int32_t slotId = 0; slotId < SIM_SLOT_COUNT_MD; slotId++) {
         networkSearchManager_->InitAirplaneMode(slotId);
     }
     TELEPHONY_LOGI("CoreService::Init success");
@@ -841,7 +841,7 @@ int32_t CoreService::SetVoiceMailInfo(
 
 int32_t CoreService::GetMaxSimCount()
 {
-    return SIM_SLOT_COUNT;
+    return SIM_SLOT_COUNT_MD;
 }
 
 int32_t CoreService::GetOpKey(int32_t slotId, std::u16string &opkey)

@@ -92,7 +92,7 @@ int32_t SimAccountManager::UpdateOperatorConfigs(int32_t slotId)
 
 bool SimAccountManager::IsValidSlotId(int32_t slotId)
 {
-    int32_t count = SIM_SLOT_COUNT;
+    int32_t count = SIM_SLOT_COUNT_MD;
     if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < count)) {
         return true;
     } else {
@@ -103,7 +103,7 @@ bool SimAccountManager::IsValidSlotId(int32_t slotId)
 
 bool SimAccountManager::IsValidSlotIdForDefault(int32_t slotId)
 {
-    int32_t count = SIM_SLOT_COUNT;
+    int32_t count = SIM_SLOT_COUNT_MD;
     if ((slotId >= DEFAULT_SIM_SLOT_ID_REMOVE) && (slotId < count)) {
         return true;
     } else {
