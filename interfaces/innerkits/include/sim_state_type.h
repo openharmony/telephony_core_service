@@ -338,6 +338,15 @@ enum class SimType {
     ESIM,
 };
 
+enum class CarrierType : int32_t {
+    UNKNOWN = 0,
+    CHINA_MOBILE,
+    CHINA_UNICOM,
+    CHINA_NET,
+    CHINA_BROADCASTING,
+    OVERSEAS,
+};
+
 struct SimLabel {
     SimType simType = SimType::PSIM;
     int32_t index = 0;
@@ -498,6 +507,20 @@ struct IccAccountInfo : public Parcelable {
     {
         return (slotIndex == p.slotIndex && simId == p.simId);
     }
+};
+
+struct SimCardInfo {
+    std::string iccId = "";
+    std::string imsi = "";
+    std::string gid1 = "";
+    std::string gid2 = "";
+    std::string spn = "";
+    std::string ehplmn = "";
+    int32_t plmnLength = 0;
+    int32_t phyCard = -1;
+    CarrierType carrierType = CarrierType::UNKNOWN;
+    bool isM0 = false;
+    SimLabel simLabel;
 };
 } // namespace Telephony
 } // namespace OHOS
