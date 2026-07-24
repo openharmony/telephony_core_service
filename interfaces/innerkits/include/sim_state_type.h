@@ -342,7 +342,7 @@ enum class CarrierType : int32_t {
     UNKNOWN = 0,
     CHINA_MOBILE,
     CHINA_UNICOM,
-    CHINA_TELECOM,
+    CHINA_NET,
     CHINA_BROADCASTING,
     OVERSEAS,
 };
