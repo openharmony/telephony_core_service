@@ -138,7 +138,7 @@ static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
         NR | LTE | TDSCDMA | WCDMA | GSM | EVDO | CDMA },
 };
 
-std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
+std::map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
 std::mutex NetworkUtils::callbackMapMutex_;
 ffrt::mutex NetworkUtils::callbackIndexMutex_;
 int64_t NetworkUtils::callbackIndex64bit_ = MIN_INDEX;

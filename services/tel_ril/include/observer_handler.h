@@ -17,7 +17,7 @@
 #define OBSERVER_HANDLER_H
 
 #include <mutex>
-#include <unordered_map>
+#include <map>
 
 #include "event_handler.h"
 #include "tel_event_handler.h"
@@ -70,7 +70,7 @@ public:
     }
 
 private:
-    std::unordered_map<int32_t, std::list<std::shared_ptr<AppExecFwk::EventHandler>>> observerHandlerMap_;
+    std::map<int32_t, std::list<std::shared_ptr<AppExecFwk::EventHandler>>> observerHandlerMap_;
     std::mutex mutex_;
 };
 } // namespace Telephony

@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../../../.."
@@ -22,6 +23,7 @@ rust_cxx("vcard_ani_cxx_gen") {
 }
 
 ohos_static_library("vcard_ani_cxx") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -37,7 +39,25 @@ ohos_static_library("vcard_ani_cxx") {
     "${target_gen_dir}/src",
   ]
 
-  branch_protector_ret = "pac_ret"
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+ 
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
   
   sources = [
     "src/cxx/ani_vcard.cpp",
@@ -77,7 +97,7 @@ ohos_rust_shared_library("vcard_ani") {
   }
 
   sources = [ "src/lib.rs" ]
-  
+
   external_deps = [
     "hilog:hilog_rust",
     "runtime_core:ani",

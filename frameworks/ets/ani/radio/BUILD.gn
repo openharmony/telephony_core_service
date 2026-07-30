@@ -38,6 +38,26 @@ ohos_static_library("telephony_radio_ani_cxx") {
 
   branch_protector_ret = "pac_ret"
 
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+ 
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
+
   sources = [
     "src/cxx/ani_radio.cpp",
     "src/cxx/network_search_callback.cpp",

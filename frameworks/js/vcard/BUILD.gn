@@ -10,8 +10,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../../../"
+
 ohos_shared_library("vcard") {
   branch_protector_ret = "pac_ret"
   include_dirs = [
@@ -29,6 +31,26 @@ ohos_shared_library("vcard") {
   ]
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
+
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+ 
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
 
   deps = [
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
@@ -59,6 +81,7 @@ ohos_shared_library("vcard") {
     "TELEPHONY_LOG_TAG = \"CoreServiceVcardJsApi\"",
     "LOG_DOMAIN = 0xD001F04",
   ]
+  
   subsystem_name = "telephony"
   part_name = "core_service"
   relative_install_dir = "module/telephony"
