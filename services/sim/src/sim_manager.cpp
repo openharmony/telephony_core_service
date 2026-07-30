@@ -736,6 +736,15 @@ void SimManager::GetRadioProtocol(int32_t slotId)
     return multiSimController_->GetRadioProtocol(slotId);
 }
 
+int32_t SimManager::GetRadioProtocolSlotIdByModemId(int32_t modemId)
+{
+    if (multiSimController_ == nullptr) {
+        TELEPHONY_LOGE("multiSimController_ is nullptr");
+        return INVALID_VALUE;
+    }
+    return multiSimController_->GetRadioProtocolSlotIdByModemId(modemId);
+}
+
 int32_t SimManager::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
 {
     if ((!IsValidSlotId(slotId)) || (stkManager_[slotId] == nullptr)) {

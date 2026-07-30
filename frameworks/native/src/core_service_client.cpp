@@ -1833,5 +1833,15 @@ int32_t CoreServiceClient::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex
     }
     return *result;
 }
+
+bool CoreServiceClient::IsMultiSimsCapabilitySupported(int32_t slotId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return false;
+    }
+    return proxy->IsMultiSimsCapabilitySupported(slotId);
+}
 }  // namespace Telephony
 } // namespace OHOS

@@ -1996,6 +1996,15 @@ void MultiSimController::GetRadioProtocol(int32_t slotId)
     radioProtocolController_->GetRadioProtocol(slotId);
 }
 
+int32_t MultiSimController::GetRadioProtocolSlotIdByModemId(int32_t modemId)
+{
+    if (radioProtocolController_ == nullptr) {
+        TELEPHONY_LOGE("radioProtocolController_ is nullptr");
+        return INVALID_VALUE;
+    }
+    return radioProtocolController_->GetRadioProtocolSlotIdByModemId(modemId);
+}
+
 int32_t MultiSimController::IsSatelliteSupported()
 {
     char satelliteSupported[SYSPARA_SIZE] = { 0 };

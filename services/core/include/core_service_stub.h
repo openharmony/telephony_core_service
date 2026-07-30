@@ -40,6 +40,7 @@ private:
     void AddHandlerOpkeyVersionToMap();
     void AddHandlerEsimToMap();
     void AddHandlerManualScanToMap();
+    void AddHandlerCapabilityToMap();
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -154,6 +155,7 @@ private:
     int32_t OnStopManualNetworkScan(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartManualNetworkScan(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetSimLabelIndex(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsMultiSimsCapabilitySupported(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CoreServiceFunc> memberFuncMap_;

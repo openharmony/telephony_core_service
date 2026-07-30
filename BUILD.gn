@@ -18,6 +18,7 @@ TELEPHONY_NETWORK_SEARCH_ROOT = "services/network_search"
 TELEPHONY_SIM_ROOT = "services/sim"
 TELEPHONY_TEL_RIL_ROOT = "services/tel_ril"
 TELEPHONY_IMS_CORE_SERVICE_SRC_PATH = "services/ims_service_interaction/src"
+TELEPHONY_CAPABILITY_MGR_ROOT = "common/capability_mgr"
 
 if (core_service_satellite) {
   TELEPHONY_SATELLITE_CORE_SERVICE_SRC_PATH =
@@ -131,6 +132,7 @@ ohos_shared_library("tel_core_service") {
     "services/core/src/core_service_stub.cpp",
     "services/core/src/raw_parcel_callback_proxy.cpp",
     "services/core/src/core_service_common_event_hub.cpp",
+    "$TELEPHONY_CAPABILITY_MGR_ROOT/src/multi_sims_capability_manager.cpp",
   ]
   if (core_service_support_esim) {
     sources += [
@@ -157,6 +159,7 @@ ohos_shared_library("tel_core_service") {
     "services/core/include",
     "services/satellite_service_interaction/include",
     "utils/log/include",
+    "$TELEPHONY_CAPABILITY_MGR_ROOT/include",
   ]
 
   if (core_service_support_esim) {

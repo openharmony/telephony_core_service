@@ -3625,6 +3625,34 @@ int32_t CoreServiceProxy::GetCurMaxSimCount()
     }
     return count;
 }
+
+bool CoreServiceProxy::IsMultiSimsCapabilitySupported(int32_t slotId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!WriteInterfaceToken(data)) {
+        TELEPHONY_LOGE("IsMultiSimsCapabilitySupported WriteInterfaceToken is false");
+        return false;
+    }
+    if (!data.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("IsMultiSimsCapabilitySupported WriteInt32 slotId failed");
+        return false;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("IsMultiSimsCapabilitySupported Remote is null");
+        return false;
+    }
+    int32_t st = remote->SendRequest(
+        static_cast<uint32_t>(CoreServiceInterfaceCode::IS_MULTI_SIMS_CAPABILITY_SUPPORTED), data, reply, option);
+    if (st != ERR_NONE) {
+        TELEPHONY_LOGE("IsMultiSimsCapabilitySupported failed, error code is %{public}d", st);
+        return false;
+    }
+    bool result = reply.ReadBool();
+    return result;
+}
 // LCOV_EXCL_STOP
 } // namespace Telephony
 } // namespace OHOS

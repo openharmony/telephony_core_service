@@ -1017,6 +1017,14 @@ public:
      */
     int32_t SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, int64_t timeoutMs = DEFAULT_RAW_CALLBACK_TIMEOUT_MS);
 
+    /**
+     * @brief Checks whether multi-SIMs capability is supported for a given slot.
+     *
+     * @param slotId[in], sim slot id
+     * @return returns true if supported; returns false otherwise.
+     */
+    bool IsMultiSimsCapabilitySupported(int32_t slotId);
+
 private:
     void RemoveDeathRecipient(const wptr<IRemoteObject> &remote, bool isRemoteDied);
     class CoreServiceDeathRecipient : public IRemoteObject::DeathRecipient {

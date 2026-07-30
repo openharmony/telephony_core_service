@@ -73,6 +73,17 @@ int32_t RadioProtocolController::GetRadioProtocolModemId(int32_t slotId)
     return static_cast<int32_t>(radioProtocol_[slotId].modemId);
 }
 
+int32_t RadioProtocolController::GetRadioProtocolSlotIdByModemId(int32_t modemId)
+{
+    std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
+    for (int32_t i = 0; i < static_cast<int32_t>(radioProtocol_.size()); i++) {
+        if (radioProtocol_[i].modemId == modemId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void RadioProtocolController::GetRadioProtocol(int32_t slotId)
 {
     auto telRilManager = telRilManager_.lock();

@@ -79,6 +79,7 @@ public:
     int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
+    int32_t GetRadioProtocolSlotIdByModemId(int32_t modemId);
     bool InitShowName(int slotId);
     void ReCheckPrimary();
     bool IsDataShareError();
