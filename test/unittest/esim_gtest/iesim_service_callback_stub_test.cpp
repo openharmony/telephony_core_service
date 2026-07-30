@@ -52,6 +52,7 @@ void IEsimServiceCallbackStubTest::TearDown() {}
 HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoList, Function | MediumTest | Level1)
 {
     MessageParcel data;
+    data.WriteInterfaceToken(IEsimServiceCallbackStub::GetDescriptor());
     std::shared_ptr<IEsimServiceCallbackStub> stub = std::make_shared<IEsimServiceCallbackStub>();
     int endIndex = static_cast<int>(IEsimServiceCallback::EsimServiceCallback::GET_EID_RESULT);
     for (int requestId = static_cast<int>(IEsimServiceCallback::EsimServiceCallback::GET_EUICCINFO_RESULT);
@@ -66,6 +67,7 @@ HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoList, Function | Med
 HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoListFailed, Function | MediumTest | Level1)
 {
     MessageParcel data;
+    data.WriteInterfaceToken(IEsimServiceCallbackStub::GetDescriptor());
     std::shared_ptr<IEsimServiceCallbackStub> stub = std::make_shared<IEsimServiceCallbackStub>();
     constexpr uint32_t outIndex = 99;
     int32_t ret = stub->OnEsimServiceCallback(static_cast<IEsimServiceCallback::EsimServiceCallback>(outIndex), data);
