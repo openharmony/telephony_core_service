@@ -646,7 +646,6 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
-    TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
 
 void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event)
