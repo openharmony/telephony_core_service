@@ -363,7 +363,6 @@ std::string& NetworkSearchState::GetRoamingString()
         int n = SIM_SLOT_COUNT > 0 ? SIM_SLOT_COUNT : 0;
         return std::string(n, '0');
     }();
-    TELEPHONY_LOGI("hpq: GetRoamingString: %{public}s", roamingStr.c_str());
     return roamingStr;
 }
 
