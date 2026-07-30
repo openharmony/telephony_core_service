@@ -33,8 +33,23 @@ ohos_shared_library("telephony_radio") {
   cflags_cc = [
     "-Wall",
     "-Werror",
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
     "-D_FORTIFY_SOURCE=2",
-    "-O2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
   ]
 
   deps = [

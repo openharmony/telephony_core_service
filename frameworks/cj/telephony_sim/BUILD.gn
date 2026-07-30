@@ -36,6 +36,26 @@ ohos_shared_library("cj_sim_ffi") {
 
   configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
 
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+ 
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
+
   deps = [
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits:tel_core_service_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtel_common",

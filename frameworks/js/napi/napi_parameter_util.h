@@ -193,7 +193,7 @@ std::optional<NapiError> MatchParameters(
     }
     bool typeMatched = true;
     std::apply(
-        [argc, &argv, &typeStd](Ts &... tupleArgs) {
+        [argc, &typeStd](Ts &... tupleArgs) {
             size_t index { 0 };
             ((index < argc ? (typeStd[index++] = GetInputArgvType(tupleArgs)) : true), ...);
         },

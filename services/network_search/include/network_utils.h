@@ -58,7 +58,7 @@ public:
     static std::string FormatString(const std::string &format, Args... args);
 
 private:
-    static std::unordered_map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
+    static std::map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> networkSearchCacheMap_;
     static std::mutex callbackMapMutex_;
     static ffrt::mutex callbackIndexMutex_;
     static int64_t callbackIndex64bit_;

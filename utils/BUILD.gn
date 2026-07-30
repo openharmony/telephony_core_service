@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 SUBSYSTEM_DIR = "../.."
 import("//build/ohos.gni")
 import("$SUBSYSTEM_DIR/core_service/telephony_core_service.gni")
@@ -112,9 +113,29 @@ ohos_shared_library("libtel_common") {
     public_configs += [ ":telephony_codec_config" ]
   }
 
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+
   if (is_double_framework) {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
   }
+
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -191,13 +212,28 @@ ohos_shared_library("libtel_vcard") {
 
   public_configs = [ ":tel_contact_config" ]
 
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+
   if (is_double_framework) {
     cflags_cc = [ "-DCONFIG_DUAL_FRAMEWORK" ]
   }
 
-  cflags_cc = [
-    "-Os",
-    "-D_FORTIFY_SOURCE=2",
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
   ]
 
   include_dirs = [

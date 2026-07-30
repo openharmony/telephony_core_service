@@ -180,7 +180,7 @@ private:
     int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
     void UpdateActiveSimInProgress(int32_t slotId, int32_t enable);
     void RetrySetPrimarySlotId(int32_t slotId);
-    
+
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     const int ACTIVE_SIM_IN_PROGRESS = 1;

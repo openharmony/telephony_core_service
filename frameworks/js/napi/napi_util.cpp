@@ -20,7 +20,7 @@
 #include <cstring>
 #include <locale>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "core_service_errors.h"
@@ -66,7 +66,7 @@ static constexpr const char *JS_ERROR_ESIM_SYSTEM_ERROR_STRING = "System interna
 static constexpr const char *JS_ERROR_CALL_UT_INVALID_INPUT_CALL_NUMBER_STRING = "Invalid input call number.";
 static constexpr const char *JS_ERROR_CALL_UT_OPERATION_TOO_FREQUENT_STRING = "Operation too frequent.";
 
-static std::unordered_map<int32_t, const char *> errorMap_ = {
+static std::map<int32_t, const char *> errorMap_ = {
     { JsErrorCode::JS_ERROR_TELEPHONY_PERMISSION_DENIED, JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING },
     { JsErrorCode::JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API, JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING },
     { JsErrorCode::JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING },

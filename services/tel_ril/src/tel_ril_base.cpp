@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Telephony {
 std::atomic_int TelRilBase::nextSerialId_(1);
-std::unordered_map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
+std::map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
 std::mutex TelRilBase::requestLock_;
 ffrt::mutex dealLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;

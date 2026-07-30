@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 import("../../../core_service/telephony_core_service.gni")
@@ -126,6 +127,26 @@ ohos_shared_library("tel_core_service_api") {
     deps = [ ":esim_service_api" ]
   }
 
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+ 
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
+
   external_deps = [
     "ability_base:configuration",
     "ability_base:want",
@@ -146,20 +167,15 @@ ohos_shared_library("tel_core_service_api") {
 
   if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_api_metrics)) {
-      external_deps += [ 
+      external_deps += [
         "api_metrics:histogrammanager",
       ]
-    defines += [ "API_METRICS_SUPPORT" ]  
+    defines += [ "API_METRICS_SUPPORT" ]
   }
-  
+
   if (core_service_support_esim) {
     external_deps += [ "ipc:ipc_core" ]
   }
-
-  cflags_cc = [
-    "-O2",
-    "-D_FORTIFY_SOURCE=2",
-  ]
 
   innerapi_tags = [ "platformsdk" ]
   part_name = "core_service"
