@@ -900,5 +900,30 @@ HWTEST_F(SimManagerTest, SetSimLabelIndexTest_003, Function | MediumTest | Level
     int32_t result = simManager_->SetSimLabelIndex(simId, 11);
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
 }
+
+HWTEST_F(SimManagerTest, IsNeedOperatorReLoad_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManagerPtr = std::make_shared<SimStateManager>(telRilManager);
+    auto telRilManagerWeak = std::weak_ptr<TelRilManager>(telRilManager);
+    auto simFileManagerPtr = std::make_shared<Telephony::SimFileManager>(
+        telRilManagerWeak, std::weak_ptr<Telephony::SimStateManager>(simStateManagerPtr));
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { simStateManagerPtr,
+        simStateManagerPtr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { simFileManagerPtr, simFileManagerPtr };
+    auto multiSimControllerMock = std::make_shared<MultiSimControllerMock>(telRilManager,
+        simStateManager, simFileManager);
+    std::vector<std::weak_ptr<Telephony::SimFileManager>> simFileManagerWeak = {
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr),
+        std::weak_ptr<Telephony::SimFileManager>(simFileManagerPtr)
+    };
+    auto multiSimMonitor = std::make_shared<MultiSimMonitor>(multiSimControllerMock,
+        simStateManager, simFileManagerWeak);
+    simManager_->multiSimMonitor_ = multiSimMonitor;
+    simStateManagerPtr->simStateHandle_ = std::make_shared<SimStateHandle>(simStateManagerPtr);
+    simStateManagerPtr->simStateHandle_->externalState_ = SimState::SIM_STATE_READY;
+    simFileManagerPtr->opKey_.clear();
+    EXPECT_TRUE(simManager_->multiSimMonitor_->IsNeedOperatorReLoad());
+}
 }
 }
