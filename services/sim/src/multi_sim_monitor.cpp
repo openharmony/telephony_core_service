@@ -635,7 +635,8 @@ bool MultiSimMonitor::IsNeedOperatorReLoad()
         if (simFileManager != nullptr && simStateManager_[slotId] != nullptr) {
             SimState currentState = simStateManager_[slotId]->GetSimState();
             auto opKey = simFileManager->GetOpKey();
-            TELEPHONY_LOGI("currentState is %{public}d and opKey is %{public}s", currentState, Str16ToStr8(opKey).data());
+            TELEPHONY_LOGI("currentState is %{public}d and opKey is %{public}s",
+                currentState, Str16ToStr8(opKey).data());
             if (currentState >= SimState::SIM_STATE_READY && opKey.empty()) {
                 needReload = true;
                 break;
