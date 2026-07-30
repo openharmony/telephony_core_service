@@ -63,6 +63,7 @@ private:
     void NotifyNrStateChange();
     void NotifyImsStateChange(ImsServiceType imsSrvType, const ImsRegInfo &info);
     ImsRegState GetImsRegState(const ImsServiceType type);
+    static std::string& GetRoamingString();
 
 private:
     std::mutex mutex_;
