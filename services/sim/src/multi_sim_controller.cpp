@@ -2138,7 +2138,7 @@ bool MultiSimController::IsEsim(int32_t slotId)
     propAtr = (slotId == SLOT_ID_0) ? GSM_SIM_ATR : propAtr;
     propAtr = (slotId == SLOT_ID_1) ? GSM_SIM_ATR1 : propAtr;
     propAtr = (slotId == SLOT_ID_2) ? GSM_SIM_ATR2 : propAtr;
-    propAtr = (slotId == SLOT_ID_3) ? GSM_SIM_ATR3 : propAtr; 
+    propAtr = (slotId == SLOT_ID_3) ? GSM_SIM_ATR3 : propAtr;
     if (propAtr.empty()) {
         TELEPHONY_LOGE("slotId %{public}d invalid, can't get atr prop.", slotId);
         return false;
