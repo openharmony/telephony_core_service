@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class TelRilUtils{
+class TelRilUtils {
 public:
     static bool IsValidSlotId(int32_t slotId);
 };
