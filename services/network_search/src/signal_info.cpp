@@ -90,7 +90,6 @@ bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
 
 static void PrintfLog(const Rssi &signalIntensity)
 {
-
     TELEPHONY_LOGD("cdma.absoluteRssi:%{public}d, cdma.ecno:%{public}d ", signalIntensity.cdma.absoluteRssi,
         signalIntensity.cdma.ecno);
 
