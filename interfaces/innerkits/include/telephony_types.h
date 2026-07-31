@@ -21,6 +21,7 @@
 
 #include "network_search_types.h"
 #include "operator_config_types.h"
+#include "sim_state_type.h"
 #include "parameter.h"
 #include "parameters.h"
 
@@ -46,6 +47,7 @@ const int32_t DSDS_MODE_V3 = 1;
 const size_t MAX_PARAMETER_LENGTH = 100;
 const int32_t DUAL_SLOT_COUNT = 2;
 const int32_t MAX_SLOT_COUNT = 3;
+const int32_t THREE_CARD_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
 const int32_t DC_MAX_SLOT_COUNT = 2;

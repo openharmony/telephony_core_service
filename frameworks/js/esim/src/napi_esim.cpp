@@ -63,7 +63,7 @@ size_t resetParameterCount = 0;
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1) && slotId != SIM_SLOT_2);
 }
 
 template<typename T, napi_async_execute_callback exec, napi_async_complete_callback complete>

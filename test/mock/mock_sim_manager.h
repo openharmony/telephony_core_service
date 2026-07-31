@@ -143,6 +143,8 @@ public:
     MOCK_METHOD0(GetMaxSimCount, int32_t(void));
     MOCK_METHOD0(GetRealSimCount, int32_t(void));
     MOCK_METHOD2(SetMatchSimStateTracker, void(int8_t, int32_t));
+    MOCK_METHOD1(SwitchSlotId, int32_t (int32_t));
+    MOCK_METHOD1(GetOverseasCarrierBySimInfo, std::string (const SimCardInfo &));
 };
 }
 }

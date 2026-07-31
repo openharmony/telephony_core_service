@@ -97,7 +97,7 @@ namespace Telephony {
 
     static inline bool IsValidSlotId(int32_t slotId)
     {
-        return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+        return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1) && slotId != SIM_SLOT_2);
     }
 
     static inline bool IsValidSlotIdEx(int32_t slotId)

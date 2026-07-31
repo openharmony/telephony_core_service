@@ -220,6 +220,7 @@ public:
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
     void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
+    int32_t SwitchSlotId(int32_t slotId);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -637,6 +638,10 @@ inline void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, i
     if (savePreferredNetworkValue_ != nullptr) {
         savePreferredNetworkValue_(slotId, networkMode);
     }
+}
+inline int32_t TelephonyExtWrapper::SwitchSlotId(int32_t slotId)
+{
+    return 0;
 }
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony

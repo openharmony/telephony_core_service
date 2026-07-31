@@ -355,6 +355,26 @@ struct SimLabel {
     {
         return (this->simType == p.simType && (p.simType ==SimType::ESIM || this->index == p.index));
     }
+        bool operator>(const SimLabel &p) const
+    {
+        if (this->simType == SimType::PSIM && p.simType == SimType::ESIM) {
+            return true;
+        }
+        if (this->simType == SimType::ESIM && p.simType == SimType::PSIM) {
+            return false;
+        }
+        return this->index > p.index;
+    }
+    bool operator<(const SimLabel &p) const
+    {
+        if (this->simType == SimType::PSIM && p.simType == SimType::ESIM) {
+            return false;
+        }
+        if (this->simType == SimType::ESIM && p.simType == SimType::PSIM) {
+            return true;
+        }
+        return this->index < p.index;
+    }
 };
 
 /**
@@ -511,6 +531,7 @@ struct IccAccountInfo : public Parcelable {
 
 struct SimCardInfo {
     std::string iccId = "";
+    std::string efust = "";
     std::string imsi = "";
     std::string gid1 = "";
     std::string gid2 = "";
@@ -519,8 +540,20 @@ struct SimCardInfo {
     int32_t plmnLength = 0;
     int32_t phyCard = -1;
     CarrierType carrierType = CarrierType::UNKNOWN;
-    bool isM0 = false;
-    SimLabel simLabel;
+    SimLabel simlabel;
+};
+
+struct CardFileDetectData {
+    int32_t phyCard;
+    int32_t lsi;
+    int32_t mncLen;
+    std::string iccId;
+    std::string efust;
+    std::string imsi;
+    std::string gid1;
+    std::string gid2;
+    std::string spn;
+    std::string ehplmn;
 };
 } // namespace Telephony
 } // namespace OHOS

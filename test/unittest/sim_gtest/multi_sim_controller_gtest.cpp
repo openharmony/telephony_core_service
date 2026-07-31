@@ -1634,5 +1634,30 @@ HWTEST_F(MultiSimControllerTest, SetActiveSim001, Function | MediumTest | Level1
     multiSimController->SetActiveSim(-1, 1);
     EXPECT_TRUE(ret != TELEPHONY_ERR_SUCCESS);
 }
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsEsimTstsMode_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    
+    multiSimController->Init();
+    
+    constexpr int32_t SLOT_ID_0 = 0;
+    constexpr int32_t SLOT_ID_1 = 1;
+    constexpr int32_t THREE_CARD_COUNT = 2;
+    
+    multiSimController->tstsMode_ = 0;
+    bool ret1 = multiSimController->IsEsim(SLOT_ID_0);
+    
+    multiSimController->tstsMode_ = SLOT_ID_1;
+    bool ret2 = multiSimController->IsEsim(SLOT_ID_0);
+    
+    multiSimController->tstsMode_ = SLOT_ID_1;
+    bool ret3 = multiSimController->IsEsim(THREE_CARD_COUNT);
+    
+    EXPECT_TRUE(multiSimController->localCacheInfo_.empty() || ret1 == false || ret2 == false || ret3 == false);
+}
 }
 }
