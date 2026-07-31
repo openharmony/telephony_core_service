@@ -66,6 +66,7 @@ constexpr int32_t ESIM_INDEX_UNKNOWN = -1;
 static constexpr int32_t SLOT_ID_0 = 0;
 static constexpr int32_t SLOT_ID_1 = 1;
 static constexpr int32_t SLOT_ID_2 = 2;
+static constexpr int32_t SLOT_ID_3 = 3;
 static const std::string PARAM_SIMID = "simId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
@@ -87,6 +88,7 @@ static const std::string SIM_LABEL_STATE_PROP = "persist.ril.sim_switch";
 static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
 static const std::string GSM_SIM_ATR1 = "gsm.sim.hw_atr1";
 static const std::string GSM_SIM_ATR2 = "gsm.sim.hw_atr2";
+static const std::string GSM_SIM_ATR3 = "gsm.sim.hw_atr3";
 static const std::string IS_SIMSLOTS_MAPPING_PROP = "persist.telephony.is_simslots_mapping";
 static const std::string INVALID_ICCID = "INVALID_ICCID";
 static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
@@ -133,6 +135,7 @@ void MultiSimController::Init()
     isRilSetPrimarySlotSupport_ =
         system::GetBoolParameter(RIL_SET_PRIMARY_SLOT_SUPPORTED, false);
     isSupportEsimMep_ = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    tstsMode_ = OHOS::system::GetIntParameter("persist.telephony.tsts_mode", 0);
     TELEPHONY_LOGI("Create SimRdbHelper count = %{public}d", maxCount_);
 }
 
@@ -485,6 +488,11 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
         values.Put(SimData::IS_CELLULAR_DATA_CARD, mainCardObj);
     }
     return simDbHelper_->UpdateDataByIccId(newIccId, values);
+}
+
+int32_t MultiSimController::SwitchSlotId(int32_t slotId)
+{
+    return TELEPHONY_EXT_WRAPPER.SwitchSlotId(slotId);
 }
 
 int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
@@ -2130,6 +2138,7 @@ bool MultiSimController::IsEsim(int32_t slotId)
     propAtr = (slotId == SLOT_ID_0) ? GSM_SIM_ATR : propAtr;
     propAtr = (slotId == SLOT_ID_1) ? GSM_SIM_ATR1 : propAtr;
     propAtr = (slotId == SLOT_ID_2) ? GSM_SIM_ATR2 : propAtr;
+    propAtr = (slotId == SLOT_ID_3) ? GSM_SIM_ATR3 : propAtr; 
     if (propAtr.empty()) {
         TELEPHONY_LOGE("slotId %{public}d invalid, can't get atr prop.", slotId);
         return false;

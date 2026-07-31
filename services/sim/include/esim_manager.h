@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t ESIM_SLOT_ID_ZERO = 0;
-const int32_t ESIM_MAX_SLOT_COUNT = 3;
+const int32_t ESIM_MAX_SLOT_COUNT = SIM_SLOT_COUNT + 1;
 class EsimManager : public IEsimManager {
 public:
     explicit EsimManager(std::shared_ptr<ITelRilManager> telRilManager);

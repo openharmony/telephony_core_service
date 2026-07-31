@@ -29,6 +29,7 @@
 #include "sim_account_manager.h"
 #include "icc_dialling_numbers_manager.h"
 #include "stk_manager.h"
+#include "card_file_detect_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -182,6 +183,11 @@ public:
     bool IsModemInitDone(int32_t slotId) override;
     int32_t GetMaxSimCount() override;
     int32_t GetRealSimCount() override;
+    int32_t SwitchSlotId(int32_t slotId) override;
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo) override;
+    int32_t SaveCardFileDetectData(const CardFileDetectData &data) override;
+    int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results) override;
+
     inline void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) override
     {
         if (operatorConfigHisysevent_ != nullptr) {
@@ -191,8 +197,6 @@ public:
 
 private:
     bool IsValidSlotId(int32_t slotId);
-    template<class N>
-    bool IsValidSlotId(int32_t slotId, std::vector<N> vec);
     bool IsValidAuthType(AuthType authType);
     bool IsValidSlotIdForDefault(int32_t slotId);
     void InitMultiSimObject();
@@ -211,6 +215,7 @@ private:
     std::vector<std::shared_ptr<Telephony::StkManager>> stkManager_;
     std::shared_ptr<MultiSimController> multiSimController_ = nullptr;
     std::shared_ptr<MultiSimMonitor> multiSimMonitor_ = nullptr;
+    std::shared_ptr<CardFileDetectManager> cardFileDetectManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> controllerRunner_ = nullptr;
     std::shared_ptr<AppExecFwk::EventRunner> monitorRunner_;
     int32_t slotCount_ = SLOT_ID_ZERO;

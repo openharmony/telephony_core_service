@@ -16,6 +16,9 @@
 #ifndef TELEPHONY_SIM_RDB_INFO_H
 #define TELEPHONY_SIM_RDB_INFO_H
 
+#include <cstdint>
+#include <string>
+
 namespace OHOS {
 namespace Telephony {
 class SimRdbInfo {
@@ -43,6 +46,14 @@ public:
     int isEsim;
     int simLabelIndex;
     std::string operatorName;
+    int32_t phyCard;
+    int32_t lsi;
+    int32_t mncLen;
+    std::string efust;
+    std::string gid1;
+    std::string gid2;
+    std::string spn;
+    std::string ehplmn;
 };
 
 enum class CardSeclectedStatus {

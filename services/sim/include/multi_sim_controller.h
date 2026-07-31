@@ -101,6 +101,7 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
+    int32_t SwitchSlotId(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -113,7 +114,7 @@ public:
         REFRESH_LOCAL_CACHE_RETRY,
         REFRESH_ALL_LOCAL_CACHE_RETRY,
     };
-    std::vector<bool> isSimSlotsMapping_ = {false, false};
+    std::vector<bool> isSimSlotsMapping_ = {false, false, false, false};
 
 private:
     bool IsValidData(int32_t slotId);
@@ -194,6 +195,7 @@ private:
     int32_t defaultVoiceSimId_ = 0;
     int32_t lastPrimarySlotId_ = 0;
     int32_t lastCellularDataSlotId_ = 0;
+    int32_t tstsMode_ = 0;
     bool waitCardsReady_ = false;
     int32_t targetPrimarySlotId_ = -1;
     static constexpr int32_t WAIT_REMOTE_TIME_SEC = 4;

@@ -51,6 +51,7 @@ public:
         std::weak_ptr<SimFileManager> simFileManager, std::shared_ptr<OperatorConfigCache> operatorConfigCache);
     virtual ~OperatorConfigLoader();
     OperatorConfig LoadOperatorConfig(int32_t slotId, int32_t state);
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
     int InitOpKeyData();
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {

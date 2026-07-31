@@ -42,7 +42,9 @@ bool EsimManager::OnInit(int32_t slotCount)
     esimFiles_.resize(slotCount_);
     esimFilesLowPriority_.resize(slotCount_);
     for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
-        if (DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId) == TELEPHONY_ERR_SUCCESS) {
+        // slot2 保留给天际通
+        if (DelayedRefSingleton<EsimServiceClient>::GetInstance().IsSupported(slotId) == TELEPHONY_ERR_SUCCESS &&
+            slotId != SIM_SLOT_2) {
             TELEPHONY_LOGI("esimFiles_[%{public}d] to be init", slotId);
             esimFiles_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
             esimFilesLowPriority_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
@@ -54,7 +56,7 @@ bool EsimManager::OnInit(int32_t slotCount)
 template<class N>
 bool EsimManager::IsValidSlotId(int32_t slotId, std::vector<N> vec)
 {
-    if ((slotId < ESIM_SLOT_ID_ZERO) || (slotId >= static_cast<int32_t>(vec.size()))) {
+    if ((slotId < ESIM_SLOT_ID_ZERO) || slotId == SIM_SLOT_2 || (slotId >= static_cast<int32_t>(vec.size()))) {
         TELEPHONY_LOGE("slotId is invalid by vec.size(), slotId = %{public}d", slotId);
         return false;
     }
@@ -231,6 +233,7 @@ int32_t EsimManager::PrepareDownload(int32_t slotId, const DownLoadConfigInfo &d
 int32_t EsimManager::LoadBoundProfilePackage(int32_t slotId, int32_t portIndex,
     const std::u16string &boundProfilePackage, ResponseEsimBppResult &responseResult)
 {
+    TELEPHONY_LOGE("multicard portIndex = %{public}d slotId = %{public}d", portIndex, slotId);
     if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

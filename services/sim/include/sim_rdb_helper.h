@@ -80,6 +80,7 @@ private:
         std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, const DataShare::DataSharePredicates &predicates);
     virtual void SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 
+    virtual void SaveDataToBeanEx(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean);
 private:
     enum class DefaultCardType {
         MAIN,

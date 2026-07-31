@@ -139,5 +139,13 @@ void SimAccountManager::UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChi
     }
     operatorConfigCache_->UpdateImsCapFromChip(slotId, imsCapFromChip);
 }
+std::string SimAccountManager::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
+{
+    if (simStateTracker_ == nullptr) {
+        TELEPHONY_LOGE("SimAccountManager::simStateTracker_ is null");
+        return "";
+    }
+    return simStateTracker_->GetOverseasCarrierBySimInfo(simCardInfo);
+}
 } // namespace Telephony
 } // namespace OHOS

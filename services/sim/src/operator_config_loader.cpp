@@ -40,7 +40,7 @@ OperatorConfigLoader::~OperatorConfigLoader() {}
 OperatorConfig OperatorConfigLoader::LoadOperatorConfig(int32_t slotId, int32_t state)
 {
     OperatorConfig opc;
-    if (slotId < 0 || slotId >= SIM_SLOTS) {
+    if (slotId < 0 || slotId > SIM_SLOTS) {
         TELEPHONY_LOGE("Invalid slotId: %{public}d", slotId);
         return opc;
     }
@@ -293,6 +293,49 @@ inline void OperatorConfigLoader::SetMatchSimStateTracker(MatchSimState matchSim
     if (operatorConfigHisysevent != nullptr) {
         operatorConfigHisysevent->SetMatchSimStateTracker(matchSimStateTracker, slotId);
     }
+}
+std::string OperatorConfigLoader::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
+{
+    Uri uri(OPKEY_INFO_URI);
+    std::vector<std::string> colume;
+    DataShare::DataSharePredicates predicates;
+    std::shared_ptr<DataShare::DataShareResultSet> resultSet;
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateOpKeyHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return DEFAULT_OPERATOR_KEY;
+    }
+    std::string mccMncCode = simCardInfo.imsi.substr(0, simCardInfo.plmnLength);
+    predicates.EqualTo(MCCMNC, mccMncCode);
+    resultSet = helper->Query(uri, predicates, colume);
+    if (resultSet != nullptr) {
+        std::string opKeyVal = mccMncCode;
+        std::string opNameVal = "COMMON";
+        std::string opKeyExtVal = "";
+        int count;
+        resultSet->GetRowCount(count);
+        if (count <= 0) {
+            TELEPHONY_LOGE("GetOpKey count: %{public}d, use MccMnc as opkey, COMMON as opname", count);
+            resultSet->Close();
+            return opKeyVal;
+        }
+        int columnIndex;
+        for (int row = 0; row < count; row++) {
+            if (MatchOperatorRule(resultSet, row)) {
+                resultSet->GetColumnIndex(OPKEY, columnIndex);
+                resultSet->GetString(columnIndex, opKeyVal);
+                resultSet->GetColumnIndex(OPNAME, columnIndex);
+                resultSet->GetString(columnIndex, opNameVal);
+                resultSet->GetColumnIndex(OPKEY_EXT, columnIndex);
+                resultSet->GetString(columnIndex, opKeyExtVal);
+            }
+        }
+        resultSet->Close();
+        helper->Release();
+        return opKeyVal;
+    }
+    helper->Release();
+    return DEFAULT_OPERATOR_KEY;
 }
 } // namespace Telephony
 } // namespace OHOS

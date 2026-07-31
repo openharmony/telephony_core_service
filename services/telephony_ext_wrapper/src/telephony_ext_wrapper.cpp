@@ -280,11 +280,13 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
     getRealSimCountExt_ =
         reinterpret_cast<GetRealSimCountExtFunc>(dlsym(telephonyExtWrapperHandle_, "GetRealSimCountExt"));
+    switchSlotId_ =
+        reinterpret_cast<SwitchSlotIdFunc>(dlsym(telephonyExtWrapperHandle_, "SwitchSlotId"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
         getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
-        getRealSimCountExt_ == nullptr);
+        getRealSimCountExt_ == nullptr || switchSlotId_ != nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -425,6 +427,13 @@ void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, int32_t 
     if (savePreferredNetworkValue_ != nullptr) {
         savePreferredNetworkValue_(slotId, networkMode);
     }
+}
+int32_t TelephonyExtWrapper::SwitchSlotId(int32_t slotId)
+{
+    if (switchSlotId_ != nullptr) {
+        return switchSlotId_(slotId);
+    }
+    return -1;
 }
 } // namespace Telephony
 } // namespace OHOS

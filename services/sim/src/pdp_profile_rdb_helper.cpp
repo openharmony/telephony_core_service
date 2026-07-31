@@ -41,7 +41,7 @@ std::shared_ptr<DataShare::DataShareHelper> PdpProfileRdbHelper::CreatePdpProfil
 
 bool PdpProfileRdbHelper::notifyInitApnConfigs(int32_t slotId)
 {
-    if (slotId < 0 || slotId >= SIM_SLOTS) {
+    if (slotId < 0 || slotId > SIM_SLOTS) {
         TELEPHONY_LOGE("Invalid slotId: %{public}d", slotId);
         return false;
     }
