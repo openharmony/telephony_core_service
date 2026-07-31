@@ -1108,7 +1108,6 @@ void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkSearchHandler::RadioGetImei event is nullptr!");
         return;
     }
-    TELEPHONY_LOGD("NetworkSearchHandler::RadioGetImei start slotId:%{public}d", slotId_);
     if (radioInfo_ != nullptr) {
         radioInfo_->ProcessGetImei(event);
     } else {
