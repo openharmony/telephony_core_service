@@ -1646,7 +1646,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsEsimTstsMode_001, Func
     
     constexpr int32_t SLOT_ID_0 = 0;
     constexpr int32_t SLOT_ID_1 = 1;
-    constexpr int32_t THREE_CARD_COUNT = 2;
+    constexpr int32_t SLOT_ID_2 = 2;
     
     multiSimController->tstsMode_ = 0;
     bool ret1 = multiSimController->IsEsim(SLOT_ID_0);
