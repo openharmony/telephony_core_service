@@ -1655,7 +1655,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsEsimTstsMode_001, Func
     bool ret2 = multiSimController->IsEsim(SLOT_ID_0);
     
     multiSimController->tstsMode_ = SLOT_ID_1;
-    bool ret3 = multiSimController->IsEsim(THREE_CARD_COUNT);
+    bool ret3 = multiSimController->IsEsim(SLOT_ID_2);
     
     EXPECT_TRUE(multiSimController->localCacheInfo_.empty() || ret1 == false || ret2 == false || ret3 == false);
 }
