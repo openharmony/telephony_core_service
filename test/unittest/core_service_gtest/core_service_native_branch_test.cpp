@@ -1016,7 +1016,7 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0022, Function 
     int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
     EXPECT_EQ(res, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_SwitchSlotId_001, Function | MediumTest | Lev)
+HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_SwitchSlotId_001, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
     mInner.OnInit(nullptr, nullptr, nullptr);
@@ -1025,7 +1025,7 @@ HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_SwitchSlotId_001, Functio
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_GetOverseasCarrierBySimInfo_001, Function | M)
+HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_GetOverseasCarrierBySimInfo_001, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
     mInner.OnInit(nullptr, nullptr, nullptr);
