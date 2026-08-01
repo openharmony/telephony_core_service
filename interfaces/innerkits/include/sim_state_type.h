@@ -355,7 +355,7 @@ struct SimLabel {
     {
         return (this->simType == p.simType && (p.simType ==SimType::ESIM || this->index == p.index));
     }
-        bool operator>(const SimLabel &p) const
+    bool operator>(const SimLabel &p) const
     {
         if (this->simType == SimType::PSIM && p.simType == SimType::ESIM) {
             return true;
