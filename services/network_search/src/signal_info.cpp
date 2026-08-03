@@ -90,8 +90,6 @@ bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
 
 static void PrintfLog(const Rssi &signalIntensity)
 {
-    TELEPHONY_LOGD("gm.rssi:%{public}d, gm.ber:%{public}d\n", signalIntensity.gw.rxlev, signalIntensity.gw.ber);
-
     TELEPHONY_LOGD("cdma.absoluteRssi:%{public}d, cdma.ecno:%{public}d ", signalIntensity.cdma.absoluteRssi,
         signalIntensity.cdma.ecno);
 
@@ -105,8 +103,6 @@ static void PrintfLog(const Rssi &signalIntensity)
                    "wcdma.ber:%{public}d ",
         signalIntensity.wcdma.rxlev, signalIntensity.wcdma.ecio, signalIntensity.wcdma.rscp, signalIntensity.wcdma.ber);
 
-    TELEPHONY_LOGD("tdScdma.rscp:%{public}d\n", signalIntensity.tdScdma.rscp);
-
     TELEPHONY_LOGD("nr.rsrp:%{public}d, "
                    "nr.rsrq:%{public}d, nr.sinr:%{public}d ",
         signalIntensity.nr.rsrp, signalIntensity.nr.rsrq, signalIntensity.nr.sinr);
@@ -115,7 +111,6 @@ static void PrintfLog(const Rssi &signalIntensity)
 __attribute__((no_sanitize("cfi")))
 void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event)
 {
-    TELEPHONY_LOGD("rssi start......\n");
     if (event == nullptr) {
         TELEPHONY_LOGE("event is nullptr\n");
         return;
@@ -129,7 +124,6 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const AppExecFwk::InnerE
     bool isUpdate = true;
     if (TELEPHONY_EXT_WRAPPER.processSignalInfos_ != nullptr) {
         isUpdate = TELEPHONY_EXT_WRAPPER.processSignalInfos_(slotId, *signalIntensity);
-        TELEPHONY_LOGD("TELEPHONY_EXT_WRAPPER.isUpdateSignal : %{public}d", isUpdate);
     }
     if (!isUpdate) {
         return;
