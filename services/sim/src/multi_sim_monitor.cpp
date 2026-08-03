@@ -629,7 +629,6 @@ void MultiSimMonitor::CheckDataShareError()
 
 bool MultiSimMonitor::IsNeedOperatorReLoad()
 {
-    bool needReload = false;
     for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
         auto simFileManager = simFileManager_[slotId].lock();
         if (simFileManager != nullptr && simStateManager_[slotId] != nullptr) {
@@ -638,12 +637,11 @@ bool MultiSimMonitor::IsNeedOperatorReLoad()
             TELEPHONY_LOGI("currentState is %{public}d and opKey is %{public}s",
                 currentState, Str16ToStr8(opKey).data());
             if (currentState >= SimState::SIM_STATE_READY && opKey.empty()) {
-                needReload = true;
-                break;
+                return true;
             }
         }
     }
-    return needReload;
+    return false;
 }
 
 void MultiSimMonitor::SetRemainCount(int remainCount)
