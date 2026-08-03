@@ -132,6 +132,7 @@ tel_core_service_src = [
   "$TELEPHONY_SIM_ROOT/src/sim_file_manager.cpp",
   "$TELEPHONY_SIM_ROOT/src/sim_file_parse.cpp",
   "$TELEPHONY_SIM_ROOT/src/sim_manager.cpp",
+  "$TELEPHONY_SIM_ROOT/src/card_file_detect_manager.cpp",
   "$TELEPHONY_SIM_ROOT/src/sim_number_decode.cpp",
   "$TELEPHONY_SIM_ROOT/src/sim_rdb_helper.cpp",
   "$TELEPHONY_SIM_ROOT/src/sim_sms_controller.cpp",
