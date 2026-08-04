@@ -1030,6 +1030,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    std::shared_ptr<Telephony::MultiSimHelper> multiSimHelper = std::make_shared<MultiSimHelper>();
     multiSimController->SortCache();
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;
     EXPECT_FALSE(multiSimController->InitData(0));
@@ -1040,7 +1041,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));
-    EXPECT_TRUE(multiSimController->AnnouncePrimarySimIdChanged(0, 0));
+    EXPECT_TRUE(multiSimHelper->AnnouncePrimarySimIdChanged(0, 0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
