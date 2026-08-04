@@ -1040,7 +1040,7 @@ HWTEST_F(BranchTest, Telephony_MultiSimController_001, Function | MediumTest | L
     EXPECT_FALSE(multiSimController->ForgetAllData());
     EXPECT_FALSE(multiSimController->ForgetAllData(0));
     EXPECT_FALSE(multiSimController->IsValidData(0));
-    EXPECT_TRUE(multiSimController->AnnouncePrimarySimIdChanged(0));
+    EXPECT_TRUE(multiSimController->AnnouncePrimarySimIdChanged(0, 0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultVoiceSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultSmsSimIdChanged(0));
     EXPECT_TRUE(multiSimController->AnnounceDefaultCellularDataSimIdChanged(0));
