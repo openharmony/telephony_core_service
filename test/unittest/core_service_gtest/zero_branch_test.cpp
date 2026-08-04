@@ -69,6 +69,7 @@
 #include "mock_sim_manager.h"
 #include "mock_multi_sim_controller.h"
 #include "network_search_test_callback_stub.h"
+#include "multi_sim_helper.h"
 
 namespace OHOS {
 namespace Telephony {
