@@ -66,9 +66,6 @@ void SimManager::InitMultiSimObject()
     stkManager_.resize(slotCount_);
     // Many card create
     for (int32_t slotId = 0; slotId < slotCount_; slotId++) {
-        if (slotId == SIM_SLOT_2) {
-            continue;
-        }
         InitBaseManager(slotId);
         simSmsManager_[slotId] =
             std::make_shared<SimSmsManager>(telRilManager_, simFileManager_[slotId], simStateManager_[slotId]);
