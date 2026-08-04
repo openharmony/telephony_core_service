@@ -67,6 +67,7 @@ static constexpr int32_t SLOT_ID_0 = 0;
 static constexpr int32_t SLOT_ID_1 = 1;
 static constexpr int32_t SLOT_ID_2 = 2;
 static const std::string PARAM_SIMID = "simId";
+static const std::string PARAM_SLOTID = "slotId";
 static const std::string PARAM_SET_PRIMARY_STATUS = "setDone";
 static const std::string PARAM_SET_PRIMARY_IS_USER_SET = "isUserSet";
 static const std::string DEFAULT_VOICE_SIMID_CHANGED = "defaultVoiceSimIdChanged";
@@ -1619,7 +1620,7 @@ void MultiSimController::SendMainCardBroadCast(int32_t slotId)
     primarySimId_ = localCacheInfo_[slotId].simId;
     lock.unlock();
     TELEPHONY_LOGI("Announce main simId %{public}d", primarySimId_);
-    AnnouncePrimarySimIdChanged(primarySimId_);
+    AnnouncePrimarySimIdChanged(primarySimId_, slotId);
 }
 
 void MultiSimController::SendDefaultCellularDataBroadCast(int32_t slotId)
@@ -1887,10 +1888,11 @@ bool MultiSimController::AnnounceDefaultCellularDataSimIdChanged(int32_t simId)
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
-bool MultiSimController::AnnouncePrimarySimIdChanged(int32_t simId)
+bool MultiSimController::AnnouncePrimarySimIdChanged(int32_t simId, int32_t slotId)
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SIMID, simId);
+    want.SetParam(PARAM_SLOTID, slotId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_MAIN_SIMID_CHANGED);
