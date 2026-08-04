@@ -63,6 +63,12 @@ IEsimServiceCallbackStub::IEsimServiceCallbackStub()
 
 int32_t IEsimServiceCallbackStub::OnEsimServiceCallback(EsimServiceCallback requestId, MessageParcel &data)
 {
+    std::u16string myDescriptor = IEsimServiceCallbackStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (myDescriptor != remoteDescriptor) {
+        TELEPHONY_LOGE("descriptor check fail!");
+        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
+    }
     uint32_t code = static_cast<uint32_t>(requestId);
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
@@ -210,12 +216,6 @@ int IEsimServiceCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     TELEPHONY_LOGI("IEsimServiceCallbackStub::OnRemoteRequest requestId:%{public}d", code);
-    std::u16string myDescriptor = IEsimServiceCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (myDescriptor != remoteDescriptor) {
-        TELEPHONY_LOGE("descriptor check fail!");
-        return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
-    }
     return OnEsimServiceCallback(static_cast<EsimServiceCallback>(code), data);
 }
 void IEsimServiceCallbackStub::OnGetEuiccInfo(const EuiccInfo &result, const int32_t errorCode)
