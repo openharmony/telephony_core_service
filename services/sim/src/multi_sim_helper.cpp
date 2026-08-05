@@ -20,6 +20,7 @@
 namespace OHOS {
 namespace Telephony {
 static const std::string PARAM_SIMID = "simId";
+static const std::string PARAM_SLOTID = "slotId";
 static const int32_t EVENT_CODE = 1;
 static constexpr int32_t DEC_TYPE = 10;
 static const std::string DEFAULT_SMS_SIMID_CHANGED = "defaultSmsSimIdChanged";
@@ -55,10 +56,11 @@ bool MultiSimHelper::AnnounceDefaultCellularDataSimIdChanged(int32_t simId)
     return PublishSimFileEvent(want, eventCode, eventData);
 }
 
-bool MultiSimHelper::AnnouncePrimarySimIdChanged(int32_t simId)
+bool MultiSimHelper::AnnouncePrimarySimIdChanged(int32_t simId, int32_t slotId)
 {
     AAFwk::Want want;
     want.SetParam(PARAM_SIMID, simId);
+    want.SetParam(PARAM_SLOTID, slotId);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_CARD_DEFAULT_MAIN_SUBSCRIPTION_CHANGED);
     int32_t eventCode = EVENT_CODE;
     std::string eventData(DEFAULT_MAIN_SIMID_CHANGED);

@@ -128,7 +128,6 @@ private:
     void RefreshSimManagerCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
-    bool AnnouncePrimarySimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
