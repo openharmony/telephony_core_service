@@ -1236,7 +1236,9 @@ int32_t NetworkSearchManager::GetRrcConnectionState(int32_t slotId, int32_t &sta
         TELEPHONY_LOGE("slotId:%{public}d inner or eventSender_ is null", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_RRC_CONNECTION_STATE);
+    if (slotId <= SIM_SLOT_COUNT) {
+        eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_RRC_CONNECTION_STATE);
+    }
     status = inner->rrcConnectionStatus_;
     return TELEPHONY_ERR_SUCCESS;
 }
