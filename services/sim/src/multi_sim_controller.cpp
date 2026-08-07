@@ -1628,10 +1628,6 @@ void MultiSimController::SendDefaultCellularDataBroadCast(int32_t slotId)
         TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
         return;
     }
-    if (localCacheInfo_[slotId].simId == defaultCellularSimId_) {
-        TELEPHONY_LOGE("no need to AnnouncePrimarySimIdChanged");
-        return;
-    }
     defaultCellularSimId_ = localCacheInfo_[slotId].simId;
     TELEPHONY_LOGI("Announce default cellular data simId %{public}d", defaultCellularSimId_);
     AnnounceDefaultCellularDataSimIdChanged(defaultCellularSimId_);
