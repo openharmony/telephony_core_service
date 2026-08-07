@@ -424,5 +424,17 @@ HWTEST_F(NetworkSearchBranchTest, NetworkState_V2Interface_Test, Function | Medi
     EXPECT_EQ(lastCfgTechV2, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
     EXPECT_EQ(lastPsRadioTechV2, RadioTech::RADIO_TECHNOLOGY_UNKNOWN);
 }
+
+HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateHandler_001, TestSize.Level0)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    auto networkSearchManager = std::make_shared<NetworkSearchManager>(telRilManager, simManager);
+    std::weak_ptr<TelRilManager> weakTelRilManager = telRilManager;
+    std::weak_ptr<NetworkSearchManager> weakNetworkSearchManager = networkSearchManager;
+    auto deviceStateHandler = std::make_shared<DeviceStateHandler>(weakNetworkSearchManager, weakTelRilManager, 100);
+    deviceStateHandler->SetNotificationFilter(0, true);
+    EXPECT_EQ(deviceStateHandler->notificationFilter_, -1);
+}
 } // namespace Telephony
 } // namespace OHOS
