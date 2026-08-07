@@ -177,7 +177,7 @@ void DeviceStateHandler::SetCellRequestMinInterval(uint32_t minInterval) const
 
 void DeviceStateHandler::SetNotificationFilter(int32_t newFilter, bool force)
 {
-    if (!force && newFilter == notificationFilter_) {
+    if ((!force && newFilter == notificationFilter_.load()) || slotId_ > SIM_SLOT_COUNT) {
         TELEPHONY_LOGD("DeviceStateHandler::SetNotificationFilter is not necessary");
         return;
     }
