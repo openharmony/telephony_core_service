@@ -337,6 +337,8 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
         static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER),
     };
     std::vector<uint8_t> euiccProfileTags;
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
@@ -715,8 +717,24 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
         std::shared_ptr<Asn1Node> pOperatorId = profileNode->Asn1GetChild(TAG_ESIM_OPERATOR_ID);
         BuildOperatorId(eProfileInfo, pOperatorId);
     }
+    if (profileNode->Asn1HasChild(TAG_ESIM_PORT)) {
+        std::shared_ptr<Asn1Node> eSIMPort = profileNode->Asn1GetChild(TAG_ESIM_PORT);
+        if (eSIMPort == nullptr) {
+            TELEPHONY_LOGE("eSIMPort is nullptr");
+            return;
+        }
+        int32_t ret = eSIMPort->Asn1AsInteger();
+        esimProfile_.portIndex = ret;
+        TELEPHONY_LOGI("enable esim port: %{public}d", esimProfile_.portIndex);
+    }
 
     BuildAdvancedProfileInfo(eProfileInfo, profileNode);
+}
+
+int32_t EsimFile::GetEsimPortIndex()
+{
+    TELEPHONY_LOGI("GetEsimPortIndex: %{public}d", esimProfile_.portIndex);
+    return esimProfile_.portIndex;
 }
 
 void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
@@ -1334,6 +1352,8 @@ std::vector<uint8_t> EsimFile::GetProfileTagList()
         static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER),
+        static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER),
     };
     std::vector<uint8_t> getProfileTags;
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
