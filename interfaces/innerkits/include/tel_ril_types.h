@@ -69,6 +69,9 @@ enum class ErrType : int32_t {
     /** Pin or puk password is not correct */
     ERR_PINPUK_PASSWORD_NOCORRECT,
 
+    /** Set CHDATA fail */
+    ERR_SET_CHDATA_FAIL,
+
     /** Invalid modem parameter */
     ERR_INVALID_MODEM_PARAMETER = 50,
 
