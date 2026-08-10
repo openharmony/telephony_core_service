@@ -717,21 +717,11 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
         std::shared_ptr<Asn1Node> pOperatorId = profileNode->Asn1GetChild(TAG_ESIM_OPERATOR_ID);
         BuildOperatorId(eProfileInfo, pOperatorId);
     }
-    if (profileNode->Asn1HasChild(TAG_ESIM_PORT)) {
-        std::shared_ptr<Asn1Node> eSIMPort = profileNode->Asn1GetChild(TAG_ESIM_PORT);
-        if (eSIMPort == nullptr) {
-            TELEPHONY_LOGE("eSIMPort is nullptr");
-            return;
-        }
-        int32_t ret = eSIMPort->Asn1AsInteger();
-        esimProfile_.portIndex = ret;
-        TELEPHONY_LOGI("enable esim port: %{public}d", esimProfile_.portIndex);
-    }
 
     BuildAdvancedProfileInfo(eProfileInfo, profileNode);
 }
 
-int32_t EsimFile::GetEsimPortIndex()
+int32_t simFile::GetEsimPortIndex()
 {
     TELEPHONY_LOGI("GetEsimPortIndex: %{public}d", esimProfile_.portIndex);
     return esimProfile_.portIndex;
@@ -740,13 +730,11 @@ int32_t EsimFile::GetEsimPortIndex()
 void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
 {
     if (eProfileInfo == nullptr || profileNode == nullptr) {
-        TELEPHONY_LOGE("BuildAdvancedProfileInfo failed");
         return;
     }
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_STATE)) {
         std::shared_ptr<Asn1Node> profileStateNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_STATE);
         if (profileStateNode == nullptr) {
-            TELEPHONY_LOGE("profileStateNode is nullptr");
             return;
         }
         int32_t ret = profileStateNode->Asn1AsInteger();
@@ -757,7 +745,6 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_CLASS)) {
         std::shared_ptr<Asn1Node> profileClassNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_CLASS);
         if (profileClassNode == nullptr) {
-            TELEPHONY_LOGE("profileClassNode is nullptr");
             return;
         }
         eProfileInfo->profileClass = profileClassNode->Asn1AsInteger();
@@ -767,7 +754,6 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_POLICY_RULE)) {
         std::shared_ptr<Asn1Node> profilePolicyRuleNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_POLICY_RULE);
         if (profilePolicyRuleNode == nullptr) {
-            TELEPHONY_LOGE("profilePolicyRuleNode is nullptr");
             return;
         }
         eProfileInfo->policyRules = profilePolicyRuleNode->Asn1AsBits();
@@ -777,10 +763,19 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
         std::shared_ptr<Asn1Node> carrierPrivilegeRulesNode =
             profileNode->Asn1GetChild(TAG_ESIM_CARRIER_PRIVILEGE_RULES);
         if (carrierPrivilegeRulesNode == nullptr) {
-            TELEPHONY_LOGE("carrierPrivilegeRulesNode is nullptr");
             return;
         }
         carrierPrivilegeRulesNode->Asn1GetChildren(TAG_ESIM_REF_AR_DO, refArDoNodes);
+    }
+    if (profileNode->Asn1HasChild(TAG_ESIM_PORT)) {
+        std::shared_ptr<Asn1Node> eSIMPort = profileNode->Asn1GetChild(TAG_ESIM_PORT);
+        if (eSIMPort == nullptr) {
+            TELEPHONY_LOGE("eSIMPort is nullptr");
+            return;
+        }
+        int32_t ret = eSIMPort->Asn1AsInteger();
+        esimProfile_.portIndex = ret;
+        TELEPHONY_LOGI("enable esim port: %{public}d", esimProfile_.portIndex);
     }
 }
 
