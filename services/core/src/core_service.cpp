@@ -39,6 +39,7 @@
 #include "esim_manager.h"
 #endif
 #include "core_service_common_event_hub.h"
+#include "multi_sims_capability_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1214,6 +1215,11 @@ int32_t CoreService::StartManualNetworkScanCallback(int32_t slotId, const sptr<I
 int32_t CoreService::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback)
 {
     return coreServiceSim_->SetSimLabelIndex(simId, simLabelIndex, callback);
+}
+
+bool CoreService::IsMultiSimsCapabilitySupported(int32_t slotId)
+{
+    return MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId);
 }
 } // namespace Telephony
 } // namespace OHOS

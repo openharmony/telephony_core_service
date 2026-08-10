@@ -43,6 +43,7 @@ CoreServiceStub::CoreServiceStub()
     AddHandlerOpkeyVersionToMap();
     AddHandlerEsimToMap();
     AddHandlerManualScanToMap();
+    AddHandlerCapabilityToMap();
 }
 
 void CoreServiceStub::AddHandlerNetWorkToMap()
@@ -303,6 +304,12 @@ void CoreServiceStub::AddHandlerManualScanToMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnStopManualNetworkScan(data, reply); };
     memberFuncMap_[uint32_t(CoreServiceInterfaceCode::START_MANUAL_NETWORK_SCAN)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnStartManualNetworkScan(data, reply); };
+}
+
+void CoreServiceStub::AddHandlerCapabilityToMap()
+{
+    memberFuncMap_[uint32_t(CoreServiceInterfaceCode::IS_MULTI_SIMS_CAPABILITY_SUPPORTED)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsMultiSimsCapabilitySupported(data, reply); };
 }
 
 int32_t CoreServiceStub::OnRemoteRequest(
@@ -2067,6 +2074,18 @@ int32_t CoreServiceStub::OnSetSimLabelIndex(MessageParcel &data, MessageParcel &
     if (!ret) {
         TELEPHONY_LOGE("OnRemoteRequest::SET_SIM_LABEL_INDEX write reply failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return NO_ERROR;
+}
+
+int32_t CoreServiceStub::OnIsMultiSimsCapabilitySupported(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t slotId = data.ReadInt32();
+    bool result = IsMultiSimsCapabilitySupported(slotId);
+    bool ret = reply.WriteBool(result);
+    if (!ret) {
+        TELEPHONY_LOGE("OnRemoteRequest::IS_MULTI_SIMS_CAPABILITY_SUPPORTED write reply failed.");
+        return ERR_FLATTEN_OBJECT;
     }
     return NO_ERROR;
 }

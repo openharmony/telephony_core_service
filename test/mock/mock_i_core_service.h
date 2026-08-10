@@ -173,6 +173,7 @@ public:
     MOCK_METHOD(int32_t, StopManualNetworkScanCallback, (int32_t slotId), (override));
     MOCK_METHOD(int32_t, SetSimLabelIndex, (
         int32_t simId, int32_t simLabelIndex, const sptr<IRawParcelCallback> &callback), (override));
+    MOCK_METHOD(bool, IsMultiSimsCapabilitySupported, (int32_t slotId), (override));
 };
 } // namespace Telephony
 } // namespace OHOS

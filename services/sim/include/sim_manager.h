@@ -97,6 +97,7 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) override;
     int32_t GetRadioProtocolTech(int32_t slotId) override;
     void GetRadioProtocol(int32_t slotId) override;
+    int32_t GetRadioProtocolSlotIdByModemId(int32_t modemId) override;
     int32_t GetDsdsMode(int32_t &dsdsMode) override;
     int32_t SetDsdsMode(int32_t dsdsMode) override;
     int32_t SendSimMatchedOperatorInfo(

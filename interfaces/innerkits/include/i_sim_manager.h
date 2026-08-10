@@ -84,6 +84,7 @@ public:
         int32_t slotId, AuthType authType, const std::string &authData, SimAuthenticationResponse &response) = 0;
     virtual int32_t GetRadioProtocolTech(int32_t slotId) = 0;
     virtual void GetRadioProtocol(int32_t slotId) = 0;
+    virtual int32_t GetRadioProtocolSlotIdByModemId(int32_t modemId) = 0;
     virtual int32_t GetDsdsMode(int32_t &dsdsMode) = 0;
     virtual int32_t SetDsdsMode(int32_t dsdsMode) = 0;
     virtual int32_t SendSimMatchedOperatorInfo(
