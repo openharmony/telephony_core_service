@@ -770,12 +770,10 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
     if (profileNode->Asn1HasChild(TAG_ESIM_PORT)) {
         std::shared_ptr<Asn1Node> eSIMPort = profileNode->Asn1GetChild(TAG_ESIM_PORT);
         if (eSIMPort == nullptr) {
-            TELEPHONY_LOGE("eSIMPort is nullptr");
             return;
         }
         int32_t ret = eSIMPort->Asn1AsInteger();
         esimProfile_.portIndex = ret;
-        TELEPHONY_LOGI("enable esim port: %{public}d", esimProfile_.portIndex);
     }
 }
 
