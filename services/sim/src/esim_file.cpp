@@ -605,9 +605,9 @@ bool EsimFile::RealProcessRequestAllProfilesDone()
     std::list<std::shared_ptr<Asn1Node>> profileNodes;
     profileRoot->Asn1GetChildren(TAG_ESIM_PROFILE_INFO, profileNodes);
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    EuiccProfileInfo euiccProfileInfo = {{0}};
     euiccProfileInfoList_.profiles_.clear();
     for (auto it = profileNodes.begin(); it != profileNodes.end(); ++it) {
+        EuiccProfileInfo euiccProfileInfo = {{0}};
         curNode = *it;
         if (!curNode->Asn1HasChild(TAG_ESIM_ICCID)) {
             TELEPHONY_LOGE("Profile must have an ICCID.");
@@ -655,6 +655,7 @@ void EsimFile::ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo
     dst.state_ = static_cast<ProfileState>(src.profileState);
     dst.profileClass_ = static_cast<ProfileClass>(src.profileClass);
     dst.policyRules_ = static_cast<PolicyRules>(src.policyRules);
+    dst.portIndex = src.portIndex;
 
     // split mccMnc to mcc and mnc
     std::string mcc = "";
