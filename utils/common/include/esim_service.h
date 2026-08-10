@@ -146,6 +146,7 @@ typedef struct TagEuiccProfileInfo {
     EsimOperatorId operatorId;
     int32_t policyRules = 0;
     std::list<std::shared_ptr<Asn1Node>> accessRules;
+    int32_t portIndex = 0;
 } EuiccProfileInfo;
 
 typedef struct TagPrepareDownloadResp {
