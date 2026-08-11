@@ -721,7 +721,7 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
     BuildAdvancedProfileInfo(eProfileInfo, profileNode);
 }
 
-int32_t simFile::GetEsimPortIndex()
+int32_t EsimFile::GetEsimPortIndex()
 {
     TELEPHONY_LOGI("GetEsimPortIndex: %{public}d", esimProfile_.portIndex);
     return esimProfile_.portIndex;
