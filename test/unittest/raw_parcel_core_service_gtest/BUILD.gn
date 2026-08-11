@@ -42,6 +42,7 @@ ohos_unittest("raw_parcel_core_service_test") {
     "$SOURCE_DIR/services/core/src/core_service.cpp",
     "$SOURCE_DIR/services/core/src/core_service_sim.cpp",
     "$SOURCE_DIR/services/core/src/core_service_common_event_hub.cpp",
+    "$SOURCE_DIR/common/capability_mgr/src/multi_sims_capability_manager.cpp",
     # deps src
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_callback_stub.cpp",
     "$SOURCE_DIR/services/ims_service_interaction/src/ims_core_service_client.cpp",
@@ -58,6 +59,7 @@ ohos_unittest("raw_parcel_core_service_test") {
     "$SOURCE_DIR/services/sim/include",
     "$SOURCE_DIR/services/network_search/include",
     "$SOURCE_DIR/services/tel_ril/include",
+    "$SOURCE_DIR/common/capability_mgr/include",
     "$SOURCE_DIR/test/mock",
     "$SOURCE_DIR/test/mock/telephony_ext_wrapper",
     "$SOURCE_DIR/utils/common/include",
@@ -100,6 +102,8 @@ ohos_unittest("raw_parcel_core_service_test") {
     "ability_runtime:data_ability_helper",
     "ability_runtime:dataobs_manager",
     "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
   ]

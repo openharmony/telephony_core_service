@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char *ROAMING_STATE = "telephony.roaming_state";
 NetworkSearchState::NetworkSearchState(const std::weak_ptr<NetworkSearchManager> &networkSearchManager, int32_t slotId)
     : networkSearchManager_(networkSearchManager), slotId_(slotId)
 {}
@@ -356,6 +357,15 @@ void NetworkSearchState::NotifyPsRegStatusChange()
     }
 }
 
+std::string& NetworkSearchState::GetRoamingString()
+{
+    static std::string roamingStr = []() -> std::string {
+        int n = SIM_SLOT_COUNT > 0 ? SIM_SLOT_COUNT : 0;
+        return std::string(n, '0');
+    }();
+    return roamingStr;
+}
+
 void NetworkSearchState::NotifyPsRoamingStatusChange()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -371,10 +381,20 @@ void NetworkSearchState::NotifyPsRoamingStatusChange()
     if (networkState_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkStateOld_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
         networkSearchManager->NotifyPsRoamingOpenChanged(slotId_);
+        auto& roamingStr = GetRoamingString();
+        if (slotId_ >= 0 && static_cast<size_t>(slotId_) < roamingStr.size()) {
+            roamingStr[slotId_] = static_cast<char>('0' + static_cast<int>(networkState_->GetPsRoamingStatus()));
+        }
+        SetParameter(ROAMING_STATE, roamingStr.c_str());
     }
     if (networkStateOld_->GetPsRoamingStatus() > RoamingType::ROAMING_STATE_UNKNOWN &&
         networkState_->GetPsRoamingStatus() == RoamingType::ROAMING_STATE_UNKNOWN) {
         networkSearchManager->NotifyPsRoamingCloseChanged(slotId_);
+        auto& roamingStr = GetRoamingString();
+        if (slotId_ >= 0 && static_cast<size_t>(slotId_) < roamingStr.size()) {
+            roamingStr[slotId_] = static_cast<char>('0' + static_cast<int>(networkState_->GetPsRoamingStatus()));
+        }
+        SetParameter(ROAMING_STATE, roamingStr.c_str());
     }
 }
 

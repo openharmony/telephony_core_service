@@ -589,6 +589,11 @@ public:
     {
         return 0;
     }
+
+    bool IsMultiSimsCapabilitySupported(int32_t slotId) override
+    {
+        return false;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

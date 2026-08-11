@@ -621,10 +621,27 @@ void MultiSimMonitor::CheckSimNotifyRegister()
 
 void MultiSimMonitor::CheckDataShareError()
 {
-    if (controller_->IsDataShareError() || GetBlockLoadOperatorConfig()) {
+    if (controller_->IsDataShareError() || GetBlockLoadOperatorConfig() || IsNeedOperatorReLoad()) {
         TELEPHONY_LOGI("CheckDataShareError or GetBlockLoadOperatorConfig is true, need Reset Opkey");
         CheckOpcNeedUpdata(true);
     }
+}
+
+bool MultiSimMonitor::IsNeedOperatorReLoad()
+{
+    for (size_t slotId = 0; slotId < simFileManager_.size(); slotId++) {
+        auto simFileManager = simFileManager_[slotId].lock();
+        if (simFileManager != nullptr && simStateManager_[slotId] != nullptr) {
+            SimState currentState = simStateManager_[slotId]->GetSimState();
+            auto opKey = simFileManager->GetOpKey();
+            TELEPHONY_LOGI("currentState is %{public}d and opKey is %{public}s",
+                currentState, Str16ToStr8(opKey).data());
+            if (currentState >= SimState::SIM_STATE_READY && opKey.empty()) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void MultiSimMonitor::SetRemainCount(int remainCount)

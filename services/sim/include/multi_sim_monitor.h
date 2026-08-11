@@ -104,6 +104,7 @@ private:
     int32_t CheckUpdateOpcVersion();
     void UpdateAllOpkeyConfigs();
     void CheckDataShareError();
+    bool IsNeedOperatorReLoad();
     void CheckSimNotifyRegister();
     void SetRemainCount(int remainCount);
     void SetBlockLoadOperatorConfig(bool isBlockLoadOperatorConfig);

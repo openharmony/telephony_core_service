@@ -72,6 +72,7 @@ public:
     MOCK_METHOD4(SimAuthentication, int32_t(int32_t, AuthType, const std::string &, SimAuthenticationResponse &));
     MOCK_METHOD1(GetRadioProtocolTech, int32_t(int32_t));
     MOCK_METHOD1(GetRadioProtocol, void(int32_t));
+    MOCK_METHOD1(GetRadioProtocolSlotIdByModemId, int32_t(int32_t));
     MOCK_METHOD1(GetDsdsMode, int32_t(int32_t &));
     MOCK_METHOD1(SetDsdsMode, int32_t(int32_t));
     MOCK_METHOD4(SendSimMatchedOperatorInfo, int32_t(int32_t, int32_t, const std::string &, const std::string &));

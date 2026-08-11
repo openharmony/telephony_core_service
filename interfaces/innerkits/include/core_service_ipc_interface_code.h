@@ -155,6 +155,7 @@ enum class CoreServiceInterfaceCode {
     STOP_MANUAL_NETWORK_SCAN,
     START_MANUAL_NETWORK_SCAN,
     SET_SIM_LABEL_INDEX,
+    IS_MULTI_SIMS_CAPABILITY_SUPPORTED,
 };
 } // namespace Telephony
 } // namespace OHOS

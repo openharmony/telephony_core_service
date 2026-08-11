@@ -26,7 +26,7 @@ public:
     MultiSimHelper();
     ~MultiSimHelper();
 
-    bool AnnouncePrimarySimIdChanged(int32_t simId);
+    bool AnnouncePrimarySimIdChanged(int32_t simId, int32_t slotId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);

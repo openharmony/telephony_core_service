@@ -646,7 +646,6 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
     if (networkSearchManager->CheckIsNeedNotify(slotId_) || isEmergency) {
         UpdateNetworkState();
     }
-    TELEPHONY_LOGD("NetworkSearchHandler::RadioRilDataRegState slotId:%{public}d", slotId_);
 }
 
 void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1109,7 +1108,6 @@ void NetworkSearchHandler::RadioGetImei(const AppExecFwk::InnerEvent::Pointer &e
         TELEPHONY_LOGE("NetworkSearchHandler::RadioGetImei event is nullptr!");
         return;
     }
-    TELEPHONY_LOGD("NetworkSearchHandler::RadioGetImei start slotId:%{public}d", slotId_);
     if (radioInfo_ != nullptr) {
         radioInfo_->ProcessGetImei(event);
     } else {

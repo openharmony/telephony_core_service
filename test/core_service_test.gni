@@ -167,6 +167,7 @@ tel_core_service_src = [
   "$CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
   "$CORE_SERVICE_ROOT/services/core/src/raw_parcel_callback_proxy.cpp",
   "$CORE_SERVICE_ROOT/services/core/src/core_service_common_event_hub.cpp",
+  "$CORE_SERVICE_ROOT/common/capability_mgr/src/multi_sims_capability_manager.cpp",
 ]
 if (core_service_support_esim) {
   tel_core_service_src += [
@@ -208,6 +209,7 @@ core_service_incluedirs = [
   "$CORE_SERVICE_ROOT/services/core/include",
   "$CORE_SERVICE_ROOT/services/satellite_service_interaction/include",
   "$CORE_SERVICE_ROOT/interfaces/innerkits/include/",
+  "$CORE_SERVICE_ROOT/common/capability_mgr/include",
   "$TELEPHONY_UTILS/log/include",
   "$TELEPHONY_UTILS/vcard/include",
   "$TELEPHONY_UTILS/vcard/include/contact_data",

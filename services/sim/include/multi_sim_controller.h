@@ -79,6 +79,7 @@ public:
     int32_t GetAllSimAccountInfoList(bool denied, std::vector<IccAccountInfo> &iccAccountInfoList);
     int32_t GetRadioProtocolTech(int32_t slotId);
     void GetRadioProtocol(int32_t slotId);
+    int32_t GetRadioProtocolSlotIdByModemId(int32_t modemId);
     bool InitShowName(int slotId);
     void ReCheckPrimary();
     bool IsDataShareError();
@@ -129,7 +130,6 @@ private:
     void RefreshSimManagerCache();
     void SavePrimarySlotIdInfo(int32_t slotId);
     void SaveDefaultCellularDataSlotIdInfo(int32_t slotId);
-    bool AnnouncePrimarySimIdChanged(int32_t simId);
     bool AnnounceDefaultVoiceSimIdChanged(int32_t simId);
     bool AnnounceDefaultSmsSimIdChanged(int32_t simId);
     bool AnnounceDefaultCellularDataSimIdChanged(int32_t simId);
@@ -181,7 +181,7 @@ private:
     int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
     void UpdateActiveSimInProgress(int32_t slotId, int32_t enable);
     void RetrySetPrimarySlotId(int32_t slotId);
-    
+
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
     const int ACTIVE_SIM_IN_PROGRESS = 1;

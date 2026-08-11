@@ -215,6 +215,7 @@ ohos_static_library("tel_core_service_static") {
     "$CORE_SERVICE_ROOT/services/core/src/core_service_stub.cpp",
     "$CORE_SERVICE_ROOT/services/core/src/raw_parcel_callback_proxy.cpp",
     "$CORE_SERVICE_ROOT/services/core/src/core_service_common_event_hub.cpp",
+    "$CORE_SERVICE_ROOT/common/capability_mgr/src/multi_sims_capability_manager.cpp",
   ]
   if (core_service_support_esim) {
     sources += [
@@ -240,6 +241,7 @@ ohos_static_library("tel_core_service_static") {
     "$TELEPHONY_EXT_WRAPPER_ROOT/include",
     "$CORE_SERVICE_ROOT/services/core/include",
     "$CORE_SERVICE_ROOT/services/satellite_service_interaction/include",
+    "$CORE_SERVICE_ROOT/common/capability_mgr/include",
     "$CORE_SERVICE_ROOT/utils/log/include",
   ]
 

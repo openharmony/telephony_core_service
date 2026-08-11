@@ -29,7 +29,7 @@ constexpr int32_t MAX_EXT_RECORD_LENGTH_BYTES = 13;
 constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 constexpr int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
 std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
-std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
+std::map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
 static std::mutex requestLock_;
 
 IccDiallingNumbersHandler::IccDiallingNumbersHandler(std::shared_ptr<IccFileController> fh)

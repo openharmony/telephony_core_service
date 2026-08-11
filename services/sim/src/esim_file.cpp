@@ -1597,6 +1597,8 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
         transApduDataResponse_.resultCode_ = static_cast<int32_t>(resultFlag);
         return transApduDataResponse_;
     }
+    std::unique_lock<std::mutex> lock(sendApduDataMutex_);
+    isSendApduDataReady_ = false;
     if (!ProcessSendApduData(slotId_, eventSendApduData)) {
         TELEPHONY_LOGE("ProcessSendApduData encode failed");
         SyncCloseChannel(MSG_ESIM_SEND_APUD_DATA);
@@ -1604,8 +1606,6 @@ ResponseEsimInnerResult EsimFile::SendApduData(const std::u16string &aid, const 
             static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
         return transApduDataResponse_;
     }
-    std::unique_lock<std::mutex> lock(sendApduDataMutex_);
-    isSendApduDataReady_ = false;
     if (!sendApduDataCv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_LONG_SECOND_FOR_ESIM),
         [this]() { return isSendApduDataReady_; })) {
         SyncCloseChannel(MSG_ESIM_SEND_APUD_DATA);

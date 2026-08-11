@@ -17,7 +17,7 @@
 #define OHOS_SIM_DIALLING_NUMBERS_HANDLER_H
 
 #include <thread>
-#include <unordered_map>
+#include <map>
 
 #include "dialling_numbers_info.h"
 #include "icc_file_controller.h"
@@ -202,7 +202,7 @@ public:
         return nextSerialId_++;
     }
     static std::atomic_int nextSerialId_;
-    static std::unordered_map<int, std::shared_ptr<DiallingNumberLoadRequest>> requestMap_;
+    static std::map<int, std::shared_ptr<DiallingNumberLoadRequest>> requestMap_;
     static std::shared_ptr<DiallingNumberLoadRequest> FindLoadRequest(int serial);
     static void ClearLoadRequest(int serial);
     static std::shared_ptr<DiallingNumberLoadRequest> CreateLoadRequest(int fileId,
