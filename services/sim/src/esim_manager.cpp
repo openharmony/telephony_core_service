@@ -560,6 +560,11 @@ int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }
 
+int32_t EsimManager::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
+{
+    return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
+}
+
 } // namespace Telephony
 } // namespace OHOS
 #endif
