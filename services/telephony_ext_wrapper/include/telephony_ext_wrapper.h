@@ -224,6 +224,7 @@ public:
     void SetActiveSimFunc(int32_t slotId, int32_t enable);
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
+    void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
     int32_t SwapM0M2SimCards(int32_t slotId);
     bool GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex);
 
