@@ -2782,6 +2782,15 @@ int32_t CoreManagerInner::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
     return esimManager_->GetEuiccInfo(slotId, eUiccInfo);
 }
 
+int32_t CoreManagerInner::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("GetEsimPortIndex esimManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return esimManager_->GetEsimPortIndex(slotId, portIndex);
+}
+
 int32_t CoreManagerInner::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {

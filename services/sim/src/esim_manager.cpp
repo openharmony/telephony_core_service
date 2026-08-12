@@ -91,6 +91,16 @@ int32_t EsimManager::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t EsimManager::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
+{
+    if ((!IsValidSlotId(slotId, esimFiles_)) || (esimFiles_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId is invalid or esimFiles_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    portIndex = esimFiles_[slotId]->GetEsimPortIndex();
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t EsimManager::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {
@@ -546,6 +556,11 @@ int32_t EsimManager::GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult)
 }
 
 int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
+{
+    return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
+}
+
+int32_t EsimManager::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
 {
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }
