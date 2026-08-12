@@ -104,7 +104,7 @@ bool CoreService::Init()
         return false;
     }
     CoreManagerInner::GetInstance().SetTelRilMangerObj(telRilManager_);
-    int32_t slotCount = SIM_SLOT_COUNT_MD;
+    int32_t slotCount = SIM_SLOT_COUNT_MD + 1;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     esimManager_ = std::make_shared<EsimManager>(telRilManager_);
     esimManager_->OnInit(SIM_SLOT_COUNT_REAL);
