@@ -344,6 +344,7 @@ enum class CarrierType : int32_t {
     CHINA_UNICOM,
     CHINA_NET,
     CHINA_BROADCASTING,
+    TEST_NET,
     OVERSEAS,
 };
 
@@ -359,10 +360,10 @@ struct SimLabel {
     bool operator>(const SimLabel &p) const
     {
         if (this->simType == SimType::PSIM && p.simType == SimType::ESIM) {
-            return true;
+            return false;
         }
         if (this->simType == SimType::ESIM && p.simType == SimType::PSIM) {
-            return false;
+            return true;
         }
         return this->index > p.index;
     }
@@ -370,10 +371,10 @@ struct SimLabel {
     bool operator<(const SimLabel &p) const
     {
         if (this->simType == SimType::PSIM && p.simType == SimType::ESIM) {
-            return false;
+            return true;
         }
         if (this->simType == SimType::ESIM && p.simType == SimType::PSIM) {
-            return true;
+            return false;
         }
         return this->index < p.index;
     }
