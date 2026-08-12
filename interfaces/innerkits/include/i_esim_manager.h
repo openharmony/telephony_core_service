@@ -78,6 +78,7 @@ public:
         std::string &response) = 0;
     virtual int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult) = 0;
     virtual int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult) = 0;
+    virtual int32_t GetEsimPortIndex(int32_t slotId, int32_t &portIndex) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
