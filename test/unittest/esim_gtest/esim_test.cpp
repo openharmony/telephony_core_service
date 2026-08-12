@@ -303,6 +303,10 @@ HWTEST_F(EsimTest, ProcessRequestAllProfiles_001, Function | MediumTest | Level2
     EXPECT_TRUE(esimFile->ProcessRequestAllProfiles(slotId, eventRequestAllProfiles));
     std::shared_ptr<IccFileController> file = std::make_shared<SimFileController>(slotId);
     std::shared_ptr<IccDiallingNumbersHandler> handler = std::make_shared<IccDiallingNumbersHandler>(file);
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "true");
+    esimFile->ProcessRequestAllProfiles(slotId, eventRequestAllProfiles);
+    OHOS::system::SetParameter(SUPPORT_ESIM_MEP, "false");
+    esimFile->ProcessRequestAllProfiles(slotId, eventRequestAllProfiles);
     EXPECT_TRUE(esimFile->ProcessRequestAllProfiles(slotId, eventRequestAllProfiles));
 }
 
