@@ -62,7 +62,7 @@ void MultiSimMonitor::Init()
 {
     TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT_MD + 1, 0);
- 	initDataRemainCount_.resize(SIM_SLOT_COUNT_MD + 1, INIT_DATA_TIMES);
+    initDataRemainCount_.resize(SIM_SLOT_COUNT_MD + 1, INIT_DATA_TIMES);
     initEsimDataRemainCount_ = INIT_DATA_TIMES;
     initRebootDetectRemainCount_.resize(SIM_SLOT_COUNT, INIT_DATA_TIMES);
     std::lock_guard<ffrt::shared_mutex> lock(controller_->loadedSimCardInfoMutex_);
