@@ -3087,13 +3087,13 @@ bool CoreManagerInner::IsModemInitDone(int32_t slotId)
     return simManager_->IsModemInitDone(slotId);
 }
 
-int32_t CoreManagerInner::SwitchSlotId(int32_t slotId)
+int32_t CoreManagerInner::SwapM0M2SimCards(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return simManager_->SwitchSlotId(slotId);
+    return simManager_->SwapM0M2SimCards(slotId);
 }
 
 std::string CoreManagerInner::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
