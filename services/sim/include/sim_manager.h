@@ -184,7 +184,7 @@ public:
     bool IsModemInitDone(int32_t slotId) override;
     int32_t GetMaxSimCount() override;
     int32_t GetRealSimCount() override;
-    int32_t SwitchSlotId(int32_t slotId) override;
+    int32_t SwapM0M2SimCards(int32_t slotId) override;
     std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo) override;
     int32_t SaveCardFileDetectData(const CardFileDetectData &data) override;
     int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results) override;
