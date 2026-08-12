@@ -37,7 +37,7 @@ public:
     void BuildSimPresentValues(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId);
     bool IsValidSlotString(const char* slotIdStr);
     int32_t GetPsimLabelIndex(int slotId);
- 	bool IsEsim(int32_t slotId);
+    bool IsEsim(int32_t slotId);
 
 private:
     bool PublishSimFileEvent(const AAFwk::Want &want, int eventCode, const std::string &eventData);
