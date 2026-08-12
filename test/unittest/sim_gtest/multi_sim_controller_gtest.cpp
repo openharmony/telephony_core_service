@@ -281,6 +281,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_InitIccId_001, Function 
     newCache.resize(2);
     newCache[0].iccId = "2164181618486135";
     newCache[1].iccId.clear();
+    EXPECT_TRUE(newCache[1].iccid.empty());
     multiSimController->localCacheInfo_ = newCache;
     
     bool ret = multiSimController->InitIccId(0);
