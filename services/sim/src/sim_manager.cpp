@@ -54,7 +54,7 @@ void SimManager::InitMultiSimObject()
 {
     // Program memory
     std::lock_guard<ffrt::shared_mutex> lck(mtx_);
-    if (slotCount_ < 0 || slotCount_ > SIM_SLOT_COUNT_MD) {
+    if (slotCount_ < 0 || slotCount_ > SIM_SLOT_COUNT_MD + 1) {
         TELEPHONY_LOGI("SimManager InitMultiSimObject, slotCount = %{public}d is out of range", slotCount_);
         return;
     }
@@ -1581,13 +1581,13 @@ int32_t SimManager::GetRealSimCount()
     return TELEPHONY_EXT_WRAPPER.GetRealSimCountExt(realSlotCount);
 }
 
-int32_t SimManager::SwitchSlotId(int32_t slotId)
+int32_t SimManager::SwapM0M2SimCards(int32_t slotId)
 {
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return multiSimController_->SwitchSlotId(slotId);
+    return multiSimController_->SwapM0M2SimCards(slotId);
 }
 
 std::string SimManager::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
