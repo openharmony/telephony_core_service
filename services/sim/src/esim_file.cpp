@@ -337,12 +337,15 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
         static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
-        static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER),
-        static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER),
     };
     std::vector<uint8_t> euiccProfileTags;
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
         euiccProfileTags.push_back(tag);
+    }
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    if (isSupportEsimMep) {
+        getProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER));
+        getProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER));
     }
     builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, euiccProfileTags, euiccProfileTags.size());
     ApduSimIORequestInfo requestInfo;
@@ -774,7 +777,7 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
             return;
         }
         int32_t ret = eSIMPort->Asn1AsInteger();
-        esimProfile_.portIndex = ret;
+        eProfileInfo->portIndex = ret;
     }
 }
 
@@ -1346,12 +1349,15 @@ std::vector<uint8_t> EsimFile::GetProfileTagList()
         static_cast<unsigned char>(TAG_ESIM_PROFILE_POLICY_RULE),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES / PROFILE_DEFAULT_NUMBER),
         static_cast<unsigned char>(TAG_ESIM_CARRIER_PRIVILEGE_RULES % PROFILE_DEFAULT_NUMBER),
-        static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER),
-        static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER),
     };
     std::vector<uint8_t> getProfileTags;
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
         getProfileTags.push_back(tag);
+    }
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    if (isSupportEsimMep) {
+        euiccProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER));
+        euiccProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER));
     }
     return getProfileTags;
 }
