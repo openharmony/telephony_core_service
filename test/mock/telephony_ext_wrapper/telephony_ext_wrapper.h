@@ -655,3 +655,4 @@ inline bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int3
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
 }  // namespace OHOS
+#endif  // TELEPHONY_EXT_WRAPPER_H
