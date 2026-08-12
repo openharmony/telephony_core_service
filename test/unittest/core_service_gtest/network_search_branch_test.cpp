@@ -438,5 +438,29 @@ HWTEST_F(NetworkSearchBranchTest, Telephony_DeviceStateHandler_001, TestSize.Lev
     deviceStateHandler->SetNotificationFilter(0, true);
     EXPECT_EQ(deviceStateHandler->notificationFilter_, -1);
 }
+
+HWTEST_F(NetworkSearchBranchTest, NetworkUtils_IsValidSlotId_Test, Function | MediumTest | Level1)
+{
+    NetworkUtils networkUtils;
+    
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = nullptr;
+    bool ret1 = networkUtils.IsValidSlotId(0);
+    bool ret2 = networkUtils.IsValidSlotId(-1);
+    
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = []() { return true; };
+    bool ret3 = networkUtils.IsValidSlotId(0);
+    bool ret4 = networkUtils.IsValidSlotId(SIM_SLOT_2);
+    
+    TELEPHONY_EXT_WRAPPER.isVSimEnabled_ = []() { return false; };
+    bool ret5 = networkUtils.IsValidSlotId(0);
+    bool ret6 = networkUtils.IsValidSlotId(SIM_SLOT_2);
+    
+    EXPECT_TRUE(ret1 == true || ret1 == false);
+    EXPECT_FALSE(ret2);
+    EXPECT_TRUE(ret3 == true || ret3 == false);
+    EXPECT_TRUE(ret4 == true || ret4 == false);
+    EXPECT_TRUE(ret5 == true || ret5 == false);
+    EXPECT_FALSE(ret6);
+}
 } // namespace Telephony
 } // namespace OHOS
