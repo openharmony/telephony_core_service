@@ -102,7 +102,7 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
-    int32_t SwitchSlotId(int32_t slotId);
+    int32_t SwapM0M2SimCards(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
