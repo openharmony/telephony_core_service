@@ -171,7 +171,7 @@ public:
     virtual int32_t GetMaxSimCount() = 0;
     virtual int32_t GetRealSimCount() = 0;
     virtual void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) = 0;
-    virtual int32_t SwitchSlotId(int32_t slotId) = 0;
+    virtual int32_t SwapM0M2SimCards(int32_t slotId) = 0;
     virtual std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo) = 0;
     virtual int32_t SaveCardFileDetectData(const CardFileDetectData &data) = 0;
     virtual int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results) = 0;
