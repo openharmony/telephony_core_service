@@ -1016,12 +1016,12 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreManagerInner_0022, Function 
     int32_t res = mInner.SetNrOptionMode(0, NrMode::NR_MODE_NSA_ONLY);
     EXPECT_EQ(res, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
-HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_SwitchSlotId_001, Function | MediumTest | Level1)
+HWTEST_F(CoreServiceNativeBranchTest, CoreManagerInner_SwapM0M2SimCards_001, Function | MediumTest | Level1)
 {
     CoreManagerInner mInner;
     mInner.OnInit(nullptr, nullptr, nullptr);
     
-    int32_t ret = mInner.SwitchSlotId(0);
+    int32_t ret = mInner.SwapM0M2SimCards(0);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
