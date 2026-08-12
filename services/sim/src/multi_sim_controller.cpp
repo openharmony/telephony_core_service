@@ -437,6 +437,10 @@ bool MultiSimController::InitIccId(int slotId)
     }
     if (!simRdbInfo.iccId.empty()) { // already have this card, reactive it
         TELEPHONY_LOGI("old sim insert, slotId%{public}d", slotId);
+        if (simRdbInfo.isEsim && !IsEsim(slotId)) {
+            TELEPHONY_LOGE("slot%{public}d isEsim not same, stop update sim account", slotId);
+            return false;
+        }
         result = UpdateDataByIccId(slotId, newIccId);
         HILOG_COMM_INFO("result is %{public}d", result);
     } else { // insert a new data for new IccId
