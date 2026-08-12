@@ -34,10 +34,6 @@
 #include "telephony_ext_wrapper.h"
 #include "multi_sim_helper.h"
 
-#ifdef  CORE_SERVICE_SUPPORT_ESIM
-#include "reset_response.h"
-#endif
-
 namespace OHOS {
 namespace Telephony {
 const int64_t DELAY_TIME = 1000;
@@ -85,10 +81,6 @@ constexpr int32_t WAIT_FOR_SINGLE_PRIMARY_SLOT_TIMEOUT = 5 * 1000;
 constexpr int32_t WAIT_FOR_SIM_SLOT_MAPPING_TIMEOUT = 5 * 1000;
 const std::string RIL_SET_PRIMARY_SLOT_SUPPORTED = "const.vendor.ril.set_primary_slot_support";
 static const std::string SIM_LABEL_STATE_PROP = "persist.ril.sim_switch";
-static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
-static const std::string GSM_SIM_ATR1 = "gsm.sim.hw_atr1";
-static const std::string GSM_SIM_ATR2 = "gsm.sim.hw_atr2";
-static const std::string GSM_SIM_ATR3 = "gsm.sim.hw_atr3";
 static const std::string IS_SIMSLOTS_MAPPING_PROP = "persist.telephony.is_simslots_mapping";
 static const std::string INVALID_ICCID = "INVALID_ICCID";
 static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
@@ -127,7 +119,7 @@ void MultiSimController::Init()
     if (multiSimHelper_ == nullptr) {
         multiSimHelper_ = std::make_shared<MultiSimHelper>();
     }
-    maxCount_ = SIM_SLOT_COUNT_MD;
+    maxCount_ = SIM_SLOT_COUNT_MD + 1;
     isSetActiveSimInProgress_.resize(maxCount_, 0);
     setPrimarySlotRemainCount_.resize(maxCount_, RETRY_TIMES);
     refreshLocalCacheRemainCount_ = RETRY_TIMES;
@@ -338,6 +330,9 @@ bool MultiSimController::IsAllCardsReady()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
             || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
             TELEPHONY_LOGI("slotId %{public}d not ready", i);
@@ -490,9 +485,19 @@ int32_t MultiSimController::UpdateDataByIccId(int slotId, const std::string &new
     return simDbHelper_->UpdateDataByIccId(newIccId, values);
 }
 
-int32_t MultiSimController::SwitchSlotId(int32_t slotId)
+int32_t MultiSimController::SwapM0M2SimCards(int32_t slotId)
 {
-    return TELEPHONY_EXT_WRAPPER.SwitchSlotId(slotId);
+    return TELEPHONY_EXT_WRAPPER.SwapM0M2SimCards(slotId);
+}
+
+int32_t MultiSimController::NeedSwitchSimCard(int32_t slotId)
+{
+    if (!IsValidData(slotId)) {
+        TELEPHONY_LOGE("no sim card");
+        return TELEPHONY_ERR_NO_SIM_CARD;
+    }
+    slotId = SwapM0M2SimCards(slotId);
+    return SetTargetPrimarySlotId(true, slotId);
 }
 
 int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
@@ -504,7 +509,7 @@ int32_t MultiSimController::InsertData(int slotId, const std::string &newIccId)
     int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
     int simLabelIndex = PSIM1;
     if (isSupportEsimMep_) {
-        simLabelIndex = GetPsimLabelIndex(slotId);
+        simLabelIndex = multiSimHelper_->GetPsimLabelIndex(slotId);
     } else {
         if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
             simLabelIndex = PSIM2;
@@ -660,7 +665,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
     } else {
         bool isEsim = false;
         if (isSupportEsimMep_) {
-            simLabel.index = GetPsimLabelIndex(slotId);
+            simLabel.index = multiSimHelper_->GetPsimLabelIndex(slotId);
         } else {
             if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
                 simLabel.index = PSIM2;
@@ -669,19 +674,6 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
     }
     TELEPHONY_LOGI("GetSimLabel slotId:%{public}d, simLabel.index = %{public}d", slotId, simLabel.index);
     return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t MultiSimController::GetPsimLabelIndex(int slotId)
-{
-    int32_t simLabelState = OHOS::system::GetIntParameter(SIM_LABEL_STATE_PROP, PSIM1_PSIM2);
-    if (!(IsEsim(slotId))) {
-        if (simLabelState == PSIM1_PSIM2) {
-            return slotId == 0 ? PSIM1 : PSIM2;
-        } else {
-            return simLabelState == PSIM1_ESIM ? PSIM1 : PSIM2;
-        }
-    }
-    return ESIM_INDEX_UNKNOWN;
 }
 
 bool MultiSimController::InitShowNumber(int slotId)
@@ -1153,7 +1145,7 @@ int32_t MultiSimController::GetDefaultMainSlotByIccId()
 
 bool MultiSimController::IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT_MD));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId <= SIM_SLOT_COUNT_MD));
 }
 
 bool MultiSimController::SetActiveSimToRil(int32_t slotId, int32_t type, int32_t enable)
@@ -1403,7 +1395,7 @@ void MultiSimController::RefreshSimManagerCache()
 {
     auto simManager = simManager_.lock();
     if (simManager != nullptr) {
-        for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
+        for (int32_t i = 0; i <= SIM_SLOT_COUNT_MD; i++) {
             simManager->RefreshCache(i);
         }
     }
@@ -1417,7 +1409,7 @@ void MultiSimController::SetSimManagerPtr(std::weak_ptr<SimManager> simManager)
 void MultiSimController::ObtainDualSimCardStatus()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
+    for (int32_t i = 0; i <= SIM_SLOT_COUNT_MD; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->ObtainIccStatus();
         }
@@ -1428,7 +1420,7 @@ void MultiSimController::SetInSenseSwitchPhase(bool flag)
 {
     TELEPHONY_LOGI("SetInSenseSwitchPhase to %{public}d", flag);
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
+    for (int32_t i = 0; i <= SIM_SLOT_COUNT_MD; i++) {
         if (simStateManager_[i] != nullptr) {
             simStateManager_[i]->SetInSenseSwitchPhase(flag);
         }
@@ -1452,6 +1444,9 @@ bool MultiSimController::IsSetPrimarySlotIdAllowed()
 int32_t MultiSimController::SetPrimarySlotId(int32_t slotId, bool isUserSet)
 {
     TELEPHONY_LOGI("set primary slotId:%{public}d, isUserSet:%{public}d", slotId, isUserSet);
+    if (slotId == SIM_SLOT_3) {
+        return NeedSwitchSimCard(SIM_SLOT_3);
+    }
     if (isUserSet && isRilSetPrimarySlotSupport_) {
         return SetPrimarySlotIdWithoutModemReboot(slotId);
     }
@@ -2125,35 +2120,7 @@ void MultiSimController::ProcessRilSetPrimarySlotResponse(bool result)
 
 bool MultiSimController::IsEsim(int32_t slotId)
 {
-#ifdef CORE_SERVICE_SUPPORT_ESIM
-    if (!CoreManagerInner::GetInstance().IsSupported(slotId)) {
-        return false;
-    }
-    std::string propAtr = "";
-    propAtr = (slotId == SLOT_ID_0) ? GSM_SIM_ATR : propAtr;
-    propAtr = (slotId == SLOT_ID_1) ? GSM_SIM_ATR1 : propAtr;
-    propAtr = (slotId == SLOT_ID_2) ? GSM_SIM_ATR2 : propAtr;
-    propAtr = (slotId == SLOT_ID_3) ? GSM_SIM_ATR3 : propAtr;
-    if (propAtr.empty()) {
-        TELEPHONY_LOGE("slotId %{public}d invalid, can't get atr prop.", slotId);
-        return false;
-    }
-
-    char buf[CARD_ATR_LEN + 1] = {0};
-    GetParameter(propAtr.c_str(), "", buf, CARD_ATR_LEN);
-    std::string cardAtr(buf);
-    if (cardAtr.empty()) {
-        TELEPHONY_LOGE("card atr is empty.");
-        return false;
-    }
-
-    ResetResponse resetResponse;
-    resetResponse.AnalysisAtrData(cardAtr);
-    TELEPHONY_LOGI("slot%{public}d isEsim: %{public}s", slotId, resetResponse.IsEuiccAvailable() ? "true" : "false");
-    return resetResponse.IsEuiccAvailable();
-#else
-    return false;
-#endif
+    return multiSimHelper_->IsEsim(slotId);
 }
 
 bool MultiSimController::IsSimSlotsMapping()
