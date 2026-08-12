@@ -137,6 +137,7 @@ public:
     typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
     typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
+    typedef bool (*GetSimLabelIndexFromLsiCfgFunc)(int32_t slotId, int32_t &simLabelindex);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -220,7 +221,8 @@ public:
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
     void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
-    int32_t SwitchSlotId(int32_t slotId);
+    int32_t SwapM0M2SimCards(int32_t slotId);
+    bool GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -236,6 +238,7 @@ private:
     GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
     SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
+    GetSimLabelIndexFromLsiCfgFunc getSimLabelIndexFromLsiCfg_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -639,11 +642,16 @@ inline void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, i
         savePreferredNetworkValue_(slotId, networkMode);
     }
 }
-inline int32_t TelephonyExtWrapper::SwitchSlotId(int32_t slotId)
+inline int32_t TelephonyExtWrapper::SwapM0M2SimCards(int32_t slotId)
 {
     return 0;
 }
+
+inline bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex)
+{
+    return true;
+}
+
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
 }  // namespace Telephony
 }  // namespace OHOS
-#endif  // TELEPHONY_EXT_WRAPPER_H
