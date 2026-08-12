@@ -25,7 +25,7 @@
 #include "parameters.h"
 #include "radio_event.h"
 #include "sim_number_decode.h"
-#include "str_convert.h" 
+#include "str_convert.h"
 #include "telephony_common_utils.h"
 #include "telephony_ext_wrapper.h"
 #include "telephony_state_registry_client.h"
