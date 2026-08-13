@@ -2394,6 +2394,7 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Esim
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_RETRIEVE_NOTIFICATION_LIST);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -2421,6 +2422,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -2449,7 +2451,7 @@ int32_t EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumbe
     removeNotifResult_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
-
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_REMOVE_NOTIFICATION);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
