@@ -36,12 +36,15 @@ int32_t VCardSipData::BuildData(std::shared_ptr<DataShare::DataShareResultSet> r
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, address_);
-    resultSet->GetColumnIndex(ContactData::LABEL_NAME, index);
-    resultSet->GetString(index, labelName_);
-    resultSet->GetColumnIndex(ContactData::LABEL_ID, index);
-    resultSet->GetString(index, labelId_);
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) == DataShare::E_OK) {
+        resultSet->GetString(index, address_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_NAME, index) == DataShare::E_OK) {
+        resultSet->GetString(index, labelName_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_ID, index) == DataShare::E_OK) {
+        resultSet->GetString(index, labelId_);
+    }
     return TELEPHONY_SUCCESS;
 }
 
