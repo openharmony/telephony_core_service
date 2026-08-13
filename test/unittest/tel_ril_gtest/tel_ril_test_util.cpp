@@ -220,6 +220,7 @@ void TelRilTest::InitData()
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI] =
         &TelRilTest::GetNetworkSliceAllowedNssaiTest;
     memberFuncMap_[DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN] = &TelRilTest::GetNetworkSliceEhplmnTest;
+    memberFuncMap_[DiffInterfaceId::TEST_RILCM_DATA_PROFILE_PASSWORD_CLEAR] = &TelRilTest::DataProfilePasswordClearTest;
 }
 
 void TelRilTest::InitSim()
@@ -1672,6 +1673,31 @@ void TelRilTest::GetNetworkSliceEhplmnTest(int32_t slotId, std::shared_ptr<AppEx
         TELEPHONY_LOGI("TelRilTest::GetNetworkSliceEhplmnTest -->");
         telRilManager_->GetNetworkSliceEhplmn(slotId, event);
         TELEPHONY_LOGI("GetNetworkSliceEhplmnTest finished");
+        bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
+        ASSERT_TRUE(syncResult);
+    }
+}
+
+/**
+ * @brief Test data profile password clear after use
+ *
+ * @param slotId Indicates the card slot index number
+ * @param handler Indicates the event handler ptr
+ */
+void TelRilTest::DataProfilePasswordClearTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    int32_t eventId = static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DATA_PROFILE_PASSWORD_CLEAR);
+    auto event = AppExecFwk::InnerEvent::Get(eventId);
+    if (event != nullptr && telRilManager_ != nullptr) {
+        event->SetOwner(handler);
+        ActivateDataParam activateData;
+        activateData.dataProfile.password = "test_password";
+        activateData.dataProfile.snssai = "01-000001";
+        TELEPHONY_LOGI("TelRilTest::DataProfilePasswordClearTest -->");
+        telRilManager_->ActivatePdpContext(slotId, activateData, event);
+        activateData.dataProfile.password = "";
+        telRilManager_->ActivatePdpContext(slotId, activateData, event);
+        TELEPHONY_LOGI("TelRilTest::DataProfilePasswordClearTest --> finished");
         bool syncResult = WaitGetResult(eventId, handler, WAIT_TIME_SECOND);
         ASSERT_TRUE(syncResult);
     }

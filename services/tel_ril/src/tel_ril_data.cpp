@@ -15,6 +15,8 @@
 
 #include "tel_ril_data.h"
 
+#include <securec.h>
+
 #include "core_service_hisysevent.h"
 #include "radio_event.h"
 #include "tel_ril_modem_parcel.h"
@@ -71,6 +73,10 @@ HDI::Ril::V1_4::DataProfileDataInfoWithApnTypesforSlice TelRilData::ChangeDPToHa
         static_cast<uint64_t>(dataProfile.supportedApnTypesBitmap);
     dataProfileInfoWithApnTypesforSlice.snssai = dataProfile.snssai;
     dataProfileInfoWithApnTypesforSlice.sscMode = dataProfile.sscMode;
+    if (!dataProfile.password.empty()) {
+        memset_s(&dataProfile.password[0], dataProfile.password.size(), 0, dataProfile.password.size());
+        dataProfile.password.clear();
+    }
     return dataProfileInfoWithApnTypesforSlice;
 }
 
