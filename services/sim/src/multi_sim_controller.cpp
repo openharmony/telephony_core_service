@@ -335,6 +335,9 @@ bool MultiSimController::IsAllCardsReady()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
     for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         if (simStateManager_[i] != nullptr && (simStateManager_[i]->GetSimState() == SimState::SIM_STATE_UNKNOWN
             || simStateManager_[i]->GetSimState() == SimState::SIM_STATE_NOT_PRESENT)) {
             TELEPHONY_LOGI("slotId %{public}d not ready", i);
@@ -353,7 +356,10 @@ bool MultiSimController::IsAllCardsReady()
 bool MultiSimController::IsAllModemInitDone()
 {
     std::shared_lock<ffrt::shared_mutex> lock(simStateManagerMutex_);
-    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL + 1; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         if (simStateManager_[i] != nullptr && !(simStateManager_[i]->IsModemInitDone())) {
             TELEPHONY_LOGI("slotId %{public}d modem init not done", i);
             unInitModemSlotId_ = i;
@@ -404,7 +410,10 @@ bool MultiSimController::IsAllCardsLoaded()
         TELEPHONY_LOGI("there is no card loaded");
         return false;
     }
-    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL + 1; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         if (localCacheInfo_[i].iccId.empty()) {
             TELEPHONY_LOGI("slotId %{public}d not loaded", i);
             return false;
