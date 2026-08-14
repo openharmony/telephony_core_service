@@ -372,6 +372,9 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
         return;
     }
     for (int32_t i = 0; i < slotCount_; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
         if (event == nullptr) {
             TELEPHONY_LOGE("SendRadioProtocol event is nullptr");
