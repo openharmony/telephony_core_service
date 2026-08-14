@@ -73,7 +73,8 @@ ohos_static_library("sim_ani_cxx") {
     "init:libbegetutil",
     "napi:ace_napi",
     "rust_cxx:cxx_cppdeps",
-    "ipc:ipc_single"
+    "ipc:ipc_single",
+    "node:node_header_notice",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"

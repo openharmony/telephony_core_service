@@ -76,6 +76,7 @@ ohos_shared_library("vcard") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "resource_management:global_resmgr",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceVcardJsApi\"",

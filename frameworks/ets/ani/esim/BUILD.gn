@@ -80,6 +80,7 @@ ohos_static_library("esim_ani_cxx") {
     "napi:ace_napi",
     "ffrt:libffrt",
     "rust_cxx:cxx_cppdeps",
+    "node:node_header_notice",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"
