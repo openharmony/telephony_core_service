@@ -64,6 +64,8 @@
                 "kv_store",
                 "location",
                 "napi",
+                "node",
+                "libuv",
                 "netmanager_base",
                 "netmanager_ext",
                 "power_manager",

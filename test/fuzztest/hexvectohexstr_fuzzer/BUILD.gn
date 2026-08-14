@@ -58,6 +58,7 @@ ohos_fuzztest("HexVecToHexStrFuzzTest") {
     "power_manager:powermgr_client",
     "samgr:samgr_proxy",
     "eventhandler:libeventhandler",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",
