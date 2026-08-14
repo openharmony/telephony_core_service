@@ -81,7 +81,7 @@ int32_t CoreManagerInner::InitExtraModule(int32_t slotId)
         TELEPHONY_LOGE("InitExtraModule, has been inited, return!");
         return TELEPHONY_SUCCESS;
     }
-    if (SIM_SLOT_COUNT != DUAL_SLOT_COUNT) {
+    if (SIM_SLOT_COUNT_REAL != DUAL_SLOT_COUNT && SIM_SLOT_COUNT != THREE_CARD_COUNT) {
         TELEPHONY_LOGE("InitExtraModule, can not been inited because of slot number, return!");
         return TELEPHONY_ERROR;
     }
@@ -3094,6 +3094,42 @@ bool CoreManagerInner::IsModemInitDone(int32_t slotId)
         return false;
     }
     return simManager_->IsModemInitDone(slotId);
+}
+
+int32_t CoreManagerInner::SwapM0M2SimCards(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SwapM0M2SimCards(slotId);
+}
+
+std::string CoreManagerInner::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return "";
+    }
+    return simManager_->GetOverseasCarrierBySimInfo(simCardInfo);
+}
+
+int32_t CoreManagerInner::SaveCardFileDetectData(const CardFileDetectData &data)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SaveCardFileDetectData(data);
+}
+
+int32_t CoreManagerInner::GetAllSimCardInfo(std::vector<SimCardInfo> &results)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetAllSimCardInfo(results);
 }
 } // namespace Telephony
 } // namespace OHOS

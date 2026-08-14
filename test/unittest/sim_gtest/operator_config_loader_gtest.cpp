@@ -160,5 +160,52 @@ HWTEST_F(OperatorConfigLoaderTest, Telephony_GetMccFromMccMnc_002, Function | Me
     std::string result = operatorConfigLoader->GetMncFromMccMnc(mccmnc);
     EXPECT_EQ(ret, "");
 }
+HWTEST_F(OperatorConfigLoaderTest, OperatorConfigLoader_GetOverseasCarrierBySimInfo_001, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    
+    SimCardInfo simCardInfo;
+    simCardInfo.imsi = "46000";
+    simCardInfo.plmnLength = 5;
+    std::string result = operatorConfigLoader->GetOverseasCarrierBySimInfo(simCardInfo);
+    EXPECT_TRUE(!result.empty() || result == DEFAULT_OPERATOR_KEY);
+}
+
+HWTEST_F(OperatorConfigLoaderTest, OperatorConfigLoader_GetOverseasCarrierBySimInfo_002, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    
+    SimCardInfo simCardInfo;
+    simCardInfo.imsi = "";
+    simCardInfo.plmnLength = 0;
+    std::string result = operatorConfigLoader->GetOverseasCarrierBySimInfo(simCardInfo);
+    EXPECT_EQ(result, DEFAULT_OPERATOR_KEY);
+}
+
+HWTEST_F(OperatorConfigLoaderTest, OperatorConfigLoader_GetOverseasCarrierBySimInfo_003, Function | MediumTest | Level1)
+{
+    auto telRilManager = std::make_shared<TelRilManager>();
+    auto simStateManager = std::make_shared<SimStateManager>(telRilManager);
+    auto simFileManager = std::make_shared<SimFileManager>(telRilManager, simStateManager);
+    auto operatorConfigCache = std::make_shared<OperatorConfigCache>(simFileManager, simStateManager, 0);
+    auto operatorConfigLoader = std::make_shared<OperatorConfigLoader>(simFileManager, operatorConfigCache);
+    
+    SimCardInfo simCardInfo;
+    simCardInfo.imsi = "46001";
+    simCardInfo.plmnLength = 5;
+    std::string result1 = operatorConfigLoader->GetOverseasCarrierBySimInfo(simCardInfo);
+    
+    simCardInfo.imsi = "44000";
+    simCardInfo.plmnLength = 5;
+    std::string result2 = operatorConfigLoader->GetOverseasCarrierBySimInfo(simCardInfo);
+}
 } // namespace Telephony
 } // namespace OHOS

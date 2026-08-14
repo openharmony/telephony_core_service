@@ -102,6 +102,7 @@ public:
     int32_t UpdateEsimOpName(const std::string &iccId, const std::string &operatorName);
     void CheckIfNeedSwitchMainSlotId(bool isUserSet);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
+    int32_t SwapM0M2SimCards(int32_t slotId);
 
 public:
     int32_t unInitModemSlotId_ = INVALID_VALUE;
@@ -114,7 +115,7 @@ public:
         REFRESH_LOCAL_CACHE_RETRY,
         REFRESH_ALL_LOCAL_CACHE_RETRY,
     };
-    std::vector<bool> isSimSlotsMapping_ = {false, false};
+    std::vector<bool> isSimSlotsMapping_ = {false, false, false, false};
 
 private:
     bool IsValidData(int32_t slotId);
@@ -173,13 +174,14 @@ private:
     void SendSimChgTypeInfo(int32_t slotId, bool isUserSet);
     void SavePrimaryCardInfo(int32_t slotId);
     void ResumePrimaryCardInfo(const char* oldPrimarySlotId, const char* oldMainCardIccId);
-    int32_t GetPsimLabelIndex(int slotId);
     bool IsESimUpdateStatus(int32_t slotId);
     void SimDataBuilder(int32_t slotId, DataShare::DataShareValuesBucket &values, const std::string &iccId,
         int32_t simLabel, bool isEsim);
     int32_t UpdateDBActiveByIccId(const std::string iccId, int32_t enable);
     void UpdateActiveSimInProgress(int32_t slotId, int32_t enable);
     void RetrySetPrimarySlotId(int32_t slotId);
+
+    int32_t NeedSwitchSimCard(int32_t slotId);
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -194,6 +196,7 @@ private:
     int32_t defaultVoiceSimId_ = 0;
     int32_t lastPrimarySlotId_ = 0;
     int32_t lastCellularDataSlotId_ = 0;
+    int32_t tstsMode_ = 0;
     bool waitCardsReady_ = false;
     int32_t targetPrimarySlotId_ = -1;
     static constexpr int32_t WAIT_REMOTE_TIME_SEC = 4;

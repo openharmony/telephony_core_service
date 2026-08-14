@@ -53,6 +53,7 @@ public:
     static std::shared_ptr<NetworkSearchCallbackInfo> FindNetworkSearchCallback(int64_t index);
     static bool RemoveCallbackFromMap(int64_t index);
     static bool AddNetworkSearchCallBack(int64_t index, std::shared_ptr<NetworkSearchCallbackInfo> &callback);
+    static bool IsValidSlotId(int32_t slotId);
 
     template<typename... Args>
     static std::string FormatString(const std::string &format, Args... args);

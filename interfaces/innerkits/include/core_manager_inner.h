@@ -206,6 +206,7 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetPreferredNetworkPara(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t SwapM0M2SimCards(int32_t slotId);
     /******************** telRilManager end *******************/
     /******************** networkSearchManager start *******************/
     int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech);
@@ -364,6 +365,9 @@ public:
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
     void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId);
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
+    int32_t SaveCardFileDetectData(const CardFileDetectData &data);
+    int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);

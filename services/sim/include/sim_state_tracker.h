@@ -41,6 +41,8 @@ public:
     bool UnRegisterOpkeyLoaded();
     bool UnregisterOperatorCacheDel();
     bool UnRegisterOperatorConfigUpdate();
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
+    
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {
         operatorConfigHisysevent_ = operatorConfigHisysevent;

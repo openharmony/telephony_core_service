@@ -160,7 +160,7 @@ inline void OperatorConfigHisysevent::ClearMatchSimFailReason(int32_t slotId)
 
 inline bool OperatorConfigHisysevent::IsValidSlotId(int32_t slotId)
 {
-    return (slotId >= 0) && slotId < SIM_SLOTS;
+    return slotId >= 0 && slotId < SIM_SLOTS;
 }
 }
 }
