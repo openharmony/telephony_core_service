@@ -229,11 +229,13 @@ private:
     std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     std::string iccid_ = "";
     std::string oldIccid_ = "";
+    std::string specifiedIccid_ = "";
     int32_t esimSwitchState_ = 0;
     bool needReupdate_ = false;
     bool isInSenseSwitchPhase_ = false;
     bool isInitPrimarySlotReady = false;
     ffrt::shared_mutex simStateInitMutex_;
+    ffrt::shared_mutex specifiedIccidMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

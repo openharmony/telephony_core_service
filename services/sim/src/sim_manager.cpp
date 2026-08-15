@@ -1619,7 +1619,7 @@ int32_t SimManager::GetAllSimCardInfo(std::vector<SimCardInfo> &results)
 
 void SimManager::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid)
 {
-    if ((!IsValidSlotId(slotId)) || (simStateManager_[slotId] == nullptr)) {
+    if (!IsValidSlotId(slotId) || (simStateManager_[slotId] == nullptr)) {
         TELEPHONY_LOGE("slotId invalid or simStateManager_ is null");
         return;
     }
