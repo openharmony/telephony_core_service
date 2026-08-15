@@ -1616,6 +1616,15 @@ int32_t SimManager::GetAllSimCardInfo(std::vector<SimCardInfo> &results)
     }
     return cardFileDetectManager_->GetAllSimCardInfo(results);
 }
+
+void SimManager::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid)
+{
+    if ((!IsValidSlotId(slotId, simStateManager_)) || (simStateManager_[slotId] == nullptr)) {
+        TELEPHONY_LOGE("slotId invalid or simStateManager_ is null");
+        return;
+    }
+    simStateManager_[slotId]->SetSpecifiedIccidBySlotId(iccid);
+}
 } // namespace Telephony
 } // namespace OHOS
 // LOCV_EXCL_STOP

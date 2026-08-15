@@ -1022,5 +1022,17 @@ HWTEST_F(SimManagerTest, IsNeedOperatorReLoad_005, Function | MediumTest | Level
     simFileManagerPtr->opKey_.clear();
     EXPECT_FALSE(simManager_->multiSimMonitor_->IsNeedOperatorReLoad());
 }
+
+HWTEST_F(SimManagerTest, SetSpecifiedIccidBySlotId_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    auto simManager = std::make_shared<SimManager>(telRilManager);
+    simManager->simStateManager_.clear();
+    std::string iccid = "";
+    simManager->SetSpecifiedIccidBySlotId(-1, iccid);
+    simManager->simStateManager_.push_back(std::make_shared<SimStateManager>(telRilManager_));
+    simManager->SetSpecifiedIccidBySlotId(0, iccid);
+    EXPECT_FALSE(simManager->simStateManager_.empty());
+}
 }
 }

@@ -188,6 +188,7 @@ public:
     std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo) override;
     int32_t SaveCardFileDetectData(const CardFileDetectData &data) override;
     int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results) override;
+    void SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid) override;
 
     inline void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId) override
     {
