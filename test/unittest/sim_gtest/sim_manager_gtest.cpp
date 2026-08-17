@@ -1030,7 +1030,7 @@ HWTEST_F(SimManagerTest, SetSpecifiedIccidBySlotId_001, Function | MediumTest | 
     simManager->simStateManager_.clear();
     std::string iccid = "";
     simManager->SetSpecifiedIccidBySlotId(-1, iccid);
-    simManager->simStateManager_.push_back(std::make_shared<SimStateManager>(telRilManager_));
+    simManager->simStateManager_.push_back(std::make_shared<SimStateManager>(telRilManager));
     simManager->SetSpecifiedIccidBySlotId(0, iccid);
     EXPECT_FALSE(simManager->simStateManager_.empty());
 }
