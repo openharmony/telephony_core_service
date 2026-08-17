@@ -100,7 +100,13 @@ T GetMaxSlotCount()
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-        maxSlotCount_ = std::atoi(simSlotCount);
+        char *endptr = nullptr;
+        errno = 0;
+        long val = std::strtol(simSlotCount, &endptr, 10);
+        if (errno != 0 || endptr == simSlotCount || *endptr != '\0' || val < 0 || val > DC_MD_MAX_SLOT_ID + 1) {
+            val = std::atoi(DEFAULT_SLOT_COUNT);
+        }
+        maxSlotCount_ = static_cast<int32_t>(val);
         if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
@@ -111,11 +117,16 @@ T GetMaxSlotCount()
 template<typename T>
 T GetMaxSlotCountMd()
 {
-// LCOV_EXCL_START
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-        maxSlotCount_ = std::atoi(simSlotCount);
+        char *endptr = nullptr;
+        errno = 0;
+        long val = std::strtol(simSlotCount, &endptr, 10);
+        if (errno != 0 || endptr == simSlotCount || *endptr != '\0' || val < 0 || val > DC_MD_MAX_SLOT_ID + 1) {
+            val = std::atoi(DEFAULT_SLOT_COUNT);
+        }
+        maxSlotCount_ = static_cast<int32_t>(val);
         if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ <= DC_MAX_SLOT_COUNT)) {
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
             char multiDeviceEnable[SYSPARA_SIZE] = { 0 };
@@ -126,7 +137,6 @@ T GetMaxSlotCountMd()
             }
         }
     }
-// LCOV_EXCL_STOP
     return maxSlotCount_;
 }
 

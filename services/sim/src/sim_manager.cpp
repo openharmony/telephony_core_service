@@ -1452,6 +1452,10 @@ int32_t SimManager::SetSimLabelIndex(int32_t simId, int32_t simLabelIndex)
 
 int32_t SimManager::SetSimLabelIndexByIccId(const std::string &iccId, int32_t labelIndex)
 {
+    if (iccId.empty() || labelIndex < SIM_LABEL_INDEX_MIN || lebelIndex > SIM_LABLE_INDEX_MAX) {
+        TELEPHONY_LOGE("SetSimLabelIndexByIccId: invalidiccId or labelIndex, iccId.empty=%{public}d, "
+            "labelIndex=%{public}d", iccId.empty(), labelIndex);
+    }
     if (multiSimController_ == nullptr) {
         TELEPHONY_LOGE("multiSimController_ is nullptr");
         return INVALID_VALUE;

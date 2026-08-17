@@ -1915,6 +1915,9 @@ void NetworkSearchManager::UpdateDeviceState(int32_t slotId, bool isEnterStrMode
     }
     if (isNeedUpdateNetworkState && inner->networkSearchHandler_ != nullptr) {
         auto event = AppExecFwk::InnerEvent::Get(RadioEvent::RADIO_NETWORK_STATE, true);
+        if (event == nullptr) {
+            TELEPHONY_LOGE("UpdateDeviceState failed to get radio_network_state event!");
+        }
         inner->networkSearchHandler_->SendEvent(event);
     }
     if (inner->deviceStateHandler_ != nullptr) {
