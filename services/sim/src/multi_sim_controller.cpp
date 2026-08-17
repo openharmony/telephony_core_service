@@ -650,6 +650,20 @@ void MultiSimController::GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, i
     simLabelIdx = simIdx > 0 ? simIdx : ESIM1;
 }
 
+void MultiSimController::GetLastSimLabel(int32_t slotId, SimLabel &simLabel)
+{
+    for (const auto& simInfo : allLocalCacheInfo_) {
+        if ((slotId >= maxCount_) && (simInfo.simLabelIndex <= 0)) {
+            break;
+        }
+        if ((simInfo.iccId == lastSimIccid_[slotId]) && simInfo.isEsim) {
+            simLabel.simType = SimType::ESIM;
+            simLabel.index = simInfo.simLabelIndex;
+            break;
+        }
+    }
+}
+
 int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
 {
     std::string esimType = OHOS::system::GetParameter(ESIM_SUPPORT_PARAM, "");
@@ -678,16 +692,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
         bool isEsim = false;
         if (isSupportEsimMep_) {
             simLabel.index = multiSimHelper_->GetPsimLabelIndex(slotId);
-            for (const auto& simInfo : allLocalCacheInfo_) {
-                if ((slotId >= maxCount_) && (simInfo.simLabelIndex <= 0)) {
-                    break;
-                }
-                if ((simInfo.iccId == lastSimIccid_[slotId]) && simInfo.isEsim) {
-                    simLabel.simType = SimType::ESIM;
-                    simLabel.index = simInfo.simLabelIndex;
-                    break;
-                }
-            }
+            GetLastSimLabel(slotId, mLsimLabel);
         } else {
             if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
                 simLabel.index = PSIM2;
