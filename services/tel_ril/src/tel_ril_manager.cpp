@@ -125,7 +125,7 @@ int32_t TelRilManager::InitTelExtraModule(int32_t slotId)
     if (slotId != SIM_SLOT_2) {
         return TELEPHONY_ERROR;
     }
-    std::shared_lock<ffrt::shared_mutex> lock(telRilMutex_;
+    std::shared_lock<ffrt::shared_mutex> lock(telRilMutex_);
     if (static_cast<int32_t>(telRilCall_.size()) == SIM_SLOT_COUNT + 1) {
         TELEPHONY_LOGI("InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;
