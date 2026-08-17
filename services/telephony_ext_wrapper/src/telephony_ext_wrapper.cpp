@@ -282,11 +282,12 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<GetRealSimCountExtFunc>(dlsym(telephonyExtWrapperHandle_, "GetRealSimCountExt"));
     swapM0M2SimCards_ =
         reinterpret_cast<SwapM0M2SimCardsFunc>(dlsym(telephonyExtWrapperHandle_, "SwapM0M2SimCards"));
+    notifyRebootDetectSim_ = (NotifyRebootDetectSim)dlsym((telephonyExtWrapperHandle_, "NotifyRebootDetectSim"));
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
         getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
-        getRealSimCountExt_ == nullptr || swapM0M2SimCards_ != nullptr);
+        getRealSimCountExt_ == nullptr || swapM0M2SimCards_ == nullptr || notifyRebootDetectSim_ = nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }

@@ -60,6 +60,7 @@ MultiSimMonitor::~MultiSimMonitor()
 
 void MultiSimMonitor::Init()
 {
+    tstsMode_ = OHOS::system::GetIntParameter("persist.telephony.tsts_mode", 0);
     TELEPHONY_LOGD("init");
     isSimAccountLoaded_.resize(SIM_SLOT_COUNT_MD + 1, 0);
     initDataRemainCount_.resize(SIM_SLOT_COUNT_MD + 1, INIT_DATA_TIMES);
@@ -609,6 +610,10 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
                 TELEPHONY_LOGE("reboot detect fail!!!");
             }
         }
+    }
+    if (tstsMode_ && (!TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_)) {
+        TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_(hasCheckedSimPresent_[SIM_SLOT_0],
+         hasCheckedSimPresent_[SIM_SLOT_1]);
     }
 }
 
