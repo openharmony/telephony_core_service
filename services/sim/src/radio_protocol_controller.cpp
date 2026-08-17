@@ -37,7 +37,7 @@ void RadioProtocolController::Init()
         return;
     }
 
-    slotCount_ = SIM_SLOT_COUNT;
+    slotCount_ = SIM_SLOT_COUNT - 1;
     InitMemberFunc();
     // make sure communication is in the initial state
     CleanUpCommunication();
