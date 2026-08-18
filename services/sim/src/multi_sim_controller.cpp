@@ -461,7 +461,9 @@ bool MultiSimController::InitIccId(int slotId)
         result = UpdateDBActiveByIccId(newIccId, static_cast<int32_t>(isActive));
     }
     HILOG_COMM_INFO("result is %{public}d", result);
-    lastSimIccid_[slotId] = newIccId;
+    if (slotId < maxCount_) {
+        lastSimIccid_[slotId] = newIccId;
+    }
     return true;
 }
 
@@ -652,8 +654,12 @@ void MultiSimController::GetSimLabelIdxFromAllLocalCache(int32_t &simLabelIdx, i
 
 void MultiSimController::GetLastSimLabel(int32_t slotId, SimLabel &simLabel)
 {
+    if (slotId >= maxCount_) {
+        TELEPHONY_LOGE("GetLastSimLabel Out of range, slotId %{public}d", slotId);
+        return;
+    }
     for (const auto& simInfo : allLocalCacheInfo_) {
-        if ((slotId >= maxCount_) && (simInfo.simLabelIndex <= 0)) {
+        if (simInfo.simLabelIndex <= 0) {
             break;
         }
         if ((simInfo.iccId == lastSimIccid_[slotId]) && simInfo.isEsim) {
@@ -692,7 +698,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
         bool isEsim = false;
         if (isSupportEsimMep_) {
             simLabel.index = multiSimHelper_->GetPsimLabelIndex(slotId);
-            GetLastSimLabel(slotId, mLsimLabel);
+            GetLastSimLabel(slotId, simLabel);
         } else {
             if ((slotId == 0 && simLabelState == PSIM2_ESIM) || (slotId == 1 && simLabelState == PSIM1_PSIM2)) {
                 simLabel.index = PSIM2;
