@@ -190,7 +190,7 @@ int32_t CoreManagerInner::UnRegisterCoreNotify(
             TELEPHONY_LOGE("esimManager_ is null");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        esimManager_->UnRegisterCoreNotify(slotId, handler, what);
+        esimManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
