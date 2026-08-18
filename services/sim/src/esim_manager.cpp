@@ -392,7 +392,8 @@ int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-void EsimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+void EsimManager::RegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
 {
     if (observerHandler_ == nullptr || handler == nullptr) {
         TELEPHONY_LOGE("observerHandler_ or handler is nullptr");
@@ -631,7 +632,8 @@ int32_t EsimManager::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }
 
-void EsimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+void EsimManager::RegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
 {
     return;
 }
