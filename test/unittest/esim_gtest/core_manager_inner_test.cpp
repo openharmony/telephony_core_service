@@ -18,6 +18,7 @@
 
 #include "core_manager_inner.h"
 #include "mock_esim_manager.h"
+#include "radio_event.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -470,6 +471,18 @@ HWTEST_F(CoreManagerInnerTest, SetEsimCaVerifyResult_001, Function | MediumTest 
     EXPECT_CALL(*mockesimManager, SetEsimCaVerifyResult(_, _)).WillOnce(Return(TELEPHONY_ERR_SUCCESS));
     ret = mInner.SetEsimCaVerifyResult(slotId, verifyResult);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+ 
+HWTEST_F(CoreManagerInnerTest, EsimProfileChange_001, Function | MediumTest | Level1)
+{
+    mInner.esimManager_ = nullptr;
+    mInner.PublishEsimProfileChange(0, RADIO_ESIM_ENABLING_PROFLIE_START, 0);
+    mInner.esimManager_ = mockesimManager;
+    EXPECT_CALL(*mockesimManager, PublishEsimProfileChange(0, RADIO_ESIM_ENABLING_PROFLIE_START, 0)).WillOnce(Return());
+    mInner.PublishEsimProfileChange(0, RADIO_ESIM_ENABLING_PROFLIE_START, 0);
+    auto handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create());
+    EXPECT_CALL(*mockesimManager, RegisterCoreNotify(0, handler, RADIO_ESIM_ENABLED_PROFILE_NUM)).WillOnce(Return());
+    (void)mInner.RegisterCoreNotify(0, handler, RADIO_ESIM_ENABLED_PROFILE_NUM, nullptr);
 }
 } // Telephony
 } // OHOS

@@ -17,10 +17,12 @@
 #include "string_ex.h"
 #include "telephony_errors.h"
 #include "core_manager_inner.h"
+#include "radio_event.h"
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
 #include "esim_controller.h"
+#include "tel_profile_util.h"
 namespace OHOS {
 namespace Telephony {
 static constexpr const char* LAST_DEACTIVE_PROFILE = "persist.telephony.last_deactive_profile";
@@ -38,6 +40,7 @@ bool EsimManager::OnInit(int32_t slotCount)
         TELEPHONY_LOGI("EsimManager, slotCount is out of range");
         return false;
     }
+    observerHandler_ = std::make_unique<ObserverHandler>();
     slotCount_ = slotCount;
     esimFiles_.resize(slotCount_);
     esimFilesLowPriority_.resize(slotCount_);
@@ -49,6 +52,12 @@ bool EsimManager::OnInit(int32_t slotCount)
             esimFiles_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
             esimFilesLowPriority_[slotId] = std::make_shared<EsimFile>(telRilManager_, slotId);
         }
+    }
+    auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
+    if (telProfileUtil != nullptr) {
+        std::string key = "enabled_profile_num";
+        enabledProfileNum_ = telProfileUtil->ObtainInt(key, 0);
+        TELEPHONY_LOGI("obtain enabled profile num, num = %{public}d", enabledProfileNum_.load());
     }
     return true;
 }
@@ -383,6 +392,60 @@ int32_t EsimManager::SetEsimCaVerifyResult(int32_t slotId, bool verifyResult)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+void EsimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+{
+    if (observerHandler_ == nullptr || handler == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ or handler is nullptr");
+        return;
+    }
+    if (slotId < ESIM_SLOT_ID_ZERO || slotId >= ESIM_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGE("bad slotId: %{public}d", slotId);
+        return;
+    }
+    observerHandler_->RegObserver(what, handler);
+    if (what == RADIO_ESIM_ENABLED_PROFILE_NUM) {
+        observerHandler_->NotifyObserver(what, enabledProfileNum_);
+    }
+}
+
+void EsimManager::UnRegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+{
+    if (observerHandler_ == nullptr || handler == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ or handler is nullptr");
+        return;
+    }
+    if (slotId < ESIM_SLOT_ID_ZERO || slotId >= ESIM_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGE("bad slotId: %{public}d", slotId);
+        return;
+    }
+    observerHandler_->Remove(what, handler);
+}
+ 
+void EsimManager::PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t param)
+{
+    if (observerHandler_ == nullptr) {
+        TELEPHONY_LOGE("observerHandler_ is nullptr");
+        return;
+    }
+    if (slotId < ESIM_SLOT_ID_ZERO || slotId >= ESIM_MAX_SLOT_COUNT) {
+        TELEPHONY_LOGE("bad slotId: %{public}d", slotId);
+        return;
+    }
+    if (what >= RADIO_ESIM_ENABLING_PROFLIE_START && what <= RADIO_ESIM_RESET_MEMORY_END) {
+        observerHandler_->NotifyObserver(what, slotId);
+    } else if (what == RADIO_ESIM_ENABLED_PROFILE_NUM) {
+        enabledProfileNum_ = param;
+        observerHandler_->NotifyObserver(what, param);
+        auto telProfileUtil = DelayedSingleton<TelProfileUtil>::GetInstance();
+        if (telProfileUtil != nullptr) {
+            std::string key = "enabled_profile_num";
+            auto ret = telProfileUtil->SaveInt(key, param);
+            TELEPHONY_LOGI("save enabled profile num, num = %{public}d, ret = %{public}d", param, ret);
+        }
+    }
+}
+
 } // namespace Telephony
 } // namespace OHOS
 
@@ -568,6 +631,21 @@ int32_t EsimManager::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
     return TELEPHONY_ERR_CORE_SERVICE_NOT_SUPPORTED_ESIM;
 }
 
+void EsimManager::RegisterCoreNotify(int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+{
+    return;
+}
+
+void EsimManager::UnRegisterCoreNotify(
+    int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what)
+{
+    return;
+}
+
+void EsimManager::PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t param)
+{
+    return;
+}
 } // namespace Telephony
 } // namespace OHOS
 #endif

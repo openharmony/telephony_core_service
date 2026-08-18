@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,357 +13,265 @@
  * limitations under the License.
  */
 
-#ifndef NETWORK_SEARCH_TYPES_H
-#define NETWORK_SEARCH_TYPES_H
+#ifndef RADIO_EVENT_H
+#define RADIO_EVENT_H
+enum RadioEvent {
+    // modem
+    RADIO_STATE_CHANGED = 0,
+    RADIO_GET_STATUS,
+    RADIO_SET_STATUS,
+    RADIO_GET_VOICE_TECH,
+    RADIO_VOICE_TECH_CHANGED,
 
-#include "parcel.h"
+    RADIO_POWER,
+    RADIO_ON,
+    RADIO_AVAIL,
+    RADIO_OFF,
+    RADIO_NOT_AVAIL,
+    RADIO_DATA_CALL_LIST_CHANGED,
+    RADIO_IMS_NETWORK_STATE_CHANGED,
+    RADIO_ICC_STATUS_CHANGED,
+    RADIO_CONNECTED,
+    RADIO_ICC_REFRESH,
+    RADIO_PCODATA,
+    RADIO_GSM_SMS,
+    RADIO_CDMA_SMS,
+    RADIO_CALL_STATUS_INFO,
+    RADIO_CALL_USSD_NOTICE,
+    RADIO_CALL_SS_NOTICE,
+    RADIO_CALL_RINGBACK_VOICE,
+    RADIO_CALL_SRVCC_STATUS,
+    RADIO_CALL_EMERGENCY_NUMBER_REPORT,
+    RADIO_CALL_RSRVCC_STATUS,
 
-namespace OHOS {
-namespace Telephony {
-constexpr const char *CUR_SLOT_ID = "CUR_SLOT_ID";
-constexpr const char *CUR_PLMN_SHOW = "CUR_PLMN_SHOW";
-constexpr const char *CUR_PLMN = "CUR_PLMN";
-constexpr const char *CUR_SPN_SHOW = "CUR_SPN_SHOW";
-constexpr const char *CUR_SPN = "CUR_SPN";
-constexpr const char *DOMESTIC_SPN = "DOMESTIC_SPN";
-constexpr int32_t RRC_CONNECTED_STATUS = 1;
-constexpr int32_t RRC_IDLE_STATUS = 0;
+    RADIO_SMS_ON_SIM,
+    RADIO_SMS_STATUS,
+    RADIO_RESTRICTED_STATE,
+    RADIO_CELL_BROADCAST,
+    RADIO_CDMA_CELL_BROADCAST,
+    RADIO_RIL_SETUP_DATA_CALL,
+    RADIO_RIL_DEACTIVATE_DATA_CALL,
+    RADIO_LINK_CAPABILITY_CHANGED,
+    RADIO_DSDS_MODE_CHANGED,
+    RADIO_RIL_ADAPTER_HOST_DIED,
+    RADIO_CLEAN_ALL_DATA_CONNECTIONS,
+    RADIO_RESTART_RILD_NV_MATCH,
+    RADIO_NETWORKSLICE_URSP_RPT,
+    RADIO_NETWORKSLICE_ALLOWEDNSSAI_RPT,
+    RADIO_NETWORKSLICE_EHPLMN_RPT,
+    // cellular call
+    RADIO_DIAL = 101,
+    RADIO_REJECT_CALL,
+    RADIO_HANGUP_CONNECT,
+    RADIO_ACCEPT_CALL,
+    RADIO_CURRENT_CALLS,
+    RADIO_HOLD_CALL,
+    RADIO_ACTIVE_CALL,
+    RADIO_SWAP_CALL,
+    RADIO_COMBINE_CALL,
+    RADIO_JOIN_CALL,
+    RADIO_SPLIT_CALL,
+    RADIO_CALL_SUPPLEMENT,
+    RADIO_GET_CALL_WAIT,
+    RADIO_SET_CALL_WAIT,
+    RADIO_GET_CALL_FORWARD,
+    RADIO_SET_CALL_FORWARD,
+    RADIO_GET_CALL_CLIP,
+    RADIO_SET_CALL_CLIP,
+    RADIO_GET_CALL_CLIR,
+    RADIO_SET_CALL_CLIR,
+    RADIO_GET_CALL_RESTRICTION,
+    RADIO_SET_CALL_RESTRICTION,
+    RADIO_SET_CALL_RESTRICTION_PWD,
+    RADIO_SEND_DTMF,
+    RADIO_START_DTMF,
+    RADIO_STOP_DTMF,
+    RADIO_SET_CALL_PREFERENCE_MODE,
+    RADIO_GET_CALL_PREFERENCE_MODE,
+    RADIO_SET_IMS_SWITCH_STATUS,
+    RADIO_GET_IMS_SWITCH_STATUS,
+    RADIO_SET_USSD,
+    RADIO_GET_USSD,
+    RADIO_SET_CMUT,
+    RADIO_GET_CMUT,
+    RADIO_GET_EMERGENCY_CALL_LIST,
+    RADIO_SET_EMERGENCY_CALL_LIST,
+    RADIO_GET_CALL_FAIL_REASON,
+    RADIO_CLOSE_UNFINISHED_USSD,
+    RADIO_SET_VONR_SWITCH_STATUS,
+    RADIO_RECV_CALL_MEDIA_MODE_REQUEST,
+    RADIO_RECV_CALL_MEDIA_MODE_RESPONSE,
+    RADIO_CALL_SESSION_EVENT_CHANGED,
+    RADIO_CALL_PEER_DIMENSIONS_CHANGED,
+    RADIO_CALL_DATA_USAGE_CHANGED,
+    RADIO_CAMERA_CAPABILITIES_CHANGED,
+    RADIO_NV_REFRESH_FINISHED,
+    RADIO_GET_IMS_CAPABILITY_FINISHED,
+    RADIO_START_RTT,
+    RADIO_STOP_RTT,
+    RADIO_RTT_UPGRADE_OR_DOWNGRADE_EVT,
+    RADIO_RTT_UPGRADE_OR_DOWNGRADE_ERR,
+    RADIO_SUPP_EXT_CHANGED,
 
-/**
- * @brief Domain type
- */
-enum class DomainType {
-    /**
-     * Packet Switched (PS) domain
-     */
-    DOMAIN_TYPE_PS,
-    /**
-     * Circuit Switched (CS) domain
-     */
-    DOMAIN_TYPE_CS,
+    // Ims sms
+    RADIO_SEND_IMS_GSM_SMS = 201,
+    RADIO_SEND_SMS,
+    RADIO_SEND_CDMA_SMS,
+    RADIO_STORAGE_SMS,
+    RADIO_DELETE_SMS,
+    RADIO_SEND_SMS_EXPECT_MORE,
+    RADIO_ADD_CDMA_SMS,
+    RADIO_DEL_CDMA_SMS,
+    RADIO_UPDATE_CDMA_SMS,
+    RADIO_SET_IMS_SMS,
+    RADIO_GET_IMS_SMS,
+
+    // Network Search
+    RADIO_NETWORK_STATE = 301,
+    RADIO_VOICE_REG_STATE,
+    RADIO_DATA_REG_STATE,
+    RADIO_OPERATOR,
+    RADIO_GET_SIGNAL_STRENGTH,
+    RADIO_SIGNAL_STRENGTH_UPDATE,
+    RADIO_NETWORK_SEARCH_RESULT,
+    RADIO_GET_NETWORK_SELECTION_MODE,
+    RADIO_SET_NETWORK_SELECTION_MODE,
+    RADIO_GET_NEIGHBORING_CELL_INFO,
+    RADIO_GET_CURRENT_CELL_INFO,
+    RADIO_NETWORK_TIME_UPDATE,
+    RADIO_NETWORK_TIME_ZONE_UPDATE,
+    RADIO_SET_PREFERRED_NETWORK_MODE,
+    RADIO_GET_PREFERRED_NETWORK_MODE,
+    RADIO_NITZ_UPDATE,
+    RADIO_GET_IMS_REG_STATUS,
+    RADIO_GET_IMEI,
+    RADIO_GET_IMEISV,
+    RADIO_SET_PS_ATTACH_STATUS,
+    RADIO_GET_MEID,
+    RADIO_CHANNEL_CONFIG_UPDATE,
+    RADIO_SET_LOCATION_UPDATE,
+    RADIO_CURRENT_CELL_UPDATE,
+    RADIO_SET_DATA_CONNECT_ACTIVE,
+    RADIO_SET_DEVICE_STATE,
+    RADIO_SET_NOTIFICATION_FILTER,
+    RADIO_GET_BASEBAND_VERSION,
+    RADIO_SET_NR_OPTION_MODE,
+    RADIO_GET_NR_OPTION_MODE,
+    RADIO_GET_RRC_CONNECTION_STATE,
+    RADIO_RRC_CONNECTION_STATE_UPDATE,
+    NOTIFY_STATE_CHANGE,
+    DELAY_NOTIFY_STATE_CHANGE,
+    RADIO_RESIDENT_NETWORK_CHANGE,
+    RADIO_GET_NR_SSBID_INFO,
+    RADIO_MANUAL_GET_PLMN_LIST_RESULT,
+
+    // module internal events
+    RADIO_PS_CONNECTION_ATTACHED = 401,
+    RADIO_PS_CONNECTION_DETACHED,
+    RADIO_IMS_REG_STATUS_UPDATE,
+    RADIO_NR_STATE_CHANGED,
+    RADIO_NR_FREQUENCY_CHANGED,
+    RADIO_PS_RAT_CHANGED,
+    RADIO_PS_ROAMING_OPEN,
+    RADIO_PS_ROAMING_CLOSE,
+    RADIO_EMERGENCY_STATE_OPEN,
+    RADIO_EMERGENCY_STATE_CLOSE,
+    RADIO_MANUAL_SEARCH_PLMN_LIST,
+    RADIO_FACTORY_RESET,
+
+    // SIM
+    RADIO_SIM_GET_STATUS = 501,
+    RADIO_SIM_IO,
+    RADIO_SIM_GET_IMSI,
+    RADIO_SIM_GET_ICCID,
+    RADIO_SIM_GET_LOCK_STATUS,
+    RADIO_SIM_SET_LOCK,
+    RADIO_SIM_CHANGE_PASSWD,
+    RADIO_SIM_ENTER_PIN,
+    RADIO_SIM_UNLOCK_PIN,
+    RADIO_SIM_PIN_INPUT_TIMES,
+    RADIO_SIM_ENTER_PIN2,
+    RADIO_SIM_UNLOCK_PIN2,
+    RADIO_SIM_PIN2_INPUT_TIMES,
+    RADIO_SIM_CARD_ENABLED,
+    RADIO_SIM_STATE_CHANGE,
+    RADIO_SIM_STATE_READY,
+    RADIO_SIM_STATE_LOCKED,
+    RADIO_SIM_STATE_SIMLOCK,
+    RADIO_IMSI_LOADED_READY,
+    RADIO_SIM_RECORDS_LOADED,
+    RADIO_SIM_ACCOUNT_LOADED,
+    RADIO_SIM_GET_RADIO_PROTOCOL,
+    RADIO_SIM_CHECK_RADIO_PROTOCOL,
+    RADIO_SIM_UPDATE_RADIO_PROTOCOL,
+    RADIO_SIM_RADIO_PROTOCOL_NOTIFY,
+    RADIO_SIM_SET_RADIO_PROTOCOL_COMPLETE,
+    RADIO_SIM_SET_RADIO_PROTOCOL_TIMEOUT,
+    RADIO_SIM_OPKEY_LOADED,
+    RADIO_OPERATOR_CACHE_DELETE,
+    RADIO_SIM_ICCID_LOADED,
+    RADIO_QUERY_ICCID_DONE,
+    RADIO_OPERATOR_CONFIG_CHANGED,
+    RADIO_OPERATOR_CONFIG_UPDATE,
+    RADIO_SIM_GET_PRIMARY_SLOT,
+    RADIO_SIM_SET_PRIMARY_SLOT,
+
+    // STK
+    RADIO_STK_SESSION_END,
+    RADIO_STK_PROACTIVE_COMMAND,
+    RADIO_STK_ALPHA_NOTIFY,
+    RADIO_STK_EVENT_NOTIFY,
+    RADIO_STK_CALL_SETUP,
+    RADIO_STK_SEND_TERMINAL_RESPONSE,
+    RADIO_STK_SEND_ENVELOPE,
+    RADIO_STK_SEND_CALL_SETUP_REQUEST_RESULT,
+    RADIO_STK_IS_READY,
+
+    RADIO_UPDATE_SMS,
+    RADIO_SET_SMS_CENTER_ADDRESS,
+    RADIO_GET_SMS_CENTER_ADDRESS,
+    RADIO_SET_CELL_BROADCAST,
+    RADIO_SET_CDMA_CELL_BROADCAST,
+    RADIO_GET_CELL_BROADCAST,
+    RADIO_GET_CDMA_CELL_BROADCAST,
+    RADIO_ACTIVE_CDMA_CELL_BROADCAST,
+
+    // Card
+    RADIO_CARD_TYPE_CHANGE,
+
+    // IMS core service
+    RADIO_IMS_SERVICE_STATUS_UPDATE = 1000,
+    RADIO_IMS_REGISTER_STATE_UPDATE,
+
+    // IMS call
+    RADIO_IMS_CALL_STATUS_INFO,
+    RADIO_IMS_GET_CALL_DATA,
+
+    // IMS supplement
+    RADIO_IMS_SET_CLIP,
+    RADIO_IMS_SET_COLR,
+    RADIO_IMS_GET_COLR,
+    RADIO_IMS_SET_COLP,
+    RADIO_IMS_GET_COLP,
+
+    // Satellite status
+    SATELLITE_STATUS_CHANGED,
+    GET_SATELLITE_CAPABILITY,
+
+    // esim switch
+    RADIO_ESIM_SWITCH_CIRCUIT_BEGIN = 1100,
+    RADIO_ESIM_SWITCH_CIRCUIT_END = 1101,
+    RADIO_ESIM_SWITCH_END = 1120,
+ 
+    RADIO_ESIM_ENABLING_PROFLIE_START = 1121,
+    RADIO_ESIM_ENABLING_PROFLIE_END,
+    RADIO_ESIM_DISABLING_PROFLIE_START,
+    RADIO_ESIM_DISABLING_PROFLIE_END,
+    RADIO_ESIM_DOWNLOADING_PROFLIE_START,
+    RADIO_ESIM_DOWNLOADING_PROFLIE_END,
+    RADIO_ESIM_RESET_MEMORY_START,
+    RADIO_ESIM_RESET_MEMORY_END,
+    RADIO_ESIM_ENABLED_PROFILE_NUM,
+    RADIO_ESIM_END = 1140,
 };
-
-enum class RegServiceState {
-    REG_STATE_UNKNOWN,
-    REG_STATE_IN_SERVICE,
-    REG_STATE_NO_SERVICE,
-    REG_STATE_EMERGENCY_ONLY,
-    REG_STATE_SEARCH,
-    REG_STATE_POWER_OFF
-};
-
-/**
- * @brief Registered roaming type
- */
-enum class RoamingType {
-    /**
-     * Registered in a roaming network, but unknown the roaming type
-     */
-    ROAMING_STATE_UNKNOWN,
-    /**
-     * Not roaming
-     */
-    ROAMING_STATE_UNSPEC,
-    /**
-     * Registered in a domestic roaming network
-     */
-    ROAMING_STATE_DOMESTIC,
-    /**
-     * Registered in an international roaming network
-     */
-    ROAMING_STATE_INTERNATIONAL
-};
-
-/**
- * @brief Describes the radio access technology.
- */
-enum class RadioTech {
-    /**
-     * Indicates the invalid value.
-     */
-    RADIO_TECHNOLOGY_INVALID = -1,
-
-    /**
-     * Indicates unknown radio access technology (RAT).
-     */
-    RADIO_TECHNOLOGY_UNKNOWN = 0,
-
-    /**
-     * Indicates that RAT is global system for mobile communications (GSM), including GSM, general packet
-     * radio system (GPRS), and enhanced data rates for GSM evolution (EDGE).
-     */
-    RADIO_TECHNOLOGY_GSM = 1,
-
-    /**
-     * Indicates that RAT is code division multiple access (CDMA), including Interim Standard 95 (IS95) and
-     * Single-Carrier Radio Transmission Technology (1xRTT).
-     */
-    RADIO_TECHNOLOGY_1XRTT = 2,
-
-    /**
-     * Indicates that RAT is wideband code division multiple address (WCDMA).
-     */
-    RADIO_TECHNOLOGY_WCDMA = 3,
-
-    /**
-     * Indicates that RAT is high-speed packet access (HSPA), including HSPA, high-speed downlink packet
-     * access (HSDPA), and high-speed uplink packet access (HSUPA).
-     */
-    RADIO_TECHNOLOGY_HSPA = 4,
-
-    /**
-     * Indicates that RAT is evolved high-speed packet access (HSPA+), including HSPA+ and dual-carrier
-     * HSPA+ (DC-HSPA+).
-     */
-    RADIO_TECHNOLOGY_HSPAP = 5,
-
-    /**
-     * Indicates that RAT is time division-synchronous code division multiple access (TD-SCDMA).
-     */
-    RADIO_TECHNOLOGY_TD_SCDMA = 6,
-
-    /**
-     * Indicates that RAT is evolution data only (EVDO), including EVDO Rev.0, EVDO Rev.A, and EVDO Rev.B.
-     */
-    RADIO_TECHNOLOGY_EVDO = 7,
-
-    /**
-     * Indicates that RAT is evolved high rate packet data (EHRPD).
-     */
-    RADIO_TECHNOLOGY_EHRPD = 8,
-
-    /**
-     * Indicates that RAT is long term evolution (LTE).
-     */
-    RADIO_TECHNOLOGY_LTE = 9,
-
-    /**
-     * Indicates that RAT is LTE carrier aggregation (LTE-CA).
-     */
-    RADIO_TECHNOLOGY_LTE_CA = 10,
-
-    /**
-     * Indicates that RAT is interworking WLAN (I-WLAN).
-     */
-    RADIO_TECHNOLOGY_IWLAN = 11,
-
-    /**
-     * Indicates that RAT is 5G new radio (NR).
-     */
-    RADIO_TECHNOLOGY_NR = 12,
-
-    /**
-     * Indicates that RAT is 5G new radio (NR) enhanced.
-     */
-    RADIO_TECHNOLOGY_NR_ENHANCED = 13,
-
-    /**
-     * Indicates that RAT is general packet radio service (GPRS), a packet-based wireless communication technology
-     * used in GSM networks.
-     */
-    RADIO_TECHNOLOGY_GPRS = 14,
-
-    /**
-     * Indicates that RAT is enhanced data rates for GSM evolution (EDGE), an enhanced version of GSM that
-     * provides higher data transmission speeds.
-     */
-    RADIO_TECHNOLOGY_EDGE = 15,
-
-    /**
-     * Indicates that RAT is universal mobile telecommunications system (UMTS), a 3G mobile communication technology
-     * based on WCDMA.
-     */
-    RADIO_TECHNOLOGY_UMTS = 16,
-
-    /**
-     * Indicates that RAT is high-speed downlink packet access (HSDPA), an enhancement to WCDMA for faster
-     * downlink data transmission.
-     */
-    RADIO_TECHNOLOGY_HSDPA = 17,
-
-    /**
-     * Indicates that RAT is high-speed uplink packet access (HSUPA), an enhancement to WCDMA for faster
-     * uplink data transmission.
-     */
-    RADIO_TECHNOLOGY_HSUPA = 18,
-
-    /**
-     * Indicates that RAT is Interim Standard 95 (IS-95), also know as CDMA One,
-     * a 2G mobile communication standard based on code division multiple access (CDMA).
-     */
-    RADIO_TECHNOLOGY_IS95A = 19,
-
-    /**
-     * Indicates that RAT is Interim Standard 95B (IS-95B),
-     * an enhanced version of IS-95 with improved data rates and voice quality.
-     */
-    RADIO_TECHNOLOGY_IS95B = 20,
-
-    /**
-     * Indicates that RAT is evolution data only (EVDO) Rev.0,
-     * a 3G mobile communication standard that provides high-speed data transmission over CDMA networks.
-     */
-    RADIO_TECHNOLOGY_EVDO_0 = 21,
-
-    /**
-     * Indicates that RAT is evolution data only (EVDO) Rev.A,
-     * an enhanced version of EVDO Rev.0 with improved data rates and support for voice services.
-     */
-    RADIO_TECHNOLOGY_EVDO_A = 22,
-
-    /**
-     * Indicates that RAT is evolution data only (EVDO) Rev.B,
-     * a further enhancement to EVDO that supports higher data rates and improved spectral efficiency.
-     */
-    RADIO_TECHNOLOGY_EVDO_B = 23,
-
-    /**
-     * Indicates that RAT is dual-carrier HSPA+ (DC -HSPA+),
-     * a high-speed data technology that uses two carriers to improve data throughput.
-     */
-    RADIO_TECHNOLOGY_DCHSPAP = 30,
-
-    /**
-     * Indicates the max value.
-     */
-    RADIO_TECHNOLOGY_MAX = RADIO_TECHNOLOGY_HSUPA,
-};
-
-/**
- * @brief Describes the nsa sa state.
- */
-enum class NrState {
-    /**
-     * Indicates that a device is idle under or is connected to an LTE cell that does not support NSA.
-     */
-    NR_STATE_NOT_SUPPORT = 1,
-
-    /**
-     * Indicates that a device is idle under an LTE cell supporting NSA but not NR coverage detection.
-     */
-    NR_NSA_STATE_NO_DETECT = 2,
-
-    /**
-     * Indicates that a device is connected to an LTE network under an LTE cell
-     * that supports NSA and NR coverage detection.
-     */
-    NR_NSA_STATE_CONNECTED_DETECT = 3,
-
-    /**
-     * Indicates that a device is idle under an LTE cell supporting NSA and NR coverage detection.
-     */
-    NR_NSA_STATE_IDLE_DETECT = 4,
-
-    /**
-     * Indicates that a device is connected to an LTE + NR network under an LTE cell that supports NSA.
-     */
-    NR_NSA_STATE_DUAL_CONNECTED = 5,
-
-    /**
-     * Indicates that a device is idle under or is connected to an NG-RAN cell while being attached to 5GC.
-     */
-    NR_NSA_STATE_SA_ATTACHED = 6
-};
-
-/**
- * @brief Describes the 5G New Radio (NR) mode.
- */
-enum class NrMode {
-    /**
-     * Indicates unknown NR networking mode.
-     */
-    NR_MODE_UNKNOWN,
-
-    /**
-     * Indicates that the NR networking mode is NSA only.
-     */
-    NR_MODE_NSA_ONLY,
-
-    /**
-     * Indicates that the NR networking mode is SA only.
-     */
-    NR_MODE_SA_ONLY,
-
-    /**
-     * Indicates that the NR networking mode is NSA and SA.
-     */
-    NR_MODE_NSA_AND_SA,
-};
-
-/**
- * @brief Describes the frequency type.
- */
-enum class FrequencyType {
-    FREQ_TYPE_UNKNOWN = 0,
-    /**
-     * Frequency range is millimeter wave frequency.
-     */
-    FREQ_TYPE_MMWAVE
-};
-
-enum class PhoneType { PHONE_TYPE_IS_NONE, PHONE_TYPE_IS_GSM, PHONE_TYPE_IS_CDMA };
-
-enum class SelectionMode { MODE_TYPE_UNKNOWN = -1, MODE_TYPE_AUTO = 0, MODE_TYPE_MANUAL = 1 };
-
-enum class PreferredNetworkMode {
-    CORE_NETWORK_MODE_AUTO = 0,
-    CORE_NETWORK_MODE_GSM = 1,
-    CORE_NETWORK_MODE_WCDMA = 2,
-    CORE_NETWORK_MODE_LTE = 3,
-    CORE_NETWORK_MODE_LTE_WCDMA = 4,
-    CORE_NETWORK_MODE_LTE_WCDMA_GSM = 5,
-    CORE_NETWORK_MODE_WCDMA_GSM = 6,
-    CORE_NETWORK_MODE_CDMA = 7,
-    CORE_NETWORK_MODE_EVDO = 8,
-    CORE_NETWORK_MODE_EVDO_CDMA = 9,
-    CORE_NETWORK_MODE_WCDMA_GSM_EVDO_CDMA = 10,
-    CORE_NETWORK_MODE_LTE_EVDO_CDMA = 11,
-    CORE_NETWORK_MODE_LTE_WCDMA_GSM_EVDO_CDMA = 12,
-    CORE_NETWORK_MODE_TDSCDMA = 13,
-    CORE_NETWORK_MODE_TDSCDMA_GSM = 14,
-    CORE_NETWORK_MODE_TDSCDMA_WCDMA = 15,
-    CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM = 16,
-    CORE_NETWORK_MODE_LTE_TDSCDMA = 17,
-    CORE_NETWORK_MODE_LTE_TDSCDMA_GSM = 18,
-    CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA = 19,
-    CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM = 20,
-    CORE_NETWORK_MODE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 21,
-    CORE_NETWORK_MODE_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 22,
-    CORE_NETWORK_MODE_NR = 31,
-    CORE_NETWORK_MODE_NR_LTE = 32,
-    CORE_NETWORK_MODE_NR_LTE_WCDMA = 33,
-    CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM = 34,
-    CORE_NETWORK_MODE_NR_LTE_EVDO_CDMA = 35,
-    CORE_NETWORK_MODE_NR_LTE_WCDMA_GSM_EVDO_CDMA = 36,
-    CORE_NETWORK_MODE_NR_LTE_TDSCDMA = 37,
-    CORE_NETWORK_MODE_NR_LTE_TDSCDMA_GSM = 38,
-    CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA = 39,
-    CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM = 40,
-    CORE_NETWORK_MODE_NR_LTE_TDSCDMA_WCDMA_GSM_EVDO_CDMA = 41,
-    CORE_NETWORK_MODE_MAX_VALUE = 99,
-};
-
-struct OperatorInformation {
-    std::string operatorNumeric = "";
-    std::string fullName = "";
-    std::string shortName = "";
-};
-
-enum class RadioProtocolTech {
-    RADIO_PROTOCOL_TECH_UNKNOWN = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_UNKNOWN),
-    RADIO_PROTOCOL_TECH_GSM = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_GSM),
-    RADIO_PROTOCOL_TECH_1XRTT = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_1XRTT),
-    RADIO_PROTOCOL_TECH_WCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_WCDMA),
-    RADIO_PROTOCOL_TECH_HSPA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPA),
-    RADIO_PROTOCOL_TECH_HSPAP = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_HSPAP),
-    RADIO_PROTOCOL_TECH_TD_SCDMA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_TD_SCDMA),
-    RADIO_PROTOCOL_TECH_EVDO = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EVDO),
-    RADIO_PROTOCOL_TECH_EHRPD = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_EHRPD),
-    RADIO_PROTOCOL_TECH_LTE = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE),
-    RADIO_PROTOCOL_TECH_LTE_CA = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_LTE_CA),
-    RADIO_PROTOCOL_TECH_IWLAN = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_IWLAN),
-    RADIO_PROTOCOL_TECH_NR = 1 << static_cast<int32_t>(RadioTech::RADIO_TECHNOLOGY_NR),
-};
-} // namespace Telephony
-} // namespace OHOS
-#endif // NETWORK_SEARCH_TYPES_H
+#endif // RADIO_EVENT_H

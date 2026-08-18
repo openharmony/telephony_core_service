@@ -22,6 +22,8 @@
 #include "mock_esim_manager.h"
 #include "core_manager_inner.h"
 #include "esim_file.h"
+#include "radio_event.h"
+
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
@@ -550,6 +552,29 @@ HWTEST_F(EsimManagerTest, SetEsimCaVerifyResult_001, Function | MediumTest | Lev
     ret = esimManager->SetEsimCaVerifyResult(slotId, result);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
 }
+
+HWTEST_F(EsimManagerTest, PublishEsimProfileChange_001, Function | MediumTest | Level1)
+{
+    esimManager->observerHandler_ = nullptr;
+    esimManager->PublishEsimProfileChange(0, RADIO_ESIM_ENABLING_PROFLIE_START, 0);
+    esimManager->OnInit(0);
+    esimManager->PublishEsimProfileChange(-1, RADIO_ESIM_ENABLING_PROFLIE_START, 0);
+    esimManager->PublishEsimProfileChange(0, RADIO_ESIM_ENABLING_PROFLIE_START, 0);
+    esimManager->PublishEsimProfileChange(0, RADIO_ESIM_ENABLED_PROFILE_NUM, 3);
+    EXPECT_EQ(esimManager->enabledProfileNum_, 3);
+}
+ 
+HWTEST_F(EsimManagerTest, RegisterCoreNotify_001, Function | MediumTest | Level1)
+{
+    auto handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create());
+    esimManager->OnInit(0);
+    esimManager->RegisterCoreNotify(0, nullptr, RADIO_ESIM_ENABLING_PROFLIE_START);
+    esimManager->RegisterCoreNotify(-1, handler, RADIO_ESIM_ENABLING_PROFLIE_START);
+    esimManager->RegisterCoreNotify(0, handler, RADIO_ESIM_ENABLING_PROFLIE_START);
+    esimManager->enabledProfileNum_ = 2;
+    esimManager->RegisterCoreNotify(0, handler, RADIO_ESIM_ENABLED_PROFILE_NUM);
+}
+
 #else
 HWTEST_F(EsimManagerTest, OnInit_002, Function | MediumTest | Level1)
 {
