@@ -316,7 +316,7 @@ void CoreServiceCommonEventHub::HandleRadioStateChange(const EventFwk::CommonEve
     auto it = callbacks_.find(TelCommonEvent::RADIO_STATE_CHANGE);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnRadioStateChange(slotId, state);
+            ffrt::submit([cb, slotId, state]() { cb->OnRadioStateChange(slotId, state); });
         }
     }
 }
@@ -327,7 +327,7 @@ void CoreServiceCommonEventHub::HandleDataShareReady(const EventFwk::CommonEvent
     auto it = callbacks_.find(TelCommonEvent::DATA_SHARE_READY);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnDataShareReady();
+            ffrt::submit([cb]() { cb->OnDataShareReady(); });
         }
     }
 }
@@ -339,7 +339,7 @@ void CoreServiceCommonEventHub::HandleUserSwitched(const EventFwk::CommonEventDa
     auto it = callbacks_.find(TelCommonEvent::USER_SWITCHED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnUserSwitched(userId);
+            ffrt::submit([cb, userId]() { cb->OnUserSwitched(userId); });
         }
     }
 }
@@ -356,7 +356,9 @@ void CoreServiceCommonEventHub::HandleSimStateChanged(const EventFwk::CommonEven
     auto it = callbacks_.find(TelCommonEvent::SIM_STATE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnSimStateChanged(slotId, simType, simState, lockReason);
+            ffrt::submit([cb, slotId, simType, simState, lockReason]() {
+                cb->OnSimStateChanged(slotId, simType, simState, lockReason);
+            });
         }
     }
 }
@@ -371,7 +373,9 @@ void CoreServiceCommonEventHub::HandleBluetoothRemotedeviceNameUpdate(const Even
     auto it = callbacks_.find(TelCommonEvent::BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnBluetoothRemoteDeviceNameUpdate(deviceAddr, remoteName);
+            ffrt::submit([cb, deviceAddr, remoteName]() {
+                cb->OnBluetoothRemoteDeviceNameUpdate(deviceAddr, remoteName);
+            });
         }
     }
 }
@@ -382,7 +386,7 @@ void CoreServiceCommonEventHub::HandleShutdown(const EventFwk::CommonEventData &
     auto it = callbacks_.find(TelCommonEvent::SHUTDOWN);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnShutdown();
+            ffrt::submit([cb]() { cb->OnShutdown(); });
         }
     }
 }
@@ -393,7 +397,7 @@ void CoreServiceCommonEventHub::HandleScreenUnlocked(const EventFwk::CommonEvent
     auto it = callbacks_.find(TelCommonEvent::SCREEN_UNLOCKED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnScreenUnlocked();
+            ffrt::submit([cb]() { cb->OnScreenUnlocked(); });
         }
     }
 }
@@ -408,7 +412,7 @@ void CoreServiceCommonEventHub::HandleOperatorConfigChanged(const EventFwk::Comm
     auto it = callbacks_.find(TelCommonEvent::OPERATOR_CONFIG_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnOperatorConfigChanged(slotId, state);
+            ffrt::submit([cb, slotId, state]() { cb->OnOperatorConfigChanged(slotId, state); });
         }
     }
 }
@@ -423,7 +427,7 @@ void CoreServiceCommonEventHub::HandleNetworkStateChanged(const EventFwk::Common
     auto it = callbacks_.find(TelCommonEvent::NETWORK_STATE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnNetworkStateChanged(slotId, networkState);
+            ffrt::submit([cb, slotId, networkState]() { cb->OnNetworkStateChanged(slotId, networkState); });
         }
     }
 }
@@ -438,7 +442,7 @@ void CoreServiceCommonEventHub::HandleCallStateChanged(const EventFwk::CommonEve
     auto it = callbacks_.find(TelCommonEvent::CALL_STATE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnCallStateChanged(slotId, state);
+            ffrt::submit([cb, slotId, state]() { cb->OnCallStateChanged(slotId, state); });
         }
     }
 }
@@ -452,7 +456,7 @@ void CoreServiceCommonEventHub::HandleSimCardDefaultDataSubscriptionChanged(cons
     auto it = callbacks_.find(TelCommonEvent::SIM_CARD_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnSimCardDefaultDataSubscriptionChanged(simId);
+            ffrt::submit([cb, simId]() { cb->OnSimCardDefaultDataSubscriptionChanged(simId); });
         }
     }
 }
@@ -463,7 +467,7 @@ void CoreServiceCommonEventHub::HandleScreenOn(const EventFwk::CommonEventData &
     auto it = callbacks_.find(TelCommonEvent::SCREEN_ON);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnScreenOn();
+            ffrt::submit([cb]() { cb->OnScreenOn(); });
         }
     }
 }
@@ -474,7 +478,7 @@ void CoreServiceCommonEventHub::HandleScreenOff(const EventFwk::CommonEventData 
     auto it = callbacks_.find(TelCommonEvent::SCREEN_OFF);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnScreenOff();
+            ffrt::submit([cb]() { cb->OnScreenOff(); });
         }
     }
 }
@@ -489,7 +493,7 @@ void CoreServiceCommonEventHub::HandleConnectivityChange(const EventFwk::CommonE
     auto it = callbacks_.find(TelCommonEvent::CONNECTIVITY_CHANGE);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnConnectivityChange(netType, netConnState);
+            ffrt::submit([cb, netType, netConnState]() { cb->OnConnectivityChange(netType, netConnState); });
         }
     }
 }
@@ -502,7 +506,7 @@ void CoreServiceCommonEventHub::HandlePowerSaveModeChanged(const EventFwk::Commo
     auto it = callbacks_.find(TelCommonEvent::POWER_SAVE_MODE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnPowerSaveModeChanged(powerMode);
+            ffrt::submit([cb, powerMode]() { cb->OnPowerSaveModeChanged(powerMode); });
         }
     }
 }
@@ -516,7 +520,7 @@ void CoreServiceCommonEventHub::HandleCharging(const EventFwk::CommonEventData &
     auto it = callbacks_.find(TelCommonEvent::CHARGING);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnCharging(chargeType);
+            ffrt::submit([cb, chargeType]() { cb->OnCharging(chargeType); });
         }
     }
 }
@@ -530,7 +534,7 @@ void CoreServiceCommonEventHub::HandleDischarging(const EventFwk::CommonEventDat
     auto it = callbacks_.find(TelCommonEvent::DISCHARGING);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnDischarging(chargeType);
+            ffrt::submit([cb, chargeType]() { cb->OnDischarging(chargeType); });
         }
     }
 }
@@ -541,7 +545,7 @@ void CoreServiceCommonEventHub::HandleLocaleChanged(const EventFwk::CommonEventD
     auto it = callbacks_.find(TelCommonEvent::LOCALE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnLocaleChanged();
+            ffrt::submit([cb]() { cb->OnLocaleChanged(); });
         }
     }
 }
@@ -554,7 +558,7 @@ void CoreServiceCommonEventHub::HandleAirplaneModeChanged(const EventFwk::Common
     auto it = callbacks_.find(TelCommonEvent::AIRPLANE_MODE_CHANGED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnAirplaneModeChanged(static_cast<bool>(code));
+            ffrt::submit([cb, code]() { cb->OnAirplaneModeChanged(static_cast<bool>(code)); });
         }
     }
 }
@@ -568,7 +572,7 @@ void CoreServiceCommonEventHub::HandleSetPrimarySlotStatus(const EventFwk::Commo
     auto it = callbacks_.find(TelCommonEvent::SET_PRIMARY_SLOT_STATUS);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnSetPrimarySlotStatus(setDone);
+            ffrt::submit([cb, setDone]() { cb->OnSetPrimarySlotStatus(setDone); });
         }
     }
 }
@@ -579,7 +583,7 @@ void CoreServiceCommonEventHub::HandleSecondMounted(const EventFwk::CommonEventD
     auto it = callbacks_.find(TelCommonEvent::SECOND_MOUNTED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnSecondMounted();
+            ffrt::submit([cb]() { cb->OnSecondMounted(); });
         }
     }
 }
@@ -590,7 +594,7 @@ void CoreServiceCommonEventHub::HandleBundleScanFinished(const EventFwk::CommonE
     auto it = callbacks_.find(TelCommonEvent::BUNDLE_SCAN_FINISHED);
     if (it != callbacks_.end()) {
         for (const auto &cb : it->second) {
-            cb->OnBundleScanFinished();
+            ffrt::submit([cb]() { cb->OnBundleScanFinished(); });
         }
     }
 }
