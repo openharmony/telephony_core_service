@@ -245,6 +245,18 @@ HWTEST_F(TelRilTest, Telephony_TelRil_GetNetworkSliceEhplmnTest_0101, Function |
         static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_GET_NETWORKSLICE_EHPLMN), SLOT_ID_0, GetHandler()));
 }
 
+/**
+ * @tc.number Telephony_TelRil_DataProfilePasswordClearTest_0101 to do ...
+ * @tc.name Test data profile password clear after use
+ * @tc.desc Function test - This test verifies password clearing in DataProfile
+ * @tc.cover This test covers the password clearing code path in ChangeDPToHalDataProfileWithApnTypesforSlice
+ */
+HWTEST_F(TelRilTest, Telephony_TelRil_DataProfilePasswordClearTest_0101, Function | MediumTest | Level3)
+{
+    ASSERT_TRUE(ProcessTest(
+        static_cast<int32_t>(DiffInterfaceId::TEST_RILCM_DATA_PROFILE_PASSWORD_CLEAR), SLOT_ID_0, GetHandler()));
+}
+
 #endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
