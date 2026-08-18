@@ -693,5 +693,15 @@ int32_t SimStateManager::GetInitPrimarySlotReady(bool& isReady)
     }
     return simStateHandle_->GetInitPrimarySlotReady(isReady);
 }
+
+void SimStateManager::SetSpecifiedIccidBySlotId(std::string &iccid)
+{
+    if (simStateHandle_ == nullptr) {
+        TELEPHONY_LOGI("SetSpecifiedIccidBySlotId(), simStateHandle_ is nullptr!!!");
+        return;
+    }
+
+    return simStateHandle_->SetSpecifiedIccidBySlotId(iccid);
+}
 } // namespace Telephony
 } // namespace OHOS

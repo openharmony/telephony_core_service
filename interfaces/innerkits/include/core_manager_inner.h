@@ -368,6 +368,7 @@ public:
     std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
     int32_t SaveCardFileDetectData(const CardFileDetectData &data);
     int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results);
+    void SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);

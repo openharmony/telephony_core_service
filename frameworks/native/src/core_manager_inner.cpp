@@ -3131,5 +3131,14 @@ int32_t CoreManagerInner::GetAllSimCardInfo(std::vector<SimCardInfo> &results)
     }
     return simManager_->GetAllSimCardInfo(results);
 }
+
+void CoreManagerInner::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    simManager_->SetSpecifiedIccidBySlotId(slotId, iccid);
+}
 } // namespace Telephony
 } // namespace OHOS

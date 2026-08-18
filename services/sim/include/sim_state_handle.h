@@ -159,6 +159,7 @@ public:
     void UpdateSimStateToStateRegistry();
     int32_t SetInitPrimarySlotReady(bool isReady);
     int32_t GetInitPrimarySlotReady(bool& isReady);
+    void SetSpecifiedIccidBySlotId(std::string &iccid);
     inline void RemoveMatchSimTimeoutTimer()
     {
         RemoveEvent(EVENT_MATCH_SIM_TIMEOUT);
@@ -228,11 +229,13 @@ private:
     std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     std::string iccid_ = "";
     std::string oldIccid_ = "";
+    std::string specifiedIccid_ = "";
     int32_t esimSwitchState_ = 0;
     bool needReupdate_ = false;
     bool isInSenseSwitchPhase_ = false;
     bool isInitPrimarySlotReady = false;
     ffrt::shared_mutex simStateInitMutex_;
+    ffrt::shared_mutex specifiedIccidMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
