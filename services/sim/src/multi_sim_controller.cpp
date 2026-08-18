@@ -405,7 +405,7 @@ bool MultiSimController::IsAllCardsLoaded()
         TELEPHONY_LOGI("there is no card loaded");
         return false;
     }
-    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL + 1; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_REAL; i++) {
         if (i == SIM_SLOT_2) {
             continue;
         }
@@ -1108,7 +1108,7 @@ void MultiSimController::CheckIfNeedSwitchMainSlotId(bool isUserSet)
         }
     } else {
         int32_t firstActivedSlotId = GetFirstActivedSlotId();
-        if (!IsValidSlotId(firstActivedSlotId)) {
+        if (!IsValidSlotId(firstActivedSlotId) || firstActivedSlotId == SIM_SLOT_3) {
             return;
         }
         TELEPHONY_LOGI("single card active, need to set slot%{public}d primary", firstActivedSlotId);
