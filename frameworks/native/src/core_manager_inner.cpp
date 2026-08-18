@@ -3152,5 +3152,14 @@ void CoreManagerInner::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &ic
     }
     simManager_->SetSpecifiedIccidBySlotId(slotId, iccid);
 }
+
+void CoreManagerInner::PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t data)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("esimManager_ is null!");
+        return;
+    }
+    esimManager_->PublishEsimProfileChange(slotId, what, data);
+}
 } // namespace Telephony
 } // namespace OHOS
