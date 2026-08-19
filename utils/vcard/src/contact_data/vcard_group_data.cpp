@@ -36,8 +36,9 @@ int32_t VCardGroupData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
     }
     int32_t index;
     std::string groupId;
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, groupId);
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) == DataShare::E_OK) {
+        resultSet->GetString(index, groupId);
+    }
     if (groupId.empty() || !IsValidDecValue(groupId)) {
         TELEPHONY_LOGE("BuildData groupId is empty or invalid.");
         return TELEPHONY_ERROR;
