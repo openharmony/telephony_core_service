@@ -705,7 +705,7 @@ int32_t MultiSimController::GetSimLabel(int32_t slotId, SimLabel &simLabel)
             }
         }
     }
-     TELEPHONY_LOGI("GetSimLabel slotId:%{public}d, index:%{public}d, simType:%{public}d", slotId, simLabel.index,
+    TELEPHONY_LOGI("GetSimLabel slotId:%{public}d, index:%{public}d, simType:%{public}d", slotId, simLabel.index,
         static_cast<int>(simLabel.simType));
     return TELEPHONY_ERR_SUCCESS;
 }
