@@ -416,6 +416,7 @@ public:
     int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult);
     bool IsModemInitDone(int32_t slotId);
     int32_t GetEsimPortIndex(int32_t slotId, int32_t &portIndex);
+    void PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t data);
     /******************** esimManager end *****************************/
 
 private:

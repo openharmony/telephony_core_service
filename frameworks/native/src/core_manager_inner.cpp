@@ -153,6 +153,12 @@ int32_t CoreManagerInner::RegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->RegisterCoreNotify(slotId, handler, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_ENABLING_PROFLIE_START && what <= RadioEvent::RADIO_ESIM_END) {
+        if (esimManager_ == nullptr) {
+            TELEPHONY_LOGE("esimManager_ is null");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        esimManager_->RegisterCoreNotify(slotId, handler, what);
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
@@ -179,6 +185,12 @@ int32_t CoreManagerInner::UnRegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_ENABLING_PROFLIE_START && what <= RadioEvent::RADIO_ESIM_END) {
+        if (esimManager_ == nullptr) {
+            TELEPHONY_LOGE("esimManager_ is null");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        esimManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
@@ -3139,6 +3151,15 @@ void CoreManagerInner::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &ic
         return;
     }
     simManager_->SetSpecifiedIccidBySlotId(slotId, iccid);
+}
+
+void CoreManagerInner::PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t data)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("esimManager_ is null!");
+        return;
+    }
+    esimManager_->PublishEsimProfileChange(slotId, what, data);
 }
 } // namespace Telephony
 } // namespace OHOS
