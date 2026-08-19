@@ -16,6 +16,7 @@
 #ifndef TELEPHONY_RADIO_CALLBACK_H
 #define TELEPHONY_RADIO_CALLBACK_H
 
+#include <memory>
 #include "i_network_search_callback_stub.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_radio_utils.h"
@@ -24,20 +25,20 @@ namespace OHOS {
 namespace Telephony {
 class GetNetworkSearchModeCallback : public INetworkSearchCallbackStub {
 public:
-    explicit GetNetworkSearchModeCallback(GetSelectModeContext *asyncContext);
+    explicit GetNetworkSearchModeCallback(std::shared_ptr<GetSelectModeContext> asyncContext);
     void OnGetNetworkModeCallback(const int32_t searchModel, const int32_t errorCode) override;
 
 private:
-    GetSelectModeContext *asyncContext_;
+    std::shared_ptr<GetSelectModeContext> asyncContext_;
 };
 
 class GetRadioStateCallback : public INetworkSearchCallbackStub {
 public:
-    explicit GetRadioStateCallback(IsRadioOnContext *context);
+    explicit GetRadioStateCallback(std::shared_ptr<IsRadioOnContext> context);
     void OnGetRadioStateCallback(const bool isOn, const int32_t errorCode) override;
 
 private:
-    IsRadioOnContext *asyncContext_;
+    std::shared_ptr<IsRadioOnContext> asyncContext_;
 };
 } // namespace Telephony
 } // namespace OHOS
