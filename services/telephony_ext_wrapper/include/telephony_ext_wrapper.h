@@ -216,7 +216,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
-    NotifyRebootDetectSim_ = nullptr;
+    NotifyRebootDetectSim notifyRebootDetectSim_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
