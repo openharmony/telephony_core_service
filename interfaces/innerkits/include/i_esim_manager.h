@@ -25,6 +25,7 @@
 #include "profile_info_list_parcel.h"
 #include "profile_metadata_result_parcel.h"
 #include "response_esim_result.h"
+#include "event_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -79,6 +80,11 @@ public:
     virtual int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult) = 0;
     virtual int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult) = 0;
     virtual int32_t GetEsimPortIndex(int32_t slotId, int32_t &portIndex) = 0;
+    virtual void RegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) = 0;
+    virtual void UnRegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) = 0;
+    virtual void PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t param) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

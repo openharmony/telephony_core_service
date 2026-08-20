@@ -148,6 +148,7 @@ public:
     MOCK_METHOD1(GetOverseasCarrierBySimInfo, std::string(const SimCardInfo &));
     MOCK_METHOD1(SaveCardFileDetectData, int32_t(const CardFileDetectData &));
     MOCK_METHOD1(GetAllSimCardInfo, int32_t(std::vector<SimCardInfo> &));
+    MOCK_METHOD2(SetSpecifiedIccidBySlotId, void(int32_t, std::string &));
 };
 }
 }

@@ -182,6 +182,7 @@ private:
     void RetrySetPrimarySlotId(int32_t slotId);
 
     int32_t NeedSwitchSimCard(int32_t slotId);
+    void GetLastSimLabel(int32_t slotId, SimLabel &simLabel);
 
 private:
     const int32_t IMS_SWITCH_STATUS_UNKNOWN = -1;
@@ -228,6 +229,7 @@ private:
     std::shared_ptr<MultiSimHelper>  multiSimHelper_;
     int refreshLocalCacheRemainCount_ = 0;
     int refreshAllLocalCacheRemainCount_ = 0;
+    std::vector<std::string> lastSimIccid_ = {};
 };
 } // namespace Telephony
 } // namespace OHOS

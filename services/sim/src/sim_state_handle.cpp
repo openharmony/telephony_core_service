@@ -669,6 +669,12 @@ void SimStateHandle::GetSimCardData(int32_t slotId, const AppExecFwk::InnerEvent
             return;
         }
     }
+    std::shared_lock<ffrt::shared_mutex> lck(specifiedIccidMutex_);
+    if (!specifiedIccid_.empty() && specifiedIccid_ != iccState.iccid_) {
+        TELEPHONY_LOGE("slot%{public}d specifiedIccid_ and iccid is not same", slotId);
+        return;
+    }
+    lck.unlock();
     ProcessIccCardState(iccState, slotId, modemInitDone);
 }
 
@@ -1187,6 +1193,13 @@ inline void SimStateHandle::ProcessMatchSimTimeoutTimer(int32_t slotId)
     if (operatorConfigHisysevent != nullptr) {
         operatorConfigHisysevent->ReportMatchSimChr(slotId);
     }
+}
+
+void SimStateHandle::SetSpecifiedIccidBySlotId(std::string &iccid)
+{
+    TELEPHONY_LOGI("SimStateHandle::SetSpecifiedIccidBySlotId slotId:%{public}d", slotId_);
+    std::unique_lock<ffrt::shared_mutex> lck(specifiedIccidMutex_);
+    specifiedIccid_ = iccid;
 }
 } // namespace Telephony
 } // namespace OHOS
