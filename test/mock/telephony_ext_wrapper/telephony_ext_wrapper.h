@@ -138,7 +138,7 @@ public:
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
     typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
     typedef bool (*GetSimLabelIndexFromLsiCfgFunc)(int32_t slotId, int32_t &simLabelindex);
-    typedef void (*notifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
+    typedef void (*NotifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
