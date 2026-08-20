@@ -611,7 +611,7 @@ void MultiSimMonitor::CheckSimPresentWhenReboot()
             }
         }
     }
-    if (tstsMode_ && (!TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_)) {
+    if (tstsMode_ && (TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_)) {
         TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_(hasCheckedSimPresent_[SIM_SLOT_0],
             hasCheckedSimPresent_[SIM_SLOT_1]);
     }
