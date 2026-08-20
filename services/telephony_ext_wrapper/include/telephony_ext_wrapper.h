@@ -141,7 +141,7 @@ public:
     typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
     typedef int32_t (*SwapM0M2SimCardsFunc)(int32_t slotId);
     typedef bool (*GetSimLabelIndexFromLsiCfgFunc)(int32_t slotId, int32_t &simLabelindex);
-    typedef void (*notifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
+    typedef void (*NotifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
