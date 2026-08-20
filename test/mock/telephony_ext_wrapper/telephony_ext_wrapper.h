@@ -240,7 +240,7 @@ private:
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
     SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
     GetSimLabelIndexFromLsiCfgFunc getSimLabelIndexFromLsiCfg_ = nullptr;
-    NotifyRebootDetectSim NotifyRebootDetectSim_ = nullptr;
+    NotifyRebootDetectSim notifyRebootDetectSim_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -657,8 +657,8 @@ inline bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int3
 
 inline void TelephonyExtWrapper::NotifyRebootDetectSimFnc(bool isPSIM1Prensent, bool isPSIM1Prensent)
 {
-    if (NotifyRebootDetectSim_ != nullptr) {
-        NotifyRebootDetectSim_(isPSIM1Prensent, isPSIM1Prensent);
+    if (notifyRebootDetectSim_ != nullptr) {
+        notifyRebootDetectSim_(isPSIM1Prensent, isPSIM1Prensent);
     }
 }
 
