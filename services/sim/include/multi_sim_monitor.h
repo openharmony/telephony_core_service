@@ -178,6 +178,7 @@ private:
     ffrt::shared_mutex simStateMgrMutex_;
     ffrt::shared_mutex forgetAllDataDoneMutex_;
     std::atomic<int32_t> lastUserId_ = -1;
+    int32_t tstsMode_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

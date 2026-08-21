@@ -138,6 +138,7 @@ public:
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
     typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
     typedef bool (*GetSimLabelIndexFromLsiCfgFunc)(int32_t slotId, int32_t &simLabelindex);
+    typedef void (*NotifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
     // === members ===
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -223,7 +224,7 @@ public:
     void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
     int32_t SwapM0M2SimCards(int32_t slotId);
     bool GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex);
-
+    void NotifyRebootDetectSimFnc(bool isPSIM1Prensent, bool isPSIM2Prensent);
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
     void* telephonyVSimWrapperHandle_ = nullptr;
@@ -239,6 +240,7 @@ private:
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
     SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
     GetSimLabelIndexFromLsiCfgFunc getSimLabelIndexFromLsiCfg_ = nullptr;
+    NotifyRebootDetectSim notifyRebootDetectSim_ = nullptr;
     void InitTelephonyExtWrapperForNetWork();
     void InitTelephonyExtWrapperForNetWork1();
     void InitTelephonyExtWrapperForVoiceMail();
@@ -642,6 +644,7 @@ inline void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, i
         savePreferredNetworkValue_(slotId, networkMode);
     }
 }
+
 inline int32_t TelephonyExtWrapper::SwapM0M2SimCards(int32_t slotId)
 {
     return 0;
@@ -650,6 +653,13 @@ inline int32_t TelephonyExtWrapper::SwapM0M2SimCards(int32_t slotId)
 inline bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex)
 {
     return true;
+}
+
+inline void TelephonyExtWrapper::NotifyRebootDetectSimFnc(bool isPSIM1Prensent, bool isPSIM2Prensent)
+{
+    if (notifyRebootDetectSim_ != nullptr) {
+        notifyRebootDetectSim_(isPSIM1Prensent, isPSIM2Prensent);
+    }
 }
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()
