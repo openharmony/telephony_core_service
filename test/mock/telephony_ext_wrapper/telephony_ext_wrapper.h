@@ -655,10 +655,10 @@ inline bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int3
     return true;
 }
 
-inline void TelephonyExtWrapper::NotifyRebootDetectSimFnc(bool isPSIM1Prensent, bool isPSIM1Prensent)
+inline void TelephonyExtWrapper::NotifyRebootDetectSimFnc(bool isPSIM1Prensent, bool isPSIM2Prensent)
 {
     if (notifyRebootDetectSim_ != nullptr) {
-        notifyRebootDetectSim_(isPSIM1Prensent, isPSIM1Prensent);
+        notifyRebootDetectSim_(isPSIM1Prensent, isPSIM2Prensent);
     }
 }
 
