@@ -125,8 +125,8 @@ private:
     bool responseFinished_ = false;
     std::string stkBundleName_ = "";
     std::mutex stkMutex_;
+    std::condition_variable stkCv_;
     std::queue<AAFwk::Want> retryWantQueue_;
-    AAFwk::Want retryWant_;
     int32_t remainTryCount_ = 0;
     bool isProactiveCommandSucc = false;
     std::mutex retryQueueMutex_;
