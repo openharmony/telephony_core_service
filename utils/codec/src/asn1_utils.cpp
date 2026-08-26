@@ -158,7 +158,8 @@ std::vector<uint8_t> Asn1Utils::HexStrToBytes(const std::string& hexStr)
 
 bool Asn1Utils::BytesToInt(const std::vector<uint8_t> &src, uint32_t offset, uint32_t length, int32_t &valInt)
 {
-    if (length > HEX_STR_MAX_LENGTH || (offset + length) > src.size()) {
+    if (length > HEX_STR_MAX_LENGTH || offset > src.size() ||
+        length > src.size() - offset) {
         TELEPHONY_LOGE("length(%{public}d) or offset(%{public}d) is invalid.", length, offset);
         return false;
     }
