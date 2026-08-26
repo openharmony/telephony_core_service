@@ -453,9 +453,9 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     want.SetParam(PARAM_MSG_CMD, cmdData);
     std::lock_guard<std::mutex> lock(retryQueueMutex_);
     if (!retryWantQueue_.empty()) {
-		retryWantQueue_.push(want);
+        retryWantQueue_.push(want);
         TELEPHONY_LOGI("StkController[%{public}d] queue not empty, skip publish, direct enqueue", slotId_);
-		return;
+        return;
     }
     bool publishResult = PublishStkEvent(want);
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilProactiveCommand() "
@@ -488,10 +488,10 @@ void StkController::RetrySendRilProactiveCommand()
         }
         TELEPHONY_LOGI("StkController[%{public}d] retry sucess", slotId_);
         retryWantQueue_.pop();
-		if (!retryWantQueue_.empty()) {
+        if (!retryWantQueue_.empty()) {
             remainTryCount_ = MAX_RETRY_COUNT;
             SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
-			return;
+            return;
         }
         isProactiveCommandSucc = true;
         remainTryCount_ = 0;
