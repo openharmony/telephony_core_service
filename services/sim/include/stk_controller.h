@@ -16,6 +16,7 @@
 #ifndef OHOS_STK_CONTROLLER_H
 #define OHOS_STK_CONTROLLER_H
 
+#include <queue>
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
 #include "telephony_state_registry_client.h"
@@ -124,10 +125,11 @@ private:
     bool responseFinished_ = false;
     std::string stkBundleName_ = "";
     std::mutex stkMutex_;
-    std::condition_variable stkCv_;
+    std::queue<AAFwk::Want> retryWantQueue_;
     AAFwk::Want retryWant_;
     int32_t remainTryCount_ = 0;
     bool isProactiveCommandSucc = false;
+    std::mutex retryQueueMutex_;
     std::shared_ptr<BundleScanFinishedEventSubscriber> bundleScanFinishedSubscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool isStkRunning_ = false;
