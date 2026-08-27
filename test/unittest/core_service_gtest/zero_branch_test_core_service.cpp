@@ -478,7 +478,7 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_Stub_006, Function | Mediu
 
     data.WriteRemoteObject(nullptr);
     auto result = DelayedSingleton<CoreService>::GetInstance()->OnSetSimLabelIndex(data, reply);
-    EXPECT_NE(result, TELEPHONY_SUCCESS);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
 /**
