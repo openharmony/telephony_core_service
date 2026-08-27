@@ -51,7 +51,7 @@ void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t search
     asyncContext_->cv.notify_all();
 }
 
-GetRadioStateCallback::GetRadioStateCallback(std:shared_ptr<IsRadioOnContext> context)
+GetRadioStateCallback::GetRadioStateCallback(std::shared_ptr<IsRadioOnContext> context)
     : asyncContext_(context)
 {}
 
