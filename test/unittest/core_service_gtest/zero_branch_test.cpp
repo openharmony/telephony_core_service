@@ -2066,6 +2066,10 @@ HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_SimRdbHelper_001");
     auto simRdbHelper = std::make_shared<SimRdbHelper>();
+    OHOS::system::SetParameter("persist.telephony.tsts_mode", "1");
+    EXPECT_NE(simRdbHelper->ForgetAllData(), TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT);
+    OHOS::system::SetParameter("persist.telephony.tsts_mode", "0");
+    EXPECT_NE(simRdbHelper->ForgetAllData(), TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
     SimRdbInfo simBean;
     std::string iccId = "";
     std::vector<SimRdbInfo> vec;
