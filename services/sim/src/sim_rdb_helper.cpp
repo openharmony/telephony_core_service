@@ -558,7 +558,7 @@ int32_t SimRdbHelper::ForgetAllData()
     DataShare::DataShareValueObject valueObj(INVALID_VALUE);
     if (OHOS::system::GetIntParameter("persist.telephony.tsts_mode", 0) >= 1) {
         TELEPHONY_LOGI("ForgetAllData tsts is on");
-        predicates1.EqualTo(SimData::IS_ESIM, std::to_string(0)); 
+        predicates1.EqualTo(SimData::IS_ESIM, std::to_string(0));
     }
     value.Put(SimData::SLOT_INDEX, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
