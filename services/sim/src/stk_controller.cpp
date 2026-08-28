@@ -180,7 +180,8 @@ void StkController::BundleScanFinishedEventSubscriber::OnBundleScanFinished()
 
 void StkController::OnReceiveBms()
 {
-    if (!retryWant_.GetStringParam(PARAM_MSG_CMD).empty() && !isProactiveCommandSucc) {
+    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    if (!retryWantQueue_.empty() && !isProactiveCommandSucc) {
         if (remainTryCount_ == 0) {
             remainTryCount_ = MAX_RETRY_COUNT;
             TELEPHONY_LOGI("OnReceiveBms retry send stkdata");
@@ -450,11 +451,17 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_COMMAND);
     want.SetParam(PARAM_SLOTID, slotId_);
     want.SetParam(PARAM_MSG_CMD, cmdData);
+    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    if (!retryWantQueue_.empty()) {
+        retryWantQueue_.push(want);
+        TELEPHONY_LOGI("StkController[%{public}d] queue not empty, skip publish, direct enqueue", slotId_);
+        return;
+    }
     bool publishResult = PublishStkEvent(want);
     TELEPHONY_LOGI("StkController[%{public}d]::OnSendRilProactiveCommand() "
         "publishResult = %{public}d", slotId_, publishResult);
     if (!publishResult) {
-        retryWant_ = want;
+        retryWantQueue_.push(want);
         remainTryCount_ = MAX_RETRY_COUNT;
         SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
         return;
@@ -465,14 +472,27 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
 
 void StkController::RetrySendRilProactiveCommand()
 {
+    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    if (retryWantQueue_.empty()) {
+        TELEPHONY_LOGI("StkController[%{public}d] retry queue empty", slotId_);
+        return;
+    }
+    AAFwk::Want want = retryWantQueue_.front();
+    TELEPHONY_LOGI("StkController[%{public}d] retry front, queue size: %{public}zu", slotId_, retryWantQueue_.size());
     remainTryCount_--;
     TELEPHONY_LOGI("StkController[%{public}d], remainTryCount_ is %{public}d", slotId_, remainTryCount_);
     if (remainTryCount_ > 0) {
-        if (!PublishStkEvent(retryWant_)) {
+        if (!PublishStkEvent(want)) {
             SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
             return;
         }
         TELEPHONY_LOGI("StkController[%{public}d] retry sucess", slotId_);
+        retryWantQueue_.pop();
+        if (!retryWantQueue_.empty()) {
+            remainTryCount_ = MAX_RETRY_COUNT;
+            SendEvent(StkController::RETRY_SEND_RIL_PROACTIVE_COMMAND, 0, DELAY_TIME);
+            return;
+        }
         isProactiveCommandSucc = true;
         remainTryCount_ = 0;
         return;
