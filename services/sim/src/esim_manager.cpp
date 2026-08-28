@@ -405,7 +405,7 @@ void EsimManager::RegisterCoreNotify(
     }
     observerHandler_->RegObserver(what, handler);
     if (what == RADIO_ESIM_ENABLED_PROFILE_NUM) {
-        observerHandler_->NotifyObserver(what, enabledProfileNum_);
+        TelEventHandler::SendTelEvent(handler, what, enabledProfileNum_, 0);
     }
 }
 
