@@ -71,6 +71,7 @@ void ImsCoreServiceClient::UnInit()
         statusChangeListener_.clear();
         statusChangeListener_ = nullptr;
     }
+    std::unique_lock<ffrt::shared_mutex> lock(handlerMapMtx_);
     handlerMap_.clear();
 }
 
@@ -156,7 +157,9 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallbackHandler(int32_t slot
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    std::unique_lock<ffrt::shared_mutex> lock(handlerMapMtx_);
     handlerMap_.insert(std::make_pair(slotId, handler));
+    lock.unlock();
     if (IsConnect()) {
         GetImsRegistrationStatus(slotId);
     }
@@ -166,6 +169,7 @@ int32_t ImsCoreServiceClient::RegisterImsCoreServiceCallbackHandler(int32_t slot
 
 std::shared_ptr<AppExecFwk::EventHandler> ImsCoreServiceClient::GetHandler(int32_t slotId)
 {
+    std::shared_lock<ffrt::shared_mutex> lock(handlerMapMtx_);
     auto itor = handlerMap_.find(slotId);
     if (itor != handlerMap_.end()) {
         return itor->second;
