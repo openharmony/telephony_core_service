@@ -244,8 +244,7 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return selectMode;
         }
-        auto selectModeContext = std::make_unique<GetSelectModeContext>();
-        auto asyncContext = static_cast<GetSelectModeContext *>(selectModeContext.get());
+        auto asyncContext = std::make_shared<GetSelectModeContext>();
         asyncContext->slotId = slotId;
         std::unique_ptr<GetNetworkSearchModeCallback> callback =
             std::make_unique<GetNetworkSearchModeCallback>(asyncContext);
@@ -358,8 +357,7 @@ namespace Telephony {
             errCode = ConvertCJErrCode(ERROR_SLOT_ID_INVALID);
             return result;
         }
-        auto radioOnContext = std::make_unique<IsRadioOnContext>();
-        auto asyncContext = static_cast<IsRadioOnContext *>(radioOnContext.get());
+        auto asyncContext = std::make_shared<IsRadioOnContext>();
         asyncContext->slotId = slotId;
         std::unique_ptr<GetRadioStateCallback> callback = std::make_unique<GetRadioStateCallback>(asyncContext);
         std::unique_lock<std::mutex> callbackLock(asyncContext->callbackMutex);
