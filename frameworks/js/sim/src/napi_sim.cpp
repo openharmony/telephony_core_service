@@ -1907,7 +1907,7 @@ napi_value SetShowNumber(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        f (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete asyncContext;
             return nullptr;
