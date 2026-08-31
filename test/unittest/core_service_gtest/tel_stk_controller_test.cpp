@@ -52,9 +52,9 @@ HWTEST_F(TelStkControllerTest, Telephony_StkController_StkBundleName_001, Functi
 {
     std::shared_ptr<TelRilManager> telRilManager = nullptr;
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
-    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
     auto tempFunc = TELEPHONY_EXT_WRAPPER.getStkBundleNameFunc_;
     TELEPHONY_EXT_WRAPPER.getStkBundleNameFunc_ = nullptr;
+    auto stkController = std::make_shared<StkController>(telRilManager, simStateManager, INVALID_SLOTID);
     stkController->InitStkBundleName();
     EXPECT_TRUE(stkController->stkBundleName_.empty());
     TELEPHONY_EXT_WRAPPER.getStkBundleNameFunc_ = [](std::string &bundleName) { bundleName = "123"; };

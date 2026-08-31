@@ -185,6 +185,9 @@ HWTEST_F(CoreServiceNativeBranchTest, Telephony_CoreServiceProxy_001, Function |
 
     EXPECT_EQ(coreServiceProxy.GetSimGid1(-1, testU16Str), TELEPHONY_ERR_SLOTID_INVALID);
     EXPECT_EQ((coreServiceProxy.GetSimGid2(-1)), u"");
+    remote->sendRequestSuccess = fasle;
+    EXPECT_EQ((coreServiceProxy.SwapM0M2SimCards(-1)), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    remote->sendRequestSuccess = true;
 
     std::string plmn = "";
     EXPECT_EQ((coreServiceProxy.GetSimEons(-1, plmn, 0, false)), u"");
