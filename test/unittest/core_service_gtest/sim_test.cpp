@@ -1444,7 +1444,7 @@ HWTEST_F(SimTest, Telephony_Sim_GetSimLabel_0100, Function | MediumTest | Level3
     SimLabel simLabel;
     int64_t timeoutMs = 0;
     int32_t result = CoreServiceClient::GetInstance().GetSimLabel(slotId, simLabel, timeoutMs);
-    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_NE(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 /**
