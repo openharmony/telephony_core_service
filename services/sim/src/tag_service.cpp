@@ -15,6 +15,8 @@
 
 #include "tag_service.h"
 
+#include <charconv>
+
 #include "telephony_common_utils.h"
 
 namespace OHOS {
@@ -51,8 +53,15 @@ int TagService::GetTagCode() const
         TELEPHONY_LOGE("GetTagCode return ERR");
         return ERR;
     }
-    int i = std::stoi(tag_, nullptr, HEX_TYPE);
-    return i;
+    int tagCode = 0;
+    const char *begin = tag_.data();
+    const char *end = begin + tag_.size();
+    auto parsed = std::from_chars(begin, end, tagCode, HEX_TYPE);
+    if (parsed.ec != std::errc{} || parsed.ptr != end) {
+        TELEPHONY_LOGE("GetTagCode parse failed");
+        return ERR;
+    }
+    return tagCode;
 }
 
 void TagService::GetValue(std::vector<uint8_t> &result) const
