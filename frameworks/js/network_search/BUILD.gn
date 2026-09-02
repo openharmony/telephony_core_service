@@ -18,6 +18,7 @@ ohos_shared_library("radio") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
+    cfi_no_nvcall = true
     debug = false
   }
   branch_protector_ret = "pac_ret"
@@ -36,9 +37,7 @@ ohos_shared_library("radio") {
     "src/get_nr_option_mode_callback.cpp",
     "src/get_preferred_network_callback.cpp",
     "src/get_radio_state_callback.cpp",
-    "src/manual_network_scan_callback_manager.cpp",
     "src/manual_network_scan_callback.cpp",
-    "src/manual_network_scan_state_callback.cpp",
     "src/napi_ims_reg_info_callback.cpp",
     "src/napi_ims_reg_info_callback_manager.cpp",
     "src/napi_radio.cpp",
@@ -55,6 +54,7 @@ ohos_shared_library("radio") {
     "-Wunreachable-code",
     "-fno-exceptions",
     "-fno-rtti",
+    "-fstack-protector-all",
     "-Os",
     "-D_FORTIFY_SOURCE=2",
     "-flto",
@@ -78,7 +78,6 @@ ohos_shared_library("radio") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
-    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

@@ -35,8 +35,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_ext_utils_wrapper.h"
-#include "manual_network_scan_state_callback.h"
-#include "manual_network_scan_callback_manager.h"
+#include "manual_network_scan_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -201,7 +200,6 @@ static void GetRadioTechCallback(napi_env env, napi_status status, void *data)
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGD("GetRadioTechCallback end");
 }
 
 static bool MatchGetRadioTechParameter(napi_env env, const napi_value parameters[], size_t parameterCount)
@@ -292,7 +290,6 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
     }
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSignalInfoList(
         asyncContext->slotId, asyncContext->signalInfoList);
-    TELEPHONY_LOGD("NativeGetSignalInfoList size = %{public}zu", asyncContext->signalInfoList.size());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = true;
     }
@@ -301,8 +298,6 @@ static void NativeGetSignalInfoList(napi_env env, void *data)
 static void GetSignalInfoListCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<SignalInfoListContext *>(data);
-    TELEPHONY_LOGD("GetSignalInfoListCallback size = %{public}zu, resolved = %{public}d",
-        asyncContext->signalInfoList.size(), asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_array(env, &callbackValue);
@@ -332,7 +327,6 @@ static void GetSignalInfoListCallback(napi_env env, napi_status status, void *da
         std::vector<sptr<SignalInformation>>().swap(asyncContext->signalInfoList);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGD("GetSignalInfoListCallback end");
 }
 
 static bool MatchGetSignalInfoListParameter(napi_env env, napi_value parameter[], size_t parameterCount)
@@ -1682,7 +1676,6 @@ static void NativeSetNetworkCapability(napi_env env, void *data)
 static void SetNetworkCapabilityCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NetworkCapabilityContext *>(data);
-    TELEPHONY_LOGD("SetNetworkCapabilityCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
@@ -1691,7 +1684,6 @@ static void SetNetworkCapabilityCallback(napi_env env, napi_status status, void 
             context->errorCode, "setNetworkCapabilityCallback", SET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
-    TELEPHONY_LOGD("SetNetworkCapabilityCallback end");
     NapiUtil::Handle1ValueCallback(env, context, callbackValue);
 }
 
@@ -1756,7 +1748,6 @@ static void NativeGetNetworkCapability(napi_env env, void *data)
 static void GetNetworkCapabilityCallback(napi_env env, napi_status status, void *data)
 {
     auto asyncContext = static_cast<NetworkCapabilityContext *>(data);
-    TELEPHONY_LOGD("GetNetworkCapabilityCallback resolved = %{public}d", asyncContext->resolved);
     napi_value callbackValue = nullptr;
     if (asyncContext->resolved) {
         napi_create_int32(env, asyncContext->networkCapabilityState, &callbackValue);
@@ -1765,7 +1756,6 @@ static void GetNetworkCapabilityCallback(napi_env env, napi_status status, void 
             asyncContext->errorCode, "getNetworkCapabilityCallback", GET_TELEPHONY_STATE);
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
-    TELEPHONY_LOGD("GetNetworkCapabilityCallback end");
     NapiUtil::Handle2ValueCallback(env, asyncContext, callbackValue);
 }
 
@@ -1819,7 +1809,6 @@ void NativeGetIMEI(napi_env env, void *data)
     if (context->errorCode == TELEPHONY_SUCCESS) {
         context->resolved = true;
         context->getIMEIResult = NapiUtil::ToUtf8(imei);
-        TELEPHONY_LOGD("NativeGetIMEI len = %{public}lu", static_cast<unsigned long>(context->getIMEIResult.length()));
     } else {
         TELEPHONY_LOGE("Get IMEI fail, NativeGetIMEI len = %{public}lu",
             static_cast<unsigned long>(context->getIMEIResult.length()));
@@ -2029,7 +2018,6 @@ static void NativeSendUpdateCellLocationRequest(napi_env env, void *data)
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = true;
     }
-    TELEPHONY_LOGD("NativeSendUpdateCellLocationRequest end");
 }
 
 static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status status, void *data)
@@ -2044,7 +2032,6 @@ static void SendUpdateCellLocationRequestCallback(napi_env env, napi_status stat
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, asyncContext, callbackValue);
-    TELEPHONY_LOGD("SendUpdateCellLocationRequestCallback end");
 }
 
 static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info info)
@@ -2231,8 +2218,6 @@ static void NativeGetCellInformation(napi_env env, void *data)
     asyncContext->cellInformations.clear();
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetCellInfoList(
         asyncContext->slotId, asyncContext->cellInformations);
-    TELEPHONY_LOGD("NativeGetCellInformation len = %{public}lu",
-        static_cast<unsigned long>(asyncContext->cellInformations.size()));
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NativeGetCellInformation errorCode = %{public}d", asyncContext->errorCode);
         return;
@@ -2287,7 +2272,6 @@ void GetCellInformationCallback(napi_env env, napi_status status, void *data)
         asyncContext->callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle2ValueCallback(env, asyncContext, asyncContext->callbackValue);
-    TELEPHONY_LOGD("GetCellInformationCallback end");
 }
 
 static napi_value GetCellInformation(napi_env env, napi_callback_info info)
@@ -2523,7 +2507,6 @@ static void NativeFactoryReset(napi_env env, void *data)
     if (context->errorCode == TELEPHONY_SUCCESS) {
         context->resolved = true;
     }
-    TELEPHONY_LOGD("NativeFactoryReset end");
 }
 
 static void FactoryResetCallback(napi_env env, napi_status status, void *data)
@@ -2538,7 +2521,6 @@ static void FactoryResetCallback(napi_env env, napi_status status, void *data)
         callbackValue = NapiUtil::CreateErrorMessage(env, error.errorMessage, error.errorCode);
     }
     NapiUtil::Handle1ValueCallback(env, context, callbackValue);
-    TELEPHONY_LOGD("FactoryResetCallback end");
 }
 
 static napi_value FactoryReset(napi_env env, napi_callback_info info)
@@ -2576,14 +2558,12 @@ static void NativeSetNrOptionMode(napi_env env, void *data)
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->cv.wait_for(
             callbackLock, std::chrono::seconds(WAIT_TIME_SECOND), [asyncContext] { return asyncContext->callbackEnd; });
-        TELEPHONY_LOGD("NativeSetNrOptionMode after callback end");
     }
 }
 
 static void SetNrOptionModeCallback(napi_env env, napi_status status, void *data)
 {
     auto context = static_cast<NrOptionModeContext *>(data);
-    TELEPHONY_LOGD("SetNrOptionModeCallback resolved = %{public}d", context->resolved);
     napi_value callbackValue = nullptr;
     if (context->resolved) {
         napi_get_undefined(env, &callbackValue);
@@ -2645,7 +2625,6 @@ static napi_value IsNrSupported(napi_env env, napi_callback_info info)
         isNrSupported = isNrSupported && TELEPHONY_EXT_UTILS_WRAPPER.isChipsetNrSupported_();
     }
 #endif
-    TELEPHONY_LOGD("isNrSupported:%{public}d", isNrSupported);
     napi_get_boolean(env, isNrSupported, &result);
     return result;
 }
@@ -3073,17 +3052,16 @@ static bool MatchStartManualNetworkScanParameter(napi_env env, napi_value parame
 static void NativeIsManualNetworkScanning(napi_env env, void *data)
 {
     if (data == nullptr) {
-        TELEPHONY_LOGE("NativeIsManualNetworkScanning data is null");
         return;
     }
 
     auto asyncContext = static_cast<IsManualScanningContext *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
-        TELEPHONY_LOGE("NativeIsManualNetworkScanning slotId is invalid");
         asyncContext->errorCode = ERROR_SLOT_ID_INVALID;
         return;
     }
-    auto callback = std::make_unique<ManualNetworkScanStateCallback>(asyncContext);
+    auto callback = std::make_unique<ManualNetworkScanCallback>();
+    callback->SetScanContext(asyncContext);
     asyncContext->errorCode = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetManualNetworkScanState(
         asyncContext->slotId, callback.release());
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
@@ -3096,7 +3074,6 @@ static void NativeIsManualNetworkScanning(napi_env env, void *data)
 static void IsManualNetworkScanningCallback(napi_env env, napi_status status, void *data)
 {
     if (data == nullptr) {
-        TELEPHONY_LOGE("IsManualNetworkScanningCallback data is null");
         return;
     }
 
@@ -3106,7 +3083,6 @@ static void IsManualNetworkScanningCallback(napi_env env, napi_status status, vo
         napi_get_boolean(env, asyncContext->isManualScanning, &callbackValue);
     } else {
         if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("IsManualNetworkScanningCallback time out, errorCode = %{public}d", asyncContext->errorCode);
             asyncContext->errorCode = TELEPHONY_ERR_FAIL;
         }
         JsError error = NapiUtil::ConverErrorMessageWithPermissionForJs(
@@ -3124,13 +3100,11 @@ static napi_value IsManualNetworkScanning(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &parameterCount, parameters, &thisVar, &data));
     if (!MatchIsManualNetworkScanningParameter(env, parameters, parameterCount)) {
-        TELEPHONY_LOGE("parameter matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
     auto asyncContext = std::make_unique<IsManualScanningContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -3142,24 +3116,14 @@ static napi_value IsManualNetworkScanning(napi_env env, napi_callback_info info)
 static bool StartManualNetworkScanCallback(
     napi_env env, napi_value thisVar, int32_t slotId, napi_value argv[])
 {
-    StartManualScanCallback startCallback;
-    startCallback.env = env;
-    startCallback.slotId = slotId;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(startCallback.thisVar));
-    napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DEFAULT_REF_COUNT, &(startCallback.callbackRef));
-    auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
-    if (manager == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
-        napi_delete_reference(env, startCallback.callbackRef);
-        napi_delete_reference(env, startCallback.thisVar);
+    auto callback = std::make_unique<ManualNetworkScanCallback>();
+    if (!callback->CreateNapiCbRef(env, thisVar, argv)) {
         return false;
     }
-    int32_t ret = manager->StartManualNetworkScanCallback(startCallback);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("startManualNetworkScan callback failed");
-        ReportFunctionFailed(env, ret, "startManualNetworkScan");
-        napi_delete_reference(env, startCallback.callbackRef);
-        napi_delete_reference(env, startCallback.thisVar);
+    int32_t rpcResult = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+        .StartManualNetworkScanCallback(slotId, callback.release());
+    if (rpcResult != TELEPHONY_SUCCESS) {
+        ReportFunctionFailed(env, rpcResult, "startManualNetworkScan");
         return false;
     }
     return true;
@@ -3171,7 +3135,6 @@ static napi_value StartManualNetworkScan(napi_env env, napi_callback_info info)
     napi_value argv[PARAMETER_COUNT_FOUR];
     napi_value thisVar;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
-        TELEPHONY_LOGE("Can not get thisVar value");
         return nullptr;
     }
     if (!MatchStartManualNetworkScanParameter(env, argv, argc)) {
@@ -3180,11 +3143,9 @@ static napi_value StartManualNetworkScan(napi_env env, napi_callback_info info)
     }
     int32_t slotId;
     if (napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("Can not get slotId value");
         return nullptr;
     }
     if (!IsValidSlotIdEx(slotId)) {
-        TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
         ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "startManualNetworkScan");
         return nullptr;
     }
@@ -3196,28 +3157,12 @@ static napi_value StartManualNetworkScan(napi_env env, napi_callback_info info)
     return result;
 }
 
-static bool StopManualNetworkScanCallback(napi_env env, int32_t slotId)
-{
-    auto manager = DelayedSingleton<ManualNetworkScanCallbackManager>::GetInstance();
-    if (manager == nullptr) {
-        TELEPHONY_LOGE("ManualNetworkScanCallbackManager is null!");
-        return false;
-    }
-    int32_t ret = manager->StopManualNetworkScanCallback(env, slotId);
-    if (ret != TELEPHONY_SUCCESS) {
-        ReportFunctionFailed(env, ret, "stopManualNetworkScan");
-        return false;
-    }
-    return true;
-}
-
 static napi_value StopManualNetworkScan(napi_env env, napi_callback_info info)
 {
     size_t argc = PARAMETER_COUNT_ONE;
     napi_value argv[PARAMETER_COUNT_ONE];
     napi_value thisVar;
     if (napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL) != napi_ok) {
-        TELEPHONY_LOGE("Can not get thisVar value");
         return nullptr;
     }
     if (!MatchIsManualNetworkScanningParameter(env, argv, argc)) {
@@ -3226,15 +3171,16 @@ static napi_value StopManualNetworkScan(napi_env env, napi_callback_info info)
     }
     int32_t slotId;
     if (napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &slotId) != napi_ok) {
-        TELEPHONY_LOGE("Can not get slotId value");
         return nullptr;
     }
     if (!IsValidSlotIdEx(slotId)) {
-        TELEPHONY_LOGE("slotId%{public}d is invalid", slotId);
         ReportFunctionFailed(env, TELEPHONY_ERR_ARGUMENT_INVALID, "stopManualNetworkScan");
         return nullptr;
     }
-    if (!StopManualNetworkScanCallback(env, slotId)) {
+    int32_t rpcResult = DelayedRefSingleton<CoreServiceClient>::GetInstance()
+        .StopManualNetworkScanCallback(slotId);
+    if (rpcResult != TELEPHONY_SUCCESS) {
+        ReportFunctionFailed(env, rpcResult, "stopManualNetworkScan");
         return nullptr;
     }
     napi_value result = nullptr;
