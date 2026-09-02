@@ -1620,7 +1620,7 @@ HWTEST_F(MultiSimControllerTest, SetActiveSim001, Function | MediumTest | Level1
         simStateManager_, simFileManager_);
     std::vector<SimRdbInfo> newCache;
     newCache.resize(2);
-    newCache[0].iccId = "2164181618486135";
+    newCache[0].iccId = "21641816184861385";
     newCache[1].iccId.clear();
     newCache[0].simId = 1;
     newCache[1].simId = 2;
