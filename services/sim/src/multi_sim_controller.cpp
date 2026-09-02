@@ -1022,8 +1022,8 @@ int32_t MultiSimController::SetActiveSim(int32_t slotId, int32_t enable, bool fo
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
     int curSimId = 0;
-    if ((GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) && !IsEsim(slotId)) {
-        TELEPHONY_LOGE("failed by out of range");
+    if ((GetTargetSimId(slotId, curSimId) != TELEPHONY_ERR_SUCCESS) && !IsEsim(slotId) && curSimId <= 0) {
+        TELEPHONY_LOGE("failed by out of range, curSimId: %{public}d", curSimId);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t ret = SetActiveCommonSim(slotId, enable, force, curSimId);
