@@ -395,6 +395,7 @@ void PinInfoParaAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinContex
         char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, pin, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
     }
 
     napi_value state = NapiUtil::GetNamedProperty(env, arg, "state");
@@ -415,6 +416,7 @@ void PersoLockInfoAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinCont
         char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, password, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
     }
 }
 
@@ -1436,6 +1438,7 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete pinContext;
@@ -1501,6 +1504,8 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
     if (result) {
         pukContext->inStr1 = std::string(tmpStr1);
         pukContext->inStr2 = std::string(tmpStr2);
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete pukContext;
@@ -1568,6 +1573,8 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
     if (result) {
         alterPinContext->inStr1 = std::string(tmpStr1);
         alterPinContext->inStr2 = std::string(tmpStr2);
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete alterPinContext;
@@ -2006,6 +2013,7 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete pinContext;
@@ -2073,6 +2081,8 @@ napi_value UnlockPuk2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete pinContext;
@@ -2138,6 +2148,8 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
         if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
             napi_delete_async_work(env, context.work);
             delete pinContext;
