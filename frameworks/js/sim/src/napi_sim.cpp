@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <securec.h>
 
 #include "core_service_client.h"
 #include "napi_parameter_util.h"
