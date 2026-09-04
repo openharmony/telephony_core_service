@@ -427,7 +427,7 @@ bool MultiSimController::InitIccId(int slotId)
     std::string newIccId = Str16ToStr8(simFileManager_[slotId]->GetSimIccId());
     if (newIccId.empty()) {
         TELEPHONY_LOGI("iccid is empty.");
-        newIccId = "emptyiccid" + std::to_string(slotId);
+        return false;
     }
     if (simDbHelper_ == nullptr) {
         TELEPHONY_LOGE("failed by nullptr");
