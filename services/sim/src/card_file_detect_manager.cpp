@@ -23,7 +23,8 @@ namespace Telephony {
 #undef TELEPHONY_LOG_TAG
 #define TELEPHONY_LOG_TAG "CardFileDetectManager"
 
-CardFileDetectManager::CardFileDetectManager()
+CardFileDetectManager::CardFileDetectManager(std::weak_ptr<MultiSimController> multiSimController)
+    : multiSimController_(multiSimController)
 {
     simRdbHelper_ = std::make_shared<SimRdbHelper>();
 }
@@ -46,7 +47,7 @@ bool CardFileDetectManager::IsIccIdExists(const std::string &iccId)
 }
 
 void CardFileDetectManager::BuildDataShareValues(
-    const CardFileDetectData &data, DataShare::DataShareValuesBucket &values)
+    const CardFileDetectData &data, DataShare::DataShareValuesBucket &values, bool isInsert)
 {
     auto PutString = [&](const std::string &key, const std::string &value) {
         if (!value.empty()) {
@@ -61,6 +62,9 @@ void CardFileDetectManager::BuildDataShareValues(
         values.Put(SimData::SIM_LABEL_INDEX, DataShare::DataShareValueObject(data.phyCard + 1));
         values.Put(SimData::IS_ESIM, DataShare::DataShareValueObject(0));
     } else {
+        if (isInsert) {
+            values.Put(SimData::SIM_LABEL_INDEX, DataShare::DataShareValueObject(-1));
+        }
         values.Put(SimData::IS_ESIM, DataShare::DataShareValueObject(1));
     }
 
@@ -69,6 +73,7 @@ void CardFileDetectManager::BuildDataShareValues(
     }
 
     PutString(SimData::ICC_ID, data.iccId);
+    PutString(SimData::CARD_ID, data.iccId);
     PutString(SimData::EFUST, data.efust);
     PutString(SimData::IMSI, data.imsi);
     PutString(SimData::GID1, data.gid1);
@@ -77,30 +82,45 @@ void CardFileDetectManager::BuildDataShareValues(
     PutString(SimData::EHPLMN, data.ehplmn);
 }
 
+std::string CardFileDetectManager::MaskSensitiveData(const std::string &str)
+{
+    std::string printInfo = str;
+    int32_t spaceBit = 4; // 4: number of characters to keep
+    int32_t spaceLen = 2 * spaceBit; // 2: number of keep/mask sections
+    for (int32_t i = 0; i < static_cast<int32_t>(str.length()); i++) {
+        if (i >= (((i / spaceLen) * spaceLen) + spaceBit)) {
+            printInfo.replace(i, 1, "*");
+        }
+    }
+    return printInfo;
+}
+
 int32_t CardFileDetectManager::InsertCardFileDetectData(const CardFileDetectData &data)
 {
     DataShare::DataShareValuesBucket values;
-    BuildDataShareValues(data, values);
+    BuildDataShareValues(data, values, true);
     int64_t id = 0;
     int32_t result = simRdbHelper_->InsertData(id, values);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("InsertCardFileDetectData: InsertData failed");
+        TELEPHONY_LOGE("InsertCardFileDetectData: InsertData failed, result=%{public}d, iccId=%{public}s",
+            result, MaskSensitiveData(data.iccId).c_str());
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
-    TELEPHONY_LOGI("InsertCardFileDetectData: success, iccId=%{public}s", data.iccId.c_str());
+    TELEPHONY_LOGI("InsertCardFileDetectData: success, iccId=%{public}s", MaskSensitiveData(data.iccId).c_str());
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CardFileDetectManager::UpdateCardFileDetectData(const CardFileDetectData &data)
 {
     DataShare::DataShareValuesBucket values;
-    BuildDataShareValues(data, values);
+    BuildDataShareValues(data, values, false);
     int32_t result = simRdbHelper_->UpdateDataByIccId(data.iccId, values);
     if (result == INVALID_VALUE) {
-        TELEPHONY_LOGE("UpdateCardFileDetectData: UpdateDataByIccId failed");
+        TELEPHONY_LOGE("UpdateCardFileDetectData: UpdateDataByIccId failed, result=%{public}d, iccId=%{public}s",
+            result, MaskSensitiveData(data.iccId).c_str());
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
-    TELEPHONY_LOGI("UpdateCardFileDetectData: success, iccId=%{public}s", data.iccId.c_str());
+    TELEPHONY_LOGI("UpdateCardFileDetectData: success, iccId=%{public}s", MaskSensitiveData(data.iccId).c_str());
     return TELEPHONY_SUCCESS;
 }
 
@@ -110,10 +130,19 @@ int32_t CardFileDetectManager::SaveCardFileDetectData(const CardFileDetectData &
         TELEPHONY_LOGE("SaveCardFileDetectData: iccId is empty");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    int32_t ret;
     if (IsIccIdExists(data.iccId)) {
-        return UpdateCardFileDetectData(data);
+        ret = UpdateCardFileDetectData(data);
+    } else {
+        ret = InsertCardFileDetectData(data);
     }
-    return InsertCardFileDetectData(data);
+    if (ret == TELEPHONY_SUCCESS) {
+        auto multiSimController = multiSimController_.lock();
+        if (multiSimController != nullptr) {
+            multiSimController->GetAllListFromDataBase();
+        }
+    }
+    return ret;
 }
 
 int32_t CardFileDetectManager::GetAllSimCardInfo(std::vector<SimCardInfo> &results)

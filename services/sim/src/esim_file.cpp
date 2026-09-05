@@ -2954,7 +2954,7 @@ ResponseEsimInnerResult EsimFile::AuthenticateServer(const AuthenticateConfigInf
     esimProfile_.serverCertificate = authenticateConfigInfo.serverCertificate_;
 
     std::u16string imei = u"";
-    CoreManagerInner::GetInstance().GetImei(slotId_, imei);
+    CoreManagerInner::GetInstance().GetImei(SLOT_ID_1, imei);
     esimProfile_.imei = imei;
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_AUTHENTICATE_SERVER);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {

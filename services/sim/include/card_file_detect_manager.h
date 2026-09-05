@@ -25,13 +25,14 @@
 #include "sim_rdb_helper.h"
 #include "sim_rdb_info.h"
 #include "telephony_log_wrapper.h"
+#include "multi_sim_controller.h"
 
 namespace OHOS {
 namespace Telephony {
 
 class CardFileDetectManager {
 public:
-    CardFileDetectManager();
+    explicit CardFileDetectManager(std::weak_ptr<MultiSimController> multiSimController);
     ~CardFileDetectManager();
 
     int32_t SaveCardFileDetectData(const CardFileDetectData &data);
@@ -42,9 +43,10 @@ private:
     int32_t InsertCardFileDetectData(const CardFileDetectData &data);
     int32_t UpdateCardFileDetectData(const CardFileDetectData &data);
     bool IsIccIdExists(const std::string &iccId);
-    void BuildDataShareValues(const CardFileDetectData &data, DataShare::DataShareValuesBucket &values);
-
+    void BuildDataShareValues(const CardFileDetectData &data, DataShare::DataShareValuesBucket &values, bool isInsert);
+    std::string MaskSensitiveData(const std::string &str);
     std::shared_ptr<SimRdbHelper> simRdbHelper_;
+    std::weak_ptr<MultiSimController> multiSimController_;
 };
 } // namespace Telephony
 } // namespace OHOS
