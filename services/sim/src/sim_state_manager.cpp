@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::mutex SimStateManager::mtx_;
+ffrt::mutex SimStateManager::mtx_;
 constexpr static const int32_t WAIT_TIME_SECOND = 3;
 constexpr static const int32_t WAIT_TIME_LONG_SECOND = 20;
 
@@ -34,7 +34,7 @@ SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
 
 void SimStateManager::Init(int32_t slotId)
 {
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<ffrt::mutex> lck(mtx_);
     TELEPHONY_LOGE("SimStateManager::Init()");
     if (simStateRun_ == STATE_RUNNING) {
         TELEPHONY_LOGE("simStateHandle_ is running");
@@ -63,7 +63,7 @@ void SimStateManager::RegisterCoreNotify(const HANDLE &handler, int what)
         TELEPHONY_LOGE("RegisterCoreNotify(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<ffrt::mutex> lck(mtx_);
     simStateHandle_->RegisterCoreNotify(handler, what);
 }
 
@@ -73,7 +73,7 @@ void SimStateManager::UnRegisterCoreNotify(const HANDLE &handler, int what)
         TELEPHONY_LOGE("UnRegisterCoreNotify(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<ffrt::mutex> lck(mtx_);
     simStateHandle_->UnRegisterCoreNotify(handler, what);
 }
 
@@ -81,7 +81,7 @@ bool SimStateManager::HasSimCard()
 {
     bool ret = false;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->HasSimCard();
     }
     return ret;
@@ -91,7 +91,7 @@ SimState SimStateManager::GetSimState()
 {
     SimState ret = SimState::SIM_STATE_UNKNOWN;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetSimState();
     }
     return ret;
@@ -101,7 +101,7 @@ IccSimStatus SimStateManager::GetSimIccStatus()
 {
     IccSimStatus ret = IccSimStatus::ICC_CONTENT_UNKNOWN;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetSimIccStatus();
     }
     return ret;
@@ -113,7 +113,7 @@ void SimStateManager::SetSimState(SimState simState)
         TELEPHONY_LOGI("SimStateManager::SetSimState(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<std::mutex> lck(mtx_);
+    std::lock_guard<ffrt::mutex> lck(mtx_);
     simStateHandle_->SetSimState(simState);
 }
 
@@ -129,7 +129,7 @@ CardType SimStateManager::GetCardType()
 {
     CardType ret = CardType::UNKNOWN_CARD;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetCardType();
     }
     return ret;
@@ -138,7 +138,7 @@ CardType SimStateManager::GetCardType()
 std::string SimStateManager::GetIccid()
 {
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         return simStateHandle_->GetIccid();
     }
     return "";
@@ -147,7 +147,7 @@ std::string SimStateManager::GetIccid()
 std::string SimStateManager::GetOldIccid()
 {
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<std::mutex> lck(mtx_);
+        std::lock_guard<ffrt::mutex> lck(mtx_);
         return simStateHandle_->GetOldIccid();
     }
     return "";
