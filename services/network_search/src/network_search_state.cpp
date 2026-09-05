@@ -474,7 +474,7 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
