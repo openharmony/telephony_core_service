@@ -192,6 +192,7 @@ private:
     ffrt::mutex activeSimMutex_;
     int32_t maxCount_ = 0;
     int32_t primarySimId_ = 0;
+    int32_t primarySlotId_ = -1;
     int32_t defaultSmsSimId_ = 0;
     int32_t defaultCellularSimId_ = 0;
     int32_t defaultVoiceSimId_ = 0;
