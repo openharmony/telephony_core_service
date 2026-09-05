@@ -450,7 +450,7 @@ void SimStateHandle::HandleSimAbsent(int32_t slotId)
 void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
 {
     if (newSimStatus == ICC_CONTENT_UNKNOWN) {
-        if (CoreManagerInner::GetInstance().IsEsim(slotId_)) {
+        if (CoreManagerInner::GetInstance().IsEsim(slotId_) && modemInitDone_) {
             if (oldSimStatus_ == ICC_CONTENT_READY) {
                 CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(true);
             }
