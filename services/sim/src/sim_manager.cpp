@@ -43,7 +43,7 @@ bool SimManager::OnInit(int32_t slotCount)
     TELEPHONY_LOGI("SimManager OnInit, slotCount = %{public}d", slotCount);
     slotCount_ = slotCount;
     operatorConfigHisysevent_ = std::make_shared<OperatorConfigHisysevent>();
-    cardFileDetectManager_ = std::make_shared<CardFileDetectManager>();
+    cardFileDetectManager_ = std::make_shared<CardFileDetectManager>(multiSimController_);
     InitMultiSimObject();
     InitSingleSimObject();
     TELEPHONY_LOGD("SimManager OnInit success");
