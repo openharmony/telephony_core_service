@@ -1649,11 +1649,12 @@ void MultiSimController::SendMainCardBroadCast(int32_t slotId)
         TELEPHONY_LOGE("Out of range, slotId %{public}d", slotId);
         return;
     }
-    if (localCacheInfo_[slotId].simId == primarySimId_) {
+    if (localCacheInfo_[slotId].simId == primarySimId_ && slotId == primarySlotId_) {
         TELEPHONY_LOGE("no need to AnnouncePrimarySimIdChanged");
         return;
     }
     primarySimId_ = localCacheInfo_[slotId].simId;
+    primarySlotId_ = slotId;
     lock.unlock();
     TELEPHONY_LOGI("Announce main simId %{public}d", primarySimId_);
     multiSimHelper_->AnnouncePrimarySimIdChanged(primarySimId_, slotId);
