@@ -22,6 +22,7 @@
 #include "network_type.h"
 #include "ims_core_service_types.h"
 #include "ims_reg_types.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -66,11 +67,11 @@ private:
     static std::string& GetRoamingString();
 
 private:
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
     std::unique_ptr<NetworkState> networkState_ = nullptr;
     std::unique_ptr<NetworkState> networkStateOld_ = nullptr;
-    std::mutex imsMutex_;
+    ffrt::mutex imsMutex_;
     bool imsRegStatus_ = false;
     int32_t slotId_ = 0;
     std::unique_ptr<ImsServiceStatus> imsServiceStatus_ = nullptr;
