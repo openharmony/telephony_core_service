@@ -15,6 +15,7 @@
 
 #include "network_search_manager.h"
 
+#include <charconv>
 #include <cinttypes>
 #include <parameters.h>
 #include <securec.h>
@@ -1408,10 +1409,14 @@ int32_t NetworkSearchManager::GetDelayNotifyTime()
     int32_t delayTime = 0;
     int32_t code = GetParameter(CFG_TECH_UPDATE_TIME, NO_DELAY_TIME__CONFIG, param, SYS_PARAMETER_SIZE);
     std::string time = param;
-    if (code <= 0 || !IsValidDecValue(time)) {
-        delayTime = std::stoi(NO_DELAY_TIME__CONFIG);
-    } else {
-        delayTime = std::stoi(time);
+    auto parseDelayTime = [](const std::string &value, int32_t &result) {
+        const char *begin = value.data();
+        const char *end = begin + value.size();
+        auto parsed = std::from_chars(begin, end, result);
+        return parsed.ec == std::errc{} && parsed.ptr == end;
+    };
+    if (code <= 0 || !IsValidDecValue(time) || !parseDelayTime(time, delayTime)) {
+        (void)parseDelayTime(NO_DELAY_TIME__CONFIG, delayTime);
     }
     return delayTime;
 }
