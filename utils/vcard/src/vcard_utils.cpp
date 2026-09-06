@@ -28,6 +28,7 @@
 #include "telephony_log_wrapper.h"
 #include "vcard_configuration.h"
 #include "vcard_constant.h"
+#include "parse_label_int.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -266,7 +267,10 @@ std::string VCardUtils::GetTypeFromImLabelId(std::string labelId)
     if (!IsNum(labelId)) {
         return "";
     }
-    int32_t num = std::stoi(labelId);
+    int32_t num = 0;
+    if (!ParseLabelInt32(labelId, num)) {
+        return "";
+    }
     auto it = imLabelIdToType.find(static_cast<ImType>(num));
     if (it != imLabelIdToType.end()) {
         return it->second;
@@ -306,7 +310,10 @@ std::vector<std::string> VCardUtils::GetTypeFromPhoneLabelId(std::string labelId
     if (!IsNum(labelId) || labelId.size() > LABEL_ID_MAX_LENGTH) {
         return paramTypes;
     }
-    int64_t num = std::stoll(labelId);
+    int64_t num = 0;
+    if (!ParseLabelInt64(labelId, num)) {
+        return paramTypes;
+    }
     auto phoneType = static_cast<PhoneVcType>(num);
     auto it = phoneLabelIdToType.find(phoneType);
     if (it != phoneLabelIdToType.end()) {
