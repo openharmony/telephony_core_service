@@ -82,6 +82,7 @@ constexpr const char *EXIT_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_EXIT_ST
 constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE = "persist.distributedmodem.multidevice.enable";
 constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT = "false";
 constexpr const char *ENABLE_TRUE = "true";
+constexpr const char *PRODUCT_DEVICE_TYPE = "const.product.devicetype";
 }
 
 template<typename T>
@@ -108,7 +109,10 @@ T GetMaxSlotCount()
             val = std::atoi(DEFAULT_SLOT_COUNT);
         }
         maxSlotCount_ = static_cast<int32_t>(val);
-        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
+        char productDeviceType[SYSPARA_SIZE] = { 0 };
+        GetParameter(PRODUCT_DEVICE_TYPE, "", productDeviceType, SYSPARA_SIZE);
+        if ((strcmp(productDeviceType, "2in1") == 0 || strcmp(productDeviceType, "tablet") == 0) &&
+            GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
     }

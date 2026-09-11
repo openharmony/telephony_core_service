@@ -554,8 +554,8 @@ HWTEST_F(CoreServiceBranchTest, Telephony_CoreService_HiSysEvent_001, Function |
 HWTEST_F(CoreServiceBranchTest, Telephony_MultiSimController_003, Function | MediumTest | Level1)
 {
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     std::shared_ptr<RadioProtocolController> radioProtocolController = nullptr;

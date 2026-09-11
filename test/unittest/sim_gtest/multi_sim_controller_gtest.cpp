@@ -102,8 +102,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ForgetAllDataWithSlotId_
 {
     int slotId = -1;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
