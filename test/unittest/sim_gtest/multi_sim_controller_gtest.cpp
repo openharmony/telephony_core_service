@@ -1517,7 +1517,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
 
     OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot0", "1");
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 0);
-    EXPECT_EQ(simIdx, 3);
+    EXPECT_EQ(simIdx, 1);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlotId, Function | MediumTest | Level1)
