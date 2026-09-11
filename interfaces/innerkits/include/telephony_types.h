@@ -132,8 +132,13 @@ T GetMaxSlotCountMd()
             val = std::atoi(DEFAULT_SLOT_COUNT);
         }
         maxSlotCount_ = static_cast<int32_t>(val);
-        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ <= DC_MAX_SLOT_COUNT)) {
-            maxSlotCount_ = DC_MAX_SLOT_COUNT;
+        if (GetVirtualModemSwitch<bool>()) {
+            char productDeviceType[SYSPARA_SIZE] = { 0 };
+            GetParameter(PRODUCT_DEVICE_TYPE, "", productDeviceType, SYSPARA_SIZE);
+            if ((strcmp(productDeviceType, "2in1") == 0 || strcmp(productDeviceType, "tablet") == 0) &&
+                maxSlotCount_ <= DC_MAX_SLOT_COUNT) {
+                maxSlotCount_ = DC_MAX_SLOT_COUNT;
+            }
             char multiDeviceEnable[SYSPARA_SIZE] = { 0 };
             GetParameter(DISTRIBUTEMODEM_MULTIDEVICE_ENABLE, DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT,
                 multiDeviceEnable, SYSPARA_SIZE);
