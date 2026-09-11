@@ -175,31 +175,28 @@ void NetworkSelection::ProcessSetNetworkSelectionMode(const AppExecFwk::InnerEve
 void NetworkSelection::ProcessManualScanResult(const AppExecFwk::InnerEvent::Pointer &event) const
 {
     TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult slotId:%{public}d", slotId_);
-    if (event == nullptr) {
+    if (event == nullptr || event->GetSharedObject<ManualScanResult>() == nullptr) {
         TELEPHONY_LOGE("NetworkSelection::ProcessManualScanResult event is nullptr slotId:%{public}d", slotId_);
         return;
     }
+    auto manualScanResult = event->GetSharedObject<ManualScanResult>();
+    bool isFinish = manualScanResult->isFinished;
     std::shared_ptr<NetworkSearchManager> nsm = networkSearchManager_.lock();
     if (nsm == nullptr) {
         TELEPHONY_LOGE("NetworkSelection::ProcessManualScanResult nsm is nullptr slotId:%{public}d", slotId_);
         return;
     }
-
-    auto manualScanResult = event->GetSharedObject<ManualScanResult>();
-    if (manualScanResult == nullptr) {
-        TELEPHONY_LOGE("ManualScanStateChanged manualScanResult is nullptr slotId:%{public}d", slotId_);
-        return;
-    }
-    bool isFinish = manualScanResult->isFinished;
     auto networkSearchResult = sptr<NetworkSearchResult>::MakeSptr();
     if (networkSearchResult == nullptr) {
-        TELEPHONY_LOGE(
-            "GetNetworkSearchInformationValue failed to create new NetWorkSearchResult slotId:%{public}d", slotId_);
+        TELEPHONY_LOGE("ProcessManualScanResult failed to create NetWorkSearchResult slotId:%{public}d", slotId_);
         return;
     }
     if (isFinish) {
         nsm->NotifyManualScanStateChanged(slotId_, isFinish, networkSearchResult);
         TELEPHONY_LOGI("NetworkSelection::ProcessManualScanResult stop end");
+        return;
+    } else if (!nsm->GetManualNetworkScanState()) {
+        TELEPHONY_LOGE("ProcessManualScanResult nsm is not searching");
         return;
     }
     const std::vector<AvailableNetworkInfo> &availableNetworkInfo = manualScanResult->availableNetworkInfo;
