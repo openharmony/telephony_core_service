@@ -223,9 +223,9 @@ void CoreServiceCommonEventHub::RegisterCallback(
             }
         }
     }
- 
+
     // Step 2: 在无锁状态下调用外部订阅逻辑
-    std::unordered_map<TelCommonEvent, std::shared_ptr<EventFwk::CommonEventSubscriber>> newSubscribers;
+    std::map<TelCommonEvent, std::shared_ptr<EventFwk::CommonEventSubscriber>> newSubscribers;
     std::vector<TelCommonEvent> failSubscribe;
     for (auto event : needSubscribe) {
         auto subscriber = Subscribe(event);
@@ -239,7 +239,7 @@ void CoreServiceCommonEventHub::RegisterCallback(
                 static_cast<int>(event));
         }
     }
- 
+
     // Step 3: 更新 subscribers_
     {
         std::unique_lock<ffrt::shared_mutex> subscribersLock(subscribersMtx_);
