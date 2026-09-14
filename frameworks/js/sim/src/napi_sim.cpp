@@ -294,7 +294,11 @@ void NapiAsyncCommomCompleteCallback(
 napi_value IccAccountInfoConversion(napi_env env, const IccAccountInfo &iccAccountInfo)
 {
     napi_value val = nullptr;
-    napi_create_object(env, &val);
+    napi_status status = napi_create_object(env, &val);
+    if (status = != napi_ok) {
+        TELEPHONY_LOGI("IccAccountInfoConversion napi_create_object failed");
+        return nullptr;
+    }
     SetPropertyToNapiObject(env, val, "simId", iccAccountInfo.simId);
     SetPropertyToNapiObject(env, val, "slotIndex", iccAccountInfo.slotIndex);
     SetPropertyToNapiObject(env, val, "isEsim", iccAccountInfo.isEsim);
@@ -313,7 +317,11 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
         response.remain);
     constexpr int32_t passWordErr = -1;
     napi_value val = nullptr;
-    napi_create_object(env, &val);
+    napi_status status = napi_create_object(env, &val);
+    if (status = != napi_ok) {
+        TELEPHONY_LOGI("PinOrPukUnlockConversion napi_create_object failed");
+        return nullptr;
+    }
     SetPropertyToNapiObject(env, val, "result", response.result);
     napi_value res =
         (response.result == passWordErr ? GetNapiValue(env, response.remain) : NapiUtil::CreateUndefined(env));
@@ -324,7 +332,11 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
 napi_value OperatorConfigAnalyze(napi_env env, const ConfigInfo &config)
 {
     napi_value obj = nullptr;
-    napi_create_object(env, &obj);
+    napi_status status = napi_create_object(env, &val);
+    if (status = != napi_ok) {
+        TELEPHONY_LOGI("OperatorConfigAnalyze napi_create_object failed");
+        return nullptr;
+    }
     SetPropertyToNapiObject(env, obj, "field", config.field);
     SetPropertyToNapiObject(env, obj, "value", config.value);
     return obj;
@@ -333,8 +345,15 @@ napi_value OperatorConfigAnalyze(napi_env env, const ConfigInfo &config)
 napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
 {
     napi_value val = nullptr;
-    napi_create_object(env, &val);
+    napi_status status = napi_create_object(env, &val);
+    if (status = != napi_ok) {
+        TELEPHONY_LOGI("DiallingNumbersConversion napi_create_object failed");
+        return nullptr;
+    }
     SetPropertyToNapiObject(env, val, "recordNumber", info.recordNumber);
+    std::string alphaTagStr(info.alphaTag.data(), strnlen(info.alphaTag.data(), info.alphaTag.size()));
+    std::string numberStr(info.number.data(), strnlen(info.number.data(), info.number.size()));
+    std::string pin2Str(info.pin2.data(), strnlen(info.pin2.data(), info.pin2.size()));
     SetPropertyToNapiObject(env, val, "alphaTag", std::data(info.alphaTag));
     SetPropertyToNapiObject(env, val, "number", std::data(info.number));
     SetPropertyToNapiObject(env, val, "pin2", std::data(info.pin2));
@@ -344,7 +363,11 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
 napi_value SimAuthResultConversion(napi_env env, const SimAuthenticationResponse &responseResult)
 {
     napi_value val = nullptr;
-    napi_create_object(env, &val);
+    napi_status status = napi_create_object(env, &val);
+    if (status = != napi_ok) {
+        TELEPHONY_LOGI("SimAuthResultConversion napi_create_object failed");
+        return nullptr;
+    }
     NapiUtil::SetPropertyInt32(env, val, "sw1", responseResult.sw1);
     NapiUtil::SetPropertyInt32(env, val, "sw2", responseResult.sw2);
     NapiUtil::SetPropertyInt32(env, val, "simStatusWord1", responseResult.sw1);
@@ -2196,10 +2219,18 @@ void GetOperatorConfigsCallback(napi_env env, napi_status status, void *data)
     AsyncContext<napi_value> &aContext = operatorConfig->asyncContext;
     if (aContext.context.resolved) {
         aContext.callbackVal = nullptr;
-        napi_create_array(env, &aContext.callbackVal);
+        napi_status createStatus = napi_create_array(env, &aContext.callbackVal);
+        if (createStatus != napi_ok) {
+            TELEPHONY_LOGI("GetOperatorConfigsCallback napi_create_array failed");
+            aContext.context.resolved = false;
+            aContext.context.errCode = ERROR_DEFAULT;
+        } else {
         for (size_t i = 0; i < operatorConfig->configValue.size(); i++) {
             napi_value val = OperatorConfigAnalyze(env, operatorConfig->configValue.at(i));
+            if (val != nullptr) {
             napi_set_element(env, aContext.callbackVal, i, val);
+                }
+            }
         }
     }
     NapiAsyncPermissionCompleteCallback(
