@@ -297,7 +297,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> networkSearchManagerHandler_;
     std::shared_ptr<AppExecFwk::EventHandler> simGeneralHandler_;
     std::shared_ptr<AppExecFwk::EventHandler> simPinHandler_;
-    std::mutex handlerInitMutex_;
+    ffrt::mutex handlerInitMutex_;
     int64_t spendTime_ = 0;
     int64_t bindTime_ = 0;
     int64_t endTime_ = 0;
