@@ -63,7 +63,9 @@ size_t resetParameterCount = 0;
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1) && slotId != SIM_SLOT_2);
+    // 手表的SIM_SLOT_COUNT为1，slot=1时是非法值
+    int32_t slotIdUpper = SIM_SLOT_COUNT > PARAMETER_COUNT_ONE ? SIM_SLOT_COUNT + 1 : SIM_SLOT_COUNT;
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < slotIdUpper) && slotId != SIM_SLOT_2);
 }
 
 template<typename T, napi_async_execute_callback exec, napi_async_complete_callback complete>
