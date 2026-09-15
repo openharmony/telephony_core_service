@@ -638,7 +638,7 @@ bool EsimFile::SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::s
 {
     int32_t max_length = 6;
     if (mccMnc.length() < max_length) {
-        TELEPHONY_LOGE("SplitMccAndMnc mccMnc length too short: %{public}zu", mccMnc.length()); 
+        TELEPHONY_LOGE("SplitMccAndMnc mccMnc length too short: %{public}zu", mccMnc.length());
         return false;
     }
     std::string mMcc(NUMBER_THREE, '\0');
@@ -3080,7 +3080,7 @@ void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &
         Asn1Utils::BcdToBytes(newImei, imeiBytes);
         if (imeiBytes.size() <= LAST_BYTE_OF_IMEI) {
             TELEPHONY_LOGE("GetImeiBytes imeiBytes size too small: %{public}zu", imeiBytes.size());
-            return; 
+            return;
         }
         unsigned char last = imeiBytes[LAST_BYTE_OF_IMEI];
         imeiBytes[LAST_BYTE_OF_IMEI] = static_cast<unsigned char>((last & 0xFF) <<
