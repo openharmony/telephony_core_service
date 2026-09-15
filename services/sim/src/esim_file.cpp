@@ -636,7 +636,8 @@ bool EsimFile::RealProcessRequestAllProfilesDone()
 
 bool EsimFile::SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::string &mnc)
 {
-    if (mccMnc.length() < 6) {
+    int32_t max_length = 6;
+    if (mccMnc.length() < max_length) {
         TELEPHONY_LOGE("SplitMccAndMnc mccMnc length too short: %{public}zu", mccMnc.length()); 
         return false;
     }

@@ -84,8 +84,8 @@ std::string SIMUtils::BytesConvertToHexString(const unsigned char *bytes, int by
 
 void SIMUtils::ArrayCopy(const unsigned char *src, int srcPos, unsigned char *dest, int destPos, int length)
 {
-    if (src == nullptr || dest == nullptr || length <= 0 ||srcPos < 0 || destPos < 0 ) {
-        TELEPHONY_LOGE("ArrayCopy invalid parameters: src=%{public}p, dest=%{public}p, length=%{public}d", src, dest, length);
+    if (src == nullptr || dest == nullptr || length <= 0 ||srcPos < 0 || destPos < 0) {
+        TELEPHONY_LOGE("ArrayCopy invalid: src=%{public}p, dest=%{public}p, length=%{public}d", src, dest, length);
         return;
     }
     src += srcPos;

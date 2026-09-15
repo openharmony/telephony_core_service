@@ -975,7 +975,7 @@ void SimStateHandle::NotifySimLock(int slotId)
     CoreServiceHiSysEvent::WriteSimStateBehaviorEvent(slotId, static_cast<int32_t>(externalState_));
     if (observerHandler_ != nullptr) {
         observerHandler_->NotifyObserver(RadioEvent::RADIO_SIM_STATE_SIMLOCK);
-    }   
+        }   
     PublishSimStateEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED, ICC_STATE_SIMLOCK, "");
 }
 

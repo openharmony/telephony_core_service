@@ -831,8 +831,9 @@ void MultiSimController::SortAllCache()
     for (size_t j = 0; j < count; j++) {
         TELEPHONY_LOGI(
             "index = %{public}d j = %{public}lu", allLocalCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
-        if (allLocalCacheInfo_[j].simId - 1 >= 0 && allLocalCacheInfo_[j].simId - 1 < static_cast<int>(sortCache.size())) {
-            sortCache[allLocalCacheInfo_[j].simId - 1] = allLocalCacheInfo_[j];
+        if (allLocalCacheInfo_[j].simId - 1 >= 0 && allLocalCacheInfo_[j].simId - 1 <
+            static_cast<int>(sortCache.size())) {
+                sortCache[allLocalCacheInfo_[j].simId - 1] = allLocalCacheInfo_[j];
         }
     }
     allLocalCacheInfo_ = sortCache;

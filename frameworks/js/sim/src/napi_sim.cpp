@@ -2227,9 +2227,7 @@ void GetOperatorConfigsCallback(napi_env env, napi_status status, void *data)
         } else {
         for (size_t i = 0; i < operatorConfig->configValue.size(); i++) {
             napi_value val = OperatorConfigAnalyze(env, operatorConfig->configValue.at(i));
-            if (val != nullptr) {
-            napi_set_element(env, aContext.callbackVal, i, val);
-                }
+            napi_set_element(env, aContext.callbackVal, i, val)
             }
         }
     }

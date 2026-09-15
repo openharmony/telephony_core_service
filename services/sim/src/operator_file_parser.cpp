@@ -177,11 +177,6 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
     char *tempChar = nullptr;
     std::map<std::u16string, std::u16string> &configValue = opc.configValue;
     while (value) {
-        if (value->string == nullptr) {
-            TELEPHONY_LOGE("ParseOperatorConfigFromJson value->string is null");
-            value = value->next;
-            continue;
-        }
         if (needSaveTempOpc) {
             tempChar = cJSON_PrintUnformatted(value);
             tempConfig_[value->string] = tempChar != nullptr ? tempChar : "";
