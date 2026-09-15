@@ -177,6 +177,11 @@ void OperatorFileParser::ParseOperatorConfigFromJson(const cJSON *root, Operator
     char *tempChar = nullptr;
     std::map<std::u16string, std::u16string> &configValue = opc.configValue;
     while (value) {
+        if (value->string == nullptr) {
+            TELEPHONY_LOGE("ParseOperatorConfigFromJson value->string is null");
+            value = value->next;
+            continue;
+        }
         if (needSaveTempOpc) {
             tempChar = cJSON_PrintUnformatted(value);
             tempConfig_[value->string] = tempChar != nullptr ? tempChar : "";
@@ -259,6 +264,10 @@ int32_t OperatorFileParser::LoaderJsonFile(char *&content, const std::string &pa
 
 bool OperatorFileParser::CloseFile(FILE *f)
 {
+    if (f == nullptr) {
+        TELEPHONY_LOGE("CloseFile f is null");
+        return false;
+    }
     int ret_close = fclose(f);
     if (ret_close != 0) {
         TELEPHONY_LOGE("LoaderJsonFile ret_close != 0!");
@@ -280,7 +289,11 @@ void OperatorFileParser::ParseArray(const std::string key, const cJSON *value, O
             opc.stringArrayValue[key] = std::vector<std::string>();
         }
         while (arrayValue) {
-            opc.stringArrayValue[key].push_back(arrayValue->valuestring);
+            if (arrayValue->valuestring != nullptr) {
+                opc.stringArrayValue[key].push_back(arrayValue->valuestring);
+            } else {
+                TELEPHONY_LOGE("ParseArray skip non-string element in string array"); 
+            }
             arrayValue = arrayValue->next;
         }
     } else if (valueType == cJSON_Number && static_cast<int64_t>(cJSON_GetNumberValue(arrayValue)) > INT_MAX) {
@@ -289,7 +302,9 @@ void OperatorFileParser::ParseArray(const std::string key, const cJSON *value, O
             opc.longArrayValue[key] = std::vector<int64_t>();
         }
         while (arrayValue) {
-            opc.longArrayValue[key].push_back(static_cast<int64_t>(cJSON_GetNumberValue(arrayValue)));
+            if (arrayValue->type == cJSON_Number) {
+                opc.longArrayValue[key].push_back(static_cast<int64_t>(cJSON_GetNumberValue(arrayValue)));
+            }
             arrayValue = arrayValue->next;
         }
     } else if (valueType == cJSON_Number) {
@@ -298,7 +313,9 @@ void OperatorFileParser::ParseArray(const std::string key, const cJSON *value, O
             opc.intArrayValue[key] = std::vector<int32_t>();
         }
         while (arrayValue) {
-            opc.intArrayValue[key].push_back(static_cast<int32_t>(cJSON_GetNumberValue(arrayValue)));
+            if (arrayValue->type == cJSON_Number) {
+                opc.intArrayValue[key].push_back(static_cast<int32_t>(cJSON_GetNumberValue(arrayValue)));
+            }
             arrayValue = arrayValue->next;
         }
     }

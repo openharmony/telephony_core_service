@@ -1474,6 +1474,10 @@ int32_t SimManager::NotifySimSlotsMapping(int32_t slotId)
         TELEPHONY_LOGE("NotifySimSlotsMapping has no sim card!");
         return TELEPHONY_ERR_NO_SIM_CARD;
     }
+    if (multiSimController_ == nullptr || simStateManager_[slotId] == nullptr) {
+        TELEPHONY_LOGE("SimManager NotifySimSlotsMapping enter");
+        return INVALID_VALUE;
+    }
     multiSimController_->isSimSlotsMapping_[slotId] = true;
     return simStateManager_[slotId]->NotifySimSlotsMapping(slotId);
 }
