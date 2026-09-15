@@ -296,7 +296,7 @@ napi_value IccAccountInfoConversion(napi_env env, const IccAccountInfo &iccAccou
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
     if (status = != napi_ok) {
-        TELEPHONY_LOGI("IccAccountInfoConversion napi_create_object failed");
+        TELEPHONY_LOGE("IccAccountInfoConversion napi_create_object failed");
         return nullptr;
     }
     SetPropertyToNapiObject(env, val, "simId", iccAccountInfo.simId);
@@ -319,7 +319,7 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
     if (status = != napi_ok) {
-        TELEPHONY_LOGI("PinOrPukUnlockConversion napi_create_object failed");
+        TELEPHONY_LOGE("PinOrPukUnlockConversion napi_create_object failed");
         return nullptr;
     }
     SetPropertyToNapiObject(env, val, "result", response.result);
@@ -334,7 +334,7 @@ napi_value OperatorConfigAnalyze(napi_env env, const ConfigInfo &config)
     napi_value obj = nullptr;
     napi_status status = napi_create_object(env, &val);
     if (status = != napi_ok) {
-        TELEPHONY_LOGI("OperatorConfigAnalyze napi_create_object failed");
+        TELEPHONY_LOGE("OperatorConfigAnalyze napi_create_object failed");
         return nullptr;
     }
     SetPropertyToNapiObject(env, obj, "field", config.field);
@@ -347,7 +347,7 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
     if (status = != napi_ok) {
-        TELEPHONY_LOGI("DiallingNumbersConversion napi_create_object failed");
+        TELEPHONY_LOGE("DiallingNumbersConversion napi_create_object failed");
         return nullptr;
     }
     SetPropertyToNapiObject(env, val, "recordNumber", info.recordNumber);
@@ -365,7 +365,7 @@ napi_value SimAuthResultConversion(napi_env env, const SimAuthenticationResponse
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
     if (status = != napi_ok) {
-        TELEPHONY_LOGI("SimAuthResultConversion napi_create_object failed");
+        TELEPHONY_LOGE("SimAuthResultConversion napi_create_object failed");
         return nullptr;
     }
     NapiUtil::SetPropertyInt32(env, val, "sw1", responseResult.sw1);
@@ -2221,7 +2221,7 @@ void GetOperatorConfigsCallback(napi_env env, napi_status status, void *data)
         aContext.callbackVal = nullptr;
         napi_status createStatus = napi_create_array(env, &aContext.callbackVal);
         if (createStatus != napi_ok) {
-            TELEPHONY_LOGI("GetOperatorConfigsCallback napi_create_array failed");
+            TELEPHONY_LOGE("GetOperatorConfigsCallback napi_create_array failed");
             aContext.context.resolved = false;
             aContext.context.errCode = ERROR_DEFAULT;
         } else {
