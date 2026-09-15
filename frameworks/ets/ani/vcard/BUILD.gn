@@ -76,7 +76,7 @@ ohos_static_library("vcard_ani_cxx") {
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
-    "ffrt:libffrt:,
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
