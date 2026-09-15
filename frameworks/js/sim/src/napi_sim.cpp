@@ -295,7 +295,7 @@ napi_value IccAccountInfoConversion(napi_env env, const IccAccountInfo &iccAccou
 {
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
-    if (status = != napi_ok) {
+    if (status != napi_ok) {
         TELEPHONY_LOGE("IccAccountInfoConversion napi_create_object failed");
         return nullptr;
     }
@@ -318,7 +318,7 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
     constexpr int32_t passWordErr = -1;
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
-    if (status = != napi_ok) {
+    if (status != napi_ok) {
         TELEPHONY_LOGE("PinOrPukUnlockConversion napi_create_object failed");
         return nullptr;
     }
@@ -332,8 +332,8 @@ napi_value PinOrPukUnlockConversion(napi_env env, const LockStatusResponse &resp
 napi_value OperatorConfigAnalyze(napi_env env, const ConfigInfo &config)
 {
     napi_value obj = nullptr;
-    napi_status status = napi_create_object(env, &val);
-    if (status = != napi_ok) {
+    napi_status status = napi_create_object(env, &obj);
+    if (status != napi_ok) {
         TELEPHONY_LOGE("OperatorConfigAnalyze napi_create_object failed");
         return nullptr;
     }
@@ -346,7 +346,7 @@ napi_value DiallingNumbersConversion(napi_env env, const TelNumbersInfo &info)
 {
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
-    if (status = != napi_ok) {
+    if (status != napi_ok) {
         TELEPHONY_LOGE("DiallingNumbersConversion napi_create_object failed");
         return nullptr;
     }
@@ -364,7 +364,7 @@ napi_value SimAuthResultConversion(napi_env env, const SimAuthenticationResponse
 {
     napi_value val = nullptr;
     napi_status status = napi_create_object(env, &val);
-    if (status = != napi_ok) {
+    if (status != napi_ok) {
         TELEPHONY_LOGE("SimAuthResultConversion napi_create_object failed");
         return nullptr;
     }
@@ -2223,7 +2223,7 @@ void GetOperatorConfigsCallback(napi_env env, napi_status status, void *data)
         if (createStatus != napi_ok) {
             TELEPHONY_LOGE("GetOperatorConfigsCallback napi_create_array failed");
             aContext.context.resolved = false;
-            aContext.context.errCode = ERROR_DEFAULT;
+            aContext.context.errorCode = ERROR_DEFAULT;
         } else {
         for (size_t i = 0; i < operatorConfig->configValue.size(); i++) {
             napi_value val = OperatorConfigAnalyze(env, operatorConfig->configValue.at(i));
