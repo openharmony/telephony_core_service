@@ -3079,7 +3079,7 @@ void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &
         newImei += 'F';
         Asn1Utils::BcdToBytes(newImei, imeiBytes);
         if (imeiBytes.size() <= LAST_BYTE_OF_IMEI) {
-            TELEPHONY_LOGE("GetImeiBytes imeiBytes size too small: %{public}zu", imeiBytes.size()); 
+            TELEPHONY_LOGE("GetImeiBytes imeiBytes size too small: %{public}zu", imeiBytes.size());
             return; 
         }
         unsigned char last = imeiBytes[LAST_BYTE_OF_IMEI];

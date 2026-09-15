@@ -287,7 +287,7 @@ void OperatorFileParser::ParseArray(const std::string key, const cJSON *value, O
             if (arrayValue->valuestring != nullptr) {
                 opc.stringArrayValue[key].push_back(arrayValue->valuestring);
             } else {
-                TELEPHONY_LOGE("ParseArray skip non-string element in string array"); 
+                TELEPHONY_LOGE("ParseArray skip non-string element in string array");
             }
             arrayValue = arrayValue->next;
         }
