@@ -215,16 +215,18 @@ void CoreServiceCommonEventHub::RegisterCallback(
     // Step 1: 先确定哪些事件需要订阅
     std::vector<TelCommonEvent> needSubscribe;
     {
-        std::shared_lock<ffrt::shared_mutex> subscribersLock(subscribersMtx_);
+        std::unique_lock<ffrt::shared_mutex> subscribersLock(subscribersMtx_);
         for (auto event : events) {
             if (subscribers_.find(event) == subscribers_.end()) {
                 needSubscribe.push_back(event);
+                subscribers_[event] = nullptr;
             }
         }
     }
 
     // Step 2: 在无锁状态下调用外部订阅逻辑
     std::map<TelCommonEvent, std::shared_ptr<EventFwk::CommonEventSubscriber>> newSubscribers;
+    std::vector<TelCommonEvent> failSubscribe;
     for (auto event : needSubscribe) {
         auto subscriber = Subscribe(event);
         if (subscriber != nullptr) {
@@ -232,15 +234,21 @@ void CoreServiceCommonEventHub::RegisterCallback(
                 static_cast<int>(event));
             newSubscribers[event] = subscriber;
         } else {
+            failSubscribe.push_back(event);
             TELEPHONY_LOGE("CoreServiceCommonEventHub RegisterCallback failed: subscribe event %{public}d failed",
                 static_cast<int>(event));
         }
     }
 
     // Step 3: 更新 subscribers_
-    for (auto &[event, subscriber] : newSubscribers) {
+    {
         std::unique_lock<ffrt::shared_mutex> subscribersLock(subscribersMtx_);
-        subscribers_[event] = subscriber;
+        for (const auto &entry : newSubscribers) {
+            subscribers_[entry.first] = entry.second;
+        }
+        for (auto event : failSubscribe) {
+            subscribers_.erase(event);
+        }
     }
 
     // Step 4: 更新 callbacks_
