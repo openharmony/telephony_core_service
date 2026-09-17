@@ -162,7 +162,7 @@ int32_t CoreService::GetServiceRunningState()
 void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
 {
     if (networkSearchManagerHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        std::unique_lock<ffrt::mutex> lock(handlerInitMutex_);
         if (networkSearchManagerHandler_ == nullptr) {
             auto networkSearchRunner = AppExecFwk::EventRunner::Create("networkSearchHandler",
                 AppExecFwk::ThreadMode::FFRT);
@@ -175,7 +175,7 @@ void CoreService::AsyncNetSearchExecute(const std::function<void()> task)
 void CoreService::AsyncSimGeneralExecute(const std::function<void()> task)
 {
     if (simGeneralHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        std::unique_lock<ffrt::mutex> lock(handlerInitMutex_);
         if (simGeneralHandler_ == nullptr) {
             auto simManagerRunner = AppExecFwk::EventRunner::Create("simManagerHandler",
                 AppExecFwk::ThreadMode::FFRT);
@@ -188,7 +188,7 @@ void CoreService::AsyncSimGeneralExecute(const std::function<void()> task)
 void CoreService::AsyncSimPinExecute(const std::function<void()> task)
 {
     if (simPinHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        std::unique_lock<ffrt::mutex> lock(handlerInitMutex_);
         if (simPinHandler_ == nullptr) {
             auto simManagerRunner = AppExecFwk::EventRunner::Create("simPinManagerHandler",
                 AppExecFwk::ThreadMode::FFRT);

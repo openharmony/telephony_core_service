@@ -17,12 +17,11 @@
 #define NETWORK_SEARCH_INCLUDE_NETWORK_SEARCH_STATE_H
 
 #include <memory>
-#include <mutex>
+#include <ffrt.h>
 #include "network_state.h"
 #include "network_type.h"
 #include "ims_core_service_types.h"
 #include "ims_reg_types.h"
-#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

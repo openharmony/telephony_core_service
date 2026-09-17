@@ -16,6 +16,7 @@
 #ifndef NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
 #define NETWORK_SEARCH_INCLUDE_SIGNAL_INFO_H
 
+#include "ffrt.h"
 #include "event_handler.h"
 #include "tel_ril_types.h"
 #include "signal_information.h"
@@ -41,7 +42,7 @@ private:
     bool ProcessNr(const NrRssi &nrSignal);
 
 private:
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     struct SignalInformations {
         SignalInformations()
         {

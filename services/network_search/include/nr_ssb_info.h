@@ -16,6 +16,7 @@
 #ifndef NETWORK_SEARCH_INCLUDE_NR_SSB_INFO_H
 #define NETWORK_SEARCH_INCLUDE_NR_SSB_INFO_H
 
+#incldude "ffrt.h"
 #include "event_handler.h"
 #include "tel_ril_network_parcel.h"
 #include "nr_ssb_information.h"
@@ -32,7 +33,7 @@ public:
 
 private:
     bool UpdateNrSsbIdInfo(int32_t slotId, std::shared_ptr<NrCellSsbIds> nrCellSsbIds);
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::shared_ptr<NrCellSsbInfo> nrCellSsbIdsInfo_ = nullptr;
     std::weak_ptr<NetworkSearchManager> networkSearchManager_;
 
