@@ -98,7 +98,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingUtils::CreateNonBlockDataShar
 bool SettingUtils::UnRegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::lock_guard<ffrt::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
     for (; it != registerInfos_.end();) {
         if (it->first == uri && it->second == dataObserver) {
@@ -121,7 +121,7 @@ bool SettingUtils::UnRegisterSettingsObserver(
 bool SettingUtils::RegisterSettingsObserver(
     const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    std::lock_guard<ffrt::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     auto it = registerInfos_.begin();
     for (; it != registerInfos_.end(); it++) {
         if (it->first == uri && it->second == dataObserver) {
@@ -136,7 +136,7 @@ bool SettingUtils::RegisterSettingsObserver(
 
 void SettingUtils::RegisterSettingsObserver()
 {
-    std::lock_guard<ffrt::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     for (auto it = registerInfos_.begin(); it != registerInfos_.end(); it++) {
         if (it->second == nullptr) {
             continue;

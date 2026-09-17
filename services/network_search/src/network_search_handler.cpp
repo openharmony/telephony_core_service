@@ -30,9 +30,9 @@
 
 namespace OHOS {
 namespace Telephony {
-std::mutex NetworkSearchManager::ctx_;
+ffrt::mutex NetworkSearchManager::ctx_;
 bool NetworkSearchManager::ssbResponseReady_ = false;
-std::condition_variable NetworkSearchManager::cv_;
+ffrt::condition_variable NetworkSearchManager::cv_;
 static const int32_t REQ_INTERVAL = 30;
 const int32_t SATELLITE_STATUS_ON = 1;
 const size_t MCC_LEN = 3;
@@ -625,7 +625,7 @@ void NetworkSearchHandler::RadioRilDataRegState(const AppExecFwk::InnerEvent::Po
         TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     psRegStatusResultInfo_ = event->GetSharedObject<PsRegStatusResultInfo>();
     if (psRegStatusResultInfo_ == nullptr) {
         TELEPHONY_LOGE("psRegStatusResult is nullptr slotId:%{public}d", slotId_);
@@ -659,7 +659,7 @@ void NetworkSearchHandler::RadioRilVoiceRegState(const AppExecFwk::InnerEvent::P
         TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     csRegStatusInfo_ = event->GetSharedObject<CsRegStatusInfo>();
     if (csRegStatusInfo_ == nullptr) {
         TELEPHONY_LOGE("csRegStatusResult is nullptr slotId:%{public}d", slotId_);
@@ -735,7 +735,7 @@ void NetworkSearchHandler::RadioRilOperator(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("NetworkSearchHandler nsm is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     operatorInfoResult_ = event->GetSharedObject<OperatorInfoResult>();
     if (operatorInfoResult_ == nullptr) {
         TELEPHONY_LOGE("operatorInfoResult is nullptr slotId:%{public}d", slotId_);
@@ -1463,7 +1463,7 @@ void NetworkSearchHandler::GetNrSsbIdResponse(const AppExecFwk::InnerEvent::Poin
 
 void NetworkSearchHandler::SyncGetSsbInfoResponse()
 {
-    std::unique_lock<std::mutex> lck(NetworkSearchManager::ctx_);
+    std::unique_lock<ffrt::mutex> lck(NetworkSearchManager::ctx_);
     NetworkSearchManager::ssbResponseReady_ = true;
     TELEPHONY_LOGD("ssbResponseReady_ = %{public}d", NetworkSearchManager::ssbResponseReady_);
     NetworkSearchManager::cv_.notify_one();

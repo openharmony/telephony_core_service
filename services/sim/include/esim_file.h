@@ -16,6 +16,7 @@
 #ifndef OHOS_ESIM_FILE_H
 #define OHOS_ESIM_FILE_H
 
+#include "ffrt.h"
 #include "apdu_command.h"
 #include "asn1_builder.h"
 #include "asn1_decoder.h"
@@ -175,7 +176,7 @@ private:
     void CreateNotification(std::shared_ptr<Asn1Node> &node, EuiccNotification &euicc);
     bool ProcessListNotificationsAsn1Response(std::shared_ptr<Asn1Node> &root);
     void SplitSendLongData(RequestApduBuild &codec, int32_t esimMessageId,
-        std::mutex &mtx, bool &flag, std::condition_variable &cv);
+        ffrt::mutex &mtx, bool &flag, ffrt::condition_variable &cv);
     uint32_t MergeRecvLongDataComplete(IccFileData &fileData, int32_t eventId);
     void ConvertPreDownloadParaFromApiStru(PrepareDownloadResp& dst, EsimProfile& src);
     uint32_t CombineResponseDataFinish(IccFileData &fileData);
@@ -224,10 +225,10 @@ private:
     void ConvertAuthInputParaFromApiStru(Es9PlusInitAuthResp &dst, EsimProfile &src);
     bool GetRawDataFromEvent(const AppExecFwk::InnerEvent::Pointer &event, IccFileData &outRawData);
     void ResetEuiccNotification();
-    void NotifyReady(std::mutex &mtx, bool &flag, std::condition_variable &cv);
+    void NotifyReady(ffrt::mutex &mtx, bool &flag, ffrt::condition_variable &cv);
     bool RealProcessPrepareDownloadDone();
     bool CommMergeRecvData(
-        std::mutex &mtx, bool &flag, std::condition_variable &cv, int32_t eventId, bool &isHandleFinish);
+        ffrt::mutex &mtx, bool &flag, ffrt::condition_variable &cv, int32_t eventId, bool &isHandleFinish);
     bool IsSameAid(const std::u16string &aid);
     bool IsValidAidForAllowSameAidReuseChannel(const std::u16string &aid);
     bool RealProcessRequestAllProfilesDone();
@@ -275,115 +276,115 @@ private:
     std::shared_ptr<ITelRilManager> telRilManager_ = nullptr;
 
     std::u16string aidStr_ = u"";
-    std::mutex occupyChannelMutex_;
+    ffrt::mutex occupyChannelMutex_;
 
-    std::mutex closeChannelMutex_;
-    std::condition_variable closeChannelCv_;
+    ffrt::mutex closeChannelMutex_;
+    ffrt::condition_variable closeChannelCv_;
 
-    std::mutex openChannelMutex_;
-    std::condition_variable openChannelCv_;
+    ffrt::mutex openChannelMutex_;
+    ffrt::condition_variable openChannelCv_;
 
-    std::mutex getEidMutex_;
-    std::condition_variable getEidCv_;
+    ffrt::mutex getEidMutex_;
+    ffrt::condition_variable getEidCv_;
     bool isEidReady_ = false;
 
-    std::mutex allProfileInfoMutex_;
-    std::condition_variable allProfileInfoCv_;
+    ffrt::mutex allProfileInfoMutex_;
+    ffrt::condition_variable allProfileInfoCv_;
     bool isAllProfileInfoReady_ = false;
 
-    std::mutex euiccInfo1Mutex_;
-    std::condition_variable euiccInfo1Cv_;
+    ffrt::mutex euiccInfo1Mutex_;
+    ffrt::condition_variable euiccInfo1Cv_;
     bool isEuiccInfo1Ready_ = false;
 
-    std::mutex disableProfileMutex_;
-    std::condition_variable disableProfileCv_;
+    ffrt::mutex disableProfileMutex_;
+    ffrt::condition_variable disableProfileCv_;
     bool isDisableProfileReady_ = false;
 
-    std::mutex smdsAddressMutex_;
-    std::condition_variable smdsAddressCv_;
+    ffrt::mutex smdsAddressMutex_;
+    ffrt::condition_variable smdsAddressCv_;
     bool isSmdsAddressReady_ = false;
 
-    std::mutex rulesAuthTableMutex_;
-    std::condition_variable rulesAuthTableCv_;
+    ffrt::mutex rulesAuthTableMutex_;
+    ffrt::condition_variable rulesAuthTableCv_;
     bool isRulesAuthTableReady_ = false;
 
-    std::mutex euiccChallengeMutex_;
-    std::condition_variable euiccChallengeCv_;
+    ffrt::mutex euiccChallengeMutex_;
+    ffrt::condition_variable euiccChallengeCv_;
     bool isEuiccChallengeReady_ = false;
 
-    std::mutex obtainDefaultSmdpAddressMutex_;
-    std::condition_variable obtainDefaultSmdpAddressCv_;
+    ffrt::mutex obtainDefaultSmdpAddressMutex_;
+    ffrt::condition_variable obtainDefaultSmdpAddressCv_;
     bool isObtainDefaultSmdpAddressReady_ = false;
 
-    std::mutex cancelSessionMutex_;
-    std::condition_variable cancelSessionCv_;
+    ffrt::mutex cancelSessionMutex_;
+    ffrt::condition_variable cancelSessionCv_;
     bool isCancelSessionReady_ = false;
 
-    std::mutex obtainProfileMutex_;
-    std::condition_variable obtainProfileCv_;
+    ffrt::mutex obtainProfileMutex_;
+    ffrt::condition_variable obtainProfileCv_;
     bool isObtainProfileReady_ = false;
 
-    std::mutex resetMemoryMutex_;
-    std::condition_variable resetMemoryCv_;
+    ffrt::mutex resetMemoryMutex_;
+    ffrt::condition_variable resetMemoryCv_;
     bool isResetMemoryReady_ = false;
 
-    std::mutex setDefaultSmdpAddressMutex_;
-    std::condition_variable setDefaultSmdpAddressCv_;
+    ffrt::mutex setDefaultSmdpAddressMutex_;
+    ffrt::condition_variable setDefaultSmdpAddressCv_;
     bool isSetDefaultSmdpAddressReady_ = false;
 
-    std::mutex sendApduDataMutex_;
-    std::condition_variable sendApduDataCv_;
+    ffrt::mutex sendApduDataMutex_;
+    ffrt::condition_variable sendApduDataCv_;
     bool isSendApduDataReady_ = false;
 
-    std::mutex prepareDownloadMutex_;
-    std::condition_variable prepareDownloadCv_;
+    ffrt::mutex prepareDownloadMutex_;
+    ffrt::condition_variable prepareDownloadCv_;
     bool isPrepareDownloadReady_ = false;
 
-    std::mutex loadBppMutex_;
-    std::condition_variable loadBppCv_;
+    ffrt::mutex loadBppMutex_;
+    ffrt::condition_variable loadBppCv_;
     bool isLoadBppReady_ = false;
 
-    std::mutex listNotificationsMutex_;
-    std::condition_variable listNotificationsCv_;
+    ffrt::mutex listNotificationsMutex_;
+    ffrt::condition_variable listNotificationsCv_;
     bool isListNotificationsReady_ = false;
 
-    std::mutex retrieveNotificationListMutex_;
-    std::condition_variable retrieveNotificationListCv_;
+    ffrt::mutex retrieveNotificationListMutex_;
+    ffrt::condition_variable retrieveNotificationListCv_;
     bool isRetrieveNotificationListReady_ = false;
 
-    std::mutex retrieveNotificationMutex_;
-    std::condition_variable retrieveNotificationCv_;
+    ffrt::mutex retrieveNotificationMutex_;
+    ffrt::condition_variable retrieveNotificationCv_;
     bool isRetrieveNotificationReady_ = false;
 
-    std::mutex removeNotificationMutex_;
-    std::condition_variable removeNotificationCv_;
+    ffrt::mutex removeNotificationMutex_;
+    ffrt::condition_variable removeNotificationCv_;
     bool isRemoveNotificationReady_ = false;
 
-    std::mutex deleteProfileMutex_;
-    std::condition_variable deleteProfileCv_;
+    ffrt::mutex deleteProfileMutex_;
+    ffrt::condition_variable deleteProfileCv_;
     bool isDeleteProfileReady_ = false;
 
-    std::mutex switchToProfileMutex_;
-    std::condition_variable switchToProfileCv_;
+    ffrt::mutex switchToProfileMutex_;
+    ffrt::condition_variable switchToProfileCv_;
     bool isSwitchToProfileReady_ = false;
 
-    std::mutex setNicknameMutex_;
-    std::condition_variable setNicknameCv_;
+    ffrt::mutex setNicknameMutex_;
+    ffrt::condition_variable setNicknameCv_;
     bool isSetNicknameReady_ = false;
 
-    std::mutex euiccInfo2Mutex_;
-    std::condition_variable euiccInfo2Cv_;
+    ffrt::mutex euiccInfo2Mutex_;
+    ffrt::condition_variable euiccInfo2Cv_;
     bool isEuiccInfo2Ready_ = false;
 
-    std::mutex authenticateServerMutex_;
-    std::condition_variable authenticateServerCv_;
+    ffrt::mutex authenticateServerMutex_;
+    ffrt::condition_variable authenticateServerCv_;
     bool isAuthenticateServerReady_ = false;
 
-    std::mutex getContractInfoMutex_;
-    std::condition_variable getContractInfoCv_;
+    ffrt::mutex getContractInfoMutex_;
+    ffrt::condition_variable getContractInfoCv_;
     bool isGetContractInfoReady_ = false;
 
-    std::mutex currentChannelIdOccupiedMutex_;
+    ffrt::mutex currentChannelIdOccupiedMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 void SignalInfo::Reset()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cache_.Init();
     cur_.Init();
 }
@@ -36,7 +36,7 @@ void SignalInfo::InitSignalBar(const int32_t bar) const
 
 bool SignalInfo::ProcessGsm(const GsmRssi &gsmSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.gsm.SetValue(gsmSignal.rxlev, gsmSignal.ber);
     bool ret = (cur_.gsm == cache_.gsm);
     cache_.gsm = cur_.gsm;
@@ -45,7 +45,7 @@ bool SignalInfo::ProcessGsm(const GsmRssi &gsmSignal)
 
 bool SignalInfo::ProcessCdma(const CdmaRssi &cdmaSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.cdma.SetValue(cdmaSignal.absoluteRssi, cdmaSignal.ecno);
     bool ret = (cur_.cdma == cache_.cdma);
     cache_.cdma = cur_.cdma;
@@ -54,7 +54,7 @@ bool SignalInfo::ProcessCdma(const CdmaRssi &cdmaSignal)
 
 bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.lte.SetValue(lteSignal.rxlev, lteSignal.rsrp, lteSignal.rsrq, lteSignal.snr);
     bool ret = (cur_.lte == cache_.lte);
     cache_.lte = cur_.lte;
@@ -63,7 +63,7 @@ bool SignalInfo::ProcessLte(const LteRssi &lteSignal)
 
 bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.wcdma.SetValue(wcdmaSignal.rxlev, wcdmaSignal.rscp, wcdmaSignal.ecio, wcdmaSignal.ber);
     bool ret = (cur_.wcdma == cache_.wcdma);
     cache_.wcdma = cur_.wcdma;
@@ -72,7 +72,7 @@ bool SignalInfo::ProcessWcdma(const WCdmaRssi &wcdmaSignal)
 
 bool SignalInfo::ProcessTdScdma(const TdScdmaRssi &tdScdmaSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.tdScdma.SetValue(tdScdmaSignal.rscp);
     bool ret = (cur_.tdScdma == cache_.tdScdma);
     cache_.tdScdma = cur_.tdScdma;
@@ -81,7 +81,7 @@ bool SignalInfo::ProcessTdScdma(const TdScdmaRssi &tdScdmaSignal)
 
 bool SignalInfo::ProcessNr(const NrRssi &nrSignal)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     cur_.nr.SetValue(nrSignal.rsrp, nrSignal.rsrq, nrSignal.sinr);
     bool ret = (cur_.nr == cache_.nr);
     cache_.nr = cur_.nr;
@@ -162,7 +162,7 @@ void SignalInfo::ProcessSignalIntensity(int32_t slotId, const Rssi *signalIntens
 
 void SignalInfo::GetSignalInfoList(std::vector<sptr<SignalInformation>> &signals)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     bool gsmValid = cur_.gsm.ValidateGsmValue();
     bool cdmaValid = cur_.cdma.ValidateCdmaValue();
     bool lteValid = cur_.lte.ValidateLteValue();

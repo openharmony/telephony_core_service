@@ -28,7 +28,7 @@ NrSsbInfo::NrSsbInfo(std::weak_ptr<NetworkSearchManager> networkSearchManager, i
 
 bool NrSsbInfo::FillNrSsbIdInformation(const std::shared_ptr<NrSsbInformation> &nrCellSsbIdsInfo)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (nrCellSsbIdsInfo == nullptr) {
         TELEPHONY_LOGE("nrCellSsbIdsInfo is null");
         return false;
@@ -42,7 +42,7 @@ bool NrSsbInfo::FillNrSsbIdInformation(const std::shared_ptr<NrSsbInformation> &
 
 bool NrSsbInfo::ProcessGetNrSsbId(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (event == nullptr) {
         TELEPHONY_LOGE("Event is nullptr");
         return false;

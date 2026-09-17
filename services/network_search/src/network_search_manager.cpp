@@ -1339,7 +1339,7 @@ void NetworkSearchManager::SetFrequencyType(int32_t slotId, FrequencyType type)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
+        std::unique_lock<ffrt::mutex> lock(inner->mutex_);
         inner->freqType_ = type;
     }
 }
@@ -1348,7 +1348,7 @@ FrequencyType NetworkSearchManager::GetFrequencyType(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
+        std::unique_lock<ffrt::mutex> lock(inner->mutex_);
         return inner->freqType_;
     }
     return FrequencyType::FREQ_TYPE_UNKNOWN;
@@ -1437,7 +1437,7 @@ bool NetworkSearchManager::IsRadioFirstPowerOn(int32_t slotId)
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
+        std::unique_lock<ffrt::mutex> lock(inner->mutex_);
         return inner->isRadioFirstPowerOn_;
     }
     return false;
@@ -1447,7 +1447,7 @@ void NetworkSearchManager::SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowe
 {
     auto inner = FindManagerInner(slotId);
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(inner->mutex_);
+        std::unique_lock<ffrt::mutex> lock(inner->mutex_);
         inner->isRadioFirstPowerOn_ = isFirstPowerOn;
     }
 }
@@ -1455,7 +1455,7 @@ void NetworkSearchManager::SetRadioFirstPowerOn(int32_t slotId, bool isFirstPowe
 std::shared_ptr<NetworkSearchManagerInner> NetworkSearchManager::FindManagerInner(int32_t slotId)
 {
     {
-        std::lock_guard<std::mutex> lock(mutexInner_);
+        std::unique_lock<ffrt::mutex> lock(mutexInner_);
         auto iter = mapManagerInner_.find(slotId);
         if (iter != mapManagerInner_.end()) {
             return iter->second;
@@ -1470,18 +1470,18 @@ void NetworkSearchManager::ClearManagerInner()
     for (int32_t slotId = 0; slotId < static_cast<int32_t>(mapManagerInner_.size()); slotId++) {
         auto inner = FindManagerInner(slotId);
         if (inner != nullptr) {
-            std::lock_guard<std::mutex> lock(inner->mutex_);
+            std::unique_lock<ffrt::mutex> lock(inner->mutex_);
             inner->networkSearchHandler_->UnregisterEvents();
         }
     }
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::unique_lock<ffrt::mutex> lock(mutexInner_);
     mapManagerInner_.clear();
 }
 
 void NetworkSearchManager::AddManagerInner(int32_t slotId, const std::shared_ptr<NetworkSearchManagerInner> &inner)
 {
     if (inner != nullptr) {
-        std::lock_guard<std::mutex> lock(mutexInner_);
+        std::unique_lock<ffrt::mutex> lock(mutexInner_);
         mapManagerInner_.emplace(slotId, inner);
         TELEPHONY_LOGE("NetworkSearchManager::AddManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
     }
@@ -1489,7 +1489,7 @@ void NetworkSearchManager::AddManagerInner(int32_t slotId, const std::shared_ptr
 
 bool NetworkSearchManager::RemoveManagerInner(int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::unique_lock<ffrt::mutex> lock(mutexInner_);
     bool ret = (mapManagerInner_.erase(slotId) != 0);
     TELEPHONY_LOGE("NetworkSearchManager::RemoveManagerInner %{public}d %{public}zu", slotId, mapManagerInner_.size());
     return ret;
@@ -1554,7 +1554,7 @@ int32_t NetworkSearchManager::RegisterImsRegInfoCallback(
         TELEPHONY_LOGE("[slot%{public}d] callback is nullptr", slotId);
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutexIms_);
+    std::unique_lock<ffrt::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
     for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
@@ -1579,7 +1579,7 @@ int32_t NetworkSearchManager::UnregisterImsRegInfoCallback(
     int32_t slotId, ImsServiceType imsSrvType, const int32_t tokenId)
 {
     bool isSuccess = false;
-    std::lock_guard<std::mutex> lock(mutexIms_);
+    std::unique_lock<ffrt::mutex> lock(mutexIms_);
     auto iter = listImsRegInfoCallbackRecord_.begin();
     for (; iter != listImsRegInfoCallbackRecord_.end(); ++iter) {
         if ((iter->slotId == slotId) && (iter->imsSrvType == imsSrvType) && (iter->tokenId == tokenId)) {
@@ -1602,7 +1602,7 @@ void NetworkSearchManager::NotifyImsRegInfoChanged(int32_t slotId, ImsServiceTyp
     TELEPHONY_LOGI("slotId:%{public}d, imsSrvType:%{public}d, ImsRegState:%{public}d, ImsRegTech:%{public}d",
         slotId, imsSrvType, info.imsRegState, info.imsRegTech);
     int32_t callbackCounts = 0;
-    std::lock_guard<std::mutex> lock(mutexIms_);
+    std::unique_lock<ffrt::mutex> lock(mutexIms_);
     for (auto iter : listImsRegInfoCallbackRecord_) {
         if ((iter.slotId == slotId) && (iter.imsSrvType == imsSrvType)) {
             if (iter.imsCallback == nullptr) {
@@ -1779,12 +1779,12 @@ int32_t NetworkSearchManager::GetNrSsbId(int32_t slotId, const std::shared_ptr<N
         TELEPHONY_LOGE("inner is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     ssbResponseReady_ = false;
     eventSender_->SendBase(slotId, RadioEvent::RADIO_GET_NR_SSBID_INFO);
     while (!ssbResponseReady_) {
         TELEPHONY_LOGD("Wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(GET_SSB_WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(GET_SSB_WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
