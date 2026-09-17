@@ -117,13 +117,13 @@ void IccFile::SetVoiceMailByOperator(std::string spn)
         return;
     }
     if (voiceMailConfig_->ContainsCarrier(spn)) {
-        std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+        std::unique_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
         isVoiceMailFixed_ = voiceMailConfig_->GetVoiceMailFixed(spn);
         voiceMailNum_ = voiceMailConfig_->GetVoiceMailNumber(spn);
         voiceMailTag_ = voiceMailConfig_->GetVoiceMailTag(spn);
     } else {
         TELEPHONY_LOGI("IccFile::SetVoiceMailByOperator, ContainsCarrier fail.");
-        std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+        std::unique_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
         isVoiceMailFixed_ = false;
     }
 }
@@ -790,7 +790,7 @@ bool IccFile::HasSimCard()
 
 void IccFile::ResetVoiceMailVariable()
 {
-    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
     isVoiceMailFixed_ = false;
     voiceMailNum_ = "";
     voiceMailTag_ = "";

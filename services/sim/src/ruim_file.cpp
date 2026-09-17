@@ -443,13 +443,13 @@ bool RuimFile::SetVoiceCallForwarding(bool enable, const std::string &number)
 
 std::string RuimFile::GetVoiceMailNumber()
 {
-    std::shared_lock<std::shared_mutex> lock(voiceMailMutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
     return voiceMailNum_;
 }
 
 void RuimFile::SetVoiceMailNumber(const std::string mailNumber)
 {
-    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
     voiceMailNum_ = mailNumber;
 }
 

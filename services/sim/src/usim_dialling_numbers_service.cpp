@@ -25,7 +25,7 @@ const std::u16string NUMBER_SPLIT = u";";
 constexpr uint8_t INVALID_SIM_BYTE_VALUE = 0xff;
 constexpr int MAX_RETRANSMIT_COUNT = 1;
 
-std::mutex UsimDiallingNumbersService::mtx_;
+ffrt::mutex UsimDiallingNumbersService::mtx_;
 
 UsimDiallingNumbersService::UsimDiallingNumbersService() : TelEventHandler("UsimDiallingNumbersService")
 {
@@ -272,7 +272,7 @@ void UsimDiallingNumbersService::ProcessIapLoadDone(const AppExecFwk::InnerEvent
 void UsimDiallingNumbersService::ObtainUsimElementaryFiles(const AppExecFwk::InnerEvent::Pointer &pointer)
 {
     {
-        std::unique_lock<std::mutex> lock(mtx_);
+        std::unique_lock<ffrt::mutex> lock(mtx_);
         callers_.push_back(std::move(const_cast<AppExecFwk::InnerEvent::Pointer &>(pointer)));
     }
     LoadPbrFiles();
@@ -280,7 +280,7 @@ void UsimDiallingNumbersService::ObtainUsimElementaryFiles(const AppExecFwk::Inn
 
 void UsimDiallingNumbersService::LoadPbrFiles()
 {
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (isProcessingPbr) {
         return;
     }
@@ -303,7 +303,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
     }
 
     TELEPHONY_LOGI("usimservice load adn recId: %{public}zu", recId);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     std::map<int, std::shared_ptr<TagData>> files = pbrFiles_.at(recId)->fileIds_;
     if (files.find(TAG_SIM_USIM_EXT1) == files.end() || files.find(TAG_SIM_USIM_ADN) == files.end()) {
         TELEPHONY_LOGE("pbr tag data is incomplete at index: %{public}zu", recId);
@@ -336,7 +336,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumberFiles(size_t recId)
 
 bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
 {
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGE("load number anr files error: recId over");
         NextStep(MSG_USIM_ANR_LOAD_DONE);
@@ -368,7 +368,7 @@ bool UsimDiallingNumbersService::LoadDiallingNumber2Files(size_t recId)
 
 bool UsimDiallingNumbersService::LoadIapFiles(size_t recId)
 {
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (recId >= pbrFiles_.size()) {
         TELEPHONY_LOGE("load number iap files error: recId over");
         NextStep(MSG_USIM_IAP_LOAD_DONE);
@@ -614,7 +614,7 @@ void UsimDiallingNumbersService::MergeNumber(std::shared_ptr<DiallingNumbersInfo
 void UsimDiallingNumbersService::SendBackResult(
     const std::shared_ptr<std::vector<std::shared_ptr<DiallingNumbersInfo>>> &diallingnumbers)
 {
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     adns_.clear();
     anrs_.clear();
     iaps_.clear();

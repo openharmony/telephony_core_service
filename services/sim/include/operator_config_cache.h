@@ -79,7 +79,7 @@ private:
     std::string modemSimMatchedOpNameCache_ = "";
     std::string iccidCache_ = "";
     bool isLoadingConfig_ = false;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     bool isUpdateImsCapFromChipDone_ = false;
     int32_t retryBatchInsertApnTimes_ = 0;
     std::shared_ptr<AppExecFwk::EventHandler> batchInsertApnRetryHandler_ = nullptr;

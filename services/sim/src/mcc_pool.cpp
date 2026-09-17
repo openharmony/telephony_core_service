@@ -20,7 +20,7 @@ using namespace std;
 
 namespace OHOS {
 namespace Telephony {
-std::mutex MccPool::mccMutex_;
+ffrt::mutex MccPool::mccMutex_;
 std::vector<MccPool::MccAccessData> MccPool::mccAccessDataTable_;
 std::vector<std::string> MccPool::specialMccMnc_;
 std::vector<std::string> MccPool::indiaMccMnc_;
@@ -252,7 +252,7 @@ constexpr const char MCC_ISO_FK[] = "fk";
 
 std::shared_ptr<MccAccess> MccPool::AccessToMcc(int mcc)
 {
-    std::lock_guard<std::mutex> lock(mccMutex_);
+    std::unique_lock<ffrt::mutex> lock(mccMutex_);
     InitMccTables();
     auto it = std::find_if(mccAccessDataTable_.begin(), mccAccessDataTable_.end(),
         [mcc](const auto &p) { return p.mcc == mcc; });
@@ -584,7 +584,7 @@ bool MccPool::CompareMcc(const MccAccessData &mccAccessDataA, const MccAccessDat
 
 bool MccPool::LengthIsTwoMnc(const std::string &mccMncCode)
 {
-    std::lock_guard<std::mutex> lock(mccMutex_);
+    std::unique_lock<ffrt::mutex> lock(mccMutex_);
     InitIndiaTables();
     std::vector<std::string>::iterator obj = std::find(indiaMccMnc_.begin(), indiaMccMnc_.end(), mccMncCode);
     return (obj == indiaMccMnc_.end()) ? false : true;
@@ -613,7 +613,7 @@ void MccPool::InitIndiaTables()
 
 bool MccPool::LengthIsThreeMnc(const std::string &mccMncCode)
 {
-    std::lock_guard<std::mutex> lock(mccMutex_);
+    std::unique_lock<ffrt::mutex> lock(mccMutex_);
     InitSpecialMccMncTables();
     std::vector<std::string>::iterator obj = std::find(specialMccMnc_.begin(), specialMccMnc_.end(), mccMncCode);
     return (obj == specialMccMnc_.end()) ? false : true;

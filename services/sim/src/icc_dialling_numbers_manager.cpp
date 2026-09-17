@@ -182,7 +182,7 @@ int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     QueryIccDiallingNumbersPreLoad(type);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (diallingNumber == nullptr || diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -200,7 +200,7 @@ int32_t IccDiallingNumbersManager::UpdateIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, false, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("UpdateIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_THREE_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_THREE_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -212,7 +212,7 @@ int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     QueryIccDiallingNumbersPreLoad(type);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (diallingNumber == nullptr || diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -230,7 +230,7 @@ int32_t IccDiallingNumbersManager::DelIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, index, true, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("DelIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -242,7 +242,7 @@ int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
     int type, const std::shared_ptr<DiallingNumbersInfo> &diallingNumber)
 {
     QueryIccDiallingNumbersPreLoad(type);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     TELEPHONY_LOGI("AddIccDiallingNumbers start:%{public}d", type);
     if (diallingNumber == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -269,8 +269,8 @@ int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
 
 int32_t IccDiallingNumbersManager::QueryIccDiallingNumbersPreLoad(int type)
 {
-    std::unique_lock<std::mutex> queryLock(queryMtx_);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> queryLock(queryMtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -301,8 +301,8 @@ int32_t IccDiallingNumbersManager::QueryIccDiallingNumbersPreLoad(int type)
 int32_t IccDiallingNumbersManager::QueryIccDiallingNumbers(
     int type, std::vector<std::shared_ptr<DiallingNumbersInfo>> &result)
 {
-    std::unique_lock<std::mutex> queryLock(queryMtx_);
-    std::unique_lock<std::mutex> lock(mtx_);
+    std::unique_lock<ffrt::mutex> queryLock(queryMtx_);
+    std::unique_lock<ffrt::mutex> lock(mtx_);
     if (diallingNumbersCache_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }

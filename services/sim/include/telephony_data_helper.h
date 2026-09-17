@@ -16,7 +16,7 @@
 #ifndef OHOS_TELEPHONY_DATA_HELPER_H
 #define OHOS_TELEPHONY_DATA_HELPER_H
 
-#include <mutex>
+#include <ffrt.h>
 #include <singleton.h>
 #include "datashare_helper.h"
 #include "iservice_registry.h"
@@ -49,7 +49,7 @@ public:
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataHelper(const std::string &strUri, const std::string &extUri,
         const int waitTime = 2);
-    std::mutex lock_;
+    ffrt::mutex lock_;
     bool isOpkeyDbError_ = false;
 };
 }  // namespace Telephony

@@ -16,6 +16,7 @@
 #ifndef OHOS_USIM_DIALLING_NUMBERS_SERVICE_H
 #define OHOS_USIM_DIALLING_NUMBERS_SERVICE_H
 
+#include "ffrt.h"
 #include "icc_dialling_numbers_handler.h"
 #include "icc_file_controller.h"
 #include "sim_constant.h"
@@ -89,7 +90,7 @@ private:
     AppExecFwk::InnerEvent::Pointer BuildCallerInfo(int eventId);
     AppExecFwk::InnerEvent::Pointer CreateHandlerPointer(
         int eventid, int efId, int index, std::shared_ptr<void> pobj);
-    static std::mutex mtx_;
+    static ffrt::mutex mtx_;
     void ProcessPbrLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumberLoadDone(const AppExecFwk::InnerEvent::Pointer &event);
     void ProcessDiallingNumber2LoadDone(const AppExecFwk::InnerEvent::Pointer &event);

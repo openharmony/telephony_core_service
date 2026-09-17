@@ -18,7 +18,6 @@
 
 #include <condition_variable>
 #include <ffrt.h>
-#include <mutex>
 
 #include "i_tel_ril_manager.h"
 #include "sim_constant.h"
