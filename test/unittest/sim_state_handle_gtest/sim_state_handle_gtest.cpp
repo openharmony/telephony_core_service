@@ -281,7 +281,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_011, Function | MediumTest
     simFile_->fileController_ = std::make_shared<UsimFileController>(0);
     simFile_->serviceTable_ = "";
     EXPECT_FALSE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
-    simFile_->serviceTable_ = "867F1F1C234E0000400050";
+    simFile_->serviceTable_ = "867F1F1C234E0000400051";
     EXPECT_TRUE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
     simFile_->serviceTable_ = "00000000000000000000";
     EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_SPN));
