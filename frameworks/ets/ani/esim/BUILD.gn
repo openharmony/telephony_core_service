@@ -81,6 +81,7 @@ ohos_static_library("esim_ani_cxx") {
     "ffrt:libffrt",
     "rust_cxx:cxx_cppdeps",
     "node:node_header_notice",
+    "samgr:samgr_proxy",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"
