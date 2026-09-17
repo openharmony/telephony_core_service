@@ -46,24 +46,33 @@ int32_t VCardPostalData::BuildData(std::shared_ptr<DataShare::DataShareResultSet
         return TELEPHONY_ERROR;
     }
     int32_t index;
-    resultSet->GetColumnIndex(ContactData::POBOX, index);
-    resultSet->GetString(index, pobox_);
-    resultSet->GetColumnIndex(ContactData::POSTCODE, index);
-    resultSet->GetString(index, postCode_);
-    resultSet->GetColumnIndex(ContactData::REGION, index);
-    resultSet->GetString(index, region_);
-    resultSet->GetColumnIndex(ContactData::STREET, index);
-    resultSet->GetString(index, street_);
-    resultSet->GetColumnIndex(ContactData::COUNTRY, index);
-    resultSet->GetString(index, country_);
-    resultSet->GetColumnIndex(ContactData::CITY, index);
-    resultSet->GetString(index, city_);
-    resultSet->GetColumnIndex(ContactData::LABEL_ID, index);
-    resultSet->GetString(index, labelId_);
-    resultSet->GetColumnIndex(ContactData::LABEL_NAME, index);
-    resultSet->GetString(index, labelName_);
-    resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index);
-    resultSet->GetString(index, postalAddress_);
+    if (resultSet->GetColumnIndex(ContactData::POBOX, index) == DataShare::E_OK) {
+        resultSet->GetString(index, pobox_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::POSTCODE, index) == DataShare::E_OK) {
+        resultSet->GetString(index, postCode_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::REGION, index) == DataShare::E_OK) {
+        resultSet->GetString(index, region_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::STREET, index) == DataShare::E_OK) {
+        resultSet->GetString(index, street_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::COUNTRY, index) == DataShare::E_OK) {
+        resultSet->GetString(index, country_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::CITY, index) == DataShare::E_OK) {
+        resultSet->GetString(index, city_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_ID, index) == DataShare::E_OK) {
+        resultSet->GetString(index, labelId_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::LABEL_NAME, index) == DataShare::E_OK) {
+        resultSet->GetString(index, labelName_);
+    }
+    if (resultSet->GetColumnIndex(ContactData::DETAIL_INFO, index) == DataShare::E_OK) {
+        resultSet->GetString(index, postalAddress_);
+    }
     return TELEPHONY_SUCCESS;
 }
 

@@ -2066,6 +2066,10 @@ HWTEST_F(BranchTest, Telephony_SimRdbHelper_001, Function | MediumTest | Level1)
 {
     TELEPHONY_LOGI("Telephony_SimRdbHelper_001");
     auto simRdbHelper = std::make_shared<SimRdbHelper>();
+    OHOS::system::SetParameter("persist.telephony.tsts_mode", "1");
+    EXPECT_NE(simRdbHelper->ForgetAllData(), TELEPHONY_ERR_ESIM_GET_RESULT_TIMEOUT);
+    OHOS::system::SetParameter("persist.telephony.tsts_mode", "0");
+    EXPECT_NE(simRdbHelper->ForgetAllData(), TELEPHONY_ERR_ARRAY_OUT_OF_BOUNDS);
     SimRdbInfo simBean;
     std::string iccId = "";
     std::vector<SimRdbInfo> vec;
@@ -2339,6 +2343,16 @@ HWTEST_F(BranchTest, Telephony_MultiSimMonitor_006, Function | MediumTest | Leve
     multiSimMonitor->isDataShareReady_ = false;
     multiSimMonitor->OnUserSwitched(userId);
     EXPECT_EQ(multiSimMonitor->lastUserId_, 0);
+    multiSimMonitor->initRebootDetectRemainCount_[0] = 1;
+    multiSimMonitor->hasCheckedSimPresent_[0] = true;
+    multiSimMonitor->hasCheckedSimPresent_[1] = true;
+    OHOS::system::SetParameter("persist.ril.reboot_detect_sim0", "0");
+    TELEPHONY_EXT_WRAPPER.notifyRebootDetectSim_ = nullptr;
+    multiSimMonitor->tstsMode_ = 1;
+    multiSimMonitor->CheckSimPresentWhenReboot();
+    multiSimMonitor->tstsMode_ = 0;
+    multiSimMonitor->CheckSimPresentWhenReboot();
+    EXPECT_TRUE(multiSimMonitor->hasCheckedSimPresent_[0]);
 }
 
 /**

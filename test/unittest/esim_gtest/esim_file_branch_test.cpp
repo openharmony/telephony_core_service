@@ -270,7 +270,7 @@ HWTEST_F(EsimfileBranchTest, BuildBasicProfileInfo_001, Function | MediumTest | 
     std::shared_ptr<MockAsn1Node> mockAsn1Node = std::make_shared<MockAsn1Node>();
     std::shared_ptr<Asn1Node> asn1Node = mockAsn1Node;
     EuiccProfileInfo *eProfileInfo = new (std::nothrow)EuiccProfileInfo();
-    EXPECT_CALL(*mockAsn1Node, Asn1HasChild(_)).Times(11).WillOnce(Return(true)).WillOnce(Return(true))
+    EXPECT_CALL(*mockAsn1Node, Asn1HasChild(_)).Times(12).WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true)).WillOnce(Return(true)).WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true)).WillOnce(Return(true)).WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true));
@@ -395,7 +395,7 @@ HWTEST_F(EsimfileBranchTest, BuildAdvancedProfileInfo_001, Function | MediumTest
     std::shared_ptr<Asn1Node> asn1Node = std::make_shared<Asn1Node>();
     EuiccProfileInfo *eProfileInfo = new (std::nothrow)EuiccProfileInfo();
     EXPECT_CALL(*mockAsn1Node, Asn1HasChild(_))
-        .Times(4)
+        .Times(5)
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true))

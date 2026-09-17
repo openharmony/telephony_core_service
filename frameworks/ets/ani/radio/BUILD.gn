@@ -76,6 +76,7 @@ ohos_static_library("telephony_radio_ani_cxx") {
     "napi:ace_napi",
     "ffrt:libffrt",
     "rust_cxx:cxx_cppdeps",
+    "node:node_header_notice",
   ]
 
   defines = [

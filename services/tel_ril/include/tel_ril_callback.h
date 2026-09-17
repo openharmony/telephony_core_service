@@ -19,6 +19,7 @@
 #include <v1_5/iril.h>
 
 #include "tel_ril_manager.h"
+#include "tel_ril_utils.h"
 
 namespace OHOS {
 namespace Telephony {

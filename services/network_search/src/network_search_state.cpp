@@ -54,7 +54,7 @@ bool NetworkSearchState::Init()
 void NetworkSearchState::SetOperatorInfo(
     const std::string &longName, const std::string &shortName, const std::string &numeric, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetOperatorInfo(longName, shortName, numeric, domainType);
         TELEPHONY_LOGD("NetworkSearchState::SetOperatorInfo longName : %{public}s, shortName : %{public}s, numeric : "
@@ -66,7 +66,7 @@ void NetworkSearchState::SetOperatorInfo(
 
 void NetworkSearchState::SetEmergency(bool isEmergency)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetEmergency(isEmergency);
     }
@@ -74,7 +74,7 @@ void NetworkSearchState::SetEmergency(bool isEmergency)
 
 bool NetworkSearchState::IsEmergency()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         return networkState_->IsEmergency();
     }
@@ -83,7 +83,7 @@ bool NetworkSearchState::IsEmergency()
 
 void NetworkSearchState::SetNetworkType(RadioTech tech, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetNetworkType(tech, domainType);
     }
@@ -91,7 +91,7 @@ void NetworkSearchState::SetNetworkType(RadioTech tech, DomainType domainType)
 
 void NetworkSearchState::SetNetworkTypeV2(RadioTech tech, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetNetworkTypeV2(tech, domainType);
     }
@@ -99,7 +99,7 @@ void NetworkSearchState::SetNetworkTypeV2(RadioTech tech, DomainType domainType)
 
 void NetworkSearchState::SetNetworkState(RegServiceState state, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetNetworkState(state, domainType);
     }
@@ -107,7 +107,7 @@ void NetworkSearchState::SetNetworkState(RegServiceState state, DomainType domai
 
 void NetworkSearchState::SetNetworkStateToRoaming(RoamingType roamingType, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetRoaming(roamingType, domainType);
     }
@@ -115,7 +115,7 @@ void NetworkSearchState::SetNetworkStateToRoaming(RoamingType roamingType, Domai
 
 int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &info)
 {
-    std::lock_guard<std::mutex> lock(imsMutex_);
+    std::lock_guard<ffrt::mutex> lock(imsMutex_);
     if (imsServiceStatus_ == nullptr) {
         TELEPHONY_LOGE("imsServiceStatus_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -145,7 +145,7 @@ int32_t NetworkSearchState::GetImsStatus(ImsServiceType imsSrvType, ImsRegInfo &
 
 void NetworkSearchState::SetImsStatus(bool imsRegStatus)
 {
-    std::lock_guard<std::mutex> lock(imsMutex_);
+    std::lock_guard<ffrt::mutex> lock(imsMutex_);
     bool imsRegStateChanged = imsRegStatus_ != imsRegStatus;
     if (!imsRegStateChanged) {
         return;
@@ -179,7 +179,7 @@ void NetworkSearchState::SetImsStatus(bool imsRegStatus)
 
 void NetworkSearchState::SetImsServiceStatus(const ImsServiceStatus &imsServiceStatus)
 {
-    std::lock_guard<std::mutex> lock(imsMutex_);
+    std::lock_guard<ffrt::mutex> lock(imsMutex_);
     bool voiceChanged = imsServiceStatus_->supportImsVoice != imsServiceStatus.supportImsVoice;
     bool videoChanged = imsServiceStatus_->supportImsVideo != imsServiceStatus.supportImsVideo;
     bool utChanged = imsServiceStatus_->supportImsUt != imsServiceStatus.supportImsUt;
@@ -244,7 +244,7 @@ std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
         TELEPHONY_LOGE("GetNetworkStatus networkState_ is null slotId:%{public}d", slotId_);
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     MessageParcel data;
     networkState_->Marshalling(data);
     std::unique_ptr<NetworkState> networkState = std::make_unique<NetworkState>();
@@ -259,7 +259,7 @@ std::unique_ptr<NetworkState> NetworkSearchState::GetNetworkStatus()
 void NetworkSearchState::SetInitial()
 {
     TELEPHONY_LOGI("NetworkSearchState::SetInitial slotId:%{public}d", slotId_);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->Init();
     }
@@ -267,7 +267,7 @@ void NetworkSearchState::SetInitial()
 
 int32_t NetworkSearchState::GetLastCfgTech(RadioTech &tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -278,7 +278,7 @@ int32_t NetworkSearchState::GetLastCfgTech(RadioTech &tech)
 
 int32_t NetworkSearchState::GetLastPsRadioTech(RadioTech &tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -289,7 +289,7 @@ int32_t NetworkSearchState::GetLastPsRadioTech(RadioTech &tech)
 
 int32_t NetworkSearchState::GetLastCfgTechV2(RadioTech &tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -300,7 +300,7 @@ int32_t NetworkSearchState::GetLastCfgTechV2(RadioTech &tech)
 
 int32_t NetworkSearchState::GetLastPsRadioTechV2(RadioTech &tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("networkState_ is null, slotId:%{public}d", slotId_);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -311,7 +311,7 @@ int32_t NetworkSearchState::GetLastPsRadioTechV2(RadioTech &tech)
 
 void NetworkSearchState::SetCfgTech(RadioTech tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetCfgTech(tech);
     }
@@ -319,7 +319,7 @@ void NetworkSearchState::SetCfgTech(RadioTech tech)
 
 void NetworkSearchState::SetCfgTechV2(RadioTech tech)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetCfgTechV2(tech);
     }
@@ -327,7 +327,7 @@ void NetworkSearchState::SetCfgTechV2(RadioTech tech)
 
 void NetworkSearchState::SetNrState(NrState state)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         TELEPHONY_LOGD("nrState_:%{public}d slotId:%{public}d", state, slotId_);
         networkState_->SetNrState(state);
@@ -336,7 +336,7 @@ void NetworkSearchState::SetNrState(NrState state)
 
 void NetworkSearchState::NotifyPsRegStatusChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NotifyPsRegStatusChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -368,7 +368,7 @@ std::string& NetworkSearchState::GetRoamingString()
 
 void NetworkSearchState::NotifyPsRoamingStatusChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NotifyPsRoamingStatusChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -400,7 +400,7 @@ void NetworkSearchState::NotifyPsRoamingStatusChange()
 
 void NetworkSearchState::NotifyPsRadioTechChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -420,7 +420,7 @@ void NetworkSearchState::NotifyPsRadioTechChange()
 
 void NetworkSearchState::NotifyEmergencyChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NotifyEmergencyChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -441,7 +441,7 @@ void NetworkSearchState::NotifyEmergencyChange()
 
 void NetworkSearchState::NotifyNrStateChange()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("NotifyPsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -459,7 +459,7 @@ void NetworkSearchState::NotifyNrStateChange()
 
 void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const ImsRegInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("networkSearchManager is null slotId:%{public}d", slotId_);
@@ -474,7 +474,7 @@ void NetworkSearchState::NotifyImsStateChange(ImsServiceType imsSrvType, const I
 
 void NetworkSearchState::NotifyStateChange()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     HILOG_COMM_INFO("NetworkSearchState::NotifyStateChange slotId:%{public}d", slotId_);
     if (networkState_ == nullptr) {
         TELEPHONY_LOGE("NotifyStateChange networkState_ is null slotId:%{public}d", slotId_);
@@ -531,7 +531,7 @@ void NetworkSearchState::NotifyStateChange()
 void NetworkSearchState::CsRadioTechChange()
 {
     TELEPHONY_LOGI("NetworkSearchState::CsRadioTechChange slotId:%{public}d", slotId_);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     auto networkSearchManager = networkSearchManager_.lock();
     if (networkSearchManager == nullptr) {
         TELEPHONY_LOGE("CsRadioTechChange NetworkSearchManager is null slotId:%{public}d", slotId_);
@@ -553,7 +553,7 @@ void NetworkSearchState::CsRadioTechChange()
 
 void NetworkSearchState::SetLongOperatorName(const std::string &longName, DomainType domainType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (networkState_ != nullptr) {
         networkState_->SetLongOperatorName(longName, domainType);
         TELEPHONY_LOGD("NetworkSearchState::SetLongOperatorName longName : %{public}s", longName.c_str());

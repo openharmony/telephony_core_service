@@ -71,6 +71,7 @@ public:
     void UpdateSimStateToStateRegistry();
     int32_t SetInitPrimarySlotReady(bool isReady);
     int32_t GetInitPrimarySlotReady(bool& isReady);
+    void SetSpecifiedIccidBySlotId(std::string &iccid);
     inline void RemoveMatchSimTimeoutTimer()
     {
         if (simStateHandle_ != nullptr) {
@@ -107,7 +108,7 @@ private:
     std::shared_ptr<SimStateHandle> simStateHandle_ = nullptr;
     std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     SimHandleRun simStateRun_ = STATE_NOT_START;
-    static std::mutex mtx_;
+    static ffrt::mutex mtx_;
 };
 } // namespace Telephony
 } // namespace OHOS

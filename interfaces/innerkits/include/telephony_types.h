@@ -21,6 +21,7 @@
 
 #include "network_search_types.h"
 #include "operator_config_types.h"
+#include "sim_state_type.h"
 #include "parameter.h"
 #include "parameters.h"
 
@@ -46,10 +47,12 @@ const int32_t DSDS_MODE_V3 = 1;
 const size_t MAX_PARAMETER_LENGTH = 100;
 const int32_t DUAL_SLOT_COUNT = 2;
 const int32_t MAX_SLOT_COUNT = 3;
+const int32_t THREE_CARD_COUNT = 3;
 const int32_t VSIM_DEFAULT_VALUE = -1;
 const int32_t ESIM_DEFAULT_SLOTID = -1;
 const int32_t DC_MAX_SLOT_COUNT = 2;
 const int32_t DC_MD_MAX_SLOT_COUNT = 8;
+const int32_t DC_MD_MAX_SLOT_ID = 7;
 std::atomic<int32_t> maxRealSlotCount_ = 0;
 int32_t maxSlotCount_ = 0;
 int32_t esimDefaultSlotId_ = ESIM_DEFAULT_SLOTID;
@@ -79,6 +82,7 @@ constexpr const char *EXIT_STR_TELEPHONY_NOTIFY = "usual.event.TELEPHONY_EXIT_ST
 constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE = "persist.distributedmodem.multidevice.enable";
 constexpr const char *DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT = "false";
 constexpr const char *ENABLE_TRUE = "true";
+constexpr const char *PRODUCT_DEVICE_TYPE = "const.product.devicetype";
 }
 
 template<typename T>
@@ -98,8 +102,17 @@ T GetMaxSlotCount()
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-        maxSlotCount_ = std::atoi(simSlotCount);
-        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
+        char *endptr = nullptr;
+        errno = 0;
+        long val = std::strtol(simSlotCount, &endptr, 10);
+        if (errno != 0 || endptr == simSlotCount || *endptr != '\0' || val < 0 || val > DC_MD_MAX_SLOT_ID + 1) {
+            val = std::atoi(DEFAULT_SLOT_COUNT);
+        }
+        maxSlotCount_ = static_cast<int32_t>(val);
+        char productDeviceType[SYSPARA_SIZE] = { 0 };
+        GetParameter(PRODUCT_DEVICE_TYPE, "", productDeviceType, SYSPARA_SIZE);
+        if ((strcmp(productDeviceType, "2in1") == 0 || strcmp(productDeviceType, "tablet") == 0) &&
+            GetVirtualModemSwitch<bool>() && (maxSlotCount_ < DC_MAX_SLOT_COUNT)) {
             maxSlotCount_ = DC_MAX_SLOT_COUNT;
         }
     }
@@ -109,13 +122,23 @@ T GetMaxSlotCount()
 template<typename T>
 T GetMaxSlotCountMd()
 {
-// LCOV_EXCL_START
     if (maxSlotCount_ == 0) {
         char simSlotCount[SYSPARA_SIZE] = { 0 };
         GetParameter(TEL_SIM_SLOT_COUNT, DEFAULT_SLOT_COUNT, simSlotCount, SYSPARA_SIZE);
-        maxSlotCount_ = std::atoi(simSlotCount);
-        if (GetVirtualModemSwitch<bool>() && (maxSlotCount_ <= DC_MAX_SLOT_COUNT)) {
-            maxSlotCount_ = DC_MAX_SLOT_COUNT;
+        char *endptr = nullptr;
+        errno = 0;
+        long val = std::strtol(simSlotCount, &endptr, 10);
+        if (errno != 0 || endptr == simSlotCount || *endptr != '\0' || val < 0 || val > DC_MD_MAX_SLOT_ID + 1) {
+            val = std::atoi(DEFAULT_SLOT_COUNT);
+        }
+        maxSlotCount_ = static_cast<int32_t>(val);
+        if (GetVirtualModemSwitch<bool>()) {
+            char productDeviceType[SYSPARA_SIZE] = { 0 };
+            GetParameter(PRODUCT_DEVICE_TYPE, "", productDeviceType, SYSPARA_SIZE);
+            if ((strcmp(productDeviceType, "2in1") == 0 || strcmp(productDeviceType, "tablet") == 0) &&
+                maxSlotCount_ <= DC_MAX_SLOT_COUNT) {
+                maxSlotCount_ = DC_MAX_SLOT_COUNT;
+            }
             char multiDeviceEnable[SYSPARA_SIZE] = { 0 };
             GetParameter(DISTRIBUTEMODEM_MULTIDEVICE_ENABLE, DISTRIBUTEMODEM_MULTIDEVICE_ENABLE_DEFAULT,
                 multiDeviceEnable, SYSPARA_SIZE);
@@ -124,7 +147,6 @@ T GetMaxSlotCountMd()
             }
         }
     }
-// LCOV_EXCL_STOP
     return maxSlotCount_;
 }
 

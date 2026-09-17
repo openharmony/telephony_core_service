@@ -17,14 +17,45 @@
 #define MANUAL_NETWORK_SCAN_CALLBACK_H
 
 #include "i_network_search_callback_stub.h"
+#include "network_search_result.h"
+#include "napi_radio.h"
 
 namespace OHOS {
 namespace Telephony {
+
 class ManualNetworkScanCallback : public INetworkSearchCallbackStub {
 public:
+    void SetScanContext(IsManualScanningContext *ctx)
+    {
+        scanCtx_ = ctx;
+    }
+    IsManualScanningContext *GetScanContext() const
+    {
+        return scanCtx_;
+    }
+    bool CreateNapiCbRef(napi_env env, napi_value thisVar, napi_value argv[]);
+    void OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode) override;
     void OnStartManualNetworkScanCallback(const sptr<NetworkSearchResult> &networkSearchResult,
         const bool isFinish, int32_t slotId) override;
+
+private:
+    static void ReportManualScanInfo(napi_env env, napi_ref thisRef, napi_ref funcRef,
+        const sptr<NetworkSearchResult> &networkSearchResult, bool isFinish);
+    static napi_value CreateCallbackObject(napi_env env);
+    static napi_value CreateSearchResultArray(napi_env env, const sptr<NetworkSearchResult> &networkSearchResult);
+    static napi_status SetCallbackProperties(napi_env env, napi_value callbackValue,
+        napi_value searchResultArray, bool isFinish);
+    static napi_status CallJavaScriptCallback(napi_env env, napi_ref thisRef, napi_ref funcRef,
+        napi_value callbackValue);
+    static void DestroyNapiCbRef(napi_env env, napi_ref thisRef, napi_ref funcRef);
+
+    IsManualScanningContext *scanCtx_ = nullptr;
+    napi_env cbEnv_ = nullptr;
+    napi_ref cbThis_ = nullptr;
+    napi_ref cbFunc_ = nullptr;
 };
+
 } // namespace Telephony
 } // namespace OHOS
+
 #endif // MANUAL_NETWORK_SCAN_CALLBACK_H

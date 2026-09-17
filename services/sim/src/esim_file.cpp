@@ -342,6 +342,11 @@ bool EsimFile::ProcessRequestAllProfiles(int32_t slotId, const AppExecFwk::Inner
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
         euiccProfileTags.push_back(tag);
     }
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    if (isSupportEsimMep) {
+        euiccProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER));
+        euiccProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER));
+    }
     builder->Asn1AddChildAsBytes(TAG_ESIM_TAG_LIST, euiccProfileTags, euiccProfileTags.size());
     ApduSimIORequestInfo requestInfo;
     CommBuildOneApduReqInfo(requestInfo, builder);
@@ -605,9 +610,9 @@ bool EsimFile::RealProcessRequestAllProfilesDone()
     std::list<std::shared_ptr<Asn1Node>> profileNodes;
     profileRoot->Asn1GetChildren(TAG_ESIM_PROFILE_INFO, profileNodes);
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    EuiccProfileInfo euiccProfileInfo = {{0}};
     euiccProfileInfoList_.profiles_.clear();
     for (auto it = profileNodes.begin(); it != profileNodes.end(); ++it) {
+        EuiccProfileInfo euiccProfileInfo = {{0}};
         curNode = *it;
         if (!curNode->Asn1HasChild(TAG_ESIM_ICCID)) {
             TELEPHONY_LOGE("Profile must have an ICCID.");
@@ -655,6 +660,7 @@ void EsimFile::ConvertProfileInfoToApiStruct(EuiccProfile &dst, EuiccProfileInfo
     dst.state_ = static_cast<ProfileState>(src.profileState);
     dst.profileClass_ = static_cast<ProfileClass>(src.profileClass);
     dst.policyRules_ = static_cast<PolicyRules>(src.policyRules);
+    dst.portIndex = src.portIndex;
 
     // split mccMnc to mcc and mnc
     std::string mcc = "";
@@ -719,16 +725,20 @@ void EsimFile::BuildBasicProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared
     BuildAdvancedProfileInfo(eProfileInfo, profileNode);
 }
 
+int32_t EsimFile::GetEsimPortIndex()
+{
+    TELEPHONY_LOGI("GetEsimPortIndex: %{public}d", esimProfile_.portIndex);
+    return esimProfile_.portIndex;
+}
+
 void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::shared_ptr<Asn1Node> &profileNode)
 {
     if (eProfileInfo == nullptr || profileNode == nullptr) {
-        TELEPHONY_LOGE("BuildAdvancedProfileInfo failed");
         return;
     }
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_STATE)) {
         std::shared_ptr<Asn1Node> profileStateNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_STATE);
         if (profileStateNode == nullptr) {
-            TELEPHONY_LOGE("profileStateNode is nullptr");
             return;
         }
         int32_t ret = profileStateNode->Asn1AsInteger();
@@ -739,7 +749,6 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_CLASS)) {
         std::shared_ptr<Asn1Node> profileClassNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_CLASS);
         if (profileClassNode == nullptr) {
-            TELEPHONY_LOGE("profileClassNode is nullptr");
             return;
         }
         eProfileInfo->profileClass = profileClassNode->Asn1AsInteger();
@@ -749,7 +758,6 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
     if (profileNode->Asn1HasChild(TAG_ESIM_PROFILE_POLICY_RULE)) {
         std::shared_ptr<Asn1Node> profilePolicyRuleNode = profileNode->Asn1GetChild(TAG_ESIM_PROFILE_POLICY_RULE);
         if (profilePolicyRuleNode == nullptr) {
-            TELEPHONY_LOGE("profilePolicyRuleNode is nullptr");
             return;
         }
         eProfileInfo->policyRules = profilePolicyRuleNode->Asn1AsBits();
@@ -759,10 +767,17 @@ void EsimFile::BuildAdvancedProfileInfo(EuiccProfileInfo *eProfileInfo, std::sha
         std::shared_ptr<Asn1Node> carrierPrivilegeRulesNode =
             profileNode->Asn1GetChild(TAG_ESIM_CARRIER_PRIVILEGE_RULES);
         if (carrierPrivilegeRulesNode == nullptr) {
-            TELEPHONY_LOGE("carrierPrivilegeRulesNode is nullptr");
             return;
         }
         carrierPrivilegeRulesNode->Asn1GetChildren(TAG_ESIM_REF_AR_DO, refArDoNodes);
+    }
+    if (profileNode->Asn1HasChild(TAG_ESIM_PORT)) {
+        std::shared_ptr<Asn1Node> eSIMPort = profileNode->Asn1GetChild(TAG_ESIM_PORT);
+        if (eSIMPort == nullptr) {
+            return;
+        }
+        int32_t ret = eSIMPort->Asn1AsInteger();
+        eProfileInfo->portIndex = ret;
     }
 }
 
@@ -1338,6 +1353,11 @@ std::vector<uint8_t> EsimFile::GetProfileTagList()
     std::vector<uint8_t> getProfileTags;
     for (const unsigned char tag : EUICC_PROFILE_TAGS) {
         getProfileTags.push_back(tag);
+    }
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    if (isSupportEsimMep) {
+        getProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT / PROFILE_DEFAULT_NUMBER));
+        getProfileTags.push_back(static_cast<unsigned char>(TAG_ESIM_PORT % PROFILE_DEFAULT_NUMBER));
     }
     return getProfileTags;
 }
@@ -2374,6 +2394,7 @@ EuiccNotificationList EsimFile::RetrieveNotificationList(int32_t portIndex, Esim
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.events = events;
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_RETRIEVE_NOTIFICATION_LIST);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -2401,6 +2422,7 @@ EuiccNotification EsimFile::ObtainRetrieveNotification(int32_t portIndex, int32_
 {
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_RETRIEVE_NOTIFICATION_DONE);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -2429,7 +2451,7 @@ int32_t EsimFile::RemoveNotificationFromList(int32_t portIndex, int32_t seqNumbe
     removeNotifResult_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DEFALUT_ERROR);
     esimProfile_.portIndex = portIndex;
     esimProfile_.seqNumber = seqNumber;
-
+    std::unique_lock<std::mutex> lck(currentChannelIdOccupiedMutex_);
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_REMOVE_NOTIFICATION);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {
         TELEPHONY_LOGE("ObtainChannelSuccessExclusive failed ,%{public}d", resultFlag);
@@ -2932,7 +2954,7 @@ ResponseEsimInnerResult EsimFile::AuthenticateServer(const AuthenticateConfigInf
     esimProfile_.serverCertificate = authenticateConfigInfo.serverCertificate_;
 
     std::u16string imei = u"";
-    CoreManagerInner::GetInstance().GetImei(slotId_, imei);
+    CoreManagerInner::GetInstance().GetImei(SLOT_ID_1, imei);
     esimProfile_.imei = imei;
     ResultInnerCode resultFlag = ObtainChannelSuccessExclusive(MSG_ESIM_AUTHENTICATE_SERVER);
     if (resultFlag != ResultInnerCode::RESULT_EUICC_CARD_OK) {

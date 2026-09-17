@@ -37,6 +37,8 @@ public:
     int32_t UpdateOperatorConfigs(int32_t slotId);
     int32_t HasOperatorPrivileges(const int32_t slotId, bool &hasOperatorPrivileges);
     void UpdateImsCapFromChip(int32_t slotId, const ImsCapFromChip &imsCapFromChip);
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
+    
     inline void SetOperatorConfigHisysevent(std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent)
     {
         operatorConfigHisysevent_ = operatorConfigHisysevent;

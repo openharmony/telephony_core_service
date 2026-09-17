@@ -18,6 +18,7 @@
 
 #include "i_esim_manager.h"
 #include "i_tel_ril_manager.h"
+#include "observer_handler.h"
 
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_file.h"
@@ -26,7 +27,7 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t ESIM_SLOT_ID_ZERO = 0;
-const int32_t ESIM_MAX_SLOT_COUNT = 3;
+const int32_t ESIM_MAX_SLOT_COUNT = SIM_SLOT_COUNT_MD + 1;
 class EsimManager : public IEsimManager {
 public:
     explicit EsimManager(std::shared_ptr<ITelRilManager> telRilManager);
@@ -76,6 +77,12 @@ public:
         int32_t slotId, const GetContractInfoRequest &getContractInfoRequest, std::string& response) override;
     int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult) override;
     int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult) override;
+    int32_t GetEsimPortIndex(int32_t slotId, int32_t &portIndex) override;
+    void RegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) override;
+    void UnRegisterCoreNotify(
+        int32_t slotId, const std::shared_ptr<AppExecFwk::EventHandler> &handler, int32_t what) override;
+    void PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t param) override;
 
 private:
     template<class N>
@@ -83,6 +90,8 @@ private:
 private:
     std::shared_ptr<Telephony::ITelRilManager> telRilManager_ = nullptr;
     [[maybe_unused]] int32_t slotCount_ = ESIM_MAX_SLOT_COUNT;
+    std::unique_ptr<ObserverHandler> observerHandler_ = nullptr;
+    std::atomic<int32_t> enabledProfileNum_ = 0;
 #ifdef CORE_SERVICE_SUPPORT_ESIM
     std::vector<std::shared_ptr<Telephony::EsimFile>> esimFiles_;
     std::vector<std::shared_ptr<Telephony::EsimFile>> esimFilesLowPriority_;

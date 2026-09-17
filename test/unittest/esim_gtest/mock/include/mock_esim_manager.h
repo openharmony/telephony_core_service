@@ -17,6 +17,8 @@
 
 #include "i_esim_manager.h"
 #include <gmock/gmock.h>
+#include "event_handler.h"
+
 namespace OHOS {
 namespace Telephony {
 class MockEsimManager : public IEsimManager {
@@ -53,6 +55,11 @@ public:
     MOCK_METHOD3(GetContractInfo, int32_t(int32_t, const GetContractInfoRequest &, std::string &));
     MOCK_METHOD2(GetEsimCaVerifyResult, int32_t(int32_t, bool &));
     MOCK_METHOD2(SetEsimCaVerifyResult, int32_t(int32_t, bool));
+    MOCK_METHOD3(RegisterCoreNotify,
+        void(int32_t, const std::shared_ptr<AppExecFwk::EventHandler> &, int32_t));
+    MOCK_METHOD3(UnRegisterCoreNotify,
+        void(int32_t, const std::shared_ptr<AppExecFwk::EventHandler> &, int32_t));
+    MOCK_METHOD3(PublishEsimProfileChange, void(int32_t, int32_t, int32_t));
 };
 } // Telephony
 } // OHOS

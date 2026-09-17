@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 #include "addiccdiallingnumbers_fuzzer.h"
 
 #include <cstddef>

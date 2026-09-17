@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr size_t VCARD_INPUT_MAX_LENGTH = 500;
+constexpr size_t VCARD_INPUT_MAX_LENGTH = 2376;
 VCardConstructor::VCardConstructor(int32_t cardType, const std::string &charset)
     : cardType_(cardType), charset_(charset)
 {

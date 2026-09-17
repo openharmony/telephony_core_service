@@ -66,6 +66,7 @@ enum class DiffInterfaceId {
     TEST_RILCM_SEND_IMS_RSD_LIST,
     TEST_RILCM_GET_NETWORKSLICE_ALLOWEDNSSAI,
     TEST_RILCM_GET_NETWORKSLICE_EHPLMN,
+    TEST_RILCM_DATA_PROFILE_PASSWORD_CLEAR,
 
     TEST_GET_SIGNAL_STRENGTH,
     TEST_CALL_DIAL,
@@ -270,6 +271,7 @@ private:
     void SendImsRsdListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetNetworkSliceAllowedNssaiTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     void GetNetworkSliceEhplmnTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
+    void DataProfilePasswordClearTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);
     /* =========== Cellular Data End ============= */
 
     void GetDataCallListTest(int32_t slotId, std::shared_ptr<AppExecFwk::EventHandler> handler);

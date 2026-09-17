@@ -402,6 +402,26 @@ void SimRdbHelper::SaveDataToBean(std::shared_ptr<DataShare::DataShareResultSet>
     result->GetInt(index, simBean.simLabelIndex);
     result->GetColumnIndex(SimData::OPERATOR_NAME, index);
     result->GetString(index, simBean.operatorName);
+    SaveDataToBeanEx(result, simBean);
+}
+
+void SimRdbHelper::SaveDataToBeanEx(std::shared_ptr<DataShare::DataShareResultSet> result, SimRdbInfo &simBean)
+{
+    int index = 0;
+    result->GetColumnIndex(SimData::PHY_CARD, index);
+    result->GetInt(index, simBean.phyCard);
+    result->GetColumnIndex(SimData::LSI, index);
+    result->GetInt(index, simBean.lsi);
+    result->GetColumnIndex(SimData::MNC_LEN, index);
+    result->GetInt(index, simBean.mncLen);
+    result->GetColumnIndex(SimData::GID1, index);
+    result->GetString(index, simBean.gid1);
+    result->GetColumnIndex(SimData::GID2, index);
+    result->GetString(index, simBean.gid2);
+    result->GetColumnIndex(SimData::SPN, index);
+    result->GetString(index, simBean.spn);
+    result->GetColumnIndex(SimData::EHPLMN, index);
+    result->GetString(index, simBean.ehplmn);
 }
 
 int32_t SimRdbHelper::QueryDataByIccId(std::string iccId, SimRdbInfo &simBean)
@@ -536,6 +556,10 @@ int32_t SimRdbHelper::ForgetAllData()
     DataShare::DataSharePredicates predicates1;
     DataShare::DataShareValuesBucket value;
     DataShare::DataShareValueObject valueObj(INVALID_VALUE);
+    if (OHOS::system::GetIntParameter("persist.telephony.tsts_mode", 0) >= 1) {
+        TELEPHONY_LOGI("ForgetAllData tsts is on");
+        predicates1.EqualTo(SimData::IS_ESIM, std::to_string(0));
+    }
     value.Put(SimData::SLOT_INDEX, valueObj);
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
         CreateDataHelper(TelephonyDataHelper::DB_CONNECT_MAX_WAIT_TIME);

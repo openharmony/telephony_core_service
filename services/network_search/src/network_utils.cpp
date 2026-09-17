@@ -211,6 +211,16 @@ bool NetworkUtils::RemoveCallbackFromMap(int64_t index)
     return (networkSearchCacheMap_.erase(index));
 }
 
+bool NetworkUtils::IsValidSlotId(int32_t slotId)
+{
+    bool vsimEnable = TELEPHONY_EXT_WRAPPER.isVSimEnabled_ && TELEPHONY_EXT_WRAPPER.isVSimEnabled_();
+
+    int32_t slotUpper = SIM_SLOT_COUNT >= THREE_CARD_COUNT ? SIM_SLOT_COUNT + 1 : SIM_SLOT_COUNT;
+    return vsimEnable ?
+        (slotId >= 0 && slotId < slotUpper) || slotId == SIM_SLOT_2 :
+        (slotId >= 0 && slotId < slotUpper) && slotId != SIM_SLOT_2;
+}
+
 const std::map<RadioEvent, RilFunc_Event> EventSender::mapFunctions_ = {
     { RadioEvent::RADIO_GET_NETWORK_SELECTION_MODE,
         [](ITelRilManager *rilManager, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &result) {

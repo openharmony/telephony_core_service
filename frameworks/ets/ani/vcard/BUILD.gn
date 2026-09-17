@@ -82,6 +82,7 @@ ohos_static_library("vcard_ani_cxx") {
     "napi:ace_napi",
     "runtime_core:ani",
     "rust_cxx:cxx_cppdeps",
+    "node:node_header_notice",
   ]
   subsystem_name = "telephony"
   part_name = "core_service"

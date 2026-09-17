@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Telephony {
-GetNetworkSearchModeCallback::GetNetworkSearchModeCallback(GetSelectModeContext *asyncContext)
+GetNetworkSearchModeCallback::GetNetworkSearchModeCallback(std::shared_ptr<GetSelectModeContext> asyncContext)
     : asyncContext_(asyncContext)
 {}
 
@@ -51,7 +51,7 @@ void GetNetworkSearchModeCallback::OnGetNetworkModeCallback(const int32_t search
     asyncContext_->cv.notify_all();
 }
 
-GetRadioStateCallback::GetRadioStateCallback(IsRadioOnContext *context)
+GetRadioStateCallback::GetRadioStateCallback(std::shared_ptr<IsRadioOnContext> context)
     : asyncContext_(context)
 {}
 

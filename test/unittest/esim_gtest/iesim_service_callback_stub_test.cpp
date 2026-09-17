@@ -60,7 +60,7 @@ HWTEST_F(IEsimServiceCallbackStubTest, OnGetEuiccProfileInfoList, Function | Med
         requestId++) {
         int32_t ret = stub->OnEsimServiceCallback(
             static_cast<IEsimServiceCallback::EsimServiceCallback>(requestId), data);
-        EXPECT_EQ(ret, DEFAULT_RESULT);
+        EXPECT_EQ(ret, TELEPHONY_ERR_DESCRIPTOR_MISMATCH);
     }
 }
 

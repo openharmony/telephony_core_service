@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <securec.h>
 
 #include "core_service_client.h"
 #include "napi_parameter_util.h"
@@ -51,7 +52,7 @@ struct PermissionPara {
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
-    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT + 1) && slotId != SIM_SLOT_2);
 }
 
 static inline bool IsValidSlotIdEx(int32_t slotId)
@@ -92,10 +93,13 @@ napi_value NapiCreateAsyncWork(napi_env env, napi_callback_info info, std::strin
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, funcName.data(), funcName.length(), &resourceName));
     AsyncContext<T> *pContext = asyncContext.release();
-    NAPI_CALL(env,
-        napi_create_async_work(
-            env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext), &context.work));
+    if (napi_create_async_work(env, nullptr, resourceName, exec, complete, static_cast<void *>(pContext),
+        &context.work) != napi_ok) {
+        delete pContext;
+        return nullptr;
+    }
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+        napi_delete_async_work(env, context.work);
         delete pContext;
         result = nullptr;
     }
@@ -116,8 +120,6 @@ napi_value NapiCreateAsyncWork2(const AsyncPara &para, AsyncContextType *asyncCo
     if (errCode.has_value()) {
         JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
         NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-        delete asyncContext;
-        asyncContext = nullptr;
         return nullptr;
     }
 
@@ -159,8 +161,6 @@ napi_value NapiCreateAsyncWork3(const AsyncPara &para, AsyncContextType *asyncCo
             if (errCode.has_value()) {
                 JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
                 NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-                delete asyncContext;
-                asyncContext = nullptr;
                 return nullptr;
             }
         }
@@ -168,8 +168,6 @@ napi_value NapiCreateAsyncWork3(const AsyncPara &para, AsyncContextType *asyncCo
         if (errCode.has_value()) {
             JsError error = NapiUtil::ConverErrorMessageForJs(errCode.value());
             NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-            delete asyncContext;
-            asyncContext = nullptr;
             return nullptr;
         }
     }
@@ -183,7 +181,7 @@ napi_value NapiCreateAsyncWork3(const AsyncPara &para, AsyncContextType *asyncCo
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, para.funcName.c_str(), para.funcName.length(), &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, para.execute, para.complete,
-                       static_cast<void *>(asyncContext), &context.work));
+            static_cast<void *>(asyncContext), &context.work));
     return result;
 }
 
@@ -398,6 +396,7 @@ void PinInfoParaAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinContex
         char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, pin, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
     }
 
     napi_value state = NapiUtil::GetNamedProperty(env, arg, "state");
@@ -418,6 +417,7 @@ void PersoLockInfoAnalyze(napi_env env, napi_value arg, AsyncContextPIN &pinCont
         char tmpStr[ARRAY_SIZE] = {0};
         NapiValueToCppValue(env, password, napi_string, tmpStr);
         pinContext.inStr1 = std::string(tmpStr);
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
     }
 }
 
@@ -576,7 +576,13 @@ napi_value GetDefaultVoiceSlotId(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultSlotId>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_user_initiated));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_user_initiated) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -622,7 +628,13 @@ napi_value GetDefaultVoiceSimId(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDefaultSimId>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -861,7 +873,13 @@ napi_value GetDsdsMode(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork3<AsyncDsdsInfo>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -920,7 +938,13 @@ napi_value GetSimAuthentication(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSimAuthInfo>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -1321,7 +1345,13 @@ napi_value GetSimAccountInfo(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, iccAccountInfo, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete iccAccountInfo;
+            return nullptr;
+        }
+    } else {
+        delete iccAccountInfo;
     }
     return result;
 }
@@ -1409,7 +1439,14 @@ napi_value UnlockPin(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete pinContext;
+            return nullptr;
+        }
+    } else {
+        delete pinContext;
     }
     return result;
 }
@@ -1468,7 +1505,15 @@ napi_value UnlockPuk(napi_env env, napi_callback_info info)
     if (result) {
         pukContext->inStr1 = std::string(tmpStr1);
         pukContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete pukContext;
+            return nullptr;
+        }
+    } else {
+        delete pukContext;
     }
     return result;
 }
@@ -1529,7 +1574,15 @@ napi_value AlterPin(napi_env env, napi_callback_info info)
     if (result) {
         alterPinContext->inStr1 = std::string(tmpStr1);
         alterPinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete alterPinContext;
+            return nullptr;
+        }
+    } else {
+        delete alterPinContext;
     }
     return result;
 }
@@ -1589,7 +1642,13 @@ napi_value SetLockState(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, asyncContextPIN, initPara);
     if (result) {
         PinInfoParaAnalyze(env, object, *asyncContextPIN);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContextPIN;
+            return nullptr;
+        }
+    } else {
+        delete asyncContextPIN;
     }
     return result;
 }
@@ -1767,7 +1826,13 @@ napi_value SetShowName(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -1850,7 +1915,13 @@ napi_value SetShowNumber(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -1943,7 +2014,14 @@ napi_value UnlockPin2(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2(para, pinContext, initPara);
     if (result) {
         pinContext->inStr1 = std::string(tmpStr);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete pinContext;
+            return nullptr;
+        }
+    } else {
+        delete pinContext;
     }
     return result;
 }
@@ -2004,7 +2082,15 @@ napi_value UnlockPuk2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete pinContext;
+            return nullptr;
+        }
+    } else {
+        delete pinContext;
     }
     return result;
 }
@@ -2063,7 +2149,15 @@ napi_value AlterPin2(napi_env env, napi_callback_info info)
     if (result) {
         pinContext->inStr1 = std::string(tmpStr1);
         pinContext->inStr2 = std::string(tmpStr2);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        memset_s(tmpStr1, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        memset_s(tmpStr2, ARRAY_SIZE, 0x00, ARRAY_SIZE);
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete pinContext;
+            return nullptr;
+        }
+    } else {
+        delete pinContext;
     }
     return result;
 }
@@ -2127,7 +2221,13 @@ napi_value GetOperatorConfigs(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncOperatorConfig>(para, crrierConfig, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete crrierConfig;
+            return nullptr;
+        }
+    } else {
+        delete crrierConfig;
     }
     return result;
 }
@@ -2181,7 +2281,13 @@ napi_value GetActiveSimAccountInfoList(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncIccAccountInfo>(para, accountInfo, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete accountInfo;
+            return nullptr;
+        }
+    } else {
+        delete accountInfo;
     }
     return result;
 }
@@ -2248,7 +2354,13 @@ napi_value QueryIccDiallingNumbers(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncDiallingNumbers<napi_value>>(para, diallingNumbers, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete diallingNumbers;
+            return nullptr;
+        }
+    } else {
+        delete diallingNumbers;
     }
     return result;
 }
@@ -2305,7 +2417,13 @@ napi_value AddIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete diallingNumbers;
+            return nullptr;
+        }
+    } else {
+        delete diallingNumbers;
     }
     return result;
 }
@@ -2360,7 +2478,13 @@ napi_value DelIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete diallingNumbers;
+            return nullptr;
+        }
+    } else {
+        delete diallingNumbers;
     }
     return result;
 }
@@ -2417,7 +2541,13 @@ napi_value UpdateIccDiallingNumbers(napi_env env, napi_callback_info info)
         TelNumbersInfo inputInfo;
         DiallingNumberParaAnalyze(env, object, inputInfo);
         diallingNumbers->infoVec.push_back(std::move(inputInfo));
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete diallingNumbers;
+            return nullptr;
+        }
+    } else {
+        delete diallingNumbers;
     }
     return result;
 }
@@ -2468,7 +2598,13 @@ napi_value SetVoiceMailInfo(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncVoiceMail>(para, mailContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete mailContext;
+            return nullptr;
+        }
+    } else {
+        delete mailContext;
     }
     return result;
 }
@@ -2515,7 +2651,13 @@ napi_value SendEnvelopeCmd(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -2562,7 +2704,13 @@ napi_value SendTerminalResponseCmd(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncContext2>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -2608,7 +2756,13 @@ napi_value AcceptCallSetupRequest(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -2654,7 +2808,13 @@ napi_value RejectCallSetupRequest(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncStkCallSetupResult>(para, asyncContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContext;
+            return nullptr;
+        }
+    } else {
+        delete asyncContext;
     }
     return result;
 }
@@ -2838,7 +2998,13 @@ napi_value GetLockState(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncGetLockState>(para, lockStateContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete lockStateContext;
+            return nullptr;
+        }
+    } else {
+        delete lockStateContext;
     }
     return result;
 }
@@ -2934,7 +3100,13 @@ napi_value UnlockSimLock(napi_env env, napi_callback_info info)
     napi_value result = NapiCreateAsyncWork2<AsyncContextPIN>(para, asyncContextPIN, initPara);
     if (result) {
         PersoLockInfoAnalyze(env, object, *asyncContextPIN);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete asyncContextPIN;
+            return nullptr;
+        }
+    } else {
+        delete asyncContextPIN;
     }
     return result;
 }
@@ -2996,6 +3168,8 @@ napi_value GetAllSimAccountInfoList(napi_env env, napi_callback_info info)
     }
     if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) == napi_ok) {
         accountInfo.release();
+        } else {
+        napi_delete_async_work(env, context.work);
     }
     return result;
 }
@@ -3057,7 +3231,13 @@ napi_value GetSimLabel(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSimLabelInfo>(para, simLabelContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete simLabelContext;
+            return nullptr;
+        }
+    } else {
+        delete simLabelContext;
     }
     return result;
 }
@@ -3133,7 +3313,13 @@ napi_value SetSimLabelIndex(napi_env env, napi_callback_info info)
     };
     napi_value result = NapiCreateAsyncWork2<AsyncSetSimLabelIndexInfo>(para, simLabelContext, initPara);
     if (result) {
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, context.work, napi_qos_default));
+        if (napi_queue_async_work_with_qos(env, context.work, napi_qos_default) != napi_ok) {
+            napi_delete_async_work(env, context.work);
+            delete simLabelContext;
+            return nullptr;
+        }
+    } else {
+        delete simLabelContext;
     }
     return result;
 }

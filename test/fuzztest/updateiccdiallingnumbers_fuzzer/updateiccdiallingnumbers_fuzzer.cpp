@@ -34,7 +34,7 @@ static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACCEPT_TYPE = 2;
 constexpr int32_t SIM_TYPE_NUM = 2;
-constexpr int32_t SLEEP_TIME_SECONDS = 2;
+constexpr int32_t SLEEP_TIME_SECONDS = 10;
 
 bool IsServiceInited()
 {

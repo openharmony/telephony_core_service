@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing;
 using namespace testing::ext;
+constexpr int32_t SLEEP_TIME_US = 1 * 1000;
 
 class CoreServiceCommonEventHubTest : public testing::Test {
 public:
@@ -224,6 +225,7 @@ HWTEST_F(CoreServiceCommonEventHubTest, OnReceiveEvent_NullptrFunc_001, Function
                                                                                 \
         EXPECT_CALL(*callback, On##eventName).Times(1);                         \
         EmitCommonEvent(hub, EventFwk::CommonEventSupport::eventConst);         \
+        usleep(SLEEP_TIME_US);                                                  \
         Mock::VerifyAndClear(callback.get());                                   \
     }
 

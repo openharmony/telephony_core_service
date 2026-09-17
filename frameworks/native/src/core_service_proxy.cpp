@@ -2958,7 +2958,11 @@ bool CoreServiceProxy::IsNrSupported(int32_t slotId)
         TELEPHONY_LOGE("IsNrSupported failed, error code is %{public}d", st);
         return false;
     }
-    bool result = reply.ReadBool();
+    bool result = false;
+    if (!reply.ReadBool(result)) {
+        TELEPHONY_LOGE("IsNrSupported ReadBool failed.");
+        return false;
+    }
     return result;
 }
 

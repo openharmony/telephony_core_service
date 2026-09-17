@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef MANUAL_NETWORK_SCAN_STATE_CALLBACK_H
-#define MANUAL_NETWORK_SCAN_STATE_CALLBACK_H
+#ifndef TEL_RIL_UTILS_H
+#define TEL_RIL_UTILS_H
 
-#include "i_network_search_callback_stub.h"
-#include "napi_radio.h"
-#include "napi/native_api.h"
+#include <cstdint>
 
 namespace OHOS {
 namespace Telephony {
-class ManualNetworkScanStateCallback : public INetworkSearchCallbackStub {
+class TelRilUtils {
 public:
-    explicit ManualNetworkScanStateCallback(IsManualScanningContext *context);
-    void OnGetManualNetworkScanStateCallback(const bool isScanning, const int32_t errorCode) override;
-
-private:
-    IsManualScanningContext *asyncContext_;
+    static bool IsValidSlotId(int32_t slotId);
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // MANUAL_NETWORK_SCAN_STATE_CALLBACK_H
+#endif

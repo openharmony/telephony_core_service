@@ -191,6 +191,7 @@ struct EuiccProfile {
     OperatorId carrierId_;
     PolicyRules policyRules_ = PolicyRules::POLICY_RULE_UNSPECIFIED;
     std::vector<AccessRule> accessRules_{};
+    int32_t portIndex = 0;
 };
 
 /**

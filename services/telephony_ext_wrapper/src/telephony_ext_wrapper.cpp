@@ -280,11 +280,14 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim()
         reinterpret_cast<ReportEventToChrFunc>(dlsym(telephonyExtWrapperHandle_, "ReportEventToChr"));
     getRealSimCountExt_ =
         reinterpret_cast<GetRealSimCountExtFunc>(dlsym(telephonyExtWrapperHandle_, "GetRealSimCountExt"));
+    swapM0M2SimCards_ =
+        reinterpret_cast<SwapM0M2SimCardsFunc>(dlsym(telephonyExtWrapperHandle_, "SwapM0M2SimCards"));
+    notifyRebootDetectSim_ = (NotifyRebootDetectSim)dlsym(telephonyExtWrapperHandle_, "NotifyRebootDetectSim");
     bool hasFuncNull = (createIccFileExt_ == nullptr || getRoamingBrokerNumeric_ == nullptr || initBip_ == nullptr ||
         getRoamingBrokerImsi_ == nullptr || sendEvent_ == nullptr ||
         updateHotPlugCardState_ == nullptr || cacheAssetPinForUpgrade_ == nullptr ||
         getStkBundleNameFunc_ == nullptr || sendSimChgTypeInfo_ == nullptr || reportEventToChr_ == nullptr ||
-        getRealSimCountExt_ == nullptr);
+        getRealSimCountExt_ == nullptr || swapM0M2SimCards_ == nullptr || notifyRebootDetectSim_ == nullptr);
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
     }
@@ -298,6 +301,11 @@ void TelephonyExtWrapper::InitTelephonyExtWrapperForSim1()
     bool hasFuncNull = setActiveSim_ == nullptr;
     if (hasFuncNull) {
         TELEPHONY_LOGE("[SIM]telephony ext wrapper symbol failed, error: %{public}s", dlerror());
+    }
+    getSimLabelIndexFromLsiCfg_ =
+        (GetSimLabelIndexFromLsiCfgFunc)dlsym(telephonyExtWrapperHandle_, "GetSimLabelIndexFromLsiCfg");
+    if (getSimLabelIndexFromLsiCfg_ == nullptr) {
+        TELEPHONY_LOGE("[SIM] GetSimLabelIndexFromLsiCfg symbol failed, error: %{public}s", dlerror());
     }
 }
 
@@ -425,6 +433,21 @@ void TelephonyExtWrapper::SavePreferredNetworkValueFunc(int32_t slotId, int32_t 
     if (savePreferredNetworkValue_ != nullptr) {
         savePreferredNetworkValue_(slotId, networkMode);
     }
+}
+int32_t TelephonyExtWrapper::SwapM0M2SimCards(int32_t slotId)
+{
+    if (swapM0M2SimCards_ != nullptr) {
+        return swapM0M2SimCards_(slotId);
+    }
+    return -1;
+}
+
+bool TelephonyExtWrapper::GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex)
+{
+    if (getSimLabelIndexFromLsiCfg_ != nullptr) {
+        return getSimLabelIndexFromLsiCfg_(slotId, simLabelindex);
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

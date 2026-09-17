@@ -228,6 +228,12 @@ HWTEST_F(ContactDataTest, VCardPhotoData_BuildData, Function | MediumTest | Leve
     resultSet->GetBlob(index, photoBlobData);
     EXPECT_EQ(photoData.BuildData(resultSet), TELEPHONY_SUCCESS);
     EXPECT_EQ(photoData.BuildData(nullptr), TELEPHONY_ERROR);
+
+    auto mockResultSet = std::make_shared<DataShareResultSetMock>();
+    ASSERT_NE(mockResultSet, nullptr);
+    EXPECT_CALL(*mockResultSet, GetColumnIndex(ContactData::BLOB_DATA, testing::_))
+        .WillOnce(Return(DataShare::E_OK));
+    EXPECT_EQ(photoData.BuildData(mockResultSet), TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(ContactDataTest, VCardContact_AddRawData, Function | MediumTest | Level3)
@@ -946,6 +952,12 @@ HWTEST_F(ContactDataTest, VCardGroupData_BuildData, Function | MediumTest | Leve
     VCardGroupData groupData;
     EXPECT_EQ(groupData.BuildData(resultSet), TELEPHONY_ERROR);
     EXPECT_EQ(groupData.BuildData(nullptr), TELEPHONY_ERROR);
+
+    auto mockResultSet = std::make_shared<DataShareResultSetMock>();
+    ASSERT_NE(mockResultSet, nullptr);
+    EXPECT_CALL(*mockResultSet, GetColumnIndex(ContactData::DETAIL_INFO, testing::_))
+        .WillOnce(Return(DataShare::E_OK));
+    EXPECT_EQ(groupData.BuildData(mockResultSet), TELEPHONY_ERROR);
 }
 
 HWTEST_F(ContactDataTest, VCardGroupData_BuildValuesBucket, Function | MediumTest | Level3)

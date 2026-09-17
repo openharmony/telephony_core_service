@@ -68,6 +68,7 @@ ohos_fuzztest("SatelliteCoreFuzzTest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"SatelliteCoreFuzzTest\"",

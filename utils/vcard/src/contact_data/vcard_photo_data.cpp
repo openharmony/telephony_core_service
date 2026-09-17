@@ -33,8 +33,9 @@ int32_t VCardPhotoData::BuildData(std::shared_ptr<DataShare::DataShareResultSet>
     }
     int32_t index;
     std::vector<uint8_t> photoBlobData;
-    resultSet->GetColumnIndex(ContactData::BLOB_DATA, index);
-    resultSet->GetBlob(index, photoBlobData);
+    if (resultSet->GetColumnIndex(ContactData::BLOB_DATA, index) == DataShare::E_OK) {
+        resultSet->GetBlob(index, photoBlobData);
+    }
     if (photoBlobData.size() > MAX_VCARD_INPUT_SIZE) {
         return TELEPHONY_ERROR;
     }

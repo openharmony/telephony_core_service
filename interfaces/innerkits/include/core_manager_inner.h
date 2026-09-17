@@ -206,6 +206,7 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetPreferredNetworkPara(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t SwapM0M2SimCards(int32_t slotId);
     /******************** telRilManager end *******************/
     /******************** networkSearchManager start *******************/
     int32_t GetPsRadioTech(int32_t slotId, int32_t &psRadioTech);
@@ -364,6 +365,10 @@ public:
     int32_t SetIccCardState(int32_t slotId, int32_t simStatus);
     int32_t SetTargetPrimarySlotId(bool isDualCard, int32_t primarySlotId);
     void SetMatchSimStateTracker(int8_t matchSimStateTracker, int32_t slotId);
+    std::string GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo);
+    int32_t SaveCardFileDetectData(const CardFileDetectData &data);
+    int32_t GetAllSimCardInfo(std::vector<SimCardInfo> &results);
+    void SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid);
     /******************** simManager end *****************************/
     /******************** esimManager start *****************************/
     int32_t GetEid(int32_t slotId, std::u16string &eId);
@@ -410,6 +415,8 @@ public:
     int32_t GetEsimCaVerifyResult(int32_t slotId, bool &verifyResult);
     int32_t SetEsimCaVerifyResult(int32_t slotId, bool verifyResult);
     bool IsModemInitDone(int32_t slotId);
+    int32_t GetEsimPortIndex(int32_t slotId, int32_t &portIndex);
+    void PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t data);
     /******************** esimManager end *****************************/
 
 private:

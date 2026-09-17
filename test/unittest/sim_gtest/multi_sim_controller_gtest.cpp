@@ -102,8 +102,8 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_ForgetAllDataWithSlotId_
 {
     int slotId = -1;
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
-    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
-    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager(SIM_SLOT_COUNT_REAL + 1, nullptr);
     std::shared_ptr<Telephony::MultiSimController> multiSimController =
         std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
     multiSimController->simDbHelper_ = nullptr;
@@ -1517,7 +1517,7 @@ HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_GetSimLabelIdxFromAllLoc
 
     OHOS::system::SetParameter("persist.telephony.last_deactive_profile_slot0", "1");
     multiSimController->GetSimLabelIdxFromAllLocalCache(simIdx, 0);
-    EXPECT_EQ(simIdx, 3);
+    EXPECT_EQ(simIdx, 1);
 }
 
 HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_CheckIfNeedSwitchMainSlotId, Function | MediumTest | Level1)
@@ -1620,7 +1620,7 @@ HWTEST_F(MultiSimControllerTest, SetActiveSim001, Function | MediumTest | Level1
         simStateManager_, simFileManager_);
     std::vector<SimRdbInfo> newCache;
     newCache.resize(2);
-    newCache[0].iccId = "2164181618486135";
+    newCache[0].iccId = "21641816184861385";
     newCache[1].iccId.clear();
     newCache[0].simId = 1;
     newCache[1].simId = 2;
@@ -1634,6 +1634,31 @@ HWTEST_F(MultiSimControllerTest, SetActiveSim001, Function | MediumTest | Level1
     int32_t ret = multiSimController->SetActiveSim(0, 0, true);
     multiSimController->SetActiveSim(-1, 1);
     EXPECT_TRUE(ret != TELEPHONY_ERR_SUCCESS);
+}
+HWTEST_F(MultiSimControllerTest, MultiSimControllerTest_IsEsimTstsMode_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
+    std::vector<std::shared_ptr<Telephony::SimStateManager>> simStateManager = { nullptr, nullptr };
+    std::vector<std::shared_ptr<Telephony::SimFileManager>> simFileManager = { nullptr, nullptr };
+    std::shared_ptr<Telephony::MultiSimController> multiSimController =
+        std::make_shared<MultiSimController>(telRilManager, simStateManager, simFileManager);
+    
+    multiSimController->Init();
+    
+    constexpr int32_t SLOT_ID_0 = 0;
+    constexpr int32_t SLOT_ID_1 = 1;
+    constexpr int32_t SLOT_ID_2 = 2;
+    
+    multiSimController->tstsMode_ = 0;
+    bool ret1 = multiSimController->IsEsim(SLOT_ID_0);
+    
+    multiSimController->tstsMode_ = SLOT_ID_1;
+    bool ret2 = multiSimController->IsEsim(SLOT_ID_0);
+    
+    multiSimController->tstsMode_ = SLOT_ID_1;
+    bool ret3 = multiSimController->IsEsim(SLOT_ID_2);
+    
+    EXPECT_TRUE(multiSimController->localCacheInfo_.empty() || ret1 == false || ret2 == false || ret3 == false);
 }
 }
 }

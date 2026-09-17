@@ -118,27 +118,6 @@ HWTEST_F(SimTest, Telephony_VSim_InitExtraModule_0700, Function | MediumTest | L
 }
 
 /**
- * @tc.number Telephony_VSim_GetMaxSimSlot_0100
- * @tc.name InitExtraModule
- * @tc.desc Function test
- */
-HWTEST_F(SimTest, Telephony_VSim_GetMaxSimSlot_0100, Function | MediumTest | Level1)
-{
-    auto telRilManager = std::make_shared<TelRilManager>();
-    auto telRilCallback = std::make_shared<TelRilCallback>(telRilManager);
-    auto maxSimSlot = telRilCallback->GetMaxSimSlot();
-#ifdef OHOS_BUILD_ENABLE_TELEPHONY_VSIM
-    if (SIM_SLOT_COUNT == 2) {
-        EXPECT_EQ(3, maxSimSlot);
-    } else {
-        EXPECT_EQ(SIM_SLOT_COUNT, maxSimSlot);
-    }
-#else
-    EXPECT_EQ(SIM_SLOT_COUNT, maxSimSlot);
-#endif
-}
-
-/**
  * @tc.number Telephony_VSim_Wrapper_0100
  * @tc.name InitExtraModule
  * @tc.desc Function test

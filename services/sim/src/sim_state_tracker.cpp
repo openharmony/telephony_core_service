@@ -332,6 +332,15 @@ void SimStateTracker::ReloadOperatorConfig()
     }
 }
 
+std::string SimStateTracker::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
+{
+    if (operatorConfigLoader_ == nullptr) {
+        TELEPHONY_LOGE("operatorConfigLoader is null!");
+        return "";
+    }
+    return operatorConfigLoader_->GetOverseasCarrierBySimInfo(simCardInfo);
+}
+
 inline void SimStateTracker::SetMatchSimReason(int32_t slotId, MatchSimReason matchSimReason)
 {
     auto operatorConfigHisysevent = operatorConfigHisysevent_.lock();

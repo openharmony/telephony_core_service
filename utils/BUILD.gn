@@ -155,6 +155,7 @@ ohos_shared_library("libtel_common") {
     "openssl:libcrypto_shared",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
+    "node:node_header_notice",
   ]
 
   innerapi_tags = [ "platformsdk" ]

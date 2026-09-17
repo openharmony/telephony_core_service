@@ -63,6 +63,7 @@ ohos_fuzztest("GetSimEonsFuzzTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "eventhandler:libeventhandler",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",

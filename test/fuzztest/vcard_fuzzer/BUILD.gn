@@ -42,6 +42,7 @@ ohos_fuzztest("VcardFuzzTest") {
     "hilog:libhilog",
     "samgr:samgr_proxy",
     "ipc:ipc_single",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CoreServiceFuzzTest\"",

@@ -37,7 +37,7 @@ void RadioProtocolController::Init()
         return;
     }
 
-    slotCount_ = SIM_SLOT_COUNT;
+    slotCount_ = SIM_SLOT_COUNT_REAL >= DUAL_SLOT_COUNT ? DUAL_SLOT_COUNT : SIM_SLOT_COUNT_REAL;
     InitMemberFunc();
     // make sure communication is in the initial state
     CleanUpCommunication();
@@ -58,7 +58,7 @@ void RadioProtocolController::Init()
 int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
-    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+    if (slotId < DEFAULT_SIM_SLOT_ID || slotId >= static_cast<int32_t>(radioProtocol_.size()) || slotId == SIM_SLOT_2) {
         return 0;
     }
     return static_cast<int32_t>(radioProtocol_[slotId].technology);
@@ -67,7 +67,7 @@ int32_t RadioProtocolController::GetRadioProtocolTech(int32_t slotId)
 int32_t RadioProtocolController::GetRadioProtocolModemId(int32_t slotId)
 {
     std::unique_lock<ffrt::mutex> radioProtocolLock(radioProtocolMutex_);
-    if (slotId < 0 || slotId >= static_cast<int32_t>(radioProtocol_.size())) {
+    if (slotId < DEFAULT_SIM_SLOT_ID || slotId >= static_cast<int32_t>(radioProtocol_.size()) || slotId == SIM_SLOT_2) {
         return 0;
     }
     return static_cast<int32_t>(radioProtocol_[slotId].modemId);
@@ -372,6 +372,9 @@ void RadioProtocolController::SendRadioProtocolEvent(std::vector<RadioProtocol> 
         return;
     }
     for (int32_t i = 0; i < slotCount_; i++) {
+        if (i == SIM_SLOT_2) {
+            continue;
+        }
         AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(eventId);
         if (event == nullptr) {
             TELEPHONY_LOGE("SendRadioProtocol event is nullptr");

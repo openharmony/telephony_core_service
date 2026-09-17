@@ -26,9 +26,6 @@ ohos_unittest("core_service_common_event_test") {
     "$SOURCE_DIR/services/core/src/core_service_common_event_hub.cpp",
     "core_service_common_event_hub_test.cpp",
   ]
-  deps = [
-    "$SOURCE_DIR/test/mock/ffrt:ffrt_mocked",
-  ]
   include_dirs = [
     "$SOURCE_DIR/utils/log/include",
     "$SOURCE_DIR/interfaces/innerkits/include",
@@ -42,6 +39,7 @@ ohos_unittest("core_service_common_event_test") {
     "googletest:gmock_main",
     "ipc:ipc_single",
     "hilog:libhilog",
+    "ffrt:libffrt",
   ]
 
   subsystem_name = "telephony"

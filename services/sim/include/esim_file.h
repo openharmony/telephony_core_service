@@ -109,6 +109,7 @@ public:
     EuiccInfo2 ObtainEuiccInfo2(int32_t portIndex);
     ResponseEsimInnerResult AuthenticateServer(const AuthenticateConfigInfo &authenticateConfigInfo);
     std::string GetContractInfo(const GetContractInfoRequest &getContractInfoRequest);
+    int32_t GetEsimPortIndex();
 private:
     using FileProcessFunc = std::function<bool(const AppExecFwk::InnerEvent::Pointer &event)>;
     void InitMemberFunc();

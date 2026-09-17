@@ -64,7 +64,7 @@ private:
     std::mutex mtx_;
     std::mutex queryMtx_;
     bool hasEventDone_ = false;
-    bool hasQueryEventDone_ = false;
+    std::atomic<bool> hasQueryEventDone_{false};
     int slotId_ = 0;
     std::condition_variable processWait_;
     SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;

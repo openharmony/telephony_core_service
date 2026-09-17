@@ -139,6 +139,9 @@ public:
     typedef int32_t (*GetRealSimCountExtFunc)(int32_t realSlotCount);
     typedef bool (*GetResetActiveFlagFunc)(int32_t slotId, bool &isActive);
     typedef void (*SavePreferredNetworkValue)(int32_t slotId, int32_t networkMode);
+    typedef int32_t (*SwapM0M2SimCardsFunc)(int32_t slotId);
+    typedef bool (*GetSimLabelIndexFromLsiCfgFunc)(int32_t slotId, int32_t &simLabelindex);
+    typedef void (*NotifyRebootDetectSim)(bool isPSIM1Prensent, bool isPSIM2Prensent);
 
     CHECK_OPC_VERSION_IS_UPDATE checkOpcVersionIsUpdate_ = nullptr;
     UPDATE_OPC_VERSION updateOpcVersion_ = nullptr;
@@ -213,6 +216,7 @@ public:
     IsDistributedCommunicationConnected isDistributedCommunicationConnected_ = nullptr;
     RegisterEsimSwitchNotify registerEsimSwitchNotify_ = nullptr;
     RegisterEsimSwitchNotify unregisterEsimSwitchNotify_ = nullptr;
+    NotifyRebootDetectSim notifyRebootDetectSim_ = nullptr;
     bool GetStkBundleName(std::string &bundleName);
     void SendSimChgTypeInfo(int32_t slotId, int32_t type);
     bool ReportEventToChr(int32_t slotId, const char* scenario, int32_t cause);
@@ -223,6 +227,8 @@ public:
     int32_t GetRealSimCountExt(int32_t realSlotCount);
     bool GetResetActiveFlag(int32_t slotId, bool &isActive);
     void SavePreferredNetworkValueFunc(int32_t slotId, int32_t networkMode);
+    int32_t SwapM0M2SimCards(int32_t slotId);
+    bool GetSimLabelIndexFromLsiCfg(int32_t slotId, int32_t &simLabelindex);
 
 private:
     void* telephonyExtWrapperHandle_ = nullptr;
@@ -249,6 +255,8 @@ private:
     GetRealSimCountExtFunc getRealSimCountExt_ = nullptr;
     GetResetActiveFlagFunc getResetActiveFlag_ = nullptr;
     SavePreferredNetworkValue savePreferredNetworkValue_ = nullptr;
+    SwapM0M2SimCardsFunc swapM0M2SimCards_ = nullptr;
+    GetSimLabelIndexFromLsiCfgFunc getSimLabelIndexFromLsiCfg_ = nullptr;
 };
 
 #define TELEPHONY_EXT_WRAPPER ::OHOS::DelayedRefSingleton<TelephonyExtWrapper>::GetInstance()

@@ -81,7 +81,7 @@ int32_t CoreManagerInner::InitExtraModule(int32_t slotId)
         TELEPHONY_LOGE("InitExtraModule, has been inited, return!");
         return TELEPHONY_SUCCESS;
     }
-    if (SIM_SLOT_COUNT != DUAL_SLOT_COUNT) {
+    if (SIM_SLOT_COUNT_REAL != DUAL_SLOT_COUNT && SIM_SLOT_COUNT != THREE_CARD_COUNT) {
         TELEPHONY_LOGE("InitExtraModule, can not been inited because of slot number, return!");
         return TELEPHONY_ERROR;
     }
@@ -153,6 +153,12 @@ int32_t CoreManagerInner::RegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->RegisterCoreNotify(slotId, handler, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_ENABLING_PROFLIE_START && what <= RadioEvent::RADIO_ESIM_END) {
+        if (esimManager_ == nullptr) {
+            TELEPHONY_LOGE("esimManager_ is null");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        esimManager_->RegisterCoreNotify(slotId, handler, what);
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
@@ -179,6 +185,12 @@ int32_t CoreManagerInner::UnRegisterCoreNotify(
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         simManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
+    } else if (what >= RadioEvent::RADIO_ESIM_ENABLING_PROFLIE_START && what <= RadioEvent::RADIO_ESIM_END) {
+        if (esimManager_ == nullptr) {
+            TELEPHONY_LOGE("esimManager_ is null");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        esimManager_->UnRegisterCoreNotify(slotId, observerCallBack, what);
     } else {
         if (telRilManager_ == nullptr) {
             TELEPHONY_LOGE("telRilManager is null!");
@@ -2782,6 +2794,15 @@ int32_t CoreManagerInner::GetEuiccInfo(int32_t slotId, EuiccInfo &eUiccInfo)
     return esimManager_->GetEuiccInfo(slotId, eUiccInfo);
 }
 
+int32_t CoreManagerInner::GetEsimPortIndex(int32_t slotId, int32_t &portIndex)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("GetEsimPortIndex esimManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return esimManager_->GetEsimPortIndex(slotId, portIndex);
+}
+
 int32_t CoreManagerInner::DisableProfile(
     int32_t slotId, int32_t portIndex, const std::u16string &iccId, bool refresh, int32_t &enumResult)
 {
@@ -3085,6 +3106,60 @@ bool CoreManagerInner::IsModemInitDone(int32_t slotId)
         return false;
     }
     return simManager_->IsModemInitDone(slotId);
+}
+
+int32_t CoreManagerInner::SwapM0M2SimCards(int32_t slotId)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SwapM0M2SimCards(slotId);
+}
+
+std::string CoreManagerInner::GetOverseasCarrierBySimInfo(const SimCardInfo &simCardInfo)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return "";
+    }
+    return simManager_->GetOverseasCarrierBySimInfo(simCardInfo);
+}
+
+int32_t CoreManagerInner::SaveCardFileDetectData(const CardFileDetectData &data)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->SaveCardFileDetectData(data);
+}
+
+int32_t CoreManagerInner::GetAllSimCardInfo(std::vector<SimCardInfo> &results)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return simManager_->GetAllSimCardInfo(results);
+}
+
+void CoreManagerInner::SetSpecifiedIccidBySlotId(int32_t slotId, std::string &iccid)
+{
+    if (simManager_ == nullptr) {
+        TELEPHONY_LOGE("simManager_ is null!");
+        return;
+    }
+    simManager_->SetSpecifiedIccidBySlotId(slotId, iccid);
+}
+
+void CoreManagerInner::PublishEsimProfileChange(int32_t slotId, int32_t what, int32_t data)
+{
+    if (esimManager_ == nullptr) {
+        TELEPHONY_LOGE("esimManager_ is null!");
+        return;
+    }
+    esimManager_->PublishEsimProfileChange(slotId, what, data);
 }
 } // namespace Telephony
 } // namespace OHOS

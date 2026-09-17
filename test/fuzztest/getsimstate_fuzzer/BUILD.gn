@@ -59,6 +59,7 @@ ohos_fuzztest("GetSimStateFuzzTest") {
     "libxml2:libxml2",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
+    "node:node_header_notice",
   ]
   defines = [
     "TELEPHONY_LOG_TAG = \"GetSimStateFuzzTest\"",
