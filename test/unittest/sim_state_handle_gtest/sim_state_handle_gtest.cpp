@@ -239,7 +239,8 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_009, Function | MediumTest
         simStateManager_->simStateHandle_->unlockRespon_.result = UNLOCK_OK;
         simStateManager_->simStateHandle_->unlockRespon_.remain = -1;
         simStateManager_->simStateHandle_->unlockRespon_.lockState = 1;
-        simStateManager_->UnlockPin(slotId, "1234", response);
+        std::string password = "1234";
+        simStateManager_->UnlockPin(slotId, password, response);
         EXPECT_FALSE(simStateManager_->simStateHandle_->GetSimState() == SimState::SIM_STATE_NOT_READY);
     });
     usleep(100 * 1000);
@@ -281,7 +282,7 @@ HWTEST_F(SimStateHandleTest, Telephony_SimStateHandle_011, Function | MediumTest
     simFile_->fileController_ = std::make_shared<UsimFileController>(0);
     simFile_->serviceTable_ = "";
     EXPECT_FALSE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
-    simFile_->serviceTable_ = "867F1F1C234E0000400051";
+    simFile_->serviceTable_ = "867F1F1C234E0000400050";
     EXPECT_TRUE(simFile_->IsServiceAvailable(UsimService::USIM_FDN));
     simFile_->serviceTable_ = "00000000000000000000";
     EXPECT_FALSE(simFile_->IsSimServiceAvailable(UsimService::USIM_SPN));
