@@ -208,6 +208,8 @@ private:
     void UpdateEsimOSVersion(int32_t slotId);
 #endif
     void UpdateSimStateToStateRegistry(int32_t slotId, LockReason reason);
+    bool IsSupportedEsim();
+    bool IsEsim();
 
 private:
     static const std::map<uint32_t, Func> memberFuncMap_;
