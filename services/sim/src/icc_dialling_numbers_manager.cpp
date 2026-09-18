@@ -259,7 +259,7 @@ int32_t IccDiallingNumbersManager::AddIccDiallingNumbers(
     diallingNumbersCache_->UpdateDiallingNumberToIcc(fileId, diallingNumber, ADD_FLAG, false, response);
     while (!hasEventDone_) {
         TELEPHONY_LOGI("AddIccDiallingNumbers::wait(), response = false");
-        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == std::cv_status::timeout) {
+        if (processWait_.wait_for(lock, std::chrono::seconds(WAIT_ONE_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
