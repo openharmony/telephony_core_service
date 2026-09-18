@@ -23,6 +23,7 @@
 #ifdef CORE_SERVICE_SUPPORT_ESIM
 #include "esim_service_client.h"
 #include "esim_controller.h"
+#include "reset_response.h"
 #endif
 #include "hilog/log.h"
 #include "if_system_ability_manager.h"
@@ -49,6 +50,14 @@
 using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
+    static const std::string ESIM_SUPPORT_PARAM = "const.ril.esim_type";
+static const std::string SUPPORT_ESIM_MEP = "const.ril.sim.esim_support_mep";
+static constexpr const char* TYPE_ESIM_3_SEL_2 = "3";
+static const std::string TYPE_ESIM_ONLY = "6";
+static const std::string GSM_SIM_ATR = "gsm.sim.hw_atr";
+static constexpr int32_t MAX_INNER_SLOT_NUM = 4;
+static const int32_t CARD_ATR_LEN = 65;
+
 const std::map<uint32_t, SimStateHandle::Func> SimStateHandle::memberFuncMap_ = {
     { MSG_SIM_UNLOCK_PIN_DONE,
         [](SimStateHandle *handle, int32_t slotId, const AppExecFwk::InnerEvent::Pointer &event) {
@@ -450,7 +459,7 @@ void SimStateHandle::HandleSimAbsent(int32_t slotId)
 void SimStateHandle::ProcessNewSimStatus(int newSimStatus)
 {
     if (newSimStatus == ICC_CONTENT_UNKNOWN) {
-        if (CoreManagerInner::GetInstance().IsEsim(slotId_) && modemInitDone_) {
+        if (IsEsim() && modemInitDone_) {
             if (oldSimStatus_ == ICC_CONTENT_READY) {
                 CoreManagerInner::GetInstance().CheckIfNeedSwitchMainSlotId(true);
             }
@@ -1200,6 +1209,43 @@ void SimStateHandle::SetSpecifiedIccidBySlotId(std::string &iccid)
     TELEPHONY_LOGI("SimStateHandle::SetSpecifiedIccidBySlotId slotId:%{public}d", slotId_);
     std::unique_lock<ffrt::shared_mutex> lck(specifiedIccidMutex_);
     specifiedIccid_ = iccid;
+}
+
+bool SimStateHandle::IsSupportedEsim()
+{
+    std::string esimType = OHOS::system::GetParameter(ESIM_SUPPORT_PARAM, "");
+    bool isEsim3Sel2 = (esimType == TYPE_ESIM_3_SEL_2 && slotId_ == SIM_SLOT_1);
+    bool isEsimOnly = (esimType == TYPE_ESIM_ONLY && slotId_ == SIM_SLOT_0);
+    bool isSupportEsimMep = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
+    if (isEsim3Sel2 || isEsimOnly || isSupportEsimMep) {
+        return true;
+    }
+    return false;
+}
+ 
+bool SimStateHandle::IsEsim()
+{
+#ifdef CORE_SERVICE_SUPPORT_ESIM
+    if (slotId_ >= MAX_INNER_SLOT_NUM || !IsSupportedEsim()) {
+        return false;
+    }
+    std::string propAtr = "";
+    propAtr = slotId_ == SIM_SLOT_0 ? GSM_SIM_ATR : GSM_SIM_ATR + std::to_string(slotId_);
+    char buf[CARD_ATR_LEN + 1] = {0};
+    GetParameter(propAtr.c_str(), "", buf, CARD_ATR_LEN);
+    std::string cardAtr(buf);
+    if (cardAtr.empty()) {
+        TELEPHONY_LOGE("card atr is empty.");
+        return false;
+    }
+ 
+    ResetResponse resetResponse;
+    resetResponse.AnalysisAtrData(cardAtr);
+    TELEPHONY_LOGI("slot%{public}d isEsim: %{public}s", slotId_, resetResponse.IsEuiccAvailable() ? "true" : "false");
+    return resetResponse.IsEuiccAvailable();
+#else
+    return false;
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS
