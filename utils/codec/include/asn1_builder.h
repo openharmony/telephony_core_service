@@ -19,7 +19,6 @@
 #include <cstdbool>
 #include <cstdint>
 #include <list>
-#include <mutex>
 #include <vector>
 #include "asn1_node.h"
 #include "telephony_log_wrapper.h"
@@ -41,7 +40,7 @@ public:
 private:
     uint32_t tag_ = 0;
     std::list<std::shared_ptr<Asn1Node>> children_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

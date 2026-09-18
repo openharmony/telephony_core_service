@@ -33,7 +33,7 @@ const uint32_t MAX_ENCODE_DATA_LENGTH = 10240;
 
 void Asn1Builder::Asn1AddChild(const std::shared_ptr<Asn1Node> node)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     children_.push_back(node);
 }
 
@@ -135,7 +135,7 @@ std::shared_ptr<Asn1Node> Asn1Builder::Asn1Build()
     // calculate newNode's length, and move asn1Node from builder to newNode
     std::shared_ptr<Asn1Node> asn1Node = nullptr;
     uint32_t dataLen = 0;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (children_.size() > MAX_UINT8) {
         TELEPHONY_LOGE("children_ is out of the bounds.");
         return nullptr;

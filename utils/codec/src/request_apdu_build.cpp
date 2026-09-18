@@ -28,7 +28,7 @@ const uint32_t P1_STORE_DATA_END = 0x91;
 
 std::list<std::unique_ptr<ApduCommand>> RequestApduBuild::GetCommands()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     std::list<std::unique_ptr<ApduCommand>> apduCommandTempLst(std::move(apduCommandLst_));
     apduCommandLst_.clear();
     return apduCommandTempLst;
@@ -61,7 +61,7 @@ void RequestApduBuild::BuildStoreData(const std::string &cmdHex)
     /* When handling packet fragmentation, if the last packet of data is less than 255 bytes,
     it requires special handling outside the loop.
     */
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     for (uint32_t i = 1; i < totalSubCmds; ++i) {
         std::string data = cmdHex.substr(startPos, cmdLen);
         ApduData apduData;

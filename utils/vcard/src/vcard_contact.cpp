@@ -14,6 +14,7 @@
  */
 #include "vcard_contact.h"
 
+#include <ffrt.h>
 #include <numeric>
 
 #include "telephony_errors.h"
@@ -25,7 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::mutex mutex_;
+ffrt::mutex mutex_;
 void VCardContact::Init() {}
 
 void VCardContact::AddRawData(std::shared_ptr<VCardRawData> rawData, int32_t &errorCode)
@@ -55,7 +56,7 @@ void VCardContact::AddRawData(std::shared_ptr<VCardRawData> rawData, int32_t &er
 void VCardContact::AddDatas(std::string name, std::string rawValue, std::string byte, std::vector<std::string> values,
     std::string propValue, std::vector<std::string> groups, std::map<std::string, std::vector<std::string>> parasMap)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (name == VCARD_TYPE_VERSION) {
         vCardType_ = rawValue;
     } else if (name == VCARD_TYPE_FN || name == VCARD_TYPE_NAME || name == VCARD_TYPE_N ||
@@ -228,7 +229,7 @@ void VCardContact::BuildValuesBuckets(int32_t rawId, std::vector<DataShare::Data
 
 int32_t VCardContact::BuildContact(std::shared_ptr<DataShare::DataShareResultSet> resultSet)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (resultSet == nullptr) {
         return TELEPHONY_ERROR;
     }

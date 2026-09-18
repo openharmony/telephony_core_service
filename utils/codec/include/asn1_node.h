@@ -19,7 +19,7 @@
 #include <cstdbool>
 #include <cstdint>
 #include <list>
-#include <mutex>
+#include <ffrt.h>
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -63,7 +63,7 @@ public:
 
     void AddNodeChildren(const std::shared_ptr<Asn1Node> &asn1Node)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::unique_lock<ffrt::mutex> lock(mutex_);
         children_.push_back(asn1Node);
     }
 
@@ -84,7 +84,7 @@ private:
     uint32_t dataOffset_ = 0;
     uint32_t dataLength_ = 0;
     uint32_t encodedLength_ = 0;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

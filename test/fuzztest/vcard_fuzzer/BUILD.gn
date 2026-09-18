@@ -39,6 +39,7 @@ ohos_fuzztest("VcardFuzzTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "samgr:samgr_proxy",
     "ipc:ipc_single",

@@ -17,7 +17,6 @@
 #define OHOS_VCARD_DECODER_V21_H
 
 #include <memory>
-#include <mutex>
 #include <set>
 
 #include "vcard_decoder.h"

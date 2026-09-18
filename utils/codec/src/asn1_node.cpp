@@ -92,7 +92,7 @@ void Asn1Node::Asn1Write(std::vector<uint8_t> &dest)
     }
 
     // Write the data.
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (constructed_ && dataBytes_.empty()) {
         std::shared_ptr<Asn1Node> asn1Node = nullptr;
         for (auto it = children_.begin(); it != children_.end(); ++it) {
@@ -119,7 +119,7 @@ std::shared_ptr<Asn1Node> Asn1Node::Asn1GetChild(const uint32_t tag)
         return nullptr;
     }
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         curNode = *it;
         if (curNode == nullptr) {
@@ -172,7 +172,7 @@ int32_t Asn1Node::Asn1GetChildren(const uint32_t tag, std::list<std::shared_ptr<
         return TELEPHONY_ERR_FAIL;
     }
     std::shared_ptr<Asn1Node> curNode = nullptr;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         curNode = *it;
         if (curNode == nullptr) {
@@ -192,7 +192,7 @@ int32_t Asn1Node::Asn1BuildChildren()
         return TELEPHONY_ERR_FAIL;
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (children_.empty()) {
         TELEPHONY_LOGD("children is empty");
     }

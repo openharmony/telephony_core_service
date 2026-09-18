@@ -17,7 +17,7 @@
 #define REQUEST_APDU_BUILD_H
 
 #include <list>
-#include <mutex>
+#include <ffrt.h>
 #include "apdu_command.h"
 
 namespace OHOS {
@@ -34,7 +34,7 @@ private:
         const std::string &cmdHex, ApduData &apduData);
     int32_t channelId_ = 0;
     std::list<std::unique_ptr<ApduCommand>> apduCommandLst_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
