@@ -609,7 +609,7 @@ int32_t SimStateManager::GetSimIO(
         TELEPHONY_LOGE("GetSimIO(), simStateHandle_ is nullptr!!!");
         return SIM_AUTH_FAIL;
     }
-    std::unique_lock<ffrt> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     int32_t ret = SIM_AUTH_FAIL;
     ret = simStateHandle_->GetSimIO(slotId, requestInfo);
