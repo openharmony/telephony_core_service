@@ -205,6 +205,16 @@ int32_t TelephonyStateRegistryClient::UpdateSimActiveState(int32_t slotId, bool 
     }
     return proxy->UpdateSimActiveState(slotId, activeStateResult);
 }
+
+int32_t TelephonyStateRegistryClient::UpdateVoIPCallState(const VoIPCallStateInfo &info)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is null!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return proxy->UpdateVoIPCallState(info);
+}
 } // namespace Telephony
 }
 
