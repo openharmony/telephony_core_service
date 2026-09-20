@@ -20,6 +20,7 @@
 
 #include "i_telephony_state_notify.h"
 #include "state_registry_ipc_interface_code.h"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,6 +52,7 @@ public:
     int32_t UpdateVoiceMailMsgIndicator(int32_t slotId, bool voiceMailMsgResult) override;
     int32_t UpdateIccAccount() override;
     int32_t UpdateSimActiveState(int32_t slotId, bool activeStateResult) override;
+    int32_t UpdateVoIPCallState(const VoIPCallStateInfo &info) override;
 
     int32_t RegisterStateChange(const sptr<TelephonyObserverBroker> &telephonyObserver,
         int32_t slotId, uint32_t mask, bool isUpdate) override;
