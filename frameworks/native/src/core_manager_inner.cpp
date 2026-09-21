@@ -1472,6 +1472,22 @@ int32_t CoreManagerInner::GetNetworkSliceEhplmn(int32_t slotId, int32_t eventId)
     return telRilManager_->GetNetworkSliceEhplmn(slotId, response);
 }
 
+int32_t CoreManagerInner::SetPrimarySlot(
+    int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+{
+    if (telRilManager_ == nullptr) {
+        TELEPHONY_LOGE("set primary slot telRilManager is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AppExecFwk::InnerEvent::Pointer response = AppExecFwk::InnerEvent::Get(eventId);
+    if (response == nullptr) {
+        TELEPHONY_LOGE("set primary slot response is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    response->SetOwner(handler);
+    return telRilManager_->SetPrimarySlot(slotId, response);
+}
+
 /******************** telRilManager end *******************/
 /******************** networkSearchManager start *******************/
 int32_t CoreManagerInner::GetPsRadioTech(int32_t slotId, int32_t &psRadioTech)
