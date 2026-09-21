@@ -95,7 +95,7 @@ int32_t CoreServiceSim::GetSimState(int32_t slotId, const sptr<IRawParcelCallbac
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimState slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -142,7 +142,7 @@ int32_t CoreServiceSim::GetCardType(int32_t slotId, CardType &cardType)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetCardType slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
 
@@ -156,7 +156,7 @@ int32_t CoreServiceSim::GetISOCountryCodeForSim(int32_t slotId, std::u16string &
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetISOCountryCodeForSim slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetISOCountryCodeForSim(slotId, countryCode);
@@ -169,7 +169,7 @@ int32_t CoreServiceSim::GetSimSpn(int32_t slotId, std::u16string &spn)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimSpn slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimSpn(slotId, spn);
@@ -190,7 +190,7 @@ int32_t CoreServiceSim::GetSimIccId(int32_t slotId, std::u16string &iccId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimIccId slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimIccId(slotId, iccId);
@@ -203,7 +203,7 @@ int32_t CoreServiceSim::GetSimOperatorNumeric(int32_t slotId, std::u16string &op
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimOperatorNumeric slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimOperatorNumeric(slotId, operatorNumeric);
@@ -224,7 +224,7 @@ int32_t CoreServiceSim::GetIMSI(int32_t slotId, std::u16string &imsi)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetIMSI slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetIMSI(slotId, imsi);
@@ -241,7 +241,7 @@ int32_t CoreServiceSim::IsCTSimCard(int32_t slotId, const sptr<IRawParcelCallbac
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("IsCTSimCard slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -269,7 +269,7 @@ bool CoreServiceSim::IsSimActive(int32_t slotId, const sptr<IRawParcelCallback> 
         return false;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("IsSimActive slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -337,7 +337,7 @@ int32_t CoreServiceSim::GetSimGid1(int32_t slotId, std::u16string &gid1)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimGid1 slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimGid1(slotId, gid1);
@@ -385,7 +385,7 @@ int32_t CoreServiceSim::GetSimAccountInfo(int32_t slotId, IccAccountInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimAccountInfo slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimAccountInfo(slotId, denied, info);
@@ -406,7 +406,7 @@ int32_t CoreServiceSim::SetDefaultVoiceSlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetDefaultVoiceSlotId slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SetDefaultVoiceSlotId(slotId);
@@ -468,7 +468,7 @@ int32_t CoreServiceSim::SetPrimarySlotId(int32_t slotId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetPrimarySlotId slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     bool hasSim = false;
@@ -515,7 +515,7 @@ int32_t CoreServiceSim::SetShowNumber(int32_t slotId, const std::u16string &numb
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetShowNumber slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, number, callback]() {
@@ -547,7 +547,7 @@ int32_t CoreServiceSim::GetShowNumber(int32_t slotId, const sptr<IRawParcelCallb
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetShowNumber slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -584,7 +584,7 @@ int32_t CoreServiceSim::SetShowName(int32_t slotId, const std::u16string &name,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetShowName slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, name, callback]() {
@@ -620,7 +620,7 @@ int32_t CoreServiceSim::GetShowName(int32_t slotId, const sptr<IRawParcelCallbac
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetShowName slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -679,7 +679,7 @@ int32_t CoreServiceSim::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetOperatorConfigs slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetOperatorConfigs(slotId, poc);
@@ -705,7 +705,7 @@ int32_t CoreServiceSim::UnlockPin(const int32_t slotId, const std::u16string &pi
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UnlockPin slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, pin, callback]() {
@@ -749,7 +749,7 @@ int32_t CoreServiceSim::UnlockPuk(const int slotId, const std::u16string &newPin
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UnlockPuk slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin, puk, callback]() {
@@ -793,7 +793,7 @@ int32_t CoreServiceSim::AlterPin(const int slotId, const std::u16string &newPin,
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("AlterPin slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin, oldPin, callback]() {
@@ -837,7 +837,7 @@ int32_t CoreServiceSim::UnlockPin2(const int32_t slotId, const std::u16string &p
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UnlockPin2 slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, pin2, callback]() {
@@ -881,7 +881,7 @@ int32_t CoreServiceSim::UnlockPuk2(const int slotId, const std::u16string &newPi
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UnlockPuk2 slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin2, puk2, callback]() {
@@ -925,7 +925,7 @@ int32_t CoreServiceSim::AlterPin2(const int slotId, const std::u16string &newPin
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("AlterPin2 slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimPinExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, newPin2, oldPin2, callback]() {
@@ -972,7 +972,7 @@ int32_t CoreServiceSim::SetLockState(int32_t slotId, const LockInfo &options, co
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetLockState slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, options, callback]() {
@@ -1014,7 +1014,7 @@ int32_t CoreServiceSim::GetLockState(int32_t slotId, LockType lockType, const sp
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetLockState slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, lockType, callback]() {
@@ -1063,7 +1063,7 @@ int32_t CoreServiceSim::SetActiveSim(int32_t slotId, int32_t enable)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetActiveSim slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     SetParameter(USER_PREFER_PRIMARY_SLOT.c_str(), "true");
@@ -1103,7 +1103,7 @@ int32_t CoreServiceSim::GetSimTelephoneNumber(int32_t slotId, std::u16string &te
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimTelephoneNumber slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetSimTelephoneNumber(slotId, telephoneNumber);
@@ -1137,7 +1137,7 @@ int32_t CoreServiceSim::GetVoiceMailIdentifier(int32_t slotId, std::u16string &v
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetVoiceMailIdentifier slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetVoiceMailIdentifier(slotId, voiceMailIdentifier);
@@ -1158,7 +1158,7 @@ int32_t CoreServiceSim::GetVoiceMailNumber(int32_t slotId, std::u16string &voice
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetVoiceMailNumber slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetVoiceMailNumber(slotId, voiceMailNumber);
@@ -1180,7 +1180,7 @@ int32_t CoreServiceSim::GetVoiceMailCount(int32_t slotId, int32_t &voiceMailCoun
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetVoiceMailCount slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetVoiceMailCount(slotId, voiceMailCount);
@@ -1230,7 +1230,7 @@ int32_t CoreServiceSim::QueryIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("QueryIccDiallingNumbers slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->QueryIccDiallingNumbers(slotId, type, reslut);
@@ -1252,7 +1252,7 @@ int32_t CoreServiceSim::AddIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("AddIccDiallingNumbers slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->AddIccDiallingNumbers(slotId, type, diallingNumber);
@@ -1274,7 +1274,7 @@ int32_t CoreServiceSim::DelIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("DelIccDiallingNumbers slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->DelIccDiallingNumbers(slotId, type, diallingNumber);
@@ -1296,7 +1296,7 @@ int32_t CoreServiceSim::UpdateIccDiallingNumbers(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UpdateIccDiallingNumbers slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->UpdateIccDiallingNumbers(slotId, type, diallingNumber);
@@ -1318,7 +1318,7 @@ int32_t CoreServiceSim::SetVoiceMailInfo(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SetVoiceMailInfo slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SetVoiceMailInfo(slotId, mailName, mailNumber);
@@ -1331,7 +1331,7 @@ int32_t CoreServiceSim::GetOpKey(int32_t slotId, std::u16string &opkey)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetOpKey slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetOpKey(slotId, opkey);
@@ -1353,7 +1353,7 @@ int32_t CoreServiceSim::GetOpName(int32_t slotId, std::u16string &opname)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetOpName slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->GetOpName(slotId, opname);
@@ -1374,7 +1374,7 @@ int32_t CoreServiceSim::SendEnvelopeCmd(int32_t slotId, const std::string &cmd)
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SendEnvelopeCmd slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SendEnvelopeCmd(slotId, cmd);
@@ -1395,7 +1395,7 @@ int32_t CoreServiceSim::SendTerminalResponseCmd(int32_t slotId, const std::strin
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SendTerminalResponseCmd slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SendTerminalResponseCmd(slotId, cmd);
@@ -1416,7 +1416,7 @@ int32_t CoreServiceSim::SendCallSetupRequestResult(int32_t slotId, bool accept)
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SendCallSetupRequestResult slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SendCallSetupRequestResult(slotId, accept);
@@ -1439,7 +1439,7 @@ int32_t CoreServiceSim::UnlockSimLock(int32_t slotId, const PersoLockInfo &lockI
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("UnlockSimLock slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->UnlockSimLock(slotId, lockInfo, response);
@@ -1456,7 +1456,7 @@ int32_t CoreServiceSim::HasOperatorPrivileges(const int32_t slotId, const sptr<I
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("HasOperatorPrivileges slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
@@ -1489,7 +1489,7 @@ int32_t CoreServiceSim::SimAuthentication(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("SimAuthentication slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     return simManager_->SimAuthentication(slotId, authType, authData, response);
@@ -1539,7 +1539,7 @@ int32_t CoreServiceSim::GetSimLabel(int32_t slotId, SimLabel &simLabel, const sp
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!MultiSimsCapabilityMgr::IsMultiSimsCapabilitySupported(slotId)) {
-        TELEPHONY_LOGE("HasSimCard slotId %{public}d is not supported", slotId);
+        TELEPHONY_LOGE("GetSimLabel slotId %{public}d is not supported", slotId);
         return TELEPHONY_ERR_SLOTID_INVALID;
     }
     AsyncSimGeneralExecute([wp = std::weak_ptr<ISimManager>(simManager_), slotId, callback]() {
