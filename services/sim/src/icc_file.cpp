@@ -897,6 +897,10 @@ void IccFile::OnOpkeyLoad(const std::string opkey, const std::string opName)
 
 bool IccFile::ExecutOriginalSimIoRequest(int32_t fileId, int fileIdDone)
 {
+    if (fileController_ == nullptr) {
+        TELEPHONY_LOGE("ExecutOriginalSimIoRequest fileController_ is null");
+        return false;
+    }
     AppExecFwk::InnerEvent::Pointer event = BuildCallerInfo(fileIdDone);
     fileController_->ObtainBinaryFile(fileId, event);
     return true;

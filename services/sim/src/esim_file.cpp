@@ -371,6 +371,10 @@ void EsimFile::ProcessEsimOpenChannel(const std::u16string &aid, const SimMessag
     std::string appId = OHOS::Telephony::ToUtf8(aid);
     bool isSupportEsimMEP = OHOS::system::GetBoolParameter(SUPPORT_ESIM_MEP, false);
     AppExecFwk::InnerEvent::Pointer response = BuildCallerInfo(MSG_ESIM_OPEN_CHANNEL_DONE);
+    if (response == nullptr) {
+        TELEPHONY_LOGI("ProcessEsimOpenChannel BuildCallerInfo return null");
+        return;
+    }
     if (telRilManager_ == nullptr) {
         return;
     }
@@ -632,6 +636,11 @@ bool EsimFile::RealProcessRequestAllProfilesDone()
 
 bool EsimFile::SplitMccAndMnc(const std::string mccMnc, std::string &mcc, std::string &mnc)
 {
+    int32_t max_length = 6;
+    if (mccMnc.length() < max_length) {
+        TELEPHONY_LOGE("SplitMccAndMnc mccMnc length too short: %{public}zu", mccMnc.length());
+        return false;
+    }
     std::string mMcc(NUMBER_THREE, '\0');
     mMcc[NUMBER_ZERO] = mccMnc[NUMBER_ONE];
     mMcc[NUMBER_ONE] = mccMnc[NUMBER_ZERO];
@@ -959,7 +968,8 @@ bool EsimFile::ProcessDisableProfile(int32_t slotId, const AppExecFwk::InnerEven
         return false;
     }
     int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-    if (apduResult == TELEPHONY_ERR_FAIL) {
+    if (apduResult != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("ProcessDisableProfile SimTransmitApduLogicalChannel failed, result: %{public}d", apduResult);
         return false;
     }
     return true;
@@ -978,7 +988,8 @@ bool EsimFile::ProcessObtainSmdsAddress(int32_t slotId, const AppExecFwk::InnerE
         return false;
     }
     int32_t apduResult = telRilManager_->SimTransmitApduLogicalChannel(slotId, reqInfo, responseEvent);
-    if (apduResult == TELEPHONY_ERR_FAIL) {
+    if (apduResult != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("ProcessObtainSmdsAddress SimTransmitApduLogicalChannel failed, result: %{public}d", apduResult);
         return false;
     }
     return true;
@@ -1784,7 +1795,7 @@ ResponseEsimBppResult EsimFile::ObtainLoadBoundProfilePackage(int32_t portIndex,
         TELEPHONY_LOGE("ProcessLoadBoundProfilePackage encode failed");
         SyncCloseChannel(MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE);
         loadBPPResult_.resultCode_ = static_cast<int32_t>(ResultInnerCode::RESULT_EUICC_CARD_DATA_PROCESS_ERROR);
-        return ResponseEsimBppResult();
+        return loadBPPResult_;
     }
     SyncCloseChannel(MSG_ESIM_LOAD_BOUND_PROFILE_PACKAGE);
     return loadBPPResult_;
@@ -2061,6 +2072,10 @@ void EsimFile::BuildApduForSequenceOf88(RequestApduBuild &codec, std::shared_ptr
 void EsimFile::BuildApduForSequenceOf86(RequestApduBuild &codec, std::shared_ptr<Asn1Node> &bppNode,
     std::shared_ptr<Asn1Node> &sequenceOf86)
 {
+    if (bppNode == nullptr || sequenceOf86 == nullptr) {
+        TELEPHONY_LOGE("BuildApduForSequenceOf86 bppNode sequenceOf86 is nullptr");
+        return;
+    }
     std::string hexStr;
     std::list<std::shared_ptr<Asn1Node>> elementSeqs;
     int32_t elementRes = sequenceOf86->Asn1GetChildren(TAG_ESIM_CTX_6, elementSeqs);
@@ -3063,6 +3078,10 @@ void EsimFile::GetImeiBytes(std::vector<uint8_t> &imeiBytes, const std::string &
         std::string newImei = imei;
         newImei += 'F';
         Asn1Utils::BcdToBytes(newImei, imeiBytes);
+        if (imeiBytes.size() <= LAST_BYTE_OF_IMEI) {
+            TELEPHONY_LOGE("GetImeiBytes imeiBytes size too small: %{public}zu", imeiBytes.size());
+            return;
+        }
         unsigned char last = imeiBytes[LAST_BYTE_OF_IMEI];
         imeiBytes[LAST_BYTE_OF_IMEI] = static_cast<unsigned char>((last & 0xFF) <<
             OFFSET_FOUR_BIT | ((last & 0xFF) >> OFFSET_FOUR_BIT));
@@ -3465,6 +3484,11 @@ bool EsimFile::ProcessGetContractInfo(const AppExecFwk::InnerEvent::Pointer &res
 
 bool EsimFile::ProcessGetContractInfoDone(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ProcessGetContractInfoDone event is nullptr");
+        NotifyReady(getContractInfoMutex_, isGetContractInfoReady_, getContractInfoCv_);
+        return false;
+    }
     std::unique_ptr<IccFromRilMsg> rcvMsg = event->GetUniqueObject<IccFromRilMsg>();
     if (rcvMsg == nullptr) {
         TELEPHONY_LOGE("receive message is nullptr");

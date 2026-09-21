@@ -802,6 +802,10 @@ void MultiSimController::SortCache()
     for (size_t j = 0; j < count; j++) {
         HILOG_COMM_INFO(
             "index = %{public}d j = %{public}lu", localCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
+        if (localCacheInfo_[j].slotIndex < 0 || localCacheInfo_[j].slotIndex >= maxCount_) {
+            TELEPHONY_LOGE("SortCache slotIndex out of range: %{public}d", localCacheInfo_[j].slotIndex);
+            continue;
+        }
         sortCache[localCacheInfo_[j].slotIndex] = localCacheInfo_[j];
     }
     localCacheInfo_ = sortCache;
@@ -827,8 +831,9 @@ void MultiSimController::SortAllCache()
     for (size_t j = 0; j < count; j++) {
         TELEPHONY_LOGI(
             "index = %{public}d j = %{public}lu", allLocalCacheInfo_[j].slotIndex, static_cast<unsigned long>(j));
-        if (allLocalCacheInfo_[j].simId - 1 < static_cast<int>(sortCache.size())) {
-            sortCache[allLocalCacheInfo_[j].simId - 1] = allLocalCacheInfo_[j];
+        if (allLocalCacheInfo_[j].simId - 1 >= 0 && allLocalCacheInfo_[j].simId - 1 <
+            static_cast<int>(sortCache.size())) {
+                sortCache[allLocalCacheInfo_[j].simId - 1] = allLocalCacheInfo_[j];
         }
     }
     allLocalCacheInfo_ = sortCache;
@@ -1542,6 +1547,10 @@ void MultiSimController::SavePrimaryCardInfo(int32_t slotId)
 {
     lastPrimarySlotId_ = slotId;
     SetParameter(PRIMARY_SLOTID_KEY.c_str(), std::to_string(slotId).c_str());
+    if (slotId < 0 || slotId >= static_cast<int32_t>(simFileManager_.size())) {
+        TELEPHONY_LOGE("SavePrimaryCardInfo slotId out of range %{public}d", slotId);
+        return;
+    }
     if (simFileManager_[slotId] == nullptr) {
         TELEPHONY_LOGE("simFileManager_ is null slotId is %{public}d", slotId);
         return;

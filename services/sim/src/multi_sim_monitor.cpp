@@ -626,6 +626,10 @@ void MultiSimMonitor::CheckSimNotifyRegister()
 
 void MultiSimMonitor::CheckDataShareError()
 {
+    if (controller_ == nullptr) {
+        TELEPHONY_LOGE("CheckDataShareError controller_ is null");
+        return;
+    }
     if (controller_->IsDataShareError() || GetBlockLoadOperatorConfig() || IsNeedOperatorReLoad()) {
         TELEPHONY_LOGI("CheckDataShareError or GetBlockLoadOperatorConfig is true, need Reset Opkey");
         CheckOpcNeedUpdata(true);

@@ -70,6 +70,10 @@ void IccDiallingNumbersHandler::GetDiallingNumbers(
     }
     AppExecFwk::InnerEvent::Pointer ptDiallingNumberRead =
         BuildCallerInfo(MSG_SIM_OBTAIN_ADN_DONE, loadRequest->GetLoadId());
+    if (ptDiallingNumberRead == nullptr) {
+        TELEPHONY_LOGE("GetDiallingNumbers ptDiallingNumberRead is null pointer");
+        return;
+    }
     fileController_->ObtainLinearFixedFile(ef, GetFilePath(ef), index, ptDiallingNumberRead);
 }
 
@@ -108,6 +112,10 @@ void IccDiallingNumbersHandler::UpdateDiallingNumbers(
     std::shared_ptr<void> diallingNumberObj = static_cast<std::shared_ptr<void>>(infor.diallingNumber);
     AppExecFwk::InnerEvent::Pointer linearFileSize =
         BuildCallerInfo(MSG_SIM_OBTAIN_LINEAR_FILE_SIZE_DONE, diallingNumberObj, loadRequest->GetLoadId());
+    if (linearFileSize == nullptr) {
+        TELEPHONY_LOGE("UpdateDiallingNumbers linearFileSize is null pointer");
+        return;
+    }
     fileController_->ObtainLinearFileSize(infor.fileId, GetFilePath(infor.fileId), linearFileSize);
 }
 

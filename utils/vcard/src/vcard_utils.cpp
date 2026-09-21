@@ -385,8 +385,8 @@ std::vector<std::string> VCardUtils::ConstructListFromValue(const std::string &v
 {
     std::vector<std::string> result;
     std::string builder;
-    int32_t length = static_cast<int32_t>(value.length());
-    for (int32_t i = 0; i < length; i++) {
+    size_t length = value.length();
+    for (size_t i = 0; i < length; i++) {
         char ch = value[i];
         if (ch == '\\' && i < length - 1) {
             char nextCh = value[i + 1];
@@ -399,6 +399,7 @@ std::vector<std::string> VCardUtils::ConstructListFromValue(const std::string &v
             }
         } else if (ch == ';') {
             result.push_back(builder);
+            builder.clear();
         } else {
             builder += ch;
         }
