@@ -32,7 +32,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_observer_broker.h"
 #include "vector"
-#include "voip_call_state_info.h"s
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
