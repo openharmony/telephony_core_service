@@ -297,12 +297,12 @@ void NapiUtil::ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std:
     result.clear();
     bool isArray = false;
     NAPI_CALL_RETURN_VOID(env, napi_is_array(env, arrayValue, &isArray));
- 
+
     if (!isArray) {
         ThrowParameterError(env);
         return;
     }
- 
+
     uint32_t length = 0;
     NAPI_CALL_RETURN_VOID(env, napi_get_array_length(env, arrayValue, &length));
     if (length > MAX_ARRAY_LENGTH) {
@@ -311,7 +311,7 @@ void NapiUtil::ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std:
         return;
     }
     result.resize(length);
- 
+
     for (uint32_t i = 0; i < length; i++) {
         napi_value element = nullptr;
         NAPI_CALL_RETURN_VOID(env, napi_get_element(env, arrayValue, i, &element));
