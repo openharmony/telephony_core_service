@@ -18,6 +18,7 @@
 
 #include "core_manager_inner.h"
 #include "mock_sim_manager.h"
+#include "mock_tel_ril_manager.h"
 #include "string_ex.h"
 #include "sim_constant.h"
 
@@ -25,6 +26,17 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing;
 using namespace testing::ext;
+
+ACTION_P(SaveInnerEventId, result)
+{
+    *result = arg1->GetInnerEventId();
+}
+
+ACTION_P(SaveEventOwner, result)
+{
+    *result = arg1->GetOwner();
+}
+
 class CoreManagerInnerTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -34,6 +46,7 @@ public:
 
     CoreManagerInner mInner;
     std::shared_ptr<MockSimManager> mockeSimManager = std::make_shared<MockSimManager>();
+    std::shared_ptr<MockTelRilManager> mockTelRilManager = std::make_shared<MockTelRilManager>();
 };
 
 void CoreManagerInnerTest::SetUpTestCase() {}
@@ -349,6 +362,45 @@ HWTEST_F(CoreManagerInnerTest, SetPrimarySlotId_001, Function | MediumTest | Lev
         Return(TELEPHONY_ERR_SUCCESS));
     ret = mInner.SetPrimarySlotId(slotId, isUserSet);
     EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+HWTEST_F(CoreManagerInnerTest, SetPrimarySlot_001, Function | MediumTest | Level1)
+{
+    mInner.telRilManager_ = nullptr;
+    int32_t slotId = 0;
+    int32_t eventId = 1;
+    auto handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create());
+    int32_t ret = mInner.SetPrimarySlot(slotId, eventId, handler);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    mInner.telRilManager_ = mockTelRilManager;
+    EXPECT_CALL(*mockTelRilManager, SetPrimarySlot(_, _)).WillOnce(
+        Return(TELEPHONY_ERR_SUCCESS));
+    ret = mInner.SetPrimarySlot(slotId, eventId, handler);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number: SetPrimarySlot_002
+ * @tc.name: Test SetPrimarySlot with ril error and parameter passing
+ * @tc.desc: Verify SetPrimarySlot propagates the telRilManager error code and passes
+ *           slotId, eventId and handler to telRilManager correctly
+ */
+HWTEST_F(CoreManagerInnerTest, SetPrimarySlot_002, Function | MediumTest | Level1)
+{
+    mInner.telRilManager_ = mockTelRilManager;
+    int32_t slotId = 1;
+    uint32_t eventId = 2;
+    auto handler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::Create());
+    uint32_t innerEventId = 0;
+    std::shared_ptr<AppExecFwk::EventHandler> owner;
+    EXPECT_CALL(*mockTelRilManager, SetPrimarySlot(slotId, _)).WillOnce(DoAll(
+        SaveInnerEventId(&innerEventId), SaveEventOwner(&owner), Return(TELEPHONY_ERR_SLOTID_INVALID)));
+    int32_t ret = mInner.SetPrimarySlot(slotId, static_cast<int32_t>(eventId), handler);
+    EXPECT_EQ(ret, TELEPHONY_ERR_SLOTID_INVALID);
+
+    EXPECT_EQ(innerEventId, eventId);
+    EXPECT_EQ(owner, handler);
 }
 
 HWTEST_F(CoreManagerInnerTest, SetShowNumber_001, Function | MediumTest | Level1)

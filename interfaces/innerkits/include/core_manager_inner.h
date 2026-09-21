@@ -206,6 +206,8 @@ public:
         const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t GetPreferredNetworkPara(
         int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+    int32_t SetPrimarySlot(
+        int32_t slotId, int32_t eventId, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
     int32_t SwapM0M2SimCards(int32_t slotId);
     /******************** telRilManager end *******************/
     /******************** networkSearchManager start *******************/
