@@ -31,6 +31,7 @@
 namespace OHOS {
 namespace Telephony {
 static constexpr int32_t MAX_TEXT_LENGTH = 4096;
+static constexpr uint32_t MAX_ARRAY_LENGTH = 256;
 static constexpr const char *JS_ERROR_TELEPHONY_PERMISSION_DENIED_STRING = "Permission denied.";
 static constexpr const char *JS_ERROR_ILLEGAL_USE_OF_SYSTEM_API_STRING = "Non-system applications use system APIs.";
 static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
@@ -294,22 +295,27 @@ std::string NapiUtil::Get64StringFromValue(napi_env env, napi_value value)
 void NapiUtil::ConvertToArrayFromValue(napi_env env, napi_value arrayValue, std::vector<int32_t>& result)
 {
     result.clear();
-    bool isArray;
-    napi_is_array(env, arrayValue, &isArray);
-
+    bool isArray = false;
+    NAPI_CALL_RETURN_VOID(env, napi_is_array(env, arrayValue, &isArray));
+ 
     if (!isArray) {
         ThrowParameterError(env);
         return;
     }
-
-    uint32_t length;
-    napi_get_array_length(env, arrayValue, &length);
+ 
+    uint32_t length = 0;
+    NAPI_CALL_RETURN_VOID(env, napi_get_array_length(env, arrayValue, &length));
+    if (length > MAX_ARRAY_LENGTH) {
+        result.clear();
+        ThrowParameterError(env);
+        return;
+    }
     result.resize(length);
-
+ 
     for (uint32_t i = 0; i < length; i++) {
-        napi_value element;
-        napi_get_element(env, arrayValue, i, &element);
-        int32_t value;
+        napi_value element = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_get_element(env, arrayValue, i, &element));
+        int32_t value = 0;
         napi_status status = napi_get_value_int32(env, element, &value);
         if (status != napi_ok) {
             result.clear();

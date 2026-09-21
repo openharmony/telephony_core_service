@@ -1907,7 +1907,6 @@ int32_t CoreServiceStub::OnGetSimIO(MessageParcel &data, MessageParcel &reply)
         TELEPHONY_LOGE("Write reply result failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    reply.WriteInt32(result);
     reply.WriteInt32(response.sw1);
     reply.WriteInt32(response.sw2);
     reply.WriteString(response.response);

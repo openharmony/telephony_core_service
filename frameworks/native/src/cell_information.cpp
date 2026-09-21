@@ -866,7 +866,7 @@ void CdmaCellInformation::SetCdmaParam(int32_t baseId, int32_t latitude, int32_t
     sid_ = sid;
 }
 
-CdmaCellInformation::CdmaCellInformation(const CdmaCellInformation &cdmaCell)
+CdmaCellInformation::CdmaCellInformation(const CdmaCellInformation &cdmaCell) : CellInformation(cdmaCell)
 {
     baseId_ = cdmaCell.baseId_;
     latitude_ = cdmaCell.latitude_;
@@ -881,6 +881,7 @@ CdmaCellInformation::CdmaCellInformation(const CdmaCellInformation &cdmaCell)
 
 CdmaCellInformation &CdmaCellInformation::operator=(const CdmaCellInformation &cdmaCell)
 {
+    CellInformation::operator=(cdmaCell);
     baseId_ = cdmaCell.baseId_;
     latitude_ = cdmaCell.latitude_;
     longitude_ = cdmaCell.longitude_;

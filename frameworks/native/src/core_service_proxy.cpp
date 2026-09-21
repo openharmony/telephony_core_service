@@ -1421,30 +1421,33 @@ int32_t CoreServiceProxy::GetActiveSimAccountInfoList(std::vector<IccAccountInfo
     MessageOption option;
     if (!WriteInterfaceToken(data)) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList WriteInterfaceToken is false");
-        return false;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList Remote is null");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t st = remote->SendRequest(uint32_t(CoreServiceInterfaceCode::GET_ACTIVE_ACCOUNT_INFO_LIST), data,
         reply, option);
     if (st != ERR_NONE) {
         TELEPHONY_LOGE("GetActiveSimAccountInfoList failed, error code is %{public}d", st);
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = reply.ReadInt32();
     if (result == TELEPHONY_ERR_SUCCESS) {
         int32_t size = reply.ReadInt32();
         TELEPHONY_LOGI("CoreServiceProxy::GetActiveSimAccountInfoList size = %{public}d", size);
         if (size > MAX_VECTOR || size < 0) {
-            return false;
+            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
         iccAccountInfoList.clear();
         for (int i = 0; i < size; i++) {
             IccAccountInfo accountInfo;
-            accountInfo.ReadFromParcel(reply);
+            if (!accountInfo.ReadFromParcel(reply)) {
+                TELEPHONY_LOGE("CoreServiceProxy::GetActiveSimAccountInfoList ReadFromParcel failed");
+                return TELEPHONY_ERR_READ_DATA_FAIL;
+            }
             TELEPHONY_LOGD("CoreServiceProxy::GetActiveSimAccountInfoList success");
             iccAccountInfoList.emplace_back(accountInfo);
         }

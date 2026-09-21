@@ -545,7 +545,11 @@ void TelRilNetwork::BuildNetworkModeInfo(
 void TelRilNetwork::BuildNeighboringCellInfoList(
     std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo, const HDI::Ril::V1_1::CellListNearbyInfo &cellInfoList)
 {
-    cellListNearbyInfo->itemNum = cellInfoList.itemNum;
+    int32_t itemNum = cellInfoList.itemNum;
+    if (itemNum > static_cast<int32_t>(cellInfoList.cellNearbyInfo.size())) {
+        itemNum = static_cast<int32_t>(cellInfoList.cellNearbyInfo.size());
+    }
+    cellListNearbyInfo->itemNum = itemNum;
     for (auto info : cellInfoList.cellNearbyInfo) {
         CellNearbyInfo cellInfo;
         FillCellNearbyInfo(cellInfo, info);
@@ -646,7 +650,11 @@ void TelRilNetwork::FillCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ril:
 void TelRilNetwork::BuildNeighboringCellInfoList(
     std::shared_ptr<CellListNearbyInfo> cellListNearbyInfo, const HDI::Ril::V1_2::CellListNearbyInfo_1_2 &cellInfoList)
 {
-    cellListNearbyInfo->itemNum = cellInfoList.itemNum;
+    int32_t itemNum = cellInfoList.itemNum;
+    if (itemNum > static_cast<int32_t>(cellInfoList.cellNearbyInfo.size())) {
+        itemNum = static_cast<int32_t>(cellInfoList.cellNearbyInfo.size());
+    }
+    cellListNearbyInfo->itemNum = itemNum;
     for (auto info : cellInfoList.cellNearbyInfo) {
         CellNearbyInfo cellInfo;
         FillCellNearbyInfo(cellInfo, info);
@@ -749,7 +757,11 @@ void TelRilNetwork::FillNrCellNearbyInfo(CellNearbyInfo &cellInfo, const HDI::Ri
 void TelRilNetwork::BuildCurrentCellInfoList(
     std::shared_ptr<CellListCurrentInfo> currentCellList, const HDI::Ril::V1_1::CellListCurrentInfo &cellInfoList)
 {
-    currentCellList->itemNum = cellInfoList.itemNum;
+    int32_t itemNum = cellInfoList.itemNum;
+    if (itemNum > static_cast<int32_t>(cellInfoList.cellCurrentInfo.size())) {
+        itemNum = static_cast<int32_t>(cellInfoList.cellCurrentInfo.size());
+    }
+    currentCellList->itemNum = itemNum;
     for (auto &info : cellInfoList.cellCurrentInfo) {
         CurrentCellInfo cellInfo;
         FillCurrentCellInfo(cellInfo, info);
@@ -861,7 +873,11 @@ void TelRilNetwork::FillNrCurrentCellInfo(CurrentCellInfo &cellInfo, const HDI::
 void TelRilNetwork::BuildCurrentCellInformationList(std::shared_ptr<CellListCurrentInformation> currentCellList,
     const HDI::Ril::V1_1::CellListCurrentInfo_1_1 &cellInfoList)
 {
-    currentCellList->itemNum = cellInfoList.itemNum;
+    int32_t itemNum = cellInfoList.itemNum;
+    if (itemNum > static_cast<int32_t>(cellInfoList.cellCurrentInfo.size())) {
+        itemNum = static_cast<int32_t>(cellInfoList.cellCurrentInfo.size());
+    }
+    currentCellList->itemNum = itemNum;
     for (auto &info : cellInfoList.cellCurrentInfo) {
         CurrentCellInformation cellInfo;
         FillCurrentCellInformation(cellInfo, info);
@@ -981,7 +997,11 @@ void TelRilNetwork::FillNrCurrentCellInformation(
 void TelRilNetwork::BuildCurrentCellInformationList(std::shared_ptr<CellListCurrentInformation> currentCellList,
     const HDI::Ril::V1_2::CellListCurrentInfo_1_2 &cellInfoList)
 {
-    currentCellList->itemNum = cellInfoList.itemNum;
+    int32_t itemNum = cellInfoList.itemNum;
+    if (itemNum > static_cast<int32_t>(cellInfoList.cellCurrentInfo.size())) {
+        itemNum = static_cast<int32_t>(cellInfoList.cellCurrentInfo.size());
+    }
+    currentCellList->itemNum = itemNum;
     for (auto &info : cellInfoList.cellCurrentInfo) {
         CurrentCellInformation cellInfo;
         FillCurrentCellInformation(cellInfo, info);

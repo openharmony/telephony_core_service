@@ -1543,7 +1543,7 @@ int32_t CoreServiceClient::SimAuthentication(
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->SimAuthentication(slotId, authType, authData, response);
 }
@@ -1701,7 +1701,7 @@ int32_t CoreServiceClient::GetSimIO(int32_t slotId, int32_t command,
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         TELEPHONY_LOGE("proxy is null!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return proxy->GetSimIO(slotId, command, fileId, dataStr, path, response);
 }

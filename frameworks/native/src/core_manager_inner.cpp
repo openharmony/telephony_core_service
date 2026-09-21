@@ -2131,6 +2131,10 @@ int32_t CoreManagerInner::SendSimMatchedOperatorInfo(
         TELEPHONY_LOGE("simManager_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (slotId < 0 || slotId > SIM_SLOT_COUNT_MD) {
+        TELEPHONY_LOGE("SendSimMatchedOperatorInfo slotId is invalid");
+        return TELEPHONY_ERR_SLOTID_INVALID;
+    }
     return simManager_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
 }
 
@@ -2477,7 +2481,7 @@ int32_t CoreManagerInner::RefreshSimState(int32_t slotId)
 {
     if (simManager_ == nullptr) {
         TELEPHONY_LOGE("simManager_ is null!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return simManager_->RefreshSimState(slotId);
 }
