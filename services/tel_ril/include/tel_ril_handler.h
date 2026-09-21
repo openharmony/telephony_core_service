@@ -16,6 +16,7 @@
 #ifndef TEL_RIL_HANDLER_H
 #define TEL_RIL_HANDLER_H
 #include <set>
+#include <ffrt.h>
 
 #include "event_handler.h"
 #include "event_runner.h"
@@ -57,7 +58,7 @@ private:
 #endif
     std::atomic_int reqLockSerialNum_;
     std::atomic_int ackLockSerialNum_;
-    std::mutex mutexRunningLock_;
+    ffrt::mutex mutexRunningLock_;
     std::set<int32_t> reqSerialSet_;
 
 private:

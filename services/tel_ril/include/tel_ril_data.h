@@ -82,7 +82,7 @@ private:
         const HDI::Ril::V1_1::DataLinkBandwidthInfo &iDataLinkBandwidthInfo);
 
 private:
-    std::mutex responseErrorLock_;
+    ffrt::mutex responseErrorLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

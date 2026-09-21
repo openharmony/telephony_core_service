@@ -45,7 +45,7 @@ OperatorConfigCache::OperatorConfigCache(
 
 void OperatorConfigCache::ClearAllCache(int32_t slotId)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     ClearOperatorValue(slotId);
     ClearMemoryCache(slotId);
     OperatorFileParser::ClearFilesCache();
@@ -54,7 +54,7 @@ void OperatorConfigCache::ClearAllCache(int32_t slotId)
 
 void OperatorConfigCache::ClearMemoryAndOpkey(int32_t slotId)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     ClearOperatorValue(slotId);
     ClearMemoryCache(slotId);
     lock.unlock();
@@ -94,7 +94,7 @@ void OperatorConfigCache::UpdateCurrentOpc(int32_t slotId, OperatorConfig &poc)
     if (isUseCloudImsNV && isUpdateImsCapFromChipDone_) {
         UpdatevolteCap(slotId, poc);
     }
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     ClearMemoryCache(slotId);
     CopyOperatorConfig(poc, opc_);
     lock.unlock();
@@ -123,7 +123,7 @@ void OperatorConfigCache::UpdatevolteCap(int32_t slotId, OperatorConfig &opc)
     int32_t volteCapInChip = GetIntParameter(volteCapKey.c_str(), -1);
     TELEPHONY_LOGI("[slot%{public}d] volteCapInChip = %{public}d", slotId, volteCapInChip);
 
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     switch (volteCapInChip) {
         case IMS_SWITCH_OFF:
             UpdateOpcBoolValue(opc, "volte_supported_bool", false);
@@ -208,7 +208,7 @@ int32_t OperatorConfigCache::LoadOperatorConfig(int32_t slotId, OperatorConfig &
 
 int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &poc)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (opc_.configValue.size() > 0) {
         TELEPHONY_LOGD("get from memory");
         CopyOperatorConfig(opc_, poc);
@@ -222,7 +222,7 @@ int32_t OperatorConfigCache::GetOperatorConfigs(int32_t slotId, OperatorConfig &
 
 int32_t OperatorConfigCache::UpdateOperatorConfigs(int32_t slotId)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     ClearMemoryCache(slotId);
     lock.unlock();
     if (slotId == 0) {
@@ -316,7 +316,7 @@ void OperatorConfigCache::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &ev
             slotId_, static_cast<int>(simState));
         if (simState == SimState::SIM_STATE_NOT_PRESENT || simState == SimState::SIM_STATE_LOCKED ||
             simState == SimState::SIM_STATE_UNKNOWN) {
-            std::unique_lock<std::mutex> lock(mutex_);
+            std::unique_lock<ffrt::mutex> lock(mutex_);
             ClearOperatorValue(slotId_);
             modemSimMatchedOpNameCache_ = "";
             iccidCache_ = "";

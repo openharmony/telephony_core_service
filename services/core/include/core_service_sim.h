@@ -16,6 +16,7 @@
 #ifndef CORE_SERVICE_SIM_H
 #define CORE_SERVICE_SIM_H
 
+#include "ffrt.h"
 #include "i_raw_parcel_callback.h"
 #include "i_sim_manager.h"
 #include "event_handler.h"
@@ -141,7 +142,7 @@ private:
     std::shared_ptr<ISimManager> simManager_;
     std::shared_ptr<AppExecFwk::EventHandler> simGeneralHandler_;
     std::shared_ptr<AppExecFwk::EventHandler> simPinHandler_;
-    std::mutex handlerInitMutex_;
+    ffrt::mutex handlerInitMutex_;
 };
 
 } // namespace Telephony

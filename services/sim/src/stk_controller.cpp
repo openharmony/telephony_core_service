@@ -180,7 +180,7 @@ void StkController::BundleScanFinishedEventSubscriber::OnBundleScanFinished()
 
 void StkController::OnReceiveBms()
 {
-    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    std::unique_lock<ffrt::mutex> lock(retryQueueMutex_);
     if (!retryWantQueue_.empty() && !isProactiveCommandSucc) {
         if (remainTryCount_ == 0) {
             remainTryCount_ = MAX_RETRY_COUNT;
@@ -451,7 +451,7 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_STK_COMMAND);
     want.SetParam(PARAM_SLOTID, slotId_);
     want.SetParam(PARAM_MSG_CMD, cmdData);
-    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    std::unique_lock<ffrt::mutex> lock(retryQueueMutex_);
     if (!retryWantQueue_.empty()) {
         retryWantQueue_.push(want);
         TELEPHONY_LOGI("StkController[%{public}d] queue not empty, skip publish, direct enqueue", slotId_);
@@ -472,7 +472,7 @@ void StkController::OnSendRilProactiveCommand(const AppExecFwk::InnerEvent::Poin
 
 void StkController::RetrySendRilProactiveCommand()
 {
-    std::lock_guard<std::mutex> lock(retryQueueMutex_);
+    std::unique_lock<ffrt::mutex> lock(retryQueueMutex_);
     if (retryWantQueue_.empty()) {
         TELEPHONY_LOGI("StkController[%{public}d] retry queue empty", slotId_);
         return;
@@ -608,13 +608,13 @@ int32_t StkController::SendTerminalResponseCmd(const std::string &strCmd)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::unique_lock<std::mutex> terminalResponselock(stkMutex_);
+    std::unique_lock<ffrt::mutex> terminalResponselock(stkMutex_);
     terminalResponseResult_ = 0;
     responseFinished_ = false;
     telRilManager->SendTerminalResponseCmd(slotId_, strCmd, event);
     while (!responseFinished_) {
         TELEPHONY_LOGI("StkController[%{public}d]::SendTerminalResponseCmd() wait for the response to finish", slotId_);
-        if (stkCv_.wait_for(terminalResponselock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (stkCv_.wait_for(terminalResponselock, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendTerminalResponseCmd() wait timeout", slotId_);
             break;
         }
@@ -640,13 +640,13 @@ int32_t StkController::SendEnvelopeCmd(const std::string &strCmd)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::unique_lock<std::mutex> envelopelock(stkMutex_);
+    std::unique_lock<ffrt::mutex> envelopelock(stkMutex_);
     envelopeResponseResult_ = 0;
     responseFinished_ = false;
     telRilManager->SendEnvelopeCmd(slotId_, strCmd, event);
     while (!responseFinished_) {
         TELEPHONY_LOGI("StkController[%{public}d]::SendEnvelopeCmd() wait for the response to finish", slotId_);
-        if (stkCv_.wait_for(envelopelock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (stkCv_.wait_for(envelopelock, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendEnvelopeCmd() wait timeout", slotId_);
             break;
         }
@@ -672,14 +672,14 @@ int32_t StkController::SendCallSetupRequestResult(bool accept)
         return TELEPHONY_ERR_FAIL;
     }
 
-    std::unique_lock<std::mutex> callSetupRequestlock(stkMutex_);
+    std::unique_lock<ffrt::mutex> callSetupRequestlock(stkMutex_);
     callSetupResponseResult_ = TELEPHONY_ERR_FAIL;
     responseFinished_ = false;
     telRilManager->SendCallSetupRequestResult(slotId_, accept, event);
     while (!responseFinished_) {
         TELEPHONY_LOGI(
             "StkController[%{public}d]::SendCallSetupRequestResult() wait for the response to finish", slotId_);
-        if (stkCv_.wait_for(callSetupRequestlock, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (stkCv_.wait_for(callSetupRequestlock, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("StkController[%{public}d]::SendCallSetupRequestResult() wait timeout", slotId_);
             responseFinished_ = true;
         }

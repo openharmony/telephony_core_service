@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <charconv>
 #include <chrono>
-#include <mutex>
 
 #include "inner_event.h"
 #include "radio_event.h"
@@ -90,8 +89,8 @@ class IccOperatorPrivilegeController::LogicalStateMachine {
     static constexpr size_t TIME_SLICE = 100;
     bool isTransmitting_ = false;
     bool isAvailable_ = false;
-    mutable std::mutex mtx_;
-    mutable std::condition_variable cv_;
+    mutable ffrt::mutex mtx_;
+    mutable ffrt::condition_variable cv_;
 
 public:
     std::chrono::system_clock::time_point openChannelTp = std::chrono::system_clock::now();
@@ -157,7 +156,7 @@ public:
     bool SuccessLoaded(const size_t timeSlice = TIME_SLICE) const
     {
         auto now = std::chrono::system_clock::now();
-        std::unique_lock<std::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         while (isAvailable_ && isTransmitting_) {
             cv_.wait_for(lck, std::chrono::milliseconds(timeSlice));
             if (IsTimeOut(now)) {

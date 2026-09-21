@@ -19,6 +19,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <ffrt.h>
 
 #include "dialling_numbers_info.h"
 #include "i_tel_ril_manager.h"
@@ -61,12 +62,12 @@ private:
     std::weak_ptr<SimFileManager> simFileManager_;
     std::shared_ptr<Telephony::SimStateManager> simStateManager_ = nullptr;
     std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbersList_;
-    std::mutex mtx_;
-    std::mutex queryMtx_;
+    ffrt::mutex mtx_;
+    ffrt::mutex queryMtx_;
     bool hasEventDone_ = false;
     std::atomic<bool> hasQueryEventDone_{false};
     int slotId_ = 0;
-    std::condition_variable processWait_;
+    ffrt::condition_variable processWait_;
     SimState currentSimState_ = SimState::SIM_STATE_NOT_PRESENT;
     void ProcessSimStateChanged();
     void ProcessLoadDone(const AppExecFwk::InnerEvent::Pointer &event);

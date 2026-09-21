@@ -70,7 +70,7 @@ void VCardManager::DecodeListener::OnRawDataCreated(std::shared_ptr<VCardRawData
 int32_t VCardManager::ImportLock(
     const std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper, int32_t accountId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("DataShareHelper is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -317,7 +317,7 @@ bool VCardManager::ParameterTypeAndCharsetCheck(int32_t cardType, std::string ch
 int32_t VCardManager::ExportLock(std::string &path, std::shared_ptr<DataShare::DataShareHelper> dataShareHelper,
     const DataShare::DataSharePredicates &predicates, int32_t cardType, const std::string &charset)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (dataShareHelper == nullptr) {
         TELEPHONY_LOGE("DataShareHelper is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

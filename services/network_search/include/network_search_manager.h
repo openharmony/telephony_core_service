@@ -20,7 +20,6 @@
 #include <cinttypes>
 #include <list>
 #include <map>
-#include <mutex>
 #include <string>
 #include <tuple>
 
@@ -74,16 +73,16 @@ struct NetworkSearchManagerInner {
     NrMode nrMode_ = NrMode::NR_MODE_UNKNOWN;
     int32_t rrcConnectionStatus_ = 0;
     FrequencyType freqType_ = FrequencyType::FREQ_TYPE_UNKNOWN;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     bool isRadioFirstPowerOn_ = true;
     bool airplaneMode_ = false;
     int32_t preferredNetworkValue_ = PREFERRED_NETWORK_TYPE;
     int64_t serialNum_ = SERIAL_NUMBER_DEFAULT;
-    std::mutex msgNumMutex_;
-    std::mutex serialNumMutex_;
+    ffrt::mutex msgNumMutex_;
+    ffrt::mutex serialNumMutex_;
     bool hasCall_ = false;
     bool skipFlag_ = false;
-    std::mutex skipFlagMutex_;
+    ffrt::mutex skipFlagMutex_;
 
     bool RegisterSetting();
     bool UnRegisterSetting();
@@ -114,22 +113,22 @@ struct NetworkSearchManagerInner {
     }
     inline void InitMsgNum()
     {
-        std::lock_guard<std::mutex> lock(msgNumMutex_);
+        std::unique_lock<ffrt::mutex> lock(msgNumMutex_);
         msgNum_ = MSG_NUM;
     }
     inline bool CheckIsNeedNotify()
     {
-        std::lock_guard<std::mutex> lock(msgNumMutex_);
+        std::unique_lock<ffrt::mutex> lock(msgNumMutex_);
         return msgNum_ == 0 ? true : false;
     }
     inline void decMsgNum()
     {
-        std::lock_guard<std::mutex> lock(msgNumMutex_);
+        std::unique_lock<ffrt::mutex> lock(msgNumMutex_);
         msgNum_--;
     }
     inline int64_t IncreaseSerialNum()
     {
-        std::lock_guard<std::mutex> lock(serialNumMutex_);
+        std::unique_lock<ffrt::mutex> lock(serialNumMutex_);
         if (serialNum_ >= SERIAL_NUMBER_THRESHOLD) {
             // recycle the serial number.
             serialNum_ = SERIAL_NUMBER_DEFAULT;
@@ -138,17 +137,17 @@ struct NetworkSearchManagerInner {
     }
     inline int64_t GetSerialNum()
     {
-        std::lock_guard<std::mutex> lock(serialNumMutex_);
+        std::unique_lock<ffrt::mutex> lock(serialNumMutex_);
         return serialNum_;
     }
     inline void SetSkipUnsolRptFlag(bool res)
     {
-        std::lock_guard<std::mutex> lock(skipFlagMutex_);
+        std::unique_lock<ffrt::mutex> lock(skipFlagMutex_);
         skipFlag_ = res;
     }
     inline bool GetSkipUnsolRptFlag()
     {
-        std::lock_guard<std::mutex> lock(skipFlagMutex_);
+        std::unique_lock<ffrt::mutex> lock(skipFlagMutex_);
         return skipFlag_;
     }
 };
@@ -363,9 +362,9 @@ public:
     }
 
 public:
-    static std::mutex ctx_;
+    static ffrt::mutex ctx_;
     static bool ssbResponseReady_;
-    static std::condition_variable cv_;
+    static ffrt::condition_variable cv_;
 
 private:
     bool InitPointer(std::shared_ptr<NetworkSearchManagerInner> &inner, int32_t slotId);
@@ -394,8 +393,8 @@ private:
     std::shared_ptr<ManualNetworkScan> manualNetworkScan_ = nullptr;
     std::map<int32_t, std::shared_ptr<NetworkSearchManagerInner>> mapManagerInner_;
     std::list<ImsRegInfoCallbackRecord> listImsRegInfoCallbackRecord_;
-    std::mutex mutexInner_;
-    std::mutex mutexIms_;
+    ffrt::mutex mutexInner_;
+    ffrt::mutex mutexIms_;
     int32_t delayTime_ = 0;
     [[maybe_unused]] NrMode modem0EflCapability_ = NrMode::NR_MODE_UNKNOWN;
     [[maybe_unused]] NrMode modem1EflCapability_ = NrMode::NR_MODE_UNKNOWN;

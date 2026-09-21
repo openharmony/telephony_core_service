@@ -14,6 +14,7 @@
  */
 
 #include "icc_dialling_numbers_handler.h"
+#include <ffrt.h>
 
 using namespace std;
 using namespace OHOS::AppExecFwk;
@@ -30,7 +31,7 @@ constexpr int32_t MAX_EXT_BCD_LENGTH = 10;
 constexpr int32_t EXT_RECORD_TYPE_ADDITIONAL_DATA = 2;
 std::atomic_int IccDiallingNumbersHandler::nextSerialId_(1);
 std::map<int, std::shared_ptr<DiallingNumberLoadRequest>> IccDiallingNumbersHandler::requestMap_;
-static std::mutex requestLock_;
+static ffrt::mutex requestLock_;
 
 IccDiallingNumbersHandler::IccDiallingNumbersHandler(std::shared_ptr<IccFileController> fh)
     : TelEventHandler("IccDiallingNumbersHandler"), fileController_(fh)
@@ -41,7 +42,7 @@ IccDiallingNumbersHandler::IccDiallingNumbersHandler(std::shared_ptr<IccFileCont
 std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::CreateLoadRequest(
     int fileId, int exId, int indexNum, const std::string &pin2Str, const AppExecFwk::InnerEvent::Pointer &result)
 {
-    std::lock_guard<std::mutex> lock(requestLock_);
+    std::unique_lock<ffrt::mutex> lock(requestLock_);
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest =
         std::make_shared<DiallingNumberLoadRequest>(GetNextSerialId(), fileId, exId, indexNum, pin2Str, result);
     IccDiallingNumbersHandler::requestMap_.insert(std::make_pair(loadRequest->GetLoadId(), loadRequest));
@@ -450,7 +451,7 @@ AppExecFwk::InnerEvent::Pointer IccDiallingNumbersHandler::BuildCallerInfo(
 
 std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::FindLoadRequest(int serial)
 {
-    std::lock_guard<std::mutex> lock(requestLock_);
+    std::unique_lock<ffrt::mutex> lock(requestLock_);
     std::shared_ptr<DiallingNumberLoadRequest> loadRequest = nullptr;
     auto iter = IccDiallingNumbersHandler::requestMap_.find(serial);
     if (iter == IccDiallingNumbersHandler::requestMap_.end()) {
@@ -464,7 +465,7 @@ std::shared_ptr<DiallingNumberLoadRequest> IccDiallingNumbersHandler::FindLoadRe
 
 void IccDiallingNumbersHandler::ClearLoadRequest(int serial)
 {
-    std::lock_guard<std::mutex> lock(requestLock_);
+    std::unique_lock<ffrt::mutex> lock(requestLock_);
     IccDiallingNumbersHandler::requestMap_.erase(serial);
 }
 

@@ -83,7 +83,7 @@ void EsimController::CloseCaEsim()
 void EsimController::ProcessCommandByCa(int slotId, const std::string &cmdData)
 {
     TELEPHONY_LOGI("EsimController:ProcessCommandByCa start.");
-    std::lock_guardffrt::mutex locker(caMutex_);
+    std::unique_lock<ffrt::mutex> locker(caMutex_);
     caEsimHandler_ = dlopen(ESIM_CA_LIBPATH.c_str(), RTLD_LAZY);
     if (caEsimHandler_ == NULL) {
         TELEPHONY_LOGE("open lib: %{public}s failed", ESIM_CA_LIBPATH.c_str());
@@ -103,7 +103,7 @@ void EsimController::SetVerifyResult(int slotId, bool isVerifySuccess)
         return;
     }
 
-    std::lock_guard<ffrt::mutex> lock(setVerifyResultMutex_);
+    std::unique_lock<ffrt::mutex> lock(setVerifyResultMutex_);
 
     bool hasSimCard = false;
     CoreManagerInner::GetInstance().HasSimCard(slotId, hasSimCard);

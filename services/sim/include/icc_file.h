@@ -178,8 +178,8 @@ protected:
     bool fileQueried_ = false;
     bool lockQueried_ = false;
     bool waitResult_ = false;
-    static std::mutex mtx_;
-    std::condition_variable processWait_;
+    static ffrt::mutex mtx_;
+    ffrt::condition_variable processWait_;
     const int HEXADECIMAL = 16;
     const size_t OPL_5G_LENGTH = 10;
     const uint8_t BYTE_NUM = 0xFF;
@@ -213,7 +213,7 @@ protected:
     int slotId_ = 0;
     void SetVoiceMailByOperator(std::string spn);
     std::shared_ptr<VoiceMailConstants> voiceMailConfig_ = nullptr;
-    std::shared_mutex voiceMailMutex_;
+    ffrt::shared_mutex voiceMailMutex_;
     bool isOnOpkeyLoaded_{false};
     bool isSimRecordLoaded_{false};
 

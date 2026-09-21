@@ -292,13 +292,13 @@ std::string IsimFile::ObtainIsoCountryCode()
 
 std::string IsimFile::GetVoiceMailNumber()
 {
-    std::shared_lock<std::shared_mutex> lock(voiceMailMutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
     return voiceMailNum_;
 }
 
 void IsimFile::SetVoiceMailNumber(const std::string mailNumber)
 {
-    std::unique_lock<std::shared_mutex> lock(voiceMailMutex_);
+    std::unique_lock<ffrt::shared_mutex> lock(voiceMailMutex_);
     voiceMailNum_ = mailNumber;
 }
 

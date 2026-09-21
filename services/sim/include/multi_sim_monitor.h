@@ -166,9 +166,9 @@ private:
     std::weak_ptr<IOperatorConfigHisysevent> operatorConfigHisysevent_{};
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     ParameterChgPtr parameterChgPtr_ = nullptr;
-    std::mutex mutexInner_;
-    std::mutex mutexForData_;
-    std::mutex mutexForUserId_;
+    ffrt::mutex mutexInner_;
+    ffrt::mutex mutexForData_;
+    ffrt::mutex mutexForUserId_;
     std::atomic<int32_t> remainCount_ = 3;
     int32_t maxSlotCount_ = 0;
     int32_t userIdRecordIndex_ = 1;

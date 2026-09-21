@@ -53,7 +53,7 @@ bool SimManager::OnInit(int32_t slotCount)
 void SimManager::InitMultiSimObject()
 {
     // Program memory
-    std::lock_guard<ffrt::shared_mutex> lck(mtx_);
+    std::unique_lock<ffrt::shared_mutex> lck(mtx_);
     if (slotCount_ < 0 || slotCount_ > SIM_SLOT_COUNT_MD + 1) {
         TELEPHONY_LOGI("SimManager InitMultiSimObject, slotCount = %{public}d is out of range", slotCount_);
         return;
@@ -94,7 +94,7 @@ int32_t SimManager::InitTelExtraModule(int32_t slotId)
     if (slotId != SIM_SLOT_2) {
         return TELEPHONY_ERROR;
     }
-    std::lock_guard<ffrt::shared_mutex> lck(mtx_);
+    std::unique_lock<ffrt::shared_mutex> lck(mtx_);
     if (simStateManager_[slotId] != nullptr && simFileManager_[slotId] != nullptr) {
         TELEPHONY_LOGI("SimManager InitTelExtraModule, slotId = %{public}d, has been inited, return.", slotId);
         return TELEPHONY_SUCCESS;

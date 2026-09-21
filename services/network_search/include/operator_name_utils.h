@@ -16,7 +16,7 @@
 #ifndef OPERATOR_NAME_UTILS_H
 #define OPERATOR_NAME_UTILS_H
 
-#include <mutex>
+#include <ffrt.h>
 
 #include "cJSON.h"
 #include "iosfwd"
@@ -55,7 +55,7 @@ private:
     static OperatorNameUtils operatorNameUtils_;
     bool isInit_ = false;
     std::vector<OperatorNameCust> nameArray_ = {};
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

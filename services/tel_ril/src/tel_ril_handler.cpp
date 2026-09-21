@@ -56,7 +56,7 @@ void TelRilHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 void TelRilHandler::OnInit(void)
 {
 #ifdef ABILITY_POWER_SUPPORT
-    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(mutexRunningLock_);
     auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
     if (ackRunningLock_ == nullptr) {
         ackRunningLock_ = powerMgrClient.CreateRunningLock(
@@ -75,7 +75,7 @@ void TelRilHandler::OnInit(void)
 void TelRilHandler::ApplyRunningLock(int32_t lockType, int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
-    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(mutexRunningLock_);
     if (ackRunningLock_ == nullptr) {
         auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
         ackRunningLock_ = powerMgrClient.CreateRunningLock(
@@ -111,7 +111,7 @@ void TelRilHandler::ApplyRunningLock(int32_t lockType, int32_t serialId)
 void TelRilHandler::ReduceRunningLock(int32_t lockType, int32_t serialId)
 {
 #ifdef ABILITY_POWER_SUPPORT
-    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGD("ReduceRunningLock, reqRunningCountSize:%{public}d", static_cast<int>(reqSerialSet_.size()));
     if ((reqRunningLock_ != nullptr) && (lockType == NORMAL_RUNNING_LOCK)) {
         if (reqSerialSet_.size() > 1) {
@@ -143,7 +143,7 @@ void TelRilHandler::ReleaseRunningLock(int32_t lockType)
         TELEPHONY_LOGE("reqRunningLock_ or ackRunningLock_ is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lockRequest(mutexRunningLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(mutexRunningLock_);
     TELEPHONY_LOGD("ReleaseRunningLock, lockType:%{public}d", lockType);
     if (lockType == NORMAL_RUNNING_LOCK) {
         reqSerialSet_.clear();

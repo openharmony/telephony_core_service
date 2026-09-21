@@ -16,7 +16,7 @@
 #ifndef OHOS_VCARD_MANAGER_H
 #define OHOS_VCARD_MANAGER_H
 
-#include "mutex"
+#include <ffrt.h>
 #include "vcard_configuration.h"
 #include "vcard_contact.h"
 #include "vcard_decoder.h"
@@ -80,7 +80,7 @@ private:
 
 private:
     std::shared_ptr<VCardManager::DecodeListener> listener_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

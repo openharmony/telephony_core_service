@@ -16,7 +16,7 @@
 #ifndef OBSERVER_HANDLER_H
 #define OBSERVER_HANDLER_H
 
-#include <mutex>
+#include <ffrt.h>
 #include <map>
 
 #include "event_handler.h"
@@ -43,7 +43,7 @@ public:
 
     void NotifyObserver(int32_t what, int64_t param)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::unique_lock<ffrt::mutex> lock(mutex_);
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
             TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
@@ -58,7 +58,7 @@ public:
     template<typename T>
     void NotifyObserver(int32_t what, std::shared_ptr<T> object)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::unique_lock<ffrt::mutex> lock(mutex_);
         auto iter = observerHandlerMap_.find(what);
         if (iter == observerHandlerMap_.end()) {
             TELEPHONY_LOGE("ObserverHandler NotifyObserver %{public}d not register", what);
@@ -71,7 +71,7 @@ public:
 
 private:
     std::map<int32_t, std::list<std::shared_ptr<AppExecFwk::EventHandler>>> observerHandlerMap_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

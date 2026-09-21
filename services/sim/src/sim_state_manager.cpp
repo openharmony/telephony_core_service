@@ -34,7 +34,7 @@ SimStateManager::SimStateManager(std::shared_ptr<ITelRilManager> telRilManager)
 
 void SimStateManager::Init(int32_t slotId)
 {
-    std::lock_guard<ffrt::mutex> lck(mtx_);
+    std::unique_lock<ffrt::mutex> lck(mtx_);
     TELEPHONY_LOGE("SimStateManager::Init()");
     if (simStateRun_ == STATE_RUNNING) {
         TELEPHONY_LOGE("simStateHandle_ is running");
@@ -63,7 +63,7 @@ void SimStateManager::RegisterCoreNotify(const HANDLE &handler, int what)
         TELEPHONY_LOGE("RegisterCoreNotify(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<ffrt::mutex> lck(mtx_);
+    std::unique_lock<ffrt::mutex> lck(mtx_);
     simStateHandle_->RegisterCoreNotify(handler, what);
 }
 
@@ -73,7 +73,7 @@ void SimStateManager::UnRegisterCoreNotify(const HANDLE &handler, int what)
         TELEPHONY_LOGE("UnRegisterCoreNotify(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<ffrt::mutex> lck(mtx_);
+    std::unique_lock<ffrt::mutex> lck(mtx_);
     simStateHandle_->UnRegisterCoreNotify(handler, what);
 }
 
@@ -81,7 +81,7 @@ bool SimStateManager::HasSimCard()
 {
     bool ret = false;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->HasSimCard();
     }
     return ret;
@@ -91,7 +91,7 @@ SimState SimStateManager::GetSimState()
 {
     SimState ret = SimState::SIM_STATE_UNKNOWN;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetSimState();
     }
     return ret;
@@ -101,7 +101,7 @@ IccSimStatus SimStateManager::GetSimIccStatus()
 {
     IccSimStatus ret = IccSimStatus::ICC_CONTENT_UNKNOWN;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetSimIccStatus();
     }
     return ret;
@@ -113,7 +113,7 @@ void SimStateManager::SetSimState(SimState simState)
         TELEPHONY_LOGI("SimStateManager::SetSimState(), simStateHandle_ is nullptr!!!");
         return;
     }
-    std::lock_guard<ffrt::mutex> lck(mtx_);
+    std::unique_lock<ffrt::mutex> lck(mtx_);
     simStateHandle_->SetSimState(simState);
 }
 
@@ -129,7 +129,7 @@ CardType SimStateManager::GetCardType()
 {
     CardType ret = CardType::UNKNOWN_CARD;
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         ret = simStateHandle_->GetCardType();
     }
     return ret;
@@ -138,7 +138,7 @@ CardType SimStateManager::GetCardType()
 std::string SimStateManager::GetIccid()
 {
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         return simStateHandle_->GetIccid();
     }
     return "";
@@ -147,7 +147,7 @@ std::string SimStateManager::GetIccid()
 std::string SimStateManager::GetOldIccid()
 {
     if (simStateHandle_ != nullptr) {
-        std::lock_guard<ffrt::mutex> lck(mtx_);
+        std::unique_lock<ffrt::mutex> lck(mtx_);
         return simStateHandle_->GetOldIccid();
     }
     return "";
@@ -170,7 +170,7 @@ int32_t SimStateManager::SetModemInit(bool state)
 
 void SimStateManager::SyncCmdResponse()
 {
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = true;
     TELEPHONY_LOGI("SimStateManager::SyncCmdResponse(), responseReady_ = %{public}d", responseReady_);
     cv_.notify_one();
@@ -178,7 +178,7 @@ void SimStateManager::SyncCmdResponse()
 
 void SimStateManager::SyncSimMatchResponse()
 {
-    std::unique_lock<std::mutex> lck(stx_);
+    std::unique_lock<ffrt::mutex> lck(stx_);
     responseSimMatchReady_ = true;
     TELEPHONY_LOGI("SimStateManager::SyncSimMatchResponse(), responseSimMatchReady = %{public}d",
                    responseSimMatchReady_);
@@ -241,12 +241,12 @@ int32_t SimStateManager::UnlockPuk(
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->UnlockPuk(slotId, newPin, puk);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPuk::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -281,12 +281,12 @@ int32_t SimStateManager::AlterPin(
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->AlterPin(slotId, newPin, oldPin);
     while (!responseReady_) {
         TELEPHONY_LOGI("AlterPin::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -328,12 +328,12 @@ int32_t SimStateManager::SetLockState(int32_t slotId, const LockInfo &options, L
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->SetLockState(slotId, options);
     while (!responseReady_) {
         TELEPHONY_LOGI("SetLockState::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_LONG_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -375,12 +375,12 @@ int32_t SimStateManager::GetLockState(int32_t slotId, LockType lockType, LockSta
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->GetLockState(slotId, lockType);
     while (!responseReady_) {
         TELEPHONY_LOGI("GetLockState::wait, response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -409,12 +409,12 @@ int32_t SimStateManager::UnlockPin2(int32_t slotId, const std::string &pin2, Loc
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->UnlockPin2(slotId, pin2);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPin2::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -442,12 +442,12 @@ int32_t SimStateManager::UnlockPuk2(
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->UnlockPuk2(slotId, newPin2, puk2);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockPuk2::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -475,12 +475,12 @@ int32_t SimStateManager::AlterPin2(
         TELEPHONY_LOGE("simStateHandle_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->AlterPin2(slotId, newPin2, oldPin2);
     while (!responseReady_) {
         TELEPHONY_LOGI("AlterPin2::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -505,12 +505,12 @@ int32_t SimStateManager::RefreshSimState(int32_t slotId)
 {
     int32_t ret = 0;
     if (simStateHandle_ != nullptr) {
-        std::unique_lock<std::mutex> lck(ctx_);
+        std::unique_lock<ffrt::mutex> lck(ctx_);
         responseReady_ = false;
         simStateHandle_->ObtainRealtimeIccStatus(slotId);
         while (!responseReady_) {
             TELEPHONY_LOGI("RefreshSimState::wait(), response = false");
-            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
                 break;
             }
         }
@@ -526,12 +526,12 @@ int32_t SimStateManager::UnlockSimLock(int32_t slotId, const PersoLockInfo &lock
         TELEPHONY_LOGE("UnlockSimLock(), simStateHandle_ is nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     simStateHandle_->UnlockSimLock(slotId, lockInfo);
     while (!responseReady_) {
         TELEPHONY_LOGI("UnlockSimLock::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -563,13 +563,13 @@ int32_t SimStateManager::SimAuthentication(
         TELEPHONY_LOGE("SimAuthentication(), simStateHandle_ is nullptr!!!");
         return SIM_AUTH_FAIL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     int32_t ret = SIM_AUTH_FAIL;
     ret = simStateHandle_->SimAuthentication(slotId, authType, authData);
     while (!responseReady_) {
         TELEPHONY_LOGI("SimAuthentication::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -588,12 +588,12 @@ int32_t SimStateManager::SendSimMatchedOperatorInfo(
         TELEPHONY_LOGE("SendSimMatchedOperatorInfo(), simStateHandle_ is nullptr!!!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<std::mutex> lck(stx_);
+    std::unique_lock<ffrt::mutex> lck(stx_);
     responseSimMatchReady_ = false;
     simStateHandle_->SendSimMatchedOperatorInfo(slotId, state, operName, operKey);
     while (!responseSimMatchReady_) {
         TELEPHONY_LOGI("SendSimMatchedOperatorInfo::wait(), response = false");
-        if (sv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (sv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }
@@ -609,13 +609,13 @@ int32_t SimStateManager::GetSimIO(
         TELEPHONY_LOGE("GetSimIO(), simStateHandle_ is nullptr!!!");
         return SIM_AUTH_FAIL;
     }
-    std::unique_lock<std::mutex> lck(ctx_);
+    std::unique_lock<ffrt::mutex> lck(ctx_);
     responseReady_ = false;
     int32_t ret = SIM_AUTH_FAIL;
     ret = simStateHandle_->GetSimIO(slotId, requestInfo);
     while (!responseReady_) {
         TELEPHONY_LOGI("GetSimIO::wait(), response = false");
-        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lck, std::chrono::seconds(WAIT_TIME_SECOND)) == ffrt::cv_status::timeout) {
             break;
         }
     }

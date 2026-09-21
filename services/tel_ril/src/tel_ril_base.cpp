@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Telephony {
 std::atomic_int TelRilBase::nextSerialId_(1);
 std::map<int32_t, std::shared_ptr<TelRilRequest>> TelRilBase::requestMap_;
-std::mutex TelRilBase::requestLock_;
+ffrt::mutex TelRilBase::requestLock_;
 ffrt::mutex dealLock_;
 std::shared_ptr<TelRilHandler> TelRilBase::handler_;
 
@@ -34,20 +34,20 @@ TelRilBase::TelRilBase(int32_t slotId, sptr<HDI::Ril::V1_5::IRil> rilInterface,
 
 void TelRilBase::ResetRilInterface(sptr<HDI::Ril::V1_5::IRil> rilInterface)
 {
-    std::lock_guard<ffrt::mutex> lock(dealLock_);
+    std::unique_lock<ffrt::mutex> lock(dealLock_);
     rilInterface_ = rilInterface;
 }
 
 sptr<HDI::Ril::V1_5::IRil> TelRilBase::GetRilInterface()
 {
-    std::lock_guard<ffrt::mutex> lock(dealLock_);
+    std::unique_lock<ffrt::mutex> lock(dealLock_);
     return rilInterface_;
 }
 
 std::shared_ptr<TelRilRequest> TelRilBase::CreateTelRilRequest(const AppExecFwk::InnerEvent::Pointer &result)
 {
     std::shared_ptr<TelRilRequest> telRilRequest = std::make_shared<TelRilRequest>(GetNextSerialId(), result);
-    std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(TelRilBase::requestLock_);
     TelRilBase::requestMap_.insert(std::make_pair(telRilRequest->serialId_, telRilRequest));
     TELEPHONY_LOGD("CreateTelRilRequest serialId : %{public}d", static_cast<int32_t>(telRilRequest->serialId_));
     if (handler_ != nullptr) {
@@ -70,7 +70,7 @@ std::shared_ptr<TelRilRequest> TelRilBase::FindTelRilRequest(const RadioResponse
 {
     int32_t serial = responseInfo.serial;
     std::shared_ptr<TelRilRequest> telRilRequest = nullptr;
-    std::lock_guard<std::mutex> lockRequest(TelRilBase::requestLock_);
+    std::unique_lock<ffrt::mutex> lockRequest(TelRilBase::requestLock_);
     auto iter = TelRilBase::requestMap_.find(serial);
     if (iter == TelRilBase::requestMap_.end()) {
         TELEPHONY_LOGD("FindTelRilRequest not found serial:%{public}d", serial);

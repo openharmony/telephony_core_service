@@ -16,7 +16,6 @@
 #ifndef OHOS_VCARD_CONSRACT_H
 #define OHOS_VCARD_CONSRACT_H
 #include <memory>
-#include <mutex>
 #include <type_traits>
 #include <vector>
 

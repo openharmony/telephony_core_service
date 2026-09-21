@@ -196,7 +196,7 @@ private:
 #endif // CORE_SERVICE_SATELLITE
     const int32_t INVALID_SLOT_ID = -1;
     bool isCsCapable_ = true;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 
 private:
     class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {

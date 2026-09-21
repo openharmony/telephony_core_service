@@ -21,6 +21,7 @@
 #include <functional>
 #include <iostream>
 #include <vector>
+#include <ffrt.h>
 
 enum MccCountry {
     MCC_GR = 202,
@@ -319,7 +320,7 @@ private:
     static void InitIndiaTables();
 
     static std::vector<MccAccessData> mccAccessDataTable_;
-    static std::mutex mccMutex_;
+    static ffrt::mutex mccMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

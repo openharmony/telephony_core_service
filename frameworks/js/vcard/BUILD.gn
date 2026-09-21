@@ -71,6 +71,7 @@ ohos_shared_library("vcard") {
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

@@ -221,7 +221,7 @@ int32_t MultiSimMonitor::CheckUpdateOpcVersion()
 {
     if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_ != nullptr &&
         TELEPHONY_EXT_WRAPPER.updateOpcVersion_ != nullptr) {
-        std::lock_guard<std::mutex> lock(mutexForData_);
+        std::unique_lock<ffrt::mutex> lock(mutexForData_);
         if (TELEPHONY_EXT_WRAPPER.checkOpcVersionIsUpdate_()) {
             TELEPHONY_LOGI("need update config");
             SetBlockLoadOperatorConfig(true);
@@ -544,7 +544,7 @@ void MultiSimMonitor::UserSwitchEventSubscriber::OnUserSwitched(int32_t userId)
 
 void MultiSimMonitor::UpdateUserIdRecord(int32_t userId, bool &isRecord)
 {
-    std::lock_guard<std::mutex> lock(mutexForUserId_);
+    std::unique_lock<ffrt::mutex> lock(mutexForUserId_);
     for (int i = 0; i < MAX_USERID_NUM; i++) {
         if (userIdRecord_[i] == userId) {
             isRecord = true;
@@ -559,7 +559,7 @@ void MultiSimMonitor::UpdateUserIdRecord(int32_t userId, bool &isRecord)
 
 void MultiSimMonitor::ClearUserId()
 {
-    std::lock_guard<std::mutex> lock(mutexForUserId_);
+    std::unique_lock<ffrt::mutex> lock(mutexForUserId_);
     for (int i = 0; i < MAX_USERID_NUM; i++) {
         userIdRecord_[i] = 0;
     }
@@ -665,7 +665,7 @@ int32_t MultiSimMonitor::RegisterSimAccountCallback(
         TELEPHONY_LOGE("callback is nullptr");
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::unique_lock<ffrt::mutex> lock(mutexInner_);
     bool isExisted = false;
     for (auto &iter : listSimAccountCallbackRecord_) {
         if (iter.simAccountCallback == nullptr) {
@@ -703,7 +703,7 @@ int32_t MultiSimMonitor::UnregisterSimAccountCallback(const sptr<SimAccountCallb
         TELEPHONY_LOGE("callback is nullptr");
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::unique_lock<ffrt::mutex> lock(mutexInner_);
     bool isSuccess = false;
     auto iter = listSimAccountCallbackRecord_.begin();
     for (; iter != listSimAccountCallbackRecord_.end();) {
@@ -728,7 +728,7 @@ int32_t MultiSimMonitor::UnregisterSimAccountCallback(const sptr<SimAccountCallb
 
 std::list<MultiSimMonitor::SimAccountCallbackRecord> MultiSimMonitor::GetSimAccountCallbackRecords()
 {
-    std::lock_guard<std::mutex> lock(mutexInner_);
+    std::unique_lock<ffrt::mutex> lock(mutexInner_);
     return listSimAccountCallbackRecord_;
 }
 

@@ -1173,9 +1173,9 @@ HWTEST_F(EsimFileTest, CommMergeRecvData001, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
-    std::mutex mtx;
+    ffrt::mutex mtx;
     bool lag = false;
-    std::condition_variable cv;
+    ffrt::condition_variable cv;
     int32_t eventId = 0;
     bool isHandleFinish = false;
     IccFileData newRecvData;
@@ -1190,9 +1190,9 @@ HWTEST_F(EsimFileTest, CommMergeRecvData002, TestSize.Level1)
     std::shared_ptr<TelRilManager> telRilManager = std::make_shared<TelRilManager>();
     std::shared_ptr<Telephony::SimStateManager> simStateManager = std::make_shared<SimStateManager>(telRilManager);
     std::shared_ptr<Telephony::EsimFile> esimFile = std::make_shared<EsimFile>(telRilManager);
-    std::mutex mtx;
+    ffrt::mutex mtx;
     bool lag = false;
-    std::condition_variable cv;
+    ffrt::condition_variable cv;
     int32_t eventId = 0;
     bool isHandleFinish = false;
     IccFileData newRecvData;

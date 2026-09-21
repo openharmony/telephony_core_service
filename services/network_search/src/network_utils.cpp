@@ -139,7 +139,7 @@ static const std::map<PreferredNetworkMode, int32_t> mapRafFromNetworkMode = {
 };
 
 std::map<int64_t, std::shared_ptr<NetworkSearchCallbackInfo>> NetworkUtils::networkSearchCacheMap_;
-std::mutex NetworkUtils::callbackMapMutex_;
+ffrt::mutex NetworkUtils::callbackMapMutex_;
 ffrt::mutex NetworkUtils::callbackIndexMutex_;
 int64_t NetworkUtils::callbackIndex64bit_ = MIN_INDEX;
 int32_t NetworkUtils::GetRafFromNetworkMode(PreferredNetworkMode PreferredNetworkMode)
@@ -174,7 +174,7 @@ bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<Netwo
 {
     TELEPHONY_LOGI("NetworkUtils::AddNetworkSearchCallBack index=(%{public}" PRId64 ")", index);
     if (callback != nullptr) {
-        std::lock_guard<std::mutex> guard(callbackMapMutex_);
+        std::unique_lock<ffrt::mutex> guard(callbackMapMutex_);
         auto result = networkSearchCacheMap_.emplace(index, callback);
         return result.second;
     }
@@ -184,7 +184,7 @@ bool NetworkUtils::AddNetworkSearchCallBack(int64_t index, std::shared_ptr<Netwo
 
 int64_t NetworkUtils::GetCallbackIndex64bit()
 {
-    std::lock_guard<ffrt::mutex> guard(callbackIndexMutex_);
+    std::unique_lock<ffrt::mutex> guard(callbackIndexMutex_);
     if (callbackIndex64bit_ > MAX_INDEX || callbackIndex64bit_ < MIN_INDEX) {
         callbackIndex64bit_ = MIN_INDEX;
     }
@@ -195,7 +195,7 @@ std::shared_ptr<NetworkSearchCallbackInfo> NetworkUtils::FindNetworkSearchCallba
 {
     TELEPHONY_LOGI("NetworkUtils::FindNetworkSearchCallback index=%{public}" PRId64 "", index);
 
-    std::lock_guard<std::mutex> guard(callbackMapMutex_);
+    std::unique_lock<ffrt::mutex> guard(callbackMapMutex_);
     auto iter = networkSearchCacheMap_.find(index);
     if (iter != networkSearchCacheMap_.end()) {
         std::shared_ptr<NetworkSearchCallbackInfo> callback = iter->second;
@@ -207,7 +207,7 @@ std::shared_ptr<NetworkSearchCallbackInfo> NetworkUtils::FindNetworkSearchCallba
 bool NetworkUtils::RemoveCallbackFromMap(int64_t index)
 {
     TELEPHONY_LOGI("NetworkUtils::RemoveCallbackFromMap index=%{public}" PRId64 "", index);
-    std::lock_guard<std::mutex> guard(callbackMapMutex_);
+    std::unique_lock<ffrt::mutex> guard(callbackMapMutex_);
     return (networkSearchCacheMap_.erase(index));
 }
 

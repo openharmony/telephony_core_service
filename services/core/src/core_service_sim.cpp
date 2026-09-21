@@ -27,7 +27,7 @@ namespace Telephony {
 void CoreServiceSim::AsyncSimGeneralExecute(const std::function<void()> task)
 {
     if (simGeneralHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        std::unique_lock<ffrt::mutex> lock(handlerInitMutex_);
         if (simGeneralHandler_ == nullptr) {
             auto simManagerRunner = AppExecFwk::EventRunner::Create("simManagerHandler",
                 AppExecFwk::ThreadMode::FFRT);
@@ -40,7 +40,7 @@ void CoreServiceSim::AsyncSimGeneralExecute(const std::function<void()> task)
 void CoreServiceSim::AsyncSimPinExecute(const std::function<void()> task)
 {
     if (simPinHandler_ == nullptr) {
-        std::lock_guard<std::mutex> lock(handlerInitMutex_);
+        std::unique_lock<ffrt::mutex> lock(handlerInitMutex_);
         if (simPinHandler_ == nullptr) {
             auto simManagerRunner = AppExecFwk::EventRunner::Create("simPinManagerHandler",
                 AppExecFwk::ThreadMode::FFRT);

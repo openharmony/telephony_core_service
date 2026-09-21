@@ -49,6 +49,7 @@ ohos_fuzztest("MccCountryCodeFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "drivers_interface_ril:ril_idl_headers",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
