@@ -17,6 +17,7 @@
 #define OHOS_I_TELEPHONY_STATE_NOTIFY_H
 
 #include "telephony_observer_broker.h"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -71,6 +72,14 @@ public:
      */
     virtual int32_t UpdateCallStateForSlotId(
         int32_t slotId, int32_t callStatus, const std::u16string &number) = 0;
+
+    /**
+     * UpdateVoIPCallState
+     *
+     * @param info VoIP call state information
+     * @return int32_t TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateVoIPCallState(const VoIPCallStateInfo &info) = 0;
 
     /**
      * UpdateSignalInfo

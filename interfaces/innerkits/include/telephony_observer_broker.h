@@ -21,6 +21,7 @@
 #include "network_state.h"
 #include "signal_information.h"
 #include "sim_state_type.h"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,6 +43,7 @@ public:
         ON_CALL_STATE_EX_UPDATED,
         ON_CCALL_STATE_UPDATED,
         ON_SIM_ACTIVE_STATE_UPDATED,
+        ON_VOIP_STATE_UPDATED,
     };
 
     virtual void OnCellularDataConnectStateUpdated(
@@ -65,6 +67,7 @@ public:
     virtual void OnCCallStateUpdated(
         int32_t slotId, int32_t callState, const std::u16string &phoneNumber) = 0;
     virtual void OnSimActiveStateUpdated(int32_t slotId, bool enable) = 0;
+    virtual void OnVoIPStateUpdated(const VoIPCallStateInfo &info) = 0;
 
 public:
     static const uint32_t OBSERVER_MASK_NETWORK_STATE = 0x00000001;
@@ -80,6 +83,7 @@ public:
     static const uint32_t OBSERVER_MASK_ICC_ACCOUNT = 0x00000400;
     static const uint32_t OBSERVER_MASK_CCALL_STATE = 0x00000800;
     static const uint32_t OBSERVER_MASK_SIM_ACTIVE_STATE = 0x00001000;
+    static const uint32_t OBSERVER_MASK_VOIP_CALL_STATE = 0x00004000;
 };
 } // namespace Telephony
 } // namespace OHOS

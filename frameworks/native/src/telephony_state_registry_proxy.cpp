@@ -32,6 +32,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_observer_broker.h"
 #include "vector"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -451,6 +452,42 @@ int32_t TelephonyStateRegistryProxy::UpdateSimActiveState(int32_t slotId, bool a
     }
     int result = remote->SendRequest(
         static_cast<uint32_t>(StateNotifyInterfaceCode::SIM_ACTIVR_STATE), in, out, option);
+    if (result == ERR_NONE) {
+        result = out.ReadInt32();
+        return result;
+    }
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+}
+
+int32_t TelephonyStateRegistryProxy::UpdateVoIPCallState(const VoIPCallStateInfo &info)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(TelephonyStateRegistryProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteString(info.appName)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteString(info.contactName)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(static_cast<int32_t>(info.callType))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(static_cast<int32_t>(info.callState))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(info.isVoiceAnswerSupported)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int result = remote->SendRequest(
+        static_cast<uint32_t>(StateNotifyInterfaceCode::VOIP_CALL_STATE), in, out, option);
     if (result == ERR_NONE) {
         result = out.ReadInt32();
         return result;
