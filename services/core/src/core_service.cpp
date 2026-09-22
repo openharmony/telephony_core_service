@@ -146,8 +146,12 @@ void CoreService::OnStop()
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
     DelayedSingleton<ImsCoreServiceClient>::GetInstance()->UnInit();
-    networkSearchManager_->DeInit();
-    telRilManager_->DeInit();
+    if (networkSearchManager_ != nullptr) {
+        networkSearchManager_->DeInit();
+    }
+    if (telRilManager_ != nullptr) {
+        telRilManager_->DeInit();
+    }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_EXT
     TELEPHONY_EXT_WRAPPER.DeInitTelephonyExtWrapper();
 #endif

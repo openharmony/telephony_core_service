@@ -843,6 +843,9 @@ static std::string GetStringProperty(napi_env env, napi_value object, const std:
         size_t charLength = 0;
         napi_status getStringStatus = napi_get_value_string_utf8(env, value, chars, BUF_SIZE, &charLength);
         if (getStringStatus == napi_ok && charLength > 0) {
+            if (charLength >= BUF_SIZE) {
+                charLength = BUF_SIZE - 1;
+            }
             return std::string(chars, charLength);
         }
     }
@@ -2046,7 +2049,7 @@ static napi_value SendUpdateCellLocationRequest(napi_env env, napi_callback_info
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<SwitchRadioContext>();
+    auto asyncContext = std::make_unique<struct SendUpdateCellLocationRequest>();
     if (parameterCount == PARAMETER_COUNT_ZERO) {
         asyncContext->slotId = GetDefaultSlotId();
     } else if (parameterCount == PARAMETER_COUNT_ONE) {
@@ -2345,7 +2348,7 @@ static napi_value GetPrimarySlotId(napi_env env, napi_callback_info info)
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<SwitchRadioContext>();
+    auto asyncContext = std::make_unique<GetPrimarySlotIdContext>();
     if (parameterCount == PARAMETER_COUNT_ONE) {
         NAPI_CALL(env, napi_create_reference(env, parameters[0], DEFAULT_REF_COUNT, &asyncContext->callbackRef));
     }
