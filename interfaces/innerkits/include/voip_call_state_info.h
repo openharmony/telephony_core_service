@@ -25,14 +25,10 @@ namespace Telephony {
  * @brief Public VoIP call type, combining media form and participant form.
  */
 enum class VoIPCallType {
-    /** Audio one-to-one call */
-    VOICE_ONE_TO_ONE = 0,
-    /** Video one-to-one call */
-    VIDEO_ONE_TO_ONE = 1,
-    /** Audio conference call */
-    VOICE_CONFERENCE = 2,
-    /** Video conference call */
-    VIDEO_CONFERENCE = 3,
+    /** Voice call */
+    VOICE = 0,
+    /** Video call */
+    VIDEO = 1,
 };
  
 /**
