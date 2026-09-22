@@ -67,7 +67,7 @@ struct VoIPCallStateInfo {
     /** Contact name of the remote party */
     std::string contactName = "";
     /** Call type (media form + participant form) */
-    VoIPCallType callType = VoIPCallType::VOICE_ONE_TO_ONE;
+    VoIPCallType callType = VoIPCallType::VOICE;
     /** Current call state */
     VoIPCallState callState = VoIPCallState::IDLE;
     /** Whether the VoIP app supports answering the current call as a voice call */
