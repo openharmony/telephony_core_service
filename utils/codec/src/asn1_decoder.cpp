@@ -94,7 +94,7 @@ std::shared_ptr<Asn1Node> Asn1Decoder::BuildAsn1Node(const uint32_t tag, uint32_
         dataLen = static_cast<uint32_t>(byteLen);
     } else {
         uint32_t lenLen = static_cast<uint32_t>(byteLen & MAX_INT8);
-        if (offset + lenLen > end_) {
+        if (offset > end_ || lenLen > end_ - offset) {
             TELEPHONY_LOGE("Cannot parse tag at position: %{public}u", tagStart);
             return nullptr;
         }
