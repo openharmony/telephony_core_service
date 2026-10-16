@@ -21,6 +21,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "vcard_constant.h"
+#include "parse_label_int.h"
 #include "vcard_utils.h"
 
 namespace OHOS {
@@ -354,7 +355,10 @@ int32_t VCardConstructor::ConstructPhones(std::shared_ptr<VCardContact> contact)
         std::string labelName = data->GetLabelName();
         int64_t type = static_cast<int64_t>(PhoneVcType::NUM_HOME);
         if (VCardUtils::IsNum(labelId) && labelId.size() < LABEL_ID_MAX_LENGTH + 1) {
-            type = std::stoll(labelId);
+            int64_t parsed = 0;
+            if (ParseLabelInt64(labelId, parsed)) {
+                type = parsed;
+            }
         }
         if (phoneNumberEncodedCallback_ != nullptr) {
             phoneNumberEncodedCallback_->onCallback(number, type, labelName, false);
@@ -484,9 +488,7 @@ int32_t VCardConstructor::ConstructEmails(std::shared_ptr<VCardContact> contact)
         }
         int32_t labelId = static_cast<int32_t>(EmailType::EMAIL_OTHER);
         std::string labelIdStr = data->GetLabelId();
-        if (!labelIdStr.empty() && VCardUtils::IsNum(labelIdStr)) {
-            labelId = std::stoi(labelIdStr);
-        }
+        (void)ParseLabelInt32(labelIdStr, labelId);
         auto it = emailSet.find(email);
         if (it != emailSet.end()) {
             continue;
@@ -718,8 +720,9 @@ int32_t VCardConstructor::ConstructEvents(std::shared_ptr<VCardContact> contact)
             continue;
         }
         int32_t labelId = static_cast<int32_t>(EventType::EVENT_OTHER);
-        if (VCardUtils::IsNum(eventData->GetLabelId())) {
-            labelId = eventMap[std::stoi(eventData->GetLabelId())];
+        int32_t parsed = 0;
+        if (ParseLabelInt32(eventData->GetLabelId(), parsed)) {
+            labelId = eventMap[parsed];
         }
         if (labelId == static_cast<int32_t>(EventHM4Type::EVENT_HM4_BIRTHDAY)) {
             if (eventData->GetEventDate().empty()) {
@@ -765,7 +768,13 @@ void VCardConstructor::AddTelLine(const std::string &labelId, const std::string 
     if (!paramTypes.empty()) {
         AddParamTypes(paramTypes);
     } else if (VCardUtils::IsNum(labelId) && labelId.size() < LABEL_ID_MAX_LENGTH + 1) {
-        auto phoneType = static_cast<PhoneVcType>(std::stoll(labelId));
+        int64_t parsed = 0;
+        if (!ParseLabelInt64(labelId, parsed)) {
+            result_ << DATA_SEPARATOR << number;
+            result_ << END_OF_LINE;
+            return;
+        }
+        auto phoneType = static_cast<PhoneVcType>(parsed);
         if (phoneType == PhoneVcType::CUSTOM_LABEL && !VCardUtils::IsContainsInvisibleChar(labelName)) {
             paramTypes.push_back("X-" + labelName);
             AddParamTypes(paramTypes);
